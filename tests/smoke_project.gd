@@ -44,8 +44,21 @@ func _check_tileset() -> void:
 	_expect(source != null, "tileset source 0 is not an atlas source")
 	if source == null:
 		return
-	_expect(source.get_tiles_count() == 4, "expected 4 tiles, found %d" % source.get_tiles_count())
+	var expected_tiles: int = _tiles_json_count()
+	_expect(expected_tiles > 0, "tiles.json missing or empty")
+	_expect(source.get_tiles_count() == expected_tiles, "tileset has %d tiles, tiles.json lists %d" % [source.get_tiles_count(), expected_tiles])
 	_expect(source.texture != null, "atlas source has no texture")
+
+
+func _tiles_json_count() -> int:
+	var file: FileAccess = FileAccess.open("res://art/build/tiles.json", FileAccess.READ)
+	if file == null:
+		return 0
+	var data: Variant = JSON.parse_string(file.get_as_text())
+	if data is Dictionary:
+		var tiles: Dictionary = (data as Dictionary).get("tiles", {})
+		return tiles.size()
+	return 0
 
 
 func _check_sprite_atlas() -> void:
