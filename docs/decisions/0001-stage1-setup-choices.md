@@ -2,7 +2,7 @@
 
 Date: 2026-10-15 · Status: accepted by default, the human may overrule
 
-- **Palette:** DawnBringer 16. Hex values read from the Lospec palette JSON (<https://lospec.com/palette-list/dawnbringer-16>) on 2026-10-15 and stored in `art/palette.json` with one symbol per color. The game design wants cozy and readable art with gold and red combat cues; DB16 has a gold (`e`) and a red (`6`).
+- **Palette:** (superseded by [0002](0002-totoy36-palette.md)) DawnBringer 16. Hex values read from the Lospec palette JSON (<https://lospec.com/palette-list/dawnbringer-16>) on 2026-10-15 and stored in `art/palette.json` with one symbol per color. The game design wants cozy and readable art with gold and red combat cues; DB16 has a gold (`e`) and a red (`6`).
 - **Art tools live in `tools/art/`**, not in `art/`, so `art/` holds only art (sources, palette, generated output). Claude Code owns `tools/`.
 - **Sprite source format:** text grids with a `# kind:` header; see `AGENTS.md` section 5.
 - **Generated art is committed** (`art/build/`), so Godot works from a fresh clone without Python.

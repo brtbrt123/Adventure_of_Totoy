@@ -26,7 +26,7 @@ Project: **Adventure of Totoy**, a 2D top-down, story-driven action fantasy game
 | Tile size | 16x16. Characters may be 16x24 or 32x32, bosses larger. The grid sets the rhythm, not every sprite size. |
 | Rendering | Base resolution **320x180**, window default 1280x720, nearest-neighbor filtering, **integer scaling only**, stretch mode `viewport`. No smoothing, no fractional scaling. Renderer: `gl_compatibility`. |
 | Transparency | Fully transparent or fully opaque pixels only. No semi-transparent edges. |
-| Palette | One fixed palette in `art/palette.json` (DawnBringer 16, hex values verified against Lospec). Every sprite and tile may only use these colors. |
+| Palette | One fixed palette in `art/palette.json`: **Totoy 36** (36 colors, approved by the human on 2026-10-15; replaces DawnBringer 16). Every sprite and tile may only use these colors. Colors come in ramps (grass, dirt, stone, water, skin) with close mid-tones: use neighbouring steps of one ramp for shading. **Gold (`x`,`y`) and red (`z`,`A`) are reserved for combat cues** (gold parry diamonds, red warnings, hit effects): tiles must not use them (the validator fails), and environment props should not either. |
 | Version control | Git. One branch per task, named `agent/<label>/<slug>`. **Nothing merges automatically. Never merge to `main` yourself.** |
 
 ## 3. Architecture: two layers with a hard boundary
@@ -57,7 +57,7 @@ harness/         later: router, checks, prompts, logs (see docs/HARNESS.md)
 
 ## 5. Art pipeline (Codex works here)
 
-Sprites are **text grids** in `art/src/<name>.txt`. One character per pixel; each character is a palette symbol from `art/palette.json` (`0`-`9`, `a`-`f`); `.` is transparent. File header lines:
+Sprites are **text grids** in `art/src/<name>.txt`. One character per pixel; each character is a palette symbol from `art/palette.json` (`0`-`9`, `a`-`z`, `A`; see the `name` of each entry, for example `5` = grass_4); `.` is transparent. File header lines:
 
 ```
 # kind: tile        (or: sprite)
@@ -68,6 +68,7 @@ Other lines starting with `#` that are not `key: value` headers are comments. Th
 
 Rules the validator enforces:
 - tiles are exactly 16x16; sprites have width and height that are multiples of 8 (max 256);
+- tiles do not use the reserved combat symbols listed in `palette.json` (`reserved`);
 - all rows have the same width; every symbol is in the palette; PNG outputs contain only fully opaque palette colors or fully transparent pixels;
 - tiles marked `seamless: true`: every color pair touching across the wrapped edge must also touch somewhere inside the tile. (This is a heuristic. It catches hard seams, not every mismatch; the human judges the 3x3 repeat on the contact sheet.)
 

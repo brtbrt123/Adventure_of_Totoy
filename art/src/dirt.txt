@@ -1,18 +1,18 @@
 # kind: tile
 # seamless: true
-4444444444444444
-4414444444744444
-4444444444444444
-4444474444444144
-4444444444444444
-1444444444444444
-4444444144444444
-4444444444447444
-4444444444444444
-4474444444444444
-4444444444444414
-4444414444444444
-4444444444444444
-4444444447444444
-1444444444444444
-4444444444444414
+bbbbbbbbbbbbbbbb
+bb9bbbbbbbcbbbbb
+bbbbbbbbbbbbbbbb
+bbbbbcbbbbbbb9bb
+bbbbbbbbbbbbbbbb
+9bbbbbbbbbbbbbbb
+bbbbbbb9bbbbbbbb
+bbbbbbbbbbbbcbbb
+bbbbbbbbbbbbbbbb
+bbcbbbbbbbbbbbbb
+bbbbbbbbbbbbbb9b
+bbbbb9bbbbbbbbbb
+bbbbbbbbbbbbbbbb
+bbbbbbbbbcbbbbbb
+9bbbbbbbbbbbbbbb
+bbbbbbbbbbbbbb9b

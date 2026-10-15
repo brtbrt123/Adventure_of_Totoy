@@ -49,8 +49,21 @@ class BadArt(unittest.TestCase):
 
     def test_off_palette_symbol(self) -> None:
         rows = ["b" * 16] * 16
-        rows[3] = "bbbbzbbbbbbbbbbb"
-        self.check_fails({"bad.txt": "# kind: tile\n" + "\n".join(rows) + "\n"}, "off-palette symbol 'z'")
+        rows[3] = "bbbb!bbbbbbbbbbb"
+        self.check_fails({"bad.txt": "# kind: tile\n" + "\n".join(rows) + "\n"}, "off-palette symbol '!'")
+
+    def test_reserved_combat_color_in_tile(self) -> None:
+        rows = ["b" * 16] * 16
+        rows[3] = "bbbbxbbbbbbbbbbb"  # x = combat gold, reserved
+        self.check_fails({"bad.txt": "# kind: tile\n" + "\n".join(rows) + "\n"}, "reserved combat color 'x'")
+
+    def test_reserved_combat_color_allowed_in_sprite(self) -> None:
+        rows = ["b" * 8] * 8
+        rows[3] = "bbbxxbbb"
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "ok.txt").write_text("# kind: sprite\n" + "\n".join(rows) + "\n", encoding="utf-8")
+            result = run_validator("--src", tmp, "--no-png")
+        self.assertEqual(result.returncode, 0, result.stdout)
 
     def test_ragged_rows(self) -> None:
         rows = ["b" * 16] * 16
@@ -78,7 +91,7 @@ class BadPng(unittest.TestCase):
     def check_png_fails(self, pixel: tuple[int, int, int, int], expected: str) -> None:
         with tempfile.TemporaryDirectory() as src, tempfile.TemporaryDirectory() as build:
             (Path(src) / "ok.txt").write_text(GOOD_TILE, encoding="utf-8")
-            image = Image.new("RGBA", (16, 16), (0x6D, 0xAA, 0x2C, 255))
+            image = Image.new("RGBA", (16, 16), (0x7F, 0x93, 0x48, 255))  # grass_4 in art/palette.json
             image.putpixel((2, 2), pixel)
             image.save(Path(build) / "bad.png")
             result = run_validator("--src", src, "--build", build)
@@ -86,7 +99,7 @@ class BadPng(unittest.TestCase):
         self.assertIn(expected, result.stdout)
 
     def test_partial_transparency(self) -> None:
-        self.check_png_fails((0x6D, 0xAA, 0x2C, 128), "partially transparent")
+        self.check_png_fails((0x7F, 0x93, 0x48, 128), "partially transparent")
 
     def test_off_palette_color(self) -> None:
         self.check_png_fails((1, 2, 3, 255), "off-palette pixel")

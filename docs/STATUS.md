@@ -8,7 +8,7 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 - `AGENTS.md` (self-contained shared rules, roles, fixed decisions, commands), `CLAUDE.md` (`@AGENTS.md`).
 - `docs/GAME_DESIGN.md` (the owner's design draft, unchanged), `docs/architecture.md` (first draft of the core/presentation interface), `docs/ROUTING.md`, `docs/HARNESS.md`, `docs/decisions/0001-stage1-setup-choices.md`, empty `harness/` skeleton.
 - `project.godot`: 320x180 base, window 1280x720, stretch `viewport` + `integer`, nearest filter, pixel snapping, `gl_compatibility`.
-- `art/palette.json`: DB16, hex values read from the Lospec palette JSON.
+- `art/palette.json`: **Totoy 36** (on branch `agent/palette/totoy36`, approved 2026-10-15; replaces DB16, see `docs/decisions/0002-totoy36-palette.md`). Gold and red are reserved for combat cues; the validator rejects them in tiles. Existing placeholder art was remapped; Codex has not yet redrawn the terrain with the new palette. Branch `agent/tile/terrain-redo` (DB16) is obsolete, as is `agent/tile/grass-polish`; neither was deleted.
 - Art tools in `tools/art/`: build (PNGs, atlases, `tileset.tres`), validator, contact-sheet preview. Placeholder art: `grass`, `dirt`, `stone`, `water` tiles and `totoy_idle_down` (16x24).
 
 ## Verified (run on this machine)

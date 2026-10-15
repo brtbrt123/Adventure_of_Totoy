@@ -33,6 +33,7 @@ class Palette:
     transparent: str
     by_symbol: dict[str, RGB]
     rgb_set: set[RGB]
+    reserved: frozenset[str] = frozenset()  # symbols tiles must not use (combat gold/red)
 
 
 def load_palette(path: Path = PALETTE_PATH) -> Palette:
@@ -55,7 +56,11 @@ def load_palette(path: Path = PALETTE_PATH) -> Palette:
         by_symbol[symbol] = (int(hex_value[1:3], 16), int(hex_value[3:5], 16), int(hex_value[5:7], 16))
     if not by_symbol:
         raise PaletteError("palette.json: no colors defined")
-    return Palette(transparent, by_symbol, set(by_symbol.values()))
+    reserved = frozenset(data.get("reserved", []))
+    unknown = reserved - set(by_symbol)
+    if unknown:
+        raise PaletteError(f"palette.json: 'reserved' lists symbols not in the palette: {sorted(unknown)}")
+    return Palette(transparent, by_symbol, set(by_symbol.values()), reserved)
 
 
 @dataclass
@@ -123,6 +128,11 @@ def check_sprite(sprite: Sprite, palette: Palette) -> list[str]:
         for x, ch in enumerate(row):
             if ch not in allowed:
                 errors.append(f"off-palette symbol {ch!r} at x={x}, y={y}")
+    if sprite.kind == "tile":
+        for y, row in enumerate(sprite.rows):
+            for x, ch in enumerate(row):
+                if ch in palette.reserved:
+                    errors.append(f"reserved combat color {ch!r} used in a tile at x={x}, y={y} (gold/red are for combat cues only)")
     if errors:
         return errors  # size and seam checks need a clean rectangular grid
     if sprite.kind == "tile":

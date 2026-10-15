@@ -1,18 +1,18 @@
 # kind: tile
 # seamless: true
-afffaaa3afffaaa3
-aaaaaaa3aaaaaaa3
-aaaaaaa3aaaaaaa3
-aaaaaaa3aaaaaaa3
-aaaaaaa3aaaaaaa3
-aaaaaaa3aaaaaaa3
-7777777377777773
-3333333333333333
-aaa3afffaaa3afff
-aaa3aaaaaaa3aaaa
-aaa3aaaaaaa3aaaa
-aaa3aaaaaaa3aaaa
-aaa3aaaaaaa3aaaa
-aaa3aaaaaaa3aaaa
-7773777777737777
-3333333333333333
+hjjjhhhfhjjjhhhf
+hhhhhhhfhhhhhhhf
+hhhhhhhfhhhhhhhf
+hhhhhhhfhhhhhhhf
+hhhhhhhfhhhhhhhf
+hhhhhhhfhhhhhhhf
+gggggggfgggggggf
+ffffffffffffffff
+hhhfhjjjhhhfhjjj
+hhhfhhhhhhhfhhhh
+hhhfhhhhhhhfhhhh
+hhhfhhhhhhhfhhhh
+hhhfhhhhhhhfhhhh
+hhhfhhhhhhhfhhhh
+gggfgggggggfgggg
+ffffffffffffffff

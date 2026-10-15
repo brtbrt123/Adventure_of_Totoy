@@ -1,24 +1,52 @@
 {
-  "name": "DawnBringer 16 (DB16)",
-  "source": "https://lospec.com/palette-list/dawnbringer-16",
-  "verified": "2026-10-15, hex values read from the Lospec palette JSON",
+  "name": "Totoy 36",
+  "source": "Original palette drafted for this project (docs/decisions/0002-totoy36-palette.md); ground hues measured from the human's style references, not copied.",
+  "approved": "2026-10-15 by the human",
   "transparent": ".",
+  "reserved": ["x", "y", "z", "A"],
   "colors": [
-    {"symbol": "0", "name": "night",   "hex": "#140c1c"},
-    {"symbol": "1", "name": "plum",    "hex": "#442434"},
-    {"symbol": "2", "name": "navy",    "hex": "#30346d"},
-    {"symbol": "3", "name": "charcoal","hex": "#4e4a4e"},
-    {"symbol": "4", "name": "brown",   "hex": "#854c30"},
-    {"symbol": "5", "name": "forest",  "hex": "#346524"},
-    {"symbol": "6", "name": "red",     "hex": "#d04648"},
-    {"symbol": "7", "name": "olive",   "hex": "#757161"},
-    {"symbol": "8", "name": "blue",    "hex": "#597dce"},
-    {"symbol": "9", "name": "orange",  "hex": "#d27d2c"},
-    {"symbol": "a", "name": "steel",   "hex": "#8595a1"},
-    {"symbol": "b", "name": "leaf",    "hex": "#6daa2c"},
-    {"symbol": "c", "name": "skin",    "hex": "#d2aa99"},
-    {"symbol": "d", "name": "sky",     "hex": "#6dc2ca"},
-    {"symbol": "e", "name": "gold",    "hex": "#dad45e"},
-    {"symbol": "f", "name": "cream",   "hex": "#deeed6"}
+    {"symbol": "0", "name": "ink",       "hex": "#1c1824"},
+    {"symbol": "1", "name": "cream",     "hex": "#f4ecd6"},
+
+    {"symbol": "2", "name": "grass_1",   "hex": "#26301c"},
+    {"symbol": "3", "name": "grass_2",   "hex": "#3f5226"},
+    {"symbol": "4", "name": "grass_3",   "hex": "#5a7a3a"},
+    {"symbol": "5", "name": "grass_4",   "hex": "#7f9348"},
+    {"symbol": "6", "name": "grass_5",   "hex": "#a0b159"},
+    {"symbol": "7", "name": "grass_6",   "hex": "#c2cb7c"},
+
+    {"symbol": "8", "name": "dirt_1",    "hex": "#2e211e"},
+    {"symbol": "9", "name": "dirt_2",    "hex": "#4d3a30"},
+    {"symbol": "a", "name": "dirt_3",    "hex": "#62453d"},
+    {"symbol": "b", "name": "dirt_4",    "hex": "#765f47"},
+    {"symbol": "c", "name": "dirt_5",    "hex": "#987959"},
+    {"symbol": "d", "name": "dirt_6",    "hex": "#bc9c72"},
+
+    {"symbol": "e", "name": "stone_1",   "hex": "#2f3231"},
+    {"symbol": "f", "name": "stone_2",   "hex": "#444b49"},
+    {"symbol": "g", "name": "stone_3",   "hex": "#5a625e"},
+    {"symbol": "h", "name": "stone_4",   "hex": "#737769"},
+    {"symbol": "i", "name": "stone_5",   "hex": "#9a9886"},
+    {"symbol": "j", "name": "stone_6",   "hex": "#c6bfaa"},
+
+    {"symbol": "k", "name": "water_1",   "hex": "#24365c"},
+    {"symbol": "l", "name": "water_2",   "hex": "#33508a"},
+    {"symbol": "m", "name": "water_3",   "hex": "#4a72ae"},
+    {"symbol": "n", "name": "water_4",   "hex": "#6f9bc8"},
+    {"symbol": "o", "name": "water_5",   "hex": "#a7cde0"},
+    {"symbol": "p", "name": "water_6",   "hex": "#e0f0ec"},
+
+    {"symbol": "q", "name": "skin_1",    "hex": "#8f5f4c"},
+    {"symbol": "r", "name": "skin_2",    "hex": "#c28a6c"},
+    {"symbol": "s", "name": "skin_3",    "hex": "#e6bf9d"},
+
+    {"symbol": "t", "name": "teal_1",    "hex": "#3f7f7a"},
+    {"symbol": "u", "name": "teal_2",    "hex": "#6aa89a"},
+    {"symbol": "v", "name": "lilac",     "hex": "#8a6fa8"},
+
+    {"symbol": "x", "name": "gold",      "hex": "#f2c744"},
+    {"symbol": "y", "name": "gold_dark", "hex": "#b8862a"},
+    {"symbol": "z", "name": "red",       "hex": "#e0463f"},
+    {"symbol": "A", "name": "red_dark",  "hex": "#92303a"}
   ]
 }
