@@ -347,8 +347,8 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	var anchor: Vector2 = ArenaAnimation.HERO_ANCHOR if actor.visual_id == &"totoy" else Vector2(size.x * 0.5, size.y - 4)
 	var destination: Rect2 = Rect2(at - anchor, size)
 	if (actor.visual_id == &"totoy" and ArenaAnimation.mirrored(actor.facing)) or (actor.visual_id != &"totoy" and ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))):
-		# CanvasItem mirrors a texture region when the destination width is negative.
-		destination.position.x += size.x
+		# CanvasItem mirrors a texture region when the destination width is negative. The rect keeps its
+		# position: shifting it by the width drew mirrored (left-facing) sprites a full sprite width to the right.
 		destination.size.x = -destination.size.x
 	if not silhouette_only:
 		draw_texture_rect_region(sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
