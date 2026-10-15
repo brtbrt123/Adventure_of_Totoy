@@ -30,6 +30,8 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 A light-tier task (`gpt-6-luna`, `--sandbox workspace-write`, worktree `..\Adventure_of_Totoy_worktrees\grass-polish`, branch `agent/tile/grass-polish`) changed nothing. Codex could not start any shell: `Failed to create unified exec process: helper_unknown_error: setup refresh had errors`. `codex doctor` shows `sandbox backend: elevated`, `sandbox provisioning: failed`. So the Windows sandbox for Codex is not set up on this machine; the model, login and prompt were not the problem. Not fixed, because re-provisioning is a system-level change and the bypass flags were ruled out. The worktree is clean and still exists (not deleted). Also seen: `failed to refresh available models: request timed out` (network, minor).
 
+**Resolved the same day.** Cause: the Codex *desktop app* was running and held `node_repl.exe` open (Windows error 32 in `~/.codex/.sandbox/sandbox.<date>.log`), so the sandbox setup refresh failed. After fully quitting the desktop app (tray icon too), `codex sandbox cmd /c echo ok` worked and the task ran. **Rule for headless runs and the Stage 2 harness: quit the Codex desktop app first**, or the sandbox may fail again. Re-test run: `gpt-6-luna`, `workspace-write`, branch `agent/tile/grass-polish` (commit `ae1c462`): changed 3 pixels of `grass.txt` (gold flecks), regenerated `art/build/`, stayed in its folders, ran validate/build/preview, did not commit. Claude Code reran validate and tests (pass) and confirmed the rebuild is identical. Not merged; waiting for the human's look at the contact sheet.
+
 ## Open questions for the human
 
 1. Add `C:\Tools\Godot` to PATH (as `godot` / `godot_console`)? Not done; the docs use the full path.
