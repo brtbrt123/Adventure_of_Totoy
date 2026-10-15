@@ -96,7 +96,15 @@ $godot = "C:\Tools\Godot\Godot_v4.7.2-stable_win64_console.exe"   # not on PATH
 & $godot --headless --path . --script res://tests/smoke_project.gd  # prints SMOKE OK; exit 0
 ```
 
-Notes: `--headless --quit` alone fails with "no main scene defined" until the project has a main scene; use the smoke script instead. Redirect output to a file (`*> out.txt`) rather than piping into `Select-Object -First`, which kills Godot early. Commit the `.import` and `.uid` files Godot generates next to assets and scripts; `.godot/` is ignored. No test framework is chosen yet; do not add an addon (GUT, GdUnit4, ...) without asking the human.
+Core tests (plain headless GDScript, no addon; exit 0 when all pass):
+
+```powershell
+& $godot --headless --path . --script res://tests/run_tests.gd
+```
+
+Test files are `tests/core/test_*.gd` and extend `res://tests/test_case.gd`; every `test_*` method runs. Gameplay numbers live in `core/tuning.gd`.
+
+Notes: `--headless --quit` alone fails with "no main scene defined" until the project has a main scene; use the smoke script instead. Redirect output to a file (`*> out.txt`) rather than piping into `Select-Object -First`, which kills Godot early. Commit the `.import` and `.uid` files Godot generates next to assets and scripts; `.godot/` is ignored. The test framework is the small runner in `tests/`; do not add an addon (GUT, GdUnit4, ...) without asking the human.
 
 ## 7. Working rules
 

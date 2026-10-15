@@ -11,6 +11,12 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 - `art/palette.json`: **Totoy 36** (on branch `agent/palette/totoy36`, approved 2026-10-15; replaces DB16, see `docs/decisions/0002-totoy36-palette.md`). Gold and red are reserved for combat cues; the validator rejects them in tiles. Existing placeholder art was remapped; Codex has not yet redrawn the terrain with the new palette. The obsolete DB16 branches `agent/tile/terrain-redo` and `agent/tile/grass-polish` were deleted at the human's request. Current Codex result: branch `agent/tile/terrain-v2` (18 tile variants on Totoy 36, built by Codex `gpt-6.1-sol` from the human's references), merged with the palette branch; waiting for the human's review. Not merged anywhere.
 - Art tools in `tools/art/`: build (PNGs, atlases, `tileset.tres`), validator, contact-sheet preview. Placeholder art: `grass`, `dirt`, `stone`, `water` tiles and `totoy_idle_down` (16x24).
 
+## Combat core slice (branch `agent/logic/combat-core`, 2026-10-15)
+
+`core/` now holds a headless, deterministic combat slice: the player (sword, dash with i-frames, gold parry with perfect/early quality, Edge) against the Mossbound Colossus (gold slam, red sweep, red shards, posture break with a 120-tick counter window, phase 2 at half health), with victory/defeat. Interface and usage: `docs/architecture.md`. All numbers: `core/tuning.gd`. Run the 26 core tests with `& $godot --headless --path . --script res://tests/run_tests.gd`. Decisions: `docs/decisions/0003-core-test-runner-and-preload.md`.
+
+**What this does not tell us:** nobody has played it. There is no scene, input mapping or drawing yet (that is `presentation/`, Codex's area), so whether the parry window, boss timings and damage feel fair or fun is unknown. The numbers in `tuning.gd` are first guesses. Only the logic is tested (including: warning area equals hit area, aim locked at commit, determinism).
+
 ## Verified (run on this machine)
 
 - `python tools/art/validate_art.py` passes on the placeholder art (5 sources, 7 PNGs).
@@ -44,5 +50,5 @@ A light-tier task (`gpt-6-luna`, `--sandbox workspace-write`, worktree `..\Adven
 ## Recommended next steps
 
 1. Human reviews `art/build/contact_sheet.png` and the palette.
-2. Claude Code builds the combat core slice against `docs/architecture.md` (core only, with headless tests), then revisits that doc.
+2. Codex builds a playable `presentation/` arena for the combat slice (scene, input mapping, drawing telegraphs from the snapshot, HUD, placeholder boss sprite), so the human can playtest and tune `core/tuning.gd`. Needs a boss placeholder sprite and Totoy states in `art/`.
 3. Stage 2 (router and worktrees) after Codex is installed.
