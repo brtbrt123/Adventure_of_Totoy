@@ -7,6 +7,8 @@ Usage: python tools/art/preview_art.py [--out PATH]
 from __future__ import annotations
 
 import argparse
+import random
+import re
 import sys
 from pathlib import Path
 
@@ -36,6 +38,32 @@ def repeated(image: Image.Image, times: int = 3) -> Image.Image:
         for tx in range(times):
             sheet.paste(image, (tx * image.width, ty * image.height))
     return sheet
+
+
+VARIANT_RE = re.compile(r"^(.*)_(\d+)$")
+MIX_COLUMNS, MIX_ROWS, MIX_SEED = 8, 5, 1
+
+
+def variant_mixes(tiles: list[artlib.Sprite], palette: artlib.Palette) -> list[Cell]:
+    """For each terrain with 2+ numbered variants (grass_1, grass_2, ...), render a seeded random patch."""
+    groups: dict[str, list[Image.Image]] = {}
+    for tile in tiles:
+        match = VARIANT_RE.match(tile.name)
+        if match:
+            groups.setdefault(match.group(1), []).append(artlib.render(tile, palette))
+    cells: list[Cell] = []
+    for terrain in sorted(groups):
+        variants = groups[terrain]
+        if len(variants) < 2:
+            continue
+        rng = random.Random(MIX_SEED)
+        size = artlib.TILE_SIZE
+        patch = Image.new("RGBA", (MIX_COLUMNS * size, MIX_ROWS * size), (0, 0, 0, 0))
+        for ty in range(MIX_ROWS):
+            for tx in range(MIX_COLUMNS):
+                patch.paste(rng.choice(variants), (tx * size, ty * size))
+        cells.append((f"{terrain}: {len(variants)} variants, random mix", scaled(patch, REPEAT_SCALE)))
+    return cells
 
 
 def place(sections: list[tuple[str, list[Cell]]]) -> tuple[list[tuple], int]:
@@ -79,6 +107,7 @@ def main() -> int:
         ("Seamless tiles repeated 3x3 (look for visible seams)", [
             (s.name, scaled(repeated(artlib.render(s, palette)), REPEAT_SCALE)) for s in tiles if s.seamless
         ]),
+        ("Variant mixes (seeded random placement; look for obvious repeats)", variant_mixes(tiles, palette)),
         (f"Sprites ({len(sprites)}) at {SCALE}x", [
             (f"{s.name} {s.width}x{s.height}", scaled(artlib.render(s, palette), SCALE)) for s in sprites
         ]),
