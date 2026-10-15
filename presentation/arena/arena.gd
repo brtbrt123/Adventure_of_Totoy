@@ -30,12 +30,17 @@ var parry_impacts: Array[Dictionary] = []
 var screen_flash_until: int = -1
 var visual_tick: int = -1
 var particles: Array[Dictionary] = []
+var hit_bursts: Array[Dictionary] = []
 var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
 var shake_left: int = 0
 var white_sprites: Texture2D
 var hurt_blink: bool = false
+var facing_left: bool = false
+var previous_player_position: Vector2 = Vector2.ZERO
+var previous_player_state: StringName = &""
+var dash_ghosts: Array[Dictionary] = []
 var sprites: Texture2D
 var tiles: Texture2D
 @onready var hud: Hud = $HUD/Display
@@ -89,20 +94,22 @@ func _physics_process(_delta: float) -> void:
 	if snapshot.result != &"playing" and Input.is_action_just_pressed("arena_restart"):
 		_restart()
 	# Node-local mouse coordinates already account for viewport scaling and canvas transforms.
-	core.step(Bindings.read_frame(snapshot.player.position, get_local_mouse_position()))
+	var intent: InputFrame = Bindings.read_frame(snapshot.player.position, get_local_mouse_position())
+	core.step(intent)
 	snapshot = core.snapshot()
 	_age_effects()
 	prepare_visuals()
 	for event: GameEvent in core.last_events:
 		_on_event(event)
-	if snapshot.player.state == &"dash":
-		trails.append({"position": snapshot.player.position, "life": 4})
 	_update_hud()
 	queue_redraw()
 
 func _restart() -> void:
 	core = GameCore.new(17)
 	snapshot = core.snapshot()
+	facing_left = false
+	previous_player_state = &""
+	dash_ghosts.clear()
 	selected_frames.clear()
 	last_attacks.clear()
 	previous_telegraphs.clear()
@@ -115,6 +122,7 @@ func _restart() -> void:
 	visual_tick = -1
 	prepare_visuals()
 	particles.clear()
+	hit_bursts.clear()
 	trails.clear()
 	flashes.clear()
 	hurt_blink = false
@@ -135,12 +143,17 @@ func _update_hud() -> void:
 	hud.snapshot = snapshot
 	hud.colors = colors
 	hud.debug_enabled = debug_enabled
+	hud.prepare_portrait()
+	hud.track_health()
 	hud.queue_redraw()
 
 func _age_effects() -> void:
 	if not snapshot.player.invulnerable:
 		hurt_blink = false
 	shake_left = maxi(0, shake_left - 1)
+	for i: int in range(hit_bursts.size() - 1, -1, -1):
+		if snapshot.tick - int(hit_bursts[i]["tick"]) >= 3:
+			hit_bursts.remove_at(i)
 	for id: int in flashes.keys():
 		flashes[id] = int(flashes[id]) - 1
 		if int(flashes[id]) <= 0:
@@ -166,6 +179,7 @@ func _on_event(event: GameEvent) -> void:
 			var perfect: bool = event.data["quality"] == &"perfect"
 			_burst(event.data["position"], 16 if perfect else 7, colors["x"], 1.6 if perfect else 1.0)
 			parry_impacts.append({"position": event.data["position"], "tick": event.tick, "perfect": perfect})
+			selected_frames[snapshot.player.id] = _resolve_frame("totoy_parry_right_3", snapshot.player)
 			shake_left = maxi(shake_left, 7 if perfect else 3)
 			screen_flash_until = event.tick + (2 if perfect else 1)
 			for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -185,6 +199,7 @@ func _on_event(event: GameEvent) -> void:
 		&"attack_hit":
 			var counter: bool = event.data["kind"] == &"counter"
 			if int(event.data["attacker_id"]) == snapshot.player.id:
+				hit_bursts.append({"position": event.data["position"], "tick": event.tick, "counter": counter})
 				_burst(event.data["position"], 16 if counter else 8, colors["1"], 1.8 if counter else 0.9)
 				if counter:
 					flashes[int(event.data["target_id"])] = 10
@@ -202,7 +217,7 @@ func _on_event(event: GameEvent) -> void:
 
 func _burst(at: Vector2, count: int, color: Color, speed: float) -> void:
 	for i: int in range(count):
-		particles.append({"position": at, "velocity": Vector2.from_angle(TAU * i / count) * speed, "life": 12, "color": color})
+		particles.append({"position": at, "velocity": Vector2.from_angle(TAU * i / count) * speed, "life": 7 if i % 3 == 0 else 11, "color": colors["p"] if color == colors["1"] and i % 3 == 0 else (colors["o"] if color == colors["1"] and i % 3 == 1 else color)})
 
 func _draw() -> void:
 	if snapshot == null or colors.is_empty():
@@ -229,6 +244,7 @@ func _draw() -> void:
 				draw_rect(Rect2((dust_at + dust_offset).round(), Vector2(2 if life > 2 else 1, 2)), colors["j"] if fleck == 1 else colors["c"])
 		else:
 			draw_circle(trail["position"], 2, colors["t"], false, 1.0)
+	_draw_dash()
 	var actors: Array[Snapshots.EntitySnapshot] = [snapshot.player]
 	actors.append_array(snapshot.entities)
 	actors.sort_custom(_behind)
@@ -240,6 +256,8 @@ func _draw() -> void:
 		CombatEffects.draw_plan(self, CombatEffects.parry_impact(impact["position"], snapshot.tick - int(impact["tick"]), bool(impact["perfect"]), colors))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_marker(self, t, colors["x"] if t.kind == &"gold" else colors["z"], colors["0"])
+	for burst: Dictionary in hit_bursts:
+		CombatEffects.draw_plan(self, CombatEffects.hit_impact(burst["position"], snapshot.tick - int(burst["tick"]), bool(burst["counter"]), colors))
 	for particle: Dictionary in particles:
 		var at: Vector2 = particle["position"]
 		draw_rect(Rect2(at.round(), Vector2.ONE), particle["color"])
@@ -279,6 +297,22 @@ func prepare_visuals() -> void:
 			red_plan.append_array(CombatEffects.red(tell, snapshot.tick, colors))
 	slash_plan = CombatEffects.slash(snapshot.player, colors)
 	var fresh: bool = snapshot.tick != visual_tick
+	if fresh:
+		var hero: Snapshots.EntitySnapshot = snapshot.player
+		var moved: bool = not hero.position.is_equal_approx(previous_player_position)
+		var attack_started: bool = hero.state == &"attack_windup" and previous_player_state != hero.state
+		if ((moved and hero.state != &"dead") or attack_started) and absf(hero.facing.x) > 0.3:
+			facing_left = hero.facing.x < 0.0
+		for i: int in range(dash_ghosts.size() - 1, -1, -1):
+			dash_ghosts[i]["life"] -= 1
+			if int(dash_ghosts[i]["life"]) <= 0:
+				dash_ghosts.remove_at(i)
+		if hero.state == &"dash" and previous_player_state == &"dash":
+			dash_ghosts.append({"position": previous_player_position, "left": facing_left, "life": 6})
+			if dash_ghosts.size() > 3:
+				dash_ghosts.pop_front()
+		previous_player_position = hero.position
+		previous_player_state = hero.state
 	if fresh:
 		for i: int in range(parry_impacts.size() - 1, -1, -1):
 			if snapshot.tick - int(parry_impacts[i]["tick"]) >= 10:
@@ -326,7 +360,14 @@ func prepare_visuals() -> void:
 			if tell.owner_id == actor.id:
 				if not last_attacks.has(actor.id) or tell.hit_tick >= int(last_attacks[actor.id].get("hit_tick", -1)):
 					last_attacks[actor.id] = {"attack": tell.attack, "hit_tick": tell.hit_tick, "end_tick": tell.end_tick, "direction_x": tell.direction.x}
-		selected_frames[actor.id] = _resolve_frame(ArenaAnimation.choose(actor, snapshot, last_attacks.get(actor.id, {})), actor)
+		var requested: String = ArenaAnimation.choose(actor, snapshot, last_attacks.get(actor.id, {}))
+		# A successful parry returns to idle immediately in core. Show the painted
+		# spark pose briefly from the recorded event while its impact ring begins.
+		if actor.id == snapshot.player.id and actor.state == &"idle":
+			for impact: Dictionary in parry_impacts:
+				if snapshot.tick - int(impact["tick"]) < 3:
+					requested = "totoy_parry_right_3"
+		selected_frames[actor.id] = _resolve_frame(requested, actor)
 
 func _resolve_frame(requested: String, actor: Snapshots.EntitySnapshot) -> String:
 	if frames.has(requested):
@@ -334,7 +375,7 @@ func _resolve_frame(requested: String, actor: Snapshots.EntitySnapshot) -> Strin
 	if not missing_frames.has(requested):
 		push_warning("Missing arena frame: " + requested + "; using idle fallback")
 		missing_frames[requested] = true
-	var fallback: String = "totoy_idle_down_1" if actor.visual_id == &"totoy" else "mossbound_colossus_idle_1"
+	var fallback: String = "totoy_idle_right_1" if actor.visual_id == &"totoy" else "mossbound_colossus_idle_1"
 	if frames.has(fallback):
 		return fallback
 	return "totoy_idle_down" if actor.visual_id == &"totoy" else "mossbound_colossus_idle"
@@ -356,17 +397,25 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 		draw_rect(Rect2(at - Vector2(radius, radius * 2), Vector2(radius * 2, radius * 2)), colors["g"])
 		return
 	var frame: Dictionary = frames[chosen]
-	var size: Vector2 = Vector2(frame["w"], frame["h"])
-	var anchor: Vector2 = ArenaAnimation.HERO_ANCHOR if actor.visual_id == &"totoy" else Vector2(size.x * 0.5, size.y - 4)
-	var destination: Rect2 = Rect2(at - anchor, size)
-	if (actor.visual_id == &"totoy" and ArenaAnimation.mirrored(actor.facing)) or (actor.visual_id != &"totoy" and ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))):
-		# CanvasItem mirrors a texture region when the destination width is negative. The rect keeps its
-		# position: shifting it by the width drew mirrored (left-facing) sprites a full sprite width to the right.
-		destination.size.x = -destination.size.x
+	var left: bool = facing_left if actor.visual_id == &"totoy" else ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))
+	var destination: Rect2 = ArenaAnimation.destination(at, frame, left)
 	if not silhouette_only:
 		draw_texture_rect_region(sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 	if silhouette_only:
 		draw_texture_rect_region(white_sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+
+func _draw_dash() -> void:
+	var frame: Dictionary = frames.get("totoy_dash_right_1", {})
+	if frame.is_empty():
+		return
+	for ghost: Dictionary in dash_ghosts:
+		var fade: float = float(ghost["life"]) / 6.0
+		draw_texture_rect_region(white_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(colors["o"], fade * 0.55))
+	if snapshot.player.state == &"dash":
+		var side: float = 1.0 if facing_left else -1.0
+		for i: int in range(3):
+			var at: Vector2 = snapshot.player.position.round() + Vector2(side * (10 + i * 3), -6 - i * 5)
+			draw_line(at, at + Vector2(side * (7 + i * 2), 0), colors["1"] if i == 1 else colors["o"], 1.0, false)
 
 func actor_is_white(actor: Snapshots.EntitySnapshot) -> bool:
 	if actor.visual_id == &"totoy" and actor.state == &"dash":

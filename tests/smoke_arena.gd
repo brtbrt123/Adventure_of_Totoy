@@ -55,6 +55,8 @@ func _run() -> void:
 	_expect(saw_attack, "scripted attack did not reach core")
 	_expect(saw_telegraph, "boss never supplied a telegraph")
 	_expect(arena.snapshot.player.position.x > 64.0, "scripted walking did not move player")
+	_expect(arena.frames.has("totoy_idle_right_1"), "new hero atlas absent")
+	_expect(arena.missing_frames.is_empty(), "scripted arena requested missing art")
 	for action: String in ["arena_right", "arena_dash", "arena_parry", "arena_attack"]:
 		Input.action_release(action)
 	arena.queue_free()

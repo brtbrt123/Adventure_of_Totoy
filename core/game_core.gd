@@ -19,6 +19,9 @@ signal event_emitted(event: GameEvent)
 
 var tick: int = 0
 var result: StringName = RESULT_PLAYING
+## Ticks since the fight ended (0 while playing). The simulation is frozen after the result, but this keeps
+## counting so presentation can play end animations (the hero's fall, a victory pose) from it.
+var result_ticks: int = 0
 var player: PlayerState = PlayerState.new()
 var boss: BossState = BossState.new()
 ## Events produced by the most recent step(), in order.
@@ -34,6 +37,7 @@ func _init(seed_value: int = 1) -> void:
 func step(input: InputFrame) -> void:
 	last_events = []
 	if result != RESULT_PLAYING:
+		result_ticks += 1
 		return
 	tick += 1
 	var events: Array[GameEvent] = []
@@ -52,6 +56,7 @@ func snapshot() -> Snapshots.GameSnapshot:
 	var snap: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
 	snap.tick = tick
 	snap.result = result
+	snap.result_ticks = result_ticks
 	snap.player = _player_snapshot()
 	snap.entities.append(_boss_snapshot())
 	for telegraph: Telegraph in boss.telegraphs:

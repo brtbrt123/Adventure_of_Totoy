@@ -38,6 +38,8 @@ func _catalog() -> void:
 	_expect(arena.frames.has("totoy_portrait"), "portrait absent from atlas")
 	_expect(arena.frames.has("hud_profile_frame"), "profile frame absent from atlas")
 	_expect(not arena.hud.profile_frame.is_empty(), "HUD frame not connected")
+	arena.hud.prepare_portrait()
+	_expect(arena.hud.portrait_mask != null, "circular portrait missing")
 	var distinct: Dictionary = {}
 	var source: Image = arena.sprites.get_image()
 	for name_key: String in arena.frames:

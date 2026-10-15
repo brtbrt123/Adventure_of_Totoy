@@ -55,6 +55,7 @@ class GameSnapshot:
 	extends RefCounted
 	var tick: int = 0
 	var result: StringName = &"playing"  # playing, victory, defeat
+	var result_ticks: int = 0  # ticks since the result; keeps counting while the simulation is frozen
 	var player: EntitySnapshot = null
 	var entities: Array[EntitySnapshot] = []  # everything except the player
 	var telegraphs: Array[TelegraphSnapshot] = []

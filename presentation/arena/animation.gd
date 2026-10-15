@@ -1,13 +1,13 @@
 extends RefCounted
 ## Visual cadence only. State lifetimes and impacts always come from snapshots.
 const Snapshots := preload("res://core/snapshots.gd")
-const DIRECTIONS: Array[String] = ["down", "up", "right"]
+const DIRECTIONS: Array[String] = ["right"]
 # [frame count, ticks per frame, loop]. Windups use telegraph progress instead.
 const PLAYER: Dictionary = {
-	"idle": [2, 24, true], "walk": [4, 9, true], "dash": [2, 3, false],
-	"parry": [3, 4, false], "parry_recovery": [1, 1, false],
-	"attack_windup": [2, 4, false], "attack_active": [1, 3, false],
-	"attack_recovery": [2, 5, false], "dead": [1, 1, false],
+	"idle": [2, 24, true], "walk": [4, 6, true], "dash": [1, 6, false],
+	"parry": [3, 5, false], "parry_recovery": [1, 1, false],
+	"attack_windup": [1, 7, false], "attack_active": [2, 2, false],
+	"attack_recovery": [1, 10, false], "dead": [3, 8, false],
 }
 const BOSS: Dictionary = {
  "idle": [2, 32, true], "gold_slam_windup": [3, 1, false],
@@ -20,22 +20,18 @@ const BOSS: Dictionary = {
  "recover": [1, 1, false], "posture_broken": [2, 12, true], "dead": [1, 1, false],
 }
 const STRIKE_HOLD_TICKS: int = 4
-# Frame pixel anchor: both feet meet the same core ground point in every pose.
-const HERO_ANCHOR: Vector2 = Vector2(16, 31)
+## Destination position stays fixed when Godot flips a negative-width region.
+static func destination(at: Vector2, frame: Dictionary, left: bool) -> Rect2:
+	var w: float = float(frame["w"])
+	var h: float = float(frame["h"])
+	var anchor: Vector2 = Vector2(float(frame.get("ax", w * 0.5)), float(frame.get("ay", h - 4)))
+	return Rect2(at.round() - Vector2(w - anchor.x if left else anchor.x, anchor.y), Vector2(-w if left else w, h))
 
-static func hero_pixel(position: Vector2, facing: Vector2, pixel: Vector2) -> Vector2:
-	var local: Vector2 = pixel
-	if mirrored(facing):
-		local.x = 31.0 - local.x
-	return position.round() - HERO_ANCHOR + local
-
-static func direction(facing: Vector2) -> String:
-	if absf(facing.x) > absf(facing.y):
-		return "right"
-	return "down" if facing.y >= 0.0 else "up"
+static func direction(_facing: Vector2) -> String:
+	return "right"
 
 static func mirrored(facing: Vector2) -> bool:
-	return absf(facing.x) > absf(facing.y) and facing.x < 0.0
+	return facing.x < -0.3
 
 static func frame_index(spec: Array, ticks: int) -> int:
 	var count: int = int(spec[0])
@@ -47,7 +43,9 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 	if actor.visual_id == &"totoy":
 		if not PLAYER.has(state):
 			return "totoy_" + state + "_" + direction(actor.facing) + "_1"
-		return "totoy_%s_%s_%d" % [state, direction(actor.facing), frame_index(PLAYER[state], actor.state_ticks)]
+		# The core freezes after the fight ends, so the fall plays from result_ticks (which keeps counting).
+		var ticks: int = snap.result_ticks if state == "dead" else actor.state_ticks
+		return "totoy_%s_%s_%d" % [state, direction(actor.facing), frame_index(PLAYER[state], ticks)]
 	if actor.state == &"attack":
 		var tell: Snapshots.TelegraphSnapshot = attack_tell(actor.id, snap)
 		if tell != null:

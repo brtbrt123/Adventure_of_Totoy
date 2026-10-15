@@ -76,6 +76,7 @@ func _step(frame: InputFrame) -> void:
 			if event.data["kind"] == &"counter":
 				_expect(int(arena.flashes[arena.snapshot.entities[0].id]) == 10, "counter flash duration")
 			_expect(not arena.particles.is_empty(), "hit has no spark")
+			_expect(not arena.hit_bursts.is_empty(), "hit has no short bright burst")
 			if event.data["kind"] == &"counter":
 				_expect(arena.shake_left > 0, "counter has no shake")
 	for event: GameEvent in arena.core.last_events:
@@ -83,7 +84,7 @@ func _step(frame: InputFrame) -> void:
 			_expect(arena.actor_is_white(arena.snapshot.entities[0]), "boss damage must flash white")
 	if arena.snapshot.player.state in [&"attack_windup", &"attack_active", &"attack_recovery"]:
 		if arena.snapshot.player.state_ticks < 3:
-			_expect(not arena.slash_plan.is_empty(), "sword state has no effect")
+			_expect(arena.slash_plan.is_empty(), "painted sword arc duplicated")
 			seen[String(arena.snapshot.player.state)] = true
 	for tell: Snapshots.TelegraphSnapshot in arena.snapshot.telegraphs:
 		if arena.snapshot.tick >= tell.hit_tick and tell.attack in [&"red_shards", &"red_sweep"]:
@@ -193,6 +194,7 @@ func _parry_visuals() -> void:
 					succeeded = true
 					_expect(event.data["quality"] == (&"perfect" if lead == 2 else &"early"), "fixture parry quality")
 					_expect(arena.parry_impacts.size() == 1, "parry impact missing")
+					_expect(arena.selected_frames[arena.snapshot.player.id] == "totoy_parry_right_3", "successful parry must show painted spark")
 					_expect(arena.screen_flash_until > arena.snapshot.tick and arena.shake_left > 0, "parry flash or shake missing")
 					counts.append(arena.particles.size())
 					var impact: Dictionary = arena.parry_impacts[0]
@@ -209,7 +211,7 @@ func _parry_visuals() -> void:
 	var parry: InputFrame = InputFrame.new()
 	parry.parry_pressed = true
 	_step(parry)
-	_expect(arena.slash_plan.size() == 2, "opening blade glint missing")
+	_expect(arena.slash_plan.is_empty(), "painted parry spark duplicated")
 	for i: int in range(14):
 		_step(InputFrame.new())
 	_expect(arena.parry_impacts.is_empty() and not arena.particles.is_empty(), "whiff must create only a dull puff")
@@ -223,7 +225,7 @@ func _parry_visuals() -> void:
 	_expect(arena.snapshot.player.state == &"attack_active", "draw transition fixture")
 	_step(InputFrame.new())
 	_step(InputFrame.new())
-	_expect(draw_commands == arena.slash_plan.size() + 1, "iai streak must end after two ticks")
+	_expect(draw_commands == 0 and arena.slash_plan.is_empty(), "runtime draw streak duplicated imported art")
 
 func _run() -> void:
 	await process_frame
@@ -328,15 +330,9 @@ func _flash_visuals() -> void:
 					return
 	_expect(opaque, "white silhouette atlas is empty")
 
-# The first draw-streak endpoint stays on the belt in both authored and mirrored poses.
+# Imported attack and guard art is the only source of blade marks.
 func _hip_streaks() -> void:
 	var actor: Snapshots.EntitySnapshot = Snapshots.EntitySnapshot.new()
-	actor.position = Vector2(64, 88)
-	actor.state = &"attack_active"
-	actor.state_ticks = 0
-	var palette: Dictionary = {"1": Color.WHITE, "p": Color.WHITE, "o": Color.WHITE}
-	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
-		actor.facing = facing
-		var plan: Array[Dictionary] = CombatEffects.slash(actor, palette)
-		var points: PackedVector2Array = plan[3]["points"]
-		_expect(points[0] == Vector2(58 if facing == Vector2.LEFT else 69, 78), "draw streak left the hip: " + str(facing))
+	for state: StringName in [&"attack_windup", &"attack_active", &"attack_recovery", &"parry"]:
+		actor.state = state
+		_expect(CombatEffects.slash(actor, {}).is_empty(), "duplicate blade marks: " + String(state))

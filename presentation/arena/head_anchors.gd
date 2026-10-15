@@ -30,4 +30,7 @@ static func world(at: Vector2, frame: Dictionary, head: Vector2, mirrored: bool)
 	var pixel: Vector2 = head
 	if mirrored:
 		pixel.x = width - 1.0 - pixel.x
-	return at.round() - Vector2(width * 0.5, height - 4.0) + pixel
+	var anchor: Vector2 = Vector2(float(frame.get("ax", width * 0.5)), float(frame.get("ay", height - 4.0)))
+	if mirrored:
+		anchor.x = width - anchor.x
+	return at.round() - anchor + pixel

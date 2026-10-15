@@ -23,7 +23,7 @@ func _step(frame: InputFrame) -> void:
 func _save(label: String) -> bool:
 	var expected: Dictionary = {
 		"hero_idle": "totoy_idle_right_1",
-		"hero_draw": "totoy_attack_windup_right_2",
+		"hero_draw": "totoy_attack_windup_right_1",
 		"hero_slash": "totoy_attack_active_right_1",
 		"hero_parry": "totoy_parry_right_2",
 	}

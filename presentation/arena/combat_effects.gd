@@ -77,54 +77,9 @@ static func red(t: Snapshots.TelegraphSnapshot, tick: int, colors: Dictionary) -
 		stroke(plan, TelegraphView.ring_points(t.center, maxf(t.inner_size, radius - 4.0)), Color(colors["j"], fade), 1.0)
 	return plan
 
-static func slash(player: Snapshots.EntitySnapshot, colors: Dictionary) -> Array[Dictionary]:
-	var plan: Array[Dictionary] = []
-	var at: Vector2 = player.position - Vector2(0, 11)
-	var angle: float = player.facing.angle()
-	var ticks: int = player.state_ticks
-	if player.state == &"parry":
-		var pose: int = ArenaAnimation.frame_index(ArenaAnimation.PLAYER["parry"], ticks)
-		var grip: Vector2 = Vector2(20, 21)
-		var tip_point: Vector2 = Vector2(26, 8) if pose == 1 else Vector2(25, 10)
-		var glint: Vector2 = grip.lerp(tip_point, float(posmod(ticks, 7)) / 6.0)
-		glint = ArenaAnimation.hero_pixel(player.position, player.facing, glint).round()
-		stroke(plan, PackedVector2Array([glint - Vector2(1, 0), glint + Vector2(1, 0)]), colors["1"])
-		if ticks < 3:
-			stroke(plan, PackedVector2Array([glint - Vector2(0, 2), glint + Vector2(0, 2)]), colors["1"])
-		return plan
-	if player.state == &"attack_windup":
-		# Belt hilt anchors the half-drawn blade.
-		var side: float = -1.0 if ArenaAnimation.mirrored(player.facing) else 1.0
-		var glint: Vector2 = ArenaAnimation.hero_pixel(player.position, player.facing, Vector2(22, 21))
-		stroke(plan, PackedVector2Array([glint - Vector2(1,0), glint + Vector2(1,0)]), colors["h"])
-		if ArenaAnimation.frame_index(ArenaAnimation.PLAYER["attack_windup"], ticks) == 2:
-			stroke(plan, PackedVector2Array([glint, glint + Vector2(side * 6, -4)]), colors["1"])
-		return plan
-	var recovery: bool = player.state == &"attack_recovery"
-	if player.state != &"attack_active" and not recovery:
-		return plan
-	if recovery and ticks >= 4:
-		return plan
-	var progress: float = 1.0 if recovery else clampf(float(ticks + 1) / 3.0, 0.0, 1.0)
-	var fade: float = 1.0 - float(ticks + 1) / 5.0 if recovery else 1.0
-	var tip: float = angle - PI / 3.0 + 2.0 * PI / 3.0 * progress
-	var start: float = angle - PI / 3.0 + (float(ticks) * 0.12 if recovery else 0.0)
-	for layer: int in range(3):
-		var radius: float = 22.0 - layer * 2.0
-		var points: PackedVector2Array = PackedVector2Array()
-		for i: int in range(25):
-			points.append(at + Vector2.from_angle(lerpf(start, tip, i / 24.0)) * radius)
-		var color: Color = colors["1"] if layer == 0 else colors["p" if layer == 1 else "o"]
-		stroke(plan, points, Color(color, fade))
-	if not recovery:
-		# Two snapshot ticks of thin cream sell the blade leaving its sheath.
-		if ticks < 2:
-			var hip: Vector2 = ArenaAnimation.hero_pixel(player.position, player.facing, Vector2(21, 21))
-			stroke(plan, PackedVector2Array([hip, at + player.facing * 24.0]), colors["1"])
-		for i: int in range(3):
-			var direction: Vector2 = Vector2.from_angle(tip - i * 0.24)
-			stroke(plan, PackedVector2Array([at + direction * 25.0, at + direction * (28.0 - i)]), colors["o"])
-	return plan
+## Sword crescent and guard spark are already painted into the imported frames.
+static func slash(_player: Snapshots.EntitySnapshot, _colors: Dictionary) -> Array[Dictionary]:
+	return []
 
 static func draw_plan(canvas: Node2D, plan: Array[Dictionary]) -> void:
 	for command: Dictionary in plan:
@@ -151,4 +106,17 @@ static func parry_impact(at: Vector2, age: int, perfect: bool, colors: Dictionar
 	if age < 2:
 		stroke(plan, PackedVector2Array([at - Vector2(0, 5) * size, at + Vector2(0, 5) * size]), colors["1"])
 		stroke(plan, PackedVector2Array([at - Vector2(5, 0) * size, at + Vector2(5, 0) * size]), colors["1"])
+	return plan
+
+## Short cream core with sky spokes, triggered only by an attack_hit event.
+static func hit_impact(at: Vector2, age: int, counter: bool, colors: Dictionary) -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	if age < 0 or age >= 3:
+		return plan
+	var radius: float = (6.0 if counter else 4.0) + age
+	for i: int in range(8):
+		var axis: Vector2 = Vector2.from_angle(TAU * i / 8.0)
+		stroke(plan, PackedVector2Array([at + axis * (1 + age), at + axis * radius]), colors["1"] if i % 2 == 0 else colors["o"])
+	if age == 0:
+		disc(plan, at, 2.0, colors["p"])
 	return plan

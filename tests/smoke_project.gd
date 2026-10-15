@@ -72,4 +72,4 @@ func _check_sprite_atlas() -> void:
 	_expect(data is Dictionary, "sprites.json is not a JSON object")
 	if data is Dictionary:
 		var frames: Dictionary = (data as Dictionary).get("frames", {})
-		_expect(frames.has("totoy_idle_down_1"), "sprites.json has no totoy_idle_down_1 frame")
+		_expect(frames.has("totoy_idle_right_1"), "sprites.json has no totoy_idle_right_1 frame")
