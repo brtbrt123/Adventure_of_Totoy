@@ -26,6 +26,10 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 - Codex: `codex-cli 0.162.1` is installed and logged in (ChatGPT). Its headless flags and model names are recorded in `docs/ROUTING.md`, but **no Codex run has been tested yet**, including whether Codex follows `AGENTS.md` and whether the listed models work with `codex exec -m`.
 - Whether the art looks good: the human must judge the contact sheet. The seam check is a heuristic.
 
+## Codex test run (2026-10-15): failed, environment problem
+
+A light-tier task (`gpt-6-luna`, `--sandbox workspace-write`, worktree `..\Adventure_of_Totoy_worktrees\grass-polish`, branch `agent/tile/grass-polish`) changed nothing. Codex could not start any shell: `Failed to create unified exec process: helper_unknown_error: setup refresh had errors`. `codex doctor` shows `sandbox backend: elevated`, `sandbox provisioning: failed`. So the Windows sandbox for Codex is not set up on this machine; the model, login and prompt were not the problem. Not fixed, because re-provisioning is a system-level change and the bypass flags were ruled out. The worktree is clean and still exists (not deleted). Also seen: `failed to refresh available models: request timed out` (network, minor).
+
 ## Open questions for the human
 
 1. Add `C:\Tools\Godot` to PATH (as `godot` / `godot_console`)? Not done; the docs use the full path.
