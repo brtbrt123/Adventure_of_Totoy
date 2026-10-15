@@ -47,11 +47,20 @@ func test_dash_invulnerability_window() -> void:
 	var core: GameCore = GameCore.new()
 	core.step(input(Vector2.RIGHT, true))
 	assert_true(core.player.is_invulnerable(), "invulnerable at dash start")
-	while core.player.state_ticks < Tuning.DASH_INVULN_TICKS:
+	for i: int in Tuning.DASH_INVULN_TICKS - 1:
 		core.step(input())
-	assert_true(core.player.is_invulnerable(), "invulnerable on last i-frame")
+	assert_true(core.player.is_invulnerable(), "invulnerable on the last i-frame")
 	core.step(input())
-	assert_false(core.player.is_invulnerable(), "vulnerable after the i-frames, before the dash ends")
+	assert_false(core.player.is_invulnerable(), "vulnerable once the i-frames are over")
+	assert_true(Tuning.DASH_INVULN_TICKS >= Tuning.DASH_TICKS, "i-frames cover the whole dash")
+
+
+func test_dash_is_short() -> void:
+	var core: GameCore = GameCore.new()
+	var start_x: float = core.player.position.x
+	core.step(input(Vector2.RIGHT, true))
+	run(core, Tuning.DASH_TICKS + 2)
+	assert_true(core.player.position.x - start_x <= 32.0, "dash covers at most 32 px")
 
 
 func test_player_stays_in_arena() -> void:

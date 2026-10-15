@@ -28,6 +28,7 @@ var attack_hit_done: bool = false
 
 var _dash_dir: Vector2 = Vector2.RIGHT
 var _hurt_invuln: int = 0
+var _dash_invuln: int = 0  # dash i-frames run on their own counter, so a short dash can keep a forgiving window
 
 
 func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
@@ -36,6 +37,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 	state_ticks += 1
 	if _hurt_invuln > 0:
 		_hurt_invuln -= 1
+	if _dash_invuln > 0:
+		_dash_invuln -= 1
 	if dash_cooldown > 0:
 		dash_cooldown -= 1
 		if dash_cooldown == 0:
@@ -90,7 +93,7 @@ func parry_ticks_since_press() -> int:
 func is_invulnerable() -> bool:
 	if state == STATE_DEAD:
 		return false
-	return (state == STATE_DASH and state_ticks <= Tuning.DASH_INVULN_TICKS) or _hurt_invuln > 0
+	return _dash_invuln > 0 or _hurt_invuln > 0
 
 
 ## Returns true when the damage was applied (false while invulnerable or dead).
@@ -134,6 +137,7 @@ func _try_actions(input: InputFrame, move: Vector2, tick: int, events: Array[Gam
 func _start_dash(move: Vector2, tick: int, events: Array[GameEvent]) -> void:
 	_dash_dir = move.normalized() if move.length_squared() > 0.0001 else facing
 	dash_cooldown = Tuning.DASH_COOLDOWN_TICKS
+	_dash_invuln = Tuning.DASH_INVULN_TICKS
 	_set_state(STATE_DASH)
 	events.append(GameEvent.new(GameEvent.DASH_STARTED, tick, {"entity_id": id, "direction": _dash_dir}))
 

@@ -12,14 +12,14 @@ const BOSS_START: Vector2 = Vector2(240.0, 88.0)
 
 # Player
 const PLAYER_MAX_HP: int = 100
-const PLAYER_SPEED: float = 1.5
+const PLAYER_SPEED: float = 1.0  # px per tick (60 px/s); was 1.5, playtest said the character was too fast
 const PLAYER_RADIUS: float = 6.0
 const PLAYER_HURT_INVULN_TICKS: int = 45
 
 # Dash: available with every weapon
-const DASH_TICKS: int = 10
-const DASH_SPEED: float = 5.6
-const DASH_INVULN_TICKS: int = 8
+const DASH_TICKS: int = 6  # was 10: playtest said the dash was too long (distance 30 px, was 56)
+const DASH_SPEED: float = 5.0
+const DASH_INVULN_TICKS: int = 8  # runs on its own counter from the dash start, so it can outlast the short dash
 const DASH_COOLDOWN_TICKS: int = 40
 
 # Gold parry. A parry press opens a window of PARRY_ACTIVE_TICKS. A gold hit that lands within
@@ -70,7 +70,7 @@ const SLAM_RADIUS: float = 34.0
 const SLAM_DAMAGE: int = 30
 const SLAM_RECOVER_TICKS: int = 40
 
-const SWEEP_WINDUP_TICKS: int = 42
+const SWEEP_WINDUP_TICKS: int = 54  # was 42; at the slower walk speed the player needs ~47 ticks to leave the cone from close range
 const SWEEP_RADIUS: float = 80.0
 const SWEEP_HALF_ANGLE_DEG: float = 50.0
 const SWEEP_ACTIVE_TICKS: int = 4
