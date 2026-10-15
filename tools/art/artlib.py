@@ -17,7 +17,7 @@ TILE_SIZE = 16
 SPRITE_STEP = 8  # sprite width/height must be a multiple of this
 SPRITE_MAX = 256
 VALID_KINDS = ("tile", "sprite")
-VALID_KEYS = ("kind", "seamless")
+VALID_KEYS = ("kind", "seamless", "anchor")  # anchor: "x,y" ground point of a sprite, in its own pixels
 HEADER_RE = re.compile(r"^#\s*([a-z_]+)\s*:\s*(.+?)\s*$")
 HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
@@ -69,6 +69,7 @@ class Sprite:
     path: Path
     kind: str = ""
     seamless: bool = False
+    anchor: tuple[int, int] | None = None  # where the sprite stands on its ground point (feet), if it has one
     rows: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
 
@@ -106,6 +107,12 @@ def parse_sprite(path: Path) -> Sprite:
                 if value not in ("true", "false"):
                     sprite.errors.append(f"line {number}: 'seamless' must be true or false")
                 sprite.seamless = value == "true"
+            elif key == "anchor":
+                parts = value.replace(" ", "").split(",")
+                if len(parts) != 2 or not all(p.lstrip("-").isdigit() for p in parts):
+                    sprite.errors.append(f"line {number}: 'anchor' must look like 'x,y' (pixels)")
+                else:
+                    sprite.anchor = (int(parts[0]), int(parts[1]))
             continue
         sprite.rows.append(line)
     return sprite
@@ -143,6 +150,11 @@ def check_sprite(sprite: Sprite, palette: Palette) -> list[str]:
             errors.append(
                 f"sprite size must be a multiple of {SPRITE_STEP} and at most {SPRITE_MAX}, got {width}x{sprite.height}"
             )
+    if sprite.anchor is not None:
+        if sprite.kind != "sprite":
+            errors.append("'anchor' is only valid for sprites")
+        elif not (0 <= sprite.anchor[0] <= width and 0 <= sprite.anchor[1] <= sprite.height):
+            errors.append(f"anchor {sprite.anchor} is outside the {width}x{sprite.height} canvas")
     if sprite.seamless:
         if sprite.kind != "tile":
             errors.append("'seamless: true' is only valid for tiles")

@@ -89,7 +89,8 @@ def build_tiles(tiles: dict[str, Image.Image], out: Path) -> None:
     (out / "tileset.tres").write_text("\n".join(lines), encoding="utf-8", newline="\n")
 
 
-def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path) -> None:
+def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path, anchors: dict[str, tuple[int, int]] | None = None) -> None:
+    anchors = anchors or {}
     order = sorted(sprites, key=lambda n: (-sprites[n].height, n))
     width = max([SPRITE_ATLAS_WIDTH] + [sprites[n].width + 2 * EXTRUDE for n in order])
     placements: dict[str, tuple[int, int]] = {}
@@ -107,6 +108,8 @@ def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path) -> None:
         px, py = placements[name]
         paste_extruded(atlas, sprites[name], px, py)
         frames[name] = {"x": px, "y": py, "w": sprites[name].width, "h": sprites[name].height}
+        if name in anchors:  # ground point of the sprite in its own pixels, used by presentation to place and mirror it
+            frames[name]["ax"], frames[name]["ay"] = anchors[name]
     atlas.save(out / "sprites.png")
     write_json(out / "sprites.json", {
         "texture": f"{RES_BUILD}/sprites.png",
@@ -137,7 +140,10 @@ def main() -> int:
             stale.unlink()
     tiles: dict[str, Image.Image] = {}
     sprites: dict[str, Image.Image] = {}
+    anchors: dict[str, tuple[int, int]] = {}
     for source in sources:
+        if source.anchor is not None:
+            anchors[source.name] = source.anchor
         image = artlib.render(source, palette)
         group, folder = (tiles, "tiles") if source.kind == "tile" else (sprites, "sprites")
         image.save(out / folder / f"{source.name}.png")
@@ -145,7 +151,7 @@ def main() -> int:
     if tiles:
         build_tiles(tiles, out)
     if sprites:
-        build_sprite_atlas(sprites, out)
+        build_sprite_atlas(sprites, out, anchors)
     print(f"Built {len(tiles)} tile(s) and {len(sprites)} sprite(s) into {out}")
     return 0
 
