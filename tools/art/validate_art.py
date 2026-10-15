@@ -30,8 +30,8 @@ def main() -> int:
     checked_png = 0
     if not args.no_png and args.build.is_dir():
         for png in sorted(args.build.rglob("*.png")):
-            if png.name == "contact_sheet.png":
-                continue  # preview image, not game art
+            if png.name == "contact_sheet.png" or png.name.startswith("arena_"):
+                continue  # contact sheet and in-game screenshots are previews, not game art
             checked_png += 1
             for message in artlib.check_png(png, palette):
                 errors.append(f"{png.relative_to(args.build).as_posix()}: {message}")
