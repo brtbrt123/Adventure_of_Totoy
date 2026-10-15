@@ -9,12 +9,14 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
+const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 
 var core: GameCore = GameCore.new(17)
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var frames: Dictionary = {}
+var head_anchors: Dictionary = {}
 var floor_regions: Array[Rect2] = []
 var missing_frames: Dictionary = {}
 var selected_frames: Dictionary = {}
@@ -47,6 +49,9 @@ func _ready() -> void:
 	sprites = load("res://art/build/sprites.png") as Texture2D
 	var white_image: Image = sprites.get_image()
 	white_image.convert(Image.FORMAT_RGBA8)
+	for name_key: String in frames:
+		if name_key.begins_with("mossbound_colossus_"):
+			head_anchors[name_key] = HeadAnchors.measure(white_image, frames[name_key])
 	for y: int in range(white_image.get_height()):
 		for x: int in range(white_image.get_width()):
 			var alpha: float = white_image.get_pixel(x, y).a
@@ -115,10 +120,18 @@ func _restart() -> void:
 	hurt_blink = false
 	shake_left = 0
 	hud.counter_max = 1
+	hud.reset_head()
 
 func _update_hud() -> void:
 	hud.portrait_atlas = sprites
 	hud.portrait_frame = frames.get("totoy_portrait", {})
+	hud.profile_frame = frames.get("hud_profile_frame", {})
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.visual_id == &"mossbound_colossus":
+			var chosen: String = String(selected_frames.get(actor.id, ""))
+			if frames.has(chosen) and head_anchors.has(chosen):
+				var mirrored: bool = ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))
+				hud.track_head(HeadAnchors.world(actor.position, frames[chosen], head_anchors[chosen], mirrored), snapshot.tick, actor.id, actor.position.round())
 	hud.snapshot = snapshot
 	hud.colors = colors
 	hud.debug_enabled = debug_enabled

@@ -17,6 +17,15 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 **What this does not tell us:** nobody has played it. There is no scene, input mapping or drawing yet (that is `presentation/`, Codex's area), so whether the parry window, boss timings and damage feel fair or fun is unknown. The numbers in `tuning.gd` are first guesses. Only the logic is tested (including: warning area equals hit area, aim locked at commit, determinism).
 
+## Round 3 feedback: glitching hero, profile like the reference, boss name (same branch, 2026-10-16)
+
+The human reported the hero "bugging and glitching", sent a reference image for the player profile, and asked that the boss name follow the boss's head, drop the word POSTURE and become small, crimson red with a BOSS tag.
+- **Glitch (Claude Code, `9b0bb97`):** found with a windowed debug capture of the hero walking in four directions. Mirrored (left-facing) sprites were drawn one full sprite width to the right of the shadow because the destination rect was shifted by the width on top of the flip. Fixed in `arena.gd`; verified with the same capture. (A small bug fix in Codex-owned code, done at the human's request.)
+- **Profile (Codex):** round portrait with an ornate frame at the upper left, a long teal health bar with a vine-like dark frame wrapping from the portrait, thin lilac Edge and sky dash bars under it, HP number on the bar. Level badge and star/coin counters from the reference were left out (the game has none). Health is teal on purpose: red is reserved for combat tells; easy to change if the human wants red.
+- **Boss panel (Codex):** small crimson name with a BOSS chip, a thin health bar and a thin posture meter under it with no POSTURE text. The panel follows the boss's head via a per-frame head anchor computed from each frame's opaque pixels (`presentation/arena/head_anchors.gd`), mirrored frames handled. Claude Code widened the panel from 96 to 104 px because the 18-letter name overflowed its right edge.
+- **Provenance, honestly:** Codex's shell failed at startup in all 4 attempts and its report says it worked through Node child processes; the work was largely in the worktree already. Claude Code reran everything: validator, art build, Python tests, Godot import, `run_tests.gd` (36), `smoke_project`, `smoke_arena`, `smoke_animation`, `smoke_effects`, `smoke_boss_attacks`, the new `smoke_profile`, a 120-frame main-scene run: all pass. Screenshots: `art/build/arena_hud2.png`, `arena_bossbar2.png`, `arena_profile2.png`.
+- **Not judged:** how the HUD feels in play and whether the frame matches the reference closely (the reference was not visible to Codex; it worked from a written description). The vine ornament has little room at this size.
+
 ## Round 2 feedback: waist sword, hero look, white flash, new HUD (same branch, 2026-10-15)
 
 The human said: the sword should be at the waist (so the draw looks cool), the character looks off, add a white flash when taking damage, put the boss health above the boss with the name on top and posture under the health, and add a character profile in the upper left (a circle with health, Edge and dash).

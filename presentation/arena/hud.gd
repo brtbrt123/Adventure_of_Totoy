@@ -7,6 +7,11 @@ var debug_enabled: bool = false
 var counter_max: int = 1
 var portrait_atlas: Texture2D
 var portrait_frame: Dictionary = {}
+var profile_frame: Dictionary = {}
+var head_position: Vector2 = Vector2.ZERO
+var head_tick: int = -1
+var head_id: int = -1
+var head_ground: Vector2 = Vector2.ZERO
 const GLYPHS: Dictionary = {
 	"0": "111101101101111",
 	"1": "010110010010111",
@@ -70,27 +75,25 @@ func _draw() -> void:
 	if snapshot == null or colors.is_empty():
 		return
 	var h: Snapshots.HudSnapshot = snapshot.hud
-	var center: Vector2 = Vector2(25, 25)
-	draw_circle(center, 23, colors["0"], true, -1.0, false)
-	if portrait_atlas != null and not portrait_frame.is_empty():
-		draw_texture_rect_region(portrait_atlas, Rect2(13, 13, 24, 24), Rect2(portrait_frame["x"], portrait_frame["y"], 24, 24))
-	ring_gauge(center, 21, h.player_hp, h.player_max_hp, colors["u"])
-	ring_gauge(center, 18, h.edge, h.edge_max, colors["v"])
-	ring_gauge(center, 15, h.dash_cooldown_max - h.dash_cooldown_ticks, h.dash_cooldown_max, colors["n"])
-	lettering(Vector2(5, 51), "%d/%d" % [h.player_hp, h.player_max_hp], colors["1"])
+	_draw_profile(h)
 	if not snapshot.entities.is_empty():
 		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
-		var panel: Rect2 = boss_panel(boss.position, h.counter_window_ticks_left > 0)
+		var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
 		draw_rect(panel, colors["0"])
 		if boss.state == &"posture_broken":
 			draw_rect(panel.grow(1), colors["p"], false, 1.0)
-		lettering(panel.position + Vector2(4, 3), "MOSSBOUND COLOSSUS", colors["1"])
-		bar(panel.position + Vector2(4, 10), 72, h.boss_hp, h.boss_max_hp, colors["7"], 3)
-		lettering(panel.position + Vector2(4, 15), "POSTURE", colors["o"])
-		bar(panel.position + Vector2(4, 22), 72, h.boss_posture, h.boss_posture_max, colors["v"], 2)
+		# 3x5 name lettering and a clipped-corner elite chip.
+		var tag: Vector2 = panel.position + Vector2(3, 2)
+		draw_rect(Rect2(tag + Vector2(1, 0), Vector2(18, 9)), colors["k"])
+		draw_rect(Rect2(tag + Vector2(0, 1), Vector2(20, 7)), colors["k"])
+		lettering(tag + Vector2(2, 2), "BOSS", colors["1"])
+		lettering(panel.position + Vector2(27, 5), "MOSSBOUND COLOSSUS", colors["A"])
+		lettering(panel.position + Vector2(26, 4), "MOSSBOUND COLOSSUS", colors["z"])
+		bar(panel.position + Vector2(4, 13), 96, h.boss_hp, h.boss_max_hp, colors["7"], 3)
+		bar(panel.position + Vector2(4, 19), 96, h.boss_posture, h.boss_posture_max, colors["p"] if boss.state == &"posture_broken" else colors["v"], 2)
 		if h.counter_window_ticks_left > 0:
-			lettering(panel.position + Vector2(4, 28), "COUNTER - ATTACK", colors["p"])
-			bar(panel.position + Vector2(4, 35), 72, h.counter_window_ticks_left, counter_max, colors["o"], 2)
+			lettering(panel.position + Vector2(4, 25), "COUNTER - ATTACK", colors["p"])
+			bar(panel.position + Vector2(4, 33), 88, h.counter_window_ticks_left, counter_max, colors["o"], 2)
 	draw_rect(Rect2(4, 167, 312, 10), colors["0"])
 	lettering(Vector2(8, 169), "LMB HIT  SPACE PARRY  SHIFT DASH  F1 DEBUG", colors["j"])
 	if debug_enabled:
@@ -103,16 +106,48 @@ func _draw() -> void:
 		lettering(Vector2(160 - title.length() * 4, 75), title, colors["1"], 2)
 		lettering(Vector2(124, 96), "PRESS R TO RESTART", colors["o"])
 
-## Pixel raster annuli: top origin, clockwise, no smoothed line edges.
-func ring_gauge(center: Vector2, radius: int, value: float, maximum: float, color: Color) -> void:
-	var fraction: float = clampf(value / maxf(1.0, maximum), 0.0, 1.0)
-	for y: int in range(-radius, radius + 1):
-		for x: int in range(-radius, radius + 1):
-			var distance: float = Vector2(x, y).length()
-			if distance <= radius and distance > radius - 2:
-				var angle: float = fposmod(atan2(float(x), float(-y)), TAU)
-				draw_rect(Rect2(center + Vector2(x, y), Vector2.ONE), color if fraction >= 1.0 or angle < fraction * TAU else colors["f"])
+## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
+func _draw_profile(h: Snapshots.HudSnapshot) -> void:
+	var origin: Vector2 = Vector2(4, 3)
+	draw_circle(origin + Vector2(19, 19), 15, colors["0"], true, -1.0, false)
+	if portrait_atlas != null and not portrait_frame.is_empty():
+		draw_texture_rect_region(portrait_atlas, Rect2(origin + Vector2(7, 7), Vector2(24, 24)), Rect2(portrait_frame["x"], portrait_frame["y"], 24, 24))
+	bar(origin + Vector2(33, 11), 97, h.player_hp, h.player_max_hp, colors["t"], 8)
+	var health_width: int = floori(97 * clampf(float(h.player_hp) / maxi(1, h.player_max_hp), 0.0, 1.0))
+	if health_width > 0:
+		draw_rect(Rect2(origin + Vector2(33, 11), Vector2(health_width, 1)), colors["u"])
+	bar(origin + Vector2(40, 25), 86, h.edge, h.edge_max, colors["v"], 2)
+	bar(origin + Vector2(40, 30), 86, dash_fraction(h), 1.0, colors["n"], 2)
+	if portrait_atlas != null and not profile_frame.is_empty():
+		draw_texture_rect_region(portrait_atlas, Rect2(origin, Vector2(profile_frame["w"], profile_frame["h"])), Rect2(profile_frame["x"], profile_frame["y"], profile_frame["w"], profile_frame["h"]))
+	var hp: String = "%d/%d" % [h.player_hp, h.player_max_hp]
+	var hp_at: Vector2 = origin + Vector2(82 - floori(hp.length() * 2.0), 13)
+	lettering(hp_at + Vector2.DOWN, hp, colors["0"])
+	lettering(hp_at, hp, colors["1"])
+	lettering(origin + Vector2(34, 24), "E", colors["v"])
+	lettering(origin + Vector2(34, 30), "D", colors["n"])
 
-static func boss_panel(at: Vector2, counter: bool) -> Rect2:
-	var height: float = 40.0 if counter else 27.0
-	return Rect2(Vector2(clampf(at.x - 40, 2, 238), clampf(at.y - 48 - height, 2, 164 - height)).round(), Vector2(80, height))
+static func dash_fraction(h: Snapshots.HudSnapshot) -> float:
+	if h.dash_cooldown_ticks <= 0:
+		return 1.0
+	return clampf(1.0 - float(h.dash_cooldown_ticks) / maxi(1, h.dash_cooldown_max), 0.0, 1.0)
+
+func reset_head() -> void:
+	head_tick = -1
+	head_id = -1
+
+## Advance once per snapshot tick, never per draw call. Restart/teleport snaps cleanly.
+func track_head(target: Vector2, tick: int, actor_id: int, ground: Vector2 = Vector2.ZERO) -> void:
+	if head_tick < 0 or tick < head_tick or actor_id != head_id:
+		head_position = target
+	elif tick > head_tick:
+		var elapsed: int = mini(tick - head_tick, 6)
+		head_position += ground - head_ground
+		head_position = head_position.lerp(target, 1.0 - pow(0.5, elapsed))
+	head_ground = ground
+	head_tick = tick
+	head_id = actor_id
+
+static func boss_panel(head: Vector2, counter: bool) -> Rect2:
+	var height: float = 39.0 if counter else 25.0
+	return Rect2(Vector2(clampf(head.x - 52, 2, 214), clampf(head.y - 4 - height, 2, 164 - height)).round(), Vector2(104, height))
