@@ -32,7 +32,7 @@ const PARRY_EARLY_POSTURE: float = 35.0
 const RIPOSTE_STEP: float = 10.0
 
 # Sword
-const ATTACK_WINDUP_TICKS: int = 5
+const ATTACK_WINDUP_TICKS: int = 7  # was 5: gives the draw-from-sheath animation time to read
 const ATTACK_ACTIVE_TICKS: int = 3
 const ATTACK_RECOVERY_TICKS: int = 9
 const ATTACK_RANGE: float = 26.0
@@ -84,3 +84,31 @@ const SHARDS_SPREAD_DEG: float = 20.0
 const SHARDS_ACTIVE_TICKS: int = 6
 const SHARDS_DAMAGE: int = 15
 const SHARDS_RECOVER_TICKS: int = 30
+
+# Added after playtest ("add more attack patterns"). Stomp and combo are in both phases' pool; the
+# combo and the charge only appear in phase 2.
+# Red stomp: a ring around the boss. The inner circle (right next to the boss) is safe, the band is not,
+# and the outside is safe. Get close or get far; a dash through the band also works.
+const STOMP_WINDUP_TICKS: int = 60
+const STOMP_INNER_RADIUS: float = 44.0
+const STOMP_OUTER_RADIUS: float = 100.0
+const STOMP_ACTIVE_TICKS: int = 3
+const STOMP_DAMAGE: int = 25
+const STOMP_RECOVER_TICKS: int = 40
+
+# Gold combo: two gold slams (second one lands COMBO_GAP ticks after the first, a bit farther out).
+const COMBO_WINDUP_TICKS: int = 54
+const COMBO_GAP_TICKS: int = 26
+const COMBO_RADIUS: float = 30.0
+const COMBO_OFFSET: float = 46.0
+const COMBO_DAMAGE: int = 25
+const COMBO_RECOVER_TICKS: int = 44
+
+# Red charge: the boss rushes along a locked line. The line is both the warning and the danger area, and
+# the boss body travels along it while it is dangerous.
+const CHARGE_WINDUP_TICKS: int = 50
+const CHARGE_LENGTH: float = 170.0
+const CHARGE_WIDTH: float = 28.0
+const CHARGE_ACTIVE_TICKS: int = 8
+const CHARGE_DAMAGE: int = 28
+const CHARGE_RECOVER_TICKS: int = 50

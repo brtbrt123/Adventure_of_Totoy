@@ -16,7 +16,13 @@ const STATE_DEAD: StringName = &"dead"
 const ATTACK_SLAM: StringName = &"gold_slam"
 const ATTACK_SWEEP: StringName = &"red_sweep"
 const ATTACK_SHARDS: StringName = &"red_shards"
-const ATTACKS: Array[StringName] = [ATTACK_SLAM, ATTACK_SWEEP, ATTACK_SHARDS]
+const ATTACK_STOMP: StringName = &"red_stomp"
+const ATTACK_COMBO: StringName = &"gold_combo"
+const ATTACK_CHARGE: StringName = &"red_charge"
+const ATTACKS: Array[StringName] = [ATTACK_SLAM, ATTACK_SWEEP, ATTACK_SHARDS, ATTACK_STOMP, ATTACK_COMBO, ATTACK_CHARGE]
+## Attacks the boss may pick on its own. Phase 2 adds the combo and the charge.
+const PHASE1_POOL: Array[StringName] = [ATTACK_SLAM, ATTACK_SWEEP, ATTACK_SHARDS, ATTACK_STOMP]
+const PHASE2_POOL: Array[StringName] = [ATTACK_SLAM, ATTACK_SWEEP, ATTACK_SHARDS, ATTACK_STOMP, ATTACK_COMBO, ATTACK_CHARGE]
 
 var id: int = 2
 var position: Vector2 = Tuning.BOSS_START
@@ -33,6 +39,8 @@ var broken_ticks_left: int = 0
 var next_attack_override: StringName = &""
 
 var _last_attack: StringName = &""
+var _charge: Telegraph = null  # the active charge line, while a charge is in progress
+var _charge_from: Vector2 = Vector2.ZERO
 var _attack_end_tick: int = 0
 var _recover_ticks: int = 0
 var _next_telegraph_id: int = 1
@@ -55,8 +63,10 @@ func step(tick: int, player_pos: Vector2, rng: RandomNumberGenerator, events: Ar
 				_begin_attack(tick, player_pos, rng, events)
 		STATE_ATTACK:
 			_decay_posture()
+			_step_charge(tick)
 			if tick > _attack_end_tick:
 				telegraphs.clear()
+				_charge = null
 				_set_state(STATE_RECOVER)
 		STATE_RECOVER:
 			_decay_posture()
@@ -101,6 +111,7 @@ func take_damage(amount: int, tick: int, events: Array[GameEvent], source_id: in
 func _break(tick: int, events: Array[GameEvent]) -> void:
 	posture = Tuning.BOSS_POSTURE_MAX
 	telegraphs.clear()  # a broken boss drops its current attack
+	_charge = null
 	broken_ticks_left = Tuning.BOSS_BREAK_TICKS
 	_set_state(STATE_BROKEN)
 	events.append(GameEvent.new(GameEvent.POSTURE_BROKEN, tick, {"entity_id": id, "window_ticks": Tuning.BOSS_BREAK_TICKS}))
@@ -116,7 +127,7 @@ func _begin_attack(tick: int, player_pos: Vector2, rng: RandomNumberGenerator, e
 	next_attack_override = &""
 	if attack == &"":
 		var choices: Array[StringName] = []
-		for candidate: StringName in ATTACKS:
+		for candidate: StringName in (PHASE2_POOL if phase == 2 else PHASE1_POOL):
 			if candidate != _last_attack:
 				choices.append(candidate)
 		attack = choices[rng.randi_range(0, choices.size() - 1)]
@@ -149,10 +160,54 @@ func _begin_attack(tick: int, player_pos: Vector2, rng: RandomNumberGenerator, e
 				shard.damage = Tuning.SHARDS_DAMAGE
 				_add(shard, events)
 			_recover_ticks = Tuning.SHARDS_RECOVER_TICKS
+		ATTACK_STOMP:
+			var hit: int = tick + roundi(Tuning.STOMP_WINDUP_TICKS * scale)
+			var stomp: Telegraph = _make(attack, Telegraph.KIND_RED, Telegraph.SHAPE_RING, position, aim, tick, hit, hit + Tuning.STOMP_ACTIVE_TICKS)
+			stomp.size = Tuning.STOMP_OUTER_RADIUS
+			stomp.inner_size = Tuning.STOMP_INNER_RADIUS
+			stomp.damage = Tuning.STOMP_DAMAGE
+			_add(stomp, events)
+			_recover_ticks = Tuning.STOMP_RECOVER_TICKS
+		ATTACK_COMBO:
+			var first_hit: int = tick + roundi(Tuning.COMBO_WINDUP_TICKS * scale)
+			var second_hit: int = first_hit + Tuning.COMBO_GAP_TICKS
+			var first_center: Vector2 = _clamp_to_arena(player_pos)
+			var second_center: Vector2 = _clamp_to_arena(player_pos + aim * Tuning.COMBO_OFFSET)
+			var first: Telegraph = _make(attack, Telegraph.KIND_GOLD, Telegraph.SHAPE_CIRCLE, first_center, aim, tick, first_hit, first_hit)
+			var second: Telegraph = _make(attack, Telegraph.KIND_GOLD, Telegraph.SHAPE_CIRCLE, second_center, aim, tick, second_hit, second_hit)
+			for slam: Telegraph in [first, second]:
+				slam.size = Tuning.COMBO_RADIUS
+				slam.damage = Tuning.COMBO_DAMAGE
+				_add(slam, events)
+			_recover_ticks = Tuning.COMBO_RECOVER_TICKS
+		ATTACK_CHARGE:
+			var hit: int = tick + roundi(Tuning.CHARGE_WINDUP_TICKS * scale)
+			var charge: Telegraph = _make(attack, Telegraph.KIND_RED, Telegraph.SHAPE_LINE, position, aim, tick, hit, hit + Tuning.CHARGE_ACTIVE_TICKS - 1)
+			charge.size = Tuning.CHARGE_LENGTH
+			charge.width = Tuning.CHARGE_WIDTH
+			charge.damage = Tuning.CHARGE_DAMAGE
+			_add(charge, events)
+			_charge = charge
+			_charge_from = position
+			_recover_ticks = Tuning.CHARGE_RECOVER_TICKS
 	_attack_end_tick = 0
 	for telegraph: Telegraph in telegraphs:
 		_attack_end_tick = maxi(_attack_end_tick, telegraph.end_tick)
 	_set_state(STATE_ATTACK)
+
+
+## While a charge is dangerous, the boss body travels along the locked line (same geometry as the warning).
+func _step_charge(tick: int) -> void:
+	if _charge == null or tick < _charge.hit_tick or tick > _charge.end_tick:
+		return
+	var span: float = float(_charge.end_tick - _charge.hit_tick + 1)
+	var progress: float = float(tick - _charge.hit_tick + 1) / span
+	position = _charge_from + _charge.direction * _charge.size * progress
+
+
+func _clamp_to_arena(point: Vector2) -> Vector2:
+	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
+	return point.clamp(low, Tuning.ARENA_SIZE - low)
 
 
 func _make(attack: StringName, kind: StringName, shape: StringName, center: Vector2, direction: Vector2, start: int, hit: int, end_tick: int) -> Telegraph:

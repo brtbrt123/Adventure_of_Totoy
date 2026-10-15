@@ -8,6 +8,7 @@ const KIND_RED: StringName = &"red"  # must be dodged: parry does nothing
 const SHAPE_CIRCLE: StringName = &"circle"  # center, size = radius
 const SHAPE_CONE: StringName = &"cone"  # center = origin, direction, size = radius, half_angle
 const SHAPE_LINE: StringName = &"line"  # center = start, direction, size = length, width
+const SHAPE_RING: StringName = &"ring"  # center, size = outer radius, inner_size = inner radius (the inside is SAFE)
 
 var id: int = 0
 var owner_id: int = 0
@@ -17,6 +18,7 @@ var shape: StringName = SHAPE_CIRCLE
 var center: Vector2 = Vector2.ZERO
 var direction: Vector2 = Vector2.RIGHT
 var size: float = 0.0
+var inner_size: float = 0.0  # rings only
 var half_angle: float = 0.0
 var width: float = 0.0
 var damage: int = 0
@@ -43,6 +45,9 @@ func overlaps_circle(point: Vector2, radius: float) -> bool:
 				return true
 			var angle: float = absf(direction.angle_to(to_point))
 			return angle <= half_angle + asin(minf(radius / dist, 1.0))
+		SHAPE_RING:
+			var ring_dist: float = point.distance_to(center)
+			return ring_dist <= size + radius and ring_dist >= inner_size - radius
 		SHAPE_LINE:
 			var end_point: Vector2 = center + direction * size
 			var closest: Vector2 = Geometry2D.get_closest_point_to_segment(point, center, end_point)

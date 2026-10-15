@@ -61,10 +61,13 @@ One `InputFrame` per tick:
 
 States: player `idle walk dash parry parry_recovery attack_windup attack_active attack_recovery dead`; boss `idle attack recover posture_broken dead`.
 
-`TelegraphSnapshot`: `id`, `owner_id`, `attack` (`gold_slam`, `red_sweep`, `red_shards`), `kind` (`gold` = parry it, `red` = dodge it), `shape` + parameters, `start_tick`, `hit_tick`, `end_tick`.
+`TelegraphSnapshot`: `id`, `owner_id`, `attack` (`gold_slam`, `gold_combo`, `red_sweep`, `red_shards`, `red_stomp`, `red_charge`), `kind` (`gold` = parry it, `red` = dodge it), `shape` + parameters, `start_tick`, `hit_tick`, `end_tick`.
 - `circle`: `center`, `size` = radius
 - `cone`: `center` = origin, `direction`, `size` = radius, `half_angle` (radians)
 - `line`: `center` = start, `direction`, `size` = length, `width`
+- `ring`: `center`, `size` = outer radius, `inner_size` = inner radius; **the inside (closer than `inner_size`) is safe**, the band is dangerous, the outside is safe
+
+Boss attacks: `gold_slam` (one parryable slam), `gold_combo` (two parryable slams, the second `COMBO_GAP_TICKS` after the first; a perfect parry on the first breaks posture and cancels the second; phase 2 only), `red_sweep` (cone), `red_shards` (three lines), `red_stomp` (ring), `red_charge` (a line; the boss body travels along it while it is dangerous, so the boss `position` in the snapshot moves from `hit_tick` to `end_tick`; phase 2 only). The attack frames presentation shows come from the telegraph `attack` name; a combo has two telegraphs with different `hit_tick`s.
 
 The area is dangerous from `hit_tick` to `end_tick` inclusive; before that it is only a warning. Presentation draws the warning growing/filling toward `hit_tick` and may slow the visual for the final windup (the design's "final windup slows briefly").
 
