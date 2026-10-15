@@ -17,15 +17,18 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 - `python tools/art/build_art.py` and `python tools/art/preview_art.py` run; `art/build/contact_sheet.png` was viewed and renders correctly.
 - `python -m unittest discover -s tests` runs 11 tests, all pass, including: bad tile size, off-palette symbol, ragged rows, missing kind, seam mismatch, bad sprite size, partial transparency and off-palette PNG pixels all **fail** validation as intended.
 
+- Godot 4.7.2 (extracted from the zip to `C:\Tools\Godot\`, PATH untouched; the `.exe` named folder in Downloads was empty). `--headless --import --quit` exits 0 with no errors. `tests/smoke_project.gd` prints `SMOKE OK`: it checks the display and filter settings, that `tileset.tres` loads with 16x16 tiles and 4 tiles, and that `sprites.png` and `sprites.json` load.
+
 ## Not verified
 
-- **Godot has never opened the project.** `C:\Users\Admin\Downloads\Godot_v4.7.2-stable_win64.exe` is an empty *folder*, not a program. The real executables are inside `Godot_v4.7.2-stable_win64.exe.zip` (editor and `_console.exe`). Not extracted yet. So these are unchecked: `project.godot` syntax and settings (for example `window/stretch/scale_mode="integer"`, `config/features`), and that `art/build/tileset.tres` loads and tiles show correctly.
+- `godot_console --headless --quit` alone fails with "no main scene defined" (there is no scene yet). The smoke script is the substitute check until a main scene exists.
+- Tiles were not rendered in a running Godot window, so seam-free display with camera movement is unchecked.
 - `codex` CLI is not installed or not on PATH, so nothing about Codex was checked.
 - Whether the art looks good: the human must judge the contact sheet. The seam check is a heuristic.
 
 ## Open questions for the human
 
-1. May I extract the Godot zip to a folder outside the repo (for example `C:\Tools\Godot\`) and optionally add it to PATH as `godot` / `godot_console`?
+1. Add `C:\Tools\Godot` to PATH (as `godot` / `godot_console`)? Not done; the docs use the full path.
 2. Art mood: the design says cozy and readable (Stardew-like feeling). Is DB16 acceptable for that, or do you want a warmer custom palette?
 3. Is `tools/` and `harness/` being owned by Claude Code acceptable (not in the brief's routing table)?
 4. Test framework: plain headless GDScript scripts (recommended, no addon) or GUT / GdUnit4 (compatibility with 4.7.2 not checked)?
@@ -34,7 +37,6 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 ## Recommended next steps
 
-1. Extract Godot, run `godot_console --headless --path . --import --quit`, fix anything it reports, then commit.
-2. Human reviews `art/build/contact_sheet.png` and the palette.
-3. Claude Code builds the combat core slice against `docs/architecture.md` (core only, with headless tests), then revisits that doc.
-4. Stage 2 (router and worktrees) after Codex is installed.
+1. Human reviews `art/build/contact_sheet.png` and the palette.
+2. Claude Code builds the combat core slice against `docs/architecture.md` (core only, with headless tests), then revisits that doc.
+3. Stage 2 (router and worktrees) after Codex is installed.

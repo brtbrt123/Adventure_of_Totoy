@@ -89,11 +89,13 @@ Godot loads `art/build/tileset.tres` (margin 1, separation 2, 16x16) and `art/bu
 Use the **console** build for headless or scripted runs, because the regular build does not reliably print to a terminal on Windows:
 
 ```powershell
-godot_console --version
-godot_console --headless --path . --quit        # opens the project; expect no errors
+$godot = "C:\Tools\Godot\Godot_v4.7.2-stable_win64_console.exe"   # not on PATH
+& $godot --version
+& $godot --headless --path . --import --quit                     # import assets; expect exit 0, no errors
+& $godot --headless --path . --script res://tests/smoke_project.gd  # prints SMOKE OK; exit 0
 ```
 
-(Until the executables are on PATH as `godot` and `godot_console`, use the full path to `Godot_v4.7.2-stable_win64_console.exe`.) No test framework is chosen yet; do not add an addon (GUT, GdUnit4, ...) without asking the human.
+Notes: `--headless --quit` alone fails with "no main scene defined" until the project has a main scene; use the smoke script instead. Redirect output to a file (`*> out.txt`) rather than piping into `Select-Object -First`, which kills Godot early. Commit the `.import` and `.uid` files Godot generates next to assets and scripts; `.godot/` is ignored. No test framework is chosen yet; do not add an addon (GUT, GdUnit4, ...) without asking the human.
 
 ## 7. Working rules
 
