@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://643cn4rhofeh"
-path="res://.godot/imported/totoy_idle_down.png-b9e596097816fd9b1d82865e0f4f5d73.ctex"
+uid="uid://dsb4y8rbnjcm4"
+path="res://.godot/imported/arena_hero_slash.png-cc54f7da0ab44b99afdb1b7fd9beb2ac.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/build/sprites/totoy_idle_down.png"
-dest_files=["res://.godot/imported/totoy_idle_down.png-b9e596097816fd9b1d82865e0f4f5d73.ctex"]
+source_file="res://art/build/arena_hero_slash.png"
+dest_files=["res://.godot/imported/arena_hero_slash.png-cc54f7da0ab44b99afdb1b7fd9beb2ac.ctex"]
 
 [params]
 

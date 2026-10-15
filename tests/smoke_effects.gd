@@ -170,6 +170,56 @@ func _new_patterns() -> void:
 			_expect(saw_rush, "charge rush never exercised")
 		_expect(arena.missing_frames.is_empty(), "new pattern requested missing frames")
 
+func _parry_visuals() -> void:
+	var counts: Array[int] = []
+	for lead: int in [10, 2]:
+		_reset()
+		arena.core.boss.next_attack_override = &"gold_slam"
+		arena.core.boss.cooldown = 1
+		var succeeded: bool = false
+		for i: int in range(120):
+			var frame: InputFrame = InputFrame.new()
+			for tell: Snapshots.TelegraphSnapshot in arena.snapshot.telegraphs:
+				if arena.snapshot.tick == tell.hit_tick - lead:
+					frame.parry_pressed = true
+			_step(frame)
+			for event: GameEvent in arena.core.last_events:
+				if event.type == &"parry_succeeded":
+					succeeded = true
+					_expect(event.data["quality"] == (&"perfect" if lead == 2 else &"early"), "fixture parry quality")
+					_expect(arena.parry_impacts.size() == 1, "parry impact missing")
+					_expect(arena.screen_flash_until > arena.snapshot.tick and arena.shake_left > 0, "parry flash or shake missing")
+					counts.append(arena.particles.size())
+					var impact: Dictionary = arena.parry_impacts[0]
+					_expect(Vector2(impact["position"]) == Vector2(event.data["position"]), "impact moved away from event contact")
+					_expect(not CombatEffects.parry_impact(impact["position"], 0, lead == 2, arena.colors).is_empty(), "impact drawing missing")
+			if succeeded:
+				break
+		_expect(succeeded, "scripted parry did not succeed")
+		for i: int in range(12):
+			_step(InputFrame.new())
+		_expect(arena.parry_impacts.is_empty() and arena.snapshot.tick >= arena.screen_flash_until, "parry effect never expired")
+	_expect(counts.size() == 2 and counts[1] > counts[0], "perfect must have more sparks than early")
+	_reset()
+	var parry: InputFrame = InputFrame.new()
+	parry.parry_pressed = true
+	_step(parry)
+	_expect(arena.slash_plan.size() == 2, "opening blade glint missing")
+	for i: int in range(14):
+		_step(InputFrame.new())
+	_expect(arena.parry_impacts.is_empty() and not arena.particles.is_empty(), "whiff must create only a dull puff")
+	_reset()
+	var attack: InputFrame = InputFrame.new()
+	attack.attack_pressed = true
+	_step(attack)
+	for i: int in range(7):
+		_step(InputFrame.new())
+	var draw_commands: int = arena.slash_plan.size()
+	_expect(arena.snapshot.player.state == &"attack_active", "draw transition fixture")
+	_step(InputFrame.new())
+	_step(InputFrame.new())
+	_expect(draw_commands == arena.slash_plan.size() + 1, "iai streak must end after two ticks")
+
 func _run() -> void:
 	await process_frame
 	_controls()
@@ -181,6 +231,7 @@ func _run() -> void:
 	arena = packed.instantiate() as Arena
 	root.add_child(arena)
 	arena.set_physics_process(false)
+	_parry_visuals()
 	await _red_encounter(&"red_shards")
 	await _red_encounter(&"red_sweep")
 	await _new_patterns()

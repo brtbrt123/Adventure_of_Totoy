@@ -17,6 +17,16 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 **What this does not tell us:** nobody has played it. There is no scene, input mapping or drawing yet (that is `presentation/`, Codex's area), so whether the parry window, boss timings and damage feel fair or fun is unknown. The numbers in `tuning.gd` are first guesses. Only the logic is tested (including: warning area equals hit area, aim locked at commit, determinism).
 
+## Hero redesign, sheath draw and parry (same branch, 2026-10-15)
+
+The human asked for a hero in the spirit of Asta (Black Clover), a sword that is drawn from a sheath, and a better parry.
+- **Design (Codex, original, inspired by that spirit):** spiky ash-blond hair, fierce face, dark sleeveless robe with a short cape, teal wrist bands, a large dark sword in a sheath across the back. No emblems or copied outfit; no gold or red on the hero (reserved for combat tells). Still 16x24. 54 frames: per direction (down, up, right; left mirrors right) idle 2, walk 4, dash 2, parry 3, parry_recovery 1, attack_windup 2, attack_active 1, attack_recovery 2, dead 1. Frame table and ticks per frame: `presentation/arena/animation.gd`.
+- **Sword draw:** sheathed on the back at rest; windup = hand to the hilt then half-drawn, a draw streak at the windup-to-active transition, then the slash and a flick back toward the sheath.
+- **Parry:** three guard frames with a glint along the blade, a whiff puff, and on `parry_succeeded` sparks, ring, radial lines, screen flash, shake and a boss recoil puff (perfect clearly bigger than early).
+- **Core:** `ATTACK_WINDUP_TICKS` is 7 so the draw has time to read (no other core change in this step).
+- **Provenance, honestly:** the work was in the worktree when Codex's last attempt opened it (shell failed at startup in all 4 attempts; Codex's report says it ran checks through Node child processes). Claude Code reran everything: validator, art build, Python tests, Godot import, `run_tests.gd` (36), `smoke_project`, `smoke_arena`, `smoke_animation`, `smoke_effects`, `smoke_boss_attacks` and a 120-frame main-scene run. All pass. Screenshots: `art/build/arena_hero_idle.png`, `arena_hero_draw.png`, `arena_hero_slash.png`, `arena_hero_parry.png`, `arena_parry_spark.png`.
+- **Not judged:** whether he looks like what the human wants (the sprite is only 16x24 and dark against the grass; the half-draw and resheathing have little room at this size), and how the draw and parry read in motion.
+
 ## Boss patterns and boss animation (branch `agent/logic/boss-patterns`, 2026-10-15)
 
 The human noticed the golem had no swing animation and asked for more attack patterns.

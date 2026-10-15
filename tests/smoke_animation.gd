@@ -63,7 +63,8 @@ func _catalog() -> void:
 	var atlas: Dictionary = parsed.get("frames", {})
 	for name_key: String in ArenaAnimation.all_names():
 		_expect(atlas.has(name_key), "atlas missing " + name_key)
-		if name_key.begins_with("mossbound_colossus_"):
+		if name_key.begins_with("mossbound_colossus_") or name_key.begins_with("totoy_"):
+			var hero: bool = name_key.begins_with("totoy_")
 			var source: FileAccess = FileAccess.open("res://art/src/" + name_key + ".txt", FileAccess.READ)
 			_expect(source != null, "boss source missing " + name_key)
 			if source != null:
@@ -72,11 +73,11 @@ func _catalog() -> void:
 					var row: String = line.strip_edges()
 					if not row.is_empty() and not row.begins_with("#"):
 						rows.append(row)
-				_expect(rows.size() == 48, "boss height must stay 48: " + name_key)
+				_expect(rows.size() == (24 if hero else 48), "actor height changed: " + name_key)
 				for row: String in rows:
-					_expect(row.length() == 48, "boss width must stay 48: " + name_key)
+					_expect(row.length() == (16 if hero else 48), "actor width changed: " + name_key)
 					for reserved: String in ["x", "y", "z", "A"]:
-						_expect(not row.contains(reserved), "combat cue color on boss body: " + name_key)
+						_expect(not row.contains(reserved), "combat cue color on actor body: " + name_key)
 	# Exercise every directional state and every frame index the table declares.
 	var snap: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
 	var actor: Snapshots.EntitySnapshot = Snapshots.EntitySnapshot.new()
@@ -123,6 +124,29 @@ func _catalog() -> void:
 		actor.state = &"posture_broken"
 		_expect(ArenaAnimation.choose(actor, snap, history).contains("posture_broken"), "break cancels strike hold")
 		actor.state = &"attack"
+
+# Follow real core state lifetimes so a pose that is unreachable before a state
+# expires cannot pass merely because the catalog can synthesize its name.
+func _hero_timelines() -> void:
+	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
+		_reset()
+		_step(_frame(facing))
+		var requested: Dictionary = {}
+		for i: int in range(50):
+			_step(_frame())
+			requested[arena.selected_frames[arena.snapshot.player.id]] = true
+		for i: int in range(40):
+			_step(_frame(facing))
+			requested[arena.selected_frames[arena.snapshot.player.id]] = true
+		for action: int in range(3):
+			_step(_frame(Vector2.ZERO, action == 0, action == 1, action == 2))
+			requested[arena.selected_frames[arena.snapshot.player.id]] = true
+			for i: int in range(40):
+				_step(_frame())
+				requested[arena.selected_frames[arena.snapshot.player.id]] = true
+		for name_key: String in ArenaAnimation.all_names():
+			if name_key.begins_with("totoy_") and name_key.contains("_" + ArenaAnimation.direction(facing) + "_") and not name_key.contains("_dead_"):
+				_expect(requested.has(name_key), "real state lifetime never requests " + name_key)
 
 func _combo_boundaries() -> void:
 	var snap: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
@@ -190,6 +214,7 @@ func _run() -> void:
 	arena = packed.instantiate() as Arena
 	root.add_child(arena)
 	arena.set_physics_process(false)
+	_hero_timelines()
 	_reset()
 	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
 		for i: int in range(24):

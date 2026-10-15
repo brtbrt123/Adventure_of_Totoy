@@ -24,6 +24,8 @@ var red_history: Dictionary = {}
 var red_plan: Array[Dictionary] = []
 var slash_plan: Array[Dictionary] = []
 var rings: Array[Dictionary] = []
+var parry_impacts: Array[Dictionary] = []
+var screen_flash_until: int = -1
 var visual_tick: int = -1
 var particles: Array[Dictionary] = []
 var trails: Array[Dictionary] = []
@@ -91,6 +93,8 @@ func _restart() -> void:
 	last_attacks.clear()
 	previous_telegraphs.clear()
 	rings.clear()
+	parry_impacts.clear()
+	screen_flash_until = -1
 	red_history.clear()
 	red_plan.clear()
 	slash_plan.clear()
@@ -132,10 +136,16 @@ func _on_event(event: GameEvent) -> void:
 		&"parry_succeeded":
 			var perfect: bool = event.data["quality"] == &"perfect"
 			_burst(event.data["position"], 16 if perfect else 7, colors["x"], 1.6 if perfect else 1.0)
+			parry_impacts.append({"position": event.data["position"], "tick": event.tick, "perfect": perfect})
+			shake_left = maxi(shake_left, 7 if perfect else 3)
+			screen_flash_until = event.tick + (2 if perfect else 1)
+			for actor: Snapshots.EntitySnapshot in snapshot.entities:
+				if actor.id == int(event.data["attacker_id"]):
+					_burst(actor.position - Vector2(0, 8), 9 if perfect else 4, colors["j"], 0.65 if perfect else 0.35)
 			_sound_parry_succeeded(event)
 		&"posture_broken":
 			flashes[int(event.data["entity_id"])] = 5
-			shake_left = 6
+			shake_left = maxi(shake_left, 6)
 			_sound_posture_broken(event)
 		&"counter_window_opened":
 			hud.counter_max = maxi(1, int(event.data["window_ticks"]))
@@ -151,7 +161,10 @@ func _on_event(event: GameEvent) -> void:
 					shake_left = maxi(shake_left, 5)
 			_sound_attack_hit(event)
 		&"attack_telegraphed": _sound_attack_telegraphed(event)
-		&"parry_failed": _sound_parry_failed(event)
+		&"parry_failed":
+			if event.data["reason"] == &"whiff":
+				_burst(snapshot.player.position - Vector2(0, 8), 4, colors["f"], 0.3)
+			_sound_parry_failed(event)
 		&"dash_ready": _sound_dash_ready(event)
 		&"entity_died": _sound_entity_died(event)
 		&"boss_phase_changed": _sound_boss_phase_changed(event)
@@ -193,6 +206,8 @@ func _draw() -> void:
 		_draw_actor(actor)
 	CombatEffects.draw_plan(self, red_plan)
 	CombatEffects.draw_plan(self, slash_plan)
+	for impact: Dictionary in parry_impacts:
+		CombatEffects.draw_plan(self, CombatEffects.parry_impact(impact["position"], snapshot.tick - int(impact["tick"]), bool(impact["perfect"]), colors))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_marker(self, t, colors["x"] if t.kind == &"gold" else colors["z"], colors["0"])
 	for particle: Dictionary in particles:
@@ -203,6 +218,8 @@ func _draw() -> void:
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
 			draw_circle(actor.position, Tuning.BOSS_RADIUS, colors["p"], false, 1.0)
 	draw_set_transform(Vector2.ZERO)
+	if snapshot.tick < screen_flash_until:
+		draw_rect(Rect2(0, 0, 320, 180), Color(colors["1"], 0.10))
 
 func _behind(a: Snapshots.EntitySnapshot, b: Snapshots.EntitySnapshot) -> bool:
 	return a.position.y < b.position.y
@@ -229,6 +246,9 @@ func prepare_visuals() -> void:
 	slash_plan = CombatEffects.slash(snapshot.player, colors)
 	var fresh: bool = snapshot.tick != visual_tick
 	if fresh:
+		for i: int in range(parry_impacts.size() - 1, -1, -1):
+			if snapshot.tick - int(parry_impacts[i]["tick"]) >= 10:
+				parry_impacts.remove_at(i)
 		# Include the preceding snapshot for a parry that clears the tell exactly
 		# at impact. An earlier cancellation disappears before this crossing.
 		var impact_candidates: Array[Snapshots.TelegraphSnapshot] = []

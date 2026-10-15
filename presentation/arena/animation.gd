@@ -5,9 +5,9 @@ const DIRECTIONS: Array[String] = ["down", "up", "right"]
 # [frame count, ticks per frame, loop]. Windups use telegraph progress instead.
 const PLAYER: Dictionary = {
 	"idle": [2, 24, true], "walk": [4, 9, true], "dash": [2, 3, false],
-	"parry": [2, 3, false], "parry_recovery": [1, 1, false],
-	"attack_windup": [1, 1, false], "attack_active": [1, 1, false],
-	"attack_recovery": [1, 1, false], "dead": [1, 1, false],
+	"parry": [3, 4, false], "parry_recovery": [1, 1, false],
+	"attack_windup": [2, 4, false], "attack_active": [1, 3, false],
+	"attack_recovery": [2, 5, false], "dead": [1, 1, false],
 }
 const BOSS: Dictionary = {
  "idle": [2, 32, true], "gold_slam_windup": [3, 1, false],

@@ -13,6 +13,6 @@ test_partial_transparency (test_art_pipeline.BadPng.test_partial_transparency) .
 test_project_art_passes (test_art_pipeline.RealArt.test_project_art_passes) ... ok
 
 ----------------------------------------------------------------------
-Ran 13 tests in 2.046s
+Ran 13 tests in 1.923s
 
 OK

@@ -2,6 +2,7 @@ extends RefCounted
 ## Snapshot-only drawing plans. Built headless too, so smoke tests exercise geometry.
 const Snapshots := preload("res://core/snapshots.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
+const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const AFTERGLOW_TICKS: int = 10
 
 static func pixel_points(points: PackedVector2Array) -> PackedVector2Array:
@@ -81,11 +82,26 @@ static func slash(player: Snapshots.EntitySnapshot, colors: Dictionary) -> Array
 	var at: Vector2 = player.position - Vector2(0, 7)
 	var angle: float = player.facing.angle()
 	var ticks: int = player.state_ticks
+	if player.state == &"parry":
+		var pose: int = ArenaAnimation.frame_index(ArenaAnimation.PLAYER["parry"], ticks)
+		var origin: Vector2 = player.position - Vector2(8, 20)
+		var grip: Vector2 = Vector2(10, 13) if pose == 1 else Vector2(7, 15)
+		var tip_point: Vector2 = Vector2(14, 4) if pose == 1 else Vector2(13, 7)
+		var glint: Vector2 = grip.lerp(tip_point, float(posmod(ticks, 7)) / 6.0)
+		if ArenaAnimation.mirrored(player.facing):
+			glint.x = 15.0 - glint.x
+		glint = (origin + glint).round()
+		stroke(plan, PackedVector2Array([glint - Vector2(1, 0), glint + Vector2(1, 0)]), colors["1"])
+		if ticks < 3:
+			stroke(plan, PackedVector2Array([glint - Vector2(0, 2), glint + Vector2(0, 2)]), colors["1"])
+		return plan
 	if player.state == &"attack_windup":
-		var glint: Vector2 = (at + Vector2.from_angle(angle - PI / 3.0) * (12.0 + mini(ticks, 4))).round()
-		var span: float = 1.0 + floorf(mini(ticks, 4) / 2.0)
-		stroke(plan, PackedVector2Array([glint - Vector2(span,0), glint + Vector2(span,0)]), colors["1"])
-		stroke(plan, PackedVector2Array([glint - Vector2(0,span), glint + Vector2(0,span)]), colors["o"])
+		# Shoulder hilt anchors the half-drawn blade.
+		var side: float = -1.0 if ArenaAnimation.mirrored(player.facing) else 1.0
+		var glint: Vector2 = player.position + Vector2(side * 6, -16)
+		stroke(plan, PackedVector2Array([glint - Vector2(1,0), glint + Vector2(1,0)]), colors["h"])
+		if ArenaAnimation.frame_index(ArenaAnimation.PLAYER["attack_windup"], ticks) == 2:
+			stroke(plan, PackedVector2Array([glint, glint - Vector2(0, 4)]), colors["1"])
 		return plan
 	var recovery: bool = player.state == &"attack_recovery"
 	if player.state != &"attack_active" and not recovery:
@@ -104,6 +120,10 @@ static func slash(player: Snapshots.EntitySnapshot, colors: Dictionary) -> Array
 		var color: Color = colors["1"] if layer == 0 else colors["p" if layer == 1 else "o"]
 		stroke(plan, points, Color(color, fade))
 	if not recovery:
+		# Two snapshot ticks of thin cream sell the blade leaving its sheath.
+		if ticks < 2:
+			var shoulder: Vector2 = player.position + Vector2(-5 if ArenaAnimation.mirrored(player.facing) else 5, -13)
+			stroke(plan, PackedVector2Array([shoulder, at + player.facing * 24.0]), colors["1"])
 		for i: int in range(3):
 			var direction: Vector2 = Vector2.from_angle(tip - i * 0.24)
 			stroke(plan, PackedVector2Array([at + direction * 25.0, at + direction * (28.0 - i)]), colors["o"])
@@ -117,3 +137,21 @@ static func draw_plan(canvas: Node2D, plan: Array[Dictionary]) -> void:
 			canvas.draw_colored_polygon(points, color)
 		else:
 			canvas.draw_polyline(points, color, float(command["width"]), false)
+
+## Recorded parry_succeeded events only; no inferred hit or timing rule.
+static func parry_impact(at: Vector2, age: int, perfect: bool, colors: Dictionary) -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	var duration: int = 10 if perfect else 6
+	if age < 0 or age >= duration:
+		return plan
+	var size: float = 1.5 if perfect else 0.85
+	var radius: float = (3.0 + age * 1.6) * size
+	stroke(plan, TelegraphView.ring_points(at, radius), colors["x"] if perfect else colors["y"])
+	var count: int = 10 if perfect else 5
+	for i: int in range(count):
+		var direction: Vector2 = Vector2.from_angle(TAU * i / count + PI / 10.0)
+		stroke(plan, PackedVector2Array([at + direction * radius, at + direction * (radius + (4.0 if age < 3 else 2.0) * size)]), colors["1"] if age < 2 else colors["x"])
+	if age < 2:
+		stroke(plan, PackedVector2Array([at - Vector2(0, 5) * size, at + Vector2(0, 5) * size]), colors["1"])
+		stroke(plan, PackedVector2Array([at - Vector2(5, 0) * size, at + Vector2(5, 0) * size]), colors["1"])
+	return plan
