@@ -20,6 +20,14 @@ const BOSS: Dictionary = {
  "recover": [1, 1, false], "posture_broken": [2, 12, true], "dead": [1, 1, false],
 }
 const STRIKE_HOLD_TICKS: int = 4
+# Frame pixel anchor: both feet meet the same core ground point in every pose.
+const HERO_ANCHOR: Vector2 = Vector2(16, 31)
+
+static func hero_pixel(position: Vector2, facing: Vector2, pixel: Vector2) -> Vector2:
+	var local: Vector2 = pixel
+	if mirrored(facing):
+		local.x = 31.0 - local.x
+	return position.round() - HERO_ANCHOR + local
 
 static func direction(facing: Vector2) -> String:
 	if absf(facing.x) > absf(facing.y):

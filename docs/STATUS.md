@@ -17,6 +17,15 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 **What this does not tell us:** nobody has played it. There is no scene, input mapping or drawing yet (that is `presentation/`, Codex's area), so whether the parry window, boss timings and damage feel fair or fun is unknown. The numbers in `tuning.gd` are first guesses. Only the logic is tested (including: warning area equals hit area, aim locked at commit, determinism).
 
+## Round 2 feedback: waist sword, hero look, white flash, new HUD (same branch, 2026-10-15)
+
+The human said: the sword should be at the waist (so the draw looks cool), the character looks off, add a white flash when taking damage, put the boss health above the boss with the name on top and posture under the health, and add a character profile in the upper left (a circle with health, Edge and dash).
+- **Hero:** all totoy_* frames redrawn on a 32x32 canvas with a hip sheath (draw starts at the waist), lighter robe tones and a cream trim; new `totoy_portrait` (face shot) for the HUD. Same frame counts as before (54).
+- **White flash:** player flashes white on damage then blinks while hurt-invulnerable (not during the dash); boss flashes on each hit (longer on counters). Pixel-exact white silhouettes, no screen tint.
+- **HUD:** the boss panel now floats above the boss (name, health, posture under it, counter-window indicator); the bottom bars are gone. Upper left: a round portrait with concentric rings (health teal outer, Edge lilac middle, dash sky inner) and an HP readout. Interpretation note: "boss health in the top of the boss" was read as above the boss's head; the previous version put it at the top of the screen.
+- **Provenance, honestly:** Codex's shell failed at startup in all 4 attempts and reported no changes, but the worktree contained the new work (written by a process I cannot identify). Claude Code reran everything: validator, art build, Python tests, Godot import, `run_tests.gd` (36), `smoke_project`, `smoke_arena`, `smoke_animation`, `smoke_effects`, `smoke_boss_attacks`, a 120-frame main-scene run: all pass. Screenshots: `art/build/arena_hud.png`, `arena_hero2_idle.png`, `arena_hero2_draw.png`, `arena_hero2_slash.png`, `arena_flash.png`, `arena_bossbar.png`.
+- **Honest assessment:** the hero art is still weak. The torso reads as a pale striped shirt, and the waist sword reads as a curved hook in idle poses; at 32x32 it is still not obviously a sheathed sword. Hand-written text-grid art from an LLM is the known weak spot of this pipeline (see `AGENTS.md`). A real fix probably needs hand-made or commissioned sprites that the human supplies or approves as PNG in the palette; the pipeline can take them (validator + build). Not judged: motion, and whether the white flash and HUD feel right.
+
 ## Hero redesign, sheath draw and parry (same branch, 2026-10-15)
 
 The human asked for a hero in the spirit of Asta (Black Clover), a sword that is drawn from a sheath, and a better parry.

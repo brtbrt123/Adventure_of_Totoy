@@ -79,29 +79,26 @@ static func red(t: Snapshots.TelegraphSnapshot, tick: int, colors: Dictionary) -
 
 static func slash(player: Snapshots.EntitySnapshot, colors: Dictionary) -> Array[Dictionary]:
 	var plan: Array[Dictionary] = []
-	var at: Vector2 = player.position - Vector2(0, 7)
+	var at: Vector2 = player.position - Vector2(0, 11)
 	var angle: float = player.facing.angle()
 	var ticks: int = player.state_ticks
 	if player.state == &"parry":
 		var pose: int = ArenaAnimation.frame_index(ArenaAnimation.PLAYER["parry"], ticks)
-		var origin: Vector2 = player.position - Vector2(8, 20)
-		var grip: Vector2 = Vector2(10, 13) if pose == 1 else Vector2(7, 15)
-		var tip_point: Vector2 = Vector2(14, 4) if pose == 1 else Vector2(13, 7)
+		var grip: Vector2 = Vector2(20, 21)
+		var tip_point: Vector2 = Vector2(26, 8) if pose == 1 else Vector2(25, 10)
 		var glint: Vector2 = grip.lerp(tip_point, float(posmod(ticks, 7)) / 6.0)
-		if ArenaAnimation.mirrored(player.facing):
-			glint.x = 15.0 - glint.x
-		glint = (origin + glint).round()
+		glint = ArenaAnimation.hero_pixel(player.position, player.facing, glint).round()
 		stroke(plan, PackedVector2Array([glint - Vector2(1, 0), glint + Vector2(1, 0)]), colors["1"])
 		if ticks < 3:
 			stroke(plan, PackedVector2Array([glint - Vector2(0, 2), glint + Vector2(0, 2)]), colors["1"])
 		return plan
 	if player.state == &"attack_windup":
-		# Shoulder hilt anchors the half-drawn blade.
+		# Belt hilt anchors the half-drawn blade.
 		var side: float = -1.0 if ArenaAnimation.mirrored(player.facing) else 1.0
-		var glint: Vector2 = player.position + Vector2(side * 6, -16)
+		var glint: Vector2 = ArenaAnimation.hero_pixel(player.position, player.facing, Vector2(22, 21))
 		stroke(plan, PackedVector2Array([glint - Vector2(1,0), glint + Vector2(1,0)]), colors["h"])
 		if ArenaAnimation.frame_index(ArenaAnimation.PLAYER["attack_windup"], ticks) == 2:
-			stroke(plan, PackedVector2Array([glint, glint - Vector2(0, 4)]), colors["1"])
+			stroke(plan, PackedVector2Array([glint, glint + Vector2(side * 6, -4)]), colors["1"])
 		return plan
 	var recovery: bool = player.state == &"attack_recovery"
 	if player.state != &"attack_active" and not recovery:
@@ -122,8 +119,8 @@ static func slash(player: Snapshots.EntitySnapshot, colors: Dictionary) -> Array
 	if not recovery:
 		# Two snapshot ticks of thin cream sell the blade leaving its sheath.
 		if ticks < 2:
-			var shoulder: Vector2 = player.position + Vector2(-5 if ArenaAnimation.mirrored(player.facing) else 5, -13)
-			stroke(plan, PackedVector2Array([shoulder, at + player.facing * 24.0]), colors["1"])
+			var hip: Vector2 = ArenaAnimation.hero_pixel(player.position, player.facing, Vector2(21, 21))
+			stroke(plan, PackedVector2Array([hip, at + player.facing * 24.0]), colors["1"])
 		for i: int in range(3):
 			var direction: Vector2 = Vector2.from_angle(tip - i * 0.24)
 			stroke(plan, PackedVector2Array([at + direction * 25.0, at + direction * (28.0 - i)]), colors["o"])

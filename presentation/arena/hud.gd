@@ -5,6 +5,8 @@ var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var debug_enabled: bool = false
 var counter_max: int = 1
+var portrait_atlas: Texture2D
+var portrait_frame: Dictionary = {}
 const GLYPHS: Dictionary = {
 	"0": "111101101101111",
 	"1": "010110010010111",
@@ -68,23 +70,29 @@ func _draw() -> void:
 	if snapshot == null or colors.is_empty():
 		return
 	var h: Snapshots.HudSnapshot = snapshot.hud
-	draw_rect(Rect2(4, 3, 312, 25), Color(colors["0"], 0.92))
-	lettering(Vector2(8, 6), "MOSSBOUND COLOSSUS", colors["1"])
-	bar(Vector2(8, 14), 304, h.boss_hp, h.boss_max_hp, colors["7"], 4)
-	lettering(Vector2(8, 21), "POSTURE", colors["j"])
-	bar(Vector2(41, 22), 271, h.boss_posture, h.boss_posture_max, colors["v"], 2)
-	draw_rect(Rect2(4, 150, 312, 28), Color(colors["0"], 0.95))
-	lettering(Vector2(8, 153), "HP %d/%d" % [h.player_hp, h.player_max_hp], colors["1"])
-	bar(Vector2(8, 161), 92, h.player_hp, h.player_max_hp, colors["u"])
-	lettering(Vector2(112, 153), "EDGE", colors["1"])
-	bar(Vector2(112, 161), 92, h.edge, h.edge_max, colors["v"])
-	lettering(Vector2(216, 153), "DASH" + (" READY" if h.dash_cooldown_ticks == 0 else ""), colors["o"])
-	bar(Vector2(216, 161), 92, h.dash_cooldown_max - h.dash_cooldown_ticks, h.dash_cooldown_max, colors["n"])
+	var center: Vector2 = Vector2(25, 25)
+	draw_circle(center, 23, colors["0"], true, -1.0, false)
+	if portrait_atlas != null and not portrait_frame.is_empty():
+		draw_texture_rect_region(portrait_atlas, Rect2(13, 13, 24, 24), Rect2(portrait_frame["x"], portrait_frame["y"], 24, 24))
+	ring_gauge(center, 21, h.player_hp, h.player_max_hp, colors["u"])
+	ring_gauge(center, 18, h.edge, h.edge_max, colors["v"])
+	ring_gauge(center, 15, h.dash_cooldown_max - h.dash_cooldown_ticks, h.dash_cooldown_max, colors["n"])
+	lettering(Vector2(5, 51), "%d/%d" % [h.player_hp, h.player_max_hp], colors["1"])
+	if not snapshot.entities.is_empty():
+		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
+		var panel: Rect2 = boss_panel(boss.position, h.counter_window_ticks_left > 0)
+		draw_rect(panel, colors["0"])
+		if boss.state == &"posture_broken":
+			draw_rect(panel.grow(1), colors["p"], false, 1.0)
+		lettering(panel.position + Vector2(4, 3), "MOSSBOUND COLOSSUS", colors["1"])
+		bar(panel.position + Vector2(4, 10), 72, h.boss_hp, h.boss_max_hp, colors["7"], 3)
+		lettering(panel.position + Vector2(4, 15), "POSTURE", colors["o"])
+		bar(panel.position + Vector2(4, 22), 72, h.boss_posture, h.boss_posture_max, colors["v"], 2)
+		if h.counter_window_ticks_left > 0:
+			lettering(panel.position + Vector2(4, 28), "COUNTER - ATTACK", colors["p"])
+			bar(panel.position + Vector2(4, 35), 72, h.counter_window_ticks_left, counter_max, colors["o"], 2)
+	draw_rect(Rect2(4, 167, 312, 10), colors["0"])
 	lettering(Vector2(8, 169), "LMB HIT  SPACE PARRY  SHIFT DASH  F1 DEBUG", colors["j"])
-	if h.counter_window_ticks_left > 0:
-		draw_rect(Rect2(104, 30, 112, 16), colors["0"])
-		lettering(Vector2(112, 33), "COUNTER OPEN - ATTACK", colors["p"])
-		bar(Vector2(112, 41), 96, h.counter_window_ticks_left, counter_max, colors["p"], 2)
 	if debug_enabled:
 		draw_rect(Rect2(5, 131, 175, 16), colors["0"])
 		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"])
@@ -94,3 +102,17 @@ func _draw() -> void:
 		var title: String = "VICTORY" if snapshot.result == &"victory" else "DEFEAT"
 		lettering(Vector2(160 - title.length() * 4, 75), title, colors["1"], 2)
 		lettering(Vector2(124, 96), "PRESS R TO RESTART", colors["o"])
+
+## Pixel raster annuli: top origin, clockwise, no smoothed line edges.
+func ring_gauge(center: Vector2, radius: int, value: float, maximum: float, color: Color) -> void:
+	var fraction: float = clampf(value / maxf(1.0, maximum), 0.0, 1.0)
+	for y: int in range(-radius, radius + 1):
+		for x: int in range(-radius, radius + 1):
+			var distance: float = Vector2(x, y).length()
+			if distance <= radius and distance > radius - 2:
+				var angle: float = fposmod(atan2(float(x), float(-y)), TAU)
+				draw_rect(Rect2(center + Vector2(x, y), Vector2.ONE), color if fraction >= 1.0 or angle < fraction * TAU else colors["f"])
+
+static func boss_panel(at: Vector2, counter: bool) -> Rect2:
+	var height: float = 40.0 if counter else 27.0
+	return Rect2(Vector2(clampf(at.x - 40, 2, 238), clampf(at.y - 48 - height, 2, 164 - height)).round(), Vector2(80, height))

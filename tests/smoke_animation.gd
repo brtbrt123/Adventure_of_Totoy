@@ -61,6 +61,9 @@ func _catalog() -> void:
 		_expect(false, "invalid sprites.json")
 		return
 	var atlas: Dictionary = parsed.get("frames", {})
+	_expect(atlas.has("totoy_portrait"), "portrait missing")
+	if atlas.has("totoy_portrait"):
+		_expect(int(atlas["totoy_portrait"]["w"]) == 24 and int(atlas["totoy_portrait"]["h"]) == 24, "portrait canvas")
 	for name_key: String in ArenaAnimation.all_names():
 		_expect(atlas.has(name_key), "atlas missing " + name_key)
 		if name_key.begins_with("mossbound_colossus_") or name_key.begins_with("totoy_"):
@@ -73,11 +76,20 @@ func _catalog() -> void:
 					var row: String = line.strip_edges()
 					if not row.is_empty() and not row.begins_with("#"):
 						rows.append(row)
-				_expect(rows.size() == (24 if hero else 48), "actor height changed: " + name_key)
+				_expect(rows.size() == (32 if hero else 48), "actor height changed: " + name_key)
 				for row: String in rows:
-					_expect(row.length() == (16 if hero else 48), "actor width changed: " + name_key)
+					_expect(row.length() == (32 if hero else 48), "actor width changed: " + name_key)
 					for reserved: String in ["x", "y", "z", "A"]:
 						_expect(not row.contains(reserved), "combat cue color on actor body: " + name_key)
+				if hero:
+					for y: int in range(rows.size()):
+						for x: int in range(rows[y].length()):
+							if rows[y][x] in [".", "0"]:
+								continue
+							for step: Vector2i in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+								var neighbor: Vector2i = Vector2i(x, y) + step
+								var inside: bool = neighbor.x >= 0 and neighbor.x < 32 and neighbor.y >= 0 and neighbor.y < 32
+								_expect(inside and rows[neighbor.y][neighbor.x] != ".", "open hero outline: %s at %d,%d" % [name_key, x, y])
 	# Exercise every directional state and every frame index the table declares.
 	var snap: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
 	var actor: Snapshots.EntitySnapshot = Snapshots.EntitySnapshot.new()
@@ -214,6 +226,8 @@ func _run() -> void:
 	arena = packed.instantiate() as Arena
 	root.add_child(arena)
 	arena.set_physics_process(false)
+	_expect(ArenaAnimation.hero_pixel(Vector2(64, 88), Vector2.RIGHT, Vector2(16, 31)) == Vector2(64, 88), "hero ground anchor moved")
+	_expect(ArenaAnimation.hero_pixel(Vector2(64, 88), Vector2.LEFT, Vector2(21, 21)) == Vector2(58, 78), "mirrored hip must use frame pixel coordinates")
 	_hero_timelines()
 	_reset()
 	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:

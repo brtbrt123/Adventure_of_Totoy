@@ -32,6 +32,8 @@ var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
 var shake_left: int = 0
+var white_sprites: Texture2D
+var hurt_blink: bool = false
 var sprites: Texture2D
 var tiles: Texture2D
 @onready var hud: Hud = $HUD/Display
@@ -43,6 +45,13 @@ func _ready() -> void:
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
 	sprites = load("res://art/build/sprites.png") as Texture2D
+	var white_image: Image = sprites.get_image()
+	white_image.convert(Image.FORMAT_RGBA8)
+	for y: int in range(white_image.get_height()):
+		for x: int in range(white_image.get_width()):
+			var alpha: float = white_image.get_pixel(x, y).a
+			white_image.set_pixel(x, y, Color(1, 1, 1, alpha))
+	white_sprites = ImageTexture.create_from_image(white_image)
 	tiles = load("res://art/build/tiles.png") as Texture2D
 	var tile_entries: Dictionary = _read_json("res://art/build/tiles.json").get("tiles", {})
 	var grass: Array[String] = []
@@ -103,16 +112,21 @@ func _restart() -> void:
 	particles.clear()
 	trails.clear()
 	flashes.clear()
+	hurt_blink = false
 	shake_left = 0
 	hud.counter_max = 1
 
 func _update_hud() -> void:
+	hud.portrait_atlas = sprites
+	hud.portrait_frame = frames.get("totoy_portrait", {})
 	hud.snapshot = snapshot
 	hud.colors = colors
 	hud.debug_enabled = debug_enabled
 	hud.queue_redraw()
 
 func _age_effects() -> void:
+	if not snapshot.player.invulnerable:
+		hurt_blink = false
 	shake_left = maxi(0, shake_left - 1)
 	for id: int in flashes.keys():
 		flashes[id] = int(flashes[id]) - 1
@@ -131,7 +145,9 @@ func _age_effects() -> void:
 func _on_event(event: GameEvent) -> void:
 	match event.type:
 		&"damage_taken":
-			flashes[int(event.data["entity_id"])] = 6
+			flashes[int(event.data["entity_id"])] = maxi(6, int(flashes.get(int(event.data["entity_id"]), 0)))
+			if int(event.data["entity_id"]) == snapshot.player.id:
+				hurt_blink = true
 			_sound_damage_taken(event)
 		&"parry_succeeded":
 			var perfect: bool = event.data["quality"] == &"perfect"
@@ -158,6 +174,7 @@ func _on_event(event: GameEvent) -> void:
 			if int(event.data["attacker_id"]) == snapshot.player.id:
 				_burst(event.data["position"], 16 if counter else 8, colors["1"], 1.8 if counter else 0.9)
 				if counter:
+					flashes[int(event.data["target_id"])] = 10
 					shake_left = maxi(shake_left, 5)
 			_sound_attack_hit(event)
 		&"attack_telegraphed": _sound_attack_telegraphed(event)
@@ -213,6 +230,10 @@ func _draw() -> void:
 	for particle: Dictionary in particles:
 		var at: Vector2 = particle["position"]
 		draw_rect(Rect2(at.round(), Vector2.ONE), particle["color"])
+	# Damage silhouettes sit over translucent combat light so white stays pure white.
+	for actor: Snapshots.EntitySnapshot in actors:
+		if actor_is_white(actor):
+			_draw_actor(actor, true)
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -309,28 +330,35 @@ func _dust(at: Vector2) -> void:
 	for i: int in range(5):
 		particles.append({"position": at + Vector2(i - 2, 2), "velocity": Vector2((i - 2) * 0.18, -0.22), "life": 6, "color": colors["c"] if i % 2 == 0 else colors["d"]})
 
-func _draw_actor(actor: Snapshots.EntitySnapshot) -> void:
+func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false) -> void:
 	var chosen: String = String(selected_frames.get(actor.id, ""))
 	var at: Vector2 = actor.position.round()
-	var radius: float = 7.0 if actor.visual_id == &"totoy" else 20.0
+	var radius: float = 10.0 if actor.visual_id == &"totoy" else 20.0
 	var shadow: PackedVector2Array = PackedVector2Array()
 	for i: int in range(32):
 		shadow.append(at + Vector2(cos(TAU * i / 32.0) * radius, sin(TAU * i / 32.0) * radius * 0.3 + 2))
-	draw_colored_polygon(shadow, colors["0"])
+	if not silhouette_only:
+		draw_colored_polygon(shadow, colors["0"])
 	if not frames.has(chosen):
 		draw_rect(Rect2(at - Vector2(radius, radius * 2), Vector2(radius * 2, radius * 2)), colors["g"])
 		return
 	var frame: Dictionary = frames[chosen]
 	var size: Vector2 = Vector2(frame["w"], frame["h"])
-	var destination: Rect2 = Rect2(at - Vector2(size.x * 0.5, size.y - 4), size)
+	var anchor: Vector2 = ArenaAnimation.HERO_ANCHOR if actor.visual_id == &"totoy" else Vector2(size.x * 0.5, size.y - 4)
+	var destination: Rect2 = Rect2(at - anchor, size)
 	if (actor.visual_id == &"totoy" and ArenaAnimation.mirrored(actor.facing)) or (actor.visual_id != &"totoy" and ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))):
 		# CanvasItem mirrors a texture region when the destination width is negative.
+		destination.position.x += size.x
 		destination.size.x = -destination.size.x
-	draw_texture_rect_region(sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
-	if flashes.has(actor.id):
-		# An opaque palette sparkle leaves the authored colors intact.
-		draw_line(at + Vector2(-3, -16), at + Vector2(3, -16), colors["p"])
-		draw_line(at + Vector2(0, -19), at + Vector2(0, -13), colors["p"])
+	if not silhouette_only:
+		draw_texture_rect_region(sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+	if silhouette_only:
+		draw_texture_rect_region(white_sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+
+func actor_is_white(actor: Snapshots.EntitySnapshot) -> bool:
+	if actor.visual_id == &"totoy" and actor.state == &"dash":
+		return false
+	return flashes.has(actor.id) or (actor.id == snapshot.player.id and hurt_blink and actor.invulnerable and snapshot.tick % 6 < 3)
 
 # AUDIO HOOKS: one hook per core event. Add playback here when original audio exists.
 

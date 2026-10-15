@@ -73,9 +73,14 @@ func _step(frame: InputFrame) -> void:
 		arena._on_event(event)
 		if event.type == &"attack_hit" and int(event.data["attacker_id"]) == arena.snapshot.player.id:
 			seen[String(event.data["kind"])] = true
+			if event.data["kind"] == &"counter":
+				_expect(int(arena.flashes[arena.snapshot.entities[0].id]) == 10, "counter flash duration")
 			_expect(not arena.particles.is_empty(), "hit has no spark")
 			if event.data["kind"] == &"counter":
 				_expect(arena.shake_left > 0, "counter has no shake")
+	for event: GameEvent in arena.core.last_events:
+		if event.type == &"damage_taken" and int(event.data["entity_id"]) == arena.snapshot.entities[0].id:
+			_expect(arena.actor_is_white(arena.snapshot.entities[0]), "boss damage must flash white")
 	if arena.snapshot.player.state in [&"attack_windup", &"attack_active", &"attack_recovery"]:
 		if arena.snapshot.player.state_ticks < 3:
 			_expect(not arena.slash_plan.is_empty(), "sword state has no effect")
@@ -223,6 +228,7 @@ func _parry_visuals() -> void:
 func _run() -> void:
 	await process_frame
 	_controls()
+	_hip_streaks()
 	var packed: PackedScene = load("res://presentation/arena/arena.tscn") as PackedScene
 	if packed == null:
 		printerr("EFFECTS FAIL: arena cannot load")
@@ -231,6 +237,7 @@ func _run() -> void:
 	arena = packed.instantiate() as Arena
 	root.add_child(arena)
 	arena.set_physics_process(false)
+	await _flash_visuals()
 	_parry_visuals()
 	await _red_encounter(&"red_shards")
 	await _red_encounter(&"red_sweep")
@@ -273,3 +280,63 @@ func _run() -> void:
 		for message: String in failures:
 			printerr("EFFECTS FAIL: " + message)
 		quit(1)
+
+func _flash_visuals() -> void:
+	_reset()
+	var dash: InputFrame = InputFrame.new()
+	dash.dash_pressed = true
+	dash.move = Vector2.DOWN
+	_step(dash)
+	for i: int in range(10):
+		_expect(not arena.actor_is_white(arena.snapshot.player), "dash i-frames blinked")
+		_step(InputFrame.new())
+	_reset()
+	arena.core.player.position = arena.core.boss.position - Vector2(30, 0)
+	arena.core.boss.next_attack_override = &"red_sweep"
+	arena.core.boss.cooldown = 1
+	var damaged: bool = false
+	var white: bool = false
+	var normal: bool = false
+	for i: int in range(140):
+		_step(InputFrame.new())
+		for event: GameEvent in arena.core.last_events:
+			if event.type == &"damage_taken" and int(event.data["entity_id"]) == arena.snapshot.player.id:
+				damaged = true
+				_expect(arena.actor_is_white(arena.snapshot.player), "player damage must flash white")
+		if damaged and arena.snapshot.player.invulnerable and not arena.flashes.has(arena.snapshot.player.id):
+			white = white or arena.actor_is_white(arena.snapshot.player)
+			normal = normal or not arena.actor_is_white(arena.snapshot.player)
+		await process_frame
+	_expect(damaged and white and normal, "hurt flash/blink paths missing")
+	_expect(not arena.hurt_blink, "hurt blink must expire")
+	for at: Vector2 in [Vector2.ZERO, Vector2(320, 0), Vector2(0, 180), Vector2(320, 180)]:
+		for counter: bool in [false, true]:
+			var panel: Rect2 = arena.hud.boss_panel(at, counter)
+			_expect(Rect2(0, 0, 320, 180).encloses(panel), "boss panel left screen")
+	_expect(not arena.hud.portrait_frame.is_empty(), "HUD portrait missing")
+	var source: Image = arena.sprites.get_image()
+	var image: Image = arena.white_sprites.get_image()
+	var opaque: bool = false
+	for y: int in range(image.get_height()):
+		for x: int in range(image.get_width()):
+			var color: Color = image.get_pixel(x, y)
+			_expect(color.a == source.get_pixel(x, y).a, "white silhouette changed alpha")
+			if color.a > 0.0:
+				opaque = true
+				if color != Color.WHITE:
+					_expect(false, "white silhouette contains tinted pixels")
+					return
+	_expect(opaque, "white silhouette atlas is empty")
+
+# The first draw-streak endpoint stays on the belt in both authored and mirrored poses.
+func _hip_streaks() -> void:
+	var actor: Snapshots.EntitySnapshot = Snapshots.EntitySnapshot.new()
+	actor.position = Vector2(64, 88)
+	actor.state = &"attack_active"
+	actor.state_ticks = 0
+	var palette: Dictionary = {"1": Color.WHITE, "p": Color.WHITE, "o": Color.WHITE}
+	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
+		actor.facing = facing
+		var plan: Array[Dictionary] = CombatEffects.slash(actor, palette)
+		var points: PackedVector2Array = plan[3]["points"]
+		_expect(points[0] == Vector2(58 if facing == Vector2.LEFT else 69, 78), "draw streak left the hip: " + str(facing))
