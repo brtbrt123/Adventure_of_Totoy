@@ -62,6 +62,18 @@ static func red(t: Snapshots.TelegraphSnapshot, tick: int, colors: Dictionary) -
 			stroke(plan, outline, dark, 1.0)
 			stroke(plan, outline.slice(1, outline.size() - 1), bright, 1.0)
 			disc(plan, t.center, 3.0, cream)
+			var progress: float = clampf(float(tick - t.hit_tick + 1) / maxi(1, t.end_tick - t.hit_tick + 1), 0.0, 1.0)
+			var tip: float = t.direction.angle() - t.half_angle + 2.0 * t.half_angle * progress
+			for layer: int in range(3):
+				var arc: PackedVector2Array = PackedVector2Array()
+				for i: int in range(25):
+					arc.append(t.center + Vector2.from_angle(lerpf(maxf(t.direction.angle() - t.half_angle, tip - t.half_angle), tip, i / 24.0)) * (t.size - layer * 2.0))
+				stroke(plan, arc, cream if layer == 0 else colors["j"], 1.0)
+	elif t.attack == &"red_stomp" and t.shape == &"ring":
+		var progress: float = clampf(float(tick - t.hit_tick + 1) / maxi(1, t.end_tick - t.hit_tick + 1), 0.0, 1.0)
+		var radius: float = lerpf(t.inner_size, t.size, progress)
+		stroke(plan, TelegraphView.ring_points(t.center, radius), Color(cream, fade), 2.0)
+		stroke(plan, TelegraphView.ring_points(t.center, maxf(t.inner_size, radius - 4.0)), Color(colors["j"], fade), 1.0)
 	return plan
 
 static func slash(player: Snapshots.EntitySnapshot, colors: Dictionary) -> Array[Dictionary]:

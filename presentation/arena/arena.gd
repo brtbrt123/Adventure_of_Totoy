@@ -178,7 +178,14 @@ func _draw() -> void:
 		var age: int = snapshot.tick - int(ring["start_tick"])
 		draw_arc(ring["position"], 5.0 + age * 2.0, 0.0, TAU, 32, colors["j"], 1.0, false)
 	for trail: Dictionary in trails:
-		draw_circle(trail["position"], 2, colors["t"], false, 1.0)
+		if bool(trail.get("charge", false)):
+			var dust_at: Vector2 = trail["position"]
+			var life: int = int(trail["life"])
+			for fleck: int in range(3):
+				var dust_offset: Vector2 = Vector2(fleck * 3 - 3, (fleck % 2) * 4 - 2 - (5 - life))
+				draw_rect(Rect2((dust_at + dust_offset).round(), Vector2(2 if life > 2 else 1, 2)), colors["j"] if fleck == 1 else colors["c"])
+		else:
+			draw_circle(trail["position"], 2, colors["t"], false, 1.0)
 	var actors: Array[Snapshots.EntitySnapshot] = [snapshot.player]
 	actors.append_array(snapshot.entities)
 	actors.sort_custom(_behind)
@@ -210,7 +217,7 @@ func prepare_visuals() -> void:
 		return
 	# Retain only strikes actually observed; cancelled warnings leave no afterglow.
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
-		if tell.attack in [&"red_shards", &"red_sweep"] and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
+		if tell.attack in [&"red_shards", &"red_sweep", &"red_stomp"] and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
 			red_history[tell.id] = tell
 	red_plan.clear()
 	for id: int in red_history.keys():
@@ -229,10 +236,12 @@ func prepare_visuals() -> void:
 		impact_candidates.append_array(snapshot.telegraphs)
 		var impacts: Dictionary = {}
 		for tell: Snapshots.TelegraphSnapshot in impact_candidates:
-			if tell.attack == &"gold_slam" and visual_tick < tell.hit_tick and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
+			if tell.attack in [&"gold_slam", &"gold_combo", &"red_stomp"] and visual_tick < tell.hit_tick and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
 				if not impacts.has(tell.id):
 					impacts[tell.id] = true
-					rings.append({"position": tell.center, "start_tick": tell.hit_tick})
+					if tell.attack != &"red_stomp":
+						rings.append({"position": tell.center, "start_tick": tell.hit_tick})
+					_burst(tell.center, 18, colors["j"], 1.4)
 					shake_left = maxi(shake_left, 4)
 		for i: int in range(rings.size() - 1, -1, -1):
 			if snapshot.tick - int(rings[i]["start_tick"]) > 9:
@@ -244,6 +253,13 @@ func prepare_visuals() -> void:
 			var cadence: int = int(ArenaAnimation.PLAYER["walk"][1])
 			if player.state_ticks % (cadence * 2) == 0:
 				_dust(player.position)
+		for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
+			if tell.attack == &"red_charge" and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
+				for actor: Snapshots.EntitySnapshot in snapshot.entities:
+					if actor.id == tell.owner_id:
+						var behind: Vector2 = actor.position - tell.direction * 14.0
+						_dust(behind)
+						trails.append({"position": behind, "life": 5, "charge": true})
 		previous_telegraphs.clear()
 		previous_telegraphs.append_array(snapshot.telegraphs)
 		visual_tick = snapshot.tick
@@ -254,7 +270,8 @@ func prepare_visuals() -> void:
 			last_attacks.erase(actor.id)
 		for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 			if tell.owner_id == actor.id:
-				last_attacks[actor.id] = {"attack": tell.attack, "end_tick": tell.end_tick}
+				if not last_attacks.has(actor.id) or tell.hit_tick >= int(last_attacks[actor.id].get("hit_tick", -1)):
+					last_attacks[actor.id] = {"attack": tell.attack, "hit_tick": tell.hit_tick, "end_tick": tell.end_tick, "direction_x": tell.direction.x}
 		selected_frames[actor.id] = _resolve_frame(ArenaAnimation.choose(actor, snapshot, last_attacks.get(actor.id, {})), actor)
 
 func _resolve_frame(requested: String, actor: Snapshots.EntitySnapshot) -> String:
@@ -286,7 +303,7 @@ func _draw_actor(actor: Snapshots.EntitySnapshot) -> void:
 	var frame: Dictionary = frames[chosen]
 	var size: Vector2 = Vector2(frame["w"], frame["h"])
 	var destination: Rect2 = Rect2(at - Vector2(size.x * 0.5, size.y - 4), size)
-	if actor.visual_id == &"totoy" and ArenaAnimation.mirrored(actor.facing):
+	if (actor.visual_id == &"totoy" and ArenaAnimation.mirrored(actor.facing)) or (actor.visual_id != &"totoy" and ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))):
 		# CanvasItem mirrors a texture region when the destination width is negative.
 		destination.size.x = -destination.size.x
 	draw_texture_rect_region(sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))

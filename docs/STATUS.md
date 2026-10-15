@@ -17,6 +17,14 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 **What this does not tell us:** nobody has played it. There is no scene, input mapping or drawing yet (that is `presentation/`, Codex's area), so whether the parry window, boss timings and damage feel fair or fun is unknown. The numbers in `tuning.gd` are first guesses. Only the logic is tested (including: warning area equals hit area, aim locked at commit, determinism).
 
+## Boss patterns and boss animation (branch `agent/logic/boss-patterns`, 2026-10-15)
+
+The human noticed the golem had no swing animation and asked for more attack patterns.
+- **Core (Claude Code, `9d3f152`):** three new attacks: `red_stomp` (new `ring` telegraph shape; the inside is safe), `gold_combo` (two parryable slams; phase 2 only) and `red_charge` (a lane the boss body travels along; phase 2 only). Phase 1 picks from slam, sweep, shards, stomp; phase 2 from all six. Player attack windup 5 -> 7 ticks (room for a draw animation). 9 new tests, 36 total, mutation-checked. Interface: `docs/architecture.md`.
+- **Presentation and art (Codex):** about 24 new Colossus frames (sweep: 3 windup + 4 strike frames and a recover; slam, shards, stomp, combo and charge with 3 windup and 2 strike frames each), a motion arc for the sweep, dust at slam impacts, the stomp ring warning with a marked safe zone and expanding shockwave, charge lane and dust trail, plus updated `animation.gd` and tests. Screenshots: `art/build/arena_sweep.png`, `arena_stomp.png`, `arena_combo.png`, `arena_charge.png` (also slam and shards).
+- **Provenance, honestly:** Codex's shell failed at startup in all 4 attempts and the work was already in the worktree (written by a process I cannot identify; its final report says existing logs reported passing checks). Claude Code reran everything: validator, art build, Python tests, Godot import, `run_tests.gd` (36), `smoke_project`, `smoke_arena`, `smoke_animation`, `smoke_effects`, and a 120-frame headless run of the main scene. One small bug was found and fixed by Claude Code in a Codex-owned file under the human's earlier exception for small syntax fixes: a one-tab indentation error in `tests/smoke_effects.gd` (line 140). After that all pass.
+- **Not judged:** motion quality (only stills reviewed; Codex itself flags the sweep strike as brief) and whether the new attacks feel fair. Phase-2 attacks were only exercised by forced scripted attacks, not by a real fight.
+
 ## Effects, controls and retuning (branch `agent/ui/effects-controls`, 2026-10-15)
 
 After playing the animated arena the human asked for: red laser light and a sword swish, new controls (attack = left click, dash = Shift, parry = Space), a slower character and a shorter dash.

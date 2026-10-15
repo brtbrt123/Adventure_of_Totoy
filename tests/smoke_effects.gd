@@ -110,6 +110,66 @@ func _red_encounter(attack: StringName) -> void:
 			return
 	_expect(false, "red encounter timed out " + String(attack))
 
+
+# Force each new pattern through the real core; assert effects at snapshot impact
+# boundaries, independent of whether the player happens to stand in the hit area.
+func _new_patterns() -> void:
+	for attack: StringName in [&"red_stomp", &"gold_combo", &"red_charge"]:
+		_reset()
+		arena.core.boss.phase = 2
+		arena.core.boss.next_attack_override = attack
+		arena.core.boss.cooldown = 1
+		var impact_ids: Dictionary = {}
+		var saw_rush: bool = false
+		var saw_reraise: bool = false
+		var charge_start: Vector2 = Vector2.ZERO
+		var last_end: int = -1
+		for i: int in range(180):
+			_step(InputFrame.new())
+			for tell: Snapshots.TelegraphSnapshot in arena.snapshot.telegraphs:
+				last_end = maxi(last_end, tell.end_tick)
+				if arena.snapshot.tick == tell.hit_tick:
+					impact_ids[tell.id] = true
+					if attack == &"red_stomp":
+						_expect(not arena.red_plan.is_empty(), "stomp has no shockwave")
+						_expect(arena.shake_left > 0, "stomp has no impact shake")
+					elif attack == &"gold_combo":
+						var centered: bool = false
+						for ring: Dictionary in arena.rings:
+							if int(ring["start_tick"]) == tell.hit_tick and Vector2(ring["position"]).is_equal_approx(tell.center):
+								centered = true
+						_expect(centered, "combo dust missing at impact center")
+				if attack == &"red_charge":
+					charge_start = tell.center
+					if arena.snapshot.tick >= tell.hit_tick and arena.snapshot.tick <= tell.end_tick:
+						var boss: Snapshots.EntitySnapshot = arena.snapshot.entities[0]
+						var behind: Vector2 = boss.position - tell.direction * 14.0
+						var follows: bool = false
+						for trail: Dictionary in arena.trails:
+							if bool(trail.get("charge", false)) and int(trail["life"]) == 5 and Vector2(trail["position"]).is_equal_approx(behind):
+								follows = true
+						_expect(follows, "charge dust does not follow snapshot position")
+						_expect(not boss.position.is_equal_approx(charge_start), "charge body did not move")
+						saw_rush = true
+			if attack == &"gold_combo" and impact_ids.size() == 1:
+				var pose: String = String(arena.selected_frames.get(2, ""))
+				saw_reraise = saw_reraise or pose.contains("gold_combo_windup")
+			# Rendering the same snapshot twice must not duplicate impacts or dust.
+			var particle_count: int = arena.particles.size()
+			var trail_count: int = arena.trails.size()
+			var ring_count: int = arena.rings.size()
+			arena.prepare_visuals()
+			_expect(arena.particles.size() == particle_count and arena.trails.size() == trail_count and arena.rings.size() == ring_count, "effects duplicated on repeated snapshot")
+			await process_frame
+			if last_end >= 0 and arena.snapshot.tick > last_end + 12:
+				break
+		_expect(impact_ids.size() == (2 if attack == &"gold_combo" else 1), "missing impacts for " + String(attack))
+		if attack == &"gold_combo":
+			_expect(saw_reraise, "combo did not re-raise between slams")
+		if attack == &"red_charge":
+			_expect(saw_rush, "charge rush never exercised")
+		_expect(arena.missing_frames.is_empty(), "new pattern requested missing frames")
+
 func _run() -> void:
 	await process_frame
 	_controls()
@@ -123,6 +183,7 @@ func _run() -> void:
 	arena.set_physics_process(false)
 	await _red_encounter(&"red_shards")
 	await _red_encounter(&"red_sweep")
+	await _new_patterns()
 	_reset()
 	# Test fixture positions the player in sword range; hits are still resolved by core.
 	arena.core.player.position = arena.core.boss.position - Vector2(30,0)

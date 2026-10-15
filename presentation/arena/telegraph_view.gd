@@ -6,7 +6,7 @@ const Snapshots := preload("res://core/snapshots.gd")
 static func outline(t: Snapshots.TelegraphSnapshot) -> PackedVector2Array:
 	var points: PackedVector2Array = PackedVector2Array()
 	match t.shape:
-		&"circle":
+		&"circle", &"ring":
 			for i: int in range(97):
 				points.append(t.center + Vector2.from_angle(TAU * i / 96.0) * t.size)
 		&"cone":
@@ -25,6 +25,9 @@ static func outline(t: Snapshots.TelegraphSnapshot) -> PackedVector2Array:
 	return points
 
 static func draw_warning(canvas: Node2D, t: Snapshots.TelegraphSnapshot, tick: int, bright: Color, dark: Color, ink: Color) -> void:
+	if t.shape == &"ring":
+		draw_ring_warning(canvas, t, tick, bright, dark, ink)
+		return
 	var points: PackedVector2Array = outline(t)
 	if points.size() < 3:
 		return
@@ -41,6 +44,8 @@ static func draw_marker(canvas: Node2D, t: Snapshots.TelegraphSnapshot, bright: 
 	var marker: Vector2 = t.center + Vector2(0, -12)
 	if t.shape == &"circle":
 		marker.y -= t.size
+	elif t.shape == &"ring":
+		marker = t.center + t.direction * (t.inner_size + t.size) * 0.5
 	marker = marker.clamp(Vector2(8, 37), Vector2(312, 143))
 	var icon: PackedVector2Array
 	if t.kind == &"gold":
@@ -52,3 +57,26 @@ static func draw_marker(canvas: Node2D, t: Snapshots.TelegraphSnapshot, bright: 
 	if t.kind != &"gold":
 		canvas.draw_line(marker + Vector2(0,-2), marker + Vector2(0,1), ink)
 		canvas.draw_rect(Rect2(marker + Vector2(0,3), Vector2.ONE), ink)
+
+static func ring_points(center: Vector2, radius: float) -> PackedVector2Array:
+	var points: PackedVector2Array = PackedVector2Array()
+	for i: int in range(97):
+		points.append(center + Vector2.from_angle(TAU * i / 96.0) * radius)
+	return points
+
+## Separate quads leave a real hole: no danger fill is ever drawn over the safe center.
+static func draw_ring_warning(canvas: Node2D, t: Snapshots.TelegraphSnapshot, tick: int, bright: Color, dark: Color, ink: Color) -> void:
+	var outer: PackedVector2Array = ring_points(t.center, t.size)
+	var inner: PackedVector2Array = ring_points(t.center, t.inner_size)
+	var progress: float = clampf(float(tick - t.start_tick) / maxi(1, t.hit_tick - t.start_tick), 0.0, 1.0)
+	var live: bool = tick >= t.hit_tick and tick <= t.end_tick
+	for i: int in range(96):
+		canvas.draw_colored_polygon(PackedVector2Array([inner[i], outer[i], outer[i+1], inner[i+1]]), Color(bright, 0.55 if live else 0.10 + 0.20 * progress))
+	canvas.draw_colored_polygon(inner.slice(0, 96), Color("a7cde0", 0.09))
+	for boundary: PackedVector2Array in [outer, inner]:
+		canvas.draw_polyline(boundary, ink, 3.0)
+		canvas.draw_polyline(boundary, bright if live else dark, 1.0)
+	# Cream dashes sit on the safe side of the inner red boundary.
+	var safe: PackedVector2Array = ring_points(t.center, maxf(0.0, t.inner_size - 3.0))
+	for i: int in range(0, 96, 8):
+		canvas.draw_polyline(safe.slice(i, i+5), Color("e0f0ec"), 1.0)
