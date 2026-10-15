@@ -23,7 +23,7 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 - `godot_console --headless --quit` alone fails with "no main scene defined" (there is no scene yet). The smoke script is the substitute check until a main scene exists.
 - Tiles were not rendered in a running Godot window, so seam-free display with camera movement is unchecked.
-- `codex` CLI is not installed or not on PATH, so nothing about Codex was checked.
+- Codex: `codex-cli 0.162.1` is installed and logged in (ChatGPT). Its headless flags and model names are recorded in `docs/ROUTING.md`, but **no Codex run has been tested yet**, including whether Codex follows `AGENTS.md` and whether the listed models work with `codex exec -m`.
 - Whether the art looks good: the human must judge the contact sheet. The seam check is a heuristic.
 
 ## Open questions for the human
@@ -32,7 +32,7 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 2. Art mood: the design says cozy and readable (Stardew-like feeling). Is DB16 acceptable for that, or do you want a warmer custom palette?
 3. Is `tools/` and `harness/` being owned by Claude Code acceptable (not in the brief's routing table)?
 4. Test framework: plain headless GDScript scripts (recommended, no addon) or GUT / GdUnit4 (compatibility with 4.7.2 not checked)?
-5. Codex: install it before Stage 2. Headless permission setup for `claude -p` / `codex exec` needs your decision.
+5. Headless permission setup for `claude -p` / `codex exec` needs your decision before Stage 2 (planned for Codex: `--sandbox workspace-write` scoped to the task worktree, no bypass flags).
 6. Name the game's first-slice ordering: the design says the combat slice (Colossus) comes first; confirm that is the next real work after Stage 1.
 
 ## Recommended next steps

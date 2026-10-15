@@ -20,11 +20,23 @@ Each agent has an ordered ladder of models, cheapest first. A task starts on the
 
 | Tier | Use for | Claude Code model | Codex model |
 |---|---|---|---|
-| `light` | small, well-defined work: rename, doc edit, one tile variant, simple UI label, small bugfix, adding a test for existing code | `claude-haiku-5-5` | **to be set in Stage 2**: cheapest suitable model listed by `codex --help` / its model list |
-| `standard` | normal feature work: a new entity, a HUD screen, a sprite set, a typical bugfix | `claude-sonnet-5-5` | **to be set in Stage 2** |
-| `heavy` | design-heavy or risky work: combat rules and timing, boss logic, the core/presentation interface, save system, hard bugs, multi-frame animation that keeps failing | `claude-opus-5-5` (top tier `claude-fable-5-1` if you want a fourth rung) | **to be set in Stage 2**: the most capable model |
+| `light` | small, well-defined work: rename, doc edit, one tile variant, simple UI label, small bugfix, adding a test for existing code | `claude-haiku-5-5` | `gpt-6-luna` ("fast and affordable model for easier tasks") |
+| `standard` | normal feature work: a new entity, a HUD screen, a sprite set, a typical bugfix | `claude-sonnet-5-5` | `gpt-6.1-sol` ("latest workhorse model for coding and everyday work") |
+| `heavy` | design-heavy or risky work: combat rules and timing, boss logic, the core/presentation interface, save system, hard bugs, multi-frame animation that keeps failing | `claude-opus-5-5` (top tier `claude-fable-5-1` if you want a fourth rung) | `gpt-6-astra` ("frontier intelligence for the most demanding work") |
 
-Codex model names are deliberately not filled in: they change between versions and `codex` is not installed on this machine yet. Stage 2 must read the real list from the installed CLI and put the names in `harness/config.json`. Claude model IDs above come from the current model list; confirm them with `claude --help` / `/model` when implementing.
+Where the names come from: the Codex names were read on 2026-10-15 from this machine's Codex model cache (`~/.codex/models_cache.json`, visible entries, installed `codex-cli 0.162.1`) and matched by their own descriptions. Older visible models exist (`gpt-6-sol`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`) but are unused. **No Codex run with a specific model has been tested yet**, so confirm the names work with `codex exec -m <model>` before relying on them; the cache can change when Codex updates. Claude model IDs come from the current model list; confirm them with `claude --help` when implementing. Codex also has per-model reasoning effort levels (each model has a default); Stage 2 may use effort as an extra escalation step.
+
+### Verified headless flags (`codex exec --help`, codex-cli 0.162.1)
+
+- `codex exec [OPTIONS] [PROMPT]`: non-interactive; prompt from argument or stdin (`-`).
+- `-m, --model <MODEL>`, `-C, --cd <DIR>` (working root, use the task worktree), `-s, --sandbox read-only | workspace-write | danger-full-access`, `--json` (JSONL events), `-o, --output-last-message <FILE>` (final answer to a file, good for the review JSON), `--output-schema <FILE>` (JSON Schema for the final response, usable to force the reviewer format), `--ephemeral`, `--skip-git-repo-check`, `--add-dir`.
+- `codex exec review` and `codex review` exist (built-in non-interactive review).
+- Do **not** use `--dangerously-bypass-approvals-and-sandbox` (skips all checks) or `--approve-for-me` without the human's explicit approval. Planned: `--sandbox workspace-write --cd <worktree>`.
+- Auth: `codex login status` reports "Logged in using ChatGPT" on this machine.
+
+### Claude Code headless (`claude -p`)
+
+Not re-checked in this pass; run `claude -p --help` before Stage 2 (see "Verify before implementing" below).
 
 How a tier is chosen and escalated:
 
@@ -54,7 +66,7 @@ Example `config.json` shape (Stage 2 builds it):
   "tiers": ["light", "standard", "heavy"],
   "models": {
     "claude": {"light": "claude-haiku-5-5", "standard": "claude-sonnet-5-5", "heavy": "claude-opus-5-5"},
-    "codex":  {"light": "<set from codex model list>", "standard": "<...>", "heavy": "<...>"}
+    "codex":  {"light": "gpt-6-luna", "standard": "gpt-6.1-sol", "heavy": "gpt-6-astra"}
   },
   "default_tier": {"tile": "light", "sprite": "light", "logic": "standard", "arch": "heavy"},
   "escalate_on": ["check_failed", "review_failed", "timeout"],
@@ -119,4 +131,4 @@ Replace keyword matching with a cheap classifier call, keeping keyword scoring a
 
 ## Verify before implementing
 
-The headless flags for `claude -p` and `codex exec` (output format, permissions, working directory) change between versions. Check each CLI's `--help` on this machine. Do not rely on memory. (On this machine `claude` 2.1.296 is installed; `codex` was **not found** during the Stage 1 pre-flight.)
+The headless flags for `claude -p` and `codex exec` (output format, permissions, working directory) change between versions. Check each CLI's `--help` on this machine. Do not rely on memory. (On this machine `claude` 2.1.296 and `codex-cli` 0.162.1 are installed. `codex exec --help` was read; `claude -p --help` was not.)
