@@ -3,11 +3,17 @@
   "extrude": 1,
   "size": {
     "w": 256,
-    "h": 26
+    "h": 50
   },
   "frames": {
-    "totoy_idle_down": {
+    "mossbound_colossus_idle": {
       "x": 1,
+      "y": 1,
+      "w": 48,
+      "h": 48
+    },
+    "totoy_idle_down": {
+      "x": 51,
       "y": 1,
       "w": 16,
       "h": 24

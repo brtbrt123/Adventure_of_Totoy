@@ -17,7 +17,15 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 **What this does not tell us:** nobody has played it. There is no scene, input mapping or drawing yet (that is `presentation/`, Codex's area), so whether the parry window, boss timings and damage feel fair or fun is unknown. The numbers in `tuning.gd` are first guesses. Only the logic is tested (including: warning area equals hit area, aim locked at commit, determinism).
 
-## Verified (run on this machine)
+## Playable arena (branch `agent/ui/arena-slice`, 2026-10-15)
+
+Codex (`gpt-6.1-sol`) wrote `presentation/arena/` (scene, input bindings, telegraph drawing, HUD, effects, silent sound hooks) and a placeholder 48x48 Colossus sprite; `project.godot` now runs `res://presentation/arena/arena.tscn` at 60 physics ticks per second. **Codex's sandbox shell failed again mid-task, so it could not run anything; Claude Code ran every check afterwards**: art validate/build/preview, Python tests, Godot import, `run_tests.gd`, `smoke_project.gd`, the new `tests/smoke_arena.gd`, a 120-frame headless run of the main scene, and the windowed `tests/capture_arena.gd`, which wrote `art/build/arena_preview.png`. All exit 0. Presentation holds no game rules (it reads `Tuning` only to draw F1 debug circles).
+
+**To play:** open the project in the Godot editor and press F5, or run `C:\Tools\Godot\Godot_v4.7.2-stable_win64.exe --path .` from the project folder. Controls: WASD/arrows move, J/Z attack, K/X parry, Space/L dash, R restart, F1 debug overlay; gamepad: left stick, west/south/east buttons for attack/parry/dash.
+
+**Not done / not judged:** nobody has played it, so fight feel, readability of the warnings and the look are unjudged. Only `totoy_idle_down` and `mossbound_colossus_idle` frames exist, so other states use an idle fallback with tints and log one warning per missing frame name. No sound yet. Interface gaps Codex reported: no unconditional slam-impact event (the shake on slam is inferred), collision radii for debug drawing are read from `core/tuning.gd`, and the counter-window maximum comes from the `counter_window_opened` event.
+
+## Verified (run on this machine, earlier stages)
 
 - `python tools/art/validate_art.py` passes on the placeholder art (5 sources, 7 PNGs).
 - `python tools/art/build_art.py` and `python tools/art/preview_art.py` run; `art/build/contact_sheet.png` was viewed and renders correctly.
@@ -27,7 +35,7 @@ Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PR
 
 ## Not verified
 
-- `godot_console --headless --quit` alone fails with "no main scene defined" (there is no scene yet). The smoke script is the substitute check until a main scene exists.
+- (Fixed on the arena branch: the project now has a main scene, so `godot_console --headless --path . --quit-after 120` runs it. On branches without the arena, `--quit` alone still fails with "no main scene defined".)
 - Tiles were not rendered in a running Godot window, so seam-free display with camera movement is unchecked.
 - Codex: `codex-cli 0.162.1` is installed and logged in (ChatGPT). Its headless flags and model names are recorded in `docs/ROUTING.md`, but **no Codex run has been tested yet**, including whether Codex follows `AGENTS.md` and whether the listed models work with `codex exec -m`.
 - Whether the art looks good: the human must judge the contact sheet. The seam check is a heuristic.
