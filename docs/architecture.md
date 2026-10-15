@@ -70,7 +70,7 @@ The area is dangerous from `hit_tick` to `end_tick` inclusive; before that it is
 
 `HudSnapshot`: `player_hp`, `player_max_hp`, `dash_cooldown_ticks`, `dash_cooldown_max`, `edge`, `edge_max`, `boss_hp`, `boss_max_hp`, `boss_posture`, `boss_posture_max`, `counter_window_ticks_left`.
 
-**Art contract:** presentation picks a frame from `art/build/sprites.json` using `<visual_id>_<state>_<direction>[_<frame>]` (see `AGENTS.md` section 5). A missing frame falls back to a visible placeholder and logs a warning; it never crashes.
+**Art contract:** presentation picks a frame from `art/build/sprites.json` using `<visual_id>_<state>_<direction>_<n>` for characters and `<visual_id>_<state>_<n>` for the boss (see `AGENTS.md` section 5 and `presentation/arena/animation.gd`). A missing frame falls back to a visible placeholder and logs a warning; it never crashes.
 
 ## Channel 3: events (core to presentation): `core/game_event.gd`
 

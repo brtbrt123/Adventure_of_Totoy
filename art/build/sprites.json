@@ -3,18 +3,378 @@
   "extrude": 1,
   "size": {
     "w": 256,
-    "h": 50
+    "h": 278
   },
   "frames": {
-    "mossbound_colossus_idle": {
+    "mossbound_colossus_dead_1": {
       "x": 1,
       "y": 1,
       "w": 48,
       "h": 48
     },
-    "totoy_idle_down": {
+    "mossbound_colossus_gold_slam_strike_1": {
       "x": 51,
       "y": 1,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_gold_slam_windup_1": {
+      "x": 101,
+      "y": 1,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_gold_slam_windup_2": {
+      "x": 151,
+      "y": 1,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_idle": {
+      "x": 201,
+      "y": 1,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_idle_1": {
+      "x": 1,
+      "y": 51,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_idle_2": {
+      "x": 51,
+      "y": 51,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_posture_broken_1": {
+      "x": 101,
+      "y": 51,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_posture_broken_2": {
+      "x": 151,
+      "y": 51,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_recover_1": {
+      "x": 201,
+      "y": 51,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_red_shards_strike_1": {
+      "x": 1,
+      "y": 101,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_red_shards_windup_1": {
+      "x": 51,
+      "y": 101,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_red_shards_windup_2": {
+      "x": 101,
+      "y": 101,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_red_sweep_strike_1": {
+      "x": 151,
+      "y": 101,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_red_sweep_windup_1": {
+      "x": 201,
+      "y": 101,
+      "w": 48,
+      "h": 48
+    },
+    "mossbound_colossus_red_sweep_windup_2": {
+      "x": 1,
+      "y": 151,
+      "w": 48,
+      "h": 48
+    },
+    "totoy_attack_active_down_1": {
+      "x": 51,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_active_right_1": {
+      "x": 69,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_active_up_1": {
+      "x": 87,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_recovery_down_1": {
+      "x": 105,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_recovery_right_1": {
+      "x": 123,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_recovery_up_1": {
+      "x": 141,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_windup_down_1": {
+      "x": 159,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_windup_right_1": {
+      "x": 177,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_attack_windup_up_1": {
+      "x": 195,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dash_down_1": {
+      "x": 213,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dash_down_2": {
+      "x": 231,
+      "y": 151,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dash_right_1": {
+      "x": 1,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dash_right_2": {
+      "x": 19,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dash_up_1": {
+      "x": 37,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dash_up_2": {
+      "x": 55,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dead_down_1": {
+      "x": 73,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dead_right_1": {
+      "x": 91,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_dead_up_1": {
+      "x": 109,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_idle_down": {
+      "x": 127,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_idle_down_1": {
+      "x": 145,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_idle_down_2": {
+      "x": 163,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_idle_right_1": {
+      "x": 181,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_idle_right_2": {
+      "x": 199,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_idle_up_1": {
+      "x": 217,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_idle_up_2": {
+      "x": 235,
+      "y": 201,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_down_1": {
+      "x": 1,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_down_2": {
+      "x": 19,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_recovery_down_1": {
+      "x": 37,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_recovery_right_1": {
+      "x": 55,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_recovery_up_1": {
+      "x": 73,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_right_1": {
+      "x": 91,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_right_2": {
+      "x": 109,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_up_1": {
+      "x": 127,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_parry_up_2": {
+      "x": 145,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_down_1": {
+      "x": 163,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_down_2": {
+      "x": 181,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_down_3": {
+      "x": 199,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_down_4": {
+      "x": 217,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_right_1": {
+      "x": 235,
+      "y": 227,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_right_2": {
+      "x": 1,
+      "y": 253,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_right_3": {
+      "x": 19,
+      "y": 253,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_right_4": {
+      "x": 37,
+      "y": 253,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_up_1": {
+      "x": 55,
+      "y": 253,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_up_2": {
+      "x": 73,
+      "y": 253,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_up_3": {
+      "x": 91,
+      "y": 253,
+      "w": 16,
+      "h": 24
+    },
+    "totoy_walk_up_4": {
+      "x": 109,
+      "y": 253,
       "w": 16,
       "h": 24
     }

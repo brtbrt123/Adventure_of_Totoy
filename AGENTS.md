@@ -64,7 +64,7 @@ Sprites are **text grids** in `art/src/<name>.txt`. One character per pixel; eac
 # seamless: true    (optional, tiles only: checks that the tile repeats without a visible seam)
 ```
 
-Other lines starting with `#` that are not `key: value` headers are comments. The file name (without `.txt`) is the sprite name. Frame naming convention for animation: `<entity>_<state>_<direction>[_<frame>]`, for example `totoy_idle_down`, `totoy_walk_down_2`.
+Other lines starting with `#` that are not `key: value` headers are comments. The file name (without `.txt`) is the sprite name. Frame naming convention for animation: characters use `<visual_id>_<state>_<direction>_<n>` with `n` starting at 1 even for single-frame states (for example `totoy_walk_down_2`); directions are authored as `down`, `up` and `right` only, and `left` is `right` mirrored at runtime. The boss has one direction: `mossbound_colossus_<state>_<n>`, where attack frames use the attack plus phase as the state (`gold_slam_windup`, `gold_slam_strike`, `red_sweep_*`, `red_shards_*`). The animation table (frame counts and ticks per frame) lives in `presentation/arena/animation.gd`; frames are chosen only from the snapshot (`state`, `state_ticks`, telegraph timeline), and `tests/smoke_animation.gd` checks that every requested frame exists. Screenshots saved in `art/build/` must be named `arena_*.png` so the validator skips them.
 
 Rules the validator enforces:
 - tiles are exactly 16x16; sprites have width and height that are multiples of 8 (max 256);
