@@ -4,7 +4,7 @@ const Snapshots := preload("res://core/snapshots.gd")
 const DIRECTIONS: Array[String] = ["down", "up", "right"]
 # [frame count, ticks per frame, loop]. Windups use telegraph progress instead.
 const PLAYER: Dictionary = {
-	"idle": [2, 24, true], "walk": [4, 6, true], "dash": [2, 4, false],
+	"idle": [2, 24, true], "walk": [4, 9, true], "dash": [2, 3, false],
 	"parry": [2, 3, false], "parry_recovery": [1, 1, false],
 	"attack_windup": [1, 1, false], "attack_active": [1, 1, false],
 	"attack_recovery": [1, 1, false], "dead": [1, 1, false],

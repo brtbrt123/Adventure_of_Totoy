@@ -8,6 +8,7 @@ const Tuning := preload("res://core/tuning.gd")
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 
 var core: GameCore = GameCore.new(17)
@@ -19,6 +20,9 @@ var missing_frames: Dictionary = {}
 var selected_frames: Dictionary = {}
 var last_attacks: Dictionary = {}
 var previous_telegraphs: Array[Snapshots.TelegraphSnapshot] = []
+var red_history: Dictionary = {}
+var red_plan: Array[Dictionary] = []
+var slash_plan: Array[Dictionary] = []
 var rings: Array[Dictionary] = []
 var visual_tick: int = -1
 var particles: Array[Dictionary] = []
@@ -26,7 +30,6 @@ var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
 var shake_left: int = 0
-var dash_trail_left: int = 0
 var sprites: Texture2D
 var tiles: Texture2D
 @onready var hud: Hud = $HUD/Display
@@ -69,16 +72,15 @@ func _physics_process(_delta: float) -> void:
 		debug_enabled = not debug_enabled
 	if snapshot.result != &"playing" and Input.is_action_just_pressed("arena_restart"):
 		_restart()
-	# One and only one simulation step per physics frame; aim stays zero.
-	core.step(Bindings.read_frame())
+	# Node-local mouse coordinates already account for viewport scaling and canvas transforms.
+	core.step(Bindings.read_frame(snapshot.player.position, get_local_mouse_position()))
 	snapshot = core.snapshot()
 	_age_effects()
 	prepare_visuals()
 	for event: GameEvent in core.last_events:
 		_on_event(event)
-	if dash_trail_left > 0:
-		trails.append({"position": snapshot.player.position, "life": 8})
-		dash_trail_left -= 1
+	if snapshot.player.state == &"dash":
+		trails.append({"position": snapshot.player.position, "life": 4})
 	_update_hud()
 	queue_redraw()
 
@@ -89,13 +91,15 @@ func _restart() -> void:
 	last_attacks.clear()
 	previous_telegraphs.clear()
 	rings.clear()
+	red_history.clear()
+	red_plan.clear()
+	slash_plan.clear()
 	visual_tick = -1
 	prepare_visuals()
 	particles.clear()
 	trails.clear()
 	flashes.clear()
 	shake_left = 0
-	dash_trail_left = 0
 	hud.counter_max = 1
 
 func _update_hud() -> void:
@@ -138,10 +142,13 @@ func _on_event(event: GameEvent) -> void:
 			_sound_counter_window_opened(event)
 		&"counter_window_closed": _sound_counter_window_closed(event)
 		&"dash_started":
-			dash_trail_left = 8
 			_sound_dash_started(event)
 		&"attack_hit":
-			_burst(event.data["position"], 5, colors["j"], 0.7)
+			var counter: bool = event.data["kind"] == &"counter"
+			if int(event.data["attacker_id"]) == snapshot.player.id:
+				_burst(event.data["position"], 16 if counter else 8, colors["1"], 1.8 if counter else 0.9)
+				if counter:
+					shake_left = maxi(shake_left, 5)
 			_sound_attack_hit(event)
 		&"attack_telegraphed": _sound_attack_telegraphed(event)
 		&"parry_failed": _sound_parry_failed(event)
@@ -177,6 +184,8 @@ func _draw() -> void:
 	actors.sort_custom(_behind)
 	for actor: Snapshots.EntitySnapshot in actors:
 		_draw_actor(actor)
+	CombatEffects.draw_plan(self, red_plan)
+	CombatEffects.draw_plan(self, slash_plan)
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_marker(self, t, colors["x"] if t.kind == &"gold" else colors["z"], colors["0"])
 	for particle: Dictionary in particles:
@@ -199,6 +208,18 @@ func _direction(facing: Vector2) -> String:
 func prepare_visuals() -> void:
 	if snapshot == null:
 		return
+	# Retain only strikes actually observed; cancelled warnings leave no afterglow.
+	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
+		if tell.attack in [&"red_shards", &"red_sweep"] and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
+			red_history[tell.id] = tell
+	red_plan.clear()
+	for id: int in red_history.keys():
+		var tell: Snapshots.TelegraphSnapshot = red_history[id]
+		if snapshot.tick > tell.end_tick + CombatEffects.AFTERGLOW_TICKS:
+			red_history.erase(id)
+		else:
+			red_plan.append_array(CombatEffects.red(tell, snapshot.tick, colors))
+	slash_plan = CombatEffects.slash(snapshot.player, colors)
 	var fresh: bool = snapshot.tick != visual_tick
 	if fresh:
 		# Include the preceding snapshot for a parry that clears the tell exactly
@@ -273,11 +294,6 @@ func _draw_actor(actor: Snapshots.EntitySnapshot) -> void:
 		# An opaque palette sparkle leaves the authored colors intact.
 		draw_line(at + Vector2(-3, -16), at + Vector2(3, -16), colors["p"])
 		draw_line(at + Vector2(0, -19), at + Vector2(0, -13), colors["p"])
-	if actor.visual_id == &"totoy" and actor.state == &"attack_active":
-		var center: Vector2 = at - Vector2(0, 7)
-		var angle: float = actor.facing.angle()
-		draw_arc(center, 13.0, angle - 0.8, angle + 0.8, 9, colors["p"], 1.0, false)
-		draw_arc(center, 15.0, angle - 0.5, angle + 0.5, 7, colors["o"], 1.0, false)
 
 # AUDIO HOOKS: one hook per core event. Add playback here when original audio exists.
 

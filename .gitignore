@@ -35,3 +35,6 @@ Desktop.ini
 docs/.obsidian/workspace*.json
 docs/.obsidian/cache
 docs/.trash/
+
+# Godot user data redirected into the project by some headless runs
+/Godot/

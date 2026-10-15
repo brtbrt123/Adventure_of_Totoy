@@ -80,7 +80,7 @@ func _draw() -> void:
 	bar(Vector2(112, 161), 92, h.edge, h.edge_max, colors["v"])
 	lettering(Vector2(216, 153), "DASH" + (" READY" if h.dash_cooldown_ticks == 0 else ""), colors["o"])
 	bar(Vector2(216, 161), 92, h.dash_cooldown_max - h.dash_cooldown_ticks, h.dash_cooldown_max, colors["n"])
-	lettering(Vector2(8, 169), "J/Z HIT  K/X PARRY  SPACE/L DASH  F1 DEBUG", colors["j"])
+	lettering(Vector2(8, 169), "LMB HIT  SPACE PARRY  SHIFT DASH  F1 DEBUG", colors["j"])
 	if h.counter_window_ticks_left > 0:
 		draw_rect(Rect2(104, 30, 112, 16), colors["0"])
 		lettering(Vector2(112, 33), "COUNTER OPEN - ATTACK", colors["p"])
