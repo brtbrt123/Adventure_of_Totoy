@@ -25,3 +25,6 @@
 *.ogg binary
 *.wav binary
 *.ttf binary
+
+# Godot generated
+*.uid text eol=lf
