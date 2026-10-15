@@ -7,7 +7,7 @@ The harness is everything around the agents that makes their work safe, checkabl
 1. **Instructions layer:** `AGENTS.md` (shared rules), `CLAUDE.md` (points to it), `docs/GAME_DESIGN.md` (intent and feel targets).
 2. **Isolation:** one git worktree and branch per task, plus folder ownership rules.
 3. **Router:** `harness/router.py`, using the algorithm in `ROUTING.md`.
-4. **Runner:** headless calls to `claude -p` and `codex exec` inside the task worktree, with timeouts.
+4. **Runner:** headless calls to `claude -p` and `codex exec` inside the task worktree, with timeouts. It picks the model from the task's tier and escalates to a higher model after a failed round (see `ROUTING.md`, "Model tiers and escalation"). Model names live in `harness/config.json`.
 5. **Checks:** sprite validator, sprite build and atlas, Godot headless tests, lint, contact-sheet render.
 6. **Review loop:** the other agent reviews the diff, max 3 rounds.
 7. **Memory and context:** the Obsidian vault in `docs/`, and Graphify later.
@@ -96,7 +96,7 @@ Each check is a script that exits 0 on success and non-zero on failure, and prin
 
 ### Run log
 
-`harness/logs/runs.jsonl`, one line per run: timestamp, task id, label, builder, reviewer, rounds used, result (`pass`, `fail`, `escalated`), duration, which checks failed, and notes. (Logs are gitignored; the folder is kept.)
+`harness/logs/runs.jsonl`, one line per run: timestamp, task id, label, builder, reviewer, model and tier per round, rounds used, result (`pass`, `fail`, `escalated`), duration, which checks failed, and notes. (Logs are gitignored; the folder is kept.)
 
 ### Git conventions
 
