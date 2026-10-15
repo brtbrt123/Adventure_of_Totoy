@@ -1,0 +1,104 @@
+"""Render all tiles and sprites onto one contact sheet (8x, nearest-neighbor) for human review.
+
+Seamless tiles are also shown repeated 3x3 so seams are visible.
+
+Usage: python tools/art/preview_art.py [--out PATH]
+"""
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+from PIL import Image, ImageDraw
+
+import artlib
+
+SCALE = 8
+REPEAT_SCALE = 4
+MAX_WIDTH = 1280
+PAD = 16
+TITLE_H = 24
+LABEL_H = 16
+BACKGROUND = (42, 42, 48)  # preview background only, not game art
+TEXT = (230, 230, 230)
+
+Cell = tuple[str, Image.Image]
+
+
+def scaled(image: Image.Image, scale: int) -> Image.Image:
+    return image.resize((image.width * scale, image.height * scale), Image.NEAREST)
+
+
+def repeated(image: Image.Image, times: int = 3) -> Image.Image:
+    sheet = Image.new("RGBA", (image.width * times, image.height * times), (0, 0, 0, 0))
+    for ty in range(times):
+        for tx in range(times):
+            sheet.paste(image, (tx * image.width, ty * image.height))
+    return sheet
+
+
+def place(sections: list[tuple[str, list[Cell]]]) -> tuple[list[tuple], int]:
+    placed: list[tuple] = []
+    y = PAD
+    for title, cells in sections:
+        placed.append(("title", PAD, y, title))
+        y += TITLE_H
+        x, row_h = PAD, 0
+        for label, image in cells:
+            if x > PAD and x + image.width > MAX_WIDTH:
+                x, y, row_h = PAD, y + row_h + LABEL_H + PAD, 0
+            placed.append(("cell", x, y, (label, image)))
+            x += max(image.width, 96) + PAD
+            row_h = max(row_h, image.height)
+        y += row_h + LABEL_H + PAD
+    return placed, y
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--out", type=Path, default=artlib.BUILD_DIR / "contact_sheet.png")
+    args = parser.parse_args()
+
+    try:
+        palette = artlib.load_palette()
+    except artlib.PaletteError as exc:
+        print(f"FAIL: {exc}")
+        return 1
+    sources, errors = artlib.collect(artlib.SRC_DIR, palette)
+    if errors:
+        print("FAIL: sources do not validate, no preview rendered")
+        for line in errors:
+            print(f"  - {line}")
+        return 1
+
+    tiles = [s for s in sources if s.kind == "tile"]
+    sprites = [s for s in sources if s.kind == "sprite"]
+    sections: list[tuple[str, list[Cell]]] = [
+        (f"Tiles ({len(tiles)}) at {SCALE}x", [(f"{s.name}", scaled(artlib.render(s, palette), SCALE)) for s in tiles]),
+        ("Seamless tiles repeated 3x3 (look for visible seams)", [
+            (s.name, scaled(repeated(artlib.render(s, palette)), REPEAT_SCALE)) for s in tiles if s.seamless
+        ]),
+        (f"Sprites ({len(sprites)}) at {SCALE}x", [
+            (f"{s.name} {s.width}x{s.height}", scaled(artlib.render(s, palette), SCALE)) for s in sprites
+        ]),
+    ]
+    sections = [(title, cells) for title, cells in sections if cells]
+    placed, height = place(sections)
+    sheet = Image.new("RGB", (MAX_WIDTH, height), BACKGROUND)
+    draw = ImageDraw.Draw(sheet)
+    for kind, x, y, payload in placed:
+        if kind == "title":
+            draw.text((x, y), payload, fill=TEXT)
+        else:
+            label, image = payload
+            sheet.paste(image, (x, y), image)
+            draw.text((x, y + image.height + 2), label, fill=TEXT)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(args.out)
+    print(f"Contact sheet written to {args.out} ({sheet.width}x{sheet.height})")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

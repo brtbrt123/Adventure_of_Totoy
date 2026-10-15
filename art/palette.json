@@ -1,0 +1,24 @@
+{
+  "name": "DawnBringer 16 (DB16)",
+  "source": "https://lospec.com/palette-list/dawnbringer-16",
+  "verified": "2026-10-15, hex values read from the Lospec palette JSON",
+  "transparent": ".",
+  "colors": [
+    {"symbol": "0", "name": "night",   "hex": "#140c1c"},
+    {"symbol": "1", "name": "plum",    "hex": "#442434"},
+    {"symbol": "2", "name": "navy",    "hex": "#30346d"},
+    {"symbol": "3", "name": "charcoal","hex": "#4e4a4e"},
+    {"symbol": "4", "name": "brown",   "hex": "#854c30"},
+    {"symbol": "5", "name": "forest",  "hex": "#346524"},
+    {"symbol": "6", "name": "red",     "hex": "#d04648"},
+    {"symbol": "7", "name": "olive",   "hex": "#757161"},
+    {"symbol": "8", "name": "blue",    "hex": "#597dce"},
+    {"symbol": "9", "name": "orange",  "hex": "#d27d2c"},
+    {"symbol": "a", "name": "steel",   "hex": "#8595a1"},
+    {"symbol": "b", "name": "leaf",    "hex": "#6daa2c"},
+    {"symbol": "c", "name": "skin",    "hex": "#d2aa99"},
+    {"symbol": "d", "name": "sky",     "hex": "#6dc2ca"},
+    {"symbol": "e", "name": "gold",    "hex": "#dad45e"},
+    {"symbol": "f", "name": "cream",   "hex": "#deeed6"}
+  ]
+}
