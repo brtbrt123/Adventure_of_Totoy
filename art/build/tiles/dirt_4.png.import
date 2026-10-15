@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjyc8knhh78pg"
-path="res://.godot/imported/stone.png-00716a64694d0663f0cc68437ea08cf5.ctex"
+uid="uid://clkl6te4lu4ne"
+path="res://.godot/imported/dirt_4.png-a423637c5e081d830cf8c09181ac1712.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/build/tiles/stone.png"
-dest_files=["res://.godot/imported/stone.png-00716a64694d0663f0cc68437ea08cf5.ctex"]
+source_file="res://art/build/tiles/dirt_4.png"
+dest_files=["res://.godot/imported/dirt_4.png-a423637c5e081d830cf8c09181ac1712.ctex"]
 
 [params]
 

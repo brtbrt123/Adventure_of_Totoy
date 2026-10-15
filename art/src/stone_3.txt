@@ -1,0 +1,18 @@
+# kind: tile
+# seamless: true
+ggghhigghhhhhhhi
+gfggiiihghhhhhhh
+igiggghifghhhggh
+hhgihggiigghhfgi
+hhghiighgggggghh
+hhghhhhihgiffggh
+hhhghhhgggggifgg
+ggighggggggggggg
+gghgfggggggggggg
+gghhfgggggfggggg
+ggghgggggggggggi
+gghhgggggggghhgg
+hhfhhgggggghhhhh
+hhhfghiiiihghhhh
+hhhgghhhhhhigggh
+ffihggghhhhhiigi

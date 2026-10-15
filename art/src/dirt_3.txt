@@ -1,0 +1,18 @@
+# kind: tile
+# seamless: true
+ccbbbbbbbbbbbccc
+ccbbbabbbbbccccc
+cccbbbaabbbbcccc
+cccbbbbb9bbbcccc
+cccbbbbbbbcccccc
+cbbbbaabcccccccc
+bbbbbbabcccccccc
+bbbbbbbbbccccbbb
+bbbbbbbbbbbbbbbb
+bbbbbbabbbbbbbbb
+bbbbbbbbbbcccccb
+ddadccbbbccccccc
+bbacacbcccaccccc
+bbacbbbbbccadcbb
+bbbbbbbbbbbbbbbb
+bbbbbbbbbbbbbccc
