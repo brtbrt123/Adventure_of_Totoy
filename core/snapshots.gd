@@ -17,6 +17,7 @@ class EntitySnapshot:
 	var posture_max: float = 0.0
 	var invulnerable: bool = false
 	var combo_index: int = 0  # player only (1-3, see docs/architecture.md); 0 for other entities
+	var skill_id: StringName = &""  # player only: the skill in progress during skill_* states, else empty
 
 
 class TelegraphSnapshot:
@@ -50,6 +51,8 @@ class HudSnapshot:
 	var boss_posture: float = 0.0
 	var boss_posture_max: float = 0.0
 	var counter_window_ticks_left: int = 0
+	var skill_cooldown_ticks: Array[int] = [0, 0, 0]  # ticks left per skill 1-3
+	var retaliate_ticks_left: int = 0  # Breaking Edge: ticks left after a successful parry
 
 
 class GameSnapshot:

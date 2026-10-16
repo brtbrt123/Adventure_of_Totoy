@@ -59,6 +59,52 @@ const NORMAL_HIT_POSTURE: float = 4.0
 const ARMOR_DAMAGE_FACTOR: float = 0.25
 const COUNTER_DAMAGE_MULT: float = 4.0
 
+# Skills (Aspect-style sword skills, bound to Z X C for testing: skill_pressed 1, 2, 3). First guesses.
+# Every skill follows windup -> active -> recovery; the hit lands on the first active tick. None grants
+# invulnerability. Health damage uses the same rules as a normal hit: reduced by ARMOR_DAMAGE_FACTOR
+# against the armored boss, multiplied by COUNTER_DAMAGE_MULT during a posture break. Skills do not use the
+# Edge counter bonus (they pay Edge instead). The Edge cost is spent when the skill starts.
+const SKILL_COUNT: int = 3
+
+# 1. Breaking Edge: after a successful parry, spend Edge to step forward with a heavy slash.
+const BREAKING_EDGE_WINDOW_TICKS: int = 50  # how long after a successful parry the skill can be used
+const BREAKING_EDGE_EDGE_COST: float = 25.0  # one parry (EDGE_PER_PARRY) pays for one retaliation
+const BREAKING_EDGE_WINDUP_TICKS: int = 6  # the forward step happens during the windup
+const BREAKING_EDGE_STEP: float = 22.0  # pixels moved during the windup
+const BREAKING_EDGE_ACTIVE_TICKS: int = 3
+const BREAKING_EDGE_RECOVERY_TICKS: int = 22
+const BREAKING_EDGE_RANGE: float = 30.0
+const BREAKING_EDGE_ARC_DOT: float = 0.1
+const BREAKING_EDGE_DAMAGE: float = 20.0
+const BREAKING_EDGE_POSTURE: float = 55.0  # high: two retaliations break the boss (posture max 100)
+const BREAKING_EDGE_EDGE_GAIN: float = 0.0
+
+# 2. Gale Cut: dash toward the aim and deliver a quick cut. No Edge cost, a cooldown instead.
+const GALE_CUT_COOLDOWN_TICKS: int = 150
+const GALE_CUT_EDGE_COST: float = 0.0
+const GALE_CUT_WINDUP_TICKS: int = 6  # the dash: GALE_CUT_SPEED px per tick along the aim
+const GALE_CUT_SPEED: float = 5.0
+const GALE_CUT_ACTIVE_TICKS: int = 2
+const GALE_CUT_RECOVERY_TICKS: int = 10
+const GALE_CUT_RANGE: float = 30.0
+const GALE_CUT_ARC_DOT: float = 0.2
+const GALE_CUT_DAMAGE: float = 15.0
+const GALE_CUT_POSTURE: float = 8.0
+const GALE_CUT_EDGE_GAIN: float = 25.0  # same as a normal hit (EDGE_PER_HIT)
+
+# 3. Moon Cleave: hold briefly, then a wide powerful slash. Biggest Edge cost and recovery.
+const MOON_CLEAVE_COOLDOWN_TICKS: int = 90
+const MOON_CLEAVE_EDGE_COST: float = 80.0
+const MOON_CLEAVE_WINDUP_TICKS: int = 30  # the committed hold
+const MOON_CLEAVE_WINDUP_MOVE_FACTOR: float = 0.2
+const MOON_CLEAVE_ACTIVE_TICKS: int = 4
+const MOON_CLEAVE_RECOVERY_TICKS: int = 44
+const MOON_CLEAVE_RANGE: float = 38.0
+const MOON_CLEAVE_ARC_DOT: float = -0.3  # a wide arc: about 107 degrees to each side of the facing
+const MOON_CLEAVE_DAMAGE: float = 40.0
+const MOON_CLEAVE_POSTURE: float = 20.0
+const MOON_CLEAVE_EDGE_GAIN: float = 0.0
+
 # Edge (sword mechanic): close hits and parries build it, a counter spends all of it for extra damage
 const EDGE_MAX: float = 100.0
 const EDGE_PER_HIT: float = 25.0

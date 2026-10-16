@@ -45,7 +45,7 @@ One `InputFrame` per tick:
 | `attack_pressed` / `attack_held` | `bool` | normal attack (sword) / draw / cast |
 | `parry_pressed` | `bool` | gold parry |
 | `dash_pressed` | `bool` | dash |
-| `skill_pressed` | `int` | Aspect slot 1 or 2, else 0 (unused so far) |
+| `skill_pressed` | `int` | skill slot 1, 2 or 3 pressed this tick, else 0. Test bindings: Z = 1 Breaking Edge, X = 2 Gale Cut, C = 3 Moon Cleave (the key mapping is presentation's job) |
 | `interact_pressed` | `bool` | talk, open, checkpoint (unused so far) |
 
 ## Channel 2: read-only snapshot (core to presentation): `core/snapshots.gd`
@@ -57,9 +57,9 @@ One `InputFrame` per tick:
 - `telegraphs: Array[TelegraphSnapshot]`
 - `hud: HudSnapshot`
 
-`EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`, `combo_index` (player only, see the sword combo below; `0` for the boss).
+`EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`, `combo_index` (player only, see the sword combo below; `0` for the boss), `skill_id` (player only: `breaking_edge`, `gale_cut` or `moon_cleave` during the `skill_*` states, otherwise empty).
 
-States: player `idle walk dash parry parry_recovery attack_windup attack_active attack_recovery dead`; boss `idle attack recover posture_broken dead`.
+States: player `idle walk dash parry parry_recovery attack_windup attack_active attack_recovery skill_windup skill_active skill_recovery dead`; boss `idle attack recover posture_broken dead`.
 
 ### Sword combo (player)
 
@@ -69,6 +69,15 @@ The sword is a three-swing combo: `combo_index` 1, 2, 3 = art `hero2_attack1`, `
 - **Chaining:** an attack press during the last `COMBO_BUFFER_TICKS` of a swing's recovery is remembered; the next swing starts the tick recovery ends (the state goes `attack_recovery` -> `attack_windup` with no idle tick, `combo_index` + 1). Earlier presses are ignored. If nothing was buffered, a press within `COMBO_GRACE_TICKS` after the swing still continues the chain. After swing 3 the combo is over: the next press starts swing 1 (a buffered press at the end of swing 3 starts a new combo at 1).
 - **Resets to 1:** the player takes damage, dashes, parries (the press, or a successful parry), dies, stops chaining (grace ran out) or finishes swing 3. A queued press is dropped with the reset.
 - **Hits:** each swing hits at most once (the first active tick that has the boss in range and arc). Damage and reach scale per swing (`SWING_DAMAGE_MULT`, `SWING_RANGE_MULT`). The `attack_hit` event carries `combo_index`.
+
+### Sword skills (player, test set)
+
+Three skills for testing the Aspect system, selected by `skill_pressed` 1-3 (Z, X, C). They are usable from `idle`, `walk` and the recovery of a normal swing (a skill cancels that recovery and resets the combo); not during a parry, dash, another skill or after death. Each runs `skill_windup` -> `skill_active` -> `skill_recovery`, and the hit lands on the first tick of `skill_active`. Read `snapshot.player.skill_id` for which one. None grants invulnerability. Phase lengths and every number are in `core/tuning.gd` (`BREAKING_EDGE_*`, `GALE_CUT_*`, `MOON_CLEAVE_*`); presentation should spread frames over `state_ticks` of the current state as for the sword.
+- **Breaking Edge (1), parry retaliation.** Usable only while `hud.retaliate_ticks_left > 0` (set by a successful parry, cleared by damage or use) and with enough Edge (`BREAKING_EDGE_EDGE_COST`, spent on press). The windup is the forward step (`BREAKING_EDGE_STEP` px); the slash then does high posture damage (two of them break the boss).
+- **Gale Cut (2), gap closer.** No Edge cost, cooldown `GALE_CUT_COOLDOWN_TICKS`. The windup is a dash along the aim (aim if given, else move, else facing); then a quick cut. A connecting cut builds Edge like a normal hit.
+- **Moon Cleave (3), committed finisher.** Costs `MOON_CLEAVE_EDGE_COST` Edge (spent on press, not refunded if interrupted), a long hold (`MOON_CLEAVE_WINDUP_TICKS`, slow movement), a wide arc, the highest health damage, and the longest recovery (cannot be cancelled by dash or parry).
+- **Damage rules:** the same as a normal hit: reduced by `ARMOR_DAMAGE_FACTOR` against the armored boss (and adds the skill's posture), multiplied by `COUNTER_DAMAGE_MULT` during a posture break (no extra posture then). Skills do not use the Edge counter bonus. The `attack_hit` event keeps `kind` `normal`/`counter` and adds `skill_id`.
+- **Presentation to do (Codex):** bind Z/X/C to `skill_pressed` 1/2/3 in `input_bindings.gd`; draw `skill_*` states (no art exists for them yet: placeholders from the attack frames are fine); show Edge, cooldowns and the Breaking Edge window on the HUD; play a cue on `skill_started`.
 
 `TelegraphSnapshot`: `id`, `owner_id`, `attack` (`gold_slam`, `gold_combo`, `red_sweep`, `red_shards`, `red_stomp`, `red_charge`), `kind` (`gold` = parry it, `red` = dodge it), `shape` + parameters, `start_tick`, `hit_tick`, `end_tick`.
 - `circle`: `center`, `size` = radius
@@ -80,7 +89,7 @@ Boss attacks: `gold_slam` (one parryable slam), `gold_combo` (two parryable slam
 
 The area is dangerous from `hit_tick` to `end_tick` inclusive; before that it is only a warning. Presentation draws the warning growing/filling toward `hit_tick` and may slow the visual for the final windup (the design's "final windup slows briefly").
 
-`HudSnapshot`: `player_hp`, `player_max_hp`, `dash_cooldown_ticks`, `dash_cooldown_max`, `edge`, `edge_max`, `boss_hp`, `boss_max_hp`, `boss_posture`, `boss_posture_max`, `counter_window_ticks_left`.
+`HudSnapshot`: `player_hp`, `player_max_hp`, `dash_cooldown_ticks`, `dash_cooldown_max`, `edge`, `edge_max`, `boss_hp`, `boss_max_hp`, `boss_posture`, `boss_posture_max`, `counter_window_ticks_left`, `skill_cooldown_ticks` (array of 3, ticks left per slot), `retaliate_ticks_left` (Breaking Edge is usable while this is above 0).
 
 **Art contract:** presentation picks a frame from `art/build/sprites.json` using `<visual_id>_<state>_<direction>_<n>` for characters and `<visual_id>_<state>_<n>` for the boss (see `AGENTS.md` section 5 and `presentation/arena/animation.gd`). A missing frame falls back to a visible placeholder and logs a warning; it never crashes.
 
@@ -91,12 +100,13 @@ Each event is a `GameEvent` with `type: StringName`, `tick: int` and `data: Dict
 | Type | `data` keys |
 |---|---|
 | `attack_telegraphed` | `telegraph_id`, `owner_id`, `kind`, `attack` |
-| `attack_hit` | `attacker_id`, `target_id`, `damage`, `kind` (`normal`, `counter`, `gold`, `red`), `position`, and for the player's sword `combo_index` (1-3) |
+| `attack_hit` | `attacker_id`, `target_id`, `damage`, `kind` (`normal`, `counter`, `gold`, `red`), `position`, and for the player's sword `combo_index` (1-3); a skill hit also has `skill_id` |
 | `parry_succeeded` | `player_id`, `attacker_id`, `telegraph_id`, `quality` (`perfect`, `early`), `position` |
 | `parry_failed` | `entity_id`, `reason` (`whiff`) |
 | `posture_broken` | `entity_id`, `window_ticks` |
 | `counter_window_opened` / `counter_window_closed` | `entity_id` (+ `window_ticks` on open) |
 | `dash_started` | `entity_id`, `direction` |
+| `skill_started` | `entity_id`, `skill_id` |
 | `dash_ready` | `entity_id` |
 | `damage_taken` | `entity_id`, `amount`, `source_id` |
 | `entity_died` | `entity_id`, `visual_id` |
