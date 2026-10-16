@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Larger aura / dedicated skill sound follow-up (2026-10-17, NOT merged)
+
+Human reports weak VFX/audio, X blocked by enemies, C aura too small. Existing explicit instruction keeps core with Claude. Presentation pass only: Moon has a40px minimum cosmetic outer crescent plus the bright blade rendered at the unchanged core width; longer trailing streak uses observed travel only. Gale's cosmetic ground cut is thicker and lasts36 ticks instead of18. No change to X collision, invulnerability, damage path or C hit width.
+
+Added three distinct layered release WAVs from the retained credited CC0 recordings (per-layer provenance in sources.json), stronger release mix, clearer Moon preparation and music ducking for all releases. skill_release_preview.wav plays X,C,Z. Samples are mono44100Hz16-bit, peak0.86, faded endpoints; PCM checks passed.
+
+Full `python harness/checks/run_tests.py --worktree .` passed Python/import/91 core tests/all smokes; art validation and windowed capture passed. Refreshed arena_skill_*.png show the larger aura. Human judges audio/visual fit; cross-review pending. No core/tools/harness edits and nothing merged.
+
+Remaining core request for Claude: during active Gale only, bypass solid-enemy push-out so the dash can cross a target; keep arena clamps, swept travelled-lane hit tests and one hit per target, grant no i-frames, restore enemy collision on recovery/interruption. C's damage width is still20; raise MOON_CLEAVE_WIDTH to40 if the larger outer aura should be fully damaging. Presentation already derives its bright projectile size from that field and will follow the new width automatically. These mechanics are not claimed implemented here.
+
 ## Skill rework presentation integration (2026-10-16, NOT merged)
 
 Updated presentation against core ca8a2d0 without editing core/tools/harness. Gale now anticipates using attack1 frames1-2, uses dash1-4 across the active dash, then attack1 recovery5-6; all timing reads current tuning. Traces/afterimages sample actual active-dash movement (including the final move into recovery), not the windup or the planned lane endpoint. Tests fund Gale with Edge and account for wall-stopped trails fading naturally.

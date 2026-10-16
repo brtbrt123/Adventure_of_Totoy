@@ -2,9 +2,9 @@ extends Node
 ## CC0 recordings: credits and source edits are in presentation/audio/.
 ## Event results choose the cue; audio never decides hits.
 const CUES: Dictionary = {
-	"release_breaking_edge": preload("res://presentation/audio/swing_2.wav"),
-	"release_gale_cut": preload("res://presentation/audio/swing.wav"),
-	"release_moon_cleave": preload("res://presentation/audio/golem_sweep.wav"),
+	"release_breaking_edge": preload("res://presentation/audio/skill_breaking_release.wav"),
+	"release_gale_cut": preload("res://presentation/audio/skill_gale_release.wav"),
+	"release_moon_cleave": preload("res://presentation/audio/skill_moon_release.wav"),
 	"skill_breaking_edge": preload("res://presentation/audio/swing.wav"),
 	"skill_gale_cut": preload("res://presentation/audio/dash.wav"),
 	"skill_moon_cleave": preload("res://presentation/audio/posture_break.wav"),
@@ -25,7 +25,7 @@ const CUES: Dictionary = {
 	"gold_warning": preload("res://presentation/audio/gold_warning.wav"),
 	"red_warning": preload("res://presentation/audio/red_warning.wav"),
 }
-const PITCH: Dictionary = {"skill_moon_cleave": 0.7, "release_moon_cleave": 0.8, "release_breaking_edge": 1.15}
+const PITCH: Dictionary = {"skill_moon_cleave": 0.7}
 const MUSIC: AudioStreamOggVorbis = preload("res://presentation/audio/music/heavy_boss_battle_1_bpm200.ogg")
 const VARIATIONS: Dictionary = {
 	"armor_hit": [preload("res://presentation/audio/armor_hit.wav"), preload("res://presentation/audio/armor_hit_2.wav"), preload("res://presentation/audio/armor_hit_3.wav")],
@@ -74,7 +74,7 @@ func cue(key: String, tick: int, strength: float = 1.0) -> void:
 		return
 	last_ticks[key] = tick
 	played[key] = int(played.get(key, 0)) + 1
-	if key in ["perfect_parry", "deflect", "counter_hit", "golem_slam", "golem_stomp", "release_moon_cleave"]:
+	if key in ["perfect_parry", "deflect", "counter_hit", "golem_slam", "golem_stomp", "release_moon_cleave", "release_gale_cut", "release_breaking_edge"]:
 		duck_remaining = 0.22
 	if DisplayServer.get_name() == "headless" or voices.is_empty():
 		return
@@ -88,7 +88,7 @@ func cue(key: String, tick: int, strength: float = 1.0) -> void:
 	var alternatives: Array = VARIATIONS.get(key, [CUES[key]])
 	voice.stream = alternatives[(int(played[key]) - 1) % alternatives.size()]
 	voice.pitch_scale = float(PITCH.get(key, 1.0))
-	voice.volume_db = -10.0 + linear_to_db(clampf(strength, 0.2, 1.0)) - (5.0 if key == "skill_moon_cleave" else 0.0)
+	voice.volume_db = -10.0 + linear_to_db(clampf(strength, 0.2, 1.0)) - (2.0 if key == "skill_moon_cleave" else 0.0) + (2.0 if key.begins_with("release_") else 0.0)
 	voice.play()
 
 func reset() -> void:

@@ -5,7 +5,7 @@ const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const SKILLS: Array[StringName] = [&"breaking_edge", &"gale_cut", &"moon_cleave"]
 const DISSIPATE_TICKS: int = 18
-const TRAIL_TICKS: int = 18
+const TRAIL_TICKS: int = 36
 
 static func all_names() -> Array[String]:
 	var names: Array[String] = []
@@ -82,9 +82,9 @@ static func trail(from: Vector2, to: Vector2, age: int, colors: Dictionary) -> A
 	if age < 0 or age >= TRAIL_TICKS or from.is_equal_approx(to):
 		return commands
 	var axis: PackedVector2Array = PackedVector2Array([from - Vector2(0, 2), to - Vector2(0, 2)])
-	_stroke(commands, axis, colors["0"], 5.0)
-	_stroke(commands, axis, colors["n"] if age < 10 else colors["l"], 3.0)
-	_stroke(commands, axis, colors["p"] if age < 6 else colors["o"], 1.0)
+	_stroke(commands, axis, colors["0"], 7.0)
+	_stroke(commands, axis, colors["n"] if age < 18 else colors["l"], 5.0)
+	_stroke(commands, axis, colors["p"] if age < 12 else colors["o"], 2.0)
 	if age < 10:
 		var normal: Vector2 = (to - from).normalized().orthogonal()
 		_stroke(commands, PackedVector2Array([to - normal * 4.0, to + normal * 4.0]), colors["o"], 1.0)
@@ -99,5 +99,5 @@ static func projectiles(snap: Snapshots.GameSnapshot) -> Array[Dictionary]:
 			continue
 		var age: int = maxi(0, snap.tick - attack.start_tick)
 		var frame: int = 4 if attack.ticks_left <= 3 else 3 + posmod(age / 4, 2)
-		plans.append({"attack_id": attack.id, "key": "fx_aspect_moon_cleave_%d" % frame, "frame": frame, "at": attack.position, "rotation": attack.direction.angle(), "width": attack.width, "ticks_left": attack.ticks_left, "trail_length": minf(16.0, attack.start.distance_to(attack.position))})
+		plans.append({"attack_id": attack.id, "key": "fx_aspect_moon_cleave_%d" % frame, "frame": frame, "at": attack.position, "rotation": attack.direction.angle(), "width": attack.width, "visual_width": maxf(40.0, attack.width), "ticks_left": attack.ticks_left, "trail_length": minf(32.0, attack.start.distance_to(attack.position))})
 	return plans

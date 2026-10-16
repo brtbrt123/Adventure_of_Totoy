@@ -21,3 +21,6 @@ Aspect VFX integration: skill_started now plays preparation cues (Breaking Edge:
 
 
 Readability follow-up: Moon preparation now uses the recorded posture_break layer at 0.7 pitch and 5 dB lower gain, creating a longer, lower charge distinct from its full-strength break use. Moon release is pitched to0.8 and Breaking Edge release to1.15; every other cue restores pitch1.0 on voice reuse. Breaking Edge confirmed hits use the heavier impact recording. No new sources or licences.
+
+
+Dedicated skill release mixes (2026-10-17): skill_gale_release layers dash and the broad sweep whoosh; skill_moon_release layers beam rush, a slowed sword swing and a quiet resonant impact tail; skill_breaking_release layers a sharp swing and metallic clash. All derive from the already credited processed CC0 recordings. sources.json records gains/pitches and normalization. Each mono44100Hz/16-bit WAV peaks below0.86 with faded endpoints. Release cues play 2dB above the old mix and all three briefly duck music. Moon preparation is now only2dB below base instead of5dB. skill_release_preview.wav demonstrates X, C, Z in that order. Human listening approval remains necessary.

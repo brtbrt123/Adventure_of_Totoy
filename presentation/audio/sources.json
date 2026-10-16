@@ -429,5 +429,51 @@
     "download": "https://opengameart.org/sites/default/files/heavy_boss_battle_1_bpm200_0.ogg",
     "sha256": "4db07e3d7c7ed1bc662cea9481b87d53ad29c105dd921d1006373242bf459b8d",
     "changes": "None; original OGG. Looped in Godot, mixed at -18 dB with temporary ducking on impacts."
+  },
+  "skill_launch_mixes": {
+    "layers": {
+      "skill_gale_release": [
+        {
+          "processed_source": "dash.wav",
+          "gain": 0.75,
+          "pitch": 0.85
+        },
+        {
+          "processed_source": "golem_sweep.wav",
+          "gain": 0.65,
+          "pitch": 1.15
+        }
+      ],
+      "skill_moon_release": [
+        {
+          "processed_source": "golem_beam.wav",
+          "gain": 0.85,
+          "pitch": 0.8
+        },
+        {
+          "processed_source": "swing_2.wav",
+          "gain": 0.75,
+          "pitch": 0.6
+        },
+        {
+          "processed_source": "posture_break.wav",
+          "gain": 0.15,
+          "pitch": 1.1
+        }
+      ],
+      "skill_breaking_release": [
+        {
+          "processed_source": "swing_2.wav",
+          "gain": 0.85,
+          "pitch": 1.1
+        },
+        {
+          "processed_source": "deflect.wav",
+          "gain": 0.25,
+          "pitch": 1.3
+        }
+      ]
+    },
+    "processing": "Existing credited mono PCM at 44100 Hz; linear resampling; bounded peak0.86; 1.5ms attack/16ms tail fades. No new recordings."
   }
 }
