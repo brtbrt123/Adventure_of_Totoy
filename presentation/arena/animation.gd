@@ -48,6 +48,8 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 			ticks = snap.result_ticks
 		if state == "dead":
 			return "hero2_hurt_right_4"
+		if state.begins_with("skill_"):
+			return skill_frame(actor.skill_id, actor.state, ticks)
 		if state.begins_with("attack_"):
 			var swing: int = clampi(actor.combo_index, 1, 3)
 			var offset: int = 0 if state == "attack_windup" else (2 if state == "attack_active" else 4)
@@ -116,3 +118,23 @@ static func boss_mirrored(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameS
 	if tell != null and tell.attack in [&"red_charge", &"red_sweep"]:
 		return tell.direction.x < 0.0
 	return actor.state == &"recover" and history.get("attack", &"") in [&"red_charge", &"red_sweep"] and float(history.get("direction_x", 1.0)) < 0.0
+
+## Placeholder poses only; phase lengths are owned by core tuning.
+static func skill_durations(skill: StringName) -> Array[int]:
+	match skill:
+		&"breaking_edge": return [Tuning.BREAKING_EDGE_WINDUP_TICKS, Tuning.BREAKING_EDGE_ACTIVE_TICKS, Tuning.BREAKING_EDGE_RECOVERY_TICKS]
+		&"gale_cut": return [Tuning.GALE_CUT_WINDUP_TICKS, Tuning.GALE_CUT_ACTIVE_TICKS, Tuning.GALE_CUT_RECOVERY_TICKS]
+		&"moon_cleave": return [Tuning.MOON_CLEAVE_WINDUP_TICKS, Tuning.MOON_CLEAVE_ACTIVE_TICKS, Tuning.MOON_CLEAVE_RECOVERY_TICKS]
+	return [1, 1, 1]
+
+static func skill_frame(skill: StringName, state: StringName, ticks: int) -> String:
+	var phase: int = 0 if state == &"skill_windup" else (1 if state == &"skill_active" else 2)
+	var duration: int = maxi(1, skill_durations(skill)[phase])
+	var elapsed: int = clampi(ticks, 0, duration - 1)
+	if skill == &"gale_cut" and phase == 0:
+		return "hero2_dash_right_%d" % (mini(3, elapsed * 4 / duration) + 1)
+	var part: int = mini(1, elapsed * 2 / duration)
+	if skill == &"moon_cleave" and phase == 0:
+		# Establish the pose, then hold frame 2 through the committed charge.
+		part = 0 if elapsed < maxi(1, duration / 5) else 1
+	return "hero2_attack%d_right_%d" % [1 if skill == &"gale_cut" else 3, phase * 2 + part + 1]

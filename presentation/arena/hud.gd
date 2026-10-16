@@ -1,5 +1,6 @@
 extends Node2D
 ## Original 3x5 bitmap lettering, drawn on integer pixels; no external font assets.
+const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
@@ -126,6 +127,7 @@ func _draw() -> void:
 		return
 	var h: Snapshots.HudSnapshot = snapshot.hud
 	_draw_profile(h)
+	_draw_skills(h)
 	if not snapshot.entities.is_empty():
 		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
 		var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
@@ -192,3 +194,29 @@ func track_head(target: Vector2, tick: int, actor_id: int, ground: Vector2 = Vec
 static func boss_panel(head: Vector2, counter: bool) -> Rect2:
 	var height: float = 47.0 if counter else 33.0
 	return Rect2(Vector2(clampf(head.x - 52, 2, 214), clampf(head.y - 4 - height, 2, 164 - height)).round(), Vector2(104, height))
+
+## Display facts from HUD snapshots; these labels do not gate input or predict hits.
+static func skill_rows(h: Snapshots.HudSnapshot) -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+	var names: Array[String] = ["BREAKING EDGE", "GALE CUT", "MOON CLEAVE"]
+	var keys: Array[String] = ["Z", "X", "C"]
+	var costs: Array[float] = [Tuning.BREAKING_EDGE_EDGE_COST, Tuning.GALE_CUT_EDGE_COST, Tuning.MOON_CLEAVE_EDGE_COST]
+	for slot: int in range(3):
+		var left: int = h.skill_cooldown_ticks[slot]
+		var status: String = "%dS" % ceili(left * Tuning.TICK_DT) if left > 0 else "CD READY"
+		if slot == 0 and left <= 0:
+			status = "PARRY WINDOW" if h.retaliate_ticks_left <= 0 else "READY"
+		rows.append({"key": keys[slot], "name": names[slot], "cost": costs[slot], "cooldown": left, "status": status})
+	return rows
+
+func _draw_skills(h: Snapshots.HudSnapshot) -> void:
+	var rows: Array[Dictionary] = skill_rows(h)
+	for slot: int in range(3):
+		var row: Dictionary = rows[slot]
+		var at: Vector2 = Vector2(4 + slot * 105, 158)
+		draw_rect(Rect2(at - Vector2(1, 2), Vector2(103, 22)), colors["0"])
+		lettering(at, "%s %s" % [row["key"], row["name"]], colors["o"] if slot == 1 else (colors["v"] if slot == 2 else colors["x"]))
+		lettering(at + Vector2(0, 8), "%d EDGE" % int(row["cost"]), colors["1"] if h.edge >= float(row["cost"]) else colors["i"])
+		lettering(at + Vector2(0, 15), row["status"], colors["i"] if int(row["cooldown"]) > 0 else colors["p"])
+	if h.retaliate_ticks_left > 0:
+		outlined(Vector2(4, 148), "Z BREAKING EDGE READY", colors["x"], colors["0"])

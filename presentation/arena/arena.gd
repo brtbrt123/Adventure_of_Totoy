@@ -211,13 +211,15 @@ func _on_event(event: GameEvent) -> void:
 			hud.counter_max = maxi(1, int(event.data["window_ticks"]))
 			_sound_counter_window_opened(event)
 		&"counter_window_closed": _sound_counter_window_closed(event)
+		&"skill_started":
+			combat_audio.cue("skill_" + String(event.data["skill_id"]), event.tick)
 		&"dash_started":
 			_sound_dash_started(event)
 		&"attack_hit":
 			var counter: bool = event.data["kind"] == &"counter"
 			if int(event.data["attacker_id"]) == snapshot.player.id:
 				var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["target_id"]), int(event.data["attacker_id"]))
-				var finisher: bool = int(event.data.get("combo_index", 1)) == 3
+				var finisher: bool = int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") == &"moon_cleave"
 				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher})
 				shake_left = maxi(shake_left, 3 if finisher else 1)
 				_burst(contact, 16 if counter or finisher else 8, colors["1"], 1.8 if counter else 0.9)
@@ -304,6 +306,8 @@ func _draw() -> void:
 	for actor: Snapshots.EntitySnapshot in actors:
 		if actor_is_white(actor):
 			_draw_actor(actor, true)
+	# Skill trails remain legible over the brief damage silhouette.
+	_draw_skill_effect()
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -343,7 +347,7 @@ func prepare_visuals() -> void:
 		var attack_started: bool = hero.state == &"attack_windup" and changed
 		if hero.state == &"attack_active" and changed:
 			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index == 3 else 0.75)
-		if ((moved and hero.state != &"dead") or attack_started) and absf(hero.facing.x) > 0.3:
+		if ((moved and hero.state != &"dead") or attack_started or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
 			facing_left = hero.facing.x < 0.0
 		for i: int in range(dash_ghosts.size() - 1, -1, -1):
 			dash_ghosts[i]["life"] -= 1
@@ -527,7 +531,7 @@ func _sound_dash_started(event: GameEvent) -> void:
 
 func _sound_attack_hit(event: GameEvent) -> void:
 	if int(event.data["attacker_id"]) == snapshot.player.id:
-		var heavy: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3
+		var heavy: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") == &"moon_cleave"
 		combat_audio.cue("counter_hit" if heavy else "armor_hit", event.tick)
 
 func _sound_attack_telegraphed(event: GameEvent) -> void:
@@ -547,3 +551,23 @@ func _sound_boss_phase_changed(_event: GameEvent) -> void:
 
 func _sound_game_result(_event: GameEvent) -> void:
 	combat_audio.set_music_active(false)
+
+## Existing atlas effects are placeholders until approved Aspect sheets are imported.
+func skill_effect() -> Dictionary:
+	var hero: Snapshots.EntitySnapshot = snapshot.player
+	if not hero.state.begins_with("skill_"):
+		return {}
+	var side: float = -1.0 if facing_left else 1.0
+	var at: Vector2 = hero.position + Vector2(side * 12, -12)
+	var index: int = 1
+	if hero.state == &"skill_active":
+		index = mini(5, hero.state_ticks * 6 / maxi(1, ArenaAnimation.skill_durations(hero.skill_id)[1])) + 1
+		return {"key": "fx_%s_%d" % ["slash_big" if hero.skill_id == &"moon_cleave" else ("counter" if hero.skill_id == &"breaking_edge" else "slash_small"), index], "at": at, "scale": Vector2(side, 1)}
+	if hero.skill_id == &"gale_cut" and hero.state == &"skill_windup":
+		return {"key": "fx_dash_%d" % (mini(5, hero.state_ticks) + 1), "at": hero.position - Vector2(0, 10), "scale": Vector2(side, 1)}
+	return {}
+
+func _draw_skill_effect() -> void:
+	var effect: Dictionary = skill_effect()
+	if not effect.is_empty():
+		_draw_imported(effect["key"], effect["at"], effect["scale"])

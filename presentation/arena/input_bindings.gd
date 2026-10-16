@@ -9,6 +9,7 @@ static func register() -> void:
 		"arena_attack": [], "arena_parry": [KEY_SPACE],
 		"arena_dash": [KEY_SHIFT], "arena_restart": [KEY_R],
 		"arena_debug": [KEY_F1],
+		"arena_skill_1": [KEY_Z], "arena_skill_2": [KEY_X], "arena_skill_3": [KEY_C],
 	}
 	for action: String in keys:
 		if not InputMap.has_action(action):
@@ -46,7 +47,11 @@ static func read_frame(player_position: Vector2 = Vector2.ZERO, mouse_position: 
 	var frame: InputFrame = InputFrame.new()
 	frame.move = Input.get_vector("arena_left", "arena_right", "arena_up", "arena_down")
 	frame.attack_pressed = Input.is_action_just_pressed("arena_attack")
-	if frame.attack_pressed:
+	for slot: int in range(1, 4):
+		if Input.is_action_just_pressed("arena_skill_%d" % slot):
+			frame.skill_pressed = slot
+			break
+	if frame.attack_pressed or frame.skill_pressed > 0:
 		frame.aim = (mouse_position - player_position).normalized()
 	frame.attack_held = Input.is_action_pressed("arena_attack")
 	frame.parry_pressed = Input.is_action_just_pressed("arena_parry")

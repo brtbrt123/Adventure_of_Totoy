@@ -2,6 +2,9 @@ extends Node
 ## CC0 recordings: credits and source edits are in presentation/audio/.
 ## Event results choose the cue; audio never decides hits.
 const CUES: Dictionary = {
+	"skill_breaking_edge": preload("res://presentation/audio/counter_hit.wav"),
+	"skill_gale_cut": preload("res://presentation/audio/dash.wav"),
+	"skill_moon_cleave": preload("res://presentation/audio/swing_2.wav"),
 	"golem_slam": preload("res://presentation/audio/golem_slam.wav"),
 	"golem_stomp": preload("res://presentation/audio/golem_stomp.wav"),
 	"golem_sweep": preload("res://presentation/audio/golem_sweep.wav"),
