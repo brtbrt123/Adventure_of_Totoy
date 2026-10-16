@@ -1,0 +1,22 @@
+{
+  "status": "Concept for human approval; not imported into gameplay",
+  "generator": "Built-in image_gen tool",
+  "reference": "art/reference/Hero_Idle.png",
+  "source": "exec-1ef10894-17e3-4b56-a270-eed35b923ee5.png",
+  "sha256": "aa6763488ffa32076cf280f84caeec8485dce449be04af9fbee6c57d62d35248",
+  "size": [
+    1672,
+    941
+  ],
+  "poses": [
+    "activation crouch",
+    "empowered ready",
+    "forward movement",
+    "horizontal black slash",
+    "rising black slash",
+    "empowered idle variation"
+  ],
+  "request": "Black katana right-click active buff: faster attacks, increased damage, black aura wrapping the body, black sword trails. Duration, cooldown, cost and multipliers remain owner/core design decisions.",
+  "prompt_summary": "Preserve reference Totoy identity, outfit and curved katana. Six right-facing pixel-art poses in a 3x2 sheet on transparency. Ink-black flame ribbons around body and blade with charcoal edges, sparse pale lavender rim pixels. No armor replacement, giant horns, wings, UI, text, scenery or smooth glow.",
+  "remaining": "Human art approval; hard-alpha Totoy36 palette normalization, aligned animation frames, independent aura/trail overlays. Claude owns weapon ability intent, buff state/timing/damage/speed and snapshot/events; presentation binds right mouse after that contract exists."
+}
