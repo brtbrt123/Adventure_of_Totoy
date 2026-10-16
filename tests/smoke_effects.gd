@@ -159,7 +159,7 @@ func _new_patterns() -> void:
 						saw_rush = true
 			if attack == &"gold_combo" and impact_ids.size() == 1:
 				var pose: String = String(arena.selected_frames.get(2, ""))
-				saw_reraise = saw_reraise or pose.contains("gold_combo_windup")
+				saw_reraise = saw_reraise or pose.begins_with("golem2_slam_") and int(pose.get_slice("_", 2)) <= 3
 			# Rendering the same snapshot twice must not duplicate impacts or dust.
 			var particle_count: int = arena.particles.size()
 			var trail_count: int = arena.trails.size()
@@ -194,7 +194,7 @@ func _parry_visuals() -> void:
 					succeeded = true
 					_expect(event.data["quality"] == (&"perfect" if lead == 2 else &"early"), "fixture parry quality")
 					_expect(arena.parry_impacts.size() == 1, "parry impact missing")
-					_expect(arena.selected_frames[arena.snapshot.player.id] == "totoy_parry_right_3", "successful parry must show painted spark")
+					_expect(arena.selected_frames[arena.snapshot.player.id] == "hero2_parry_right_6", "successful parry must show painted spark")
 					_expect(arena.screen_flash_until > arena.snapshot.tick and arena.shake_left > 0, "parry flash or shake missing")
 					counts.append(arena.particles.size())
 					var impact: Dictionary = arena.parry_impacts[0]

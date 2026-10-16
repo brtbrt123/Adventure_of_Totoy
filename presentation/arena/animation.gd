@@ -4,21 +4,20 @@ const Snapshots := preload("res://core/snapshots.gd")
 const DIRECTIONS: Array[String] = ["right"]
 # [frame count, ticks per frame, loop]. Windups use telegraph progress instead.
 const PLAYER: Dictionary = {
-	"idle": [2, 24, true], "walk": [4, 6, true], "dash": [1, 6, false],
-	"parry": [3, 5, false], "parry_recovery": [1, 1, false],
-	"attack_windup": [1, 7, false], "attack_active": [2, 2, false],
-	"attack_recovery": [1, 10, false], "dead": [3, 8, false],
+	"idle": [4, 12, true], "walk": [6, 5, true], "dash": [4, 1, false],
+	"parry": [6, 2, false], "parry_recovery": [1, 1, false],
+	"attack_windup": [2, 4, false], "attack_active": [2, 2, false],
+	"attack_recovery": [2, 5, false], "dead": [1, 1, false],
+	"hurt": [4, 3, false], "victory": [6, 8, false],
 }
 const BOSS: Dictionary = {
- "idle": [2, 32, true], "gold_slam_windup": [3, 1, false],
- "gold_slam_strike": [2, 2, false], "red_sweep_windup": [3, 1, false],
- "red_sweep_strike": [4, 1, false], "red_sweep_recover": [1, 1, false],
- "red_shards_windup": [3, 1, false], "red_shards_strike": [2, 3, false],
- "red_stomp_windup": [3, 1, false], "red_stomp_strike": [2, 2, false],
- "gold_combo_windup": [3, 1, false], "gold_combo_strike": [2, 2, false],
- "red_charge_windup": [3, 1, false], "red_charge_strike": [2, 2, true],
- "recover": [1, 1, false], "posture_broken": [2, 12, true], "dead": [1, 1, false],
+	"idle": [4, 16, true], "walk": [6, 5, true],
+	"slam": [6, 3, false], "sweep": [6, 3, false], "stomp": [6, 3, false],
+	"charge": [6, 3, false], "beam": [6, 3, false],
+	"staggered": [4, 8, true], "hurt": [4, 3, false],
+	"roar": [6, 5, false], "death": [8, 6, false],
 }
+const ATTACKS: Dictionary = {"gold_slam": "slam", "gold_combo": "slam", "red_sweep": "sweep", "red_stomp": "stomp", "red_charge": "charge", "red_shards": "beam"}
 const STRIKE_HOLD_TICKS: int = 4
 ## Destination position stays fixed when Godot flips a negative-width region.
 static func destination(at: Vector2, frame: Dictionary, left: bool) -> Rect2:
@@ -41,49 +40,52 @@ static func frame_index(spec: Array, ticks: int) -> int:
 static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot, last_attack: Dictionary) -> String:
 	var state: String = String(actor.state)
 	if actor.visual_id == &"totoy":
-		if not PLAYER.has(state):
-			return "totoy_" + state + "_" + direction(actor.facing) + "_1"
-		# The core freezes after the fight ends, so the fall plays from result_ticks (which keeps counting).
-		var ticks: int = snap.result_ticks if state == "dead" else actor.state_ticks
-		return "totoy_%s_%s_%d" % [state, direction(actor.facing), frame_index(PLAYER[state], ticks)]
-	if actor.state == &"attack":
+		var ticks: int = actor.state_ticks
+		if snap.result == &"victory":
+			state = "victory"
+			ticks = snap.result_ticks
+		if state == "dead":
+			return "hero2_hurt_right_4"
+		if state.begins_with("attack_"):
+			var offset: int = 0 if state == "attack_windup" else (2 if state == "attack_active" else 4)
+			return "hero2_attack1_right_%d" % (offset + frame_index(PLAYER[state], ticks))
+		if state == "parry_recovery":
+			return "hero2_parry_right_6"
+		return "hero2_%s_right_%d" % [state, frame_index(PLAYER.get(state, PLAYER["idle"]), ticks)]
+	if state == "dead":
+		return "golem2_death_%d" % frame_index(BOSS["death"], snap.result_ticks)
+	if state == "attack":
 		var tell: Snapshots.TelegraphSnapshot = attack_tell(actor.id, snap)
 		if tell != null:
-			var phase: String = "strike" if snap.tick >= tell.hit_tick else "windup"
-			state = String(tell.attack) + "_" + phase
-			if not BOSS.has(state):
-				return "%s_%s_1" % [actor.visual_id, state]
-			var index: int = frame_index(BOSS[state], snap.tick - tell.hit_tick)
-			if phase == "windup":
+			var pose: String = ATTACKS.get(String(tell.attack), "slam")
+			var index: int = 4 + mini(2, maxi(0, snap.tick - tell.hit_tick) / 3)
+			if snap.tick < tell.hit_tick:
 				var start_tick: int = tell.start_tick
-				# The second combo lift starts after the observed first strike hold.
 				for earlier: Snapshots.TelegraphSnapshot in snap.telegraphs:
 					if earlier.owner_id == actor.id and earlier.attack == tell.attack and earlier.hit_tick < tell.hit_tick:
 						start_tick = maxi(start_tick, earlier.end_tick + STRIKE_HOLD_TICKS + 1)
 				var progress: float = clampf(float(snap.tick - start_tick) / maxi(1, tell.hit_tick - start_tick), 0.0, 1.0)
-				index = mini(int(BOSS[state][0]) - 1, floori(progress * int(BOSS[state][0]))) + 1
-			return "%s_%s_%d" % [actor.visual_id, state, index]
-	if actor.state == &"recover" and not last_attack.is_empty():
-		var end_tick: int = int(last_attack["end_tick"])
-		var attack: String = String(last_attack["attack"])
-		if snap.tick > end_tick and snap.tick <= end_tick + STRIKE_HOLD_TICKS:
-			state = attack + "_strike"
-			return "%s_%s_%d" % [actor.visual_id, state, frame_index(BOSS[state], snap.tick - int(last_attack["hit_tick"]))]
-		if attack == "red_sweep":
-			state = "red_sweep_recover"
-	if not BOSS.has(state):
-		return String(actor.visual_id) + "_" + state + "_1"
-	return "%s_%s_%d" % [actor.visual_id, state, frame_index(BOSS[state], actor.state_ticks)]
+				index = mini(2, floori(progress * 3)) + 1
+			return "golem2_%s_%d" % [pose, index]
+	if state == "recover" and not last_attack.is_empty():
+		var index: int = 4 + mini(2, maxi(0, snap.tick - int(last_attack["hit_tick"])) / 3)
+		return "golem2_%s_%d" % [ATTACKS.get(String(last_attack["attack"]), "slam"), index]
+	if state == "posture_broken":
+		state = "staggered"
+	if state == "recover":
+		state = "idle"
+	return "golem2_%s_%d" % [state, frame_index(BOSS.get(state, BOSS["idle"]), actor.state_ticks)]
 
 static func all_names() -> Array[String]:
 	var names: Array[String] = []
-	for state: String in PLAYER:
-		for facing: String in DIRECTIONS:
-			for n: int in range(1, int(PLAYER[state][0]) + 1):
-				names.append("totoy_%s_%s_%d" % [state, facing, n])
+	for state: String in ["idle", "walk", "dash", "parry", "hurt", "victory"]:
+		for n: int in range(1, int(PLAYER[state][0]) + 1):
+			names.append("hero2_%s_right_%d" % [state, n])
+	for n: int in range(1, 7):
+		names.append("hero2_attack1_right_%d" % n)
 	for state: String in BOSS:
 		for n: int in range(1, int(BOSS[state][0]) + 1):
-			names.append("mossbound_colossus_%s_%d" % [state, n])
+			names.append("golem2_%s_%d" % [state, n])
 	return names
 
 ## Prefer the most recent impact through its visual hold, then the next warning.

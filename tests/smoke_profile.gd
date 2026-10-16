@@ -36,14 +36,14 @@ func _save(name_key: String) -> void:
 
 func _catalog() -> void:
 	_expect(arena.frames.has("totoy_portrait"), "portrait absent from atlas")
-	_expect(arena.frames.has("hud_profile_frame"), "profile frame absent from atlas")
+	_expect(arena.frames.has("ui_profile"), "profile frame absent from atlas")
 	_expect(not arena.hud.profile_frame.is_empty(), "HUD frame not connected")
 	arena.hud.prepare_portrait()
 	_expect(arena.hud.portrait_mask != null, "circular portrait missing")
 	var distinct: Dictionary = {}
 	var source: Image = arena.sprites.get_image()
 	for name_key: String in arena.frames:
-		if not name_key.begins_with("mossbound_colossus_"):
+		if not name_key.begins_with("golem2_"):
 			continue
 		_expect(arena.head_anchors.has(name_key), "uncached boss frame: " + name_key)
 		var frame: Dictionary = arena.frames[name_key]
@@ -54,10 +54,10 @@ func _catalog() -> void:
 		var left: Vector2 = HeadAnchors.world(Vector2(160, 100), frame, head, true)
 		_expect(is_equal_approx(left.x + right.x, 319.0) and left.y == right.y, "mirror anchor mismatch: " + name_key)
 	_expect(distinct.size() >= 2, "head anchor is constant across boss frames")
-	var idle: Vector2 = arena.head_anchors["mossbound_colossus_idle_1"]
-	var charge: Vector2 = arena.head_anchors["mossbound_colossus_red_charge_strike_1"]
+	var idle: Vector2 = arena.head_anchors["golem2_idle_1"]
+	var charge: Vector2 = arena.head_anchors["golem2_charge_4"]
 	_expect(not idle.is_equal_approx(charge), "charge lean must move head")
-	_expect(Vector2(arena.head_anchors["mossbound_colossus_gold_slam_windup_3"]).y >= 4, "raised fist mistaken for head")
+	_expect(Vector2(arena.head_anchors["golem2_slam_3"]).y >= 4, "raised fist mistaken for head")
 	for at: Vector2 in [Vector2.ZERO, Vector2(320, 0), Vector2(0, 180), Vector2(320, 180)]:
 		for counter: bool in [false, true]:
 			_expect(Rect2(1, 1, 318, 165).encloses(arena.hud.boss_panel(at, counter).grow(1)), "panel/highlight left screen")
@@ -99,7 +99,7 @@ func _fight(attack: StringName, left: bool) -> void:
 		var target: Vector2 = HeadAnchors.world(boss.position, arena.frames[name_key], arena.head_anchors[name_key], mirrored)
 		_expect(arena.hud.head_position.distance_to(target) < 20.0, "panel trails head too far: %s tick %d head %s target %s" % [attack, arena.snapshot.tick, arena.hud.head_position, target])
 		_expect(arena.hud.head_tick == arena.snapshot.tick, "head not updated for fight frame")
-		if capture and attack == &"gold_slam" and not saved and name_key.ends_with("windup_3"):
+		if capture and attack == &"gold_slam" and not saved and name_key == "golem2_slam_3":
 			await _save("arena_bossbar2")
 			saved = true
 		await process_frame

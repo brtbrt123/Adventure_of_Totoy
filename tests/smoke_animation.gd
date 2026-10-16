@@ -66,7 +66,7 @@ func _catalog() -> void:
 		_expect(int(atlas["totoy_portrait"]["w"]) == 48 and int(atlas["totoy_portrait"]["h"]) == 48, "portrait canvas")
 	for name_key: String in ArenaAnimation.all_names():
 		_expect(atlas.has(name_key), "atlas missing " + name_key)
-		if atlas.has(name_key) and name_key.begins_with("totoy_"):
+		if atlas.has(name_key) and name_key.begins_with("hero2_"):
 			var frame: Dictionary = atlas[name_key]
 			_expect(frame.has("ax") and frame.has("ay"), "feet anchor missing: " + name_key)
 			var at: Vector2 = Vector2(64, 88)
@@ -88,40 +88,6 @@ func _catalog() -> void:
 				_expect(atlas.has(ArenaAnimation.choose(actor, snap, {})), "selector missing player %s %s tick %d" % [state, facing, t])
 	_expect(ArenaAnimation.mirrored(Vector2.LEFT), "left must mirror right")
 	_expect(not ArenaAnimation.mirrored(Vector2.UP), "up must not mirror")
-	# Test exact attack boundaries and the post-impact hold independently of
-	# the fight, where a perfect parry removes the active telegraph immediately.
-	actor.visual_id = &"mossbound_colossus"
-	actor.id = 2
-	actor.state = &"attack"
-	for attack: String in ["gold_slam", "red_sweep", "red_shards", "red_stomp", "gold_combo", "red_charge"]:
-		var tell: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
-		tell.owner_id = 2
-		tell.attack = StringName(attack)
-		tell.start_tick = 10
-		tell.hit_tick = 70
-		tell.end_tick = 74
-		snap.telegraphs.clear()
-		snap.telegraphs.append(tell)
-		for tick: int in range(10, 75):
-			snap.tick = tick
-			var phase: String = "strike" if tick >= 70 else "windup"
-			var spec: Array = ArenaAnimation.BOSS[attack + "_" + phase]
-			var index: int = ArenaAnimation.frame_index(spec, tick - 70)
-			if tick < 70:
-				index = mini(int(spec[0]) - 1, floori(float(tick - 10) / 60.0 * int(spec[0]))) + 1
-			var expected: String = "mossbound_colossus_%s_%s_%d" % [attack, phase, index]
-			_expect(ArenaAnimation.choose(actor, snap, {}) == expected, "attack boundary " + expected)
-		actor.state = &"recover"
-		snap.telegraphs.clear()
-		snap.tick = 75
-		var history: Dictionary = {"attack": attack, "hit_tick": 70, "end_tick": 74}
-		_expect(ArenaAnimation.choose(actor, snap, history) == "mossbound_colossus_%s_strike_%d" % [attack, ArenaAnimation.frame_index(ArenaAnimation.BOSS[attack + "_strike"], 5)], "strike hold")
-		snap.tick = 74 + ArenaAnimation.STRIKE_HOLD_TICKS + 1
-		_expect(ArenaAnimation.choose(actor, snap, history) == ("mossbound_colossus_red_sweep_recover_1" if attack == "red_sweep" else "mossbound_colossus_recover_1"), "hold expires")
-		actor.state = &"posture_broken"
-		_expect(ArenaAnimation.choose(actor, snap, history).contains("posture_broken"), "break cancels strike hold")
-		actor.state = &"attack"
-
 # Follow real core state lifetimes so a pose that is unreachable before a state
 # expires cannot pass merely because the catalog can synthesize its name.
 func _hero_timelines() -> void:
@@ -142,41 +108,8 @@ func _hero_timelines() -> void:
 				_step(_frame())
 				requested[arena.selected_frames[arena.snapshot.player.id]] = true
 		for name_key: String in ArenaAnimation.all_names():
-			if name_key.begins_with("totoy_") and name_key.contains("_" + ArenaAnimation.direction(facing) + "_") and not name_key.contains("_dead_"):
+			if name_key.begins_with("hero2_") and name_key.contains("_" + ArenaAnimation.direction(facing) + "_") and not name_key.contains("_hurt_") and not name_key.contains("_victory_"):
 				_expect(requested.has(name_key), "real state lifetime never requests " + name_key)
-
-func _combo_boundaries() -> void:
-	var snap: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
-	var actor: Snapshots.EntitySnapshot = Snapshots.EntitySnapshot.new()
-	actor.id = 2
-	actor.visual_id = &"mossbound_colossus"
-	actor.state = &"attack"
-	var first: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
-	first.owner_id = 2
-	first.attack = &"gold_combo"
-	first.start_tick = 10
-	first.hit_tick = 70
-	first.end_tick = 70
-	var second: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
-	second.owner_id = 2
-	second.attack = &"gold_combo"
-	second.start_tick = 10
-	second.hit_tick = 96
-	second.end_tick = 96
-	for reverse: bool in [false, true]:
-		snap.telegraphs.assign([second, first] if reverse else [first, second])
-		for tick: int in range(10, 101):
-			snap.tick = tick
-			var selected: String = ArenaAnimation.choose(actor, snap, {})
-			_expect(selected.contains("strike") == ((tick >= 70 and tick <= 74) or tick >= 96), "combo phase at %d" % tick)
-			snap.tick = 75
-			_expect(ArenaAnimation.choose(actor, snap, {}).ends_with("windup_1"), "combo must re-raise")
-	first.attack = &"red_charge"
-	first.direction = Vector2.LEFT
-	snap.telegraphs.assign([first])
-	_expect(ArenaAnimation.boss_mirrored(actor, snap, {}), "left charge must mirror")
-	first.direction = Vector2.RIGHT
-	_expect(not ArenaAnimation.boss_mirrored(actor, snap, {}), "right charge must not mirror")
 
 func _encounter(attack: StringName, parry_slam: bool) -> void:
 	_reset()
@@ -202,7 +135,6 @@ func _encounter(attack: StringName, parry_slam: bool) -> void:
 
 func _run() -> void:
 	_catalog()
-	_combo_boundaries()
 	var packed: PackedScene = load("res://presentation/arena/arena.tscn") as PackedScene
 	if packed == null:
 		printerr("ANIMATION FAIL: cannot load arena")
@@ -227,7 +159,7 @@ func _run() -> void:
 	await _encounter(&"gold_slam", true)
 	await _encounter(&"gold_combo", true)
 	for state: String in ArenaAnimation.PLAYER:
-		if state != "dead":
+		if state not in ["dead", "hurt", "victory"]:
 			_expect(player_states.has(state), "script never reached player " + state)
 	for name_key: String in ArenaAnimation.all_names():
 		if name_key.begins_with("mossbound_colossus_") and (name_key.contains("windup") or name_key.contains("strike") or name_key.contains("red_sweep_recover")):

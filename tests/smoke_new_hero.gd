@@ -61,7 +61,7 @@ func _run() -> void:
 	check(arena.facing_left, "attack aim did not turn left")
 	# Every canvas uses its own feet point, including fractional world positions.
 	for key: String in ArenaAnimation.all_names():
-		if not key.begins_with("totoy_"):
+		if not key.begins_with("hero2_"):
 			continue
 		var frame: Dictionary = arena.frames[key]
 		var at: Vector2 = Vector2(111.6, 109.2)
@@ -69,7 +69,7 @@ func _run() -> void:
 		check(rect.position + Vector2(float(frame["w"]) - float(frame["ax"]), float(frame["ay"])) == at.round(), "mirrored foot does not meet rounded shadow: " + key)
 	for i: int in range(9):
 		step(InputFrame.new())
-	check(arena.selected_frames[arena.snapshot.player.id] == "totoy_attack_active_right_2", "big slash fixture")
+	check(arena.selected_frames[arena.snapshot.player.id] == "hero2_attack1_right_4", "big slash fixture")
 	await save("attack")
 	for i: int in range(20):
 		step(InputFrame.new())
@@ -92,7 +92,7 @@ func _run() -> void:
 	step(parry)
 	for i: int in range(10):
 		step(InputFrame.new())
-	check(arena.selected_frames[arena.snapshot.player.id] == "totoy_parry_right_3", "spark art fixture")
+	check(arena.selected_frames[arena.snapshot.player.id] == "hero2_parry_right_6", "spark art fixture")
 	await save("parry")
 	arena.core.player.hp -= 25
 	arena.core.boss.hp -= 30
@@ -116,7 +116,7 @@ func _run() -> void:
 	var death_tick: int = arena.snapshot.tick
 	step(InputFrame.new())
 	check(arena.snapshot.tick == death_tick and arena.snapshot.player.state_ticks == 0, "terminal snapshot contract changed; revisit death animation")
-	check(ArenaAnimation.frame_index(ArenaAnimation.PLAYER["dead"], 16) == 3 and ArenaAnimation.frame_index(ArenaAnimation.PLAYER["dead"], 100) == 3, "death cadence must hold final pose")
+	check(ArenaAnimation.frame_index(ArenaAnimation.PLAYER["dead"], 16) == 1 and ArenaAnimation.frame_index(ArenaAnimation.PLAYER["dead"], 100) == 1, "death cadence must hold final pose")
 	await process_frame
 	arena._restart()
 	arena.core.boss.hp = 1

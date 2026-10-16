@@ -41,12 +41,7 @@ static func draw_warning(canvas: Node2D, t: Snapshots.TelegraphSnapshot, tick: i
 	canvas.draw_polyline(points.slice(0, count), bright, 1.0)
 
 static func draw_marker(canvas: Node2D, t: Snapshots.TelegraphSnapshot, bright: Color, ink: Color) -> void:
-	var marker: Vector2 = t.center + Vector2(0, -12)
-	if t.shape == &"circle":
-		marker.y -= t.size
-	elif t.shape == &"ring":
-		marker = t.center + t.direction * (t.inner_size + t.size) * 0.5
-	marker = marker.clamp(Vector2(8, 37), Vector2(312, 143))
+	var marker: Vector2 = marker_position(t)
 	var icon: PackedVector2Array
 	if t.kind == &"gold":
 		icon = PackedVector2Array([marker + Vector2(0,-5), marker + Vector2(5,0), marker + Vector2(0,5), marker + Vector2(-5,0), marker + Vector2(0,-5)])
@@ -80,3 +75,11 @@ static func draw_ring_warning(canvas: Node2D, t: Snapshots.TelegraphSnapshot, ti
 	var safe: PackedVector2Array = ring_points(t.center, maxf(0.0, t.inner_size - 3.0))
 	for i: int in range(0, 96, 8):
 		canvas.draw_polyline(safe.slice(i, i+5), Color("e0f0ec"), 1.0)
+
+static func marker_position(t: Snapshots.TelegraphSnapshot) -> Vector2:
+	var marker: Vector2 = t.center + Vector2(0, -12)
+	if t.shape == &"circle":
+		marker.y -= t.size
+	elif t.shape == &"ring":
+		marker = t.center + t.direction * (t.inner_size + t.size) * 0.5
+	return marker.clamp(Vector2(8, 37), Vector2(312, 143))

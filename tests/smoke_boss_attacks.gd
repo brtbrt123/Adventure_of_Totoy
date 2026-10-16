@@ -87,7 +87,7 @@ func _run() -> void:
 	arena = packed.instantiate() as Arena
 	root.add_child(arena)
 	arena.set_physics_process(false)
-	_expect(arena.frames.has("totoy_attack_active_right_2"), "new slash frame absent")
+	_expect(arena.frames.has("hero2_attack1_right_4"), "new slash frame absent")
 	for attack: StringName in [&"gold_slam", &"red_sweep", &"red_shards", &"red_stomp", &"gold_combo", &"red_charge"]:
 		await _attack(attack)
 	arena.queue_free()

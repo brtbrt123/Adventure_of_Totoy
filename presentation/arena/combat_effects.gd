@@ -120,3 +120,48 @@ static func hit_impact(at: Vector2, age: int, counter: bool, colors: Dictionary)
 	if age == 0:
 		disc(plan, at, 2.0, colors["p"])
 	return plan
+
+## Texture polygons are clipped to the snapshot's exact hit geometry, including
+## the stomp's safe centre. UVs keep the imported effect centred on its anchor.
+static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapshot, tick: int, frames: Dictionary, sprites: Texture2D) -> void:
+	var age: int = tick - tell.hit_tick
+	var pose: String = {&"gold_slam": "slam", &"gold_combo": "slam", &"red_sweep": "sweep", &"red_stomp": "stomp", &"red_charge": "charge", &"red_shards": "beam_body"}.get(tell.attack, "slam")
+	var count: int = 4 if pose == "beam_body" else 6
+	var key: String = "fx_%s_%d" % [pose, mini(count - 1, age / 2) + 1]
+	if not frames.has(key):
+		return
+	var frame: Dictionary = frames[key]
+	if tell.shape == &"line":
+		# Body repeats along the beam axis; end pieces are clipped to the lane too.
+		var length: float = 24.0
+		var cursor: float = 0.0
+		while cursor < tell.size:
+			var piece: float = minf(length, tell.size - cursor)
+			var side: Vector2 = tell.direction.orthogonal() * tell.width * 0.5
+			var start: Vector2 = tell.center + tell.direction * cursor
+			var polygon: PackedVector2Array = PackedVector2Array([start - side, start + tell.direction * piece - side, start + tell.direction * piece + side, start + side])
+			var segment: Dictionary = frame
+			if pose == "beam_body" and (cursor == 0.0 or cursor + piece >= tell.size):
+				segment = frames["fx_beam_%s_%d" % ["start" if cursor == 0.0 else "end", mini(3, age / 2) + 1]]
+			var uv: PackedVector2Array = PackedVector2Array([Vector2(segment["x"], segment["y"]), Vector2(segment["x"] + segment["w"], segment["y"]), Vector2(segment["x"] + segment["w"], segment["y"] + segment["h"]), Vector2(segment["x"], segment["y"] + segment["h"])])
+			for i: int in range(uv.size()):
+				uv[i] /= sprites.get_size()
+			canvas.draw_polygon(polygon, PackedColorArray([Color.WHITE]), uv, sprites)
+			cursor += piece
+		return
+	if tell.shape == &"ring":
+		for i: int in range(96):
+			var a: Vector2 = Vector2.from_angle(TAU * i / 96.0)
+			var b: Vector2 = Vector2.from_angle(TAU * (i + 1) / 96.0)
+			_effect_polygon(canvas, sprites, PackedVector2Array([tell.center + a * tell.inner_size, tell.center + a * tell.size, tell.center + b * tell.size, tell.center + b * tell.inner_size]), tell, frame)
+	else:
+		var boundary: PackedVector2Array = TelegraphView.outline(tell)
+		_effect_polygon(canvas, sprites, boundary.slice(0, boundary.size() - 1), tell, frame)
+
+static func _effect_polygon(canvas: Node2D, sprites: Texture2D, polygon: PackedVector2Array, tell: Snapshots.TelegraphSnapshot, frame: Dictionary) -> void:
+	var uv: PackedVector2Array = PackedVector2Array()
+	var radius: float = maxf(1.0, tell.size)
+	for point: Vector2 in polygon:
+		var local: Vector2 = (point - tell.center).rotated(-tell.direction.angle() if tell.shape == &"cone" else 0.0)
+		uv.append((Vector2(frame["x"] + frame["ax"], frame["y"] + frame["ay"]) + local / (radius * 2.0) * Vector2(frame["w"], frame["h"])) / sprites.get_size())
+	canvas.draw_polygon(polygon, PackedColorArray([Color.WHITE]), uv, sprites)

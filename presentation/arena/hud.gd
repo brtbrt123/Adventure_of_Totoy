@@ -8,6 +8,7 @@ var counter_max: int = 1
 var portrait_atlas: Texture2D
 var portrait_frame: Dictionary = {}
 var profile_frame: Dictionary = {}
+var ui_frames: Dictionary = {}
 var portrait_mask: Texture2D
 var health_tick: int = -1
 var health_ghosts: Dictionary = {}
@@ -128,14 +129,13 @@ func _draw() -> void:
 	if not snapshot.entities.is_empty():
 		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
 		var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
-		var tag: Vector2 = panel.position + Vector2(4, 3)
-		outlined(tag, "BOSS", colors["1"], colors["A"])
-		outlined(panel.position + Vector2(26, 3), "MOSSBOUND COLOSSUS", colors["z"], colors["0"])
-		bar(panel.position + Vector2(4, 13), 96, h.boss_hp, h.boss_max_hp, colors["7"], 3, float(health_ghosts.get("boss", h.boss_hp)))
-		bar(panel.position + Vector2(4, 19), 96, h.boss_posture, h.boss_posture_max, colors["p"] if boss.state == &"posture_broken" else colors["v"], 2)
+		ui("ui_boss", Rect2(panel.position + Vector2(0, 7), Vector2(104, 24)))
+		outlined(panel.position + Vector2(18, 0), "MOSSBOUND COLOSSUS", colors["z"], colors["0"])
+		bar(panel.position + Vector2(8, 18), 88, h.boss_hp, h.boss_max_hp, colors["7"], 3, float(health_ghosts.get("boss", h.boss_hp)))
+		bar(panel.position + Vector2(20, 27), 64, h.boss_posture, h.boss_posture_max, colors["p"] if boss.state == &"posture_broken" else colors["v"], 2)
 		if h.counter_window_ticks_left > 0:
-			outlined(panel.position + Vector2(4, 25), "COUNTER - ATTACK", colors["p"], colors["0"])
-			bar(panel.position + Vector2(4, 33), 88, h.counter_window_ticks_left, counter_max, colors["o"], 2)
+			outlined(panel.position + Vector2(4, 33), "COUNTER - ATTACK", colors["p"], colors["0"])
+			bar(panel.position + Vector2(4, 41), 88, h.counter_window_ticks_left, counter_max, colors["o"], 2)
 	if debug_enabled:
 		draw_rect(Rect2(5, 131, 175, 16), colors["0"])
 		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"])
@@ -148,36 +148,24 @@ func _draw() -> void:
 
 ## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
-	var center: Vector2 = Vector2(28, 28)
-	bar(Vector2(49, 16), 105, h.player_hp, h.player_max_hp, colors["t"], 9, float(health_ghosts.get("player", h.player_hp)))
-	bar(Vector2(56, 33), 94, h.edge, h.edge_max, colors["v"], 2)
-	bar(Vector2(56, 40), 94, dash_fraction(h), 1.0, colors["n"], 2)
-	# Pixel-stepped vine shoulders wrap from the portrait into the health frame.
-	for i: int in range(5):
-		var at: Vector2 = Vector2(49 + i * 3, 12 - mini(i, 2))
-		draw_rect(Rect2(at, Vector2(4, 2)), colors["0"])
-		draw_rect(Rect2(at + Vector2(0, 1), Vector2(2, 1)), colors["u"])
-		draw_rect(Rect2(Vector2(151 - i, 26 + i), Vector2(2, 2)), colors["0"])
-	draw_circle(center, 24, colors["0"], true, -1.0, false)
-	draw_arc(center, 23, 0, TAU, 96, colors["j"], 1.0, false)
-	draw_arc(center, 22, 0, TAU, 96, colors["t"], 1.0, false)
 	prepare_portrait()
 	if portrait_mask != null:
-		draw_texture(portrait_mask, Vector2(6, 6))
-	# Small stepped leaves ornament the rim without covering the face.
-	for side: int in [-1, 1]:
-		for row: int in [-1, 1]:
-			var leaf: Vector2 = center + Vector2(side * 18, row * 17)
-			draw_polyline(PackedVector2Array([leaf + Vector2(-side * 3, 0), leaf, leaf + Vector2(0, row * 3)]), colors["0"], 3.0, false)
-			draw_polyline(PackedVector2Array([leaf + Vector2(-side * 3, 0), leaf, leaf + Vector2(0, row * 3)]), colors["u"], 1.0, false)
-	for offset: Vector2 in [Vector2(-24, 0), Vector2(24, 0), Vector2(0, -24), Vector2(0, 24)]:
-		var tip: Vector2 = center + offset
-		draw_rect(Rect2(tip - Vector2.ONE, Vector2(3, 3)), colors["0"])
-		draw_rect(Rect2(tip, Vector2.ONE), colors["1"])
+		draw_texture_rect(portrait_mask, Rect2(13, 14, 32, 32), false)
+	bar(Vector2(58, 25), 86, h.player_hp, h.player_max_hp, colors["t"], 7, float(health_ghosts.get("player", h.player_hp)))
+	bar(Vector2(59, 41), 82, h.edge, h.edge_max, colors["v"], 2)
+	bar(Vector2(59, 49), 82, dash_fraction(h), 1.0, colors["n"], 2)
+	ui("ui_profile", Rect2(2, 2, 156, 60))
+	ui("ui_icon_edge_1", Rect2(49, 39, 7, 7))
+	ui("ui_icon_dash_1", Rect2(49, 47, 7, 7))
+	ui("ui_icon_parry_1", Rect2(145, 40, 9, 9))
 	var hp: String = "%d/%d" % [h.player_hp, h.player_max_hp]
-	outlined(Vector2(101 - hp.length() * 2, 18), hp, colors["1"], colors["0"])
-	outlined(Vector2(50, 32), "E", colors["v"], colors["0"])
-	outlined(Vector2(50, 39), "D", colors["n"], colors["0"])
+	outlined(Vector2(101 - hp.length() * 2, 26), hp, colors["1"], colors["0"])
+
+func ui(key: String, rect: Rect2) -> void:
+	if portrait_atlas == null or not ui_frames.has(key):
+		return
+	var frame: Dictionary = ui_frames[key]
+	draw_texture_rect_region(portrait_atlas, rect, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 
 static func dash_fraction(h: Snapshots.HudSnapshot) -> float:
 	if h.dash_cooldown_ticks <= 0:
@@ -202,5 +190,5 @@ func track_head(target: Vector2, tick: int, actor_id: int, ground: Vector2 = Vec
 	head_id = actor_id
 
 static func boss_panel(head: Vector2, counter: bool) -> Rect2:
-	var height: float = 39.0 if counter else 25.0
+	var height: float = 47.0 if counter else 33.0
 	return Rect2(Vector2(clampf(head.x - 52, 2, 214), clampf(head.y - 4 - height, 2, 164 - height)).round(), Vector2(104, height))
