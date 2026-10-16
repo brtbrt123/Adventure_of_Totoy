@@ -9,6 +9,7 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
+const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
@@ -17,6 +18,7 @@ const Hud := preload("res://presentation/arena/hud.gd")
 
 var combat_audio: CombatAudio
 var previous_combo_index: int = 0
+var previous_skill_id: StringName = &""
 var core: GameCore = GameCore.new(17)
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
@@ -118,6 +120,7 @@ func _restart() -> void:
 	combat_audio.reset()
 	combat_audio.set_music_active(true)
 	previous_combo_index = 0
+	previous_skill_id = &""
 	core = GameCore.new(17)
 	snapshot = core.snapshot()
 	facing_left = false
@@ -220,7 +223,7 @@ func _on_event(event: GameEvent) -> void:
 			if int(event.data["attacker_id"]) == snapshot.player.id:
 				var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["target_id"]), int(event.data["attacker_id"]))
 				var finisher: bool = int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") == &"moon_cleave"
-				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher})
+				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher, "skill_id": event.data.get("skill_id", &"")})
 				shake_left = maxi(shake_left, 3 if finisher else 1)
 				_burst(contact, 16 if counter or finisher else 8, colors["1"], 1.8 if counter else 0.9)
 				if counter:
@@ -307,7 +310,7 @@ func _draw() -> void:
 		if actor_is_white(actor):
 			_draw_actor(actor, true)
 	# Skill trails remain legible over the brief damage silhouette.
-	_draw_skill_effect()
+	_draw_skill_effect(offset)
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -343,8 +346,10 @@ func prepare_visuals() -> void:
 	if fresh:
 		var hero: Snapshots.EntitySnapshot = snapshot.player
 		var moved: bool = not hero.position.is_equal_approx(previous_player_position)
-		var changed: bool = previous_player_state != hero.state or previous_combo_index != hero.combo_index
+		var changed: bool = previous_player_state != hero.state or previous_combo_index != hero.combo_index or previous_skill_id != hero.skill_id
 		var attack_started: bool = hero.state == &"attack_windup" and changed
+		if hero.state == &"skill_active" and changed:
+			combat_audio.cue("release_" + String(hero.skill_id), snapshot.tick)
 		if hero.state == &"attack_active" and changed:
 			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index == 3 else 0.75)
 		if ((moved and hero.state != &"dead") or attack_started or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
@@ -360,6 +365,7 @@ func prepare_visuals() -> void:
 		previous_player_position = hero.position
 		previous_player_state = hero.state
 		previous_combo_index = hero.combo_index
+		previous_skill_id = hero.skill_id
 	if fresh:
 		for i: int in range(parry_impacts.size() - 1, -1, -1):
 			if snapshot.tick - int(parry_impacts[i]["tick"]) >= 12:
@@ -552,22 +558,21 @@ func _sound_boss_phase_changed(_event: GameEvent) -> void:
 func _sound_game_result(_event: GameEvent) -> void:
 	combat_audio.set_music_active(false)
 
-## Existing atlas effects are placeholders until approved Aspect sheets are imported.
-func skill_effect() -> Dictionary:
-	var hero: Snapshots.EntitySnapshot = snapshot.player
-	if not hero.state.begins_with("skill_"):
-		return {}
-	var side: float = -1.0 if facing_left else 1.0
-	var at: Vector2 = hero.position + Vector2(side * 12, -12)
-	var index: int = 1
-	if hero.state == &"skill_active":
-		index = mini(5, hero.state_ticks * 6 / maxi(1, ArenaAnimation.skill_durations(hero.skill_id)[1])) + 1
-		return {"key": "fx_%s_%d" % ["slash_big" if hero.skill_id == &"moon_cleave" else ("counter" if hero.skill_id == &"breaking_edge" else "slash_small"), index], "at": at, "scale": Vector2(side, 1)}
-	if hero.skill_id == &"gale_cut" and hero.state == &"skill_windup":
-		return {"key": "fx_dash_%d" % (mini(5, hero.state_ticks) + 1), "at": hero.position - Vector2(0, 10), "scale": Vector2(side, 1)}
-	return {}
 
-func _draw_skill_effect() -> void:
+## Effects follow current snapshot phases; cancelled skills leave no queued release.
+func skill_effect() -> Dictionary:
+	return SkillEffects.plan(snapshot.player)
+
+func _draw_skill_effect(shake_offset: Vector2 = Vector2.ZERO) -> void:
 	var effect: Dictionary = skill_effect()
-	if not effect.is_empty():
-		_draw_imported(effect["key"], effect["at"], effect["scale"])
+	if effect.is_empty():
+		return
+	var key: String = effect["key"]
+	if not frames.has(key):
+		push_warning("Missing skill effect: " + key)
+		return
+	var frame: Dictionary = frames[key]
+	var anchor: Vector2 = Vector2(frame["ax"], frame["ay"])
+	draw_set_transform(Vector2(effect["at"]) + shake_offset, float(effect["rotation"]))
+	draw_texture_rect_region(sprites, Rect2(-anchor, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+	draw_set_transform(shake_offset)

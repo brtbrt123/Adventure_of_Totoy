@@ -2,9 +2,12 @@ extends Node
 ## CC0 recordings: credits and source edits are in presentation/audio/.
 ## Event results choose the cue; audio never decides hits.
 const CUES: Dictionary = {
-	"skill_breaking_edge": preload("res://presentation/audio/counter_hit.wav"),
+	"release_breaking_edge": preload("res://presentation/audio/swing_2.wav"),
+	"release_gale_cut": preload("res://presentation/audio/swing.wav"),
+	"release_moon_cleave": preload("res://presentation/audio/golem_sweep.wav"),
+	"skill_breaking_edge": preload("res://presentation/audio/swing.wav"),
 	"skill_gale_cut": preload("res://presentation/audio/dash.wav"),
-	"skill_moon_cleave": preload("res://presentation/audio/swing_2.wav"),
+	"skill_moon_cleave": preload("res://presentation/audio/gold_warning.wav"),
 	"golem_slam": preload("res://presentation/audio/golem_slam.wav"),
 	"golem_stomp": preload("res://presentation/audio/golem_stomp.wav"),
 	"golem_sweep": preload("res://presentation/audio/golem_sweep.wav"),
@@ -70,7 +73,7 @@ func cue(key: String, tick: int, strength: float = 1.0) -> void:
 		return
 	last_ticks[key] = tick
 	played[key] = int(played.get(key, 0)) + 1
-	if key in ["perfect_parry", "deflect", "counter_hit", "golem_slam", "golem_stomp"]:
+	if key in ["perfect_parry", "deflect", "counter_hit", "golem_slam", "golem_stomp", "release_moon_cleave"]:
 		duck_remaining = 0.22
 	if DisplayServer.get_name() == "headless" or voices.is_empty():
 		return

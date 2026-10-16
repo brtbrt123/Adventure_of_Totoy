@@ -1,0 +1,387 @@
+{
+  "source": "art/reference/aspect_effects_approved_v1.png",
+  "source_alpha_threshold": 192,
+  "output_alpha_threshold": 128,
+  "resample": "BOX",
+  "align": "opaque bounds centered on effect origin, fixed scale per row",
+  "frames": [
+    {
+      "name": "fx_aspect_breaking_edge_1",
+      "source_rect": [
+        0,
+        0,
+        245,
+        330
+      ],
+      "alpha_bbox": [
+        67,
+        129,
+        179,
+        233
+      ],
+      "row_scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette_symbols": "01xyj"
+    },
+    {
+      "name": "fx_aspect_breaking_edge_2",
+      "source_rect": [
+        245,
+        0,
+        540,
+        330
+      ],
+      "alpha_bbox": [
+        57,
+        112,
+        253,
+        263
+      ],
+      "row_scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette_symbols": "01xyj"
+    },
+    {
+      "name": "fx_aspect_breaking_edge_3",
+      "source_rect": [
+        540,
+        0,
+        925,
+        330
+      ],
+      "alpha_bbox": [
+        53,
+        61,
+        385,
+        286
+      ],
+      "row_scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette_symbols": "01xyj"
+    },
+    {
+      "name": "fx_aspect_breaking_edge_4",
+      "source_rect": [
+        925,
+        0,
+        1235,
+        330
+      ],
+      "alpha_bbox": [
+        0,
+        96,
+        263,
+        280
+      ],
+      "row_scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette_symbols": "01xyj"
+    },
+    {
+      "name": "fx_aspect_breaking_edge_5",
+      "source_rect": [
+        1235,
+        0,
+        1525,
+        330
+      ],
+      "alpha_bbox": [
+        20,
+        107,
+        223,
+        263
+      ],
+      "row_scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette_symbols": "01xyj"
+    },
+    {
+      "name": "fx_aspect_breaking_edge_6",
+      "source_rect": [
+        1525,
+        0,
+        1774,
+        330
+      ],
+      "alpha_bbox": [
+        36,
+        123,
+        183,
+        227
+      ],
+      "row_scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette_symbols": "01xyj"
+    },
+    {
+      "name": "fx_aspect_gale_cut_1",
+      "source_rect": [
+        0,
+        330,
+        235,
+        548
+      ],
+      "alpha_bbox": [
+        67,
+        86,
+        165,
+        148
+      ],
+      "row_scale": 0.15,
+      "canvas": [
+        80,
+        40
+      ],
+      "palette_symbols": "01klmnop"
+    },
+    {
+      "name": "fx_aspect_gale_cut_2",
+      "source_rect": [
+        235,
+        330,
+        510,
+        548
+      ],
+      "alpha_bbox": [
+        22,
+        77,
+        248,
+        150
+      ],
+      "row_scale": 0.15,
+      "canvas": [
+        80,
+        40
+      ],
+      "palette_symbols": "01klmnop"
+    },
+    {
+      "name": "fx_aspect_gale_cut_3",
+      "source_rect": [
+        510,
+        330,
+        955,
+        548
+      ],
+      "alpha_bbox": [
+        22,
+        61,
+        441,
+        171
+      ],
+      "row_scale": 0.15,
+      "canvas": [
+        80,
+        40
+      ],
+      "palette_symbols": "01klmnop"
+    },
+    {
+      "name": "fx_aspect_gale_cut_4",
+      "source_rect": [
+        955,
+        330,
+        1305,
+        548
+      ],
+      "alpha_bbox": [
+        39,
+        62,
+        331,
+        170
+      ],
+      "row_scale": 0.15,
+      "canvas": [
+        80,
+        40
+      ],
+      "palette_symbols": "01klmnop"
+    },
+    {
+      "name": "fx_aspect_gale_cut_5",
+      "source_rect": [
+        1305,
+        330,
+        1540,
+        548
+      ],
+      "alpha_bbox": [
+        16,
+        77,
+        192,
+        158
+      ],
+      "row_scale": 0.15,
+      "canvas": [
+        80,
+        40
+      ],
+      "palette_symbols": "01klmnop"
+    },
+    {
+      "name": "fx_aspect_gale_cut_6",
+      "source_rect": [
+        1540,
+        330,
+        1774,
+        548
+      ],
+      "alpha_bbox": [
+        38,
+        83,
+        191,
+        150
+      ],
+      "row_scale": 0.15,
+      "canvas": [
+        80,
+        40
+      ],
+      "palette_symbols": "01klmnop"
+    },
+    {
+      "name": "fx_aspect_moon_cleave_1",
+      "source_rect": [
+        0,
+        548,
+        250,
+        887
+      ],
+      "alpha_bbox": [
+        67,
+        113,
+        183,
+        215
+      ],
+      "row_scale": 0.17,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette_symbols": "01klnopv"
+    },
+    {
+      "name": "fx_aspect_moon_cleave_2",
+      "source_rect": [
+        250,
+        548,
+        535,
+        887
+      ],
+      "alpha_bbox": [
+        57,
+        81,
+        233,
+        250
+      ],
+      "row_scale": 0.17,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette_symbols": "01klnopv"
+    },
+    {
+      "name": "fx_aspect_moon_cleave_3",
+      "source_rect": [
+        535,
+        548,
+        930,
+        887
+      ],
+      "alpha_bbox": [
+        29,
+        15,
+        352,
+        297
+      ],
+      "row_scale": 0.17,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette_symbols": "01klnopv"
+    },
+    {
+      "name": "fx_aspect_moon_cleave_4",
+      "source_rect": [
+        930,
+        548,
+        1250,
+        887
+      ],
+      "alpha_bbox": [
+        24,
+        45,
+        258,
+        291
+      ],
+      "row_scale": 0.17,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette_symbols": "01klnopv"
+    },
+    {
+      "name": "fx_aspect_moon_cleave_5",
+      "source_rect": [
+        1250,
+        548,
+        1535,
+        887
+      ],
+      "alpha_bbox": [
+        8,
+        51,
+        225,
+        273
+      ],
+      "row_scale": 0.17,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette_symbols": "01klnopv"
+    },
+    {
+      "name": "fx_aspect_moon_cleave_6",
+      "source_rect": [
+        1535,
+        548,
+        1774,
+        887
+      ],
+      "alpha_bbox": [
+        36,
+        86,
+        180,
+        238
+      ],
+      "row_scale": 0.17,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette_symbols": "01klnopv"
+    }
+  ]
+}

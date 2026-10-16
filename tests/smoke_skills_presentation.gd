@@ -1,5 +1,6 @@
 extends SceneTree
 const Arena := preload("res://presentation/arena/arena.gd")
+const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
@@ -68,6 +69,7 @@ func _skill(slot: int, id: StringName) -> void:
 	_observe()
 	var durations: Array[int] = ArenaAnimation.skill_durations(id)
 	var seen: Dictionary = {}
+	var effect_frames: Dictionary = {}
 	var hits: int = 0
 	var phases: Dictionary = {}
 	for tick: int in range(durations[0] + durations[1] + durations[2] + 2):
@@ -80,6 +82,9 @@ func _skill(slot: int, id: StringName) -> void:
 			seen[requested] = true
 			var effect: Dictionary = arena.skill_effect()
 			if not effect.is_empty():
+				effect_frames[int(effect["frame"])] = true
+				if hero.state == &"skill_active" and hero.state_ticks == 0:
+					_expect(int(effect["frame"]) == 3, "effect peak must land on first active tick")
 				_expect(arena.frames.has(effect["key"]), "missing skill effect " + str(effect["key"]))
 			if not phases.has(hero.state):
 				phases[hero.state] = true
@@ -91,8 +96,12 @@ func _skill(slot: int, id: StringName) -> void:
 				hits += 1
 				if slot == 3:
 					_expect(not arena.hit_bursts.is_empty() and arena.hit_bursts[-1]["finisher"], "moon hit spark not heavy")
+		if capture:
+			await physics_frame
 		arena.core.step(InputFrame.new())
 		_observe()
+	_expect(effect_frames.size() == 6, "not all six skill VFX frames played " + String(id))
+	_expect(int(arena.combat_audio.played.get("release_" + String(id), 0)) == 1, "release cue must play once " + String(id))
 	_expect(phases.size() == 3, "missing skill phase " + String(id))
 	_expect(hits == 1, "confirmed skill hit count " + String(id))
 	_expect(int(arena.combat_audio.played.get("skill_" + String(id), 0)) == 1, "skill start cue " + String(id))
@@ -109,16 +118,67 @@ func _skill(slot: int, id: StringName) -> void:
 		var swing: int = 1 if slot == 2 else 3
 		_expect(start == ("hero2_dash_right_1" if slot == 2 and phase == 0 else "hero2_attack%d_right_%d" % [swing, phase * 2 + 1]), "phase start " + String(id))
 		_expect(end == ("hero2_dash_right_4" if slot == 2 and phase == 0 else "hero2_attack%d_right_%d" % [swing, phase * 2 + 2]), "phase end " + String(id))
+
+func _catalog_effects() -> void:
+	for key: String in SkillEffects.all_names():
+		_expect(arena.frames.has(key), "missing approved VFX frame " + key)
+		if arena.frames.has(key):
+			var frame: Dictionary = arena.frames[key]
+			_expect(int(frame["ax"]) * 2 == int(frame["w"]) and int(frame["ay"]) * 2 == int(frame["h"]), "effect origin must be centered " + key)
+
+func _cancel_and_miss() -> void:
+	# A real interrupted windup must never leave a scheduled release behind.
+	arena._restart()
+	arena.core.boss.cooldown = 100000
+	arena.core.player.edge = Tuning.EDGE_MAX
+	var start: InputFrame = InputFrame.new()
+	start.skill_pressed = 3
+	arena.core.step(start)
+	_observe()
+	_expect(not arena.skill_effect().is_empty(), "moon charge missing")
+	arena.core.player.take_damage(1, arena.core.tick, arena.core.last_events, arena.core.boss.id)
+	_observe()
+	_expect(arena.skill_effect().is_empty(), "cancelled windup still draws")
+	for tick: int in range(Tuning.MOON_CLEAVE_WINDUP_TICKS + 2):
+		arena.core.step(InputFrame.new())
+		_observe()
+	_expect(not arena.combat_audio.played.has("release_moon_cleave"), "cancelled moon releases audio")
+	for direction: Vector2 in [Vector2.LEFT, Vector2.UP]:
+		arena._restart()
+		arena.core.boss.cooldown = 100000
+		arena.core.player.position = Vector2(150, 90)
+		arena.core.boss.position = Vector2(280, 150)
+		start = InputFrame.new()
+		start.skill_pressed = 2
+		start.aim = direction
+		arena.core.step(start)
+		_observe()
+		_expect(is_equal_approx(float(arena.skill_effect()["rotation"]), direction.angle()), "skill VFX ignores aim")
+		var hit: bool = false
+		for tick: int in range(Tuning.GALE_CUT_WINDUP_TICKS + Tuning.GALE_CUT_ACTIVE_TICKS + Tuning.GALE_CUT_RECOVERY_TICKS + 1):
+			arena.core.step(InputFrame.new())
+			_observe()
+			if arena.snapshot.player.state == &"skill_active" and arena.snapshot.player.state_ticks == 0:
+				await _save("gale_cut_miss_" + ("left" if direction == Vector2.LEFT else "up"))
+			# Re-reading the same snapshot must not replay its release sound.
+			arena.prepare_visuals()
+			for event: GameEvent in arena.core.last_events:
+				if event.type == GameEvent.ATTACK_HIT:
+					hit = true
+		_expect(not hit and arena.hit_bursts.is_empty(), "miss creates hit feedback")
+		_expect(int(arena.combat_audio.played.get("release_gale_cut", 0)) == 1, "miss must release audio exactly once")
 func _run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	arena = (load("res://presentation/arena/arena.tscn") as PackedScene).instantiate() as Arena
 	root.add_child(arena)
 	arena.set_physics_process(false)
+	_catalog_effects()
 	await _inputs()
 	await _skill(1, &"breaking_edge")
 	await _skill(2, &"gale_cut")
 	await _skill(3, &"moon_cleave")
 	_expect(ArenaAnimation.skill_frame(&"moon_cleave", &"skill_windup", Tuning.MOON_CLEAVE_WINDUP_TICKS / 2) == "hero2_attack3_right_2", "moon charge hold")
+	await _cancel_and_miss()
 	arena._restart()
 	arena.core.player.edge = 0
 	var denied: InputFrame = InputFrame.new()

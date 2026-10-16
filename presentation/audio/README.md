@@ -15,3 +15,6 @@ Heavy Boss Battle 1 by MintoDog (CC0) loops during combat, fades out on the resu
 battle_mix_preview.wav is an illustrative 12-second offline mix of the track and new cues, not a gameplay recording (runtime ducking is not included). Human listening approval remains necessary. Source credits and hashes are retained in sources.json and LICENSES.
 
 Follow-up: the human found the beam sound inconsistent. golem_beam.wav now layers swish-3 with impactMining_002, removing the sword-clash recording. The earlier battle_mix_preview.wav documents the previous mix; listen to the individual golem_beam.wav for the current beam cue.
+
+
+Aspect VFX integration: skill_started now plays preparation cues (Breaking Edge: swing, Gale Cut: dash, Moon Cleave: restrained warning foley). On the first observed skill_active tick, distinct release keys play swing_2, swing and golem_sweep respectively. Moon release briefly ducks music. Confirmed attack_hit events retain impact sounds and heavier Moon sparks; a whiff has a release but no fabricated impact. Interrupted windups never schedule a release. These routes reuse the credited processed recordings, with no additional downloads or licence changes.
