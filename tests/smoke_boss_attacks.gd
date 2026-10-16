@@ -1,5 +1,6 @@
 extends SceneTree
 ## Headless six-attack effects check; windowed invocation also captures actual states.
+const Tuning := preload("res://core/tuning.gd")
 const Arena := preload("res://presentation/arena/arena.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const Snapshots := preload("res://core/snapshots.gd")
@@ -84,12 +85,33 @@ func _attack(attack: StringName) -> void:
 		_expect(moved, "charge snapshot never moved")
 	_expect(arena.missing_frames.is_empty(), "missing frame " + str(arena.missing_frames))
 
+func _sweep_atlas_bounds() -> void:
+	var tell: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
+	tell.shape = &"cone"
+	tell.attack = &"red_sweep"
+	tell.center = Vector2(190, 110)
+	tell.size = Tuning.SWEEP_RADIUS
+	tell.half_angle = deg_to_rad(Tuning.SWEEP_HALF_ANGLE_DEG)
+	for direction: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN, Vector2(1, -1).normalized()]:
+		tell.direction = direction
+		var polygon: PackedVector2Array = TelegraphView.outline(tell)
+		for index: int in range(1, 7):
+			var f: Dictionary = arena.frames["fx_sweep_%d" % index]
+			var uv: PackedVector2Array = CombatEffects.effect_uvs(polygon, tell, f, arena.sprites.get_size())
+			var bounds: Rect2 = Rect2(f["x"], f["y"], f["w"] - 1, f["h"] - 1)
+			for point: Vector2 in uv:
+				var pixel: Vector2 = point * arena.sprites.get_size()
+				_expect(pixel.x >= bounds.position.x - 0.001 and pixel.x <= bounds.end.x + 0.001 and pixel.y >= bounds.position.y - 0.001 and pixel.y <= bounds.end.y + 0.001, "sweep samples another atlas frame %d" % index)
+			var forward: PackedVector2Array = CombatEffects.effect_uvs(PackedVector2Array([tell.center, tell.center + direction * tell.size]), tell, f, arena.sprites.get_size())
+			_expect(forward[1].x < forward[0].x, "left-facing sweep art points away from attack")
+
 func _run() -> void:
 	var packed: PackedScene = load("res://presentation/arena/arena.tscn") as PackedScene
 	arena = packed.instantiate() as Arena
 	root.add_child(arena)
 	arena.set_physics_process(false)
 	_expect(arena.frames.has("hero2_attack1_right_4"), "new slash frame absent")
+	_sweep_atlas_bounds()
 	for attack: StringName in [&"gold_slam", &"red_sweep", &"red_shards", &"red_stomp", &"gold_combo", &"red_charge"]:
 		await _attack(attack)
 	arena.queue_free()

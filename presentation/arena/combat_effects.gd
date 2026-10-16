@@ -151,13 +151,32 @@ static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapsh
 		var boundary: PackedVector2Array = TelegraphView.outline(tell)
 		_effect_polygon(canvas, sprites, boundary.slice(0, boundary.size() - 1), tell, frame)
 
-static func _effect_polygon(canvas: Node2D, sprites: Texture2D, polygon: PackedVector2Array, tell: Snapshots.TelegraphSnapshot, frame: Dictionary) -> void:
+## Imported sweep arcs face left; their effect origin is not necessarily the cell centre.
+## Every UV stays inside this frame so adjacent atlas sprites can never leak into a hit.
+static func effect_uvs(polygon: PackedVector2Array, tell: Snapshots.TelegraphSnapshot, frame: Dictionary, atlas_size: Vector2) -> PackedVector2Array:
 	var uv: PackedVector2Array = PackedVector2Array()
 	var radius: float = maxf(1.0, tell.size)
+	var anchor: Vector2 = Vector2(frame["ax"], frame["ay"])
+	var last: Vector2 = Vector2(frame["w"] - 1, frame["h"] - 1)
+	var sweep_radius: float = anchor.x
+	if tell.shape == &"cone":
+		var side: float = maxf(0.001, sin(minf(PI * 0.5, tell.half_angle)))
+		sweep_radius = maxf(1.0, minf(anchor.x, minf(anchor.y, last.y - anchor.y) / side))
 	for point: Vector2 in polygon:
-		var local: Vector2 = (point - tell.center).rotated(-tell.direction.angle() if tell.shape == &"cone" else 0.0)
-		uv.append((Vector2(frame["x"] + frame["ax"], frame["y"] + frame["ay"]) + local / (radius * 2.0) * Vector2(frame["w"], frame["h"])) / sprites.get_size())
-	canvas.draw_polygon(polygon, PackedColorArray([Color.WHITE]), uv, sprites)
+		var local: Vector2 = point - tell.center
+		var pixel: Vector2
+		if tell.shape == &"cone":
+			local = local.rotated(-tell.direction.angle())
+			# Rotate left-facing art onto the forward half of the hit cone.
+			pixel = anchor - local * sweep_radius / radius
+		else:
+			pixel = anchor + local / (radius * 2.0) * Vector2(frame["w"], frame["h"])
+		pixel = pixel.clamp(Vector2.ZERO, last)
+		uv.append((Vector2(frame["x"], frame["y"]) + pixel) / atlas_size)
+	return uv
+
+static func _effect_polygon(canvas: Node2D, sprites: Texture2D, polygon: PackedVector2Array, tell: Snapshots.TelegraphSnapshot, frame: Dictionary) -> void:
+	canvas.draw_polygon(polygon, PackedColorArray([Color.WHITE]), effect_uvs(polygon, tell, frame, sprites.get_size()), sprites)
 
 ## Use one opaque cross-section of the imported body: padded cells and changing
 ## start/end shapes can no longer punch gaps into the damaging lane.

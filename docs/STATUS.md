@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Golem sweep atlas sampling fix (2026-10-17, NOT merged)
+
+Human reported the golem sweep had the same stray-slice appearance. Its imported art is intact, but the polygon UV mapping assumed a centred anchor and right-facing crescent. fx_sweep_6 has ax35 in a48px-wide cell, so the old forward UV reached x59,12px beyond the frame. Adjacent atlas fragments could leak into the sweep, while the actual left-facing crescent was mapped away from the attack.
+
+Added bounded, testable effect_uvs: cone mapping uses the declared effect origin and available frame space, rotating the left-facing source crescent into the snapshot attack direction; every UV clamps inside its own frame. Other circular/ring impacts receive the same atlas bounds protection. Telegraph polygons, radius, direction, hit timing, parryability and core files are unchanged. No generated Gemini art was edited.
+
+New smoke exercises all six sweep frames with right/left/up/down/diagonal attack directions, asserting no UV samples a neighbouring cell and the painted crescent faces the attack. Windowed six-boss-pattern smoke passed and refreshed arena_sweep.png plus the other pattern captures. Art validation and the full python harness/checks/run_tests.py --worktree . passed (Python tests, Godot import, core suite and every smoke suite). Human visual/motion review and Claude cross-review remain pending; nothing merged.
+
 ## Black Katana detached/clipped sword trail fix (2026-10-17, NOT merged)
 
 Human screenshots showed a flat-topped partial slash floating above the hero. Confirmed an import bug: the already-centred80px slash canvas was passed through feet-baseline placement again, shifting it upward40px and clipping its upper half. Peak opaque bounds were(15,0)..(64,28) around anchor(40,40). Regenerated all six frames directly from the retained source with one centre placement: peak bounds now(15,11)..(64,68), full57px height. Import metadata updated. No art generation or new design was needed.
