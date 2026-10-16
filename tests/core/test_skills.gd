@@ -220,14 +220,113 @@ func test_gale_cut_has_no_invulnerability() -> void:
 
 
 func test_gale_cut_hits_a_target_inside_the_corridor_once() -> void:
-	var core: GameCore = _core(Vector2(40.0, 88.0), Vector2(120.0, 88.0))  # in the way: the dash ends against the boss
+	var core: GameCore = _core(Vector2(40.0, 88.0), Vector2(120.0, 88.0))  # in the way
 	var hits: Array[GameEvent] = _gale(core)
-	assert_eq(hits.size(), 1, "once per target per cast, although the dash presses against the boss for many ticks")
+	assert_eq(hits.size(), 1, "once per target per cast, although the dash overlaps the boss for many ticks")
 	if hits.size() == 1:
 		assert_eq(hits[0].data["skill_id"], PlayerState.SKILL_GALE_CUT)
 		assert_eq(int(hits[0].data["damage"]), _armored(Tuning.GALE_CUT_DAMAGE))
 	assert_near(core.boss.posture, Tuning.GALE_CUT_POSTURE, 1.5, "light posture damage")
-	assert_true(core.player.position.distance_to(core.boss.position) >= Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS - 0.01, "the boss is still solid")
+	assert_true(_clear_of_boss(core), "the player ends outside the boss")
+
+
+func _clear_of_boss(core: GameCore) -> bool:
+	return core.player.position.distance_to(core.boss.position) >= Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS - 0.01
+
+
+func _inside_arena(core: GameCore) -> bool:
+	var low: float = Tuning.ARENA_MARGIN - 0.001
+	var high: Vector2 = Tuning.ARENA_SIZE - Vector2(low, low)
+	var p: Vector2 = core.player.position
+	return p.x >= low and p.y >= low and p.x <= high.x and p.y <= high.y
+
+
+func test_gale_cut_passes_through_the_boss_during_skill_active() -> void:
+	var core: GameCore = _core(Vector2(40.0, 88.0), Vector2(130.0, 88.0))
+	var boss_start: Vector2 = core.boss.position
+	core.player.edge = 100.0
+	_press(core, 2, Vector2.RIGHT)
+	var min_gap: float = 1000.0
+	var min_gap_while_dashing: float = 1000.0
+	var hits: int = 0
+	for i: int in Tuning.GALE_CUT_WINDUP_TICKS + Tuning.GALE_CUT_ACTIVE_TICKS:
+		core.step(input())
+		var gap: float = core.player.position.distance_to(core.boss.position)
+		if core.player.state == PlayerState.STATE_SKILL_WINDUP:
+			assert_true(gap >= Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS - 0.01, "the windup is still solid")
+		if core.player.state == PlayerState.STATE_SKILL_ACTIVE:
+			min_gap_while_dashing = minf(min_gap_while_dashing, gap)
+		min_gap = minf(min_gap, gap)
+		hits += event_types(core).count(GameEvent.ATTACK_HIT)
+	assert_true(min_gap_while_dashing < Tuning.PLAYER_RADIUS, "the player went through the middle of the boss (gap %s)" % str(min_gap_while_dashing))
+	assert_near(core.player.position.x, 40.0 + Tuning.GALE_CUT_DISTANCE, 0.01, "and covered the full dash distance, 120 px")
+	assert_true(core.player.position.x > core.boss.position.x, "ending on the far side of the boss")
+	assert_eq(hits, 1, "one hit for the whole pass")
+	assert_eq(core.boss.position, boss_start, "the boss was not moved")
+	assert_true(_clear_of_boss(core), "not left inside the boss")
+
+
+func test_gale_cut_that_ends_inside_the_boss_is_moved_out() -> void:
+	var core: GameCore = _core(Vector2(40.0, 88.0), Vector2(150.0, 88.0))  # the dash ends at x=160, 10 px from the centre
+	var hits: Array[GameEvent] = _gale(core)
+	assert_eq(hits.size(), 1, "still one hit")
+	assert_true(_clear_of_boss(core), "pushed out of the boss")
+	assert_true(core.player.position.x >= 150.0 + Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS - 0.01, "out on the side the dash was heading")
+	assert_true(_inside_arena(core))
+	assert_false(core.player.state == PlayerState.STATE_SKILL_ACTIVE, "the dash is over")
+
+
+func test_gale_cut_ending_inside_a_boss_next_to_a_wall_still_ends_free() -> void:
+	var core: GameCore = _core(Vector2(190.0, 88.0), Vector2(300.0, 88.0))  # the dash ends at x=310, inside the boss, by the wall
+	_gale(core)
+	assert_true(_clear_of_boss(core), "a free spot was found although the wall blocks the forward side")
+	assert_true(_inside_arena(core), "and it is inside the arena")
+
+
+func test_gale_cut_stops_at_the_wall_even_when_passing_through_the_boss() -> void:
+	var core: GameCore = _core(Vector2(250.0, 88.0), Vector2(280.0, 88.0))
+	var hits: Array[GameEvent] = _gale(core)
+	var wall: float = Tuning.ARENA_SIZE.x - Tuning.ARENA_MARGIN
+	assert_near(core.player.position.x, wall, 0.01, "stopped by the right wall, 62 px of the 120 px dash")
+	assert_eq(hits.size(), 1, "the boss on the way was hit once")
+	assert_true(_inside_arena(core))
+	assert_true(_clear_of_boss(core))
+
+
+func test_gale_cut_stops_at_every_wall() -> void:
+	for dir: Vector2 in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
+		var core: GameCore = _core(Vector2(160.0, 88.0))
+		_gale(core, dir)
+		assert_true(_inside_arena(core), "inside the arena after dashing %s" % str(dir))
+		var travelled: float = core.player.position.distance_to(Vector2(160.0, 88.0))
+		assert_true(travelled <= Tuning.GALE_CUT_DISTANCE + 0.01, "never farther than the dash distance")
+
+
+func test_normal_collision_returns_after_the_dash() -> void:
+	var core: GameCore = _core(Vector2(100.0, 88.0), Vector2(150.0, 88.0))
+	run(core, 60, input(Vector2.RIGHT))
+	assert_true(_clear_of_boss(core), "before the dash the boss is solid")
+	core.player.position = Vector2(40.0, 88.0)
+	_gale(core, Vector2.RIGHT)
+	run(core, Tuning.GALE_CUT_RECOVERY_TICKS)
+	assert_eq(core.player.state, PlayerState.STATE_IDLE)
+	run(core, 60, input(Vector2.LEFT))  # walk back towards the boss from the far side
+	assert_true(_clear_of_boss(core), "after the dash the boss is solid again")
+	assert_true(core.player.position.x > core.boss.position.x, "still on the far side: no walking through")
+
+
+func test_interrupted_inside_the_boss_the_player_is_moved_out() -> void:
+	var core: GameCore = _core(Vector2(40.0, 88.0), Vector2(100.0, 88.0))
+	core.player.edge = 100.0
+	_press(core, 2, Vector2.RIGHT)
+	run(core, Tuning.GALE_CUT_WINDUP_TICKS + 8)  # about x=104, in the middle of the boss
+	assert_true(core.player.position.distance_to(core.boss.position) < Tuning.PLAYER_RADIUS, "the player is inside the boss")
+	var events: Array[GameEvent] = []
+	core.player.take_damage(5, core.tick, events, core.boss.id)
+	core.step(input())
+	assert_eq(core.player.state, PlayerState.STATE_IDLE)
+	assert_true(_clear_of_boss(core), "not stuck inside the boss")
+	assert_true(_inside_arena(core))
 
 
 func test_gale_cut_lane_width_boundary() -> void:

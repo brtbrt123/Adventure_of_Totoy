@@ -52,8 +52,9 @@ func step(input: InputFrame) -> void:
 	_spawn_released_skill(events)
 	boss.step(tick, player.position, _rng, events)
 	_resolve_telegraphs(events)
-	_keep_in_arena()
+	_clamp_to_arena()
 	_resolve_skill_attacks(player_before, events)
+	_separate_from_boss()
 	_check_result(events)
 	last_events = events
 	for event: GameEvent in events:
@@ -311,17 +312,51 @@ func _resolve_telegraphs(events: Array[GameEvent]) -> void:
 			}))
 
 
-func _keep_in_arena() -> void:
+func _clamp_to_arena() -> void:
 	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
 	var high: Vector2 = Tuning.ARENA_SIZE - low
 	player.position = player.position.clamp(low, high)
 	boss.position = boss.position.clamp(low, high)
-	# The boss is solid: push the player out of it.
+
+
+## Gale Cut passes through the boss only while the dash itself runs (skill_active). Skill attacks are
+## resolved before this, so the corridor is the path really travelled, walls included.
+func _player_passes_through_boss() -> bool:
+	return player.state == PlayerState.STATE_SKILL_ACTIVE and player.skill_id == PlayerState.SKILL_GALE_CUT
+
+
+## The boss is solid: push the player out of it. The tick the dash ends (or is interrupted) the player may
+## be inside the boss; they are moved to the nearest free spot and never left overlapping.
+func _separate_from_boss() -> void:
+	if _player_passes_through_boss():
+		return
 	var min_dist: float = Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS
 	var offset: Vector2 = player.position - boss.position
-	if offset.length() < min_dist:
-		var push_dir: Vector2 = offset.normalized() if offset.length_squared() > 0.0001 else Vector2.LEFT
-		player.position = (boss.position + push_dir * min_dist).clamp(low, high)
+	if offset.length() >= min_dist:
+		return
+	var push_dir: Vector2 = offset.normalized() if offset.length_squared() > 0.0001 else (player.skill_dir if player.skill_dir.length_squared() > 0.0001 else Vector2.LEFT)
+	player.position = _free_spot(push_dir, min_dist)
+
+
+## boss + dir * min_dist, kept inside the arena. If the wall pulls that back into the boss (the boss stands near
+## a wall), try the other directions around the boss, nearest to `dir` first.
+func _free_spot(dir: Vector2, min_dist: float) -> Vector2:
+	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
+	var high: Vector2 = Tuning.ARENA_SIZE - low
+	var best: Vector2 = (boss.position + dir * min_dist).clamp(low, high)
+	if best.distance_to(boss.position) >= min_dist - 0.01:
+		return best
+	var farthest: float = best.distance_to(boss.position)
+	for step: int in range(1, 9):
+		for sign: float in [1.0, -1.0]:
+			var candidate: Vector2 = (boss.position + dir.rotated(sign * step * PI / 8.0) * min_dist).clamp(low, high)
+			var d: float = candidate.distance_to(boss.position)
+			if d >= min_dist - 0.01:
+				return candidate
+			if d > farthest:
+				farthest = d
+				best = candidate
+	return best
 
 
 func _check_result(events: Array[GameEvent]) -> void:
