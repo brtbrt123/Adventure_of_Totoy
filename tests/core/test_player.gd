@@ -106,3 +106,29 @@ func test_normal_hit_is_weak_against_armored_boss() -> void:
 	var expected: int = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.ARMOR_DAMAGE_FACTOR))
 	assert_eq(Tuning.BOSS_MAX_HP - core.boss.hp, expected, "armored damage")
 	assert_near(core.boss.posture, Tuning.NORMAL_HIT_POSTURE, 0.1, "a normal hit adds a little posture")
+
+
+func test_missed_parry_blocks_dash_and_attack_until_recovery_ends() -> void:
+	var core: GameCore = GameCore.new()
+	core.boss.cooldown = 100000
+	core.step(input(Vector2.ZERO, false, true))
+	assert_eq(core.player.state, PlayerState.STATE_PARRY, "parry press opens the window")
+	for i: int in Tuning.PARRY_ACTIVE_TICKS:
+		core.step(input())
+		if event_types(core).has(GameEvent.PARRY_FAILED):
+			break
+	assert_true(event_types(core).has(GameEvent.PARRY_FAILED), "missed parry emits parry_failed")
+	assert_eq(core.player.state, PlayerState.STATE_PARRY_RECOVERY, "missed parry starts recovery")
+
+	var recovery_start_tick: int = core.tick
+	for recovery_tick: int in range(1, Tuning.PARRY_WHIFF_RECOVERY_TICKS):
+		var dash_pressed: bool = recovery_tick % 2 == 1
+		core.step(input(Vector2.ZERO, dash_pressed, false, not dash_pressed))
+		assert_false(event_types(core).has(GameEvent.DASH_STARTED), "dash blocked during parry recovery")
+		assert_eq(core.player.state, PlayerState.STATE_PARRY_RECOVERY, "dash and attack cannot interrupt parry recovery")
+	core.step(input())
+	assert_eq(core.tick - recovery_start_tick, Tuning.PARRY_WHIFF_RECOVERY_TICKS, "full whiff recovery elapsed")
+	assert_eq(core.player.state, PlayerState.STATE_IDLE, "recovery ends after the configured ticks")
+	core.step(input(Vector2.RIGHT, true))
+	assert_true(event_types(core).has(GameEvent.DASH_STARTED), "dash available after parry recovery")
+	assert_eq(core.player.state, PlayerState.STATE_DASH, "dash starts after parry recovery")
