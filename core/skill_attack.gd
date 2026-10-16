@@ -18,6 +18,7 @@ var width: float = 0.0
 var size: float = 0.0
 var arc_dot: float = 0.0
 var speed: float = 0.0
+var damage_mult: float = 1.0  # locked when the skill was released
 var travelled: float = 0.0
 var length: float = 0.0
 var start_tick: int = 0

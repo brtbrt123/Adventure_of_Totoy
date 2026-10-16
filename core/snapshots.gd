@@ -17,6 +17,10 @@ class EntitySnapshot:
 	var posture_max: float = 0.0
 	var invulnerable: bool = false
 	var combo_index: int = 0  # player only (1-3, see docs/architecture.md); 0 for other entities
+	var weapon_id: StringName = &""  # player only: the equipped weapon, e.g. &"black_katana"
+	var weapon_buff_active: bool = false  # player only
+	var weapon_buff_ticks_left: int = 0  # player only: ticks of buff left, 0 when not active
+	var attack_speed_mult: float = 1.0  # player only: the speed of the swing in progress (locked at its start), else the current buff speed
 	var skill_id: StringName = &""  # player only: the skill in progress during skill_* states, else empty
 
 
@@ -72,6 +76,10 @@ class HudSnapshot:
 	var boss_posture_max: float = 0.0
 	var counter_window_ticks_left: int = 0
 	var skill_cooldown_ticks: Array[int] = [0, 0, 0]  # ticks left per skill 1-3
+	var weapon_buff_duration: int = 0  # full duration of the weapon buff (0 if the weapon has none)
+	var weapon_buff_cooldown_ticks: int = 0  # ticks until the weapon active can be used again
+	var weapon_buff_cooldown_max: int = 0
+	var weapon_buff_edge_cost: float = 0.0
 	var retaliate_ticks_left: int = 0  # Breaking Edge: ticks left after a successful parry
 
 

@@ -45,6 +45,7 @@ One `InputFrame` per tick:
 | `attack_pressed` / `attack_held` | `bool` | normal attack (sword) / draw / cast |
 | `parry_pressed` | `bool` | gold parry |
 | `dash_pressed` | `bool` | dash |
+| `weapon_active_pressed` | `bool` | the equipped weapon's active this tick (right click; Black Katana buff, see "Weapon active") |
 | `skill_pressed` | `int` | skill slot 1, 2 or 3 pressed this tick, else 0. Test bindings: Z = 1 Breaking Edge, X = 2 Gale Cut, C = 3 Moon Cleave (the key mapping is presentation's job) |
 | `interact_pressed` | `bool` | talk, open, checkpoint (unused so far) |
 
@@ -58,7 +59,7 @@ One `InputFrame` per tick:
 - `skill_attacks: Array[SkillAttackSnapshot]` (live skill attacks, see "Sword skills")
 - `hud: HudSnapshot`
 
-`EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`, `combo_index` (player only, see the sword combo below; `0` for the boss), `skill_id` (player only: `breaking_edge`, `gale_cut` or `moon_cleave` during the `skill_*` states, otherwise empty).
+`EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`, `combo_index` (player only, see the sword combo below; `0` for the boss), `skill_id` (player only: `breaking_edge`, `gale_cut` or `moon_cleave` during the `skill_*` states, otherwise empty), and for the player the weapon fields `weapon_id`, `weapon_buff_active`, `weapon_buff_ticks_left`, `attack_speed_mult` (see "Weapon active").
 
 States: player `idle walk dash parry parry_recovery attack_windup attack_active attack_recovery skill_windup skill_active skill_recovery dead`; boss `idle attack recover posture_broken dead`.
 
@@ -84,6 +85,36 @@ Three skills for testing the Aspect system, selected by `skill_pressed` 1-3 (Z, 
 - **Collision:** swept: each tick tests the whole segment moved (so a fast mover cannot tunnel) against the target circle widened by half the lane/projectile width.
 - **Presentation to do (Codex):** a Gale Cut dash now moves the player during `skill_active` (before it moved during the windup), so the dash trail and effect timing must follow `skill_active` and `snapshot.skill_attacks`; draw the Moon Cleave projectile from `skill_attacks` (`position`, `direction`, `width`, `ticks_left`) and keep it after the player's state changes; use `skill_released` for release sounds and effects. `tests/smoke_skills_presentation.gd` sets no Edge before pressing X, which now costs 35.
 
+### Weapon active: Black Katana buff (player)
+
+The equipped weapon is `snapshot.player.weapon_id` (`black_katana`, the only weapon so far). Its active is **right click**: input field `InputFrame.weapon_active_pressed` (true for the tick of the press; mapping the mouse button is presentation's job). The core owns everything else.
+
+**All numbers are PLACEHOLDERS** (`core/tuning.gd`, `BLACK_KATANA_*`): the design has not fixed duration (480 ticks = 8 s), cooldown (1200 ticks = 20 s, counted from the activation), Edge cost (30), attack speed (x1.35) or damage (x1.25). Replace them after a design decision; nothing else in core hard-codes them. Open design questions: should it cost Edge at all, can it be re-pressed to refresh, does the buff change skill speed (it does not now), should damage taken or a parry affect it.
+
+**Rules (as built):**
+- Needs: weapon `black_katana`, not dead, enough Edge, cooldown ready, and **no buff running** (it cannot be refreshed). A refused press does nothing and emits no event.
+- It is a **free action**: no state change, no animation lock, allowed in any state except `dead` (idle, walk, attack, dash, parry, skill). The cost is spent on the press.
+- It **stays active through movement, attacks, dashes, parries, skills and damage**. It ends only when the duration runs out or the player dies. A new fight (`GameCore.new()`) starts without it.
+- **Attack speed** applies to the normal sword swings: every phase length (windup, active, recovery) is `Player.scaled_ticks(base, mult)` = `round(base / mult)`, at least 1 tick. Skill timings are unchanged.
+- **Damage** is multiplied on normal swings and skill hits (counter hits too). Both multipliers are **locked** when a swing starts and when a skill is released: a swing never changes speed halfway, and a projectile released under the buff keeps its damage even if the buff ends before it lands.
+- The combo buffer, grace and resets are unchanged (the buffer window never extends past the shorter recovery).
+
+**Snapshot:**
+- `player.weapon_id`, `player.weapon_buff_active`, `player.weapon_buff_ticks_left` (0 when inactive), `player.attack_speed_mult` (the locked speed of the swing in progress during `attack_*` states; otherwise the current buff speed, 1.0 without the buff).
+- `hud.weapon_buff_duration` (0 for a weapon without an active), `hud.weapon_buff_cooldown_ticks` / `hud.weapon_buff_cooldown_max`, `hud.weapon_buff_edge_cost`. (The boss entity has `weapon_id` empty.)
+
+**Events:**
+- `weapon_buff_started`: `entity_id`, `weapon_id`, `duration` (ticks), `attack_speed_mult`, `damage_mult`.
+- `weapon_buff_ended`: `entity_id`, `weapon_id`, `reason` (`expired` or `death`).
+The buff is active from the activation tick through the `duration`-th tick; `weapon_buff_ended` fires on the tick after the last active one.
+
+**Presentation to do (Codex), none of it changes rules:**
+1. Bind right mouse button to `weapon_active_pressed` in `input_bindings.gd`.
+2. **Swing animation lengths must follow the speed.** Use `Player.scaled_ticks(Tuning.SWING_WINDUP_TICKS[i], snapshot.player.attack_speed_mult)` (and the same for ACTIVE and RECOVERY) instead of the raw `Tuning.SWING_*` numbers in `animation.gd`, using the swing's `combo_index`; otherwise frames stop early or hold at the end while the buff runs.
+3. Show the empowered look (aura, empowered katana frames) while `player.weapon_buff_active`, with a fade-out cue from `weapon_buff_ticks_left`; one-shot cues on `weapon_buff_started` / `weapon_buff_ended`.
+4. HUD: show the active's remaining duration and the cooldown (`hud.weapon_buff_*`), and the Edge cost, near the weapon icon.
+5. Add a smoke test that every frame requested while the buff speeds up the swings exists.
+
 `TelegraphSnapshot`: `id`, `owner_id`, `attack` (`gold_slam`, `gold_combo`, `red_sweep`, `red_shards`, `red_stomp`, `red_charge`), `kind` (`gold` = parry it, `red` = dodge it), `shape` + parameters, `start_tick`, `hit_tick`, `end_tick`.
 - `circle`: `center`, `size` = radius
 - `cone`: `center` = origin, `direction`, `size` = radius, `half_angle` (radians)
@@ -94,7 +125,7 @@ Boss attacks: `gold_slam` (one parryable slam), `gold_combo` (two parryable slam
 
 The area is dangerous from `hit_tick` to `end_tick` inclusive; before that it is only a warning. Presentation draws the warning growing/filling toward `hit_tick` and may slow the visual for the final windup (the design's "final windup slows briefly").
 
-`HudSnapshot`: `player_hp`, `player_max_hp`, `dash_cooldown_ticks`, `dash_cooldown_max`, `edge`, `edge_max`, `boss_hp`, `boss_max_hp`, `boss_posture`, `boss_posture_max`, `counter_window_ticks_left`, `skill_cooldown_ticks` (array of 3, ticks left per slot), `retaliate_ticks_left` (Breaking Edge is usable while this is above 0).
+`HudSnapshot`: `player_hp`, `player_max_hp`, `dash_cooldown_ticks`, `dash_cooldown_max`, `edge`, `edge_max`, `boss_hp`, `boss_max_hp`, `boss_posture`, `boss_posture_max`, `counter_window_ticks_left`, `skill_cooldown_ticks` (array of 3, ticks left per slot), `retaliate_ticks_left` (Breaking Edge is usable while this is above 0), `weapon_buff_duration`, `weapon_buff_cooldown_ticks`, `weapon_buff_cooldown_max`, `weapon_buff_edge_cost`.
 
 **Art contract:** presentation picks a frame from `art/build/sprites.json` using `<visual_id>_<state>_<direction>_<n>` for characters and `<visual_id>_<state>_<n>` for the boss (see `AGENTS.md` section 5 and `presentation/arena/animation.gd`). A missing frame falls back to a visible placeholder and logs a warning; it never crashes.
 
@@ -111,6 +142,8 @@ Each event is a `GameEvent` with `type: StringName`, `tick: int` and `data: Dict
 | `posture_broken` | `entity_id`, `window_ticks` |
 | `counter_window_opened` / `counter_window_closed` | `entity_id` (+ `window_ticks` on open) |
 | `dash_started` | `entity_id`, `direction` |
+| `weapon_buff_started` | `entity_id`, `weapon_id`, `duration`, `attack_speed_mult`, `damage_mult` |
+| `weapon_buff_ended` | `entity_id`, `weapon_id`, `reason` (`expired`, `death`) |
 | `skill_started` | `entity_id`, `skill_id` (the press: the windup begins; Edge is spent) |
 | `skill_released` | `attack_id`, `entity_id`, `skill_id`, `shape` (`arc`, `lane`, `projectile`), `position`, `direction`, `start`, `end`, `width` (the attack exists from this tick: the first `skill_active` tick; use it for effects and audio) |
 | `dash_ready` | `entity_id` |

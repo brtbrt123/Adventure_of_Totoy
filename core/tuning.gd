@@ -113,6 +113,19 @@ const MOON_CLEAVE_DAMAGE: float = 40.0
 const MOON_CLEAVE_POSTURE: float = 20.0
 const MOON_CLEAVE_EDGE_GAIN: float = 0.0
 
+# Black Katana active (right click). PLACEHOLDER VALUES: the design has not fixed duration, cooldown, cost or
+# amounts yet; every number below is a starting guess to be replaced after a design decision.
+# While the buff is active, normal swings are faster (each phase's ticks are divided by the multiplier, see
+# Player.scaled_ticks) and the player's damage is higher (normal swings and skills). Skill timings do not change.
+# The multipliers are locked when a swing starts or a skill is released, so a swing never changes speed or
+# damage halfway. Activating is free of animation lock (no state change) and works in any state but dead.
+const WEAPON_BLACK_KATANA: StringName = &"black_katana"
+const BLACK_KATANA_BUFF_DURATION_TICKS: int = 480  # 8 seconds (placeholder)
+const BLACK_KATANA_BUFF_COOLDOWN_TICKS: int = 1200  # 20 seconds, counted from the activation (placeholder)
+const BLACK_KATANA_BUFF_EDGE_COST: float = 30.0  # spent on activation (placeholder)
+const BLACK_KATANA_ATTACK_SPEED_MULT: float = 1.35  # placeholder
+const BLACK_KATANA_DAMAGE_MULT: float = 1.25  # placeholder
+
 # Edge (sword mechanic): close hits and parries build it, a counter spends all of it for extra damage
 const EDGE_MAX: float = 100.0
 const EDGE_PER_HIT: float = 25.0

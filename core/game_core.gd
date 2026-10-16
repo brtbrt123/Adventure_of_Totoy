@@ -117,6 +117,11 @@ func snapshot() -> Snapshots.GameSnapshot:
 	hud.counter_window_ticks_left = boss.broken_ticks_left if boss.state == BossState.STATE_BROKEN else 0
 	hud.skill_cooldown_ticks = player.skill_cooldowns.duplicate()
 	hud.retaliate_ticks_left = player.retaliate_ticks
+	var has_active: bool = player.weapon_id == Tuning.WEAPON_BLACK_KATANA
+	hud.weapon_buff_duration = Tuning.BLACK_KATANA_BUFF_DURATION_TICKS if has_active else 0
+	hud.weapon_buff_cooldown_ticks = player.buff_cooldown
+	hud.weapon_buff_cooldown_max = Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS if has_active else 0
+	hud.weapon_buff_edge_cost = Tuning.BLACK_KATANA_BUFF_EDGE_COST if has_active else 0.0
 	snap.hud = hud
 	return snap
 
@@ -134,6 +139,10 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.invulnerable = player.is_invulnerable()
 	e.combo_index = player.combo_index
 	e.skill_id = player.skill_id
+	e.weapon_id = player.weapon_id
+	e.weapon_buff_active = player.is_buff_active()
+	e.weapon_buff_ticks_left = player.buff_ticks
+	e.attack_speed_mult = player.swing_speed_mult if String(player.state).begins_with("attack_") else player.attack_speed_mult()
 	return e
 
 
@@ -167,10 +176,10 @@ func _resolve_player_attack(events: Array[GameEvent]) -> void:
 	var counter: bool = boss.state == BossState.STATE_BROKEN
 	var damage: int
 	if counter:
-		damage = roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
+		damage = roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * player.swing_damage_mult * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
 		player.edge = 0.0  # the counter spends all Edge
 	else:
-		damage = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * Tuning.ARMOR_DAMAGE_FACTOR))
+		damage = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * player.swing_damage_mult * Tuning.ARMOR_DAMAGE_FACTOR))
 		player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.EDGE_PER_HIT)
 	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
 		"attacker_id": player.id, "target_id": boss.id, "damage": damage,
@@ -193,6 +202,7 @@ func _spawn_released_skill(events: Array[GameEvent]) -> void:
 	attack.owner_id = player.id
 	attack.skill_id = skill
 	attack.direction = player.skill_dir
+	attack.damage_mult = player.damage_mult()
 	attack.start_tick = tick
 	attack.position = player.position
 	attack.start = player.position
@@ -270,9 +280,9 @@ func _skill_hit(attack: SkillAttack, events: Array[GameEvent]) -> void:
 	var counter: bool = boss.state == BossState.STATE_BROKEN
 	var damage: int
 	if counter:
-		damage = roundi(profile["damage"] * Tuning.COUNTER_DAMAGE_MULT)
+		damage = roundi(profile["damage"] * attack.damage_mult * Tuning.COUNTER_DAMAGE_MULT)
 	else:
-		damage = maxi(1, roundi(profile["damage"] * Tuning.ARMOR_DAMAGE_FACTOR))
+		damage = maxi(1, roundi(profile["damage"] * attack.damage_mult * Tuning.ARMOR_DAMAGE_FACTOR))
 		player.edge = minf(Tuning.EDGE_MAX, player.edge + profile["edge_gain"])
 	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
 		"attacker_id": player.id, "target_id": boss.id, "damage": damage,

@@ -34,6 +34,11 @@ var state_ticks: int = 0
 var dash_cooldown: int = 0
 var edge: float = 0.0
 var attack_hit_done: bool = false  # one hit per swing: set when a swing connects, cleared when the next swing starts
+var weapon_id: StringName = Tuning.WEAPON_BLACK_KATANA  # the equipped weapon; only the Black Katana has an active so far
+var buff_ticks: int = 0  # weapon buff ticks left (0 = not active)
+var buff_cooldown: int = 0  # ticks until the weapon active can be used again
+var swing_speed_mult: float = 1.0  # locked at the start of each swing
+var swing_damage_mult: float = 1.0  # locked at the start of each swing
 var skill_id: StringName = &""  # the skill in progress during skill_* states, empty otherwise
 var skill_cooldowns: Array[int] = [0, 0, 0]  # ticks left per skill 1-3
 var retaliate_ticks: int = 0  # Breaking Edge is usable while this is above zero (set by a successful parry)
@@ -58,6 +63,14 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		_hurt_invuln -= 1
 	if _dash_invuln > 0:
 		_dash_invuln -= 1
+	if buff_cooldown > 0:
+		buff_cooldown -= 1
+	if buff_ticks > 0:
+		buff_ticks -= 1
+		if buff_ticks == 0:
+			_emit_buff_end(tick, events, &"expired")
+	if input.weapon_active_pressed:
+		_try_weapon_active(tick, events)
 	for i: int in skill_cooldowns.size():
 		if skill_cooldowns[i] > 0:
 			skill_cooldowns[i] -= 1
@@ -99,11 +112,11 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 				_set_state(STATE_IDLE)
 		STATE_ATTACK_WINDUP:
 			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
-			if state_ticks >= Tuning.SWING_WINDUP_TICKS[combo_index - 1]:
+			if state_ticks >= _swing_ticks(Tuning.SWING_WINDUP_TICKS):
 				_set_state(STATE_ATTACK_ACTIVE)
 		STATE_ATTACK_ACTIVE:
 			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
-			if state_ticks >= Tuning.SWING_ACTIVE_TICKS[combo_index - 1]:
+			if state_ticks >= _swing_ticks(Tuning.SWING_ACTIVE_TICKS):
 				_set_state(STATE_ATTACK_RECOVERY)
 		STATE_SKILL_WINDUP:
 			match skill_id:
@@ -126,7 +139,7 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		STATE_ATTACK_RECOVERY:
 			if _try_actions(input, move, tick, events, false):
 				return
-			var recovery: int = Tuning.SWING_RECOVERY_TICKS[combo_index - 1]
+			var recovery: int = _swing_ticks(Tuning.SWING_RECOVERY_TICKS)
 			if input.attack_pressed and state_ticks >= recovery - Tuning.COMBO_BUFFER_TICKS:
 				_combo_queued = true
 			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
@@ -161,6 +174,9 @@ func take_damage(amount: int, tick: int, events: Array[GameEvent], source_id: in
 		state = STATE_DEAD
 		state_ticks = 0
 		skill_id = &""
+		if buff_ticks > 0:
+			buff_ticks = 0
+			_emit_buff_end(tick, events, &"death")
 		events.append(GameEvent.new(GameEvent.ENTITY_DIED, tick, {"entity_id": id, "visual_id": VISUAL_ID}))
 	elif state != STATE_DASH:
 		_set_state(STATE_IDLE)  # a hit interrupts attacks and parries
@@ -261,8 +277,56 @@ static func skill_profile(skill: StringName) -> Dictionary:
 			return {"damage": Tuning.MOON_CLEAVE_DAMAGE, "posture": Tuning.MOON_CLEAVE_POSTURE, "edge_gain": Tuning.MOON_CLEAVE_EDGE_GAIN}
 
 
+## The Black Katana active (right click): a timed buff of attack speed and damage. It is a free action (no
+## state change), costs Edge, has its own cooldown and cannot be refreshed while it is running. It lasts through
+## movement, attacks, dashes, parries, skills and damage; it ends when it runs out or the player dies.
+func _try_weapon_active(tick: int, events: Array[GameEvent]) -> bool:
+	if weapon_id != Tuning.WEAPON_BLACK_KATANA or state == STATE_DEAD or buff_ticks > 0 or buff_cooldown > 0:
+		return false
+	if edge < Tuning.BLACK_KATANA_BUFF_EDGE_COST:
+		return false
+	edge -= Tuning.BLACK_KATANA_BUFF_EDGE_COST
+	buff_ticks = Tuning.BLACK_KATANA_BUFF_DURATION_TICKS
+	buff_cooldown = Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS
+	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, tick, {
+		"entity_id": id, "weapon_id": weapon_id, "duration": buff_ticks,
+		"attack_speed_mult": Tuning.BLACK_KATANA_ATTACK_SPEED_MULT, "damage_mult": Tuning.BLACK_KATANA_DAMAGE_MULT,
+	}))
+	return true
+
+
+func _emit_buff_end(tick: int, events: Array[GameEvent], reason: StringName) -> void:
+	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_ENDED, tick, {"entity_id": id, "weapon_id": weapon_id, "reason": reason}))
+
+
+func is_buff_active() -> bool:
+	return buff_ticks > 0
+
+
+## Current attack speed multiplier (1.0 without the buff).
+func attack_speed_mult() -> float:
+	return Tuning.BLACK_KATANA_ATTACK_SPEED_MULT if buff_ticks > 0 else 1.0
+
+
+## Current damage multiplier (1.0 without the buff).
+func damage_mult() -> float:
+	return Tuning.BLACK_KATANA_DAMAGE_MULT if buff_ticks > 0 else 1.0
+
+
+## A phase length in ticks at an attack speed: base / mult, rounded, at least 1.
+static func scaled_ticks(base: int, mult: float) -> int:
+	return maxi(1, roundi(float(base) / maxf(mult, 0.01)))
+
+
+## Length of a phase of the swing in progress (windup, active or recovery), using the speed locked at its start.
+func _swing_ticks(table: Array[int]) -> int:
+	return scaled_ticks(table[combo_index - 1], swing_speed_mult)
+
+
 func _start_swing(index: int) -> void:
 	combo_index = index
+	swing_speed_mult = attack_speed_mult()
+	swing_damage_mult = damage_mult()
 	attack_hit_done = false
 	_combo_queued = false
 	_combo_grace = 0
