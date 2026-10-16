@@ -1,6 +1,35 @@
-# Harness plan (documentation only; implemented in Stages 2 and 3)
+# Harness (Stage 2 implemented; Stage 3 is still a plan)
 
-The harness is everything around the agents that makes their work safe, checkable and repeatable. Stage 1 only created the instruction files, layout, git, palette, art pipeline and validator, and an empty `harness/` skeleton.
+The harness is everything around the agents that makes their work safe, checkable and repeatable. **Stage 2 is implemented** in `harness/` (router, runner, checks, review loop, worktrees, logs) and tested with stub agents. CI and Graphify (Stage 3) are not built.
+
+## How to use it (Stage 2)
+
+```powershell
+python harness/router.py run "make three grass tile variants" --dry-run   # plan only: label, models, ladder, branch. Changes nothing.
+python harness/router.py run "make three grass tile variants"              # really run it (spends agent tokens)
+python harness/router.py run --label tile --tier light "..."               # force the label and/or the starting tier
+python harness/router.py run --task harness/tasks/001-example.md           # task file: title, label, acceptance checklist, scope
+python harness/router.py list                                              # recent runs from harness/logs/runs.jsonl
+python harness/router.py cleanup                                           # remove finished worktrees (asks first; branches are kept)
+python -m unittest discover -s tests                                       # includes the harness tests (stub agents, no tokens)
+```
+
+What a run does: picks the label (explicit wins; else keywords and path hints; a tie or no match stops and asks you), picks the builder, reviewer and starting tier from `harness/config.json`, creates a worktree and branch `agent/<label>/<slug>` outside the repo, runs the builder headless with a prompt built from `harness/prompts/builder.md`, then (in order) checks folder ownership, runs the label's checks, runs the reviewer (read-only, must answer JSON), and loops up to 3 rounds. A failed check, a reviewer `fail` or a timeout escalates to the next model tier; an ownership violation is retried on the same tier. On a pass it commits on the branch (trailers say who built and reviewed) and prints the human gates; it never merges and never deletes a branch. After 3 failed rounds it stops and prints the branch, worktree, last feedback and failed checks.
+
+Facts learned while building it (verified on this machine, 2026-10-16):
+- `claude -p` is called with `--model`, `--permission-mode acceptEdits` for builders and `plan` (read-only) for reviewers, an explicit `--allowedTools` list, and the prompt on stdin. `codex exec` is called with `-m`, `-s workspace-write` (builders) or `-s read-only` (reviewers), `-C <worktree>`, `-o <file>`, prompt on stdin. The runner refuses to run if any forbidden flag (`--dangerously-*`, `danger-full-access`, `bypassPermissions`) is in the command. Both real command lines were smoke-tested with a trivial prompt (a haiku and a gpt-6-luna reviewer both answered correctly).
+- Codex's Windows sandbox sometimes fails to start its shell (`helper_unknown_error`), especially while the Codex desktop app is running. The runner retries that exact failure up to 4 times. Closing the desktop app helps.
+- The repository has no git remote, so the harness does not open pull requests; it leaves the branch. (If a remote and `gh` are set up later, opening a PR is a small addition.)
+- Reviewers are told what they cannot judge (looks, feel); those notes are logged per round (`cannot_judge`).
+- The checks run from this repo against the task worktree: `check_ownership.py`, `validate_art.py`, `build_art.py` (build + validate + contact sheet), `run_tests.py` (Python tests, Godot import, `run_tests.gd`, every `smoke_*.gd` except windowed capture scripts, each with a hard time limit that kills the process tree).
+
+Limits: per-run timeout 15 min (`agent_timeout_seconds`), 3 rounds, optional `max_heavy_runs_per_day` (null = unlimited; when hit the harness stops instead of silently downgrading).
+
+Not built (Stage 3 or later): GitHub CI, Graphify, opening PRs, a classifier replacing keyword routing, screenshots as a check, running several tasks in parallel.
+
+## Original plan notes (kept for reference)
+
+The sections below are the original Stage 1 plan and specification the implementation followed.
 
 ## Components
 
@@ -31,7 +60,7 @@ human: route "3 grass tile variants" --label tile
 ## Stages
 
 - **Stage 1 (done):** instruction files, layout, git, palette, art pipeline and validator, docs.
-- **Stage 2:** `router.py`, worktrees, run loop, logging, cross-review.
+- **Stage 2 (done):** `router.py`, worktrees, run loop, logging, cross-review.
 - **Stage 3:** GitHub CI for PR checks, then Graphify (optional).
 
 ## Knowledge tools

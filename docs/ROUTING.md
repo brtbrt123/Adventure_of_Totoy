@@ -1,4 +1,6 @@
-# Routing plan (documentation only; implemented in Stage 2)
+# Routing (implemented in Stage 2: `harness/router.py` and `harness/config.json`)
+
+The rules, keywords, models, tiers and checks below live in `harness/config.json`; `docs/HARNESS.md` explains how to run it. Implementation notes: the labels `bugfix-core` and `bugfix-presentation` are the two halves of `bugfix` (the bare label is resolved from the file paths in the task text, or refused); two labels tying on score, or no match, stops and asks for `--label` instead of guessing; `design-doc` and `balance` run no agent (the human decides); the starting tier is bumped one step when the task text has risky words (`combat`, `parry`, `boss`, `save`, `interface`, `refactor`, `snapshot`).
 
 Tasks get a label. An explicit label from the human always wins. Otherwise infer it from keywords.
 

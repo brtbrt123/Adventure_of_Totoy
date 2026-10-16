@@ -114,4 +114,4 @@ Notes: `--headless --quit` alone fails with "no main scene defined" until the pr
 - Never delete branches or worktrees without asking.
 - Report honestly: what you ran, what passed, what you could not verify.
 - Future sessions start with no memory. Read `docs/STATUS.md` first; update it when you finish a piece of work.
-- The router, review loop, CI and Graphify are later stages (`docs/ROUTING.md`, `docs/HARNESS.md`). Do not build them unless asked.
+- The router, runner, checks and review loop exist (`harness/`, see `docs/HARNESS.md` and `docs/ROUTING.md`): `python harness/router.py run "<task>" --dry-run` shows the plan. Claude Code owns `harness/` and `tools/`. CI and Graphify are later stages; do not build them unless asked.

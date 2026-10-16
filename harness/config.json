@@ -1,0 +1,98 @@
+{
+  "max_rounds": 3,
+  "agent_timeout_seconds": 900,
+  "check_timeout_seconds": 600,
+  "max_heavy_runs_per_day": null,
+  "max_diff_chars": 60000,
+  "base_branch": "HEAD",
+  "worktrees_dir": "../Adventure_of_Totoy_worktrees",
+  "godot": "C:\\Tools\\Godot\\Godot_v4.7.2-stable_win64_console.exe",
+  "tiers": ["light", "standard", "heavy"],
+  "models": {
+    "claude": {"light": "claude-haiku-5-5", "standard": "claude-sonnet-5-5", "heavy": "claude-opus-5-5"},
+    "codex": {"light": "gpt-6-luna", "standard": "gpt-6.1-sol", "heavy": "gpt-6-astra"}
+  },
+  "review_tier": {"default": "standard", "logic": "heavy", "arch": "heavy", "save": "heavy"},
+  "always_allowed": ["\\.uid$", "\\.import$", "^art/build/", "^harness/logs/"],
+  "risky_keywords": ["combat", "parry", "boss", "save", "interface", "refactor", "snapshot"],
+  "human_labels": ["design-doc", "balance"],
+  "rules": {
+    "logic": {"builder": "claude", "reviewer": "codex", "owned": ["core/", "docs/"], "tier": "standard"},
+    "arch": {"builder": "claude", "reviewer": "codex", "owned": ["core/", "docs/"], "tier": "heavy"},
+    "refactor": {"builder": "claude", "reviewer": "codex", "owned": ["core/", "docs/"], "tier": "standard"},
+    "save": {"builder": "claude", "reviewer": "codex", "owned": ["core/", "docs/"], "tier": "standard"},
+    "state": {"builder": "claude", "reviewer": "codex", "owned": ["core/", "docs/"], "tier": "standard"},
+    "sprite": {"builder": "codex", "reviewer": "claude", "owned": ["art/", "presentation/"], "tier": "light"},
+    "tile": {"builder": "codex", "reviewer": "claude", "owned": ["art/", "presentation/"], "tier": "light"},
+    "tileset": {"builder": "codex", "reviewer": "claude", "owned": ["art/", "presentation/"], "tier": "standard"},
+    "animation": {"builder": "codex", "reviewer": "claude", "owned": ["art/", "presentation/"], "tier": "standard"},
+    "palette": {"builder": "codex", "reviewer": "claude", "owned": ["art/", "presentation/"], "tier": "standard"},
+    "ui": {"builder": "codex", "reviewer": "claude", "owned": ["presentation/"], "tier": "light"},
+    "hud": {"builder": "codex", "reviewer": "claude", "owned": ["presentation/"], "tier": "light"},
+    "menu": {"builder": "codex", "reviewer": "claude", "owned": ["presentation/"], "tier": "light"},
+    "effects": {"builder": "codex", "reviewer": "claude", "owned": ["presentation/"], "tier": "standard"},
+    "shader": {"builder": "codex", "reviewer": "claude", "owned": ["presentation/"], "tier": "standard"},
+    "bugfix-core": {"builder": "claude", "reviewer": "codex", "owned": ["core/"], "tier": "standard"},
+    "bugfix-presentation": {"builder": "codex", "reviewer": "claude", "owned": ["presentation/", "art/"], "tier": "standard"},
+    "tests": {"builder": "codex", "reviewer": "claude", "owned": ["tests/"], "tier": "light"},
+    "design-doc": {"builder": "human", "reviewer": "human", "owned": ["docs/"], "tier": "light"},
+    "balance": {"builder": "human", "reviewer": "human", "owned": ["docs/"], "tier": "light"}
+  },
+  "keywords": {
+    "logic": ["logic", "rules", "damage", "collision", "ai behavior", "boss logic", "attack pattern", "cooldown", "timing"],
+    "arch": ["architecture", "interface", "snapshot", "event"],
+    "refactor": ["refactor", "cleanup", "restructure", "reorganize"],
+    "save": ["save", "load game", "persistence", "savegame"],
+    "state": ["state machine", "game state"],
+    "sprite": ["sprite", "character art", "hero art", "golem art", "frame"],
+    "tile": ["tile", "terrain", "grass", "dirt", "water", "floor"],
+    "tileset": ["tileset", "autotile", "atlas"],
+    "animation": ["animation", "animate", "walk cycle", "idle"],
+    "palette": ["palette", "color scheme"],
+    "ui": ["ui", "interface layout", "menu screen", "button"],
+    "hud": ["hud", "health bar", "profile", "minimap"],
+    "menu": ["menu", "title screen", "pause"],
+    "effects": ["effect", "particle", "flash", "spark", "screen shake", "vfx"],
+    "shader": ["shader"],
+    "bugfix": ["bug", "fix", "crash", "glitch", "broken", "regression"],
+    "tests": ["test", "tests", "coverage", "smoke"],
+    "design-doc": ["design doc", "game design", "story", "lore"],
+    "balance": ["balance", "tuning numbers", "difficulty"]
+  },
+  "agents": {
+    "claude": {
+      "executable": "claude",
+      "builder_args": ["-p", "--model", "{model}", "--permission-mode", "acceptEdits", "--output-format", "text",
+        "--allowedTools", "Read", "Edit", "Write", "Glob", "Grep", "Bash(python *)", "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(C:/Tools/Godot/*)"],
+      "reviewer_args": ["-p", "--model", "{model}", "--permission-mode", "plan", "--output-format", "text"],
+      "uses_output_file": false,
+      "retry_on": [],
+      "retry_attempts": 1
+    },
+    "codex": {
+      "executable": "codex",
+      "builder_args": ["exec", "-m", "{model}", "-s", "workspace-write", "-C", "{cwd}", "-o", "{output_file}"],
+      "reviewer_args": ["exec", "-m", "{model}", "-s", "read-only", "-C", "{cwd}", "-o", "{output_file}"],
+      "uses_output_file": true,
+      "retry_on": ["helper_unknown_error"],
+      "retry_attempts": 4
+    }
+  },
+  "checks": {
+    "default": [["python", "harness/checks/check_ownership.py", "--worktree", "{worktree}", "--base", "{base_sha}", "--owned", "{owned}"]],
+    "art": [
+      ["python", "harness/checks/validate_art.py", "--worktree", "{worktree}"],
+      ["python", "harness/checks/build_art.py", "--worktree", "{worktree}"]
+    ],
+    "godot": [
+      ["python", "harness/checks/run_tests.py", "--worktree", "{worktree}"]
+    ]
+  },
+  "label_checks": {
+    "sprite": ["art", "godot"], "tile": ["art", "godot"], "tileset": ["art", "godot"], "animation": ["art", "godot"],
+    "palette": ["art", "godot"], "ui": ["godot"], "hud": ["godot"], "menu": ["godot"], "effects": ["godot"], "shader": ["godot"],
+    "logic": ["godot"], "arch": ["godot"], "refactor": ["godot"], "save": ["godot"], "state": ["godot"],
+    "bugfix-core": ["godot"], "bugfix-presentation": ["art", "godot"], "tests": ["godot"],
+    "design-doc": [], "balance": []
+  }
+}

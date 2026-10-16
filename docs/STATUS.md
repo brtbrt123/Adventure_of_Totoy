@@ -2,7 +2,13 @@
 
 Last updated: 2026-10-15 · Branch: `stage1/setup` · Stage 1 of the plan in `PROJECT_BRIEF.md`
 
-## Done
+## Stage 2: the harness (branch `agent/harness/stage2`, 2026-10-16)
+
+Built `harness/` as specified in `docs/HARNESS.md` (usage and learned facts are at the top of that file): `router.py` (`run` with `--dry-run`, `--label`, `--tier`, `--task`; `list`; `cleanup`), `config.json` (rules, keywords, models, tiers, agent commands, checks), `lib/` (labels, tiers, ownership, git worktrees, agent runner, review parsing, check runner, run log, task files, the run loop), `checks/` (ownership, art validate and build, Python plus Godot test suites), `prompts/` (builder and reviewer templates). **Verified:** 40 new Python tests (`tests/harness_tests`: routing logic, and the whole loop with stub agents in a throwaway git repo: pass, check failure with escalation, ownership retry on the same tier, reviewer fail, invalid review JSON, timeout, no changes, exhausted rounds, daily cap, cleanup keeping the branch) and a mutation check (breaking escalation and breaking ownership each make tests fail); the real `claude -p` (haiku) and `codex exec` (gpt-6-luna, read-only) command lines each answered a trivial prompt through the runner; the real check scripts ran against a real worktree.
+
+**Not verified:** a complete real run (real builder plus real reviewer on a real task) has NOT been done, because it spends agent tokens and Codex's sandbox is unreliable while its desktop app is open. Run one small task yourself first, for example `python harness/router.py run "<small task>" --label tests --tier light`. No pull requests (the repo has no remote). CI, Graphify and an Obsidian vault setup are still not done.
+
+## Done (Stage 1)
 
 - Git repo, folder layout, `.gitignore`, `.gitattributes` (LF for text files, binary PNGs).
 - `AGENTS.md` (self-contained shared rules, roles, fixed decisions, commands), `CLAUDE.md` (`@AGENTS.md`).
