@@ -39,6 +39,9 @@ var visual_tick: int = -1
 var particles: Array[Dictionary] = []
 var hit_bursts: Array[Dictionary] = []
 var skill_trails: Array[Dictionary] = []
+var released_skill_attacks: Dictionary = {}
+var current_skill_release: Dictionary = {}
+var projectile_textures: Dictionary = {}
 var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
@@ -128,6 +131,8 @@ func _restart() -> void:
 	previous_player_state = &""
 	dash_ghosts.clear()
 	skill_trails.clear()
+	released_skill_attacks.clear()
+	current_skill_release.clear()
 	selected_frames.clear()
 	last_attacks.clear()
 	previous_telegraphs.clear()
@@ -221,7 +226,15 @@ func _on_event(event: GameEvent) -> void:
 			_sound_counter_window_opened(event)
 		&"counter_window_closed": _sound_counter_window_closed(event)
 		&"skill_started":
+			current_skill_release.clear()
 			combat_audio.cue("skill_" + String(event.data["skill_id"]), event.tick)
+		&"skill_released":
+			var attack_id: int = int(event.data["attack_id"])
+			if released_skill_attacks.has(attack_id):
+				return
+			released_skill_attacks[attack_id] = true
+			current_skill_release = event.data.duplicate()
+			combat_audio.cue("release_" + String(event.data["skill_id"]), event.tick)
 		&"dash_started":
 			_sound_dash_started(event)
 		&"attack_hit":
@@ -319,6 +332,7 @@ func _draw() -> void:
 			_draw_actor(actor, true)
 	# Skill trails remain legible over the brief damage silhouette.
 	_draw_skill_effect(offset)
+	_draw_skill_projectiles(offset)
 	_draw_skill_contacts()
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
@@ -357,8 +371,6 @@ func prepare_visuals() -> void:
 		var moved: bool = not hero.position.is_equal_approx(previous_player_position)
 		var changed: bool = previous_player_state != hero.state or previous_combo_index != hero.combo_index or previous_skill_id != hero.skill_id
 		var attack_started: bool = hero.state == &"attack_windup" and changed
-		if hero.state == &"skill_active" and changed:
-			combat_audio.cue("release_" + String(hero.skill_id), snapshot.tick)
 		if hero.state == &"attack_active" and changed:
 			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index == 3 else 0.75)
 		if ((moved and hero.state != &"dead") or attack_started or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
@@ -367,7 +379,7 @@ func prepare_visuals() -> void:
 			dash_ghosts[i]["life"] -= 1
 			if int(dash_ghosts[i]["life"]) <= 0:
 				dash_ghosts.remove_at(i)
-		var gale_travel: bool = hero.skill_id == &"gale_cut" and previous_skill_id == &"gale_cut" and moved and previous_player_state == &"skill_windup"
+		var gale_travel: bool = hero.skill_id == &"gale_cut" and previous_skill_id == &"gale_cut" and moved and (hero.state == &"skill_active" or (previous_player_state == &"skill_active" and hero.state == &"skill_recovery"))
 		if gale_travel:
 			skill_trails.append({"from": previous_player_position, "to": hero.position, "tick": snapshot.tick})
 		if (hero.state == &"dash" and previous_player_state == &"dash") or gale_travel:
@@ -573,7 +585,11 @@ func _sound_game_result(_event: GameEvent) -> void:
 
 ## Effects follow current snapshot phases; cancelled skills leave no queued release.
 func skill_effect() -> Dictionary:
-	return SkillEffects.plan(snapshot.player) if snapshot.result == &"playing" else {}
+	if snapshot.result != &"playing":
+		return {}
+	if snapshot.player.state != &"skill_windup" and current_skill_release.get("skill_id", &"") != snapshot.player.skill_id:
+		return {}
+	return SkillEffects.plan(snapshot.player)
 
 func _draw_skill_effect(shake_offset: Vector2 = Vector2.ZERO) -> void:
 	var effect: Dictionary = skill_effect()
@@ -588,9 +604,6 @@ func _draw_skill_effect(shake_offset: Vector2 = Vector2.ZERO) -> void:
 	draw_set_transform(Vector2(effect["at"]) + shake_offset, float(effect["rotation"]))
 	var rect: Rect2 = Rect2(-anchor, Vector2(frame["w"], frame["h"]))
 	var region: Rect2 = Rect2(frame["x"], frame["y"], frame["w"], frame["h"])
-	if snapshot.player.skill_id == &"moon_cleave" and int(effect["frame"]) == 3:
-		# Offset edge-light increases readability without projecting a fake ranged hit.
-		draw_texture_rect_region(white_sprites, Rect2(rect.position - Vector2(3, 0), rect.size), region, colors["v"])
 	draw_texture_rect_region(sprites, rect, region)
 	draw_set_transform(shake_offset)
 	CombatEffects.draw_plan(self, SkillEffects.accents(snapshot.player, colors))
@@ -613,3 +626,43 @@ func _draw_skill_contacts() -> void:
 			CombatEffects.stroke(commands, cut, colors["0"], 5.0)
 			CombatEffects.stroke(commands, cut, colors["1"] if age < 3 else colors["x"], 2.0)
 		CombatEffects.draw_plan(self, commands)
+
+
+func skill_projectile_effects() -> Array[Dictionary]:
+	return SkillEffects.projectiles(snapshot)
+
+## Resize once into integer-pixel textures; width is supplied by the core snapshot.
+## Keep each frame's declared anchor when trimming its transparent padding.
+func _projectile_texture(key: String, diameter: int) -> Dictionary:
+	var cache_key: String = "%s:%d" % [key, diameter]
+	if projectile_textures.has(cache_key):
+		return projectile_textures[cache_key]
+	if not frames.has(key):
+		push_warning("Missing projectile effect: " + key)
+		return {}
+	var frame: Dictionary = frames[key]
+	var image: Image = sprites.get_image().get_region(Rect2i(frame["x"], frame["y"], frame["w"], frame["h"]))
+	var used: Rect2i = image.get_used_rect()
+	if not used.has_area():
+		return {}
+	image = image.get_region(used)
+	var ratio: float = float(diameter) / maxi(used.size.x, used.size.y)
+	var size: Vector2i = Vector2i(maxi(1, roundi(used.size.x * ratio)), maxi(1, roundi(used.size.y * ratio)))
+	image.resize(size.x, size.y, Image.INTERPOLATE_NEAREST)
+	var anchor: Vector2 = Vector2(roundf((float(frame["ax"]) - used.position.x) * float(size.x) / used.size.x), roundf((float(frame["ay"]) - used.position.y) * float(size.y) / used.size.y))
+	var entry: Dictionary = {"texture": ImageTexture.create_from_image(image), "anchor": anchor, "diameter": diameter}
+	projectile_textures[cache_key] = entry
+	return entry
+
+func _draw_skill_projectiles(shake_offset: Vector2) -> void:
+	for effect: Dictionary in skill_projectile_effects():
+		var entry: Dictionary = _projectile_texture(effect["key"], maxi(1, roundi(float(effect["width"]))))
+		if entry.is_empty():
+			continue
+		draw_set_transform(Vector2(effect["at"]).round() + shake_offset, float(effect["rotation"]))
+		var length: float = float(effect["trail_length"])
+		if length > 3.0:
+			draw_line(Vector2(-length, 0), Vector2(-3, 0), colors["v"], 3.0, false)
+			draw_line(Vector2(-length, 0), Vector2(-3, 0), colors["p"], 1.0, false)
+		draw_texture(entry["texture"], -Vector2(entry["anchor"]))
+		draw_set_transform(shake_offset)

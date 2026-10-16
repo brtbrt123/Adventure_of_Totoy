@@ -95,6 +95,9 @@ func _skill(slot: int, id: StringName) -> void:
 			await _save(String(id) + "_charged")
 		if hero.state == &"skill_active" and hero.state_ticks == 1:
 			await _save(String(id) + "_impact")
+		for projectile: Dictionary in arena.skill_projectile_effects():
+			_expect(arena.frames.has(projectile["key"]), "missing live projectile frame")
+			_expect(projectile["width"] == arena.snapshot.skill_attacks[0].width, "projectile width not from snapshot")
 		for event: GameEvent in arena.core.last_events:
 			if event.type == GameEvent.ATTACK_HIT and event.data.get("skill_id", &"") == id:
 				hits += 1
@@ -104,7 +107,7 @@ func _skill(slot: int, id: StringName) -> void:
 			await physics_frame
 		arena.core.step(InputFrame.new())
 		_observe()
-	_expect(effect_frames.size() == 6, "not all six skill VFX frames played " + String(id))
+	_expect(effect_frames.size() == (2 if slot == 3 else 6), "not all six skill VFX frames played " + String(id))
 	_expect(int(arena.combat_audio.played.get("release_" + String(id), 0)) == 1, "release cue must play once " + String(id))
 	_expect(phases.size() == 3, "missing skill phase " + String(id))
 	_expect(hits == 1, "confirmed skill hit count " + String(id))
@@ -120,8 +123,8 @@ func _skill(slot: int, id: StringName) -> void:
 		var start: String = ArenaAnimation.skill_frame(id, state, 0)
 		var end: String = ArenaAnimation.skill_frame(id, state, durations[phase] - 1)
 		var swing: int = 1 if slot == 2 else 3
-		_expect(start == ("hero2_dash_right_1" if slot == 2 and phase == 0 else "hero2_attack%d_right_%d" % [swing, phase * 2 + 1]), "phase start " + String(id))
-		_expect(end == ("hero2_dash_right_4" if slot == 2 and phase == 0 else "hero2_attack%d_right_%d" % [swing, phase * 2 + 2]), "phase end " + String(id))
+		_expect(start == ("hero2_dash_right_1" if slot == 2 and phase == 1 else "hero2_attack%d_right_%d" % [swing, phase * 2 + 1]), "phase start " + String(id))
+		_expect(end == ("hero2_dash_right_4" if slot == 2 and phase == 1 else "hero2_attack%d_right_%d" % [swing, phase * 2 + 2]), "phase end " + String(id))
 
 func _catalog_effects() -> void:
 	for key: String in SkillEffects.all_names():
@@ -153,19 +156,27 @@ func _cancel_and_miss() -> void:
 		arena.core.boss.cooldown = 100000
 		arena.core.player.position = Vector2(150, 90)
 		arena.core.boss.position = Vector2(280, 150)
+		arena.core.player.edge = Tuning.EDGE_MAX
 		start = InputFrame.new()
 		start.skill_pressed = 2
 		start.aim = direction
+		if direction == Vector2.LEFT:
+			start.move = direction
+			start.aim = Vector2.RIGHT
 		arena.core.step(start)
 		_observe()
-		_expect(is_equal_approx(float(arena.skill_effect()["rotation"]), direction.angle()), "skill VFX ignores aim")
+		_expect(is_equal_approx(float(arena.skill_effect()["rotation"]), direction.angle()), "skill VFX ignores core-selected direction")
 		var hit: bool = false
+		var trail_seen: bool = false
 		for tick: int in range(Tuning.GALE_CUT_WINDUP_TICKS + Tuning.GALE_CUT_ACTIVE_TICKS + Tuning.GALE_CUT_RECOVERY_TICKS + 1):
 			arena.core.step(InputFrame.new())
 			_observe()
 			if arena.snapshot.player.state == &"skill_active" and arena.snapshot.player.state_ticks == 0:
 				await _save("gale_cut_miss_" + ("left" if direction == Vector2.LEFT else "up"))
+			if arena.snapshot.player.state == &"skill_active" and arena.snapshot.player.state_ticks == Tuning.GALE_CUT_ACTIVE_TICKS / 2:
+				await _save("gale_cut_mid_dash_" + ("left" if direction == Vector2.LEFT else "up"))
 			if not arena.skill_trails.is_empty():
+				trail_seen = true
 				for trace: Dictionary in arena.skill_trails:
 					_expect(Vector2(trace["to"]).distance_to(trace["from"]) <= Tuning.GALE_CUT_SPEED + 0.01, "blade trace invents untravelled distance")
 			# Re-reading the same snapshot must not replay its release sound.
@@ -175,11 +186,79 @@ func _cancel_and_miss() -> void:
 					hit = true
 		_expect(not hit and arena.hit_bursts.is_empty(), "miss creates hit feedback")
 		_expect(int(arena.combat_audio.played.get("release_gale_cut", 0)) == 1, "miss must release audio exactly once")
-		_expect(not arena.skill_trails.is_empty(), "Gale Cut leaves no blade trail")
+		_expect(trail_seen, "Gale Cut leaves no blade trail")
 		arena.snapshot.result = &"victory"
 		arena.snapshot.result_ticks = SkillEffects.TRAIL_TICKS + 1
 		arena._age_effects()
 		_expect(arena.skill_trails.is_empty() and arena.skill_effect().is_empty(), "effects freeze after result")
+
+func _moon_until_release() -> GameEvent:
+	arena._restart()
+	arena.core.boss.cooldown = 100000
+	arena.core.boss.position = Vector2(280, 150)
+	arena.core.player.position = Vector2(65, 80)
+	arena.core.player.edge = Tuning.EDGE_MAX
+	var frame: InputFrame = InputFrame.new()
+	frame.skill_pressed = 3
+	frame.aim = Vector2.RIGHT
+	arena.core.step(frame)
+	_observe()
+	for tick: int in range(Tuning.MOON_CLEAVE_WINDUP_TICKS + 1):
+		arena.core.step(InputFrame.new())
+		for event: GameEvent in arena.core.last_events:
+			if event.type == &"skill_released":
+				# A state transition alone must not synthesize release feedback.
+				arena.snapshot = arena.core.snapshot()
+				arena.prepare_visuals()
+				_expect(not arena.combat_audio.played.has("release_moon_cleave"), "state transition plays release without event")
+				_observe()
+				return event
+		_observe()
+	_expect(false, "Moon never released")
+	return null
+
+func _projectile_lifecycle() -> void:
+	var release: GameEvent = _moon_until_release()
+	if release == null:
+		return
+	var effect: Dictionary = arena.skill_projectile_effects()[0]
+	_expect(effect["attack_id"] == release.data["attack_id"], "release attack id mismatch")
+	_expect(arena.skill_effect().is_empty(), "released Moon still attaches a melee crescent to hero")
+	var cache: Dictionary = arena._projectile_texture(effect["key"], roundi(effect["width"]))
+	_expect(not cache.is_empty() and int(cache["diameter"]) == roundi(effect["width"]), "projectile texture does not fit snapshot width")
+	arena._on_event(release)
+	_expect(int(arena.combat_audio.played.get("release_moon_cleave", 0)) == 1, "duplicate release event plays twice")
+	var previous: Vector2 = effect["at"]
+	arena.core.player.take_damage(1, arena.core.tick, arena.core.last_events, arena.core.boss.id)
+	_observe()
+	_expect(arena.snapshot.player.state == &"idle" and arena.skill_projectile_effects().size() == 1, "projectile disappears after player hit")
+	for tick: int in range(6):
+		var move: InputFrame = InputFrame.new()
+		move.move = Vector2.DOWN
+		arena.core.step(move)
+		_observe()
+		effect = arena.skill_projectile_effects()[0]
+		_expect(effect["at"] == arena.snapshot.skill_attacks[0].position, "projectile is not at core position")
+		_expect(Vector2(effect["at"]).x > previous.x and is_equal_approx(Vector2(effect["at"]).y, previous.y), "projectile follows player instead of its own direction")
+		previous = effect["at"]
+	await _save("moon_projectile_after_hit")
+	for tick: int in range(14):
+		arena.core.step(InputFrame.new())
+		_observe()
+	await _save("moon_projectile_ranged")
+	for tick: int in range(60):
+		arena.core.step(InputFrame.new())
+		_observe()
+	_expect(arena.skill_projectile_effects().is_empty(), "expired projectile still draws")
+	# A released projectile is still represented even with a dead player/result.
+	release = _moon_until_release()
+	arena.core.player.take_damage(Tuning.PLAYER_MAX_HP, arena.core.tick, arena.core.last_events, arena.core.boss.id)
+	arena.core.step(InputFrame.new())
+	_observe()
+	_expect(arena.snapshot.player.state == &"dead" and arena.skill_projectile_effects().size() == 1, "death hides a still-live projectile snapshot")
+	await _save("moon_projectile_after_death")
+	arena._restart()
+	_expect(arena.skill_projectile_effects().is_empty() and arena.released_skill_attacks.is_empty(), "restart retains an old projectile/release")
 func _run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	arena = (load("res://presentation/arena/arena.tscn") as PackedScene).instantiate() as Arena
@@ -192,6 +271,7 @@ func _run() -> void:
 	await _skill(3, &"moon_cleave")
 	_expect(ArenaAnimation.skill_frame(&"moon_cleave", &"skill_windup", Tuning.MOON_CLEAVE_WINDUP_TICKS / 2) == "hero2_attack3_right_2", "moon charge hold")
 	await _cancel_and_miss()
+	await _projectile_lifecycle()
 	arena._restart()
 	arena.core.player.edge = 0
 	var denied: InputFrame = InputFrame.new()

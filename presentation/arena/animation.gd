@@ -131,7 +131,7 @@ static func skill_frame(skill: StringName, state: StringName, ticks: int) -> Str
 	var phase: int = 0 if state == &"skill_windup" else (1 if state == &"skill_active" else 2)
 	var duration: int = maxi(1, skill_durations(skill)[phase])
 	var elapsed: int = clampi(ticks, 0, duration - 1)
-	if skill == &"gale_cut" and phase == 0:
+	if skill == &"gale_cut" and phase == 1:
 		return "hero2_dash_right_%d" % (mini(3, elapsed * 4 / duration) + 1)
 	var part: int = mini(1, elapsed * 2 / duration)
 	if skill == &"moon_cleave" and phase == 0:

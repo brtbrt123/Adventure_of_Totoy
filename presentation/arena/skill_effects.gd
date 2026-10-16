@@ -17,6 +17,9 @@ static func all_names() -> Array[String]:
 static func plan(hero: Snapshots.EntitySnapshot) -> Dictionary:
 	if not hero.state.begins_with("skill_") or not hero.skill_id in SKILLS:
 		return {}
+	# Moon release is a world attack, never an attached melee crescent.
+	if hero.skill_id == &"moon_cleave" and hero.state != &"skill_windup":
+		return {}
 	var durations: Array[int] = ArenaAnimation.skill_durations(hero.skill_id)
 	var index: int = 3
 	var ticks: int = maxi(0, hero.state_ticks)
@@ -36,7 +39,7 @@ static func plan(hero: Snapshots.EntitySnapshot) -> Dictionary:
 	var direction: Vector2 = hero.facing.normalized()
 	if direction == Vector2.ZERO:
 		direction = Vector2.RIGHT
-	var reach: float = -10.0 if hero.skill_id == &"gale_cut" and hero.state == &"skill_windup" else 16.0
+	var reach: float = -10.0 if hero.skill_id == &"gale_cut" and hero.state == &"skill_active" else 16.0
 	return {"key": "fx_aspect_%s_%d" % [hero.skill_id, index], "at": (hero.position - Vector2(0, 12) + direction * reach).round(), "rotation": direction.angle(), "frame": index}
 
 
@@ -86,3 +89,15 @@ static func trail(from: Vector2, to: Vector2, age: int, colors: Dictionary) -> A
 		var normal: Vector2 = (to - from).normalized().orthogonal()
 		_stroke(commands, PackedVector2Array([to - normal * 4.0, to + normal * 4.0]), colors["o"], 1.0)
 	return commands
+
+
+## Core attack objects own projectile position/lifetime, independently of player state.
+static func projectiles(snap: Snapshots.GameSnapshot) -> Array[Dictionary]:
+	var plans: Array[Dictionary] = []
+	for attack: Snapshots.SkillAttackSnapshot in snap.skill_attacks:
+		if attack.shape != &"projectile" or attack.skill_id != &"moon_cleave":
+			continue
+		var age: int = maxi(0, snap.tick - attack.start_tick)
+		var frame: int = 4 if attack.ticks_left <= 3 else 3 + posmod(age / 4, 2)
+		plans.append({"attack_id": attack.id, "key": "fx_aspect_moon_cleave_%d" % frame, "frame": frame, "at": attack.position, "rotation": attack.direction.angle(), "width": attack.width, "ticks_left": attack.ticks_left, "trail_length": minf(16.0, attack.start.distance_to(attack.position))})
+	return plans
