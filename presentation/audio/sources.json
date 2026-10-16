@@ -107,6 +107,54 @@
       "sha256": "aabd55ad99a1d171b50d741923077488a1021460fab35adf4fb7f36def49adc0",
       "creator": "StarNinjas",
       "license": "CC0-1.0"
+    },
+    {
+      "file": "bing1.wav",
+      "sha256": "d14941ce27e6b409e0cd941eaad7201d613070a4c3eb9c3627fec4cf3ae686e4",
+      "creator": "Brian MacIntosh (BMacZero)",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMining_000.ogg",
+      "sha256": "36b4ea107222d073c67ca64dde26944975609202d5090b2f2021213c1a7e35cd",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMining_002.ogg",
+      "sha256": "059558ec751115ca6b1441e00f0adc837c1a3eeb0a066b109e0fd879fc5d0b0c",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMining_004.ogg",
+      "sha256": "8ca3a99d85d845751ad8ce7b40509da58263a62e48cde70e5a30b5ccef4c9a3b",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactPlate_heavy_003.ogg",
+      "sha256": "59775f8979a396c8a793b0a1db206d5bdc651eae808d858e9acaee8ebda5bc6d",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactWood_heavy_002.ogg",
+      "sha256": "ce1e06f2a05f2634c645cb72f6a1623e64bc2d92be34917430a61031fb6597d4",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactWood_heavy_003.ogg",
+      "sha256": "af07511902b309b3f6d8f0e1fafbe93869127fb88099ebdc0aa6a00a98dc3cb0",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sword_clash.6.ogg",
+      "sha256": "4c7643dbcd813eb614a56451652987d37ba587fac3309303aa0ab9a27d3a7e71",
+      "creator": "StarNinjas",
+      "license": "CC0-1.0"
     }
   ],
   "processing": "Decode at 44100 Hz; mono downmix; remove DC; trim leading silence preserving 3ms, tail preserving 18ms; source peak normalization; linear resampling for listed pitch; weighted recording layers; limit peak; 1.5ms attack/12ms tail fades. No synthetic oscillators.",
@@ -175,26 +223,36 @@
       "layers": [
         {
           "source": "sword_clash.2",
-          "gain": 1,
-          "pitch": 0.92
+          "gain": 0.8,
+          "pitch": 0.94
+        },
+        {
+          "source": "bing1",
+          "gain": 0.45,
+          "pitch": 0.9
         }
       ],
-      "peak": 0.58
+      "peak": 0.68
     },
     "perfect_parry": {
       "layers": [
         {
-          "source": "sword_clash.9",
+          "source": "bing1",
           "gain": 1,
           "pitch": 1
         },
         {
+          "source": "sword_clash.9",
+          "gain": 0.55,
+          "pitch": 1
+        },
+        {
           "source": "impactMetal_heavy_001",
-          "gain": 0.28,
+          "gain": 0.2,
           "pitch": 1
         }
       ],
-      "peak": 0.82
+      "peak": 0.88
     },
     "posture_break": {
       "layers": [
@@ -270,6 +328,106 @@
         }
       ],
       "peak": 0.36
+    },
+    "golem_slam": {
+      "layers": [
+        {
+          "source": "impactMining_000",
+          "gain": 0.7,
+          "pitch": 0.8
+        },
+        {
+          "source": "impactWood_heavy_002",
+          "gain": 1,
+          "pitch": 0.7
+        },
+        {
+          "source": "impactPunch_heavy_002",
+          "gain": 0.5,
+          "pitch": 0.6
+        },
+        {
+          "source": "impactPlate_heavy_003",
+          "gain": 0.1,
+          "pitch": 0.6
+        }
+      ],
+      "peak": 0.9
+    },
+    "golem_stomp": {
+      "layers": [
+        {
+          "source": "impactMining_004",
+          "gain": 0.7,
+          "pitch": 0.7
+        },
+        {
+          "source": "impactWood_heavy_003",
+          "gain": 0.9,
+          "pitch": 0.55
+        },
+        {
+          "source": "impactPunch_heavy_000",
+          "gain": 0.6,
+          "pitch": 0.5
+        }
+      ],
+      "peak": 0.88
+    },
+    "golem_sweep": {
+      "layers": [
+        {
+          "source": "swish-9",
+          "gain": 1,
+          "pitch": 0.65
+        },
+        {
+          "source": "impactMining_002",
+          "gain": 0.35,
+          "pitch": 0.9
+        }
+      ],
+      "peak": 0.74
+    },
+    "golem_charge": {
+      "layers": [
+        {
+          "source": "swish-7",
+          "gain": 1,
+          "pitch": 0.55
+        },
+        {
+          "source": "impactWood_heavy_002",
+          "gain": 0.4,
+          "pitch": 0.8
+        }
+      ],
+      "peak": 0.8
+    },
+    "golem_beam": {
+      "layers": [
+        {
+          "source": "sword_clash.6",
+          "gain": 1,
+          "pitch": 0.75
+        },
+        {
+          "source": "swish-3",
+          "gain": 0.45,
+          "pitch": 0.65
+        }
+      ],
+      "peak": 0.72
     }
+  },
+  "music": {
+    "file": "music/heavy_boss_battle_1_bpm200.ogg",
+    "title": "Heavy Boss Battle 1",
+    "creator": "MintoDog",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/heavy-boss-battle-1",
+    "download": "https://opengameart.org/sites/default/files/heavy_boss_battle_1_bpm200_0.ogg",
+    "sha256": "4db07e3d7c7ed1bc662cea9481b87d53ad29c105dd921d1006373242bf459b8d",
+    "changes": "None; original OGG. Looped in Godot, mixed at -18 dB with temporary ducking on impacts."
   }
 }

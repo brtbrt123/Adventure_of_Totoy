@@ -76,6 +76,8 @@ func _attack(attack: StringName) -> void:
 			break
 	_expect(captured, "attack never struck " + String(attack))
 	_expect(impacts.size() == (2 if attack == &"gold_combo" else (3 if attack == &"red_shards" else 1)), "impact count " + String(attack))
+	var cue_key: String = {&"gold_slam": "golem_slam", &"gold_combo": "golem_slam", &"red_stomp": "golem_stomp", &"red_sweep": "golem_sweep", &"red_charge": "golem_charge", &"red_shards": "golem_beam"}[attack]
+	_expect(int(arena.combat_audio.played.get(cue_key, 0)) == (2 if attack == &"gold_combo" else 1), "strike audio count " + String(attack))
 	if attack == &"gold_combo":
 		_expect(hit_ticks.size() == 2, "combo needs distinct hit ticks")
 	if attack == &"red_charge":

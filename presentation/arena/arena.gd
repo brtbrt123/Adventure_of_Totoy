@@ -54,6 +54,7 @@ var tiles: Texture2D
 func _ready() -> void:
 	combat_audio = CombatAudio.new()
 	add_child(combat_audio)
+	combat_audio.set_music_active(true)
 	Bindings.register()
 	var palette: Dictionary = _read_json("res://art/palette.json")
 	for entry: Dictionary in palette.get("colors", []):
@@ -104,6 +105,7 @@ func _physics_process(_delta: float) -> void:
 
 func _restart() -> void:
 	combat_audio.reset()
+	combat_audio.set_music_active(true)
 	previous_combo_index = 0
 	core = GameCore.new(17)
 	snapshot = core.snapshot()
@@ -347,6 +349,11 @@ func prepare_visuals() -> void:
 		for i: int in range(parry_impacts.size() - 1, -1, -1):
 			if snapshot.tick - int(parry_impacts[i]["tick"]) >= 12:
 				parry_impacts.remove_at(i)
+		# Only live tells sound: interrupted attacks must not produce a later impact.
+		for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
+			if visual_tick < tell.hit_tick and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
+				var cue_key: String = {&"gold_slam": "golem_slam", &"gold_combo": "golem_slam", &"red_stomp": "golem_stomp", &"red_sweep": "golem_sweep", &"red_charge": "golem_charge", &"red_shards": "golem_beam"}.get(tell.attack, "")
+				combat_audio.cue(cue_key, snapshot.tick)
 		# Include the preceding snapshot for a parry that clears the tell exactly
 		# at impact. An earlier cancellation disappears before this crossing.
 		var impact_candidates: Array[Snapshots.TelegraphSnapshot] = []
@@ -528,4 +535,4 @@ func _sound_boss_phase_changed(_event: GameEvent) -> void:
 	pass
 
 func _sound_game_result(_event: GameEvent) -> void:
-	pass
+	combat_audio.set_music_active(false)

@@ -28,3 +28,11 @@ Windowed --capture saves arena_combo_hit_1/2/3, early_deflect, perfect_parry and
 The human rejected the procedural cues. All active sound files now derive from downloaded CC0 recordings; no oscillator synthesis remains in this set. Original selected recordings and creator credits are retained. See presentation/audio/README.md and sources.json for the per-cue layers and processing. preview.wav gives a short listening comparison; perceived quality and fit remain the human's decision. No core changes.
 
 Recorded-set validation: Godot import, windowed combo/parry playback fixture and `python harness/checks/run_tests.py --worktree .` all pass. All 14 processed WAVs have bounded peaks and faded endpoints; the 18 retained source recordings match their saved SHA-256 hashes. Human listening approval and the previously blocked Claude cross-review remain pending.
+
+## Golem audio and music follow-up
+
+Added distinct slam, stomp, sweep, charge and beam cues across all six boss patterns, driven by live snapshot hit_tick rather than player damage events. Parry now layers a recorded ringing metal strike. Added MintoDog's CC0 Heavy Boss Battle 1 as a 108-second looping background track with fade-in/result fade-out and brief ducking beneath clashes/heavy impacts. Retry clears playback and starts music again. No core edits.
+
+smoke_boss_audio verifies a missed slam still sounds once, an interrupted slam stays silent, repeated snapshots do not duplicate sounds, and music starts/ducks/stops/resets. smoke_boss_attacks now checks the sound count for every boss pattern, including two combo impacts and one cue for three shard lines. battle_mix_preview.wav is an offline listening preview, not captured gameplay. Human listening approval and prior Claude cross-review remain pending.
+
+Validation: `python harness/checks/run_tests.py --worktree .` passed Python tests, Godot import, core tests and all smoke suites (including boss audio). Windowed game playback starts/exits cleanly after explicitly releasing the music stream at shutdown. All processed PCM peaks are bounded; all 26 retained source hashes and the music hash match. Musical fit, perceived impact and seamlessness across a full 108-second loop still need human listening/playtesting.
