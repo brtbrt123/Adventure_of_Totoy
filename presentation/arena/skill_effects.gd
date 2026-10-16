@@ -2,8 +2,10 @@ extends RefCounted
 ## Cosmetic skill animation only. No hit tests, cooldowns or movement live here.
 const Snapshots := preload("res://core/snapshots.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const SKILLS: Array[StringName] = [&"breaking_edge", &"gale_cut", &"moon_cleave"]
-const DISSIPATE_TICKS: int = 12
+const DISSIPATE_TICKS: int = 18
+const TRAIL_TICKS: int = 18
 
 static func all_names() -> Array[String]:
 	var names: Array[String] = []
@@ -28,9 +30,59 @@ static func plan(hero: Snapshots.EntitySnapshot) -> Dictionary:
 		var fade_ticks: int = mini(DISSIPATE_TICKS, durations[2])
 		if ticks >= fade_ticks:
 			return {}
-		index = 4 + mini(2, ticks * 3 / maxi(1, fade_ticks))
+		# Let the strike read before it dissolves; this never extends damage.
+		var peak_hold: int = mini(4, fade_ticks / 3)
+		index = 3 if ticks < peak_hold else 4 + mini(2, (ticks - peak_hold) * 3 / maxi(1, fade_ticks - peak_hold))
 	var direction: Vector2 = hero.facing.normalized()
 	if direction == Vector2.ZERO:
 		direction = Vector2.RIGHT
 	var reach: float = -10.0 if hero.skill_id == &"gale_cut" and hero.state == &"skill_windup" else 16.0
 	return {"key": "fx_aspect_%s_%d" % [hero.skill_id, index], "at": (hero.position - Vector2(0, 12) + direction * reach).round(), "rotation": direction.angle(), "frame": index}
+
+
+static func _stroke(plan_data: Array[Dictionary], points: PackedVector2Array, color: Color, width: float) -> void:
+	CombatEffects.stroke(plan_data, points, color, width)
+
+static func accents(hero: Snapshots.EntitySnapshot, colors: Dictionary) -> Array[Dictionary]:
+	var commands: Array[Dictionary] = []
+	var effect: Dictionary = plan(hero)
+	if effect.is_empty():
+		return commands
+	var at: Vector2 = effect["at"]
+	var direction: Vector2 = Vector2.from_angle(float(effect["rotation"]))
+	if hero.skill_id == &"breaking_edge":
+		var radius: float = 19.0 if int(effect["frame"]) == 3 else 5.0
+		if hero.state == &"skill_windup" or int(effect["frame"]) == 3:
+			for angle: float in [-0.75, 0.75]:
+				var axis: Vector2 = direction.rotated(angle) * radius
+				var cut: PackedVector2Array = PackedVector2Array([at - axis, at + axis])
+				_stroke(commands, cut, colors["0"], 5.0)
+				_stroke(commands, cut, colors["x"], 3.0)
+				_stroke(commands, cut, colors["1"], 1.0)
+	elif hero.skill_id == &"moon_cleave" and hero.state == &"skill_windup":
+		var duration: int = maxi(1, ArenaAnimation.skill_durations(hero.skill_id)[0])
+		var progress: float = clampf(float(hero.state_ticks) / duration, 0.0, 1.0)
+		var radius: float = 8.0 + floorf(progress * 8.0)
+		var ring: PackedVector2Array = PackedVector2Array()
+		for point: int in range(25):
+			ring.append(at + Vector2.from_angle(TAU * point / 24.0) * radius)
+		_stroke(commands, ring, colors["0"], 4.0)
+		_stroke(commands, ring, colors["v"], 2.0)
+		for ray: int in range(4):
+			var axis: Vector2 = Vector2.from_angle(TAU * ray / 4.0 + float(hero.state_ticks) * 0.08)
+			_stroke(commands, PackedVector2Array([at + axis * (radius + 6.0), at + axis * (radius + 1.0)]), colors["p"], 1.0)
+	return commands
+
+## Only the path actually travelled is recorded. This is cosmetic, never a hit lane.
+static func trail(from: Vector2, to: Vector2, age: int, colors: Dictionary) -> Array[Dictionary]:
+	var commands: Array[Dictionary] = []
+	if age < 0 or age >= TRAIL_TICKS or from.is_equal_approx(to):
+		return commands
+	var axis: PackedVector2Array = PackedVector2Array([from - Vector2(0, 2), to - Vector2(0, 2)])
+	_stroke(commands, axis, colors["0"], 5.0)
+	_stroke(commands, axis, colors["n"] if age < 10 else colors["l"], 3.0)
+	_stroke(commands, axis, colors["p"] if age < 6 else colors["o"], 1.0)
+	if age < 10:
+		var normal: Vector2 = (to - from).normalized().orthogonal()
+		_stroke(commands, PackedVector2Array([to - normal * 4.0, to + normal * 4.0]), colors["o"], 1.0)
+	return commands

@@ -18,3 +18,6 @@ Follow-up: the human found the beam sound inconsistent. golem_beam.wav now layer
 
 
 Aspect VFX integration: skill_started now plays preparation cues (Breaking Edge: swing, Gale Cut: dash, Moon Cleave: restrained warning foley). On the first observed skill_active tick, distinct release keys play swing_2, swing and golem_sweep respectively. Moon release briefly ducks music. Confirmed attack_hit events retain impact sounds and heavier Moon sparks; a whiff has a release but no fabricated impact. Interrupted windups never schedule a release. These routes reuse the credited processed recordings, with no additional downloads or licence changes.
+
+
+Readability follow-up: Moon preparation now uses the recorded posture_break layer at 0.7 pitch and 5 dB lower gain, creating a longer, lower charge distinct from its full-strength break use. Moon release is pitched to0.8 and Breaking Edge release to1.15; every other cue restores pitch1.0 on voice reuse. Breaking Edge confirmed hits use the heavier impact recording. No new sources or licences.

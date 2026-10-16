@@ -67,6 +67,8 @@ func _skill(slot: int, id: StringName) -> void:
 	frame.aim = Vector2.RIGHT
 	arena.core.step(frame)
 	_observe()
+	if slot == 2:
+		_expect(arena.skill_trails.is_empty(), "skill start invents a travelled lane")
 	var durations: Array[int] = ArenaAnimation.skill_durations(id)
 	var seen: Dictionary = {}
 	var effect_frames: Dictionary = {}
@@ -89,6 +91,8 @@ func _skill(slot: int, id: StringName) -> void:
 			if not phases.has(hero.state):
 				phases[hero.state] = true
 				await _save(String(id) + "_" + String(hero.state).trim_prefix("skill_"))
+		if hero.state == &"skill_windup" and hero.state_ticks == durations[0] - 1:
+			await _save(String(id) + "_charged")
 		if hero.state == &"skill_active" and hero.state_ticks == 1:
 			await _save(String(id) + "_impact")
 		for event: GameEvent in arena.core.last_events:
@@ -143,6 +147,7 @@ func _cancel_and_miss() -> void:
 		arena.core.step(InputFrame.new())
 		_observe()
 	_expect(not arena.combat_audio.played.has("release_moon_cleave"), "cancelled moon releases audio")
+	_expect(SkillEffects.accents(arena.snapshot.player, arena.colors).is_empty(), "cancelled skill retains charge accents")
 	for direction: Vector2 in [Vector2.LEFT, Vector2.UP]:
 		arena._restart()
 		arena.core.boss.cooldown = 100000
@@ -160,6 +165,9 @@ func _cancel_and_miss() -> void:
 			_observe()
 			if arena.snapshot.player.state == &"skill_active" and arena.snapshot.player.state_ticks == 0:
 				await _save("gale_cut_miss_" + ("left" if direction == Vector2.LEFT else "up"))
+			if not arena.skill_trails.is_empty():
+				for trace: Dictionary in arena.skill_trails:
+					_expect(Vector2(trace["to"]).distance_to(trace["from"]) <= Tuning.GALE_CUT_SPEED + 0.01, "blade trace invents untravelled distance")
 			# Re-reading the same snapshot must not replay its release sound.
 			arena.prepare_visuals()
 			for event: GameEvent in arena.core.last_events:
@@ -167,6 +175,11 @@ func _cancel_and_miss() -> void:
 					hit = true
 		_expect(not hit and arena.hit_bursts.is_empty(), "miss creates hit feedback")
 		_expect(int(arena.combat_audio.played.get("release_gale_cut", 0)) == 1, "miss must release audio exactly once")
+		_expect(not arena.skill_trails.is_empty(), "Gale Cut leaves no blade trail")
+		arena.snapshot.result = &"victory"
+		arena.snapshot.result_ticks = SkillEffects.TRAIL_TICKS + 1
+		arena._age_effects()
+		_expect(arena.skill_trails.is_empty() and arena.skill_effect().is_empty(), "effects freeze after result")
 func _run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	arena = (load("res://presentation/arena/arena.tscn") as PackedScene).instantiate() as Arena

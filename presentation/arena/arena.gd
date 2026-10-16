@@ -38,6 +38,7 @@ var screen_flash_until: int = -1
 var visual_tick: int = -1
 var particles: Array[Dictionary] = []
 var hit_bursts: Array[Dictionary] = []
+var skill_trails: Array[Dictionary] = []
 var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
@@ -126,6 +127,7 @@ func _restart() -> void:
 	facing_left = false
 	previous_player_state = &""
 	dash_ghosts.clear()
+	skill_trails.clear()
 	selected_frames.clear()
 	last_attacks.clear()
 	previous_telegraphs.clear()
@@ -166,11 +168,15 @@ func _update_hud() -> void:
 	hud.queue_redraw()
 
 func _age_effects() -> void:
+	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
+	for index: int in range(skill_trails.size() - 1, -1, -1):
+		if cosmetic_tick - int(skill_trails[index]["tick"]) >= SkillEffects.TRAIL_TICKS:
+			skill_trails.remove_at(index)
 	if not snapshot.player.invulnerable:
 		hurt_blink = false
 	shake_left = maxi(0, shake_left - 1)
 	for i: int in range(hit_bursts.size() - 1, -1, -1):
-		if snapshot.tick - int(hit_bursts[i]["tick"]) >= 12:
+		if cosmetic_tick - int(hit_bursts[i]["tick"]) >= 12:
 			hit_bursts.remove_at(i)
 	for id: int in flashes.keys():
 		flashes[id] = int(flashes[id]) - 1
@@ -223,7 +229,7 @@ func _on_event(event: GameEvent) -> void:
 			if int(event.data["attacker_id"]) == snapshot.player.id:
 				var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["target_id"]), int(event.data["attacker_id"]))
 				var finisher: bool = int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") == &"moon_cleave"
-				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher, "skill_id": event.data.get("skill_id", &"")})
+				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher, "skill_id": event.data.get("skill_id", &""), "facing": snapshot.player.facing})
 				shake_left = maxi(shake_left, 3 if finisher else 1)
 				_burst(contact, 16 if counter or finisher else 8, colors["1"], 1.8 if counter else 0.9)
 				if counter:
@@ -256,6 +262,8 @@ func _draw() -> void:
 	draw_set_transform(offset)
 	draw_rect(Rect2(-2, -2, 324, 184), colors["2"])
 	draw_texture(ground_texture, Vector2.ZERO, Color(0.72, 0.72, 0.72))
+	for trace: Dictionary in skill_trails:
+		CombatEffects.draw_plan(self, SkillEffects.trail(trace["from"], trace["to"], snapshot.tick + snapshot.result_ticks - int(trace["tick"]), colors))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, t, snapshot.tick, colors["x"] if t.kind == &"gold" else colors["z"], colors["y"] if t.kind == &"gold" else colors["A"], colors["0"])
 	for ring: Dictionary in rings:
@@ -296,7 +304,7 @@ func _draw() -> void:
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		_draw_imported("ui_warning_%s_%d" % ["gold" if t.kind == &"gold" else "red", 1 + (snapshot.tick / 12) % 2], TelegraphView.marker_position(t), Vector2(0.5, 0.5))
 	for burst: Dictionary in hit_bursts:
-		var age: int = snapshot.tick - int(burst["tick"])
+		var age: int = snapshot.tick + snapshot.result_ticks - int(burst["tick"])
 		var contact: Vector2 = burst.get("contact", burst["position"])
 		var heavy: bool = bool(burst.get("finisher", false)) or bool(burst["counter"])
 		_draw_imported("fx_%s_%d" % ["counter" if bool(burst["counter"]) else "hit", mini(5, age / 2) + 1], contact, Vector2(1.3, 1.3) if heavy else Vector2.ONE)
@@ -311,6 +319,7 @@ func _draw() -> void:
 			_draw_actor(actor, true)
 	# Skill trails remain legible over the brief damage silhouette.
 	_draw_skill_effect(offset)
+	_draw_skill_contacts()
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -358,7 +367,10 @@ func prepare_visuals() -> void:
 			dash_ghosts[i]["life"] -= 1
 			if int(dash_ghosts[i]["life"]) <= 0:
 				dash_ghosts.remove_at(i)
-		if hero.state == &"dash" and previous_player_state == &"dash":
+		var gale_travel: bool = hero.skill_id == &"gale_cut" and previous_skill_id == &"gale_cut" and moved and previous_player_state == &"skill_windup"
+		if gale_travel:
+			skill_trails.append({"from": previous_player_position, "to": hero.position, "tick": snapshot.tick})
+		if (hero.state == &"dash" and previous_player_state == &"dash") or gale_travel:
 			dash_ghosts.append({"position": previous_player_position, "left": facing_left, "life": 6})
 			if dash_ghosts.size() > 3:
 				dash_ghosts.pop_front()
@@ -537,7 +549,7 @@ func _sound_dash_started(event: GameEvent) -> void:
 
 func _sound_attack_hit(event: GameEvent) -> void:
 	if int(event.data["attacker_id"]) == snapshot.player.id:
-		var heavy: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") == &"moon_cleave"
+		var heavy: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") in [&"moon_cleave", &"breaking_edge"]
 		combat_audio.cue("counter_hit" if heavy else "armor_hit", event.tick)
 
 func _sound_attack_telegraphed(event: GameEvent) -> void:
@@ -561,7 +573,7 @@ func _sound_game_result(_event: GameEvent) -> void:
 
 ## Effects follow current snapshot phases; cancelled skills leave no queued release.
 func skill_effect() -> Dictionary:
-	return SkillEffects.plan(snapshot.player)
+	return SkillEffects.plan(snapshot.player) if snapshot.result == &"playing" else {}
 
 func _draw_skill_effect(shake_offset: Vector2 = Vector2.ZERO) -> void:
 	var effect: Dictionary = skill_effect()
@@ -574,5 +586,30 @@ func _draw_skill_effect(shake_offset: Vector2 = Vector2.ZERO) -> void:
 	var frame: Dictionary = frames[key]
 	var anchor: Vector2 = Vector2(frame["ax"], frame["ay"])
 	draw_set_transform(Vector2(effect["at"]) + shake_offset, float(effect["rotation"]))
-	draw_texture_rect_region(sprites, Rect2(-anchor, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+	var rect: Rect2 = Rect2(-anchor, Vector2(frame["w"], frame["h"]))
+	var region: Rect2 = Rect2(frame["x"], frame["y"], frame["w"], frame["h"])
+	if snapshot.player.skill_id == &"moon_cleave" and int(effect["frame"]) == 3:
+		# Offset edge-light increases readability without projecting a fake ranged hit.
+		draw_texture_rect_region(white_sprites, Rect2(rect.position - Vector2(3, 0), rect.size), region, colors["v"])
+	draw_texture_rect_region(sprites, rect, region)
 	draw_set_transform(shake_offset)
+	CombatEffects.draw_plan(self, SkillEffects.accents(snapshot.player, colors))
+
+
+## Strong contact accents are driven by confirmed attack_hit events only.
+func _draw_skill_contacts() -> void:
+	for burst: Dictionary in hit_bursts:
+		if burst.get("skill_id", &"") != &"breaking_edge":
+			continue
+		var age: int = snapshot.tick + snapshot.result_ticks - int(burst["tick"])
+		if age < 0 or age >= 10:
+			continue
+		var at: Vector2 = burst["contact"]
+		var radius: float = 17.0 - age
+		var commands: Array[Dictionary] = []
+		for angle: float in [-0.75, 0.75]:
+			var axis: Vector2 = Vector2(burst["facing"]).rotated(angle) * radius
+			var cut: PackedVector2Array = PackedVector2Array([at - axis, at + axis])
+			CombatEffects.stroke(commands, cut, colors["0"], 5.0)
+			CombatEffects.stroke(commands, cut, colors["1"] if age < 3 else colors["x"], 2.0)
+		CombatEffects.draw_plan(self, commands)

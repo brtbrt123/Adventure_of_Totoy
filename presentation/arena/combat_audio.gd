@@ -7,7 +7,7 @@ const CUES: Dictionary = {
 	"release_moon_cleave": preload("res://presentation/audio/golem_sweep.wav"),
 	"skill_breaking_edge": preload("res://presentation/audio/swing.wav"),
 	"skill_gale_cut": preload("res://presentation/audio/dash.wav"),
-	"skill_moon_cleave": preload("res://presentation/audio/gold_warning.wav"),
+	"skill_moon_cleave": preload("res://presentation/audio/posture_break.wav"),
 	"golem_slam": preload("res://presentation/audio/golem_slam.wav"),
 	"golem_stomp": preload("res://presentation/audio/golem_stomp.wav"),
 	"golem_sweep": preload("res://presentation/audio/golem_sweep.wav"),
@@ -25,6 +25,7 @@ const CUES: Dictionary = {
 	"gold_warning": preload("res://presentation/audio/gold_warning.wav"),
 	"red_warning": preload("res://presentation/audio/red_warning.wav"),
 }
+const PITCH: Dictionary = {"skill_moon_cleave": 0.7, "release_moon_cleave": 0.8, "release_breaking_edge": 1.15}
 const MUSIC: AudioStreamOggVorbis = preload("res://presentation/audio/music/heavy_boss_battle_1_bpm200.ogg")
 const VARIATIONS: Dictionary = {
 	"armor_hit": [preload("res://presentation/audio/armor_hit.wav"), preload("res://presentation/audio/armor_hit_2.wav"), preload("res://presentation/audio/armor_hit_3.wav")],
@@ -86,7 +87,8 @@ func cue(key: String, tick: int, strength: float = 1.0) -> void:
 	voice.stop()
 	var alternatives: Array = VARIATIONS.get(key, [CUES[key]])
 	voice.stream = alternatives[(int(played[key]) - 1) % alternatives.size()]
-	voice.volume_db = -10.0 + linear_to_db(clampf(strength, 0.2, 1.0))
+	voice.pitch_scale = float(PITCH.get(key, 1.0))
+	voice.volume_db = -10.0 + linear_to_db(clampf(strength, 0.2, 1.0)) - (5.0 if key == "skill_moon_cleave" else 0.0)
 	voice.play()
 
 func reset() -> void:
