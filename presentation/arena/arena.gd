@@ -661,14 +661,9 @@ func _draw_skill_projectiles(shake_offset: Vector2) -> void:
 			continue
 		draw_set_transform(Vector2(effect["at"]).round() + shake_offset, float(effect["rotation"]))
 		# The outer wake is cosmetic; the bright blade still uses the core width.
-		var outer: PackedVector2Array = PackedVector2Array()
-		var radius: float = float(effect["visual_width"]) * 0.5
-		for point: int in range(25):
-			var angle: float = lerpf(-PI * 0.65, PI * 0.65, point / 24.0)
-			outer.append((Vector2(-6, 0) + Vector2.from_angle(angle) * radius).round())
-		draw_polyline(outer, colors["0"], 6.0, false)
-		draw_polyline(outer, colors["v"], 4.0, false)
-		draw_polyline(outer, colors["o"], 1.0, false)
+		var wake: Dictionary = _projectile_texture(effect["key"], maxi(1, roundi(float(effect["visual_width"]))))
+		if not wake.is_empty():
+			draw_texture(wake["texture"], -Vector2(wake["anchor"]), colors["v"])
 		var length: float = float(effect["trail_length"])
 		if length > 3.0:
 			draw_line(Vector2(-length, 0), Vector2(-3, 0), colors["v"], 3.0, false)

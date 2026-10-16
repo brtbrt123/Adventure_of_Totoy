@@ -31,6 +31,10 @@ func _save(label: String) -> void:
 	await RenderingServer.frame_post_draw
 	_expect(root.get_texture().get_image().save_png("res://art/build/arena_skill_" + label + ".png") == OK, "capture " + label)
 func _inputs() -> void:
+	var releases: Dictionary = {"breaking_edge": "z_metal_clash", "gale_cut": "x_air_cut", "moon_cleave": "c_energy_aura"}
+	for skill: String in releases:
+		var stream: AudioStream = arena.combat_audio.CUES["release_" + skill]
+		_expect(stream.resource_path.ends_with(str(releases[skill]) + "_candidate.wav"), "new release recording missing: " + skill)
 	await process_frame
 	await process_frame
 	var keys: Array[int] = [KEY_Z, KEY_X, KEY_C]

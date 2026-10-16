@@ -11,7 +11,7 @@ static func all_names() -> Array[String]:
 	var names: Array[String] = []
 	for skill: StringName in SKILLS:
 		for frame: int in range(1, 7):
-			names.append("fx_aspect_%s_%d" % [skill, frame])
+			names.append("fx_aspect2_%s_%d" % [skill, frame])
 	return names
 
 static func plan(hero: Snapshots.EntitySnapshot) -> Dictionary:
@@ -40,7 +40,7 @@ static func plan(hero: Snapshots.EntitySnapshot) -> Dictionary:
 	if direction == Vector2.ZERO:
 		direction = Vector2.RIGHT
 	var reach: float = -10.0 if hero.skill_id == &"gale_cut" and hero.state == &"skill_active" else 16.0
-	return {"key": "fx_aspect_%s_%d" % [hero.skill_id, index], "at": (hero.position - Vector2(0, 12) + direction * reach).round(), "rotation": direction.angle(), "frame": index}
+	return {"key": "fx_aspect2_%s_%d" % [hero.skill_id, index], "at": (hero.position - Vector2(0, 12) + direction * reach).round(), "rotation": direction.angle(), "frame": index}
 
 
 static func _stroke(plan_data: Array[Dictionary], points: PackedVector2Array, color: Color, width: float) -> void:
@@ -99,5 +99,5 @@ static func projectiles(snap: Snapshots.GameSnapshot) -> Array[Dictionary]:
 			continue
 		var age: int = maxi(0, snap.tick - attack.start_tick)
 		var frame: int = 4 if attack.ticks_left <= 3 else 3 + posmod(age / 4, 2)
-		plans.append({"attack_id": attack.id, "key": "fx_aspect_moon_cleave_%d" % frame, "frame": frame, "at": attack.position, "rotation": attack.direction.angle(), "width": attack.width, "visual_width": maxf(40.0, attack.width), "ticks_left": attack.ticks_left, "trail_length": minf(32.0, attack.start.distance_to(attack.position))})
+		plans.append({"attack_id": attack.id, "key": "fx_aspect2_moon_cleave_%d" % frame, "frame": frame, "at": attack.position, "rotation": attack.direction.angle(), "width": attack.width, "visual_width": maxf(40.0, attack.width), "ticks_left": attack.ticks_left, "trail_length": minf(32.0, attack.start.distance_to(attack.position))})
 	return plans

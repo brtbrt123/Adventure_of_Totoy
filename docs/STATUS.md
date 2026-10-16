@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Installed skill VFX and replacement release audio (2026-10-17, NOT merged)
+
+Implemented the human's approved new sheets: 18 new fx_aspect2 frames, hard alpha, Totoy36 palette, centered anchors and fixed scale per skill. Import crop/threshold/scale metadata lives in art/reference/skills_v2/import.json. Previous sprites remain available. Z uses the gold crossing cuts; X uses cyan cutting ribbons during the actual active dash plus its observed ground trail; C uses the travelling crescent from independent skill attack snapshots and a larger cosmetic sprite wake. The bright C centre remains core-width. No collision, damage, timing, cooldown or core files changed.
+
+The new CC0 Z metallic clash, X air cut and C electric aura audition recordings now play once per skill_released event, with their original source credits retained. Smoke assertions check the new recording paths. New screenshots overwrite arena_skill_*.png for review.
+
+Passed: python tools/art/validate_art.py (411 sources / 413 built PNGs), build_art.py, preview_art.py; python harness/checks/run_tests.py --worktree . (Python tests, Godot import, core suite and every smoke suite); an additional headless skill smoke and windowed skill capture both passed. Inspected the Z impact, leftward X dash and independent C projectile captures. Human approval of appearance, sound and combat feel, and Claude's cross-review remain pending. Nothing merged.
+
+Claude still needs to implement X passing through enemies in core: allow Gale Cut active movement through enemy solids while retaining arena bounds and actual travelled-corridor, once-per-target hits; restore normal collision on recovery/cancellation. Presentation cannot fix the reported blocking. Increasing C's actual damage width would also be a core design change; current larger outer art is cosmetic.
+
 ## New VFX concepts and different sound auditions (2026-10-17, NOT merged)
 
 Human requested newly generated improved VFX and different found sound effects. Saved three new six-frame concept sheets in art/reference/skills_v2: stronger gold cross cuts, a straight cyan severing lane, and a large travelling crescent with trailing blades. These are raw concepts, not installed sprites: generated glow/partial alpha remains despite a cleanup attempt, so palette/hard-alpha/alignment/size import is still required after review. Existing gameplay art remains active.
