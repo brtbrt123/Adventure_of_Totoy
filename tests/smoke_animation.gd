@@ -107,6 +107,12 @@ func _hero_timelines() -> void:
 			for i: int in range(40):
 				_step(_frame())
 				requested[arena.selected_frames[arena.snapshot.player.id]] = true
+		_step(_frame(Vector2.ZERO, false, false, true))
+		for i: int in range(100):
+			var hero: Snapshots.EntitySnapshot = arena.snapshot.player
+			var chain: bool = hero.state == &"attack_recovery" and hero.combo_index < 3
+			_step(_frame(Vector2.ZERO, false, false, chain))
+			requested[arena.selected_frames[arena.snapshot.player.id]] = true
 		for name_key: String in ArenaAnimation.all_names():
 			if name_key.begins_with("hero2_") and name_key.contains("_" + ArenaAnimation.direction(facing) + "_") and not name_key.contains("_hurt_") and not name_key.contains("_victory_"):
 				_expect(requested.has(name_key), "real state lifetime never requests " + name_key)

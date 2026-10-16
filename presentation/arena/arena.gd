@@ -8,12 +8,15 @@ const Tuning := preload("res://core/tuning.gd")
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
 const DECORATIONS: Array[Dictionary] = [{"name": "prop_nature_1", "at": Vector2(18, 91), "scale": Vector2.ONE}, {"name": "prop_nature_4", "at": Vector2(289, 172), "scale": Vector2(2, 2)}, {"name": "prop_ruins_2", "at": Vector2(290, 80), "scale": Vector2(2, 2)}, {"name": "prop_small_3", "at": Vector2(35, 170), "scale": Vector2.ONE}]
 const Hud := preload("res://presentation/arena/hud.gd")
 
+var combat_audio: CombatAudio
+var previous_combo_index: int = 0
 var core: GameCore = GameCore.new(17)
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
@@ -49,6 +52,8 @@ var tiles: Texture2D
 @onready var hud: Hud = $HUD/Display
 
 func _ready() -> void:
+	combat_audio = CombatAudio.new()
+	add_child(combat_audio)
 	Bindings.register()
 	var palette: Dictionary = _read_json("res://art/palette.json")
 	for entry: Dictionary in palette.get("colors", []):
@@ -98,6 +103,8 @@ func _physics_process(_delta: float) -> void:
 	queue_redraw()
 
 func _restart() -> void:
+	combat_audio.reset()
+	previous_combo_index = 0
 	core = GameCore.new(17)
 	snapshot = core.snapshot()
 	facing_left = false
@@ -173,8 +180,9 @@ func _on_event(event: GameEvent) -> void:
 			_sound_damage_taken(event)
 		&"parry_succeeded":
 			var perfect: bool = event.data["quality"] == &"perfect"
-			_burst(event.data["position"], 16 if perfect else 7, colors["x"], 1.6 if perfect else 1.0)
-			parry_impacts.append({"position": event.data["position"], "tick": event.tick, "perfect": perfect})
+			var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["player_id"]), int(event.data["attacker_id"]))
+			_burst(contact, 16 if perfect else 7, colors["x"], 1.6 if perfect else 1.0)
+			parry_impacts.append({"position": event.data["position"], "tick": event.tick, "perfect": perfect, "contact": contact})
 			selected_frames[snapshot.player.id] = _resolve_frame("hero2_parry_right_6", snapshot.player)
 			shake_left = maxi(shake_left, 7 if perfect else 3)
 			screen_flash_until = event.tick + (2 if perfect else 1)
@@ -195,8 +203,11 @@ func _on_event(event: GameEvent) -> void:
 		&"attack_hit":
 			var counter: bool = event.data["kind"] == &"counter"
 			if int(event.data["attacker_id"]) == snapshot.player.id:
-				hit_bursts.append({"position": event.data["position"], "tick": event.tick, "counter": counter})
-				_burst(event.data["position"], 16 if counter else 8, colors["1"], 1.8 if counter else 0.9)
+				var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["target_id"]), int(event.data["attacker_id"]))
+				var finisher: bool = int(event.data.get("combo_index", 1)) == 3
+				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher})
+				shake_left = maxi(shake_left, 3 if finisher else 1)
+				_burst(contact, 16 if counter or finisher else 8, colors["1"], 1.8 if counter else 0.9)
 				if counter:
 					flashes[int(event.data["target_id"])] = 10
 					shake_left = maxi(shake_left, 5)
@@ -258,11 +269,21 @@ func _draw() -> void:
 		if snapshot.tick > tell.end_tick:
 			_draw_impact(tell)
 	for impact: Dictionary in parry_impacts:
-		_draw_imported("fx_parry_%d" % (mini(5, (snapshot.tick - int(impact["tick"])) / 2) + 1), impact["position"])
+		var age: int = snapshot.tick - int(impact["tick"])
+		var contact: Vector2 = impact.get("contact", impact["position"])
+		var size_scale: Vector2 = Vector2(1.15, 1.15) if bool(impact["perfect"]) else Vector2(0.75, 0.75)
+		_draw_imported("fx_parry_%d" % (mini(5, age / 2) + 1), contact, size_scale)
+		if age < 2 and bool(impact["perfect"]):
+			_draw_imported("fx_flash_1", contact, Vector2(0.6, 0.6))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		_draw_imported("ui_warning_%s_%d" % ["gold" if t.kind == &"gold" else "red", 1 + (snapshot.tick / 12) % 2], TelegraphView.marker_position(t), Vector2(0.5, 0.5))
 	for burst: Dictionary in hit_bursts:
-		_draw_imported("fx_%s_%d" % ["counter" if bool(burst["counter"]) else "hit", mini(5, (snapshot.tick - int(burst["tick"])) / 2) + 1], burst["position"])
+		var age: int = snapshot.tick - int(burst["tick"])
+		var contact: Vector2 = burst.get("contact", burst["position"])
+		var heavy: bool = bool(burst.get("finisher", false)) or bool(burst["counter"])
+		_draw_imported("fx_%s_%d" % ["counter" if bool(burst["counter"]) else "hit", mini(5, age / 2) + 1], contact, Vector2(1.3, 1.3) if heavy else Vector2.ONE)
+		if age < 2:
+			_draw_imported("fx_flash_1", contact, Vector2(0.65, 0.65) if heavy else Vector2(0.4, 0.4))
 	for particle: Dictionary in particles:
 		var at: Vector2 = particle["position"]
 		draw_rect(Rect2(at.round(), Vector2.ONE), particle["color"])
@@ -305,7 +326,10 @@ func prepare_visuals() -> void:
 	if fresh:
 		var hero: Snapshots.EntitySnapshot = snapshot.player
 		var moved: bool = not hero.position.is_equal_approx(previous_player_position)
-		var attack_started: bool = hero.state == &"attack_windup" and previous_player_state != hero.state
+		var changed: bool = previous_player_state != hero.state or previous_combo_index != hero.combo_index
+		var attack_started: bool = hero.state == &"attack_windup" and changed
+		if hero.state == &"attack_active" and changed:
+			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index == 3 else 0.75)
 		if ((moved and hero.state != &"dead") or attack_started) and absf(hero.facing.x) > 0.3:
 			facing_left = hero.facing.x < 0.0
 		for i: int in range(dash_ghosts.size() - 1, -1, -1):
@@ -318,6 +342,7 @@ func prepare_visuals() -> void:
 				dash_ghosts.pop_front()
 		previous_player_position = hero.position
 		previous_player_state = hero.state
+		previous_combo_index = hero.combo_index
 	if fresh:
 		for i: int in range(parry_impacts.size() - 1, -1, -1):
 			if snapshot.tick - int(parry_impacts[i]["tick"]) >= 12:
@@ -450,16 +475,28 @@ func actor_is_white(actor: Snapshots.EntitySnapshot) -> bool:
 		return false
 	return flashes.has(actor.id) or (actor.id == snapshot.player.id and hurt_blink and actor.invulnerable and snapshot.tick % 6 < 3)
 
-# AUDIO HOOKS: one hook per core event. Add playback here when original audio exists.
+## The event position remains untouched. Only the painted contact is raised to
+## the target's torso/weapon, so feedback no longer appears underneath its feet.
+func _impact_contact(at: Vector2, target_id: int, attacker_id: int) -> Vector2:
+	var target: Snapshots.EntitySnapshot = snapshot.player
+	var attacker: Snapshots.EntitySnapshot = snapshot.player
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.id == target_id:
+			target = actor
+		if actor.id == attacker_id:
+			attacker = actor
+	var side: float = (attacker.position - at).normalized().x
+	return at + Vector2(side * 9.0, -20.0 if target.visual_id == &"mossbound_colossus" else -14.0)
 
-func _sound_damage_taken(_event: GameEvent) -> void:
-	pass
+func _sound_damage_taken(event: GameEvent) -> void:
+	if int(event.data["entity_id"]) == snapshot.player.id:
+		combat_audio.cue("player_hurt", event.tick)
 
-func _sound_parry_succeeded(_event: GameEvent) -> void:
-	pass
+func _sound_parry_succeeded(event: GameEvent) -> void:
+	combat_audio.cue("perfect_parry" if event.data["quality"] == &"perfect" else "deflect", event.tick)
 
-func _sound_posture_broken(_event: GameEvent) -> void:
-	pass
+func _sound_posture_broken(event: GameEvent) -> void:
+	combat_audio.cue("posture_break", event.tick)
 
 func _sound_counter_window_opened(_event: GameEvent) -> void:
 	pass
@@ -467,14 +504,16 @@ func _sound_counter_window_opened(_event: GameEvent) -> void:
 func _sound_counter_window_closed(_event: GameEvent) -> void:
 	pass
 
-func _sound_dash_started(_event: GameEvent) -> void:
-	pass
+func _sound_dash_started(event: GameEvent) -> void:
+	combat_audio.cue("dash", event.tick, 0.8)
 
-func _sound_attack_hit(_event: GameEvent) -> void:
-	pass
+func _sound_attack_hit(event: GameEvent) -> void:
+	if int(event.data["attacker_id"]) == snapshot.player.id:
+		var heavy: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3
+		combat_audio.cue("counter_hit" if heavy else "armor_hit", event.tick)
 
-func _sound_attack_telegraphed(_event: GameEvent) -> void:
-	pass
+func _sound_attack_telegraphed(event: GameEvent) -> void:
+	combat_audio.cue("gold_warning" if event.data["kind"] == &"gold" else "red_warning", event.tick, 0.7)
 
 func _sound_parry_failed(_event: GameEvent) -> void:
 	pass

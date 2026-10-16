@@ -1,13 +1,15 @@
 extends RefCounted
 ## Visual cadence only. State lifetimes and impacts always come from snapshots.
+const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const DIRECTIONS: Array[String] = ["right"]
-# [frame count, ticks per frame, loop]. Windups use telegraph progress instead.
+# [frame count, ticks per frame, loop]. Sword phases use per-swing tuning;
+# boss windups use telegraph progress. Attack entries only declare frame counts.
 const PLAYER: Dictionary = {
 	"idle": [4, 12, true], "walk": [6, 5, true], "dash": [4, 1, false],
 	"parry": [6, 2, false], "parry_recovery": [1, 1, false],
-	"attack_windup": [2, 4, false], "attack_active": [2, 2, false],
-	"attack_recovery": [2, 5, false], "dead": [1, 1, false],
+	"attack_windup": [2, 1, false], "attack_active": [2, 1, false],
+	"attack_recovery": [2, 1, false], "dead": [1, 1, false],
 	"hurt": [4, 3, false], "victory": [6, 8, false],
 }
 const BOSS: Dictionary = {
@@ -47,8 +49,11 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 		if state == "dead":
 			return "hero2_hurt_right_4"
 		if state.begins_with("attack_"):
+			var swing: int = clampi(actor.combo_index, 1, 3)
 			var offset: int = 0 if state == "attack_windup" else (2 if state == "attack_active" else 4)
-			return "hero2_attack1_right_%d" % (offset + frame_index(PLAYER[state], ticks))
+			var durations: Array[int] = Tuning.SWING_WINDUP_TICKS if state == "attack_windup" else (Tuning.SWING_ACTIVE_TICKS if state == "attack_active" else Tuning.SWING_RECOVERY_TICKS)
+			var index: int = mini(1, maxi(0, ticks) * 2 / maxi(1, durations[swing - 1])) + 1
+			return "hero2_attack%d_right_%d" % [swing, offset + index]
 		if state == "parry_recovery":
 			return "hero2_parry_right_6"
 		return "hero2_%s_right_%d" % [state, frame_index(PLAYER.get(state, PLAYER["idle"]), ticks)]
@@ -81,8 +86,9 @@ static func all_names() -> Array[String]:
 	for state: String in ["idle", "walk", "dash", "parry", "hurt", "victory"]:
 		for n: int in range(1, int(PLAYER[state][0]) + 1):
 			names.append("hero2_%s_right_%d" % [state, n])
-	for n: int in range(1, 7):
-		names.append("hero2_attack1_right_%d" % n)
+	for swing: int in range(1, 4):
+		for n: int in range(1, 7):
+			names.append("hero2_attack%d_right_%d" % [swing, n])
 	for state: String in BOSS:
 		for n: int in range(1, int(BOSS[state][0]) + 1):
 			names.append("golem2_%s_%d" % [state, n])

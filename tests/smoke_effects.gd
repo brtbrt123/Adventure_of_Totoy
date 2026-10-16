@@ -73,6 +73,9 @@ func _step(frame: InputFrame) -> void:
 		arena._on_event(event)
 		if event.type == &"attack_hit" and int(event.data["attacker_id"]) == arena.snapshot.player.id:
 			seen[String(event.data["kind"])] = true
+			var heavy_sound: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3
+			_expect(arena.combat_audio.played.has("counter_hit" if heavy_sound else "armor_hit"), "confirmed hit audio missing")
+			_expect(Vector2(arena.hit_bursts.back()["contact"]).y < Vector2(event.data["position"]).y, "hit spark is still at feet")
 			if event.data["kind"] == &"counter":
 				_expect(int(arena.flashes[arena.snapshot.entities[0].id]) == 10, "counter flash duration")
 			_expect(not arena.particles.is_empty(), "hit has no spark")
@@ -193,6 +196,7 @@ func _parry_visuals() -> void:
 				if event.type == &"parry_succeeded":
 					succeeded = true
 					_expect(event.data["quality"] == (&"perfect" if lead == 2 else &"early"), "fixture parry quality")
+					_expect(arena.combat_audio.played.has("perfect_parry" if lead == 2 else "deflect"), "parry quality audio missing")
 					_expect(arena.parry_impacts.size() == 1, "parry impact missing")
 					_expect(arena.selected_frames[arena.snapshot.player.id] == "hero2_parry_right_6", "successful parry must show painted spark")
 					_expect(arena.screen_flash_until > arena.snapshot.tick and arena.shake_left > 0, "parry flash or shake missing")
