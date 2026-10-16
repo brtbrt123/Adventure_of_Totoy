@@ -55,6 +55,7 @@ One `InputFrame` per tick:
 - `tick`, `result` (`playing`, `victory`, `defeat`)
 - `player: EntitySnapshot`, `entities: Array[EntitySnapshot]` (the boss; more later)
 - `telegraphs: Array[TelegraphSnapshot]`
+- `skill_attacks: Array[SkillAttackSnapshot]` (live skill attacks, see "Sword skills")
 - `hud: HudSnapshot`
 
 `EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`, `combo_index` (player only, see the sword combo below; `0` for the boss), `skill_id` (player only: `breaking_edge`, `gale_cut` or `moon_cleave` during the `skill_*` states, otherwise empty).
@@ -72,12 +73,16 @@ The sword is a three-swing combo: `combo_index` 1, 2, 3 = art `hero2_attack1`, `
 
 ### Sword skills (player, test set)
 
-Three skills for testing the Aspect system, selected by `skill_pressed` 1-3 (Z, X, C). They are usable from `idle`, `walk` and the recovery of a normal swing (a skill cancels that recovery and resets the combo); not during a parry, dash, another skill or after death. Each runs `skill_windup` -> `skill_active` -> `skill_recovery`, and the hit lands on the first tick of `skill_active`. Read `snapshot.player.skill_id` for which one. None grants invulnerability. Phase lengths and every number are in `core/tuning.gd` (`BREAKING_EDGE_*`, `GALE_CUT_*`, `MOON_CLEAVE_*`); presentation should spread frames over `state_ticks` of the current state as for the sword.
-- **Breaking Edge (1), parry retaliation.** Usable only while `hud.retaliate_ticks_left > 0` (set by a successful parry, cleared by damage or use) and with enough Edge (`BREAKING_EDGE_EDGE_COST`, spent on press). The windup is the forward step (`BREAKING_EDGE_STEP` px); the slash then does high posture damage (two of them break the boss).
-- **Gale Cut (2), gap closer.** No Edge cost, cooldown `GALE_CUT_COOLDOWN_TICKS`. The windup is a dash along the aim (aim if given, else move, else facing); then a quick cut. A connecting cut builds Edge like a normal hit.
-- **Moon Cleave (3), committed finisher.** Costs `MOON_CLEAVE_EDGE_COST` Edge (spent on press, not refunded if interrupted), a long hold (`MOON_CLEAVE_WINDUP_TICKS`, slow movement), a wide arc, the highest health damage, and the longest recovery (cannot be cancelled by dash or parry).
-- **Damage rules:** the same as a normal hit: reduced by `ARMOR_DAMAGE_FACTOR` against the armored boss (and adds the skill's posture), multiplied by `COUNTER_DAMAGE_MULT` during a posture break (no extra posture then). Skills do not use the Edge counter bonus. The `attack_hit` event keeps `kind` `normal`/`counter` and adds `skill_id`.
-- **Presentation to do (Codex):** bind Z/X/C to `skill_pressed` 1/2/3 in `input_bindings.gd`; draw `skill_*` states (no art exists for them yet: placeholders from the attack frames are fine); show Edge, cooldowns and the Breaking Edge window on the HUD; play a cue on `skill_started`.
+Three skills for testing the Aspect system, selected by `skill_pressed` 1-3 (Z, X, C). Usable from `idle`, `walk` and the recovery of a normal swing (a skill cancels that recovery and resets the combo); not during a parry, dash, another skill or after death. Each runs `skill_windup` -> `skill_active` -> `skill_recovery` (read `snapshot.player.skill_id` for which). None grants invulnerability. Phase lengths and every number are in `core/tuning.gd` (`BREAKING_EDGE_*`, `GALE_CUT_*`, `MOON_CLEAVE_*`); spread frames over `state_ticks` of the current state.
+- **Direction:** fixed when the skill is pressed: the **move input** if the player is moving, else `aim`, else the facing. The player's `facing` is set to it. (The mouse aim no longer beats the way the player is walking.)
+- **Edge:** the cost is spent on the press and is not refunded if the skill is interrupted. Each skill has its own cooldown (`hud.skill_cooldown_ticks`).
+- **Attack objects:** the tick a skill enters `skill_active`, the core creates one **skill attack** with an id and emits `skill_released`. It is listed in `snapshot.skill_attacks` while it lives. A cast hits each target at most once; the confirmed hit is an `attack_hit` event with `skill_id` and `attack_id`. Damage uses the normal-hit rules (armored factor; counter multiplier during a posture break; posture added only when not broken).
+- **`SkillAttackSnapshot`:** `id`, `owner_id`, `skill_id`, `shape` (`arc`, `lane`, `projectile`), `position` (arc/lane: the player; projectile: its centre now), `direction`, `start` and `end` (lane/projectile endpoints; `end` is where it ends if nothing shortens it), `width`, `size` (arc reach), `half_angle` (arc, radians), `start_tick`, `end_tick`, `ticks_left`, `hit_target_ids`.
+- **Breaking Edge (1), parry retaliation:** only while `hud.retaliate_ticks_left > 0` (set by a successful parry, cleared by damage or use) and with `BREAKING_EDGE_EDGE_COST` Edge. A 3-tick windup that is also the forward step (`BREAKING_EDGE_STEP`), then a short melee `arc` (one confirmed hit) with strong posture damage (two break the boss).
+- **Gale Cut (2), dash corridor:** 35 Edge, 300-tick cooldown. A short windup (no movement), then during `skill_active` the player dashes `GALE_CUT_SPEED` px per tick for `GALE_CUT_ACTIVE_TICKS` ticks (about 120 px). The `lane` attack damages whatever the **actually travelled** segment (previous position to the final position each tick, after arena walls and the solid boss) touches, widened by `GALE_CUT_LANE_WIDTH` (18 px) plus the target's radius. The lane lives until the dash ends or is interrupted (damage ends it at once). The lingering blade trail is cosmetic: presentation draws it from the positions, it deals no damage.
+- **Moon Cleave (3), sword-aura projectile:** `MOON_CLEAVE_EDGE_COST` Edge, a committed hold (`MOON_CLEAVE_WINDUP_TICKS`, slow movement). Damage only comes from the projectile. If the hold is interrupted nothing spawns (and the Edge is gone). On the first `skill_active` tick the `projectile` spawns `MOON_CLEAVE_SPAWN_OFFSET` px ahead, then travels `MOON_CLEAVE_TRAVEL` px at `MOON_CLEAVE_SPEED` px per tick, `MOON_CLEAVE_WIDTH` px wide, piercing (each target once). It then lives on its own: taking damage or dying after the release does not remove it. The recovery cannot be cancelled by dash, parry or attack.
+- **Collision:** swept: each tick tests the whole segment moved (so a fast mover cannot tunnel) against the target circle widened by half the lane/projectile width.
+- **Presentation to do (Codex):** a Gale Cut dash now moves the player during `skill_active` (before it moved during the windup), so the dash trail and effect timing must follow `skill_active` and `snapshot.skill_attacks`; draw the Moon Cleave projectile from `skill_attacks` (`position`, `direction`, `width`, `ticks_left`) and keep it after the player's state changes; use `skill_released` for release sounds and effects. `tests/smoke_skills_presentation.gd` sets no Edge before pressing X, which now costs 35.
 
 `TelegraphSnapshot`: `id`, `owner_id`, `attack` (`gold_slam`, `gold_combo`, `red_sweep`, `red_shards`, `red_stomp`, `red_charge`), `kind` (`gold` = parry it, `red` = dodge it), `shape` + parameters, `start_tick`, `hit_tick`, `end_tick`.
 - `circle`: `center`, `size` = radius
@@ -100,13 +105,14 @@ Each event is a `GameEvent` with `type: StringName`, `tick: int` and `data: Dict
 | Type | `data` keys |
 |---|---|
 | `attack_telegraphed` | `telegraph_id`, `owner_id`, `kind`, `attack` |
-| `attack_hit` | `attacker_id`, `target_id`, `damage`, `kind` (`normal`, `counter`, `gold`, `red`), `position`, and for the player's sword `combo_index` (1-3); a skill hit also has `skill_id` |
+| `attack_hit` | `attacker_id`, `target_id`, `damage`, `kind` (`normal`, `counter`, `gold`, `red`), `position`, and for the player's sword `combo_index` (1-3); a skill hit has `skill_id` and `attack_id` instead (no `combo_index`) |
 | `parry_succeeded` | `player_id`, `attacker_id`, `telegraph_id`, `quality` (`perfect`, `early`), `position` |
 | `parry_failed` | `entity_id`, `reason` (`whiff`) |
 | `posture_broken` | `entity_id`, `window_ticks` |
 | `counter_window_opened` / `counter_window_closed` | `entity_id` (+ `window_ticks` on open) |
 | `dash_started` | `entity_id`, `direction` |
-| `skill_started` | `entity_id`, `skill_id` |
+| `skill_started` | `entity_id`, `skill_id` (the press: the windup begins; Edge is spent) |
+| `skill_released` | `attack_id`, `entity_id`, `skill_id`, `shape` (`arc`, `lane`, `projectile`), `position`, `direction`, `start`, `end`, `width` (the attack exists from this tick: the first `skill_active` tick; use it for effects and audio) |
 | `dash_ready` | `entity_id` |
 | `damage_taken` | `entity_id`, `amount`, `source_id` |
 | `entity_died` | `entity_id`, `visual_id` |

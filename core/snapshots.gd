@@ -38,6 +38,26 @@ class TelegraphSnapshot:
 	var end_tick: int = 0
 
 
+class SkillAttackSnapshot:
+	extends RefCounted
+	## A skill attack that is live right now: a melee arc, a dash lane or a travelling projectile.
+	var id: int = 0  # the same id appears in the skill_released and attack_hit events
+	var owner_id: int = 0
+	var skill_id: StringName = &""
+	var shape: StringName = &"arc"  # arc (melee), lane (dash corridor), projectile
+	var position: Vector2 = Vector2.ZERO  # arc: the player; lane: the dash head (the player); projectile: its centre now
+	var direction: Vector2 = Vector2.RIGHT
+	var start: Vector2 = Vector2.ZERO  # lane/projectile: where it began
+	var end: Vector2 = Vector2.ZERO  # lane/projectile: where it ends if nothing shortens it
+	var width: float = 0.0  # lane width / projectile width
+	var size: float = 0.0  # arc: reach in pixels
+	var half_angle: float = 0.0  # arc: half the arc, radians
+	var start_tick: int = 0
+	var end_tick: int = 0  # last tick it can hit (projectile: when it runs out of travel)
+	var ticks_left: int = 0
+	var hit_target_ids: Array[int] = []
+
+
 class HudSnapshot:
 	extends RefCounted
 	var player_hp: int = 0
@@ -63,4 +83,5 @@ class GameSnapshot:
 	var player: EntitySnapshot = null
 	var entities: Array[EntitySnapshot] = []  # everything except the player
 	var telegraphs: Array[TelegraphSnapshot] = []
+	var skill_attacks: Array[SkillAttackSnapshot] = []
 	var hud: HudSnapshot = null

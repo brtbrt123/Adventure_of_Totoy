@@ -37,11 +37,13 @@ var attack_hit_done: bool = false  # one hit per swing: set when a swing connect
 var skill_id: StringName = &""  # the skill in progress during skill_* states, empty otherwise
 var skill_cooldowns: Array[int] = [0, 0, 0]  # ticks left per skill 1-3
 var retaliate_ticks: int = 0  # Breaking Edge is usable while this is above zero (set by a successful parry)
+var skill_dir: Vector2 = Vector2.RIGHT  # direction fixed when the skill was pressed
+var skill_motion: bool = false  # true on a tick in which a skill moved the player (Gale Cut's dash)
+var pending_release: StringName = &""  # set on the tick a skill enters skill_active; the core reads and clears it
 var combo_index: int = 1  # swing in progress (or the last swing during the chain grace window); 1 otherwise
 
 var _dash_dir: Vector2 = Vector2.RIGHT
 var _combo_queued: bool = false
-var _skill_dir: Vector2 = Vector2.RIGHT
 var _combo_grace: int = 0  # ticks left in which a press after a finished swing still continues the chain
 var _hurt_invuln: int = 0
 var _dash_invuln: int = 0  # dash i-frames run on their own counter, so a short dash can keep a forgiving window
@@ -51,6 +53,7 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 	if state == STATE_DEAD:
 		return
 	state_ticks += 1
+	skill_motion = false
 	if _hurt_invuln > 0:
 		_hurt_invuln -= 1
 	if _dash_invuln > 0:
@@ -105,14 +108,16 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		STATE_SKILL_WINDUP:
 			match skill_id:
 				SKILL_BREAKING_EDGE:
-					position += _skill_dir * (Tuning.BREAKING_EDGE_STEP / Tuning.BREAKING_EDGE_WINDUP_TICKS)
-				SKILL_GALE_CUT:
-					position += _skill_dir * Tuning.GALE_CUT_SPEED
+					position += skill_dir * (Tuning.BREAKING_EDGE_STEP / Tuning.BREAKING_EDGE_WINDUP_TICKS)
 				SKILL_MOON_CLEAVE:
 					position += move * Tuning.PLAYER_SPEED * Tuning.MOON_CLEAVE_WINDUP_MOVE_FACTOR
 			if state_ticks >= _skill_ticks("windup"):
 				_set_state(STATE_SKILL_ACTIVE)
+				pending_release = skill_id
 		STATE_SKILL_ACTIVE:
+			if skill_id == SKILL_GALE_CUT:
+				position += skill_dir * Tuning.GALE_CUT_SPEED
+				skill_motion = true
 			if state_ticks >= _skill_ticks("active"):
 				_set_state(STATE_SKILL_RECOVERY)
 		STATE_SKILL_RECOVERY:
@@ -214,13 +219,25 @@ func _try_skill(input: InputFrame, tick: int, events: Array[GameEvent]) -> bool:
 	edge -= cost
 	skill_cooldowns[slot - 1] = cooldown
 	skill_id = chosen
-	_skill_dir = facing
+	skill_dir = _skill_direction(input)
+	facing = skill_dir
 	attack_hit_done = false
+	pending_release = &""
 	retaliate_ticks = 0
 	reset_combo()
 	_set_state(STATE_SKILL_WINDUP)
 	events.append(GameEvent.new(GameEvent.SKILL_STARTED, tick, {"entity_id": id, "skill_id": chosen}))
 	return true
+
+
+## Where a skill goes: the way the player is moving, else the aim, else the way they already face.
+func _skill_direction(input: InputFrame) -> Vector2:
+	var move: Vector2 = input.move.limit_length(1.0)
+	if move.length_squared() > 0.0001:
+		return move.normalized()
+	if input.aim.length_squared() > 0.0001:
+		return input.aim.normalized()
+	return facing
 
 
 func _skill_ticks(phase: String) -> int:
@@ -233,15 +250,15 @@ func _skill_ticks(phase: String) -> int:
 			return {"windup": Tuning.MOON_CLEAVE_WINDUP_TICKS, "active": Tuning.MOON_CLEAVE_ACTIVE_TICKS, "recovery": Tuning.MOON_CLEAVE_RECOVERY_TICKS}[phase]
 
 
-## Hit parameters of the skill in progress (used by the core's hit resolution).
-func skill_profile() -> Dictionary:
-	match skill_id:
+## Hit parameters of a skill (used by the core's hit resolution). The ids are the SKILL_* constants.
+static func skill_profile(skill: StringName) -> Dictionary:
+	match skill:
 		SKILL_BREAKING_EDGE:
-			return {"range": Tuning.BREAKING_EDGE_RANGE, "arc_dot": Tuning.BREAKING_EDGE_ARC_DOT, "damage": Tuning.BREAKING_EDGE_DAMAGE, "posture": Tuning.BREAKING_EDGE_POSTURE, "edge_gain": Tuning.BREAKING_EDGE_EDGE_GAIN}
+			return {"damage": Tuning.BREAKING_EDGE_DAMAGE, "posture": Tuning.BREAKING_EDGE_POSTURE, "edge_gain": Tuning.BREAKING_EDGE_EDGE_GAIN}
 		SKILL_GALE_CUT:
-			return {"range": Tuning.GALE_CUT_RANGE, "arc_dot": Tuning.GALE_CUT_ARC_DOT, "damage": Tuning.GALE_CUT_DAMAGE, "posture": Tuning.GALE_CUT_POSTURE, "edge_gain": Tuning.GALE_CUT_EDGE_GAIN}
+			return {"damage": Tuning.GALE_CUT_DAMAGE, "posture": Tuning.GALE_CUT_POSTURE, "edge_gain": Tuning.GALE_CUT_EDGE_GAIN}
 		_:
-			return {"range": Tuning.MOON_CLEAVE_RANGE, "arc_dot": Tuning.MOON_CLEAVE_ARC_DOT, "damage": Tuning.MOON_CLEAVE_DAMAGE, "posture": Tuning.MOON_CLEAVE_POSTURE, "edge_gain": Tuning.MOON_CLEAVE_EDGE_GAIN}
+			return {"damage": Tuning.MOON_CLEAVE_DAMAGE, "posture": Tuning.MOON_CLEAVE_POSTURE, "edge_gain": Tuning.MOON_CLEAVE_EDGE_GAIN}
 
 
 func _start_swing(index: int) -> void:

@@ -10,6 +10,7 @@ const Telegraph := preload("res://core/telegraph.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const PlayerState := preload("res://core/player.gd")
 const BossState := preload("res://core/boss.gd")
+const SkillAttack := preload("res://core/skill_attack.gd")
 
 const RESULT_PLAYING: StringName = &"playing"
 const RESULT_VICTORY: StringName = &"victory"
@@ -27,7 +28,11 @@ var boss: BossState = BossState.new()
 ## Events produced by the most recent step(), in order.
 var last_events: Array[GameEvent] = []
 
+## Live skill attacks (melee arcs, dash lanes, travelling projectiles). A projectile outlives the player's state.
+var skill_attacks: Array[SkillAttack] = []
+
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _next_attack_id: int = 1
 
 
 func _init(seed_value: int = 1) -> void:
@@ -41,11 +46,14 @@ func step(input: InputFrame) -> void:
 		return
 	tick += 1
 	var events: Array[GameEvent] = []
+	var player_before: Vector2 = player.position
 	player.step(input, tick, events)
 	_resolve_player_attack(events)
+	_spawn_released_skill(events)
 	boss.step(tick, player.position, _rng, events)
 	_resolve_telegraphs(events)
 	_keep_in_arena()
+	_resolve_skill_attacks(player_before, events)
 	_check_result(events)
 	last_events = events
 	for event: GameEvent in events:
@@ -76,6 +84,24 @@ func snapshot() -> Snapshots.GameSnapshot:
 		t.hit_tick = telegraph.hit_tick
 		t.end_tick = telegraph.end_tick
 		snap.telegraphs.append(t)
+	for attack: SkillAttack in skill_attacks:
+		var a: Snapshots.SkillAttackSnapshot = Snapshots.SkillAttackSnapshot.new()
+		a.id = attack.id
+		a.owner_id = attack.owner_id
+		a.skill_id = attack.skill_id
+		a.shape = attack.shape
+		a.position = attack.position
+		a.direction = attack.direction
+		a.start = attack.start
+		a.end = attack.end
+		a.width = attack.width
+		a.size = attack.size
+		a.half_angle = acos(clampf(attack.arc_dot, -1.0, 1.0)) if attack.shape == SkillAttack.SHAPE_ARC else 0.0
+		a.start_tick = attack.start_tick
+		a.end_tick = attack.end_tick
+		a.ticks_left = maxi(0, attack.end_tick - tick)
+		a.hit_target_ids = attack.hit_targets.duplicate()
+		snap.skill_attacks.append(a)
 	var hud: Snapshots.HudSnapshot = Snapshots.HudSnapshot.new()
 	hud.player_hp = player.hp
 	hud.player_max_hp = Tuning.PLAYER_MAX_HP
@@ -125,53 +151,136 @@ func _boss_snapshot() -> Snapshots.EntitySnapshot:
 	return e
 
 
+## The normal sword swing (skills are resolved from their SkillAttack objects instead).
 func _resolve_player_attack(events: Array[GameEvent]) -> void:
-	if player.attack_hit_done or boss.state == BossState.STATE_DEAD:
+	if player.attack_hit_done or boss.state == BossState.STATE_DEAD or player.state != PlayerState.STATE_ATTACK_ACTIVE:
 		return
-	var skill: Dictionary = {}
-	var reach: float = Tuning.ATTACK_RANGE
-	var arc_dot: float = Tuning.ATTACK_ARC_DOT
-	if player.state == PlayerState.STATE_ATTACK_ACTIVE:
-		reach *= Tuning.SWING_RANGE_MULT[player.combo_index - 1]
-	elif player.state == PlayerState.STATE_SKILL_ACTIVE:
-		skill = player.skill_profile()
-		reach = skill["range"]
-		arc_dot = skill["arc_dot"]
-	else:
-		return
+	var swing: int = player.combo_index - 1
 	var to_boss: Vector2 = boss.position - player.position
 	var dist: float = to_boss.length()
-	if dist - Tuning.BOSS_RADIUS > reach:
+	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE * Tuning.SWING_RANGE_MULT[swing]:
 		return
-	if dist > 0.0001 and player.facing.dot(to_boss / dist) < arc_dot:
+	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Tuning.ATTACK_ARC_DOT:
 		return
 	player.attack_hit_done = true
 	var counter: bool = boss.state == BossState.STATE_BROKEN
 	var damage: int
-	var posture: float = Tuning.NORMAL_HIT_POSTURE
-	if not skill.is_empty():
-		posture = skill["posture"]
-		if counter:
-			damage = roundi(skill["damage"] * Tuning.COUNTER_DAMAGE_MULT)
-		else:
-			damage = maxi(1, roundi(skill["damage"] * Tuning.ARMOR_DAMAGE_FACTOR))
-			player.edge = minf(Tuning.EDGE_MAX, player.edge + skill["edge_gain"])
-	elif counter:
-		damage = roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[player.combo_index - 1] * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
+	if counter:
+		damage = roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
 		player.edge = 0.0  # the counter spends all Edge
 	else:
-		damage = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[player.combo_index - 1] * Tuning.ARMOR_DAMAGE_FACTOR))
+		damage = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * Tuning.ARMOR_DAMAGE_FACTOR))
 		player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.EDGE_PER_HIT)
-	var data: Dictionary = {
+	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
 		"attacker_id": player.id, "target_id": boss.id, "damage": damage,
 		"kind": &"counter" if counter else &"normal", "position": boss.position, "combo_index": player.combo_index,
-	}
-	if not skill.is_empty():
-		data["skill_id"] = player.skill_id
-	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, data))
+	}))
 	boss.take_damage(damage, tick, events, player.id)
 	if not counter:
-		boss.add_posture(posture, tick, events)
+		boss.add_posture(Tuning.NORMAL_HIT_POSTURE, tick, events)
+
+
+## The player just entered skill_active: create the attack that belongs to the skill (once per cast).
+func _spawn_released_skill(events: Array[GameEvent]) -> void:
+	var skill: StringName = player.pending_release
+	if skill == &"":
+		return
+	player.pending_release = &""
+	var attack: SkillAttack = SkillAttack.new()
+	attack.id = _next_attack_id
+	_next_attack_id += 1
+	attack.owner_id = player.id
+	attack.skill_id = skill
+	attack.direction = player.skill_dir
+	attack.start_tick = tick
+	attack.position = player.position
+	attack.start = player.position
+	attack.end = player.position
+	match skill:
+		PlayerState.SKILL_BREAKING_EDGE:
+			attack.shape = SkillAttack.SHAPE_ARC
+			attack.size = Tuning.BREAKING_EDGE_RANGE
+			attack.arc_dot = Tuning.BREAKING_EDGE_ARC_DOT
+			attack.end_tick = tick + Tuning.BREAKING_EDGE_ACTIVE_TICKS - 1
+		PlayerState.SKILL_GALE_CUT:
+			attack.shape = SkillAttack.SHAPE_LANE
+			attack.width = Tuning.GALE_CUT_LANE_WIDTH
+			attack.end = player.position + player.skill_dir * Tuning.GALE_CUT_DISTANCE
+			attack.end_tick = tick + Tuning.GALE_CUT_ACTIVE_TICKS
+		_:
+			attack.shape = SkillAttack.SHAPE_PROJECTILE
+			attack.width = Tuning.MOON_CLEAVE_WIDTH
+			attack.speed = Tuning.MOON_CLEAVE_SPEED
+			attack.length = Tuning.MOON_CLEAVE_TRAVEL
+			attack.start = player.position + player.skill_dir * Tuning.MOON_CLEAVE_SPAWN_OFFSET
+			attack.position = attack.start
+			attack.end = attack.start + player.skill_dir * Tuning.MOON_CLEAVE_TRAVEL
+			attack.end_tick = tick + ceili(Tuning.MOON_CLEAVE_TRAVEL / Tuning.MOON_CLEAVE_SPEED)
+	skill_attacks.append(attack)
+	events.append(GameEvent.new(GameEvent.SKILL_RELEASED, tick, {
+		"attack_id": attack.id, "entity_id": player.id, "skill_id": skill, "shape": attack.shape,
+		"position": attack.position, "direction": attack.direction, "start": attack.start, "end": attack.end,
+		"width": attack.width,
+	}))
+
+
+## Advance and test every live skill attack. `player_before` is where the player stood before this tick's
+## movement: with the final position it is the segment actually travelled (walls and the solid boss included).
+func _resolve_skill_attacks(player_before: Vector2, events: Array[GameEvent]) -> void:
+	for attack: SkillAttack in skill_attacks.duplicate():
+		var done: bool = false
+		match attack.shape:
+			SkillAttack.SHAPE_ARC:
+				attack.position = player.position
+				if _arc_touches_boss(attack):
+					_skill_hit(attack, events)
+				done = tick >= attack.end_tick
+			SkillAttack.SHAPE_LANE:
+				attack.position = player.position
+				if SkillAttack.segment_touches_circle(player_before, player.position, boss.position, Tuning.BOSS_RADIUS + attack.width * 0.5):
+					_skill_hit(attack, events)
+				done = player.state != PlayerState.STATE_SKILL_ACTIVE
+			_:
+				var from: Vector2 = attack.position
+				if tick > attack.start_tick:
+					var step: float = minf(attack.speed, attack.length - attack.travelled)
+					attack.position += attack.direction * step
+					attack.travelled += step
+				if SkillAttack.segment_touches_circle(from, attack.position, boss.position, Tuning.BOSS_RADIUS + attack.width * 0.5):
+					_skill_hit(attack, events)
+				done = attack.travelled >= attack.length
+		if done:
+			skill_attacks.erase(attack)
+
+
+func _arc_touches_boss(attack: SkillAttack) -> bool:
+	var to_boss: Vector2 = boss.position - attack.position
+	var dist: float = to_boss.length()
+	if dist - Tuning.BOSS_RADIUS > attack.size:
+		return false
+	return dist <= 0.0001 or attack.direction.dot(to_boss / dist) >= attack.arc_dot
+
+
+func _skill_hit(attack: SkillAttack, events: Array[GameEvent]) -> void:
+	if attack.has_hit(boss.id) or boss.state == BossState.STATE_DEAD:
+		return
+	attack.hit_targets.append(boss.id)
+	var profile: Dictionary = PlayerState.skill_profile(attack.skill_id)
+	var counter: bool = boss.state == BossState.STATE_BROKEN
+	var damage: int
+	if counter:
+		damage = roundi(profile["damage"] * Tuning.COUNTER_DAMAGE_MULT)
+	else:
+		damage = maxi(1, roundi(profile["damage"] * Tuning.ARMOR_DAMAGE_FACTOR))
+		player.edge = minf(Tuning.EDGE_MAX, player.edge + profile["edge_gain"])
+	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
+		"attacker_id": player.id, "target_id": boss.id, "damage": damage,
+		"kind": &"counter" if counter else &"normal", "position": boss.position,
+		"skill_id": attack.skill_id, "attack_id": attack.id,
+	}))
+	boss.take_damage(damage, tick, events, player.id)
+	if not counter:
+		boss.add_posture(profile["posture"], tick, events)
 
 
 func _resolve_telegraphs(events: Array[GameEvent]) -> void:

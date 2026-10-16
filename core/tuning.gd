@@ -60,47 +60,55 @@ const ARMOR_DAMAGE_FACTOR: float = 0.25
 const COUNTER_DAMAGE_MULT: float = 4.0
 
 # Skills (Aspect-style sword skills, bound to Z X C for testing: skill_pressed 1, 2, 3). First guesses.
-# Every skill follows windup -> active -> recovery; the hit lands on the first active tick. None grants
-# invulnerability. Health damage uses the same rules as a normal hit: reduced by ARMOR_DAMAGE_FACTOR
-# against the armored boss, multiplied by COUNTER_DAMAGE_MULT during a posture break. Skills do not use the
-# Edge counter bonus (they pay Edge instead). The Edge cost is spent when the skill starts.
+# Every skill follows windup -> active -> recovery and none grants invulnerability. The direction is chosen
+# when the skill is pressed: the move input if the player is moving, else the aim, else the facing.
+# Health damage uses the same rules as a normal hit: reduced by ARMOR_DAMAGE_FACTOR against the armored boss,
+# multiplied by COUNTER_DAMAGE_MULT during a posture break. Skills do not use the Edge counter bonus (they pay
+# Edge instead). The Edge cost is spent when the skill is pressed and is not refunded if it is interrupted.
 const SKILL_COUNT: int = 3
 
-# 1. Breaking Edge: after a successful parry, spend Edge to step forward with a heavy slash.
+# 1. Breaking Edge: after a successful parry, spend Edge for a fast forward retaliation (one melee hit).
 const BREAKING_EDGE_WINDOW_TICKS: int = 50  # how long after a successful parry the skill can be used
 const BREAKING_EDGE_EDGE_COST: float = 25.0  # one parry (EDGE_PER_PARRY) pays for one retaliation
-const BREAKING_EDGE_WINDUP_TICKS: int = 6  # the forward step happens during the windup
-const BREAKING_EDGE_STEP: float = 22.0  # pixels moved during the windup
-const BREAKING_EDGE_ACTIVE_TICKS: int = 3
-const BREAKING_EDGE_RECOVERY_TICKS: int = 22
+const BREAKING_EDGE_WINDUP_TICKS: int = 3  # the forward step happens during the windup
+const BREAKING_EDGE_STEP: float = 26.0  # pixels moved during the windup
+const BREAKING_EDGE_ACTIVE_TICKS: int = 2
+const BREAKING_EDGE_RECOVERY_TICKS: int = 16
 const BREAKING_EDGE_RANGE: float = 30.0
 const BREAKING_EDGE_ARC_DOT: float = 0.1
 const BREAKING_EDGE_DAMAGE: float = 20.0
-const BREAKING_EDGE_POSTURE: float = 55.0  # high: two retaliations break the boss (posture max 100)
+const BREAKING_EDGE_POSTURE: float = 55.0  # strong: two retaliations break the boss (posture max 100)
 const BREAKING_EDGE_EDGE_GAIN: float = 0.0
+const BREAKING_EDGE_COOLDOWN_TICKS: int = 0
 
-# 2. Gale Cut: dash toward the aim and deliver a quick cut. No Edge cost, a cooldown instead.
-const GALE_CUT_COOLDOWN_TICKS: int = 150
-const GALE_CUT_EDGE_COST: float = 0.0
-const GALE_CUT_WINDUP_TICKS: int = 6  # the dash: GALE_CUT_SPEED px per tick along the aim
-const GALE_CUT_SPEED: float = 5.0
-const GALE_CUT_ACTIVE_TICKS: int = 2
-const GALE_CUT_RECOVERY_TICKS: int = 10
-const GALE_CUT_RANGE: float = 30.0
-const GALE_CUT_ARC_DOT: float = 0.2
+# 2. Gale Cut: a short windup, then an aimed dash. Everything the dash corridor touches is hit once per cast.
+# The corridor is the segment the player really travelled each tick (arena walls and the solid boss can
+# shorten it), widened by the lane width. Distance = GALE_CUT_SPEED * GALE_CUT_ACTIVE_TICKS.
+const GALE_CUT_COOLDOWN_TICKS: int = 300
+const GALE_CUT_EDGE_COST: float = 35.0
+const GALE_CUT_WINDUP_TICKS: int = 4
+const GALE_CUT_SPEED: float = 8.0  # px per tick while dashing
+const GALE_CUT_ACTIVE_TICKS: int = 15  # 15 * 8 = 120 px
+const GALE_CUT_RECOVERY_TICKS: int = 12
+const GALE_CUT_DISTANCE: float = 120.0  # the planned corridor length (reported in the snapshot)
+const GALE_CUT_LANE_WIDTH: float = 18.0
 const GALE_CUT_DAMAGE: float = 15.0
-const GALE_CUT_POSTURE: float = 8.0
-const GALE_CUT_EDGE_GAIN: float = 25.0  # same as a normal hit (EDGE_PER_HIT)
+const GALE_CUT_POSTURE: float = 10.0
+const GALE_CUT_EDGE_GAIN: float = 0.0
 
-# 3. Moon Cleave: hold briefly, then a wide powerful slash. Biggest Edge cost and recovery.
+# 3. Moon Cleave: hold, then release a sword-aura projectile that travels on its own and pierces (each target
+# is hit once). An interrupted hold spawns nothing; after the release the projectile no longer depends on the
+# player.
 const MOON_CLEAVE_COOLDOWN_TICKS: int = 90
 const MOON_CLEAVE_EDGE_COST: float = 80.0
 const MOON_CLEAVE_WINDUP_TICKS: int = 30  # the committed hold
 const MOON_CLEAVE_WINDUP_MOVE_FACTOR: float = 0.2
-const MOON_CLEAVE_ACTIVE_TICKS: int = 4
+const MOON_CLEAVE_ACTIVE_TICKS: int = 4  # the release pose; the projectile spawns on its first tick
 const MOON_CLEAVE_RECOVERY_TICKS: int = 44
-const MOON_CLEAVE_RANGE: float = 38.0
-const MOON_CLEAVE_ARC_DOT: float = -0.3  # a wide arc: about 107 degrees to each side of the facing
+const MOON_CLEAVE_TRAVEL: float = 140.0  # distance the projectile travels from its spawn point
+const MOON_CLEAVE_SPEED: float = 4.0  # px per tick
+const MOON_CLEAVE_WIDTH: float = 20.0
+const MOON_CLEAVE_SPAWN_OFFSET: float = 10.0  # in front of the player
 const MOON_CLEAVE_DAMAGE: float = 40.0
 const MOON_CLEAVE_POSTURE: float = 20.0
 const MOON_CLEAVE_EDGE_GAIN: float = 0.0
