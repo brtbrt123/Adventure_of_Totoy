@@ -1,0 +1,33 @@
+{
+  "source": "art/reference/totoy_weapon_layers_v1.png",
+  "columns": 2,
+  "resample": "BOX",
+  "alpha_threshold": 128,
+  "palette": "nearest RGB Totoy36",
+  "frames": [
+    {
+      "key": "ui_weapon_frame_1",
+      "cell": 0,
+      "crop": [
+        111,
+        95,
+        846,
+        807
+      ],
+      "canvas": 48,
+      "fit": 48
+    },
+    {
+      "key": "ui_weapon_totoy_blade_1",
+      "cell": 1,
+      "crop": [
+        153,
+        178,
+        760,
+        753
+      ],
+      "canvas": 32,
+      "fit": 28
+    }
+  ]
+}

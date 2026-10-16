@@ -35,7 +35,10 @@ func _save(name_key: String) -> void:
 	_expect(image.save_png("res://art/build/" + name_key + ".png") == OK, "capture failed: " + name_key)
 
 func _catalog() -> void:
-	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1", "ui_weapon_sword_1"]
+	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1", "ui_weapon_frame_1"]
+	_expect(arena.frames.has(arena.hud.weapon_icon_key), "equipped blade icon missing")
+	if arena.frames.has(arena.hud.weapon_icon_key):
+		_expect(int(arena.frames[arena.hud.weapon_icon_key]["w"]) == 32, "blade glyph must use native 32px size")
 	var sockets: Array[Rect2] = arena.hud.aspect_rects()
 	sockets.append(arena.hud.weapon_rect())
 	for slot: int in range(4):

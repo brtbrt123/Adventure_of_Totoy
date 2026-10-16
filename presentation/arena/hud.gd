@@ -5,6 +5,8 @@ const Snapshots := preload("res://core/snapshots.gd")
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var debug_enabled: bool = false
+# Current sword test set; future equipped-weapon snapshot data can select this key.
+var weapon_icon_key: String = "ui_weapon_totoy_blade_1"
 var counter_max: int = 1
 var portrait_atlas: Texture2D
 var portrait_frame: Dictionary = {}
@@ -226,7 +228,8 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var rows: Array[Dictionary] = skill_rows(h)
 	var sockets: Array[Rect2] = aspect_rects()
 	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
-	ui("ui_weapon_sword_1", weapon_rect())
+	ui("ui_weapon_frame_1", weapon_rect())
+	ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
 	outlined(weapon_rect().get_center() + Vector2(-10, 14), "SWORD", colors["j"], colors["0"])
 	for slot: int in range(3):
 		var row: Dictionary = rows[slot]

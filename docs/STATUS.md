@@ -2,6 +2,12 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Equipped blade icon correction (2026-10-16, NOT merged)
+
+Replaced the generic straight sword shown in the HUD with a separate slim curved dark-steel blade, short guard and brown wrapped grip based on Hero_Attact1.png. New ui_weapon_frame_1 (48px) and ui_weapon_totoy_blade_1 (32px) are separate layers; the earlier combined sword icon is preserved. weapon_icon_key is currently set for the sword test set, not inferred from skill state. Future automatic swapping needs an equipped-weapon identifier from core; no weapon field exists yet, and no core edits were made. Generated reference plus crop/palette import settings retained in art/reference/totoy_weapon_layers_v1.*.
+
+Validated/built/previewed art and imported Godot assets; smoke_animation, smoke_profile, smoke_skills_presentation and windowed skill capture passed. Refreshed arena_skill_*.png. Human reviews the weapon likeness/readability. Claude cross-review pending; nothing merged. The approved custom skill VFX remain unimported; Codex owns their presentation playback, while Claude owns core timing/results and importer tooling.
+
 ## Circular Aspect / weapon HUD (2026-10-16, NOT merged)
 
 Implemented the human's drawn bottom-right arrangement: three 24x24 Aspect medallions arc around a larger 48x48 sword medallion. Stone/teal circular frames and four icon sprites come from the new generated skill_medallions_v1 reference; alpha/crops/resampling are recorded in its JSON. New sources ui_aspect_breaking_edge_1, ui_aspect_gale_cut_1, ui_aspect_moon_cleave_1 and ui_weapon_sword_1 use Totoy36 and binary alpha. Existing Gemini sources unchanged; atlas/contact sheet regenerated with the standard tools.
