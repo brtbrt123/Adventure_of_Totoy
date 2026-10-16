@@ -21,7 +21,7 @@ from pathlib import Path
 from PIL import Image
 
 import artlib
-from import_reference import Quantizer, despeckle, outline, shrink, to_grid, trim, write_sprite
+from import_reference import Quantizer, despeckle, outline, shrink, srgb_to_lab, to_grid, trim, write_sprite
 
 REF_DIR = artlib.ROOT / "art" / "reference"
 
@@ -148,6 +148,103 @@ def import_sheet(stem: str, out: Path, palette: artlib.Palette) -> list[str]:
     return names
 
 
+
+# Effects, UI and props: one family scale per sheet, chosen so the largest frame is `target` game pixels.
+# (stem, id prefix, columns, rows, frame count, mode, target px, per-frame labels or None)
+# modes: fx = centred on the cell centre (anchor = origin of the effect), prop = anchor at the bottom
+# centre, ui = no anchor; `beam` keeps the full cell width so segments tile; reserved gold/red allowed
+# for fx and warning icons only.
+EXTRA: list[tuple[str, str, int, int, int, str, int, list[str] | None]] = [
+    ("Slam_Shockwave", "fx_slam", 3, 2, 6, "fx", 96, None),
+    ("Stomp_Ring", "fx_stomp", 3, 2, 6, "fx", 96, None),
+    ("Sweep_Arc", "fx_sweep", 3, 2, 6, "fx", 80, None),
+    ("Dust_and_Debris", "fx_dust", 3, 2, 6, "fx", 48, None),
+    ("Charge_Trail", "fx_charge", 3, 2, 6, "fx", 64, None),
+    ("Ground_Cracks", "fx_cracks", 3, 2, 6, "fx", 48, None),
+    ("Laser_Start", "fx_beam_start", 2, 2, 4, "fx", 32, None),
+    ("Laser_Body", "fx_beam_body", 2, 2, 4, "beam", 96, None),
+    ("Lazer_End", "fx_beam_end", 2, 2, 4, "fx", 40, None),
+    ("Hit_Spark", "fx_hit", 3, 2, 6, "fx", 24, None),
+    ("Counter_Hit", "fx_counter", 3, 2, 6, "fx", 40, None),
+    ("Parry_Clash", "fx_parry", 3, 2, 6, "fx", 40, None),
+    ("Sword_Slash_Small", "fx_slash_small", 3, 2, 6, "fx", 32, None),
+    ("Sword_Slash_Big", "fx_slash_big", 3, 2, 6, "fx", 48, None),
+    ("Dash_Lines", "fx_dash", 3, 2, 6, "fx", 40, None),
+    ("Heal_and_Flash", "fx", 4, 2, 8, "fx", 32, ["flash"] * 4 + ["heal"] * 4),
+    ("Gold_Warning_Icon", "ui_warning_gold", 2, 1, 2, "icon_fx", 16, None),
+    ("Red_Warning_Icon", "ui_warning_red", 2, 1, 2, "icon_fx", 16, None),
+    ("Edge_Dash_Parry_Icon", "ui_icon", 3, 1, 3, "ui", 24, ["edge", "dash", "parry"]),
+    ("Player_Profile_Frame", "ui_profile", 1, 1, 1, "ui", 200, None),
+    ("Boss_Bar_Frame", "ui_boss", 1, 1, 1, "ui", 200, None),
+    ("Nature_Prop", "prop_nature", 4, 2, 8, "prop", 40, None),
+    ("Ruins_Prop", "prop_ruins", 3, 2, 6, "prop", 48, None),
+    ("Small_Props", "prop_small", 4, 2, 8, "prop", 24, None),
+    ("Arena_Walls_Prop", "prop_wall", 4, 3, 12, "prop", 40, None),
+]
+
+
+def import_extra(spec: tuple[str, str, int, int, int, str, int, list[str] | None], out: Path, palette: artlib.Palette) -> int:
+    stem, prefix, cols, rows, count, mode, target, labels = spec
+    image = Image.open(REF_DIR / f"{stem}.png").convert("RGB")
+    mask = figure_mask(image)
+    cw, ch = image.width / cols, image.height / rows
+    boxes = [
+        (round((i % cols) * cw), round((i // cols) * ch), round((i % cols + 1) * cw), round((i // cols + 1) * ch)) for i in range(count)
+    ]
+    biggest = 1
+    for box in boxes:
+        bb = mask.crop(box).getbbox()
+        if bb:
+            biggest = max(biggest, bb[2] - bb[0], bb[3] - bb[1])
+    scale = biggest / target
+    quant = Quantizer(palette, True)
+    if mode in ("fx", "icon_fx", "beam"):
+        quant.choices = [(sym, srgb_to_lab(rgb)) for sym, rgb in palette.by_symbol.items()]  # red and gold allowed
+    else:
+        quant = Quantizer(palette, False)
+    for old in out.glob(f"{prefix}_*.txt"):
+        if labels is None:
+            old.unlink()
+    counters: dict[str, int] = {}
+    written = 0
+    for i, box in enumerate(boxes):
+        cmask = mask.crop(box)
+        if cmask.getbbox() is None:
+            print(f"  warning: {stem} cell {i + 1} is empty, skipped")
+            continue
+        small_pre, small_a = shrink(image.crop(box), cmask, scale)
+        grid = to_grid(small_pre, small_a, quant, palette, threshold=60 if mode in ("fx", "beam") else 100)
+        if mode in ("prop", "icon_fx", "ui"):
+            drop_fragments(grid, palette.transparent, 4)
+        if mode == "beam":
+            top = [y for y, row in enumerate(grid) if any(c != palette.transparent for c in row)]
+            trimmed, ox, oy = grid[top[0] : top[-1] + 1], 0, top[0]
+        else:
+            trimmed, ox, oy = trim(grid, palette.transparent)
+        if not trimmed or not trimmed[0]:
+            continue
+        anchor: tuple[int, int] | None = None
+        if mode in ("fx", "icon_fx"):
+            anchor = (round(cw / 2 / scale - ox), round(ch / 2 / scale - oy))
+            # keep the true origin even when the effect sits off-centre in its cell: pad the sprite to include it
+            h0, w0 = len(trimmed), len(trimmed[0])
+            top, left = max(0, -anchor[1]), max(0, -anchor[0])
+            bottom, right = max(0, anchor[1] - h0 + 1), max(0, anchor[0] - w0 + 1)
+            if top or left or bottom or right:
+                t = palette.transparent
+                trimmed = [[t] * (w0 + left + right) for _ in range(top)] + [[t] * left + row + [t] * right for row in trimmed] + [[t] * (w0 + left + right) for _ in range(bottom)]
+                anchor = (anchor[0] + left, anchor[1] + top)
+        elif mode == "prop":
+            anchor = (feet_x(trimmed, palette.transparent), len(trimmed))
+        label = labels[i] if labels else None
+        key = f"{prefix}_{label}" if label else prefix
+        counters[key] = counters.get(key, 0) + 1
+        name = f"{key}_{counters[key]}" if count > 1 or label else key
+        write_sprite(out / f"{name}.txt", trimmed, anchor, f"imported from {stem}.png (Gemini), scale {scale:.2f}", palette.transparent)
+        written += 1
+    return written
+
+
 TILE_SHEETS = {"Grass": "grass", "Dirt": "dirt", "Stone": "stone", "Water": "water"}  # 4x4 grids of 16 tiles, no gaps
 
 
@@ -178,6 +275,9 @@ def main() -> int:
 
     palette = artlib.load_palette()
     stems = [s for s in args.only.split(",") if s] or list(SHEETS)
+    only_given = bool(args.only)
+    extra_stems = {spec[0] for spec in EXTRA}
+    stems = [s for s in stems if s not in extra_stems]
     unknown = [s for s in stems if s not in SHEETS]
     if unknown:
         print(f"unknown sheets: {unknown}", file=sys.stderr)
@@ -191,6 +291,12 @@ def main() -> int:
         names = import_sheet(stem, args.out, palette)
         total += len(names)
         print(f"{stem}: {len(names)} frames")
+    wanted = {x for x in args.only.split(",") if x}
+    for spec in EXTRA:
+        if not wanted or spec[0] in wanted:
+            n = import_extra(spec, args.out, palette)
+            total += n
+            print(f"{spec[0]}: {n} frames")
     if not args.only:
         for stem in TILE_SHEETS:
             print(f"{stem}: {import_tiles(stem, args.out, palette)} tiles")
