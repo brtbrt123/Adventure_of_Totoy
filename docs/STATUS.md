@@ -2,6 +2,12 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Moon Cleave larger aura follow-up (2026-10-17, NOT merged)
+
+Human still found the C aura too small and lacking effects. Increased its opaque cosmetic crescent from40 to64 pixels (about twice the hero height), with two smaller trailing crescent fragments, three energy streaks, eight moving sparks and a five-tick release star. All fragments follow projectile age, direction, position and already-travelled distance; they remain visible independently of player state. Removed the multiplied purple texture tint so the main aura retains its bright imported palette. Hit width remains the core snapshot width; no core change. Skill smoke now asserts the64px cosmetic minimum. Updated windowed captures include arena_skill_moon_projectile_ranged.png.
+
+Windowed skill smoke/captures passed. python harness/checks/run_tests.py --worktree . passed Python tests, Godot import, the core suite and every smoke suite. Human still judges appearance and feel; Claude cross-review pending.
+
 ## Installed skill VFX and replacement release audio (2026-10-17, NOT merged)
 
 Implemented the human's approved new sheets: 18 new fx_aspect2 frames, hard alpha, Totoy36 palette, centered anchors and fixed scale per skill. Import crop/threshold/scale metadata lives in art/reference/skills_v2/import.json. Previous sprites remain available. Z uses the gold crossing cuts; X uses cyan cutting ribbons during the actual active dash plus its observed ground trail; C uses the travelling crescent from independent skill attack snapshots and a larger cosmetic sprite wake. The bright C centre remains core-width. No collision, damage, timing, cooldown or core files changed.

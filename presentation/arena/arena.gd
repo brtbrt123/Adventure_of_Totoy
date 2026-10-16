@@ -660,13 +660,37 @@ func _draw_skill_projectiles(shake_offset: Vector2) -> void:
 		if entry.is_empty():
 			continue
 		draw_set_transform(Vector2(effect["at"]).round() + shake_offset, float(effect["rotation"]))
-		# The outer wake is cosmetic; the bright blade still uses the core width.
-		var wake: Dictionary = _projectile_texture(effect["key"], maxi(1, roundi(float(effect["visual_width"]))))
-		if not wake.is_empty():
-			draw_texture(wake["texture"], -Vector2(wake["anchor"]), colors["v"])
+		# Large cosmetic aura; collision width remains entirely core-owned.
+		var diameter: int = maxi(1, roundi(float(effect["visual_width"])))
+		var wake: Dictionary = _projectile_texture(effect["key"], diameter)
 		var length: float = float(effect["trail_length"])
+		var age: int = int(effect["age"])
+		# Detached smaller crescents follow only the distance already travelled.
+		for echo: int in range(2, 0, -1):
+			var offset: float = float(echo * 14)
+			if length < offset:
+				continue
+			var remnant: Dictionary = _projectile_texture("fx_aspect2_moon_cleave_5", diameter - echo * 12)
+			if not remnant.is_empty():
+				draw_texture(remnant["texture"], Vector2(-offset, 0) - Vector2(remnant["anchor"]))
 		if length > 3.0:
-			draw_line(Vector2(-length, 0), Vector2(-3, 0), colors["v"], 3.0, false)
-			draw_line(Vector2(-length, 0), Vector2(-3, 0), colors["p"], 1.0, false)
+			for lane: int in [-1, 0, 1]:
+				var y: float = float(lane * 10)
+				draw_line(Vector2(-length, y), Vector2(-5, y * 0.4), colors["l"], 5.0, false)
+				draw_line(Vector2(-length + 3, y), Vector2(-5, y * 0.4), colors["o"], 2.0, false)
+		if not wake.is_empty():
+			draw_texture(wake["texture"], -Vector2(wake["anchor"]))
+		# Crisp orbiting fragments, deterministic from the attack's age.
+		for fragment: int in range(8):
+			var phase: int = posmod(age + fragment * 5, 18)
+			var side: float = -1.0 if fragment % 2 == 0 else 1.0
+			var at: Vector2 = Vector2(-float(phase * 2), side * (18.0 + float(posmod(fragment * 7 + age, 16))))
+			draw_line(at.round(), (at + Vector2(4, -side * 2)).round(), colors["p"] if phase < 9 else colors["v"], 2.0, false)
+		# A short release star belongs to the projectile, so it survives interruption.
+		if age < 5:
+			var radius: float = float(18 - age * 2)
+			for ray: int in range(4):
+				var axis: Vector2 = Vector2.from_angle(PI * 0.25 + ray * PI * 0.5)
+				draw_line((axis * 4).round(), (axis * radius).round(), colors["1"], 2.0, false)
 		draw_texture(entry["texture"], -Vector2(entry["anchor"]))
 		draw_set_transform(shake_offset)

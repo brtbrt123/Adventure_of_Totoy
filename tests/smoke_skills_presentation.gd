@@ -228,6 +228,7 @@ func _projectile_lifecycle() -> void:
 	var effect: Dictionary = arena.skill_projectile_effects()[0]
 	_expect(effect["attack_id"] == release.data["attack_id"], "release attack id mismatch")
 	_expect(arena.skill_effect().is_empty(), "released Moon still attaches a melee crescent to hero")
+	_expect(float(effect["visual_width"]) >= 64.0, "Moon aura should read larger than the hero")
 	var cache: Dictionary = arena._projectile_texture(effect["key"], roundi(effect["width"]))
 	_expect(not cache.is_empty() and int(cache["diameter"]) == roundi(effect["width"]), "projectile texture does not fit snapshot width")
 	arena._on_event(release)
