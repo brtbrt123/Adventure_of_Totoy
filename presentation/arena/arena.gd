@@ -20,7 +20,6 @@ var colors: Dictionary = {}
 var frames: Dictionary = {}
 var head_anchors: Dictionary = {}
 var ground_texture: Texture2D
-var floor_regions: Array[Rect2] = []
 var missing_frames: Dictionary = {}
 var selected_frames: Dictionary = {}
 var last_attacks: Dictionary = {}
@@ -68,9 +67,8 @@ func _ready() -> void:
 	white_sprites = ImageTexture.create_from_image(white_image)
 	tiles = load("res://art/build/tiles.png") as Texture2D
 	var tile_entries: Dictionary = _read_json("res://art/build/tiles.json").get("tiles", {})
-	var ground: Dictionary = GroundView.build(tiles.get_image(), tile_entries, colors)
-	ground_texture = ImageTexture.create_from_image(ground["image"])
-	floor_regions.assign(ground["regions"])
+	var ground: Image = GroundView.build(tiles.get_image(), tile_entries)
+	ground_texture = ImageTexture.create_from_image(ground)
 	snapshot = core.snapshot()
 	prepare_visuals()
 	_update_hud()

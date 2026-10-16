@@ -26,7 +26,7 @@ func _run() -> void:
 	root.add_child(arena)
 	_expect(Engine.physics_ticks_per_second == 60, "physics must run at 60 Hz")
 	_expect(arena.frames.has("mossbound_colossus_idle"), "boss atlas is stale: run validate/build/preview")
-	_expect(arena.floor_regions.size() == 220, "floor must contain 20x11 tiles")
+	_expect(arena.ground_texture.get_size() == Vector2(320, 176), "floor must cover 20x11 tiles")
 	# Re-registration must not accumulate duplicate bindings.
 	var before: int = InputMap.action_get_events("arena_attack").size()
 	Bindings.register()

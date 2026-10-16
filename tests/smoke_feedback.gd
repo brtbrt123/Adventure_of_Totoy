@@ -40,12 +40,13 @@ func run() -> void:
 		for y: int in range(int(strip.position.y), int(strip.end.y)):
 			check(image.get_pixel(int(strip.position.x), y).a == 1.0, "beam has transparent hole in frame %d" % n)
 	var ground: Image = arena.ground_texture.get_image()
-	for x: int in range(16, 320, 16):
-		for y: int in range(176):
-			check(ground.get_pixel(x - 1, y) == ground.get_pixel(x, y), "grass vertical seam")
-	for y: int in range(16, 176, 16):
-		for x: int in range(320):
-			check(ground.get_pixel(x, y - 1) == ground.get_pixel(x, y), "grass horizontal seam")
+	var ground_colors: Dictionary = {}
+	for y: int in range(ground.get_height()):
+		for x: int in range(ground.get_width()):
+			var pixel: Color = ground.get_pixel(x, y)
+			ground_colors[pixel.to_rgba32()] = true
+			check(pixel.a == 1.0, "ground has a transparent hole")
+	check(ground_colors.size() >= 4, "grass shading and detail were flattened")
 	await save("layout")
 	var tell: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
 	tell.owner_id = arena.snapshot.entities[0].id
