@@ -21,3 +21,11 @@ Installed Godot reports 4.7.2.stable.official.ed1daf0bf. `python tools/art/valid
 Windowed `tests/smoke_gemini_capture.gd`: pass. Review images in art/build/arena_gemini_*.png: hero walk, attack, parry; golem slam, staggered, death; HUD and debug hitboxes. These are labelled snapshot fixtures rendered through production presentation, not evidence of animation feel. No missing requested atlas frames were found. No judgement of art quality, readability in motion, animation feel or fun is possible here; the human approves those.
 
 Claude cross-review remains pending: three read-only CLI attempts (sandboxed, escalated, then a minimal no-plugin invocation) returned no review output and were interrupted. No pass/fail result was obtained. This does not constitute the required cross-review or human art approval. Nothing was merged.
+
+## Human feedback follow-up
+
+Profile footprint reduced from 156x60 to 125x48 with repositioned live meters and portrait. Laser body now uses an opaque imported cross-section normalized to the snapshot width, with continuous capsule backing; cap art overlays rather than replaces the body. Body padding cannot create gaps, and all four frames use the same lane geometry; afterglow fades after end_tick. Charge uses its own lane texture.
+
+The floor selects quiet imported grass variants and reflected versions by neighbouring edge cost. Shared border pixels match exactly; a two-colour tint in neighbouring Totoy grass colours reduces busy contrast. All work is done in presentation at startup; no art sources or generated atlases were edited. Tree and pillar are 2x larger and draw in foot-position order with actors. Static prop collision is not implemented because the core has no obstacle interface; see PROP_COLLISION_HANDOFF.md for proposed footprints and required core tests.
+
+Verification: art validator and the full harness runner pass, including smoke_feedback. Windowed smoke_feedback --capture passes, with arena_feedback_layout.png and horizontal/diagonal laser captures across all four frames. Screenshots still need human art approval. Automatic approval review rejected sending the private code/diffs to Claude for cross-review without explicit disclosure approval; no cross-review verdict is claimed.

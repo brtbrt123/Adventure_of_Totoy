@@ -3,6 +3,7 @@ extends RefCounted
 const Snapshots := preload("res://core/snapshots.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+static var beam_strips: Dictionary = {}
 const AFTERGLOW_TICKS: int = 10
 
 static func pixel_points(points: PackedVector2Array) -> PackedVector2Array:
@@ -132,22 +133,14 @@ static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapsh
 		return
 	var frame: Dictionary = frames[key]
 	if tell.shape == &"line":
-		# Body repeats along the beam axis; end pieces are clipped to the lane too.
-		var length: float = 24.0
-		var cursor: float = 0.0
-		while cursor < tell.size:
-			var piece: float = minf(length, tell.size - cursor)
-			var side: Vector2 = tell.direction.orthogonal() * tell.width * 0.5
-			var start: Vector2 = tell.center + tell.direction * cursor
-			var polygon: PackedVector2Array = PackedVector2Array([start - side, start + tell.direction * piece - side, start + tell.direction * piece + side, start + side])
-			var segment: Dictionary = frame
-			if pose == "beam_body" and (cursor == 0.0 or cursor + piece >= tell.size):
-				segment = frames["fx_beam_%s_%d" % ["start" if cursor == 0.0 else "end", mini(3, age / 2) + 1]]
-			var uv: PackedVector2Array = PackedVector2Array([Vector2(segment["x"], segment["y"]), Vector2(segment["x"] + segment["w"], segment["y"]), Vector2(segment["x"] + segment["w"], segment["y"] + segment["h"]), Vector2(segment["x"], segment["y"] + segment["h"])])
+		if pose == "beam_body":
+			draw_beam(canvas, tell, tick, frames, sprites)
+		else:
+			# Charge remains a lane effect; it is not a laser.
+			var uv: PackedVector2Array = PackedVector2Array([Vector2(frame["x"], frame["y"]), Vector2(frame["x"] + frame["w"], frame["y"]), Vector2(frame["x"] + frame["w"], frame["y"] + frame["h"]), Vector2(frame["x"], frame["y"] + frame["h"])])
 			for i: int in range(uv.size()):
 				uv[i] /= sprites.get_size()
-			canvas.draw_polygon(polygon, PackedColorArray([Color.WHITE]), uv, sprites)
-			cursor += piece
+			canvas.draw_polygon(beam_body_polygon(tell), PackedColorArray([Color.WHITE]), uv, sprites)
 		return
 	if tell.shape == &"ring":
 		for i: int in range(96):
@@ -165,3 +158,54 @@ static func _effect_polygon(canvas: Node2D, sprites: Texture2D, polygon: PackedV
 		var local: Vector2 = (point - tell.center).rotated(-tell.direction.angle() if tell.shape == &"cone" else 0.0)
 		uv.append((Vector2(frame["x"] + frame["ax"], frame["y"] + frame["ay"]) + local / (radius * 2.0) * Vector2(frame["w"], frame["h"])) / sprites.get_size())
 	canvas.draw_polygon(polygon, PackedColorArray([Color.WHITE]), uv, sprites)
+
+## Use one opaque cross-section of the imported body: padded cells and changing
+## start/end shapes can no longer punch gaps into the damaging lane.
+static func beam_strip(sprites: Texture2D, frame: Dictionary) -> Rect2:
+	var cache_key: String = "%d:%d:%d" % [sprites.get_instance_id(), frame["x"], frame["y"]]
+	if beam_strips.has(cache_key):
+		return beam_strips[cache_key]
+	var image: Image = sprites.get_image()
+	var x: int = int(frame["x"]) + int(frame["w"]) / 2
+	var top: int = int(frame["y"])
+	var bottom: int = top + int(frame["h"]) - 1
+	while top < bottom and image.get_pixel(x, top).a == 0.0:
+		top += 1
+	while bottom > top and image.get_pixel(x, bottom).a == 0.0:
+		bottom -= 1
+	var strip: Rect2 = Rect2(x, top, 1, bottom - top + 1)
+	beam_strips[cache_key] = strip
+	return strip
+
+static func beam_body_polygon(tell: Snapshots.TelegraphSnapshot) -> PackedVector2Array:
+	var side: Vector2 = tell.direction.orthogonal() * tell.width * 0.5
+	var end: Vector2 = tell.center + tell.direction * tell.size
+	return PackedVector2Array([tell.center - side, end - side, end + side, tell.center + side])
+
+static func draw_beam(canvas: Node2D, tell: Snapshots.TelegraphSnapshot, tick: int, frames: Dictionary, sprites: Texture2D) -> void:
+	var age: int = maxi(0, tick - tell.hit_tick)
+	var index: int = 1 + (age / 2) % 4
+	var fade: float = 1.0 if tick <= tell.end_tick else clampf(1.0 - float(tick - tell.end_tick) / AFTERGLOW_TICKS, 0.0, 1.0)
+	var tint: Color = Color(1, 1, 1, fade)
+	var outline: PackedVector2Array = TelegraphView.outline(tell)
+	canvas.draw_colored_polygon(outline.slice(0, outline.size() - 1), Color(Color("#e0463f"), fade))
+	var region: Rect2 = beam_strip(sprites, frames["fx_beam_body_%d" % index])
+	var uv: PackedVector2Array = PackedVector2Array([region.position, region.position + Vector2(region.size.x, 0), region.end, region.position + Vector2(0, region.size.y)])
+	for i: int in range(uv.size()):
+		uv[i] /= sprites.get_size()
+	canvas.draw_polygon(beam_body_polygon(tell), PackedColorArray([tint]), uv, sprites)
+	# End art overlays a continuous body, centred at its declared origin. Each
+	# circle is wholly inside the snapshot capsule, so caps cannot enlarge damage.
+	for part: String in ["start", "end"]:
+		var frame: Dictionary = frames["fx_beam_%s_%d" % [part, index]]
+		var origin: Vector2 = tell.center if part == "start" else tell.center + tell.direction * tell.size
+		var polygon: PackedVector2Array = PackedVector2Array()
+		var cap_uv: PackedVector2Array = PackedVector2Array()
+		var extent: float = maxf(float(frame["w"]), float(frame["h"]))
+		for i: int in range(48):
+			var unit: Vector2 = Vector2.from_angle(TAU * i / 48.0)
+			polygon.append(origin + unit.rotated(tell.direction.angle()) * tell.width * 0.5)
+			var pixel: Vector2 = Vector2(frame["ax"], frame["ay"]) + unit * extent * 0.5
+			pixel = pixel.clamp(Vector2.ZERO, Vector2(frame["w"] - 1, frame["h"] - 1))
+			cap_uv.append((Vector2(frame["x"], frame["y"]) + pixel) / sprites.get_size())
+		canvas.draw_polygon(polygon, PackedColorArray([tint]), cap_uv, sprites)

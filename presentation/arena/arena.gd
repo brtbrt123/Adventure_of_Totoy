@@ -10,6 +10,8 @@ const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
+const GroundView := preload("res://presentation/arena/ground_view.gd")
+const DECORATIONS: Array[Dictionary] = [{"name": "prop_nature_1", "at": Vector2(18, 91), "scale": Vector2.ONE}, {"name": "prop_nature_4", "at": Vector2(289, 172), "scale": Vector2(2, 2)}, {"name": "prop_ruins_2", "at": Vector2(290, 80), "scale": Vector2(2, 2)}, {"name": "prop_small_3", "at": Vector2(35, 170), "scale": Vector2.ONE}]
 const Hud := preload("res://presentation/arena/hud.gd")
 
 var core: GameCore = GameCore.new(17)
@@ -17,6 +19,7 @@ var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var frames: Dictionary = {}
 var head_anchors: Dictionary = {}
+var ground_texture: Texture2D
 var floor_regions: Array[Rect2] = []
 var missing_frames: Dictionary = {}
 var selected_frames: Dictionary = {}
@@ -65,18 +68,9 @@ func _ready() -> void:
 	white_sprites = ImageTexture.create_from_image(white_image)
 	tiles = load("res://art/build/tiles.png") as Texture2D
 	var tile_entries: Dictionary = _read_json("res://art/build/tiles.json").get("tiles", {})
-	var grass: Array[String] = []
-	for key: String in tile_entries:
-		if key.begins_with("grass"):
-			grass.append(key)
-	grass.sort()
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = 1908
-	for y: int in range(11):
-		for x: int in range(20):
-			var name_key: String = grass[rng.randi_range(0, grass.size() - 1)]
-			var tile: Dictionary = tile_entries[name_key]
-			floor_regions.append(Rect2(tile["x"], tile["y"], 16, 16))
+	var ground: Dictionary = GroundView.build(tiles.get_image(), tile_entries, colors)
+	ground_texture = ImageTexture.create_from_image(ground["image"])
+	floor_regions.assign(ground["regions"])
 	snapshot = core.snapshot()
 	prepare_visuals()
 	_update_hud()
@@ -234,10 +228,7 @@ func _draw() -> void:
 		offset = Vector2(1 if shake_left % 2 == 0 else -1, 1 if shake_left % 3 == 0 else -1)
 	draw_set_transform(offset)
 	draw_rect(Rect2(-2, -2, 324, 184), colors["2"])
-	for index: int in range(floor_regions.size()):
-		draw_texture_rect_region(tiles, Rect2((index % 20) * 16, floori(index / 20.0) * 16, 16, 16), floor_regions[index], Color(0.72, 0.72, 0.72))
-	for decoration: Dictionary in [{"name": "prop_nature_1", "at": Vector2(18, 85)}, {"name": "prop_nature_4", "at": Vector2(300, 160)}, {"name": "prop_ruins_2", "at": Vector2(292, 53)}, {"name": "prop_small_3", "at": Vector2(35, 170)}]:
-		_draw_imported(decoration["name"], decoration["at"])
+	draw_texture(ground_texture, Vector2.ZERO, Color(0.72, 0.72, 0.72))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, t, snapshot.tick, colors["x"] if t.kind == &"gold" else colors["z"], colors["y"] if t.kind == &"gold" else colors["A"], colors["0"])
 	for ring: Dictionary in rings:
@@ -250,8 +241,17 @@ func _draw() -> void:
 	var actors: Array[Snapshots.EntitySnapshot] = [snapshot.player]
 	actors.append_array(snapshot.entities)
 	actors.sort_custom(_behind)
+	var drawables: Array[Dictionary] = []
+	for decoration: Dictionary in DECORATIONS:
+		drawables.append(decoration)
 	for actor: Snapshots.EntitySnapshot in actors:
-		_draw_actor(actor)
+		drawables.append({"actor": actor, "at": actor.position})
+	drawables.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
+	for item: Dictionary in drawables:
+		if item.has("actor"):
+			_draw_actor(item["actor"])
+		else:
+			_draw_imported(item["name"], item["at"], item["scale"])
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		if snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
 			_draw_impact(tell)

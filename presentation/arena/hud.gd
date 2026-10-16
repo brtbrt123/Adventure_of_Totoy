@@ -150,16 +150,16 @@ func _draw() -> void:
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	prepare_portrait()
 	if portrait_mask != null:
-		draw_texture_rect(portrait_mask, Rect2(13, 14, 32, 32), false)
-	bar(Vector2(58, 25), 86, h.player_hp, h.player_max_hp, colors["t"], 7, float(health_ghosts.get("player", h.player_hp)))
-	bar(Vector2(59, 41), 82, h.edge, h.edge_max, colors["v"], 2)
-	bar(Vector2(59, 49), 82, dash_fraction(h), 1.0, colors["n"], 2)
-	ui("ui_profile", Rect2(2, 2, 156, 60))
-	ui("ui_icon_edge_1", Rect2(49, 39, 7, 7))
-	ui("ui_icon_dash_1", Rect2(49, 47, 7, 7))
-	ui("ui_icon_parry_1", Rect2(145, 40, 9, 9))
+		draw_texture_rect(portrait_mask, Rect2(11, 12, 25, 25), false)
+	bar(Vector2(47, 20), 68, h.player_hp, h.player_max_hp, colors["t"], 5, float(health_ghosts.get("player", h.player_hp)))
+	bar(Vector2(47, 33), 66, h.edge, h.edge_max, colors["v"], 2)
+	bar(Vector2(47, 40), 66, dash_fraction(h), 1.0, colors["n"], 2)
+	ui("ui_profile", Rect2(2, 2, 125, 48))
+	ui("ui_icon_edge_1", Rect2(39, 31, 6, 6))
+	ui("ui_icon_dash_1", Rect2(39, 38, 6, 6))
+	ui("ui_icon_parry_1", Rect2(116, 32, 7, 7))
 	var hp: String = "%d/%d" % [h.player_hp, h.player_max_hp]
-	outlined(Vector2(101 - hp.length() * 2, 26), hp, colors["1"], colors["0"])
+	outlined(Vector2(81 - hp.length() * 2, 20), hp, colors["1"], colors["0"])
 
 func ui(key: String, rect: Rect2) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
