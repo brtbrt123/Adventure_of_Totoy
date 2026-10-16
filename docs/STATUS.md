@@ -2,6 +2,10 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Harder boss and parryable sweep (2026-10-16, NOT merged)
+
+Human explicitly requested harder boss combat and parryable sweep. Core changes for this request: 380 HP, faster approach, shorter cooldowns/recoveries, one-second posture-break opening. Sweep now has gold kind (legacy red_sweep identifier retained), with both parry qualities tested; other red attacks stay dodge-only. Warning/hit geometry and windups unchanged. Presentation colours sweep effects gold, and the laser sound replaces the sword-clash layer with air rush/stone rumble. Details and tuning are in architecture.md. Human playtest and cross-review remain pending; no claim of fun or balanced difficulty.
+
 ## Sword combo in core (branch `agent/art/gemini-import`, 2026-10-16, NOT merged)
 
 Requested by Codex's task notes. `core/player.gd` now has a three-swing combo (`combo_index` 1-3, snapshot field `player.combo_index`, `attack_hit` event carries it). Buffer: an attack press in the last `COMBO_BUFFER_TICKS` of recovery chains with no idle gap; a press within `COMBO_GRACE_TICKS` after a swing still chains; resets on damage, dash, parry (press or success), death, grace expiry and after swing 3. One hit per swing is kept (`attack_hit_done`). Numbers (per-swing windup/active/recovery, damage and range multipliers, buffer, grace) are in `core/tuning.gd` as `SWING_*` and `COMBO_*`; they are first guesses. The older `ATTACK_*_TICKS` constants are now swing 1's values. Documented in `docs/architecture.md` ("Sword combo"). 16 new tests in `tests/core/test_combo.gd`; mutation check: removing the damage reset, the dash reset or the duplicate-hit guard each fails tests. Verified: `run_tests.py` all suites pass (54 core tests). **Not done:** presentation still needs to pick `hero2_attack<combo_index>` frames (Codex); not played, so the feel and numbers are unjudged.
@@ -142,3 +146,5 @@ A light-tier task (`gpt-6-luna`, `--sandbox workspace-write`, worktree `..\Adven
 1. Human reviews `art/build/contact_sheet.png` and the palette.
 2. Codex builds a playable `presentation/` arena for the combat slice (scene, input mapping, drawing telegraphs from the snapshot, HUD, placeholder boss sprite), so the human can playtest and tune `core/tuning.gd`. Needs a boss placeholder sprite and Totoy states in `art/`.
 3. Stage 2 (router and worktrees) after Codex is installed.
+
+Verification: `python harness/checks/run_tests.py --worktree .` passed Python tests, Godot import, 55 core tests and every smoke suite. A further windowed six-pattern run passed after gold effect recolouring; screenshots saved under art/build/arena_*.png. No merge performed.

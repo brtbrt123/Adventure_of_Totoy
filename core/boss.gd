@@ -1,5 +1,5 @@
 extends RefCounted
-## Mossbound Colossus simulation. No rendering. Three attacks: a gold slam (parry it), a red sweep and
+## Mossbound Colossus simulation. No rendering. Three attacks: a gold slam and sweep (parry them), and
 ## red shards (dodge them). Posture break opens a counter window. Phase 2 at half health.
 
 const Tuning := preload("res://core/tuning.gd")
@@ -145,7 +145,7 @@ func _begin_attack(tick: int, player_pos: Vector2, rng: RandomNumberGenerator, e
 			_recover_ticks = Tuning.SLAM_RECOVER_TICKS
 		ATTACK_SWEEP:
 			var hit: int = tick + roundi(Tuning.SWEEP_WINDUP_TICKS * scale)
-			var sweep: Telegraph = _make(attack, Telegraph.KIND_RED, Telegraph.SHAPE_CONE, position, aim, tick, hit, hit + Tuning.SWEEP_ACTIVE_TICKS)
+			var sweep: Telegraph = _make(attack, Telegraph.KIND_GOLD, Telegraph.SHAPE_CONE, position, aim, tick, hit, hit + Tuning.SWEEP_ACTIVE_TICKS)
 			sweep.size = Tuning.SWEEP_RADIUS
 			sweep.half_angle = deg_to_rad(Tuning.SWEEP_HALF_ANGLE_DEG)
 			sweep.damage = Tuning.SWEEP_DAMAGE

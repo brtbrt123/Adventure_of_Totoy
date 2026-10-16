@@ -76,18 +76,18 @@ func test_parry_too_early_whiffs_and_the_slam_lands() -> void:
 	assert_eq(core.player.hp, Tuning.PLAYER_MAX_HP - Tuning.SLAM_DAMAGE, "the slam landed")
 
 
-func test_parry_does_not_cancel_a_red_sweep() -> void:
+func test_perfect_parry_cancels_a_gold_sweep() -> void:
 	var core: GameCore = GameCore.new()
 	var hit_tick: int = begin_attack(core, BossState.ATTACK_SWEEP, IN_SWEEP_RANGE)
 	run_to_tick(core, hit_tick - 3)
 	core.step(input(Vector2.ZERO, false, true))
 	run_to_tick(core, hit_tick)
-	assert_false(event_types(core).has(GameEvent.PARRY_SUCCEEDED), "red attacks are not parried")
-	assert_eq(core.player.hp, Tuning.PLAYER_MAX_HP - Tuning.SWEEP_DAMAGE, "the sweep hit through the parry")
-	assert_true(core.boss.state != BossState.STATE_BROKEN, "no posture break from a red attack")
+	assert_true(event_types(core).has(GameEvent.PARRY_SUCCEEDED), "gold sweep is parryable")
+	assert_eq(core.player.hp, Tuning.PLAYER_MAX_HP, "parried sweep does no damage")
+	assert_eq(core.boss.state, BossState.STATE_BROKEN, "perfect sweep parry breaks posture")
 
 
-func test_dash_i_frames_dodge_a_red_sweep() -> void:
+func test_dash_i_frames_dodge_a_gold_sweep() -> void:
 	var core: GameCore = GameCore.new()
 	var hit_tick: int = begin_attack(core, BossState.ATTACK_SWEEP, IN_SWEEP_RANGE)
 	run_to_tick(core, hit_tick - 3)
@@ -96,7 +96,7 @@ func test_dash_i_frames_dodge_a_red_sweep() -> void:
 	assert_eq(core.player.hp, Tuning.PLAYER_MAX_HP, "no damage while dashing through the sweep")
 
 
-func test_standing_still_in_a_red_sweep_hurts_and_stepping_out_does_not() -> void:
+func test_standing_still_in_a_gold_sweep_hurts_and_stepping_out_does_not() -> void:
 	var hurt: GameCore = GameCore.new()
 	var hit_tick: int = begin_attack(hurt, BossState.ATTACK_SWEEP, IN_SWEEP_RANGE)
 	run_to_tick(hurt, hit_tick)
@@ -157,7 +157,7 @@ func test_broken_boss_cancels_its_attack_and_takes_counter_damage() -> void:
 	assert_true(expected > Tuning.ATTACK_DAMAGE * 3, "a counter is much stronger than a normal hit")
 
 
-func test_counter_window_lasts_two_seconds_then_closes() -> void:
+func test_counter_window_lasts_one_second_then_closes() -> void:
 	var core: GameCore = GameCore.new()
 	core.boss.cooldown = 100000
 	core.boss.add_posture(Tuning.BOSS_POSTURE_MAX, 1, [])
@@ -167,7 +167,7 @@ func test_counter_window_lasts_two_seconds_then_closes() -> void:
 	assert_true(event_types(core).has(GameEvent.COUNTER_WINDOW_CLOSED), "counter_window_closed event")
 	assert_true(core.boss.state != BossState.STATE_BROKEN, "boss recovers")
 	assert_near(core.boss.posture, 0.0, 0.001, "posture resets")
-	assert_eq(Tuning.BOSS_BREAK_TICKS, 120, "the design asks for a two-second opening")
+	assert_eq(Tuning.BOSS_BREAK_TICKS, 60, "harder boss has a one-second opening")
 
 
 func test_phase_two_at_half_health() -> void:
@@ -234,9 +234,27 @@ func test_snapshot_exposes_telegraph_geometry() -> void:
 	begin_attack(core, BossState.ATTACK_SWEEP, IN_SWEEP_RANGE)
 	var snap: GameCore.Snapshots.GameSnapshot = core.snapshot()
 	assert_eq(snap.telegraphs.size(), 1)
-	assert_eq(snap.telegraphs[0].kind, Telegraph.KIND_RED)
+	assert_eq(snap.telegraphs[0].kind, Telegraph.KIND_GOLD)
 	assert_eq(snap.telegraphs[0].shape, Telegraph.SHAPE_CONE)
 	assert_eq(snap.telegraphs[0].hit_tick, core.boss.telegraphs[0].hit_tick)
 	assert_eq(snap.entities[0].visual_id, &"mossbound_colossus")
 	assert_eq(snap.player.visual_id, &"totoy")
 	assert_eq(snap.hud.boss_max_hp, Tuning.BOSS_MAX_HP)
+
+
+func test_early_sweep_deflect_and_red_shards_stays_unparryable() -> void:
+	var sweep: GameCore = GameCore.new()
+	var hit: int = begin_attack(sweep, BossState.ATTACK_SWEEP, IN_SWEEP_RANGE)
+	run_to_tick(sweep, hit - Tuning.PARRY_PERFECT_TICKS - 2)
+	sweep.step(input(Vector2.ZERO, false, true))
+	run_to_tick(sweep, hit)
+	assert_eq(sweep.player.hp, Tuning.PLAYER_MAX_HP, "early sweep deflect prevents damage")
+	assert_true(event_types(sweep).has(GameEvent.PARRY_SUCCEEDED), "early sweep parry event")
+	assert_true(sweep.boss.posture > 0.0 and sweep.boss.state != BossState.STATE_BROKEN, "early deflect gives partial posture")
+	var shards: GameCore = GameCore.new()
+	hit = begin_attack(shards, BossState.ATTACK_SHARDS, IN_SWEEP_RANGE)
+	run_to_tick(shards, hit - 3)
+	shards.step(input(Vector2.ZERO, false, true))
+	run_to_tick(shards, hit)
+	assert_false(event_types(shards).has(GameEvent.PARRY_SUCCEEDED), "red beam remains dodge-only")
+	assert_true(shards.player.hp < Tuning.PLAYER_MAX_HP, "beam hits through parry")

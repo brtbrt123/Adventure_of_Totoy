@@ -66,31 +66,31 @@ const EDGE_PER_PARRY: float = 25.0
 const EDGE_COUNTER_BONUS: float = 0.5
 
 # Mossbound Colossus
-const BOSS_MAX_HP: int = 300
+const BOSS_MAX_HP: int = 380
 const BOSS_POSTURE_MAX: float = 100.0
 const BOSS_RADIUS: float = 20.0
-const BOSS_SPEED: float = 0.35
-const BOSS_FIRST_ATTACK_DELAY_TICKS: int = 90
-const BOSS_COOLDOWN_PHASE1_TICKS: int = 70
-const BOSS_COOLDOWN_PHASE2_TICKS: int = 42
+const BOSS_SPEED: float = 0.5
+const BOSS_FIRST_ATTACK_DELAY_TICKS: int = 60
+const BOSS_COOLDOWN_PHASE1_TICKS: int = 40
+const BOSS_COOLDOWN_PHASE2_TICKS: int = 24
 const BOSS_PHASE2_HP_FRACTION: float = 0.5
 const BOSS_PHASE2_WINDUP_FACTOR: float = 0.85
 const BOSS_POSTURE_DECAY: float = 0.03
-const BOSS_BREAK_TICKS: int = 120  # the counter opening: two seconds
+const BOSS_BREAK_TICKS: int = 60  # one second to punish a posture break
 const BOSS_BREAK_RECOVER_TICKS: int = 20
 
-# Boss attacks: gold slam (parry it), red sweep and red shards (dodge them)
+# Boss attacks: gold slam and sweep (parry them), red shards (dodge them)
 const SLAM_WINDUP_TICKS: int = 60
 const SLAM_RADIUS: float = 34.0
 const SLAM_DAMAGE: int = 30
-const SLAM_RECOVER_TICKS: int = 40
+const SLAM_RECOVER_TICKS: int = 26
 
 const SWEEP_WINDUP_TICKS: int = 54  # was 42; at the slower walk speed the player needs ~47 ticks to leave the cone from close range
 const SWEEP_RADIUS: float = 80.0
 const SWEEP_HALF_ANGLE_DEG: float = 50.0
 const SWEEP_ACTIVE_TICKS: int = 4
 const SWEEP_DAMAGE: int = 20
-const SWEEP_RECOVER_TICKS: int = 36
+const SWEEP_RECOVER_TICKS: int = 24
 
 const SHARDS_WINDUP_TICKS: int = 48
 const SHARDS_LENGTH: float = 170.0
@@ -98,7 +98,7 @@ const SHARDS_WIDTH: float = 12.0
 const SHARDS_SPREAD_DEG: float = 20.0
 const SHARDS_ACTIVE_TICKS: int = 6
 const SHARDS_DAMAGE: int = 15
-const SHARDS_RECOVER_TICKS: int = 30
+const SHARDS_RECOVER_TICKS: int = 22
 
 # Added after playtest ("add more attack patterns"). Stomp and combo are in both phases' pool; the
 # combo and the charge only appear in phase 2.
@@ -109,7 +109,7 @@ const STOMP_INNER_RADIUS: float = 44.0
 const STOMP_OUTER_RADIUS: float = 100.0
 const STOMP_ACTIVE_TICKS: int = 3
 const STOMP_DAMAGE: int = 25
-const STOMP_RECOVER_TICKS: int = 40
+const STOMP_RECOVER_TICKS: int = 28
 
 # Gold combo: two gold slams (second one lands COMBO_GAP ticks after the first, a bit farther out).
 const COMBO_WINDUP_TICKS: int = 54
@@ -117,7 +117,7 @@ const COMBO_GAP_TICKS: int = 26
 const COMBO_RADIUS: float = 30.0
 const COMBO_OFFSET: float = 46.0
 const COMBO_DAMAGE: int = 25
-const COMBO_RECOVER_TICKS: int = 44
+const COMBO_RECOVER_TICKS: int = 30
 
 # Red charge: the boss rushes along a locked line. The line is both the warning and the danger area, and
 # the boss body travels along it while it is dangerous.
@@ -126,4 +126,4 @@ const CHARGE_LENGTH: float = 170.0
 const CHARGE_WIDTH: float = 28.0
 const CHARGE_ACTIVE_TICKS: int = 8
 const CHARGE_DAMAGE: int = 28
-const CHARGE_RECOVER_TICKS: int = 50
+const CHARGE_RECOVER_TICKS: int = 34

@@ -13,3 +13,5 @@ All six boss patterns now sound at live snapshot hit_tick, including misses: sla
 Heavy Boss Battle 1 by MintoDog (CC0) loops during combat, fades out on the result, and restarts from the beginning on retry. Music is mixed below effects at -18 dB and briefly ducks to -25 dB for major impacts/parries. These are presentation timing/mixing choices; no core rules changed.
 
 battle_mix_preview.wav is an illustrative 12-second offline mix of the track and new cues, not a gameplay recording (runtime ducking is not included). Human listening approval remains necessary. Source credits and hashes are retained in sources.json and LICENSES.
+
+Follow-up: the human found the beam sound inconsistent. golem_beam.wav now layers swish-3 with impactMining_002, removing the sword-clash recording. The earlier battle_mix_preview.wav documents the previous mix; listen to the individual golem_beam.wav for the current beam cue.

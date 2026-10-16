@@ -76,7 +76,7 @@ The sword is a three-swing combo: `combo_index` 1, 2, 3 = art `hero2_attack1`, `
 - `line`: `center` = start, `direction`, `size` = length, `width`
 - `ring`: `center`, `size` = outer radius, `inner_size` = inner radius; **the inside (closer than `inner_size`) is safe**, the band is dangerous, the outside is safe
 
-Boss attacks: `gold_slam` (one parryable slam), `gold_combo` (two parryable slams, the second `COMBO_GAP_TICKS` after the first; a perfect parry on the first breaks posture and cancels the second; phase 2 only), `red_sweep` (cone), `red_shards` (three lines), `red_stomp` (ring), `red_charge` (a line; the boss body travels along it while it is dangerous, so the boss `position` in the snapshot moves from `hit_tick` to `end_tick`; phase 2 only). The attack frames presentation shows come from the telegraph `attack` name; a combo has two telegraphs with different `hit_tick`s.
+Boss attacks: `gold_slam` (one parryable slam), `gold_combo` (two parryable slams, the second `COMBO_GAP_TICKS` after the first; a perfect parry on the first breaks posture and cancels the second; phase 2 only), `red_sweep` (legacy attack identifier; gold parryable cone), `red_shards` (three lines), `red_stomp` (ring), `red_charge` (a line; the boss body travels along it while it is dangerous, so the boss `position` in the snapshot moves from `hit_tick` to `end_tick`; phase 2 only). The attack frames presentation shows come from the telegraph `attack` name; a combo has two telegraphs with different `hit_tick`s.
 
 The area is dangerous from `hit_tick` to `end_tick` inclusive; before that it is only a warning. Presentation draws the warning growing/filling toward `hit_tick` and may slow the visual for the final windup (the design's "final windup slows briefly").
 
@@ -120,3 +120,10 @@ Every gameplay number lives in `core/tuning.gd` (parry window, dash i-frames, bo
 - How generous should the parry window feel (design question): `PARRY_ACTIVE_TICKS` 14, `PARRY_PERFECT_TICKS` 6 are first guesses.
 - Dialogue and quest data format (owned by core, authored by the human).
 - Bow and staff need per-weapon intents (`attack_held` for draw, placed sigils); not designed yet.
+
+
+### Boss difficulty playtest update (2026-10-16)
+
+Human requested a harder boss and a parryable sweep. `red_sweep` retains its identifier for frame/test compatibility, but its telegraph `kind` is now `gold`; always use `kind` for warning colour and parry eligibility. Geometry and windup are unchanged. Both early and perfect parries work. Other red attacks remain dodge-only. Presentation recolours reserved red effect pixels to gold for this sweep without editing generated art.
+
+Current tuning: boss HP 380, approach speed 0.5 px/tick, initial delay 60 ticks, phase cooldowns 40/24 ticks, posture-break opening 60 ticks. Recovery ticks: slam 26, sweep 24, shards 22, stomp 28, combo 30, charge 34. These replace the earlier longer pauses; windups, damage and player windows are unchanged. Perfect parry still instantly breaks posture. Human must playtest difficulty and feel.

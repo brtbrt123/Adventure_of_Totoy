@@ -40,6 +40,7 @@ var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
 var shake_left: int = 0
+var gold_sprites: Texture2D
 var white_sprites: Texture2D
 var hurt_blink: bool = false
 var facing_left: bool = false
@@ -61,6 +62,16 @@ func _ready() -> void:
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
 	sprites = load("res://art/build/sprites.png") as Texture2D
+	var gold_image: Image = sprites.get_image()
+	gold_image.convert(Image.FORMAT_RGBA8)
+	for y: int in range(gold_image.get_height()):
+		for x: int in range(gold_image.get_width()):
+			var pixel: Color = gold_image.get_pixel(x, y)
+			if pixel == colors["z"]:
+				gold_image.set_pixel(x, y, colors["x"])
+			elif pixel == colors["A"]:
+				gold_image.set_pixel(x, y, colors["y"])
+	gold_sprites = ImageTexture.create_from_image(gold_image)
 	var white_image: Image = sprites.get_image()
 	white_image.convert(Image.FORMAT_RGBA8)
 	for name_key: String in frames:
@@ -475,7 +486,7 @@ func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE)
 	draw_texture_rect_region(sprites, Rect2(origin.round(), extent * size_scale), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 
 func _draw_impact(tell: Snapshots.TelegraphSnapshot) -> void:
-	CombatEffects.draw_imported_impact(self, tell, snapshot.tick, frames, sprites)
+	CombatEffects.draw_imported_impact(self, tell, snapshot.tick, frames, gold_sprites if tell.kind == &"gold" and tell.shape == &"cone" else sprites)
 
 func actor_is_white(actor: Snapshots.EntitySnapshot) -> bool:
 	if actor.visual_id == &"totoy" and actor.state == &"dash":

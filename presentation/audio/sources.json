@@ -407,14 +407,14 @@
     "golem_beam": {
       "layers": [
         {
-          "source": "sword_clash.6",
+          "source": "swish-3",
           "gain": 1,
-          "pitch": 0.75
+          "pitch": 0.55
         },
         {
-          "source": "swish-3",
-          "gain": 0.45,
-          "pitch": 0.65
+          "source": "impactMining_002",
+          "gain": 0.42,
+          "pitch": 0.7
         }
       ],
       "peak": 0.72

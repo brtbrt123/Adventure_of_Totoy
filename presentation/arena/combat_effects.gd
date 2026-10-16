@@ -38,8 +38,8 @@ static func red(t: Snapshots.TelegraphSnapshot, tick: int, colors: Dictionary) -
 	var live: bool = tick <= t.end_tick
 	var fade: float = 1.0 if live else 1.0 - float(tick - t.end_tick) / AFTERGLOW_TICKS
 	var flicker: float = 0.90 + 0.05 * float(posmod(tick + t.id, 3))
-	var bright: Color = colors["z"]
-	var dark: Color = colors["A"]
+	var bright: Color = colors["x"] if t.kind == &"gold" else colors["z"]
+	var dark: Color = colors["y"] if t.kind == &"gold" else colors["A"]
 	var cream: Color = colors["1"]
 	if t.attack == &"red_shards" and t.shape == &"line":
 		var end: Vector2 = t.center + t.direction * t.size
