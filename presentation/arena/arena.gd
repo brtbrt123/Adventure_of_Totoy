@@ -9,6 +9,7 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
+const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
@@ -16,6 +17,10 @@ const GroundView := preload("res://presentation/arena/ground_view.gd")
 const DECORATIONS: Array[Dictionary] = [{"name": "prop_nature_1", "at": Vector2(18, 91), "scale": Vector2.ONE}, {"name": "prop_nature_4", "at": Vector2(289, 172), "scale": Vector2(2, 2)}, {"name": "prop_ruins_2", "at": Vector2(290, 80), "scale": Vector2(2, 2)}, {"name": "prop_small_3", "at": Vector2(35, 170), "scale": Vector2.ONE}]
 const Hud := preload("res://presentation/arena/hud.gd")
 
+var empowered_sprites: Texture2D
+var buff_textures: Dictionary = {}
+var buff_events: Dictionary = {}
+var buff_transition: Dictionary = {}
 var combat_audio: CombatAudio
 var previous_combo_index: int = 0
 var previous_skill_id: StringName = &""
@@ -68,6 +73,19 @@ func _ready() -> void:
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
 	sprites = load("res://art/build/sprites.png") as Texture2D
+	var empowered_image: Image = sprites.get_image()
+	empowered_image.convert(Image.FORMAT_RGBA8)
+	var dark_colors: Dictionary = {colors["e"]: colors["0"], colors["f"]: colors["0"], colors["g"]: colors["e"], colors["h"]: colors["k"], colors["k"]: colors["0"], colors["l"]: colors["e"], colors["m"]: colors["k"]}
+	for key: String in frames:
+		if not key.begins_with("hero2_"):
+			continue
+		var region: Dictionary = frames[key]
+		for y: int in range(region["y"], region["y"] + region["h"]):
+			for x: int in range(region["x"], region["x"] + region["w"]):
+				var pixel: Color = empowered_image.get_pixel(x, y)
+				if pixel.a > 0.0 and dark_colors.has(pixel):
+					empowered_image.set_pixel(x, y, dark_colors[pixel])
+	empowered_sprites = ImageTexture.create_from_image(empowered_image)
 	var gold_image: Image = sprites.get_image()
 	gold_image.convert(Image.FORMAT_RGBA8)
 	for y: int in range(gold_image.get_height()):
@@ -121,6 +139,8 @@ func _physics_process(_delta: float) -> void:
 	queue_redraw()
 
 func _restart() -> void:
+	buff_events.clear()
+	buff_transition.clear()
 	combat_audio.reset()
 	combat_audio.set_music_active(true)
 	previous_combo_index = 0
@@ -199,6 +219,15 @@ func _age_effects() -> void:
 
 func _on_event(event: GameEvent) -> void:
 	match event.type:
+		&"weapon_buff_started", &"weapon_buff_ended":
+			var identity: String = "%s:%d:%d" % [event.type, event.tick, int(event.data["entity_id"])]
+			if buff_events.has(identity):
+				return
+			buff_events[identity] = true
+			var started: bool = event.type == &"weapon_buff_started"
+			buff_transition = {"tick": event.tick, "started": started, "at": snapshot.player.position}
+			combat_audio.cue("weapon_buff_start" if started else "weapon_buff_end", event.tick)
+			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["k"], 0.8)
 		&"damage_taken":
 			reactions[int(event.data["entity_id"])] = {"pose": "hurt", "tick": snapshot.tick, "duration": 12}
 			flashes[int(event.data["entity_id"])] = maxi(6, int(flashes.get(int(event.data["entity_id"]), 0)))
@@ -334,6 +363,8 @@ func _draw() -> void:
 	_draw_skill_effect(offset)
 	_draw_skill_projectiles(offset)
 	_draw_skill_contacts()
+	_draw_buff_slash(offset)
+	_draw_buff_transition()
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -493,9 +524,14 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	var left: bool = facing_left if actor.visual_id == &"totoy" else ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))
 	var destination: Rect2 = ArenaAnimation.destination(at, frame, left)
 	if not silhouette_only:
-		draw_texture_rect_region(sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+		if actor.id == snapshot.player.id:
+			_draw_buff_aura(actor, false)
+		var actor_texture: Texture2D = empowered_sprites if actor.id == snapshot.player.id and actor.weapon_buff_active else sprites
+		draw_texture_rect_region(actor_texture, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 	if silhouette_only:
 		draw_texture_rect_region(white_sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+	if not silhouette_only and actor.id == snapshot.player.id:
+		_draw_buff_aura(actor, true)
 
 func _draw_dash() -> void:
 	var frame: Dictionary = frames.get("hero2_dash_right_1", {})
@@ -503,7 +539,11 @@ func _draw_dash() -> void:
 		return
 	for ghost: Dictionary in dash_ghosts:
 		var fade: float = float(ghost["life"]) / 6.0
-		draw_texture_rect_region(white_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(colors["o"], fade * 0.55))
+		if snapshot.player.weapon_buff_active:
+			draw_texture_rect_region(empowered_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+			_draw_buff_frame("fx_black_aura_back_%d" % (posmod(snapshot.tick / 5, 6) + 1), ghost["position"], 1, bool(ghost["left"]))
+		else:
+			draw_texture_rect_region(white_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(colors["o"], fade * 0.55))
 	if snapshot.player.state == &"dash":
 		_draw_imported("fx_dash_%d" % (mini(5, snapshot.player.state_ticks / 2) + 1), snapshot.player.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
 
@@ -694,3 +734,59 @@ func _draw_skill_projectiles(shake_offset: Vector2) -> void:
 				draw_line((axis * 4).round(), (axis * radius).round(), colors["1"], 2.0, false)
 		draw_texture(entry["texture"], -Vector2(entry["anchor"]))
 		draw_set_transform(shake_offset)
+
+func weapon_buff_effect() -> Dictionary:
+	return WeaponBuffView.plan(snapshot)
+
+## Binary pixel coverage instead of translucent aura edges.
+func _buff_texture(key: String, level: int) -> Texture2D:
+	var cache_key: String = "%s:%d" % [key, level]
+	if buff_textures.has(cache_key):
+		return buff_textures[cache_key]
+	if not frames.has(key) or level <= 0:
+		return null
+	var f: Dictionary = frames[key]
+	var image: Image = sprites.get_image().get_region(Rect2i(f["x"], f["y"], f["w"], f["h"]))
+	image.convert(Image.FORMAT_RGBA8)
+	if level < 4:
+		for y: int in range(image.get_height()):
+			for x: int in range(image.get_width()):
+				if posmod(x + y * 2, 4) >= level:
+					image.set_pixel(x, y, Color.TRANSPARENT)
+	var texture: Texture2D = ImageTexture.create_from_image(image)
+	buff_textures[cache_key] = texture
+	return texture
+
+func _draw_buff_frame(key: String, at: Vector2, level: int, left: bool) -> void:
+	var texture: Texture2D = _buff_texture(key, level)
+	if texture == null:
+		return
+	var f: Dictionary = frames[key]
+	draw_texture_rect_region(texture, ArenaAnimation.destination(at, f, left), Rect2(0, 0, f["w"], f["h"]))
+
+func _draw_buff_aura(actor: Snapshots.EntitySnapshot, front: bool) -> void:
+	var effect: Dictionary = weapon_buff_effect()
+	if effect.is_empty():
+		return
+	_draw_buff_frame(effect["front" if front else "back"], actor.position, int(effect["level"]), facing_left)
+
+func _draw_buff_slash(shake_offset: Vector2) -> void:
+	var effect: Dictionary = weapon_buff_effect()
+	if effect.is_empty() or String(effect["slash"]).is_empty():
+		return
+	var direction: Vector2 = snapshot.player.facing.normalized()
+	if direction == Vector2.ZERO:
+		direction = Vector2.LEFT if facing_left else Vector2.RIGHT
+	draw_set_transform((snapshot.player.position - Vector2(0, 12) + direction * 15).round() + shake_offset, direction.angle())
+	_draw_buff_frame(effect["slash"], Vector2.ZERO, int(effect["level"]), false)
+	draw_set_transform(shake_offset)
+
+func _draw_buff_transition() -> void:
+	if buff_transition.is_empty():
+		return
+	var age: int = snapshot.tick + snapshot.result_ticks - int(buff_transition["tick"])
+	if age < 0 or age >= 12:
+		return
+	var level: int = maxi(1, 4 - age / 3)
+	var at: Vector2 = snapshot.player.position if bool(buff_transition["started"]) else Vector2(buff_transition["at"])
+	_draw_buff_frame("fx_black_aura_back_%d" % (mini(5, age / 2) + 1), at, level, facing_left)

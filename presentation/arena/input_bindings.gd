@@ -6,7 +6,7 @@ static func register() -> void:
 	var keys: Dictionary = {
 		"arena_left": [KEY_A, KEY_LEFT], "arena_right": [KEY_D, KEY_RIGHT],
 		"arena_up": [KEY_W, KEY_UP], "arena_down": [KEY_S, KEY_DOWN],
-		"arena_attack": [], "arena_parry": [KEY_SPACE],
+		"arena_attack": [], "arena_weapon_active": [], "arena_parry": [KEY_SPACE],
 		"arena_dash": [KEY_SHIFT], "arena_restart": [KEY_R],
 		"arena_debug": [KEY_F1],
 		"arena_skill_1": [KEY_Z], "arena_skill_2": [KEY_X], "arena_skill_3": [KEY_C],
@@ -29,6 +29,11 @@ static func register() -> void:
 				click.button_index = MOUSE_BUTTON_LEFT
 				InputMap.action_add_event(action, click)
 				_button(action, JOY_BUTTON_X)
+			"arena_weapon_active":
+				var click: InputEventMouseButton = InputEventMouseButton.new()
+				click.button_index = MOUSE_BUTTON_RIGHT
+				InputMap.action_add_event(action, click)
+				_button(action, JOY_BUTTON_Y)
 			"arena_parry": _button(action, JOY_BUTTON_A)
 			"arena_dash": _button(action, JOY_BUTTON_B)
 
@@ -46,6 +51,7 @@ static func _button(action: String, button: int) -> void:
 static func read_frame(player_position: Vector2 = Vector2.ZERO, mouse_position: Vector2 = Vector2.ZERO) -> InputFrame:
 	var frame: InputFrame = InputFrame.new()
 	frame.move = Input.get_vector("arena_left", "arena_right", "arena_up", "arena_down")
+	frame.weapon_active_pressed = Input.is_action_just_pressed("arena_weapon_active")
 	frame.attack_pressed = Input.is_action_just_pressed("arena_attack")
 	for slot: int in range(1, 4):
 		if Input.is_action_just_pressed("arena_skill_%d" % slot):

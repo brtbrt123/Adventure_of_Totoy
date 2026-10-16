@@ -1,6 +1,7 @@
 extends SceneTree
 ## Run after validate/build/preview and Godot import.
 const Arena := preload("res://presentation/arena/arena.gd")
+const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const GameCore := preload("res://core/game_core.gd")
@@ -65,7 +66,7 @@ func _catalog() -> void:
 	_expect(atlas.has("totoy_portrait"), "portrait missing")
 	if atlas.has("totoy_portrait"):
 		_expect(int(atlas["totoy_portrait"]["w"]) == 48 and int(atlas["totoy_portrait"]["h"]) == 48, "portrait canvas")
-	for name_key: String in ArenaAnimation.all_names() + SkillEffects.all_names():
+	for name_key: String in ArenaAnimation.all_names() + SkillEffects.all_names() + WeaponBuffView.all_names():
 		_expect(atlas.has(name_key), "atlas missing " + name_key)
 		if atlas.has(name_key) and name_key.begins_with("hero2_"):
 			var frame: Dictionary = atlas[name_key]

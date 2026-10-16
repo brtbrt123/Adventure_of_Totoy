@@ -1,0 +1,35 @@
+extends RefCounted
+## Snapshot-only cosmetic plans; no buff rules or multipliers live here.
+const Snapshots := preload("res://core/snapshots.gd")
+const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+
+static func all_names() -> Array[String]:
+	var names: Array[String] = []
+	for prefix: String in ["fx_black_aura_back", "fx_black_aura_front", "fx_black_slash"]:
+		for frame: int in range(1, 7):
+			names.append("%s_%d" % [prefix, frame])
+	return names
+
+static func fade_level(hero: Snapshots.EntitySnapshot, duration: int) -> int:
+	if not hero.weapon_buff_active or duration <= 0:
+		return 0
+	# Pixel coverage fades during the final fifth; every visible pixel stays opaque.
+	return clampi(ceili(float(hero.weapon_buff_ticks_left) / maxf(1.0, duration * 0.2) * 4.0), 1, 4)
+
+static func plan(snap: Snapshots.GameSnapshot) -> Dictionary:
+	var hero: Snapshots.EntitySnapshot = snap.player
+	if not hero.weapon_buff_active:
+		return {}
+	# World time keeps the aura rolling when the character pose/state changes.
+	var index: int = posmod(snap.tick / 5, 6) + 1
+	var data: Dictionary = {"back": "fx_black_aura_back_%d" % index, "front": "fx_black_aura_front_%d" % index, "level": fade_level(hero, snap.hud.weapon_buff_duration), "at": hero.position, "slash": ""}
+	if hero.state.begins_with("attack_"):
+		var phase: int = 0 if hero.state == &"attack_windup" else (1 if hero.state == &"attack_active" else 2)
+		var durations: Array[int] = ArenaAnimation.swing_durations(hero)
+		var frame: int = phase * 2 + mini(1, maxi(0, hero.state_ticks) * 2 / maxi(1, durations[phase])) + 1
+		data["slash"] = "fx_black_slash_%d" % frame
+	elif hero.state.begins_with("skill_"):
+		var phase: int = 0 if hero.state == &"skill_windup" else (1 if hero.state == &"skill_active" else 2)
+		var durations: Array[int] = ArenaAnimation.skill_durations(hero.skill_id)
+		data["slash"] = "fx_black_slash_%d" % (phase * 2 + mini(1, maxi(0, hero.state_ticks) * 2 / maxi(1, durations[phase])) + 1)
+	return data

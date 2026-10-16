@@ -5,7 +5,7 @@ const Snapshots := preload("res://core/snapshots.gd")
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var debug_enabled: bool = false
-# Current sword test set; future equipped-weapon snapshot data can select this key.
+# Snapshot weapon identity selects the matching blade glyph.
 var weapon_icon_key: String = "ui_weapon_totoy_blade_1"
 var counter_max: int = 1
 var portrait_atlas: Texture2D
@@ -230,7 +230,8 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
 	ui("ui_weapon_frame_1", weapon_rect())
 	ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
-	outlined(weapon_rect().get_center() + Vector2(-10, 14), "SWORD", colors["j"], colors["0"])
+	outlined(weapon_rect().get_center() + Vector2(-10, 14), "BLACK" if snapshot.player.weapon_id == Tuning.WEAPON_BLACK_KATANA else "SWORD", colors["j"], colors["0"])
+	_draw_weapon_active()
 	for slot: int in range(3):
 		var row: Dictionary = rows[slot]
 		var socket: Rect2 = sockets[slot]
@@ -266,3 +267,27 @@ func _draw_aspect_hint(row: Dictionary) -> void:
 	lettering(at, "%s %s" % [row["key"], row["name"]], colors["1"])
 	lettering(at + Vector2(0, 8), "%d EDGE" % int(row["cost"]), colors["v"])
 	lettering(at + Vector2(0, 16), row["status"], colors["o"])
+
+static func weapon_status(snap: Snapshots.GameSnapshot) -> Dictionary:
+	var h: Snapshots.HudSnapshot = snap.hud
+	if h.weapon_buff_duration <= 0:
+		return {}
+	return {"active": snap.player.weapon_buff_active, "remaining": ceili(snap.player.weapon_buff_ticks_left * Tuning.TICK_DT), "cooldown": ceili(h.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "cost": h.weapon_buff_edge_cost, "duration_fraction": clampf(float(snap.player.weapon_buff_ticks_left) / h.weapon_buff_duration, 0.0, 1.0), "cooldown_fraction": clampf(float(h.weapon_buff_cooldown_ticks) / maxi(1, h.weapon_buff_cooldown_max), 0.0, 1.0)}
+
+func _draw_weapon_active() -> void:
+	var data: Dictionary = weapon_status(snapshot)
+	if data.is_empty():
+		return
+	var at: Vector2 = Vector2(181, 153)
+	draw_rect(Rect2(at - Vector2(2, 2), Vector2(55, 24)), colors["0"])
+	lettering(at, "RMB %dE" % int(data["cost"]), colors["v"])
+	lettering(at + Vector2(0, 8), "FORM %dS" % int(data["remaining"]) if bool(data["active"]) else "FORM OFF", colors["p"] if bool(data["active"]) else colors["j"])
+	lettering(at + Vector2(0, 16), "CD %dS" % int(data["cooldown"]) if int(data["cooldown"]) > 0 else "CD READY", colors["o"])
+	for active: bool in [false, true]:
+		var fraction: float = float(data["duration_fraction" if active else "cooldown_fraction"])
+		if fraction <= 0.0:
+			continue
+		var arc: PackedVector2Array = PackedVector2Array()
+		for point: int in range(33):
+			arc.append((weapon_rect().get_center() + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * (21.0 if active else 24.0)).round())
+		draw_polyline(arc, colors["v"] if active else colors["o"], 1.0, false)

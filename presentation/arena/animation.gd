@@ -1,5 +1,6 @@
 extends RefCounted
 ## Visual cadence only. State lifetimes and impacts always come from snapshots.
+const PlayerState := preload("res://core/player.gd")
 const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const DIRECTIONS: Array[String] = ["right"]
@@ -54,7 +55,7 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 			var swing: int = clampi(actor.combo_index, 1, 3)
 			var offset: int = 0 if state == "attack_windup" else (2 if state == "attack_active" else 4)
 			var durations: Array[int] = Tuning.SWING_WINDUP_TICKS if state == "attack_windup" else (Tuning.SWING_ACTIVE_TICKS if state == "attack_active" else Tuning.SWING_RECOVERY_TICKS)
-			var index: int = mini(1, maxi(0, ticks) * 2 / maxi(1, durations[swing - 1])) + 1
+			var index: int = mini(1, maxi(0, ticks) * 2 / maxi(1, PlayerState.scaled_ticks(durations[swing - 1], actor.attack_speed_mult))) + 1
 			return "hero2_attack%d_right_%d" % [swing, offset + index]
 		if state == "parry_recovery":
 			return "hero2_parry_right_6"
@@ -138,3 +139,8 @@ static func skill_frame(skill: StringName, state: StringName, ticks: int) -> Str
 		# Establish the pose, then hold frame 2 through the committed charge.
 		part = 0 if elapsed < maxi(1, duration / 5) else 1
 	return "hero2_attack%d_right_%d" % [1 if skill == &"gale_cut" else 3, phase * 2 + part + 1]
+
+## Shared phase lengths for cosmetic trails, using the speed locked by core per swing.
+static func swing_durations(actor: Snapshots.EntitySnapshot) -> Array[int]:
+	var index: int = clampi(actor.combo_index, 1, 3) - 1
+	return [PlayerState.scaled_ticks(Tuning.SWING_WINDUP_TICKS[index], actor.attack_speed_mult), PlayerState.scaled_ticks(Tuning.SWING_ACTIVE_TICKS[index], actor.attack_speed_mult), PlayerState.scaled_ticks(Tuning.SWING_RECOVERY_TICKS[index], actor.attack_speed_mult)]
