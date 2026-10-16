@@ -126,6 +126,9 @@ func _run() -> void:
 	arena.core.step(denied)
 	_observe()
 	_expect(not arena.combat_audio.played.has("skill_moon_cleave"), "rejected skill plays start cue")
+	arena.combat_audio.reset()
+	for frame: int in range(4):
+		await process_frame
 	arena.queue_free()
 	await process_frame
 	for message: String in failures:

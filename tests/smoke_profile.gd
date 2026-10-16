@@ -35,6 +35,18 @@ func _save(name_key: String) -> void:
 	_expect(image.save_png("res://art/build/" + name_key + ".png") == OK, "capture failed: " + name_key)
 
 func _catalog() -> void:
+	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1", "ui_weapon_sword_1"]
+	var sockets: Array[Rect2] = arena.hud.aspect_rects()
+	sockets.append(arena.hud.weapon_rect())
+	for slot: int in range(4):
+		_expect(arena.frames.has(icons[slot]), "medallion absent: " + icons[slot])
+		if arena.frames.has(icons[slot]):
+			var icon: Dictionary = arena.frames[icons[slot]]
+			_expect(Vector2(icon["w"], icon["h"]) == sockets[slot].size, "medallion must use native pixel size")
+		_expect(Rect2(0, 0, 320, 180).encloses(sockets[slot]), "socket clipped by viewport")
+		for other: int in range(slot):
+			_expect(sockets[slot].get_center().distance_to(sockets[other].get_center()) >= (sockets[slot].size.x + sockets[other].size.x) * 0.5, "overlapping medallion frames")
+	_expect(sockets[3].size == sockets[0].size * 2, "weapon icon must be larger than Aspects")
 	_expect(arena.frames.has("totoy_portrait"), "portrait absent from atlas")
 	_expect(arena.frames.has("ui_profile"), "profile frame absent from atlas")
 	_expect(not arena.hud.profile_frame.is_empty(), "HUD frame not connected")

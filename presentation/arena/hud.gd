@@ -209,14 +209,57 @@ static func skill_rows(h: Snapshots.HudSnapshot) -> Array[Dictionary]:
 		rows.append({"key": keys[slot], "name": names[slot], "cost": costs[slot], "cooldown": left, "status": status})
 	return rows
 
+
+## The owner's layout: three small Aspect sockets climbing around a larger weapon socket.
+## Native sprite sizes keep the new HUD at integer scale.
+static func aspect_rects() -> Array[Rect2]:
+	return [Rect2(241, 147, 24, 24), Rect2(253, 116, 24, 24), Rect2(284, 100, 24, 24)]
+
+static func weapon_rect() -> Rect2:
+	return Rect2(269, 130, 48, 48)
+
+static func cooldown_fraction(slot: int, h: Snapshots.HudSnapshot) -> float:
+	var maximum: int = [1, Tuning.GALE_CUT_COOLDOWN_TICKS, Tuning.MOON_CLEAVE_COOLDOWN_TICKS][slot]
+	return clampf(float(h.skill_cooldown_ticks[slot]) / maxi(1, maximum), 0.0, 1.0)
+
 func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var rows: Array[Dictionary] = skill_rows(h)
+	var sockets: Array[Rect2] = aspect_rects()
+	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
+	ui("ui_weapon_sword_1", weapon_rect())
+	outlined(weapon_rect().get_center() + Vector2(-10, 14), "SWORD", colors["j"], colors["0"])
 	for slot: int in range(3):
 		var row: Dictionary = rows[slot]
-		var at: Vector2 = Vector2(4 + slot * 105, 158)
-		draw_rect(Rect2(at - Vector2(1, 2), Vector2(103, 22)), colors["0"])
-		lettering(at, "%s %s" % [row["key"], row["name"]], colors["o"] if slot == 1 else (colors["v"] if slot == 2 else colors["x"]))
-		lettering(at + Vector2(0, 8), "%d EDGE" % int(row["cost"]), colors["1"] if h.edge >= float(row["cost"]) else colors["i"])
-		lettering(at + Vector2(0, 15), row["status"], colors["i"] if int(row["cooldown"]) > 0 else colors["p"])
+		var socket: Rect2 = sockets[slot]
+		var centre: Vector2 = socket.get_center()
+		ui(icons[slot], socket)
+		if int(row["cooldown"]) > 0:
+			# Snapshot-only countdown. The core still accepts or rejects every press.
+			var arc: PackedVector2Array = PackedVector2Array()
+			var fraction: float = cooldown_fraction(slot, h)
+			for point: int in range(33):
+				arc.append((centre + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * 11.0).round())
+			draw_polyline(arc, colors["o"], 1.0, false)
+			var seconds: String = str(ceili(int(row["cooldown"]) * Tuning.TICK_DT))
+			draw_rect(Rect2(centre + Vector2(-seconds.length() * 2 - 1, -3), Vector2(seconds.length() * 4 + 1, 7)), colors["0"])
+			lettering(centre + Vector2(-seconds.length() * 2, -2), seconds, colors["p"])
+		var badge: Vector2 = socket.position + Vector2(-2, 16)
+		draw_rect(Rect2(badge - Vector2.ONE, Vector2(7, 7)), colors["0"])
+		lettering(badge, row["key"], colors["1"])
+		var cost: String = "%dE" % int(row["cost"])
+		outlined(centre + Vector2(-cost.length() * 2, 14), cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"])
+		if socket.has_point(get_local_mouse_position()):
+			_draw_aspect_hint(row)
 	if h.retaliate_ticks_left > 0:
-		outlined(Vector2(4, 148), "Z BREAKING EDGE READY", colors["x"], colors["0"])
+		outlined(Vector2(216, 91), "Z BREAKING EDGE READY", colors["x"], colors["0"])
+		var ring: PackedVector2Array = PackedVector2Array()
+		for point: int in range(33):
+			ring.append((sockets[0].get_center() + Vector2.from_angle(TAU * point / 32.0) * 12.0).round())
+		draw_polyline(ring, colors["x"], 1.0, false)
+
+func _draw_aspect_hint(row: Dictionary) -> void:
+	var at: Vector2 = Vector2(163, 68)
+	draw_rect(Rect2(at - Vector2(3, 3), Vector2(154, 27)), colors["0"])
+	lettering(at, "%s %s" % [row["key"], row["name"]], colors["1"])
+	lettering(at + Vector2(0, 8), "%d EDGE" % int(row["cost"]), colors["v"])
+	lettering(at + Vector2(0, 16), row["status"], colors["o"])
