@@ -80,7 +80,8 @@ def run_task(task: Task, label: str, tier: str, cfg: dict[str, Any], repo_root: 
     base_ref = base_ref or cfg.get("base_branch", "HEAD")
     base_sha = gitutil.resolve_sha(repo_root, base_ref)
     branch = gitutil.unique_branch(repo_root, label, slug)
-    worktrees_dir = (repo_root / cfg["worktrees_dir"]).resolve()
+    # resolved against the MAIN checkout, so running the harness from inside a worktree does not nest worktrees
+    worktrees_dir = (gitutil.main_repo_root(repo_root) / cfg["worktrees_dir"]).resolve()
     worktree = gitutil.create_worktree(repo_root, worktrees_dir, branch, base_sha)
     say(f"[{run_id}] branch {branch}, worktree {worktree}")
 
@@ -110,6 +111,14 @@ def run_task(task: Task, label: str, tier: str, cfg: dict[str, Any], repo_root: 
             continue
         changed = gitutil.changed_files(worktree, base_sha)
         round_info["changed_files"] = len(changed)
+        if result.sandbox_failed and not changed:
+            # An environment problem, not a capability problem: do not escalate to a bigger model for it.
+            round_info["outcome"] = "sandbox_failed"
+            outcome.message = ("the agent's sandbox could not start a shell and nothing was changed "
+                               "(for Codex: close the Codex desktop app and run again)")
+            feedback = None
+            say(f"[{run_id}]   {outcome.message}")
+            continue
         bad = ownership.violations_for_label(changed, label, cfg)
         if bad:
             feedback = "You edited files outside your area. Revert them and keep to " + ", ".join(owned) + ":\n" + "\n".join(f"- {b}" for b in bad)

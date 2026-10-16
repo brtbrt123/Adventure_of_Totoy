@@ -175,6 +175,36 @@ class RunLoopTests(EngineCase):
         self.assertIn("daily cap", outcome.message)
         self.assertEqual(self.calls(), [], "no agent was run")
 
+    def test_a_sandbox_that_cannot_start_is_not_escalated_to_a_bigger_model(self) -> None:
+        self.cfg["agents"]["codex"]["retry_on"] = ["helper_unknown_error"]
+        self.cfg["agents"]["codex"]["retry_attempts"] = 2
+        self.plan([{"print": "Failed to create unified exec process: helper_unknown_error: setup refresh had errors"}])
+        outcome = self.run_task("add a test", "tests")
+        self.assertEqual(outcome.result, "escalated")
+        self.assertEqual([r["outcome"] for r in outcome.rounds], ["sandbox_failed"] * 3)
+        self.assertEqual(self.builder_models(), ["gpt-6-luna"] * 6, "same light model every round (2 attempts each): an environment problem")
+        self.assertIn("sandbox", outcome.message)
+        self.assertIn("close the Codex desktop app", outcome.message)
+
+    def test_check_names_in_the_log_are_readable(self) -> None:
+        self.plan([{"write": {"tests/t.py": "x"}}])
+        outcome = self.run_task("add a test", "tests")
+        names = list(outcome.rounds[0]["checks"])
+        self.assertEqual(names, ["godot: -c"])
+
+    def test_worktrees_are_not_nested_when_the_harness_runs_from_a_worktree(self) -> None:
+        linked = self.tmp / "linked"
+        gitutil.git(["worktree", "add", "-b", "linked-branch", str(linked)], self.repo)
+        self.assertEqual(gitutil.main_repo_root(linked), self.repo.resolve())
+        self.assertEqual(gitutil.main_repo_root(self.repo), self.repo.resolve())
+        self.cfg["worktrees_dir"] = "../task_worktrees"  # relative, like the shipped config
+        self.plan([{"write": {"tests/t.py": "x"}}])
+        task = tasks.from_text("add a test")
+        outcome = engine.run_task(task, "tests", "light", self.cfg, linked, self.log, None, self.said.append)
+        self.assertEqual(outcome.result, "pass")
+        self.assertEqual(Path(outcome.worktree).parent, (self.repo.parent / "task_worktrees").resolve(),
+                         "next to the main checkout, not inside the linked worktree's parent twice")
+
     def test_cleanup_removes_a_finished_worktree_but_keeps_the_branch(self) -> None:
         self.plan([{"write": {"core/new.gd": "x"}}])
         outcome = self.run_task("add a helper", "logic")

@@ -17,6 +17,14 @@ def git(args: list[str], cwd: Path, check: bool = True) -> str:
     return result.stdout
 
 
+def main_repo_root(repo: Path) -> Path:
+    """The main checkout's folder, even when `repo` is itself a linked worktree (so worktrees never nest)."""
+    common = Path(git(["rev-parse", "--git-common-dir"], repo).strip())
+    if not common.is_absolute():
+        common = repo / common
+    return common.resolve().parent
+
+
 def slugify(text: str, limit: int = 40) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return (slug[:limit].strip("-")) or "task"

@@ -101,7 +101,7 @@ def cmd_list(args: argparse.Namespace, cfg: dict[str, Any], repo_root: Path) -> 
 
 
 def cmd_cleanup(args: argparse.Namespace, cfg: dict[str, Any], repo_root: Path) -> int:
-    worktrees_dir = (repo_root / cfg["worktrees_dir"]).resolve()
+    worktrees_dir = (gitutil.main_repo_root(repo_root) / cfg["worktrees_dir"]).resolve()
     finished = {Path(r["worktree"]).resolve(): r for r in logbook.read_runs(log_path_for(repo_root)) if r.get("worktree")}
     candidates = []
     for item in gitutil.list_worktrees(repo_root):

@@ -47,7 +47,8 @@ def run_checks(label: str, worktree: Path, base_sha: str, repo_root: Path, cfg: 
     for name in check_names_for(label, cfg):
         for command in cfg["checks"].get(name, []):
             expanded = _expand(command, values)
-            label_text = f"{name}: {' '.join(Path(expanded[1]).name if len(expanded) > 1 else expanded[0:1])}"
+            script = Path(expanded[1]).name if len(expanded) > 1 else expanded[0]
+            label_text = f"{name}: {script}"
             try:
                 done = subprocess.run(expanded, cwd=str(repo_root), capture_output=True, text=True, encoding="utf-8",
                                       errors="replace", timeout=timeout, env=env)
