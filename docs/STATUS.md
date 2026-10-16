@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Black Katana detached/clipped sword trail fix (2026-10-17, NOT merged)
+
+Human screenshots showed a flat-topped partial slash floating above the hero. Confirmed an import bug: the already-centred80px slash canvas was passed through feet-baseline placement again, shifting it upward40px and clipping its upper half. Peak opaque bounds were(15,0)..(64,28) around anchor(40,40). Regenerated all six frames directly from the retained source with one centre placement: peak bounds now(15,11)..(64,68), full57px height. Import metadata updated. No art generation or new design was needed.
+
+The overlay now mirrors with the rendered side-view hero instead of independently rotating toward vertical/diagonal aim. It renders in world coordinates with the actor's canvas transform. No slash during anticipation, late recovery, hurt overrides or frozen victory; actual strike and short follow-through retain the black trail. These are cosmetic changes only, no aim/hit/gameplay rule changes.
+
+Smoke checks every slash frame is centred and not clipped, verifies peak height, and exercises actual core swings with up/down/left/right/diagonal aim, matching blade-side attachment and mirroring. It also checks premature windup, long recovery, hurt/victory and Moon charge overlays stay absent. Windowed smoke/captures and art validate/build/preview passed. Final python harness/checks/run_tests.py --worktree . passed Python tests, Godot import, core tests and every smoke suite with regenerated art and the new clipping regression. Human must review feel/motion; Claude cross-review pending. Nothing merged.
+
 ## Black Katana buff presentation integration (2026-10-17, NOT merged)
 
 Built against Claude commit4fe0cc5 and the documented weapon-buff interface; no core/tools/harness changes. Right mouse (gamepad north/Y) sends a one-tick weapon_active_pressed intent. Activation is a free action and does not choose an attack pose. Normal swing frame lengths now use Player.scaled_ticks with the snapshot's locked attack_speed_mult for each combo phase; skills retain their existing cadence.

@@ -79,6 +79,16 @@ func input_check() -> void:
 func catalog() -> void:
 	for key: String in View.all_names():
 		check(arena.frames.has(key), "missing buff art " + key)
+	# Effect-origin frames must be centred, unlike feet-anchored actor/aura frames.
+	for frame: int in range(1, 7):
+		var f: Dictionary = arena.frames["fx_black_slash_%d" % frame]
+		var crop: Image = arena.sprites.get_image().get_region(Rect2i(f["x"], f["y"], f["w"], f["h"]))
+		var used: Rect2i = crop.get_used_rect()
+		var centre: Vector2 = Vector2(used.position) + Vector2(used.size) * 0.5
+		check(centre.distance_to(Vector2(f["ax"], f["ay"])) <= 3.0, "slash art offset from effect anchor")
+		check(used.position.y > 0 and used.end.y < int(f["h"]), "slash art clipped at canvas edge")
+		if frame == 3:
+			check(used.size.y >= 40, "peak slash lost half its crescent")
 	var snap: Snapshots.GameSnapshot = arena.core.snapshot()
 	var hero: Snapshots.EntitySnapshot = snap.player
 	hero.weapon_buff_active = true
@@ -203,6 +213,44 @@ func actions() -> void:
 	check(arena.buff_events.is_empty() and arena.buff_transition.is_empty() and arena.weapon_buff_effect().is_empty(), "restart retains buff effect")
 	check(arena.combat_audio.played.is_empty(), "restart retains buff sound")
 
+func slash_attachment() -> void:
+	for direction: Vector2 in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT, Vector2(-1, -1).normalized()]:
+		fixture()
+		activate()
+		var input: InputFrame = InputFrame.new()
+		input.attack_pressed = true
+		input.aim = direction
+		step(input)
+		check(arena.weapon_slash_effect().is_empty(), "slash appears before sword strike")
+		while arena.snapshot.player.state == &"attack_windup":
+			step(InputFrame.new())
+		var trail: Dictionary = arena.weapon_slash_effect()
+		check(not trail.is_empty(), "active swing loses its trail")
+		if not trail.is_empty():
+			var offset: Vector2 = Vector2(trail["at"]) - arena.snapshot.player.position
+			check(offset == Vector2(-15 if arena.facing_left else 15, -12), "slash detaches from painted blade for aim " + str(direction))
+			check(bool(trail["left"]) == arena.facing_left, "slash mirrors differently from hero")
+		await save("attached_%d_%d" % [roundi(direction.x), roundi(direction.y)])
+		while arena.snapshot.player.state == &"attack_active":
+			step(InputFrame.new())
+		while arena.snapshot.player.state == &"attack_recovery" and arena.snapshot.player.state_ticks < 6:
+			step(InputFrame.new())
+		check(arena.weapon_slash_effect().is_empty(), "stray slash hangs through recovery")
+	fixture()
+	activate()
+	# A hurt/victory override must never receive an unrelated attack overlay.
+	arena.snapshot.player.state = &"attack_active"
+	arena.snapshot.player.state_ticks = 0
+	arena.selected_frames[arena.snapshot.player.id] = "hero2_hurt_right_1"
+	check(arena.weapon_slash_effect().is_empty(), "hurt pose retains attack overlay")
+	arena.snapshot.result = &"victory"
+	arena.selected_frames[arena.snapshot.player.id] = "hero2_victory_right_1"
+	check(arena.weapon_slash_effect().is_empty(), "victory keeps frozen slash")
+	arena.snapshot.result = &"playing"
+	arena.snapshot.player.state = &"skill_windup"
+	arena.snapshot.player.skill_id = &"moon_cleave"
+	check(String(View.plan(arena.snapshot)["slash"]).is_empty(), "Moon hold shows a premature black cut")
+
 func run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	arena = load("res://presentation/arena/arena.tscn").instantiate() as Arena
@@ -218,6 +266,7 @@ func run() -> void:
 	catalog()
 	await swings()
 	await actions()
+	await slash_attachment()
 	arena.queue_free()
 	await process_frame
 	for message: String in failures:

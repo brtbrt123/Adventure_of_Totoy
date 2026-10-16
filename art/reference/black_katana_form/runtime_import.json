@@ -260,5 +260,7 @@
     }
   ],
   "status": "Imported into gameplay as18 new frames; original concepts retained",
-  "slash_pre_export_scale": 0.12
+  "slash_pre_export_scale": 0.12,
+  "slash_alignment": "Opaque bounds centred directly on(40,40), once only; no feet-baseline placement or second crop",
+  "slash_output_alpha_threshold": 128
 }

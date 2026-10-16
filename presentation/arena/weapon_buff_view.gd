@@ -23,13 +23,20 @@ static func plan(snap: Snapshots.GameSnapshot) -> Dictionary:
 	# World time keeps the aura rolling when the character pose/state changes.
 	var index: int = posmod(snap.tick / 5, 6) + 1
 	var data: Dictionary = {"back": "fx_black_aura_back_%d" % index, "front": "fx_black_aura_front_%d" % index, "level": fade_level(hero, snap.hud.weapon_buff_duration), "at": hero.position, "slash": ""}
-	if hero.state.begins_with("attack_"):
-		var phase: int = 0 if hero.state == &"attack_windup" else (1 if hero.state == &"attack_active" else 2)
+	# No detached slash during anticipation or a long recovery hold.
+	# The imported hero paints a side-view sword; arena attaches the trail to that pose.
+	if snap.result != &"playing":
+		return data
+	if hero.state in [&"attack_active", &"attack_recovery"]:
 		var durations: Array[int] = ArenaAnimation.swing_durations(hero)
-		var frame: int = phase * 2 + mini(1, maxi(0, hero.state_ticks) * 2 / maxi(1, durations[phase])) + 1
-		data["slash"] = "fx_black_slash_%d" % frame
-	elif hero.state.begins_with("skill_"):
-		var phase: int = 0 if hero.state == &"skill_windup" else (1 if hero.state == &"skill_active" else 2)
+		var active: bool = hero.state == &"attack_active"
+		var duration: int = durations[1] if active else mini(6, durations[2])
+		if active or hero.state_ticks < duration:
+			data["slash"] = "fx_black_slash_%d" % ((2 if active else 4) + mini(1, maxi(0, hero.state_ticks) * 2 / maxi(1, duration)) + 1)
+	elif hero.state in [&"skill_active", &"skill_recovery"]:
 		var durations: Array[int] = ArenaAnimation.skill_durations(hero.skill_id)
-		data["slash"] = "fx_black_slash_%d" % (phase * 2 + mini(1, maxi(0, hero.state_ticks) * 2 / maxi(1, durations[phase])) + 1)
+		var active: bool = hero.state == &"skill_active"
+		var duration: int = durations[1] if active else mini(6, durations[2])
+		if active or hero.state_ticks < duration:
+			data["slash"] = "fx_black_slash_%d" % ((2 if active else 4) + mini(1, maxi(0, hero.state_ticks) * 2 / maxi(1, duration)) + 1)
 	return data

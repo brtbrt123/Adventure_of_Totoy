@@ -770,16 +770,22 @@ func _draw_buff_aura(actor: Snapshots.EntitySnapshot, front: bool) -> void:
 		return
 	_draw_buff_frame(effect["front" if front else "back"], actor.position, int(effect["level"]), facing_left)
 
-func _draw_buff_slash(shake_offset: Vector2) -> void:
+## Match the painted side-view blade rather than rotating independently toward aim.
+func weapon_slash_effect() -> Dictionary:
 	var effect: Dictionary = weapon_buff_effect()
 	if effect.is_empty() or String(effect["slash"]).is_empty():
+		return {}
+	var chosen: String = String(selected_frames.get(snapshot.player.id, ""))
+	if not chosen.begins_with("hero2_attack") and not (snapshot.player.state == &"skill_active" and chosen.begins_with("hero2_dash")):
+		return {}
+	return {"key": effect["slash"], "at": (snapshot.player.position + Vector2(-15 if facing_left else 15, -12)).round(), "left": facing_left, "level": effect["level"]}
+
+func _draw_buff_slash(_shake_offset: Vector2) -> void:
+	var effect: Dictionary = weapon_slash_effect()
+	if effect.is_empty():
 		return
-	var direction: Vector2 = snapshot.player.facing.normalized()
-	if direction == Vector2.ZERO:
-		direction = Vector2.LEFT if facing_left else Vector2.RIGHT
-	draw_set_transform((snapshot.player.position - Vector2(0, 12) + direction * 15).round() + shake_offset, direction.angle())
-	_draw_buff_frame(effect["slash"], Vector2.ZERO, int(effect["level"]), false)
-	draw_set_transform(shake_offset)
+	# Draw directly in world coordinates, sharing the actor's current canvas transform.
+	_draw_buff_frame(effect["key"], effect["at"], int(effect["level"]), bool(effect["left"]))
 
 func _draw_buff_transition() -> void:
 	if buff_transition.is_empty():
