@@ -1,5 +1,6 @@
 extends Node
-## Original combat audio. Event results choose the cue; audio never decides hits.
+## CC0 recordings: credits and source edits are in presentation/audio/.
+## Event results choose the cue; audio never decides hits.
 const CUES: Dictionary = {
 	"armor_hit": preload("res://presentation/audio/armor_hit.wav"),
 	"counter_hit": preload("res://presentation/audio/counter_hit.wav"),
@@ -11,6 +12,10 @@ const CUES: Dictionary = {
 	"dash": preload("res://presentation/audio/dash.wav"),
 	"gold_warning": preload("res://presentation/audio/gold_warning.wav"),
 	"red_warning": preload("res://presentation/audio/red_warning.wav"),
+}
+const VARIATIONS: Dictionary = {
+	"armor_hit": [preload("res://presentation/audio/armor_hit.wav"), preload("res://presentation/audio/armor_hit_2.wav"), preload("res://presentation/audio/armor_hit_3.wav")],
+	"swing": [preload("res://presentation/audio/swing.wav"), preload("res://presentation/audio/swing_2.wav")],
 }
 var voices: Array[AudioStreamPlayer] = []
 var played: Dictionary = {}
@@ -41,7 +46,8 @@ func cue(key: String, tick: int, strength: float = 1.0) -> void:
 			break
 	next_voice = (next_voice + 1) % voices.size()
 	voice.stop()
-	voice.stream = CUES[key]
+	var alternatives: Array = VARIATIONS.get(key, [CUES[key]])
+	voice.stream = alternatives[(int(played[key]) - 1) % alternatives.size()]
 	voice.volume_db = -10.0 + linear_to_db(clampf(strength, 0.2, 1.0))
 	voice.play()
 

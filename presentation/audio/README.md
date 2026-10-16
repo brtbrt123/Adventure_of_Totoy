@@ -1,5 +1,7 @@
-# Original combat cues
+# Recorded combat cues
 
-Original procedural PCM sound effects for Adventure of Totoy. No recordings or samples from Sekiro or other games. Generated from decaying inharmonic sine resonances, seeded noise transients and bass impacts; 44.1 kHz, mono, signed 16-bit PCM. Each cue has a short attack and faded tail; peaks are limited to 0.60 (impacts) or 0.38 (movement/warnings) before in-game mixing. Human listening approval is pending.
+Replaces the rejected procedural sound set. All active cues now derive from downloaded CC0 recordings by StarNinjas, artisticdude and Kenney. See LICENSES and sources.json for credits, exact source files, hashes and mixing/pitch edits. Original selected recordings are retained in sources/; unused download archives live only in the ignored .godot cache.
 
-armor_hit: short dull metal impact; counter_hit: deeper cut and ringing tail; deflect: muted clang; perfect_parry: brighter high metal ring; posture_break: low crack; player_hurt: blunt thud; swing/dash: filtered noise whooshes; gold_warning: low metal bell; red_warning: low noisy warning. Playback is driven by snapshot transitions and core events only.
+The processed cues are 44.1 kHz mono 16-bit PCM, trimmed to remove leading silence, with bounded peaks and faded tails. Three armor-hit variations and two swing variations alternate during gameplay. Early deflect uses a shorter clash; perfect parry uses a longer clash with a low metal impact. Counter, posture break and damage use recorded impact layers. Warnings use subdued foley instead of synthetic beeps.
+
+preview.wav plays: swing, ordinary hit, early deflect, perfect parry, heavy counter, posture break. There is a pause between cues. Human listening approval is still pending; waveform checks do not establish that the sound fits the game.

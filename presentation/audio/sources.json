@@ -1,0 +1,275 @@
+{
+  "sources": [
+    {
+      "file": "impactBell_heavy_003.ogg",
+      "sha256": "5572ccdeb3b62373b86fa955355b3a222c36e815f0636ba16165189a21cf2514",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMetal_heavy_001.ogg",
+      "sha256": "83554049f81f4db9209379e103c30bfa63f65c42189a03f300b045c2c82e23ae",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMetal_heavy_002.ogg",
+      "sha256": "b914c8f1eb7c0f34bb165d7c77f4be0351f6be0660c13c53e65424e262e2c093",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMetal_heavy_003.ogg",
+      "sha256": "b0f2ba4dabde9a87eb9c188a19d31e0c2300fd321adeba08d3b9b8aa011d7037",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMetal_medium_000.ogg",
+      "sha256": "a96f879fec0864a8938e0c745b6996a6c5679c16a234ce31a01cc995e8401003",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactMetal_medium_003.ogg",
+      "sha256": "2a185e2e57211d02c1bdd33b872d6b6a2fe83e6c14f4e56f426a95e717acf08e",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactPunch_heavy_000.ogg",
+      "sha256": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactPunch_heavy_002.ogg",
+      "sha256": "7993dd4c156b9979ad69f17be5ebe31850b16039a3857f8477141be54dfee1b3",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "impactWood_heavy_001.ogg",
+      "sha256": "f1b07a53ac10c615fff9ba470511fdeb722b5902e1a8520759fc20ad6f546015",
+      "creator": "Kenney",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "swish-3.wav",
+      "sha256": "55b100e2c67fa43dad8510e31e85bbd51a68d5ce84a6e0259e21e19030083e24",
+      "creator": "artisticdude",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "swish-7.wav",
+      "sha256": "e6de737a34de16afed094d6170d7679149022f149e0a8356d2f029b0e8f4a4d7",
+      "creator": "artisticdude",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "swish-9.wav",
+      "sha256": "123883f006ce55feecbff11eea5f87c4493df4399989983037144570a23723c1",
+      "creator": "artisticdude",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sword.8.ogg",
+      "sha256": "97f55774d7f0602c5f87e4ef289fcdf7ff07eea987ddc52849909d74374458a6",
+      "creator": "StarNinjas",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sword_clash.2.ogg",
+      "sha256": "e09f222b70d53f2967514d076e2ae50c21526ac640fe4919965f964af043da1a",
+      "creator": "StarNinjas",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sword_clash.4.ogg",
+      "sha256": "4c2c962f8703882b8a6f863c1f5a35c6ae518d0281755fac9a13e63a73b86fa5",
+      "creator": "StarNinjas",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sword_clash.5.ogg",
+      "sha256": "09e36369f2556e6a234ce78ec797447518ef7671f8224fc64747a7fa66ea229a",
+      "creator": "StarNinjas",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sword_clash.7.ogg",
+      "sha256": "6763e519e7b31250a78f514d2b8b4f4e73a3bb105c980844ea687d698364b80c",
+      "creator": "StarNinjas",
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sword_clash.9.ogg",
+      "sha256": "aabd55ad99a1d171b50d741923077488a1021460fab35adf4fb7f36def49adc0",
+      "creator": "StarNinjas",
+      "license": "CC0-1.0"
+    }
+  ],
+  "processing": "Decode at 44100 Hz; mono downmix; remove DC; trim leading silence preserving 3ms, tail preserving 18ms; source peak normalization; linear resampling for listed pitch; weighted recording layers; limit peak; 1.5ms attack/12ms tail fades. No synthetic oscillators.",
+  "cues": {
+    "armor_hit": {
+      "layers": [
+        {
+          "source": "impactMetal_medium_003",
+          "gain": 1,
+          "pitch": 1
+        },
+        {
+          "source": "sword_clash.4",
+          "gain": 0.35,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.65
+    },
+    "armor_hit_2": {
+      "layers": [
+        {
+          "source": "impactMetal_medium_000",
+          "gain": 1,
+          "pitch": 1
+        },
+        {
+          "source": "sword_clash.7",
+          "gain": 0.3,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.65
+    },
+    "armor_hit_3": {
+      "layers": [
+        {
+          "source": "impactMetal_heavy_003",
+          "gain": 1,
+          "pitch": 1
+        },
+        {
+          "source": "sword_clash.5",
+          "gain": 0.3,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.65
+    },
+    "counter_hit": {
+      "layers": [
+        {
+          "source": "sword.8",
+          "gain": 1,
+          "pitch": 1
+        },
+        {
+          "source": "impactPunch_heavy_002",
+          "gain": 0.7,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.78
+    },
+    "deflect": {
+      "layers": [
+        {
+          "source": "sword_clash.2",
+          "gain": 1,
+          "pitch": 0.92
+        }
+      ],
+      "peak": 0.58
+    },
+    "perfect_parry": {
+      "layers": [
+        {
+          "source": "sword_clash.9",
+          "gain": 1,
+          "pitch": 1
+        },
+        {
+          "source": "impactMetal_heavy_001",
+          "gain": 0.28,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.82
+    },
+    "posture_break": {
+      "layers": [
+        {
+          "source": "impactWood_heavy_001",
+          "gain": 1,
+          "pitch": 0.88
+        },
+        {
+          "source": "impactMetal_heavy_003",
+          "gain": 0.5,
+          "pitch": 0.9
+        }
+      ],
+      "peak": 0.7
+    },
+    "player_hurt": {
+      "layers": [
+        {
+          "source": "impactPunch_heavy_000",
+          "gain": 1,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.65
+    },
+    "swing": {
+      "layers": [
+        {
+          "source": "swish-7",
+          "gain": 1,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.5
+    },
+    "swing_2": {
+      "layers": [
+        {
+          "source": "swish-9",
+          "gain": 1,
+          "pitch": 1
+        }
+      ],
+      "peak": 0.5
+    },
+    "dash": {
+      "layers": [
+        {
+          "source": "swish-3",
+          "gain": 1,
+          "pitch": 0.85
+        }
+      ],
+      "peak": 0.45
+    },
+    "gold_warning": {
+      "layers": [
+        {
+          "source": "impactBell_heavy_003",
+          "gain": 1,
+          "pitch": 0.9
+        }
+      ],
+      "peak": 0.32
+    },
+    "red_warning": {
+      "layers": [
+        {
+          "source": "impactMetal_heavy_002",
+          "gain": 1,
+          "pitch": 0.72
+        }
+      ],
+      "peak": 0.36
+    }
+  }
+}
