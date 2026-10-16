@@ -148,6 +148,27 @@ def import_sheet(stem: str, out: Path, palette: artlib.Palette) -> list[str]:
     return names
 
 
+TILE_SHEETS = {"Grass": "grass", "Dirt": "dirt", "Stone": "stone", "Water": "water"}  # 4x4 grids of 16 tiles, no gaps
+
+
+def import_tiles(stem: str, out: Path, palette: artlib.Palette) -> int:
+    """Cut a 4x4 tile sheet into sixteen 16x16 tiles (area average, palette snap, no outline)."""
+    prefix = TILE_SHEETS[stem]
+    image = Image.open(REF_DIR / f"{stem}.png").convert("RGB")
+    quant = Quantizer(palette, False)
+    cell = image.width / 4
+    for old in out.glob(f"{prefix}_*.txt"):
+        old.unlink()
+    for i in range(16):
+        c, r = i % 4, i // 4
+        box = (round(c * cell), round(r * cell), round((c + 1) * cell), round((r + 1) * cell))
+        small = image.crop(box).resize((16, 16), Image.BOX)
+        rows = ["".join(quant.symbol(small.getpixel((x, y))) for x in range(16)) for y in range(16)]
+        lines = ["# kind: tile", f"# imported from {stem}.png (Gemini), cell {i + 1}"] + rows
+        (out / f"{prefix}_{i + 1}.txt").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    return 16
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--only", default="", help="comma separated sheet stems, default all")
@@ -170,6 +191,9 @@ def main() -> int:
         names = import_sheet(stem, args.out, palette)
         total += len(names)
         print(f"{stem}: {len(names)} frames")
+    if not args.only:
+        for stem in TILE_SHEETS:
+            print(f"{stem}: {import_tiles(stem, args.out, palette)} tiles")
     print(f"wrote {total} frames to {args.out}")
     return 0
 

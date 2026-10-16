@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Dirt.png (Gemini), cell 12
+aaqqaaaaaaaaaaaa
+abqbaaqaaaaqqaqa
+aaqaaqqaaaqqaaba
+aaabqqqaaaaaaaaa
+aabqqqqbqaaabaaa
+aaqqqqqqqaaaaaaa
+qqqqcqqqqbaaaaaa
+qqqqqqqqqqbaaqaa
+aaaaqqqqqqqbbaba
+aabaaqqqqqqqqaaa
+aa9aqqqqqcqqbaaa
+aaaaabaqqqqqaaaa
+aaaaaaaqqqqqqaqa
+aqaaaaaqbaqqaaqa
+aaaaaaaaaaaaaqqa
+aaaaaaaaaaaaaaaa

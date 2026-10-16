@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Stone.png (Gemini), cell 11
+22ff2ehhhhhhhih2
+hihh2hhgggggggif
+ggggfhgggggggghb
+gggffhgffggggggg
+fggffgffffgfffgh
+fgf2fffffgfggggg
+fgf32fffgfgggggg
+ff232ffggfgggggg
+233ghhggeffgffff
+fhhhggghhhffefff
+hhgggggggghh2fgg
+ggggggggggggeggg
+gggggggggggehggg
+gggffggggf22gggf
+ggfffffgg2332ggf
+ffffffffe3332eff

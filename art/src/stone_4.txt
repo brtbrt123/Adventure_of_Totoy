@@ -1,18 +1,18 @@
 # kind: tile
-# seamless: true
-fhhghhhfhhhhhhhh
-hfhhhhhhhhiiihhh
-hghhhhhhghhhghhh
-ghgghhhihhhhhhhg
-ghihghhhiggghhhf
-iihhhhhhhhhihhhi
-hhghhhhhhhhghhhh
-hhhhhhhhhhhfhhhh
-hhhhhhhhhhhhhhhh
-hhhhhhhhhhhhhfhh
-hhhhhfhhiigghggg
-hhghghihhhhhhiih
-fhhgihhhhhhhhhhh
-hhhgghihhhhhhhhh
-hhhhgghhhhhhhihf
-hhhghhhhhhhhhhgi
+# imported from Stone.png (Gemini), cell 4
+2hiiihhhg2ffffii
+ghgggggggefffggg
+hhgggggggfeeehgg
+fhgggffffgfffggf
+e22fffffffefffff
+ff3hhhfffe32ffff
+e3ghhghhhhf33fff
+23hggggggghg222e
+32hgggggggggf3fh
+3ghggggggggg23hg
+fhggggggggfeghgf
+ghggggfffffehgff
+ggggffffffffgfff
+eggffefffffeffff
+feffeffffff332ff
+fe2effffff23322e
