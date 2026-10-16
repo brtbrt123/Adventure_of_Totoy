@@ -24,7 +24,13 @@ static func outline(t: Snapshots.TelegraphSnapshot) -> PackedVector2Array:
 			points.append(points[0])
 	return points
 
+## The sweep's yellow cone/marker are anticipation only, ending on the strike tick.
+static func warning_visible(tell: Snapshots.TelegraphSnapshot, tick: int) -> bool:
+	return tick < tell.hit_tick if tell.attack == &"red_sweep" else true
+
 static func draw_warning(canvas: Node2D, t: Snapshots.TelegraphSnapshot, tick: int, bright: Color, dark: Color, ink: Color) -> void:
+	if not warning_visible(t, tick):
+		return
 	if t.shape == &"ring":
 		draw_ring_warning(canvas, t, tick, bright, dark, ink)
 		return

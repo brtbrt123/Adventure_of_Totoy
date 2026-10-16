@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Full sweep art and windup-only warning (2026-10-17, NOT merged)
+
+Human requested an unclipped fully extended sweep and removal of its yellow indicator when the swing starts. Sweep impact now draws the entire source frame as an anchored rotated quad, with one common scale measured across the imported sequence and sized from the snapshot radius. It no longer clips the crescent to the cone boundaries. Peak frame3 lands exactly on hit_tick, followed by4/5/6 and brief breakup. Geometry/UV bounds remain separated so neighbouring atlas sprites cannot leak in. No generated source art edits.
+
+The yellow sweep cone, boundary and gold marker are now windup-only: visible before hit_tick, hidden from hit_tick onward. Both area and marker share TelegraphView.warning_visible. Other attacks retain their existing cues. The full arc is cosmetic; core cone hit angle/radius, damage, timing and parry rules are unchanged.
+
+Windowed six-pattern smoke passed with new full-frame/source-corner coverage, constant-scale, peak-on-hit, warning-boundary and cleanup checks. Captures: arena_sweep_warning.png, arena_sweep_strike.png and arena_sweep.png. Full python harness/checks/run_tests.py --worktree . passed Python tests, Godot import, core tests and every smoke suite. Human approves animation/readability; Claude cross-review pending; no merge.
+
 ## Golem sweep atlas sampling fix (2026-10-17, NOT merged)
 
 Human reported the golem sweep had the same stray-slice appearance. Its imported art is intact, but the polygon UV mapping assumed a centred anchor and right-facing crescent. fx_sweep_6 has ax35 in a48px-wide cell, so the old forward UV reached x59,12px beyond the frame. Adjacent atlas fragments could leak into the sweep, while the actual left-facing crescent was mapped away from the attack.

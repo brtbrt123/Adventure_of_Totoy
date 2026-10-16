@@ -66,6 +66,10 @@ func _attack(attack: StringName) -> void:
 				moved = moved or arena.snapshot.entities[0].position.distance_to(before) > 10.0
 				_expect(not arena.trails.is_empty(), "charge dust trail missing")
 				_expect(ArenaAnimation.boss_mirrored(arena.snapshot.entities[0], arena.snapshot, {}), "left charge not mirrored")
+			if attack == &"red_sweep" and arena.snapshot.tick == tell.hit_tick - 1:
+				await _save("sweep_warning")
+			if attack == &"red_sweep" and arena.snapshot.tick == tell.hit_tick:
+				await _save("sweep_strike")
 			var target: int = tell.hit_tick + (3 if attack == &"red_charge" else (2 if attack == &"red_sweep" else 0))
 			if not captured and arena.snapshot.tick == target:
 				captured = true
@@ -105,6 +109,38 @@ func _sweep_atlas_bounds() -> void:
 			var forward: PackedVector2Array = CombatEffects.effect_uvs(PackedVector2Array([tell.center, tell.center + direction * tell.size]), tell, f, arena.sprites.get_size())
 			_expect(forward[1].x < forward[0].x, "left-facing sweep art points away from attack")
 
+func _full_sweep_and_warning() -> void:
+	var tell: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
+	tell.attack = &"red_sweep"
+	tell.shape = &"cone"
+	tell.center = Vector2(190, 110)
+	tell.direction = Vector2.LEFT
+	tell.size = Tuning.SWEEP_RADIUS
+	tell.half_angle = deg_to_rad(Tuning.SWEEP_HALF_ANGLE_DEG)
+	tell.hit_tick = 100 # Isolated timeline fixture.
+	_expect(TelegraphView.warning_visible(tell, tell.hit_tick - 1), "sweep loses windup warning")
+	_expect(not TelegraphView.warning_visible(tell, tell.hit_tick), "yellow sweep warning persists on strike")
+	_expect(not TelegraphView.warning_visible(tell, tell.hit_tick + 1), "yellow sweep warning returns after strike")
+	_expect(CombatEffects.sweep_plan(tell, tell.hit_tick - 1, arena.frames, arena.sprites).is_empty(), "full sweep appears before hit")
+	var strike: Dictionary = CombatEffects.sweep_plan(tell, tell.hit_tick, arena.frames, arena.sprites)
+	_expect(strike["key"] == "fx_sweep_3", "full cut not on hit tick")
+	_expect(strike["origin"] == tell.center, "sweep origin detached from boss attack")
+	var f: Dictionary = arena.frames[strike["key"]]
+	var uv: PackedVector2Array = strike["uv"]
+	var polygon: PackedVector2Array = strike["polygon"]
+	_expect(polygon.size() == 4, "sweep still clipped to warning cone")
+	_expect((uv[0] * arena.sprites.get_size()).is_equal_approx(Vector2(f["x"], f["y"])), "sweep omits source top/left")
+	_expect((uv[2] * arena.sprites.get_size()).is_equal_approx(Vector2(f["x"] + f["w"] - 1, f["y"] + f["h"] - 1)), "sweep omits source bottom/right")
+	var extends_outside_cone: bool = false
+	for point: Vector2 in polygon:
+		var offset: Vector2 = point - tell.center
+		if offset.length_squared() > 0.0 and offset.normalized().dot(tell.direction) < cos(tell.half_angle) - 0.05:
+			extends_outside_cone = true
+	_expect(extends_outside_cone, "sweep remains cut at cone boundaries")
+	var later: Dictionary = CombatEffects.sweep_plan(tell, tell.hit_tick + 2, arena.frames, arena.sprites)
+	_expect(is_equal_approx(float(strike["scale"]), float(later["scale"])), "sweep scale changes between frames")
+	_expect(CombatEffects.sweep_plan(tell, tell.hit_tick + 10, arena.frames, arena.sprites).is_empty(), "sweep lingers after breakup")
+
 func _run() -> void:
 	var packed: PackedScene = load("res://presentation/arena/arena.tscn") as PackedScene
 	arena = packed.instantiate() as Arena
@@ -112,6 +148,7 @@ func _run() -> void:
 	arena.set_physics_process(false)
 	_expect(arena.frames.has("hero2_attack1_right_4"), "new slash frame absent")
 	_sweep_atlas_bounds()
+	_full_sweep_and_warning()
 	for attack: StringName in [&"gold_slam", &"red_sweep", &"red_shards", &"red_stomp", &"gold_combo", &"red_charge"]:
 		await _attack(attack)
 	arena.queue_free()

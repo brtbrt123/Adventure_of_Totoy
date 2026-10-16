@@ -4,6 +4,7 @@ const Snapshots := preload("res://core/snapshots.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 static var beam_strips: Dictionary = {}
+static var sweep_radii: Dictionary = {}
 const AFTERGLOW_TICKS: int = 10
 
 static func pixel_points(points: PackedVector2Array) -> PackedVector2Array:
@@ -122,9 +123,14 @@ static func hit_impact(at: Vector2, age: int, counter: bool, colors: Dictionary)
 		disc(plan, at, 2.0, colors["p"])
 	return plan
 
-## Texture polygons are clipped to the snapshot's exact hit geometry, including
-## the stomp's safe centre. UVs keep the imported effect centred on its anchor.
+## The sweep draws its full cosmetic crescent; other impacts stay clipped to hit
+## geometry, including the stomp safe centre. All art uses its declared anchor.
 static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapshot, tick: int, frames: Dictionary, sprites: Texture2D) -> void:
+	if tell.attack == &"red_sweep" and tell.shape == &"cone":
+		var sweep: Dictionary = sweep_plan(tell, tick, frames, sprites)
+		if not sweep.is_empty():
+			canvas.draw_polygon(sweep["polygon"], PackedColorArray([Color.WHITE]), sweep["uv"], sprites)
+		return
 	var age: int = tick - tell.hit_tick
 	var pose: String = {&"gold_slam": "slam", &"gold_combo": "slam", &"red_sweep": "sweep", &"red_stomp": "stomp", &"red_charge": "charge", &"red_shards": "beam_body"}.get(tell.attack, "slam")
 	var count: int = 4 if pose == "beam_body" else 6
@@ -150,6 +156,40 @@ static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapsh
 	else:
 		var boundary: PackedVector2Array = TelegraphView.outline(tell)
 		_effect_polygon(canvas, sprites, boundary.slice(0, boundary.size() - 1), tell, frame)
+
+## One scale for the entire imported sequence preserves its natural growth/breakup.
+static func sweep_reference_radius(frames: Dictionary, sprites: Texture2D) -> float:
+	var identity: int = sprites.get_instance_id()
+	if sweep_radii.has(identity):
+		return float(sweep_radii[identity])
+	var image: Image = sprites.get_image()
+	var radius: float = 1.0
+	for index: int in range(1, 7):
+		var frame: Dictionary = frames["fx_sweep_%d" % index]
+		var anchor: Vector2 = Vector2(frame["ax"], frame["ay"])
+		for y: int in range(frame["h"]):
+			for x: int in range(frame["w"]):
+				if image.get_pixel(frame["x"] + x, frame["y"] + y).a > 0.0:
+					radius = maxf(radius, Vector2(x, y).distance_to(anchor))
+	sweep_radii[identity] = radius
+	return radius
+
+## Full cosmetic arc, deliberately unclipped by the warning cone. Core still owns hits.
+static func sweep_plan(tell: Snapshots.TelegraphSnapshot, tick: int, frames: Dictionary, sprites: Texture2D) -> Dictionary:
+	var age: int = tick - tell.hit_tick
+	if age < 0 or age >= 10:
+		return {}
+	# Anticipation is already painted by the boss; the full cut lands on hit_tick.
+	var key: String = "fx_sweep_%d" % mini(6, 3 + age / 2)
+	var f: Dictionary = frames[key]
+	var scale_px: float = tell.size / sweep_reference_radius(frames, sprites)
+	var pixels: PackedVector2Array = PackedVector2Array([Vector2.ZERO, Vector2(f["w"] - 1, 0), Vector2(f["w"] - 1, f["h"] - 1), Vector2(0, f["h"] - 1)])
+	var polygon: PackedVector2Array = PackedVector2Array()
+	var uv: PackedVector2Array = PackedVector2Array()
+	for pixel: Vector2 in pixels:
+		polygon.append((tell.center + (pixel - Vector2(f["ax"], f["ay"])).rotated(tell.direction.angle() + PI) * scale_px).round())
+		uv.append((Vector2(f["x"], f["y"]) + pixel) / sprites.get_size())
+	return {"key": key, "polygon": polygon, "uv": uv, "scale": scale_px, "origin": tell.center}
 
 ## Imported sweep arcs face left; their effect origin is not necessarily the cell centre.
 ## Every UV stays inside this frame so adjacent atlas sprites can never leak into a hit.

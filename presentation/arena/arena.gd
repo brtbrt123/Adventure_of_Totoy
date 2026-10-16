@@ -344,6 +344,8 @@ func _draw() -> void:
 		if age < 2 and bool(impact["perfect"]):
 			_draw_imported("fx_flash_1", contact, Vector2(0.6, 0.6))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
+		if not TelegraphView.warning_visible(t, snapshot.tick):
+			continue
 		_draw_imported("ui_warning_%s_%d" % ["gold" if t.kind == &"gold" else "red", 1 + (snapshot.tick / 12) % 2], TelegraphView.marker_position(t), Vector2(0.5, 0.5))
 	for burst: Dictionary in hit_bursts:
 		var age: int = snapshot.tick + snapshot.result_ticks - int(burst["tick"])
