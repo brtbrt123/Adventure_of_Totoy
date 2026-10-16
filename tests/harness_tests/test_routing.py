@@ -159,6 +159,14 @@ class SafetyTests(unittest.TestCase):
             for role in ("builder", "reviewer"):
                 runner.build_command(agent, role, "m", Path("."), Path("out.txt"))  # raises on a forbidden flag
 
+    def test_model_specific_flags_are_added_only_for_that_model(self) -> None:
+        agent = CFG["agents"]["codex"]
+        light = runner.build_command(agent, "builder", "gpt-6-luna", Path("."), Path("o.txt"))
+        standard = runner.build_command(agent, "builder", "gpt-6.1-sol", Path("."), Path("o.txt"))
+        self.assertIn("code_mode_host", light, "the light model needs the code-mode host disabled to get a shell")
+        self.assertNotIn("code_mode_host", standard, "the standard model needs code mode, so it must not be disabled")
+        self.assertIn("workspace-write", light)
+
     def test_reviewers_are_read_only(self) -> None:
         self.assertIn("read-only", CFG["agents"]["codex"]["reviewer_args"])
         self.assertIn("plan", CFG["agents"]["claude"]["reviewer_args"])

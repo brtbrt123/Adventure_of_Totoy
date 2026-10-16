@@ -74,6 +74,10 @@
       "builder_args": ["exec", "-m", "{model}", "-s", "workspace-write", "-C", "{cwd}", "-o", "{output_file}"],
       "reviewer_args": ["exec", "-m", "{model}", "-s", "read-only", "-C", "{cwd}", "-o", "{output_file}"],
       "uses_output_file": true,
+      "model_args": {
+        "gpt-6-luna": ["--disable", "browser_use", "--disable", "browser_use_external", "--disable", "computer_use",
+                       "--disable", "in_app_browser", "--disable", "plugins", "--disable", "apps", "--disable", "code_mode_host"]
+      },
       "retry_on": ["helper_unknown_error"],
       "retry_attempts": 4
     }

@@ -40,6 +40,8 @@ def build_command(agent_cfg: dict[str, Any], role: str, model: str, cwd: Path, o
     args_key = "builder_args" if role == "builder" else "reviewer_args"
     values = {"model": model, "cwd": str(cwd), "output_file": str(output_file)}
     args = [str(a).format(**values) for a in agent_cfg[args_key]]
+    # Some models need extra CLI flags to work on this machine (see "model_args" in config.json).
+    args += [str(a).format(**values) for a in agent_cfg.get("model_args", {}).get(model, [])]
     for flag in FORBIDDEN_FLAGS:
         if any(flag in a for a in args):
             raise ValueError(f"refusing to run: the agent command contains the forbidden flag {flag}")
