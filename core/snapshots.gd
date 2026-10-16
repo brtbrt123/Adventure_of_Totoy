@@ -16,6 +16,7 @@ class EntitySnapshot:
 	var posture: float = 0.0
 	var posture_max: float = 0.0
 	var invulnerable: bool = false
+	var combo_index: int = 0  # player only (1-3, see docs/architecture.md); 0 for other entities
 
 
 class TelegraphSnapshot:

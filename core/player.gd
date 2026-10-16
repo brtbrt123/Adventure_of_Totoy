@@ -24,9 +24,12 @@ var state: StringName = STATE_IDLE
 var state_ticks: int = 0
 var dash_cooldown: int = 0
 var edge: float = 0.0
-var attack_hit_done: bool = false
+var attack_hit_done: bool = false  # one hit per swing: set when a swing connects, cleared when the next swing starts
+var combo_index: int = 1  # swing in progress (or the last swing during the chain grace window); 1 otherwise
 
 var _dash_dir: Vector2 = Vector2.RIGHT
+var _combo_queued: bool = false
+var _combo_grace: int = 0  # ticks left in which a press after a finished swing still continues the chain
 var _hurt_invuln: int = 0
 var _dash_invuln: int = 0  # dash i-frames run on their own counter, so a short dash can keep a forgiving window
 
@@ -43,6 +46,10 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		dash_cooldown -= 1
 		if dash_cooldown == 0:
 			events.append(GameEvent.new(GameEvent.DASH_READY, tick, {"entity_id": id}))
+	if _combo_grace > 0:
+		_combo_grace -= 1
+		if _combo_grace == 0:
+			combo_index = 1
 	var move: Vector2 = input.move.limit_length(1.0)
 	if input.aim.length_squared() > 0.0001:
 		facing = input.aim.normalized()
@@ -71,18 +78,24 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 				_set_state(STATE_IDLE)
 		STATE_ATTACK_WINDUP:
 			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
-			if state_ticks >= Tuning.ATTACK_WINDUP_TICKS:
+			if state_ticks >= Tuning.SWING_WINDUP_TICKS[combo_index - 1]:
 				_set_state(STATE_ATTACK_ACTIVE)
 		STATE_ATTACK_ACTIVE:
 			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
-			if state_ticks >= Tuning.ATTACK_ACTIVE_TICKS:
+			if state_ticks >= Tuning.SWING_ACTIVE_TICKS[combo_index - 1]:
 				_set_state(STATE_ATTACK_RECOVERY)
 		STATE_ATTACK_RECOVERY:
 			if _try_actions(input, move, tick, events, false):
 				return
+			var recovery: int = Tuning.SWING_RECOVERY_TICKS[combo_index - 1]
+			if input.attack_pressed and state_ticks >= recovery - Tuning.COMBO_BUFFER_TICKS:
+				_combo_queued = true
 			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
-			if state_ticks >= Tuning.ATTACK_RECOVERY_TICKS:
-				_set_state(STATE_IDLE)
+			if state_ticks >= recovery:
+				if _combo_queued:
+					_start_swing(combo_index + 1 if combo_index < Tuning.COMBO_MAX else 1)
+				else:
+					_finish_combo_swing()
 
 
 ## Ticks since the parry press, or -1 when not parrying. 0 on the tick of the press.
@@ -101,6 +114,7 @@ func take_damage(amount: int, tick: int, events: Array[GameEvent], source_id: in
 	if state == STATE_DEAD or is_invulnerable():
 		return false
 	hp = maxi(0, hp - amount)
+	reset_combo()
 	_hurt_invuln = Tuning.PLAYER_HURT_INVULN_TICKS
 	events.append(GameEvent.new(GameEvent.DAMAGE_TAKEN, tick, {"entity_id": id, "amount": amount, "source_id": source_id}))
 	if hp == 0:
@@ -115,6 +129,7 @@ func take_damage(amount: int, tick: int, events: Array[GameEvent], source_id: in
 ## A gold hit was parried: build Edge and take a short riposte step toward the attacker.
 func on_parry_success(toward: Vector2) -> void:
 	edge = minf(Tuning.EDGE_MAX, edge + Tuning.EDGE_PER_PARRY)
+	reset_combo()
 	if toward.length_squared() > 0.0001:
 		position += toward.normalized() * Tuning.RIPOSTE_STEP
 	_set_state(STATE_IDLE)
@@ -125,19 +140,46 @@ func _try_actions(input: InputFrame, move: Vector2, tick: int, events: Array[Gam
 		_start_dash(move, tick, events)
 		return true
 	if input.parry_pressed:
+		reset_combo()
 		_set_state(STATE_PARRY)
 		return true
 	if allow_attack and input.attack_pressed:
-		attack_hit_done = false
-		_set_state(STATE_ATTACK_WINDUP)
+		var chaining: bool = _combo_grace > 0 and combo_index < Tuning.COMBO_MAX
+		_start_swing(combo_index + 1 if chaining else 1)
 		return true
 	return false
+
+
+func _start_swing(index: int) -> void:
+	combo_index = index
+	attack_hit_done = false
+	_combo_queued = false
+	_combo_grace = 0
+	_set_state(STATE_ATTACK_WINDUP)
+
+
+## A swing ran out without a buffered press. After the finisher the combo is over; otherwise a late press
+## still counts for COMBO_GRACE_TICKS.
+func _finish_combo_swing() -> void:
+	if combo_index >= Tuning.COMBO_MAX:
+		reset_combo()
+	else:
+		_combo_grace = Tuning.COMBO_GRACE_TICKS
+	_set_state(STATE_IDLE)
+
+
+## Back to swing 1 with nothing buffered (damage, dash, parry, death, or the chain ran out).
+func reset_combo() -> void:
+	combo_index = 1
+	_combo_queued = false
+	_combo_grace = 0
 
 
 func _start_dash(move: Vector2, tick: int, events: Array[GameEvent]) -> void:
 	_dash_dir = move.normalized() if move.length_squared() > 0.0001 else facing
 	dash_cooldown = Tuning.DASH_COOLDOWN_TICKS
 	_dash_invuln = Tuning.DASH_INVULN_TICKS
+	reset_combo()
 	_set_state(STATE_DASH)
 	events.append(GameEvent.new(GameEvent.DASH_STARTED, tick, {"entity_id": id, "direction": _dash_dir}))
 

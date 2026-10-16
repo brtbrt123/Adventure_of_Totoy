@@ -57,9 +57,18 @@ One `InputFrame` per tick:
 - `telegraphs: Array[TelegraphSnapshot]`
 - `hud: HudSnapshot`
 
-`EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`.
+`EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`, `combo_index` (player only, see the sword combo below; `0` for the boss).
 
 States: player `idle walk dash parry parry_recovery attack_windup attack_active attack_recovery dead`; boss `idle attack recover posture_broken dead`.
+
+### Sword combo (player)
+
+The sword is a three-swing combo: `combo_index` 1, 2, 3 = art `hero2_attack1`, `attack2`, `attack3`. The core owns all of it (progression, timing, hit resolution); presentation only reads `player.combo_index` together with `state` and `state_ticks`.
+- **Meaning of `combo_index`:** during `attack_windup`, `attack_active` and `attack_recovery` it is the swing in progress (1-3). While idle it is `1`, except for a short chain-grace window (`COMBO_GRACE_TICKS`) right after swing 1 or 2 ended, when it still shows that swing. Pick the attack animation from `combo_index` whenever `state` starts with `attack_`.
+- **Frames per swing (the art has six):** windup = frames 1-2, active = 3-4, recovery = 5-6. Each swing has its own tick counts (`SWING_WINDUP_TICKS`, `SWING_ACTIVE_TICKS`, `SWING_RECOVERY_TICKS` in `core/tuning.gd`, one entry per swing), so spread the frames over `state_ticks` of the current state, not over fixed tick counts.
+- **Chaining:** an attack press during the last `COMBO_BUFFER_TICKS` of a swing's recovery is remembered; the next swing starts the tick recovery ends (the state goes `attack_recovery` -> `attack_windup` with no idle tick, `combo_index` + 1). Earlier presses are ignored. If nothing was buffered, a press within `COMBO_GRACE_TICKS` after the swing still continues the chain. After swing 3 the combo is over: the next press starts swing 1 (a buffered press at the end of swing 3 starts a new combo at 1).
+- **Resets to 1:** the player takes damage, dashes, parries (the press, or a successful parry), dies, stops chaining (grace ran out) or finishes swing 3. A queued press is dropped with the reset.
+- **Hits:** each swing hits at most once (the first active tick that has the boss in range and arc). Damage and reach scale per swing (`SWING_DAMAGE_MULT`, `SWING_RANGE_MULT`). The `attack_hit` event carries `combo_index`.
 
 `TelegraphSnapshot`: `id`, `owner_id`, `attack` (`gold_slam`, `gold_combo`, `red_sweep`, `red_shards`, `red_stomp`, `red_charge`), `kind` (`gold` = parry it, `red` = dodge it), `shape` + parameters, `start_tick`, `hit_tick`, `end_tick`.
 - `circle`: `center`, `size` = radius
@@ -82,7 +91,7 @@ Each event is a `GameEvent` with `type: StringName`, `tick: int` and `data: Dict
 | Type | `data` keys |
 |---|---|
 | `attack_telegraphed` | `telegraph_id`, `owner_id`, `kind`, `attack` |
-| `attack_hit` | `attacker_id`, `target_id`, `damage`, `kind` (`normal`, `counter`, `gold`, `red`), `position` |
+| `attack_hit` | `attacker_id`, `target_id`, `damage`, `kind` (`normal`, `counter`, `gold`, `red`), `position`, and for the player's sword `combo_index` (1-3) |
 | `parry_succeeded` | `player_id`, `attacker_id`, `telegraph_id`, `quality` (`perfect`, `early`), `position` |
 | `parry_failed` | `entity_id`, `reason` (`whiff`) |
 | `posture_broken` | `entity_id`, `window_ticks` |

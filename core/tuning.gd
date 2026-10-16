@@ -31,10 +31,25 @@ const PARRY_WHIFF_RECOVERY_TICKS: int = 20
 const PARRY_EARLY_POSTURE: float = 35.0
 const RIPOSTE_STEP: float = 10.0
 
-# Sword
-const ATTACK_WINDUP_TICKS: int = 7  # was 5: gives the draw-from-sheath animation time to read
-const ATTACK_ACTIVE_TICKS: int = 3
-const ATTACK_RECOVERY_TICKS: int = 9
+# Sword: a three-swing combo (attack1 -> attack2 -> attack3). Index 0 of each list is swing 1.
+# The art has six frames per swing: 1-2 windup, 3-4 active, 5-6 recovery (presentation maps the states).
+# All values are first guesses; nobody has played the combo yet.
+const COMBO_MAX: int = 3
+const SWING_WINDUP_TICKS: Array[int] = [7, 6, 9]  # swing 1 was 5, then 7 so the draw animation reads
+const SWING_ACTIVE_TICKS: Array[int] = [3, 3, 4]
+const SWING_RECOVERY_TICKS: Array[int] = [9, 9, 16]  # the finisher leaves a longer opening
+const SWING_DAMAGE_MULT: Array[float] = [1.0, 1.2, 2.0]  # multiplies ATTACK_DAMAGE
+const SWING_RANGE_MULT: Array[float] = [1.0, 1.0, 1.25]  # multiplies ATTACK_RANGE
+# A press during the last COMBO_BUFFER_TICKS of a swing's recovery is remembered and starts the next swing
+# the moment recovery ends. Earlier presses are ignored (no mashing ahead). If recovery ends with nothing
+# buffered, a press within COMBO_GRACE_TICKS still continues the chain; after that the combo resets to 1.
+# The chain also resets on damage, dash, parry and death, and after the third swing.
+const COMBO_BUFFER_TICKS: int = 6
+const COMBO_GRACE_TICKS: int = 8
+# Swing 1 values, kept as named constants for readability and older tests.
+const ATTACK_WINDUP_TICKS: int = SWING_WINDUP_TICKS[0]
+const ATTACK_ACTIVE_TICKS: int = SWING_ACTIVE_TICKS[0]
+const ATTACK_RECOVERY_TICKS: int = SWING_RECOVERY_TICKS[0]
 const ATTACK_RANGE: float = 26.0
 const ATTACK_ARC_DOT: float = 0.2
 const ATTACK_DAMAGE: int = 10

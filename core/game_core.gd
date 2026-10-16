@@ -103,6 +103,7 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.hp = player.hp
 	e.max_hp = Tuning.PLAYER_MAX_HP
 	e.invulnerable = player.is_invulnerable()
+	e.combo_index = player.combo_index
 	return e
 
 
@@ -128,7 +129,8 @@ func _resolve_player_attack(events: Array[GameEvent]) -> void:
 		return
 	var to_boss: Vector2 = boss.position - player.position
 	var dist: float = to_boss.length()
-	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE:
+	var swing: int = player.combo_index - 1
+	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE * Tuning.SWING_RANGE_MULT[swing]:
 		return
 	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Tuning.ATTACK_ARC_DOT:
 		return
@@ -136,14 +138,14 @@ func _resolve_player_attack(events: Array[GameEvent]) -> void:
 	var counter: bool = boss.state == BossState.STATE_BROKEN
 	var damage: int
 	if counter:
-		damage = roundi(Tuning.ATTACK_DAMAGE * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
+		damage = roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
 		player.edge = 0.0  # the counter spends all Edge
 	else:
-		damage = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.ARMOR_DAMAGE_FACTOR))
+		damage = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * Tuning.ARMOR_DAMAGE_FACTOR))
 		player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.EDGE_PER_HIT)
 	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
 		"attacker_id": player.id, "target_id": boss.id, "damage": damage,
-		"kind": &"counter" if counter else &"normal", "position": boss.position,
+		"kind": &"counter" if counter else &"normal", "position": boss.position, "combo_index": player.combo_index,
 	}))
 	boss.take_damage(damage, tick, events, player.id)
 	if not counter:
