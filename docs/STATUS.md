@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## New VFX concepts and different sound auditions (2026-10-17, NOT merged)
+
+Human requested newly generated improved VFX and different found sound effects. Saved three new six-frame concept sheets in art/reference/skills_v2: stronger gold cross cuts, a straight cyan severing lane, and a large travelling crescent with trailing blades. These are raw concepts, not installed sprites: generated glow/partial alpha remains despite a cleanup attempt, so palette/hard-alpha/alignment/size import is still required after review. Existing gameplay art remains active.
+
+Downloaded Vehicle/Jan Schupke's CC0 Tinysized SFX (new organic sword clashes/whooshes) and Brandon Morris/Augmentality's CC0 electricspell2 (submitted by HaelDB). Original selected files, credits, SHA256 manifest and processed Z/X/C audition WAVs are in presentation/audio/candidates. Preview order: Z metallic clash, X air cut, C electric aura. Different recordings from the active game set, not another mix of the same old samples. No game routing or core changes. Original archive and temporary offline decoder remain in ignored .godot cache only.
+
+Validation: source licences checked on author pages; magic OGG decoded successfully in Godot; mono44100Hz16-bit preview WAV peaks/endpoints passed. Godot import checked. No full test rerun needed for these inactive reference/candidate assets; prior game tests unchanged. Human visual/listening selection pending. Nothing merged.
+
 ## Larger aura / dedicated skill sound follow-up (2026-10-17, NOT merged)
 
 Human reports weak VFX/audio, X blocked by enemies, C aura too small. Existing explicit instruction keeps core with Claude. Presentation pass only: Moon has a40px minimum cosmetic outer crescent plus the bright blade rendered at the unchanged core width; longer trailing streak uses observed travel only. Gale's cosmetic ground cut is thicker and lasts36 ticks instead of18. No change to X collision, invulnerability, damage path or C hit width.

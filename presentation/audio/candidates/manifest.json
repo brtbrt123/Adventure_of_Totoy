@@ -1,0 +1,83 @@
+{
+  "status": "Audition only; not routed into the game",
+  "sources": [
+    {
+      "file": "vehicle/metal-hammer-hit-02.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "867f94bfb19e7fb43ccc4a06147d1c259d9f36129afa3ff441cfcffe13a786de"
+    },
+    {
+      "file": "vehicle/seax-unsheathe-02.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "c9a69a0631f7c094a4c9a0c388979858a3f5642564062783770b15b8fc28f570"
+    },
+    {
+      "file": "vehicle/sword-clash-01.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "58072bf9c80d84a37c4cfaeb694659dad3b5c4ecd24e2f7fc1e7c2fcdc7fc325"
+    },
+    {
+      "file": "vehicle/sword-clash-03.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "2fb00a674fc987ef8aeca008c6b3987e0df9b0c11a81fc892ade97c59534b188"
+    },
+    {
+      "file": "vehicle/sword-clash-05.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "3eb34d29cbc2f16d9a385ebebe36eb33fde2ffcab5c8fcf72429434b35df97e9"
+    },
+    {
+      "file": "vehicle/tin-whistle-whoosh-02.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "6ecd0cfa25f5598f5137260a0abcec7c9140ef31e4c12d2f3c7808b1e5538b16"
+    },
+    {
+      "file": "vehicle/tube-plastic-whoosh-01.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "6bf539745db12b4b546bb8bb1ab2f75ccf403db80c07fc8f473fa288d0d428b9"
+    },
+    {
+      "file": "vehicle/tube-plastic-whoosh-02.wav",
+      "creator": "Vehicle (Jan Schupke)",
+      "license": "CC0-1.0",
+      "page": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx",
+      "download": "https://opengameart.org/sites/default/files/tinysized.zip",
+      "sha256": "2ba001b889f1465d949b5531e7c9f61425a0f81d2a40febe3bdb4e449e99c190"
+    },
+    {
+      "file": "electricspell2_original.ogg",
+      "creator": "Augmentality (Brandon Morris), submitted by HaelDB",
+      "license": "CC0-1.0 (selected from offered licences)",
+      "page": "https://opengameart.org/content/spell-sounds",
+      "download": "https://opengameart.org/sites/default/files/electricspell2.ogg",
+      "sha256": "5fcb8824064d9dba2e3880d439a44b798ecdc2a58041cd028f094d774302a9a1"
+    }
+  ],
+  "edits": "Preview WAVs: mono44100Hz16-bit, DC removed, silence trimmed, normalized peak0.8, 2ms attack/20ms tail fade. No pitch edits.",
+  "preview_order": [
+    "Z: Vehicle sword-clash-03",
+    "X: Vehicle tube-plastic-whoosh-02",
+    "C: Brandon Morris electricspell2 excerpt3.18..4.88 seconds"
+  ]
+}
