@@ -4,6 +4,8 @@ Last updated: 2026-10-16 · Branch: `main` · **Everything described below is me
 
 ## Laser origin fixed in core; charge facing done (2026-10-17, NOT merged)
 
+Follow-up (human report: the beam warning was hidden behind the golem): the red_shards warning is now drawn after the actors, so it shows over the golem's body where it leaves the chest (`arena.gd` `_draw_warning`); `smoke_boss_attacks.gd` saves `art/build/arena_shards_warning.png`.
+
 Claude Code picked up Codex's unfinished work (Codex's weekly limit was reached; the human allowed Claude to continue in presentation for this). (1) Committed the charge facing correction and updated `tests/smoke_profile.gd` to the new convention (charge art faces left: a leftward charge is native, a rightward one mirrored). (2) The laser geometry gap from the previous note is closed: `core/tuning.gd` has `SHARDS_ORIGIN_OFFSET` (0, -30), the chest core measured from the golem2 frames; `core/boss.gd` aims the beam from that muzzle and starts all three warning/damage lines there, locked at commit; `TelegraphSnapshot.muzzle` exposes it; presentation (`arena.gd` `impact_origin`) now draws warning and beam from `tell.muzzle`. 6 new core tests (`tests/core/test_beam_muzzle.gd`, 119 core tests) and `smoke_boss_attacks.gd` now checks that the drawn core and the muzzle agree within 8 px and that the drawn beam is the damaged ray. `art/build/arena_shards.png` refreshed: the beams leave the boss's chest. Note: the animated core wobbles 1-3 px between frames; the muzzle is a fixed point, so the flash can differ from the drawn core by those pixels. Human visual/motion review pending.
 
 ## Charge facing correction; laser geometry gap (2026-10-17, NOT merged)

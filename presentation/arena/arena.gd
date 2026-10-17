@@ -310,7 +310,8 @@ func _draw() -> void:
 	for trace: Dictionary in skill_trails:
 		CombatEffects.draw_plan(self, SkillEffects.trail(trace["from"], trace["to"], snapshot.tick + snapshot.result_ticks - int(trace["tick"]), colors))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
-		TelegraphView.draw_warning(self, t, snapshot.tick, colors["x"] if t.kind == &"gold" else colors["z"], colors["y"] if t.kind == &"gold" else colors["A"], colors["0"])
+		if t.attack != &"red_shards":  # the beam warning starts at the golem's chest: drawn over the golem below
+			_draw_warning(t)
 	for ring: Dictionary in rings:
 		if ring.has("tell") and snapshot.tick > ring["tell"].end_tick:
 			_draw_impact(ring["tell"])
@@ -332,6 +333,9 @@ func _draw() -> void:
 			_draw_actor(item["actor"])
 		else:
 			_draw_imported(item["name"], item["at"], item["scale"])
+	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
+		if t.attack == &"red_shards":
+			_draw_warning(t)
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		if snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
 			_draw_impact(tell)
@@ -576,6 +580,9 @@ func impact_origin(tell: Snapshots.TelegraphSnapshot) -> Vector2:
 			# The beam leaves the core's authoritative muzzle (the chest), the same point the damage capsule starts at.
 			return tell.muzzle if tell.attack == &"red_shards" else actor.position
 	return tell.center
+
+func _draw_warning(t: Snapshots.TelegraphSnapshot) -> void:
+	TelegraphView.draw_warning(self, t, snapshot.tick, colors["x"] if t.kind == &"gold" else colors["z"], colors["y"] if t.kind == &"gold" else colors["A"], colors["0"])
 
 func _draw_impact(tell: Snapshots.TelegraphSnapshot) -> void:
 	CombatEffects.draw_imported_impact(self, tell, snapshot.tick, frames, gold_sprites if tell.kind == &"gold" and tell.shape == &"cone" else sprites, impact_origin(tell))

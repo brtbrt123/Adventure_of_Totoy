@@ -97,6 +97,8 @@ func _attack(attack: StringName, right_charge: bool = false) -> void:
 				_expect((visual.center + visual.direction * visual.size).is_equal_approx(tell.center + tell.direction * tell.size) and visual.direction.is_equal_approx(tell.direction), "the drawn beam is not the ray the core damages")
 				_expect(visual.width == tell.width and tell.center == original_center and tell.direction == original_direction and tell.size == original_size, "laser render changes hit geometry")
 
+			if attack == &"red_shards" and arena.snapshot.tick == tell.hit_tick - 2:
+				await _save("shards_warning")
 			if attack == &"red_sweep" and arena.snapshot.tick == tell.hit_tick - 1:
 				await _save("sweep_warning")
 			if attack == &"red_sweep" and arena.snapshot.tick == tell.hit_tick:
