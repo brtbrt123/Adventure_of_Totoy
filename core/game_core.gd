@@ -76,6 +76,7 @@ func snapshot() -> Snapshots.GameSnapshot:
 		t.kind = telegraph.kind
 		t.shape = telegraph.shape
 		t.center = telegraph.center
+		t.muzzle = telegraph.muzzle
 		t.direction = telegraph.direction
 		t.size = telegraph.size
 		t.inner_size = telegraph.inner_size

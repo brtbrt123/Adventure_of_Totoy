@@ -164,6 +164,10 @@ const SHARDS_LENGTH: float = 170.0
 const SHARDS_WIDTH: float = 12.0
 const SHARDS_SPREAD_DEG: float = 20.0
 const SHARDS_ACTIVE_TICKS: int = 6
+# The beam leaves the boss's chest core, not its feet. This offset from the boss position (its feet) is the single
+# authoritative muzzle: the shots are aimed from it, the warning and the damage capsules start at it, and it is
+# locked when the attack commits. (Measured from the golem2 frames: the core sits about 30 px above the feet.)
+const SHARDS_ORIGIN_OFFSET: Vector2 = Vector2(0.0, -30.0)
 const SHARDS_DAMAGE: int = 15
 const SHARDS_RECOVER_TICKS: int = 22
 

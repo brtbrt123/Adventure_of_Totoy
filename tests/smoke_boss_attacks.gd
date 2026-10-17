@@ -87,13 +87,14 @@ func _attack(attack: StringName, right_charge: bool = false) -> void:
 			if attack == &"red_shards" and arena.snapshot.tick >= tell.hit_tick:
 				var owner: Snapshots.EntitySnapshot = arena.snapshot.entities[0]
 				var muzzle: Vector2 = arena.impact_origin(tell)
-				_expect(muzzle == arena.boss_core_position(owner) and muzzle.y < owner.position.y - 10.0, "laser starts at feet instead of core")
+				_expect(muzzle == tell.muzzle and muzzle == tell.center and muzzle.y < owner.position.y - 10.0, "laser does not start at the core muzzle")
+				_expect(muzzle.distance_to(arena.boss_core_position(owner)) <= 8.0, "the drawn core and the beam muzzle disagree")
 				var original_center: Vector2 = tell.center
 				var original_direction: Vector2 = tell.direction
 				var original_size: float = tell.size
 				var visual: Snapshots.TelegraphSnapshot = CombatEffects.beam_visual_tell(tell, muzzle)
 				_expect(visual.center == muzzle, "laser visual detached from chest")
-				_expect((visual.center + visual.direction * visual.size).is_equal_approx(tell.center + tell.direction * tell.size), "laser loses core endpoint")
+				_expect((visual.center + visual.direction * visual.size).is_equal_approx(tell.center + tell.direction * tell.size) and visual.direction.is_equal_approx(tell.direction), "the drawn beam is not the ray the core damages")
 				_expect(visual.width == tell.width and tell.center == original_center and tell.direction == original_direction and tell.size == original_size, "laser render changes hit geometry")
 
 			if attack == &"red_sweep" and arena.snapshot.tick == tell.hit_tick - 1:

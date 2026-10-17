@@ -153,8 +153,12 @@ func _begin_attack(tick: int, player_pos: Vector2, rng: RandomNumberGenerator, e
 			_recover_ticks = Tuning.SWEEP_RECOVER_TICKS
 		ATTACK_SHARDS:
 			var hit: int = tick + roundi(Tuning.SHARDS_WINDUP_TICKS * scale)
+			# Everything starts at the chest muzzle (locked now): the aim, the warning and the damage lines.
+			var muzzle: Vector2 = position + Tuning.SHARDS_ORIGIN_OFFSET
+			var beam_aim: Vector2 = (player_pos - muzzle).normalized() if player_pos != muzzle else aim
 			for offset: float in [-Tuning.SHARDS_SPREAD_DEG, 0.0, Tuning.SHARDS_SPREAD_DEG]:
-				var shard: Telegraph = _make(attack, Telegraph.KIND_RED, Telegraph.SHAPE_LINE, position, aim.rotated(deg_to_rad(offset)), tick, hit, hit + Tuning.SHARDS_ACTIVE_TICKS)
+				var shard: Telegraph = _make(attack, Telegraph.KIND_RED, Telegraph.SHAPE_LINE, muzzle, beam_aim.rotated(deg_to_rad(offset)), tick, hit, hit + Tuning.SHARDS_ACTIVE_TICKS)
+				shard.muzzle = muzzle
 				shard.size = Tuning.SHARDS_LENGTH
 				shard.width = Tuning.SHARDS_WIDTH
 				shard.damage = Tuning.SHARDS_DAMAGE
@@ -219,6 +223,7 @@ func _make(attack: StringName, kind: StringName, shape: StringName, center: Vect
 	telegraph.kind = kind
 	telegraph.shape = shape
 	telegraph.center = center
+	telegraph.muzzle = position
 	telegraph.direction = direction
 	telegraph.start_tick = start
 	telegraph.hit_tick = hit

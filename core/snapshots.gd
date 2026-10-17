@@ -32,6 +32,7 @@ class TelegraphSnapshot:
 	var kind: StringName = &"red"  # gold = parry it, red = dodge it
 	var shape: StringName = &"circle"  # circle, cone, line, ring
 	var center: Vector2 = Vector2.ZERO
+	var muzzle: Vector2 = Vector2.ZERO  # where the attack leaves the boss (red_shards: the chest core, equal to center)
 	var direction: Vector2 = Vector2.RIGHT
 	var size: float = 0.0
 	var inner_size: float = 0.0  # ring: inner radius, the inside is safe

@@ -573,7 +573,8 @@ func boss_core_position(actor: Snapshots.EntitySnapshot) -> Vector2:
 func impact_origin(tell: Snapshots.TelegraphSnapshot) -> Vector2:
 	for actor: Snapshots.EntitySnapshot in snapshot.entities:
 		if actor.id == tell.owner_id:
-			return boss_core_position(actor) if tell.attack == &"red_shards" else actor.position
+			# The beam leaves the core's authoritative muzzle (the chest), the same point the damage capsule starts at.
+			return tell.muzzle if tell.attack == &"red_shards" else actor.position
 	return tell.center
 
 func _draw_impact(tell: Snapshots.TelegraphSnapshot) -> void:
