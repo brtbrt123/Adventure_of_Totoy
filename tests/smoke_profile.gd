@@ -102,6 +102,7 @@ func _fight(attack: StringName, left: bool) -> void:
 	var seen: Dictionary = {}
 	var mirror_seen: bool = false
 	var unmirror_seen: bool = false
+	var charge_mirrored: Array[bool] = []
 	var saved: bool = false
 	for i: int in range(120):
 		_step()
@@ -111,6 +112,9 @@ func _fight(attack: StringName, left: bool) -> void:
 		var mirrored: bool = ArenaAnimation.boss_mirrored(boss, arena.snapshot, arena.last_attacks.get(boss.id, {}))
 		mirror_seen = mirror_seen or mirrored
 		unmirror_seen = unmirror_seen or not mirrored
+		var tell: Snapshots.TelegraphSnapshot = ArenaAnimation.attack_tell(boss.id, arena.snapshot)
+		if tell != null and tell.attack == &"red_charge":
+			charge_mirrored.append(mirrored)
 		var target: Vector2 = HeadAnchors.world(boss.position, arena.frames[name_key], arena.head_anchors[name_key], mirrored)
 		_expect(arena.hud.head_position.distance_to(target) < 20.0, "panel trails head too far: %s tick %d head %s target %s" % [attack, arena.snapshot.tick, arena.hud.head_position, target])
 		_expect(arena.hud.head_tick == arena.snapshot.tick, "head not updated for fight frame")
@@ -120,7 +124,10 @@ func _fight(attack: StringName, left: bool) -> void:
 		await process_frame
 	_expect(seen.size() >= 4, "too few boss frames exercised")
 	if attack == &"red_charge":
-		_expect(mirror_seen if left else unmirror_seen, "fight mirror direction not exercised")
+		# The charge source art faces LEFT: a leftward charge is native, a rightward one is mirrored.
+		_expect(not charge_mirrored.is_empty(), "no charge frames exercised")
+		for was_mirrored: bool in charge_mirrored:
+			_expect(was_mirrored == (not left), "charge mirror direction wrong for a %s charge" % ("left" if left else "right"))
 
 func _run() -> void:
 	capture = OS.get_cmdline_user_args().has("--capture")

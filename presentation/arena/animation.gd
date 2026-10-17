@@ -114,11 +114,17 @@ static func attack_tell(owner_id: int, snap: Snapshots.GameSnapshot) -> Snapshot
 		return struck
 	return upcoming
 
+## Charge source art faces left; sweep source art uses the opposite convention.
+static func _boss_attack_mirrored(attack: StringName, direction_x: float) -> bool:
+	if attack == &"red_charge":
+		return direction_x > 0.0
+	return attack == &"red_sweep" and direction_x < 0.0
+
 static func boss_mirrored(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot, history: Dictionary) -> bool:
 	var tell: Snapshots.TelegraphSnapshot = attack_tell(actor.id, snap)
-	if tell != null and tell.attack in [&"red_charge", &"red_sweep"]:
-		return tell.direction.x < 0.0
-	return actor.state == &"recover" and history.get("attack", &"") in [&"red_charge", &"red_sweep"] and float(history.get("direction_x", 1.0)) < 0.0
+	if tell != null:
+		return _boss_attack_mirrored(tell.attack, tell.direction.x)
+	return actor.state == &"recover" and _boss_attack_mirrored(history.get("attack", &""), float(history.get("direction_x", 0.0)))
 
 ## Placeholder poses only; phase lengths are owned by core tuning.
 static func skill_durations(skill: StringName) -> Array[int]:

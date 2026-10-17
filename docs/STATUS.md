@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Charge facing correction; laser geometry gap (2026-10-17, NOT merged)
+
+Human reported the charge faces backward and that the feet-origin laser warning disagrees with the chest-origin visual beam. Corrected the source-art convention: golem2_charge frames face LEFT, so rightward charges are mirrored and leftward charges remain native. The recovery pose preserves that orientation. Sweep mirroring is unchanged. Added real-core rightward charge coverage alongside leftward, checking both travel and recovery; refreshed arena_charge.png and added arena_charge_right.png.
+
+Laser is NOT fully fixed: presentation moved its muzzle in be274c6, but core/boss.gd still constructs red_shards telegraph/damage lines from boss.position (feet). Moving the warning onto the cosmetic chest ray would no longer accurately mark the core damage capsule. The user's ownership rule keeps core with Claude. Needed core change: one authoritative chest/muzzle origin (configured in core tuning) used for red_shards aim, warning capsule and damage capsule, locked consistently through windup/strike, exposed in the snapshot. Then presentation should draw warning and beam from that same ray; measured sprite core stays cosmetic for muzzle art only. Never derive gameplay geometry from painted pixels. No core files changed in this fix.
+
+Windowed left/right charge test and captures passed. Full regression pending. Human visual/motion review and Claude cross-review pending. Nothing merged.
+
 ## Moving charge effect and chest-core laser muzzle (2026-10-17, NOT merged)
 
 Human reported charge visual bugs and requested lasers from the golem core. Charge previously stretched a small multi-clump dust sprite across the entire locked lane. It now draws an anchored native-size fx_charge frame behind the golem's current snapshot position, rotating with the travel direction and looping only while active. Existing dust traces still follow observed movement. It never paints the planned lane ahead as stretched dust, and UVs stay within the selected source cell.

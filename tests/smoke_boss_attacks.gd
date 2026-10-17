@@ -27,10 +27,10 @@ func _save(name_key: String) -> void:
 	var image: Image = root.get_texture().get_image()
 	_expect(image.save_png("res://art/build/arena_" + name_key + ".png") == OK, "capture " + name_key)
 
-func _attack(attack: StringName) -> void:
+func _attack(attack: StringName, right_charge: bool = false) -> void:
 	arena._restart()
-	arena.core.boss.position = Vector2(190, 110)
-	arena.core.player.position = Vector2(110, 110)
+	arena.core.boss.position = Vector2(110 if right_charge else 190, 110)
+	arena.core.player.position = Vector2(190 if right_charge else 110, 110)
 	if attack in [&"gold_combo", &"red_charge"]:
 		arena.core.boss.phase = 2
 	arena.core.boss.next_attack_override = attack
@@ -72,7 +72,7 @@ func _attack(attack: StringName) -> void:
 			if attack == &"red_charge" and arena.snapshot.tick >= tell.hit_tick:
 				moved = moved or arena.snapshot.entities[0].position.distance_to(before) > 10.0
 				_expect(not arena.trails.is_empty(), "charge dust trail missing")
-				_expect(ArenaAnimation.boss_mirrored(arena.snapshot.entities[0], arena.snapshot, {}), "left charge not mirrored")
+				_expect(ArenaAnimation.boss_mirrored(arena.snapshot.entities[0], arena.snapshot, {}) == (tell.direction.x > 0.0), "charge source orientation does not match movement")
 				var plan: Dictionary = CombatEffects.charge_plan(tell, arena.snapshot.tick, arena.impact_origin(tell), arena.frames, arena.sprites.get_size())
 				_expect(plan["body_position"] == arena.snapshot.entities[0].position, "charge trail not attached to moving body")
 				var f: Dictionary = arena.frames[plan["key"]]
@@ -103,7 +103,7 @@ func _attack(attack: StringName) -> void:
 			var target: int = tell.hit_tick + (3 if attack == &"red_charge" else (2 if attack == &"red_sweep" else 0))
 			if not captured and arena.snapshot.tick == target:
 				captured = true
-				await _save(String(attack).trim_prefix("red_").trim_prefix("gold_"))
+				await _save("charge_right" if right_charge else String(attack).trim_prefix("red_").trim_prefix("gold_"))
 			if attack == &"gold_combo" and arena.snapshot.tick == tell.hit_tick:
 				await _save("combo_impact_" + str(impacts.size()))
 		await process_frame
@@ -117,6 +117,8 @@ func _attack(attack: StringName) -> void:
 		_expect(hit_ticks.size() == 2, "combo needs distinct hit ticks")
 	if attack == &"red_charge":
 		_expect(moved, "charge snapshot never moved")
+		var owner: Snapshots.EntitySnapshot = arena.snapshot.entities[0]
+		_expect(ArenaAnimation.boss_mirrored(owner, arena.snapshot, arena.last_attacks.get(owner.id, {})) == right_charge, "charge recovery turns away from travel")
 	_expect(arena.missing_frames.is_empty(), "missing frame " + str(arena.missing_frames))
 
 func _sweep_atlas_bounds() -> void:
@@ -196,6 +198,7 @@ func _run() -> void:
 	_core_anchor_art()
 	for attack: StringName in [&"gold_slam", &"red_sweep", &"red_shards", &"red_stomp", &"gold_combo", &"red_charge"]:
 		await _attack(attack)
+	await _attack(&"red_charge", true)
 	arena.queue_free()
 	if failures.is_empty():
 		print("BOSS ATTACKS SMOKE OK (six attacks; capture=" + str(DisplayServer.get_name() != "headless") + ")")
