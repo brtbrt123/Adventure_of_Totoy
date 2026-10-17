@@ -12,6 +12,7 @@ const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
+const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
 const DECORATIONS: Array[Dictionary] = [{"name": "prop_nature_1", "at": Vector2(18, 91), "scale": Vector2.ONE}, {"name": "prop_nature_4", "at": Vector2(289, 172), "scale": Vector2(2, 2)}, {"name": "prop_ruins_2", "at": Vector2(290, 80), "scale": Vector2(2, 2)}, {"name": "prop_small_3", "at": Vector2(35, 170), "scale": Vector2.ONE}]
@@ -29,6 +30,7 @@ var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var frames: Dictionary = {}
 var head_anchors: Dictionary = {}
+var core_anchors: Dictionary = {}
 var ground_texture: Texture2D
 var missing_frames: Dictionary = {}
 var selected_frames: Dictionary = {}
@@ -73,7 +75,7 @@ func _ready() -> void:
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
 	sprites = load("res://art/build/sprites.png") as Texture2D
-	var empowered_image: Image = sprites.get_image()
+	var empowered_image: Image = sprites.get_image().duplicate() as Image
 	empowered_image.convert(Image.FORMAT_RGBA8)
 	var dark_colors: Dictionary = {colors["e"]: colors["0"], colors["f"]: colors["0"], colors["g"]: colors["e"], colors["h"]: colors["k"], colors["k"]: colors["0"], colors["l"]: colors["e"], colors["m"]: colors["k"]}
 	for key: String in frames:
@@ -86,7 +88,7 @@ func _ready() -> void:
 				if pixel.a > 0.0 and dark_colors.has(pixel):
 					empowered_image.set_pixel(x, y, dark_colors[pixel])
 	empowered_sprites = ImageTexture.create_from_image(empowered_image)
-	var gold_image: Image = sprites.get_image()
+	var gold_image: Image = sprites.get_image().duplicate() as Image
 	gold_image.convert(Image.FORMAT_RGBA8)
 	for y: int in range(gold_image.get_height()):
 		for x: int in range(gold_image.get_width()):
@@ -96,11 +98,12 @@ func _ready() -> void:
 			elif pixel == colors["A"]:
 				gold_image.set_pixel(x, y, colors["y"])
 	gold_sprites = ImageTexture.create_from_image(gold_image)
-	var white_image: Image = sprites.get_image()
+	var white_image: Image = sprites.get_image().duplicate() as Image
 	white_image.convert(Image.FORMAT_RGBA8)
 	for name_key: String in frames:
 		if (name_key.begins_with("mossbound_colossus_") or name_key.begins_with("golem2_")):
 			head_anchors[name_key] = HeadAnchors.measure(white_image, frames[name_key])
+			core_anchors[name_key] = CoreAnchors.measure(white_image, frames[name_key], colors["1"])
 	for y: int in range(white_image.get_height()):
 		for x: int in range(white_image.get_width()):
 			var alpha: float = white_image.get_pixel(x, y).a
@@ -561,8 +564,20 @@ func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE)
 		origin.x = at.x - (extent.x - anchor.x) * absf(size_scale.x)
 	draw_texture_rect_region(sprites, Rect2(origin.round(), extent * size_scale), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 
+func boss_core_position(actor: Snapshots.EntitySnapshot) -> Vector2:
+	var key: String = String(selected_frames.get(actor.id, ""))
+	if not frames.has(key) or not core_anchors.has(key):
+		return actor.position
+	return HeadAnchors.world(actor.position, frames[key], core_anchors[key], ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {})))
+
+func impact_origin(tell: Snapshots.TelegraphSnapshot) -> Vector2:
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.id == tell.owner_id:
+			return boss_core_position(actor) if tell.attack == &"red_shards" else actor.position
+	return tell.center
+
 func _draw_impact(tell: Snapshots.TelegraphSnapshot) -> void:
-	CombatEffects.draw_imported_impact(self, tell, snapshot.tick, frames, gold_sprites if tell.kind == &"gold" and tell.shape == &"cone" else sprites)
+	CombatEffects.draw_imported_impact(self, tell, snapshot.tick, frames, gold_sprites if tell.kind == &"gold" and tell.shape == &"cone" else sprites, impact_origin(tell))
 
 func actor_is_white(actor: Snapshots.EntitySnapshot) -> bool:
 	if actor.visual_id == &"totoy" and actor.state == &"dash":

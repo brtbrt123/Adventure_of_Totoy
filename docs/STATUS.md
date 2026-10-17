@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Moving charge effect and chest-core laser muzzle (2026-10-17, NOT merged)
+
+Human reported charge visual bugs and requested lasers from the golem core. Charge previously stretched a small multi-clump dust sprite across the entire locked lane. It now draws an anchored native-size fx_charge frame behind the golem's current snapshot position, rotating with the travel direction and looping only while active. Existing dust traces still follow observed movement. It never paints the planned lane ahead as stretched dust, and UVs stay within the selected source cell.
+
+Added per-frame core_anchors measured from the largest bright connected patch in the central torso. The measurement uses original atlas colours; frame anchors/mirroring convert the point to world space. All three laser rays now share that animated chest muzzle and keep their original reported floor endpoints and width in a separate cosmetic geometry object. No core snapshot is mutated, and hit/warning geometry, damage and timing are unchanged. Afterglow remains attached to the current painted core.
+
+Found and fixed shared CPU image mutation while making the empowered/gold/white atlas variants: duplicate each source image before recolouring so source pixels remain available for core detection and effect texture extraction. No art source changes.
+
+Regression coverage follows charge origins against moving body positions, checks native sprite length and atlas bounds, validates bright core locations in all six beam poses with mirrored anchors, and verifies beam visual endpoints/width plus unchanged input geometry. Targeted headless and windowed six-pattern tests passed after fixing legacy frames without ax fallback; refreshed arena_charge.png and arena_shards.png. Full python harness/checks/run_tests.py --worktree . passed Python tests, Godot import, core tests and every smoke suite. Human still judges motion/readability and sound; Claude cross-review pending; nothing merged.
+
 ## Windup-only warnings for every golem attack (2026-10-17, NOT merged)
 
 Extended the owner's sweep warning behavior to every golem attack: TelegraphView.warning_visible now permits a warning only from start_tick through the tick before hit_tick. Both warning areas and imported gold/red markers already share that predicate, so slam, combo, sweep, stomp, charge and beam lose their warning overlay on their own strike tick. Actual dust, crescents, shockwave, charge and beam effects remain. Each combo hit keeps its independent windup warning until its own hit, even after the previous hit strikes. No core timing, geometry, damage or parry changes.

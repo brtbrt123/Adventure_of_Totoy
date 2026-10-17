@@ -1,5 +1,6 @@
 extends SceneTree
 ## Headless six-attack effects check; windowed invocation also captures actual states.
+const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const Tuning := preload("res://core/tuning.gd")
 const Arena := preload("res://presentation/arena/arena.gd")
 const InputFrame := preload("res://core/input_frame.gd")
@@ -39,6 +40,7 @@ func _attack(attack: StringName) -> void:
 	var captured: bool = false
 	var moved: bool = false
 	var before: Vector2 = arena.core.boss.position
+	var previous_charge: Dictionary = {}
 	for i: int in range(160):
 		arena.core.step(InputFrame.new())
 		arena.snapshot = arena.core.snapshot()
@@ -71,6 +73,29 @@ func _attack(attack: StringName) -> void:
 				moved = moved or arena.snapshot.entities[0].position.distance_to(before) > 10.0
 				_expect(not arena.trails.is_empty(), "charge dust trail missing")
 				_expect(ArenaAnimation.boss_mirrored(arena.snapshot.entities[0], arena.snapshot, {}), "left charge not mirrored")
+				var plan: Dictionary = CombatEffects.charge_plan(tell, arena.snapshot.tick, arena.impact_origin(tell), arena.frames, arena.sprites.get_size())
+				_expect(plan["body_position"] == arena.snapshot.entities[0].position, "charge trail not attached to moving body")
+				var f: Dictionary = arena.frames[plan["key"]]
+				var polygon: PackedVector2Array = plan["polygon"]
+				_expect(absf(polygon[0].distance_to(polygon[1]) - float(f["w"] - 1)) < 1.5, "charge dust stretched across lane")
+				for uv: Vector2 in plan["uv"]:
+					var pixel: Vector2 = uv * arena.sprites.get_size()
+					_expect(pixel.x >= f["x"] - 0.001 and pixel.x <= f["x"] + f["w"] - 1 + 0.001 and pixel.y >= f["y"] - 0.001 and pixel.y <= f["y"] + f["h"] - 1 + 0.001, "charge samples adjacent atlas art")
+				if not previous_charge.is_empty():
+					_expect((Vector2(plan["origin"]) - Vector2(previous_charge["origin"])).is_equal_approx(Vector2(plan["body_position"]) - Vector2(previous_charge["body_position"])), "charge dust origin moves independently")
+				previous_charge = plan
+			if attack == &"red_shards" and arena.snapshot.tick >= tell.hit_tick:
+				var owner: Snapshots.EntitySnapshot = arena.snapshot.entities[0]
+				var muzzle: Vector2 = arena.impact_origin(tell)
+				_expect(muzzle == arena.boss_core_position(owner) and muzzle.y < owner.position.y - 10.0, "laser starts at feet instead of core")
+				var original_center: Vector2 = tell.center
+				var original_direction: Vector2 = tell.direction
+				var original_size: float = tell.size
+				var visual: Snapshots.TelegraphSnapshot = CombatEffects.beam_visual_tell(tell, muzzle)
+				_expect(visual.center == muzzle, "laser visual detached from chest")
+				_expect((visual.center + visual.direction * visual.size).is_equal_approx(tell.center + tell.direction * tell.size), "laser loses core endpoint")
+				_expect(visual.width == tell.width and tell.center == original_center and tell.direction == original_direction and tell.size == original_size, "laser render changes hit geometry")
+
 			if attack == &"red_sweep" and arena.snapshot.tick == tell.hit_tick - 1:
 				await _save("sweep_warning")
 			if attack == &"red_sweep" and arena.snapshot.tick == tell.hit_tick:
@@ -146,6 +171,20 @@ func _full_sweep_and_warning() -> void:
 	_expect(is_equal_approx(float(strike["scale"]), float(later["scale"])), "sweep scale changes between frames")
 	_expect(CombatEffects.sweep_plan(tell, tell.hit_tick + 10, arena.frames, arena.sprites).is_empty(), "sweep lingers after breakup")
 
+func _core_anchor_art() -> void:
+	var image: Image = arena.sprites.get_image()
+	var distinct: Dictionary = {}
+	for index: int in range(1, 7):
+		var key: String = "golem2_beam_%d" % index
+		var f: Dictionary = arena.frames[key]
+		var point: Vector2 = arena.core_anchors[key]
+		distinct[point] = true
+		_expect(image.get_pixel(f["x"] + roundi(point.x), f["y"] + roundi(point.y)) == arena.colors["1"], "beam muzzle not on bright core art " + key)
+		var right: Vector2 = HeadAnchors.world(Vector2(160, 100), f, point, false)
+		var left: Vector2 = HeadAnchors.world(Vector2(160, 100), f, point, true)
+		_expect(right.y == left.y and is_equal_approx(right.x + left.x, 319.0), "core point mirror/anchor mismatch")
+	_expect(distinct.size() > 1, "core anchor does not follow animated chest")
+
 func _run() -> void:
 	var packed: PackedScene = load("res://presentation/arena/arena.tscn") as PackedScene
 	arena = packed.instantiate() as Arena
@@ -154,6 +193,7 @@ func _run() -> void:
 	_expect(arena.frames.has("hero2_attack1_right_4"), "new slash frame absent")
 	_sweep_atlas_bounds()
 	_full_sweep_and_warning()
+	_core_anchor_art()
 	for attack: StringName in [&"gold_slam", &"red_sweep", &"red_shards", &"red_stomp", &"gold_combo", &"red_charge"]:
 		await _attack(attack)
 	arena.queue_free()
