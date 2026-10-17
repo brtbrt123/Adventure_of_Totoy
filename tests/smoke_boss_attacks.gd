@@ -47,6 +47,11 @@ func _attack(attack: StringName) -> void:
 		arena._update_hud()
 		arena.queue_redraw()
 		for tell: Snapshots.TelegraphSnapshot in arena.snapshot.telegraphs:
+			_expect(TelegraphView.warning_visible(tell, arena.snapshot.tick) == (arena.snapshot.tick >= tell.start_tick and arena.snapshot.tick < tell.hit_tick), "warning timing " + String(attack))
+			if arena.snapshot.tick == tell.hit_tick - 1:
+				_expect(TelegraphView.warning_visible(tell, arena.snapshot.tick), "warning vanishes before strike " + String(attack))
+			if arena.snapshot.tick >= tell.hit_tick:
+				_expect(not TelegraphView.warning_visible(tell, arena.snapshot.tick), "warning remains during attack " + String(attack))
 			hit_ticks[tell.hit_tick] = true
 			if arena.snapshot.tick == tell.hit_tick:
 				impacts[tell.id] = true
