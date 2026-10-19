@@ -137,7 +137,26 @@ func _title_screen() -> void:
 		_expect((material.get_shader_parameter("palette") as PackedVector3Array).size() == 36, "the palette array is full length")
 		_expect(title.text_display.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "and it is drawn with nearest filtering")
 	_expect(title.background_sprite != null and title.background_sprite.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR, "the painting is not pixelated")
-	_expect(title.logo_sprite != null and title.logo_sprite.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR, "neither is the logo")
+	# the logo matches the pixel lettering: game resolution, palette-bound, hard alpha, nearest filtering
+	_expect(title.logo_pixel and title.logo_sprite != null and title.logo_sprite.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "the logo is the pixel version, drawn with nearest filtering")
+	if title.logo_pixel:
+		var logo_image: Image = title.logo_sprite.texture.get_image()
+		_expect(logo_image.get_width() == int(Title.LOGO_WIDTH) and title.logo_sprite.scale == Vector2.ONE, "the logo is 190 game pixels wide at scale 1")
+		var logo_palette: Dictionary = {}
+		var logo_reserved: Array = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))["reserved"]
+		for entry: Dictionary in JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))["colors"]:
+			if not logo_reserved.has(entry["symbol"]):
+				logo_palette[Color.html(entry["hex"])] = true
+		var logo_stray: int = 0
+		var logo_soft: int = 0
+		for y: int in logo_image.get_height():
+			for x: int in logo_image.get_width():
+				var pixel: Color = logo_image.get_pixel(x, y)
+				if pixel.a > 0.0 and pixel.a < 1.0:
+					logo_soft += 1
+				if pixel.a > 0.0 and not logo_palette.has(Color(pixel.r, pixel.g, pixel.b, 1.0)):
+					logo_stray += 1
+		_expect(logo_stray == 0 and logo_soft == 0, "the pixel logo uses only palette colours (%d stray) and no soft alpha (%d)" % [logo_stray, logo_soft])
 	_expect(title.has_method("draw_text_layer") and title.text_layer != null and title.text_layer.view == title, "the lettering layer draws what the title screen says")
 	# the background: the owner's painting, graded; a smooth sprite behind everything
 	_expect(title.painted and title.background != null and title.background.get_size() == Vector2(1920, 1080), "the painted menu background loads at 1920x1080")

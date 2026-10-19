@@ -23,9 +23,13 @@ const TitleText := preload("res://presentation/menu/title_text.gd")
 var text_viewport: SubViewport
 var text_layer: Node2D
 var text_display: Sprite2D
+## The logo at game resolution (title_logo_pixel.png, palette-bound, to match the pixel lettering); the smooth
+## 1800 px drawing (title_logo.png) is the fallback.
+const LOGO_PIXEL_PATH: String = "res://presentation/menu/title_logo_pixel.png"
 const LOGO_PATH: String = "res://presentation/menu/title_logo.png"
 const LOGO_WIDTH: float = 190.0  # game pixels (the logo is 1800 px wide, drawn smooth)
 var logo_sprite: Sprite2D
+var logo_pixel: bool = false
 const ITEMS: Array[String] = ["START", "CONTROLS", "CREDITS", "QUIT"]
 const SCREEN_TITLE: StringName = &"title"
 const SCREEN_CONTROLS: StringName = &"controls"
@@ -100,14 +104,16 @@ func _ready() -> void:
 		add_child(background_sprite)
 	elif ResourceLoader.exists(BACKGROUND_PATH):
 		background = load(BACKGROUND_PATH) as Texture2D
-	if ResourceLoader.exists(LOGO_PATH):
-		var logo: Texture2D = load(LOGO_PATH) as Texture2D
+	var logo_path: String = LOGO_PIXEL_PATH if ResourceLoader.exists(LOGO_PIXEL_PATH) else LOGO_PATH
+	if ResourceLoader.exists(logo_path):
+		var logo: Texture2D = load(logo_path) as Texture2D
+		logo_pixel = logo_path == LOGO_PIXEL_PATH
 		logo_sprite = Sprite2D.new()
 		logo_sprite.texture = logo
 		logo_sprite.centered = false
 		logo_sprite.scale = Vector2.ONE * (LOGO_WIDTH / logo.get_width())
-		logo_sprite.position = Vector2((320.0 - LOGO_WIDTH) * 0.5, 2.0)
-		logo_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		logo_sprite.position = Vector2(floorf((320.0 - LOGO_WIDTH) * 0.5), 2.0)
+		logo_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST if logo_pixel else CanvasItem.TEXTURE_FILTER_LINEAR
 		logo_sprite.show_behind_parent = true
 		add_child(logo_sprite)
 	_add_text_layer()

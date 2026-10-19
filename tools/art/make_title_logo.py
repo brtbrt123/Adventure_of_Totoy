@@ -5,7 +5,10 @@ violet-winged "OF" over "TOTOY", teal gems on the top and bottom of the plaque, 
 sharp at 1800x920 and graded to the game's dusk mood (grey-green stone, cream-and-bronze letters, teal and violet
 gems, mossy vines). Drawn at 2x and reduced for smooth edges.
 
-Writes presentation/menu/title_logo.png (RGBA). Deterministic (fixed seed). Needs presentation/fonts/Cinzel.ttf.
+Writes presentation/menu/title_logo.png (RGBA, the smooth 1800x920 drawing) and presentation/menu/title_logo_pixel.png
+(the same logo at game resolution, 190 px wide: area-averaged, hard alpha, snapped to the Totoy 36 palette without
+the reserved gold/red) which is what the menu shows, to match the pixel lettering. Deterministic (fixed seed).
+Needs presentation/fonts/Cinzel.ttf.
 Run from the project root:  python tools/art/make_title_logo.py
 """
 from __future__ import annotations
@@ -20,6 +23,8 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 ROOT = Path(__file__).resolve().parents[2]
 FONT = ROOT / "presentation" / "fonts" / "Cinzel.ttf"
 OUT = ROOT / "presentation" / "menu" / "title_logo.png"
+OUT_PIXEL = ROOT / "presentation" / "menu" / "title_logo_pixel.png"
+PIXEL_WIDTH = 190  # game pixels: must match LOGO_WIDTH in presentation/menu/title.gd
 W, H = 1800, 920
 S = 2  # supersampling
 
@@ -331,7 +336,46 @@ def main() -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     result.save(OUT)
     print("wrote", OUT, result.size, OUT.stat().st_size, "bytes")
+    pixel_logo(result).save(OUT_PIXEL)
+    print("wrote", OUT_PIXEL)
     return 0
+
+
+def pixel_logo(logo: Image.Image) -> Image.Image:
+    """The logo as game-resolution pixel art in the Totoy palette (premultiplied area average, hard alpha)."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import artlib
+    from import_reference import srgb_to_lab
+
+    palette = artlib.load_palette()
+    reserved = set(palette.reserved)
+    choices = [(srgb_to_lab(rgb), rgb) for sym, rgb in palette.by_symbol.items() if sym not in reserved]
+    cache: dict[tuple[int, int, int], tuple[int, int, int]] = {}
+
+    def snap(rgb: tuple[int, int, int]) -> tuple[int, int, int]:
+        hit = cache.get(rgb)
+        if hit is None:
+            lab = srgb_to_lab(rgb)
+            hit = min(choices, key=lambda c: (c[0][0] - lab[0]) ** 2 * 1.4 + (c[0][1] - lab[1]) ** 2 + (c[0][2] - lab[2]) ** 2)[1]
+            cache[rgb] = hit
+        return hit
+
+    width = PIXEL_WIDTH
+    height = round(logo.height * width / logo.width)
+    r, g, b, a = logo.split()
+    small = [ImageChops.multiply(c, a).resize((width, height), Image.BOX) for c in (r, g, b)]
+    alpha = a.resize((width, height), Image.BOX)
+    out = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    px = out.load()
+    pr, pg, pb, pa = (c.load() for c in (*small, alpha))
+    for y in range(height):
+        for x in range(width):
+            al = pa[x, y]
+            if al < 128:
+                continue
+            k = 255.0 / al
+            px[x, y] = snap((min(255, int(pr[x, y] * k)), min(255, int(pg[x, y] * k)), min(255, int(pb[x, y] * k)))) + (255,)
+    return out
 
 
 if __name__ == "__main__":
