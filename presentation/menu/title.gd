@@ -57,6 +57,15 @@ var profile: Object = null
 var started: bool = false
 var sprite_frames: Dictionary = {}
 var sprite_texture: Texture2D
+var background: Texture2D
+## Seconds since the menu opened; drives the idle animations, the drifting mist and the fireflies.
+var time: float = 0.0
+## Where the live hero and golem stand: the background has their shadows baked in at the same spots
+## (tools/art/make_menu_background.py FEET_HERO / FEET_GOLEM).
+const FEET_HERO: Vector2 = Vector2(70, 150)
+const FEET_GOLEM: Vector2 = Vector2(250, 150)
+const BACKGROUND_PATH: String = "res://presentation/menu/menu_background.png"
+const FIREFLIES: int = 14
 ## Replaced by tests so choosing START does not leave the scene they run in.
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
 
@@ -69,11 +78,15 @@ func _ready() -> void:
 	var atlas: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))
 	sprite_frames = (atlas as Dictionary).get("frames", {})
 	sprite_texture = load("res://art/build/sprites.png") as Texture2D
+	if ResourceLoader.exists(BACKGROUND_PATH):
+		background = load(BACKGROUND_PATH) as Texture2D
 	profile = SaveStore.load_profile()
 	queue_redraw()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	time += delta
+	queue_redraw()  # the background is alive: idle animations, mist, fireflies
 	if Input.is_action_just_pressed("menu_up"):
 		move_selection(-1)
 	if Input.is_action_just_pressed("menu_down"):
@@ -149,9 +162,7 @@ func record_text() -> String:
 func _draw() -> void:
 	if colors.is_empty():
 		return
-	draw_rect(Rect2(0, 0, 320, 180), colors["2"])
-	for stripe: int in range(0, 180, 4):
-		draw_rect(Rect2(0, stripe, 320, 2), Color(0, 0, 0, 0.12))
+	_draw_background()
 	match screen:
 		SCREEN_CONTROLS:
 			_draw_page("CONTROLS", CONTROL_LINES, CONTROL_FOOTER)
@@ -161,9 +172,44 @@ func _draw() -> void:
 			_draw_title()
 
 
+## The dusk arena picture (made from the game's own tiles and props), drifting mist and fireflies. On the pages
+## (controls, credits) the picture is dimmed so the lettering reads.
+func _draw_background() -> void:
+	if background == null:
+		draw_rect(Rect2(0, 0, 320, 180), colors["2"])
+	else:
+		draw_texture_rect(background, Rect2(0, 0, 320, 180), false)
+	# mist: thin pale bands that drift sideways at different speeds (pixel rows, so it stays pixel art)
+	var mist: Color = colors["p"]
+	for band: int in 6:
+		var y: float = 58.0 + band * 21.0
+		var speed: float = (6.0 + band * 2.5) * (1.0 if band % 2 == 0 else -1.0)
+		for piece: int in 4:
+			var x: float = fposmod(piece * 90.0 + time * speed + band * 37.0, 400.0) - 60.0
+			var length: float = 40.0 + 24.0 * sin(time * 0.3 + band + piece)
+			var alpha: float = 0.05 + 0.025 * sin(time * 0.5 + band * 1.7 + piece)
+			draw_rect(Rect2(floorf(x), floorf(y + 2.0 * sin(time * 0.4 + piece)), length, 1.0), Color(mist, alpha))
+			draw_rect(Rect2(floorf(x) + 6.0, floorf(y + 2.0 * sin(time * 0.4 + piece)) + 1.0, length * 0.6, 1.0), Color(mist, alpha * 0.7))
+	# fireflies: tiny pale lights wandering over the arena, pulsing
+	var rnd: RandomNumberGenerator = RandomNumberGenerator.new()
+	rnd.seed = 77
+	for i: int in FIREFLIES:
+		var home: Vector2 = Vector2(rnd.randf_range(14.0, 306.0), rnd.randf_range(60.0, 172.0))
+		var rate: Vector2 = Vector2(rnd.randf_range(0.25, 0.6), rnd.randf_range(0.2, 0.5))
+		var phase: float = rnd.randf_range(0.0, TAU)
+		var at: Vector2 = home + Vector2(sin(time * rate.x + phase) * 9.0, cos(time * rate.y + phase * 1.3) * 5.0)
+		var pulse: float = 0.5 + 0.5 * sin(time * 1.6 + phase * 2.0)
+		var dot: Vector2 = Vector2(floorf(at.x), floorf(at.y))
+		draw_rect(Rect2(dot - Vector2(1, 0), Vector2(3, 1)), Color(colors["1"], 0.18 * pulse))
+		draw_rect(Rect2(dot - Vector2(0, 1), Vector2(1, 3)), Color(colors["1"], 0.18 * pulse))
+		draw_rect(Rect2(dot, Vector2(1, 1)), Color(colors["p"], 0.55 + 0.45 * pulse))
+	if screen != SCREEN_TITLE:
+		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], 0.74))
+
+
 func _draw_title() -> void:
-	_draw_frame("hero2_idle_right_1", Vector2(70, 150))
-	_draw_frame("golem2_idle_1", Vector2(250, 150))
+	_draw_frame("hero2_idle_right_%d" % (1 + int(time / 0.2) % 4), FEET_HERO)
+	_draw_frame("golem2_idle_%d" % (1 + int(time / 0.25) % 4), FEET_GOLEM)
 	var title: String = "ADVENTURE OF TOTOY"
 	centered(160, 22, title, colors["1"], colors["0"], 3)
 	var tagline: String = "GOLD CAN BE PARRIED. RED MUST BE DODGED."
