@@ -85,7 +85,7 @@ func _title_screen() -> void:
 	strings.append_array(["ADVENTURE OF TOTOY", "GOLD CAN BE PARRIED. RED MUST BE DODGED.", "VICTORIES 0  DEFEATS 0  BEST 1:00.0", "SAVE RESET: NOT VALID JSON", "ESC OR ENTER: BACK", "> START", "NEW BEST!", "ESC: TITLE", "R TO RESTART", "TIME 1:23.4"])
 	for line: String in strings:
 		for character: String in line.to_upper():
-			_expect(Title.ui_font().has_char(character.unicode_at(0)), "the UI font has no glyph for '%s' in \"%s\"" % [character, line])
+			_expect(Title.menu_font().has_char(character.unicode_at(0)), "the menu font has no glyph for '%s' in \"%s\"" % [character, line])
 	# the controls page covers every binding the game uses
 	var controls: String = " ".join(Title.CONTROL_LINES).to_upper()
 	for needle: String in ["WASD", "LEFT CLICK", "RIGHT CLICK", "SHIFT", "SPACE", "Z:", "X:", "C:", "R:", "ESC"]:
@@ -102,18 +102,31 @@ func _title_screen() -> void:
 	_expect(credits.contains("PIXELIFY SANS") and credits.contains("OFL"), "credits miss the font")
 	_expect(FileAccess.file_exists("res://presentation/fonts/PixelifySans.ttf"), "the pixel font file is missing")
 	_expect(FileAccess.get_file_as_string("res://presentation/fonts/OFL-PixelifySans.txt").contains("SIL Open Font License"), "the font licence text is missing")
-	_expect(Title.ui_font() is FontVariation and (Title.ui_font() as FontVariation).base_font is FontFile, "titles and names use the pixel font, not the fallback")
-	_expect(Title.stat_font() == Title.ui_font(), "numbers use the pixel font too (the human's choice)")
-	# nothing runs off the page: credit lines fit in 280 game pixels, control keys and actions in their columns
+	_expect(Title.menu_font() is FontVariation and (Title.menu_font() as FontVariation).base_font is FontFile, "the menu uses Cinzel, not the fallback")
+	_expect(FileAccess.file_exists("res://presentation/fonts/Cinzel.ttf") and FileAccess.get_file_as_string("res://presentation/fonts/OFL-Cinzel.txt").contains("SIL Open Font License"), "Cinzel ships with its licence")
+	_expect(credits.contains("CINZEL"), "credits name Cinzel")
+	_expect(Title.ui_font() is FontVariation and (Title.ui_font() as FontVariation).base_font is FontFile, "the in-game HUD still uses the pixel font")
+	# the logo: a smooth sprite centred at the top, only on the menu screen
+	_expect(title.logo_sprite != null and absf(title.logo_sprite.texture.get_width() * title.logo_sprite.scale.x - Title.LOGO_WIDTH) < 0.01, "the title logo is shown at its width")
+	_expect(title.logo_sprite != null and absf(title.logo_sprite.position.x * 2.0 + Title.LOGO_WIDTH - 320.0) < 0.01, "and centred")
+	_expect(title.logo_sprite != null and title.logo_sprite.position.y + title.logo_sprite.texture.get_height() * title.logo_sprite.scale.y < Title.MENU_TOP - 2, "and it ends above the first menu line")
+	# nothing runs off the page: credit lines fit, control keys and actions stay in their columns (menu font)
+	var face: Font = Title.menu_font()
 	for line: String in Title.CREDIT_LINES:
-		_expect(Title.text_width(line) <= 280.0, "credit line too wide (%d px): %s" % [int(Title.text_width(line)), line])
+		_expect(Title.text_width(line, 1, face, Title.PAGE_SIZE) <= 285.0, "credit line too wide (%d px): %s" % [int(Title.text_width(line, 1, face, Title.PAGE_SIZE)), line])
 	for line: String in Title.CONTROL_LINES:
 		var colon: int = line.find(":")
-		_expect(Title.text_width(line.substr(0, colon)) <= 52.0, "control key too wide: " + line)
-		_expect(Title.text_width(line.substr(colon + 1)) <= 216.0, "control action too wide: " + line)
+		_expect(Title.text_width(line.substr(0, colon), 1, face, Title.PAGE_SIZE) <= 64.0, "control key too wide: " + line)
+		_expect(Title.text_width(line.substr(colon + 1), 1, face, Title.PAGE_SIZE) <= 212.0, "control action too wide: " + line)
 	for line: String in Title.CONTROL_FOOTER:
-		_expect(Title.text_width(line) <= 280.0, "controls footer too wide: " + line)
-	_expect(Title.text_width("ADVENTURE OF TOTOY", 3) <= 300.0, "the title fits the screen")
+		_expect(Title.text_width(line, 1, face, Title.PAGE_SIZE) <= 285.0, "controls footer too wide: " + line)
+	_expect(Title.text_width("ADVENTURE OF TOTOY", 1, face, Title.FALLBACK_TITLE_SIZE) <= 300.0, "the plain-lettering title fits the screen")
+	var credits_end: int = 26 + Title.CREDIT_LINES.size() * 9
+	_expect(credits_end <= 164, "the credits end above the back line (end y %d)" % credits_end)
+	var controls_end: int = 26 + Title.CONTROL_LINES.size() * 9 + 4 + Title.CONTROL_FOOTER.size() * 9
+	_expect(controls_end <= 164, "the controls page ends above the back line (end y %d)" % controls_end)
+	for item: String in Title.ITEMS:
+		_expect(Title.text_width(item, 1, face, Title.MENU_SIZE) <= 100.0, "menu item fits its plate: " + item)
 	# the background: the owner's painting, graded; a smooth sprite behind everything
 	_expect(title.painted and title.background != null and title.background.get_size() == Vector2(1920, 1080), "the painted menu background loads at 1920x1080")
 	_expect(title.background_sprite != null and title.background_sprite.show_behind_parent and absf(title.background_sprite.scale.x * 1920.0 - 320.0) < 0.01, "it fills the 320x180 canvas, behind everything")

@@ -108,6 +108,27 @@ static func ui_font() -> Font:
 static func stat_font() -> Font:
 	return ui_font()
 
+## The menu face: Cinzel (OFL, see presentation/fonts/README.md), carved-looking capitals like the title logo.
+## Falls back to the pixel font if the file is missing.
+const MENU_FONT_PATH: String = "res://presentation/fonts/Cinzel.ttf"
+const MENU_FONT_WEIGHT: int = 700
+static var _menu_font: Font = null
+
+static func menu_font() -> Font:
+	if _menu_font == null:
+		if ResourceLoader.exists(MENU_FONT_PATH):
+			var variation: FontVariation = FontVariation.new()
+			variation.base_font = load(MENU_FONT_PATH) as Font
+			variation.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("weight"): MENU_FONT_WEIGHT}
+			_menu_font = variation
+		else:
+			_menu_font = ui_font()
+	return _menu_font
+
+## Cap height as a fraction of the font size (the pixel font's 5 of 9, Cinzel's capitals about 0.7 of the em).
+static func _cap_ratio(face: Font) -> float:
+	return 0.70 if face == _menu_font and _menu_font != _font else 5.0 / 9.0
+
 static func _size_for(_font: Font, scale_px: int, size_px: int = 0) -> int:
 	return size_px if size_px > 0 else FONT_SIZE * scale_px
 
@@ -120,12 +141,12 @@ static func text_width(text: String, scale_px: int = 1, font: Font = null, size_
 func lettering(at: Vector2, text: String, color: Color, scale_px: int = 1, font: Font = null, size_px: int = 0) -> void:
 	var face: Font = font if font != null else ui_font()
 	var size: int = _size_for(face, scale_px, size_px)
-	draw_string(face, Vector2(at.x, at.y + 5.0 * size / FONT_SIZE), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
+	draw_string(face, Vector2(at.x, at.y + _cap_ratio(face) * size), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
 
 func outlined(at: Vector2, text: String, color: Color, outline: Color, scale_px: int = 1, font: Font = null, size_px: int = 0) -> void:
 	var face: Font = font if font != null else ui_font()
 	var size: int = _size_for(face, scale_px, size_px)
-	draw_string_outline(face, Vector2(at.x, at.y + 5.0 * size / FONT_SIZE), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, maxi(2, 2 * size / FONT_SIZE), outline)
+	draw_string_outline(face, Vector2(at.x, at.y + _cap_ratio(face) * size), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, maxi(2, 2 * size / FONT_SIZE), outline)
 	lettering(at, text, color, scale_px, font, size_px)
 
 ## Text centred on `center_x`.

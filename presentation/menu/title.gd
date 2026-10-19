@@ -10,8 +10,14 @@ const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 ## not set it and never touch the player's save).
 const PERSIST_META: StringName = &"totoy_persist"
 
-const MENU_TOP: int = 82  # y of the first menu line, in game pixels
-const MENU_STEP: int = 16
+const MENU_TOP: int = 103  # y of the first menu line, in game pixels
+const MENU_STEP: int = 14
+const MENU_SIZE: int = 12  # menu item font size (Cinzel capitals)
+const PAGE_SIZE: int = 8  # body text on the controls and credits pages
+const FALLBACK_TITLE_SIZE: int = 15  # the plain-lettering title used when the logo image is missing
+const LOGO_PATH: String = "res://presentation/menu/title_logo.png"
+const LOGO_WIDTH: float = 190.0  # game pixels (the logo is 1800 px wide, drawn smooth)
+var logo_sprite: Sprite2D
 const ITEMS: Array[String] = ["START", "CONTROLS", "CREDITS", "QUIT"]
 const SCREEN_TITLE: StringName = &"title"
 const SCREEN_CONTROLS: StringName = &"controls"
@@ -35,7 +41,6 @@ const CONTROL_FOOTER: Array[String] = [
 	"RED ATTACKS MUST BE DODGED.",
 ]
 const CREDIT_LINES: Array[String] = [
-	"ADVENTURE OF TOTOY",
 	"GAME DESIGN AND ART DIRECTION: THE OWNER",
 	"HERO REFERENCE ART: THE OWNER",
 	"MENU PAINTING: SUPPLIED BY THE OWNER",
@@ -46,8 +51,8 @@ const CREDIT_LINES: Array[String] = [
 	"SOUND AND MUSIC (CC0):",
 	"STARNINJAS, ARTISTICDUDE, KENNEY,",
 	"BRIAN MACINTOSH (BMACZERO), MINTODOG",
-	"FONT: PIXELIFY SANS (SIL OFL 1.1),",
-	"THE PIXELIFY SANS PROJECT AUTHORS",
+	"FONTS (SIL OFL 1.1): CINZEL AND PIXELIFY SANS,",
+	"BY THE CINZEL AND PIXELIFY SANS PROJECT AUTHORS",
 	"LICENCES: PRESENTATION/AUDIO/LICENSES",
 	"AND PRESENTATION/FONTS",
 ]
@@ -88,12 +93,24 @@ func _ready() -> void:
 		add_child(background_sprite)
 	elif ResourceLoader.exists(BACKGROUND_PATH):
 		background = load(BACKGROUND_PATH) as Texture2D
+	if ResourceLoader.exists(LOGO_PATH):
+		var logo: Texture2D = load(LOGO_PATH) as Texture2D
+		logo_sprite = Sprite2D.new()
+		logo_sprite.texture = logo
+		logo_sprite.centered = false
+		logo_sprite.scale = Vector2.ONE * (LOGO_WIDTH / logo.get_width())
+		logo_sprite.position = Vector2((320.0 - LOGO_WIDTH) * 0.5, 2.0)
+		logo_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		logo_sprite.show_behind_parent = true
+		add_child(logo_sprite)
 	profile = SaveStore.load_profile()
 	queue_redraw()
 
 
 func _process(delta: float) -> void:
 	time += delta
+	if logo_sprite != null:
+		logo_sprite.visible = screen == SCREEN_TITLE
 	queue_redraw()  # the background is alive: mist and fireflies
 	if Input.is_action_just_pressed("menu_up"):
 		move_selection(-1)
@@ -216,38 +233,40 @@ func _draw_background() -> void:
 
 
 func _draw_title() -> void:
-	var title: String = "ADVENTURE OF TOTOY"
-	centered(160, 22, title, colors["1"], colors["0"], 3)
-	var tagline: String = "GOLD CAN BE PARRIED. RED MUST BE DODGED."
-	centered(160, 50, tagline, colors["o"], colors["0"])
+	if logo_sprite == null:  # without the logo image the title is plain lettering
+		centered(160, 30, "ADVENTURE OF TOTOY", colors["1"], colors["0"], 1, menu_font(), FALLBACK_TITLE_SIZE)
+	var face: Font = menu_font()
 	for i: int in ITEMS.size():
 		var selected: bool = i == index
 		var y: float = MENU_TOP + i * MENU_STEP
 		if selected:
-			draw_rect(Rect2(100, y - 3, 120, MENU_STEP - 2), Color(colors["1"], 0.14))
-			outlined(Vector2(104, y), ">", colors["1"], colors["0"], 2)
-		centered(160, y, ITEMS[i], colors["1"] if selected else colors["p"], colors["0"], 2)
+			# a soft violet plate behind the chosen item with a thin cream line under it
+			draw_rect(Rect2(96, y - 3, 128, MENU_STEP - 1), Color(colors["v"], 0.30))
+			draw_rect(Rect2(96, y - 3 + MENU_STEP - 2, 128, 1), Color(colors["1"], 0.55))
+			outlined(Vector2(100, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
+		centered(160, y, ITEMS[i], colors["1"] if selected else colors["j"], colors["0"], 1, face, MENU_SIZE)
 	var record: String = record_text()
 	if record != "":
-		centered(160, 158, record, colors["p"], colors["0"], 1, stat_font())
+		centered(160, 167, record, colors["j"], colors["0"], 1, face, 8)
 	var note: String = String(profile.load_note) if profile != null else ""
 	if note != "":
-		centered(160, 168, "SAVE RESET: " + note, colors["o"], colors["0"])
+		centered(160, 175, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)
 
 
 func _draw_page(heading: String, lines: Array[String], footer: Array[String]) -> void:
-	centered(160, 8, heading, colors["1"], colors["0"], 3)
-	var y: int = 36
+	var face: Font = menu_font()
+	centered(160, 4, heading, colors["1"], colors["0"], 1, face, 20)
+	var y: int = 26
 	for line: String in lines:
 		var split: int = line.find(":")
 		if split > 0 and lines == CONTROL_LINES:
-			outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"], 1, stat_font())
-			outlined(Vector2(74, y), line.substr(split + 1), colors["p"], colors["0"])
+			outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"], 1, face, PAGE_SIZE)
+			outlined(Vector2(88, y), line.substr(split + 1), colors["j"], colors["0"], 1, face, PAGE_SIZE)
 		else:
-			outlined(Vector2(20, y), line, colors["p"], colors["0"])
+			outlined(Vector2(20, y), line, colors["j"], colors["0"], 1, face, PAGE_SIZE)
 		y += 9
-	y += 6
+	y += 4
 	for line: String in footer:
-		outlined(Vector2(20, y), line, colors["o"], colors["0"])
+		outlined(Vector2(20, y), line, colors["o"], colors["0"], 1, face, PAGE_SIZE)
 		y += 9
-	outlined(Vector2(20, 168), "ESC OR ENTER: BACK", colors["1"], colors["0"])
+	outlined(Vector2(20, 168), "ESC OR ENTER: BACK", colors["1"], colors["0"], 1, face, PAGE_SIZE)
