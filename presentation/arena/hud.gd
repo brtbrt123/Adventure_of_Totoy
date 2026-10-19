@@ -169,7 +169,12 @@ func bar(at: Vector2, width: int, value: float, maximum: float, color: Color, he
 ## frame; everything else in the HUD stays nearest-neighbour. Falls back to the palette portrait if the file is missing.
 const PORTRAIT_SIZE: int = 200
 const PORTRAIT_SOURCE: String = "res://art/reference/hero_portrait.jpg"
-const PORTRAIT_CROP: Rect2i = Rect2i(330, 0, 1260, 1260)  # square around the head (the same crop import_reference.py uses)
+## Square centred on the whole head (hair spikes to chin span x 430-1500, y 25-1300 of the 2000 px source) with a margin.
+const PORTRAIT_CROP: Rect2i = Rect2i(215, 0, 1500, 1500)
+## The circular opening of ui_profile (a hole at x 16-58, y 16-57 of the 208x80 art, drawn into Rect2(2, 2, 125, 48)):
+## its centre and diameter in game pixels.
+const PORTRAIT_CENTER: Vector2 = Vector2(24.54, 24.2)
+const PORTRAIT_DIAMETER: float = 26.0
 var portrait_sprite: Sprite2D = null
 
 func prepare_portrait() -> void:
@@ -199,8 +204,8 @@ func prepare_portrait() -> void:
 	portrait_sprite = Sprite2D.new()
 	portrait_sprite.texture = portrait_mask
 	portrait_sprite.centered = false
-	portrait_sprite.position = Vector2(11, 12)
-	portrait_sprite.scale = Vector2.ONE * (25.0 / PORTRAIT_SIZE)
+	portrait_sprite.position = PORTRAIT_CENTER - Vector2.ONE * (PORTRAIT_DIAMETER * 0.5)
+	portrait_sprite.scale = Vector2.ONE * (PORTRAIT_DIAMETER / PORTRAIT_SIZE)
 	portrait_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	portrait_sprite.show_behind_parent = true
 	add_child(portrait_sprite)
@@ -249,8 +254,6 @@ func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	ui("ui_icon_edge_1", Rect2(39, 31, 6, 6))
 	ui("ui_icon_dash_1", Rect2(39, 38, 6, 6))
 	ui("ui_icon_parry_1", Rect2(116, 32, 7, 7))
-	var hp: String = "%d/%d" % [h.player_hp, h.player_max_hp]
-	centered(81, 18, hp, colors["1"], colors["0"], 1, null, 12)
 
 func ui(key: String, rect: Rect2) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
