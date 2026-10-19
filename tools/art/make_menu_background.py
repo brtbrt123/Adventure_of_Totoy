@@ -2,8 +2,7 @@
 
 A dusk view of the Mossbound Colossus's arena: grass outside, a ring of ruined flagstones and cracked ground in the
 middle, ruins, trees and walls around the edge, all from the real tiles and props in art/src, then graded to dusk and
-snapped to the Totoy 36 palette (no reserved gold/red). Hero and golem are NOT in the picture: the menu draws them
-live (animated idle) standing on the shadows baked in here at FEET_HERO and FEET_GOLEM.
+snapped to the Totoy 36 palette (no reserved gold/red). No characters are in the picture.
 
 Writes presentation/menu/menu_background.png (320x180). Deterministic (fixed seed).
 Run from the project root:  python tools/art/make_menu_background.py [--preview]
@@ -26,8 +25,6 @@ ROOT = artlib.ROOT
 SRC = artlib.SRC_DIR
 OUT = ROOT / "presentation" / "menu" / "menu_background.png"
 W, H = 320, 180
-FEET_HERO = (70, 150)  # keep in sync with presentation/menu/title.gd
-FEET_GOLEM = (250, 150)
 SEED = 20261019
 
 palette = artlib.load_palette()
@@ -120,9 +117,6 @@ def add_props(canvas: Image.Image) -> None:
     for name, x, y, flip in sorted(items, key=lambda i: i[2]):
         shadow(canvas, (x, y), 12, 3, 0.45)
         place(canvas, name, (x, y), flip)
-    # shadows where the live hero and golem will stand
-    shadow(canvas, (FEET_HERO[0], FEET_HERO[1] + 1), 13, 4, 0.6)
-    shadow(canvas, (FEET_GOLEM[0], FEET_GOLEM[1] + 1), 24, 7, 0.6)
 
 
 # ---------------------------------------------------------------- grading

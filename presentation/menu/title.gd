@@ -56,15 +56,9 @@ var screen: StringName = SCREEN_TITLE
 var index: int = 0
 var profile: Object = null
 var started: bool = false
-var sprite_frames: Dictionary = {}
-var sprite_texture: Texture2D
 var background: Texture2D
-## Seconds since the menu opened; drives the idle animations, the drifting mist and the fireflies.
+## Seconds since the menu opened; drives the drifting mist and the fireflies.
 var time: float = 0.0
-## Where the live hero and golem stand: the background has their shadows baked in at the same spots
-## (tools/art/make_menu_background.py FEET_HERO / FEET_GOLEM).
-const FEET_HERO: Vector2 = Vector2(70, 150)
-const FEET_GOLEM: Vector2 = Vector2(250, 150)
 ## The owner's painted scene, graded to dusk by tools/art/grade_menu_background.py (1920x1080). It is shown by a
 ## smooth-filtered sprite behind everything. If it is missing the pixel-art arena (menu_background.png, composed
 ## from the game's own tiles by tools/art/make_menu_background.py) is drawn instead.
@@ -82,9 +76,6 @@ func _ready() -> void:
 	var palette: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))
 	for entry: Dictionary in (palette as Dictionary).get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
-	var atlas: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))
-	sprite_frames = (atlas as Dictionary).get("frames", {})
-	sprite_texture = load("res://art/build/sprites.png") as Texture2D
 	if ResourceLoader.exists(PAINTED_PATH):
 		background = load(PAINTED_PATH) as Texture2D
 		painted = true
@@ -103,7 +94,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	time += delta
-	queue_redraw()  # the background is alive: idle animations, mist, fireflies
+	queue_redraw()  # the background is alive: mist and fireflies
 	if Input.is_action_just_pressed("menu_up"):
 		move_selection(-1)
 	if Input.is_action_just_pressed("menu_down"):
@@ -196,9 +187,6 @@ func _draw_background() -> void:
 		draw_rect(Rect2(0, 0, 320, 180), colors["2"])
 	elif not painted:
 		draw_texture_rect(background, Rect2(0, 0, 320, 180), false)
-	if painted:
-		_draw_soft_shadow(FEET_HERO + Vector2(0, 1), 13.0, 4.0)
-		_draw_soft_shadow(FEET_GOLEM + Vector2(0, 1), 24.0, 7.0)
 	# mist: thin pale bands that drift sideways at different speeds (pixel rows; only over the pixel-art fallback)
 	var mist: Color = colors["p"]
 	for band: int in (0 if painted else 6):
@@ -227,21 +215,7 @@ func _draw_background() -> void:
 		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], 0.74))
 
 
-## A dark ellipse under a character's feet (the painted background has no baked shadows).
-func _draw_soft_shadow(centre: Vector2, rx: float, ry: float) -> void:
-	var points: PackedVector2Array = PackedVector2Array()
-	for i: int in 28:
-		points.append(centre + Vector2(cos(TAU * i / 28.0) * rx, sin(TAU * i / 28.0) * ry))
-	draw_colored_polygon(points, Color(colors["0"], 0.55))
-	var inner: PackedVector2Array = PackedVector2Array()
-	for i: int in 28:
-		inner.append(centre + Vector2(cos(TAU * i / 28.0) * rx * 0.6, sin(TAU * i / 28.0) * ry * 0.6))
-	draw_colored_polygon(inner, Color(colors["0"], 0.3))
-
-
 func _draw_title() -> void:
-	_draw_frame("hero2_idle_right_%d" % (1 + int(time / 0.2) % 4), FEET_HERO)
-	_draw_frame("golem2_idle_%d" % (1 + int(time / 0.25) % 4), FEET_GOLEM)
 	var title: String = "ADVENTURE OF TOTOY"
 	centered(160, 22, title, colors["1"], colors["0"], 3)
 	var tagline: String = "GOLD CAN BE PARRIED. RED MUST BE DODGED."
@@ -277,11 +251,3 @@ func _draw_page(heading: String, lines: Array[String], footer: Array[String]) ->
 		outlined(Vector2(20, y), line, colors["o"], colors["0"])
 		y += 9
 	outlined(Vector2(20, 168), "ESC OR ENTER: BACK", colors["1"], colors["0"])
-
-
-func _draw_frame(key: String, at: Vector2) -> void:
-	if not sprite_frames.has(key) or sprite_texture == null:
-		return
-	var frame: Dictionary = sprite_frames[key]
-	var anchor: Vector2 = Vector2(frame.get("ax", float(frame["w"]) / 2), frame.get("ay", float(frame["h"])))
-	draw_texture_rect_region(sprite_texture, Rect2((at - anchor).round(), Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
