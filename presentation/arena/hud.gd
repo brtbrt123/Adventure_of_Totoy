@@ -84,32 +84,58 @@ static func format_ticks(ticks: int) -> String:
 ## Text is a real font drawn at the window resolution (the project stretches the canvas, so a font size of 7
 ## "game pixels" is rendered with 28 screen pixels at the default 4x window): crisp at any size. The old
 ## 3x5 bitmap glyph table above is no longer used for drawing.
-const FONT_SIZE: int = 7  # cap height is about 5 game pixels, like the old bitmap letters
+const FONT_PATH: String = "res://presentation/fonts/PixelifySans.ttf"
+const FONT_SIZE: int = 9  # game pixels; the cap height is about 5-6 game pixels, like the old bitmap letters
+const FONT_WEIGHT: int = 400  # Pixelify Sans has a weight axis of 400-700
 static var _font: Font = null
 
+## Pixelify Sans (OFL, see presentation/fonts/README.md); Godot's built-in font if that file is missing.
 static func ui_font() -> Font:
 	if _font == null:
+		var variation: FontVariation = FontVariation.new()
+		if ResourceLoader.exists(FONT_PATH):
+			variation.base_font = load(FONT_PATH) as Font
+			variation.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("weight"): FONT_WEIGHT}
+		else:
+			variation.base_font = ThemeDB.fallback_font
+			variation.variation_embolden = 0.55
+		_font = variation
+	return _font
+
+## Numbers and key letters use a clearer bold sans face: the pixel font's 0/O, 5/S, 3/8 and Z/2 are too alike at
+## HUD size. Titles, menus, names and sentences use the pixel font.
+const STAT_FONT_SIZE: int = 7
+static var _stat_font: Font = null
+
+static func stat_font() -> Font:
+	if _stat_font == null:
 		var bold: FontVariation = FontVariation.new()
 		bold.base_font = ThemeDB.fallback_font
 		bold.variation_embolden = 0.55
-		_font = bold
-	return _font
+		_stat_font = bold
+	return _stat_font
 
-## Width of `text` in game pixels at a size multiplier.
-static func text_width(text: String, scale_px: int = 1) -> float:
-	return ui_font().get_string_size(text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE * scale_px).x
+static func _size_for(font: Font, scale_px: int) -> int:
+	return (STAT_FONT_SIZE if font == _stat_font and _stat_font != null else FONT_SIZE) * scale_px
+
+## Width of `text` in game pixels at a size multiplier (`font` defaults to the pixel font).
+static func text_width(text: String, scale_px: int = 1, font: Font = null) -> float:
+	var face: Font = font if font != null else ui_font()
+	return face.get_string_size(text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, _size_for(face, scale_px)).x
 
 ## `at` is the top-left of the letters, as with the old bitmap text.
-func lettering(at: Vector2, text: String, color: Color, scale_px: int = 1) -> void:
-	draw_string(ui_font(), Vector2(at.x, at.y + 5.0 * scale_px), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE * scale_px, color)
+func lettering(at: Vector2, text: String, color: Color, scale_px: int = 1, font: Font = null) -> void:
+	var face: Font = font if font != null else ui_font()
+	draw_string(face, Vector2(at.x, at.y + 5.0 * scale_px), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, _size_for(face, scale_px), color)
 
-func outlined(at: Vector2, text: String, color: Color, outline: Color, scale_px: int = 1) -> void:
-	draw_string_outline(ui_font(), Vector2(at.x, at.y + 5.0 * scale_px), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE * scale_px, 2 * scale_px, outline)
-	lettering(at, text, color, scale_px)
+func outlined(at: Vector2, text: String, color: Color, outline: Color, scale_px: int = 1, font: Font = null) -> void:
+	var face: Font = font if font != null else ui_font()
+	draw_string_outline(face, Vector2(at.x, at.y + 5.0 * scale_px), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, _size_for(face, scale_px), 2 * scale_px, outline)
+	lettering(at, text, color, scale_px, font)
 
 ## Text centred on `center_x`.
-func centered(center_x: float, y: float, text: String, color: Color, outline: Color, scale_px: int = 1) -> void:
-	outlined(Vector2(center_x - text_width(text, scale_px) * 0.5, y), text, color, outline, scale_px)
+func centered(center_x: float, y: float, text: String, color: Color, outline: Color, scale_px: int = 1, font: Font = null) -> void:
+	outlined(Vector2(center_x - text_width(text, scale_px, font) * 0.5, y), text, color, outline, scale_px, font)
 
 func track_health() -> void:
 	if snapshot == null:
@@ -202,8 +228,8 @@ func _draw() -> void:
 			bar(panel.position + Vector2(4, 41), 88, h.counter_window_ticks_left, counter_max, colors["o"], 2)
 	if debug_enabled:
 		draw_rect(Rect2(5, 131, 175, 16), colors["0"])
-		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"])
-		lettering(Vector2(8, 141), "PLAYER " + String(snapshot.player.state), colors["p"])
+		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"], 1, stat_font())
+		lettering(Vector2(8, 141), "PLAYER " + String(snapshot.player.state), colors["p"], 1, stat_font())
 	if snapshot.result != &"playing":
 		var extra: int = result_lines.size() + (1 if result_hint != "" else 0)
 		draw_rect(Rect2(60, 67, 200, 43 + extra * 8), colors["0"])
@@ -212,7 +238,7 @@ func _draw() -> void:
 		centered(160, 96, "R TO RESTART", colors["o"], colors["0"])
 		var line_y: int = 105
 		for line: String in result_lines:
-			centered(160, line_y, line, colors["1"], colors["0"])
+			centered(160, line_y, line, colors["1"], colors["0"], 1, stat_font())
 			line_y += 8
 		if result_hint != "":
 			centered(160, line_y, result_hint, colors["o"], colors["0"])
@@ -229,7 +255,7 @@ func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	ui("ui_icon_dash_1", Rect2(39, 38, 6, 6))
 	ui("ui_icon_parry_1", Rect2(116, 32, 7, 7))
 	var hp: String = "%d/%d" % [h.player_hp, h.player_max_hp]
-	centered(81, 20, hp, colors["1"], colors["0"])
+	centered(81, 20, hp, colors["1"], colors["0"], 1, stat_font())
 
 func ui(key: String, rect: Rect2) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
@@ -311,18 +337,18 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 				arc.append((centre + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * 11.0).round())
 			draw_polyline(arc, colors["o"], 1.0, false)
 			var seconds: String = str(ceili(int(row["cooldown"]) * Tuning.TICK_DT))
-			var seconds_width: float = text_width(seconds)
+			var seconds_width: float = text_width(seconds, 1, stat_font())
 			draw_rect(Rect2(centre + Vector2(-seconds_width * 0.5 - 1, -3), Vector2(seconds_width + 2, 7)), colors["0"])
-			lettering(centre + Vector2(-seconds_width * 0.5, -2), seconds, colors["p"])
+			lettering(centre + Vector2(-seconds_width * 0.5, -2), seconds, colors["p"], 1, stat_font())
 		var badge: Vector2 = socket.position + Vector2(-2, 16)
 		draw_rect(Rect2(badge - Vector2.ONE, Vector2(7, 7)), colors["0"])
-		lettering(badge, row["key"], colors["1"])
+		lettering(badge, row["key"], colors["1"], 1, stat_font())
 		var cost: String = "%dE" % int(row["cost"])
-		centered(centre.x, centre.y + 14, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"])
+		centered(centre.x, centre.y + 14, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"], 1, stat_font())
 		if socket.has_point(get_local_mouse_position()):
 			_draw_aspect_hint(row)
 	if h.retaliate_ticks_left > 0:
-		outlined(Vector2(216, 91), "Z BREAKING EDGE READY", colors["x"], colors["0"])
+		outlined(Vector2(216, 91), "Z BREAKING EDGE READY", colors["x"], colors["0"], 1, stat_font())
 		var ring: PackedVector2Array = PackedVector2Array()
 		for point: int in range(33):
 			ring.append((sockets[0].get_center() + Vector2.from_angle(TAU * point / 32.0) * 12.0).round())
@@ -331,9 +357,9 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 func _draw_aspect_hint(row: Dictionary) -> void:
 	var at: Vector2 = Vector2(163, 68)
 	draw_rect(Rect2(at - Vector2(3, 3), Vector2(154, 27)), colors["0"])
-	lettering(at, "%s %s" % [row["key"], row["name"]], colors["1"])
-	lettering(at + Vector2(0, 8), "%d EDGE" % int(row["cost"]), colors["v"])
-	lettering(at + Vector2(0, 16), row["status"], colors["o"])
+	lettering(at, "%s %s" % [row["key"], row["name"]], colors["1"], 1, stat_font())
+	lettering(at + Vector2(0, 8), "%d EDGE" % int(row["cost"]), colors["v"], 1, stat_font())
+	lettering(at + Vector2(0, 16), row["status"], colors["o"], 1, stat_font())
 
 static func weapon_status(snap: Snapshots.GameSnapshot) -> Dictionary:
 	var h: Snapshots.HudSnapshot = snap.hud
@@ -347,9 +373,9 @@ func _draw_weapon_active() -> void:
 		return
 	var at: Vector2 = Vector2(181, 153)
 	draw_rect(Rect2(at - Vector2(2, 2), Vector2(55, 24)), colors["0"])
-	lettering(at, "RMB %dE" % int(data["cost"]), colors["v"])
-	lettering(at + Vector2(0, 8), "FORM %dS" % int(data["remaining"]) if bool(data["active"]) else "FORM OFF", colors["p"] if bool(data["active"]) else colors["j"])
-	lettering(at + Vector2(0, 16), "CD %dS" % int(data["cooldown"]) if int(data["cooldown"]) > 0 else "CD READY", colors["o"])
+	lettering(at, "RMB %dE" % int(data["cost"]), colors["v"], 1, stat_font())
+	lettering(at + Vector2(0, 8), "FORM %dS" % int(data["remaining"]) if bool(data["active"]) else "FORM OFF", colors["p"] if bool(data["active"]) else colors["j"], 1, stat_font())
+	lettering(at + Vector2(0, 16), "CD %dS" % int(data["cooldown"]) if int(data["cooldown"]) > 0 else "CD READY", colors["o"], 1, stat_font())
 	for active: bool in [false, true]:
 		var fraction: float = float(data["duration_fraction" if active else "cooldown_fraction"])
 		if fraction <= 0.0:

@@ -98,6 +98,22 @@ func _title_screen() -> void:
 		_expect(credits.contains(creator), "credits miss audio creator " + creator)
 	for creator: String in ["StarNinjas", "artisticdude", "Kenney", "BMacZero", "MintoDog"]:
 		_expect(credits.contains(creator.to_upper()), "credits miss " + creator)
+	# the pixel font ships with its licence and is named in the credits (OFL requires the licence text to travel with it)
+	_expect(credits.contains("PIXELIFY SANS") and credits.contains("OFL"), "credits miss the font")
+	_expect(FileAccess.file_exists("res://presentation/fonts/PixelifySans.ttf"), "the pixel font file is missing")
+	_expect(FileAccess.get_file_as_string("res://presentation/fonts/OFL-PixelifySans.txt").contains("SIL Open Font License"), "the font licence text is missing")
+	_expect(Title.ui_font() is FontVariation and (Title.ui_font() as FontVariation).base_font is FontFile, "titles and names use the pixel font, not the fallback")
+	_expect(Title.stat_font() != Title.ui_font(), "numbers use the clearer sans face")
+	# nothing runs off the page: credit lines fit in 280 game pixels, control keys and actions in their columns
+	for line: String in Title.CREDIT_LINES:
+		_expect(Title.text_width(line) <= 280.0, "credit line too wide (%d px): %s" % [int(Title.text_width(line)), line])
+	for line: String in Title.CONTROL_LINES:
+		var colon: int = line.find(":")
+		_expect(Title.text_width(line.substr(0, colon), 1, Title.stat_font()) <= 52.0, "control key too wide: " + line)
+		_expect(Title.text_width(line.substr(colon + 1)) <= 216.0, "control action too wide: " + line)
+	for line: String in Title.CONTROL_FOOTER:
+		_expect(Title.text_width(line) <= 280.0, "controls footer too wide: " + line)
+	_expect(Title.text_width("ADVENTURE OF TOTOY", 3) <= 300.0, "the title fits the screen")
 	# time formatting and the record line
 	_expect(Title.format_ticks(0) == "0:00.0", "0 ticks")
 	_expect(Title.format_ticks(3600) == "1:00.0", "one minute")

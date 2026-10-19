@@ -38,13 +38,17 @@ const CREDIT_LINES: Array[String] = [
 	"ADVENTURE OF TOTOY",
 	"GAME DESIGN AND ART DIRECTION: THE OWNER",
 	"HERO REFERENCE ART: THE OWNER",
-	"SPRITES AND TILES: GENERATED WITH GEMINI FROM THE OWNER'S DESIGNS",
+	"SPRITES AND TILES: GENERATED WITH GEMINI",
+	"FROM THE OWNER'S DESIGNS",
 	"BUILT WITH GODOT 4, CLAUDE CODE AND CODEX",
 	"",
 	"SOUND AND MUSIC (CC0):",
 	"STARNINJAS, ARTISTICDUDE, KENNEY,",
 	"BRIAN MACINTOSH (BMACZERO), MINTODOG",
-	"FULL SOURCES: PRESENTATION/AUDIO/LICENSES",
+	"FONT: PIXELIFY SANS (SIL OFL 1.1),",
+	"THE PIXELIFY SANS PROJECT AUTHORS",
+	"LICENCES: PRESENTATION/AUDIO/LICENSES",
+	"AND PRESENTATION/FONTS",
 ]
 
 var screen: StringName = SCREEN_TITLE
@@ -173,7 +177,7 @@ func _draw_title() -> void:
 		centered(160, y, ITEMS[i], colors["1"] if selected else colors["p"], colors["0"], 2)
 	var record: String = record_text()
 	if record != "":
-		centered(160, 158, record, colors["p"], colors["0"])
+		centered(160, 158, record, colors["p"], colors["0"], 1, stat_font())
 	var note: String = String(profile.load_note) if profile != null else ""
 	if note != "":
 		centered(160, 168, "SAVE RESET: " + note, colors["o"], colors["0"])
@@ -185,7 +189,7 @@ func _draw_page(heading: String, lines: Array[String], footer: Array[String]) ->
 	for line: String in lines:
 		var split: int = line.find(":")
 		if split > 0 and lines == CONTROL_LINES:
-			outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"])
+			outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"], 1, stat_font())
 			outlined(Vector2(74, y), line.substr(split + 1), colors["p"], colors["0"])
 		else:
 			outlined(Vector2(20, y), line, colors["p"], colors["0"])
