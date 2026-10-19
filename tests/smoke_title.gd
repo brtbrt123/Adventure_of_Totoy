@@ -116,26 +116,29 @@ func _title_screen() -> void:
 		_expect(Title.text_width(line, 1, face, Title.PAGE_SIZE) <= 285.0, "credit line too wide (%d px): %s" % [int(Title.text_width(line, 1, face, Title.PAGE_SIZE)), line])
 	for line: String in Title.CONTROL_LINES:
 		var colon: int = line.find(":")
-		_expect(Title.text_width(line.substr(0, colon), 1, face, Title.PAGE_SIZE) <= 64.0, "control key too wide: " + line)
-		_expect(Title.text_width(line.substr(colon + 1), 1, face, Title.PAGE_SIZE) <= 212.0, "control action too wide: " + line)
+		_expect(Title.text_width(line.substr(0, colon), 1, face, Title.PAGE_SIZE) <= 80.0, "control key too wide: " + line)
+		_expect(Title.text_width(line.substr(colon + 1), 1, face, Title.PAGE_SIZE) <= 190.0, "control action too wide: " + line)
 	for line: String in Title.CONTROL_FOOTER:
 		_expect(Title.text_width(line, 1, face, Title.PAGE_SIZE) <= 285.0, "controls footer too wide: " + line)
 	_expect(Title.text_width("ADVENTURE OF TOTOY", 1, face, Title.FALLBACK_TITLE_SIZE) <= 300.0, "the plain-lettering title fits the screen")
-	var credits_end: int = 26 + Title.CREDIT_LINES.size() * 9
+	var credits_end: int = 26 + Title.CREDIT_LINES.size() * 10
 	_expect(credits_end <= 164, "the credits end above the back line (end y %d)" % credits_end)
-	var controls_end: int = 26 + Title.CONTROL_LINES.size() * 9 + 4 + Title.CONTROL_FOOTER.size() * 9
+	var controls_end: int = 26 + Title.CONTROL_LINES.size() * 10 + 4 + Title.CONTROL_FOOTER.size() * 10
 	_expect(controls_end <= 164, "the controls page ends above the back line (end y %d)" % controls_end)
 	for item: String in Title.ITEMS:
 		_expect(Title.text_width(item, 1, face, Title.MENU_SIZE) <= 100.0, "menu item fits its plate: " + item)
-	# the pixel filter: everything is redrawn as 320x180 game pixels in the palette (reserved gold and red excluded)
-	_expect(title.pixel_overlay != null and title.pixel_overlay.material is ShaderMaterial, "the menu has its pixel filter overlay")
-	if title.pixel_overlay != null:
-		var material: ShaderMaterial = title.pixel_overlay.material as ShaderMaterial
-		_expect(material.shader != null and material.shader.code.contains("hint_screen_texture"), "the filter reads the screen")
+	# the lettering is a 320x180 layer cut to hard palette pixels; the painting and logo stay smooth
+	_expect(title.text_viewport != null and title.text_viewport.size == Vector2i(320, 180) and title.text_viewport.transparent_bg, "the menu lettering has its own transparent 320x180 layer")
+	_expect(title.text_display != null and title.text_display.material is ShaderMaterial, "shown through the pixel text shader")
+	if title.text_display != null and title.text_display.material is ShaderMaterial:
+		var material: ShaderMaterial = title.text_display.material as ShaderMaterial
+		_expect(material.shader != null and material.shader.code.contains("step(0.5"), "the shader cuts the edge to fully opaque or fully transparent pixels")
 		_expect(int(material.get_shader_parameter("palette_size")) == 32, "it snaps to the 32 unreserved Totoy colours")
 		_expect((material.get_shader_parameter("palette") as PackedVector3Array).size() == 36, "the palette array is full length")
-		_expect(title.pixel_overlay.size == Vector2(320, 180) and title.pixel_overlay.mouse_filter == Control.MOUSE_FILTER_IGNORE, "the overlay covers the screen and ignores the mouse")
-	_expect(title.get_child(title.get_child_count() - 1) == title.pixel_overlay, "it is the last child, so it sees everything drawn before it")
+		_expect(title.text_display.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "and it is drawn with nearest filtering")
+	_expect(title.background_sprite != null and title.background_sprite.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR, "the painting is not pixelated")
+	_expect(title.logo_sprite != null and title.logo_sprite.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR, "neither is the logo")
+	_expect(title.has_method("draw_text_layer") and title.text_layer != null and title.text_layer.view == title, "the lettering layer draws what the title screen says")
 	# the background: the owner's painting, graded; a smooth sprite behind everything
 	_expect(title.painted and title.background != null and title.background.get_size() == Vector2(1920, 1080), "the painted menu background loads at 1920x1080")
 	_expect(title.background_sprite != null and title.background_sprite.show_behind_parent and absf(title.background_sprite.scale.x * 1920.0 - 320.0) < 0.01, "it fills the 320x180 canvas, behind everything")

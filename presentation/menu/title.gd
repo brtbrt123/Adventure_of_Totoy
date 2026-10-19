@@ -13,11 +13,16 @@ const PERSIST_META: StringName = &"totoy_persist"
 
 const MENU_TOP: int = 103  # y of the first menu line, in game pixels
 const MENU_STEP: int = 14
-const MENU_SIZE: int = 12  # menu item font size (Cinzel capitals)
-const PAGE_SIZE: int = 8  # body text on the controls and credits pages
+const MENU_SIZE: int = 13  # menu item font size (Cinzel capitals)
+const PAGE_SIZE: int = 10  # body text on the controls and credits pages
 const FALLBACK_TITLE_SIZE: int = 15  # the plain-lettering title used when the logo image is missing
-const PIXEL_FILTER_PATH: String = "res://presentation/menu/pixel_filter.gdshader"
-var pixel_overlay: ColorRect
+const PIXEL_TEXT_SHADER: String = "res://presentation/menu/pixel_text.gdshader"
+const TitleText := preload("res://presentation/menu/title_text.gd")
+## The lettering is drawn into a 320x180 layer and shown as hard palette pixels (pixel_text.gdshader) over the
+## smooth painting and logo.
+var text_viewport: SubViewport
+var text_layer: Node2D
+var text_display: Sprite2D
 const LOGO_PATH: String = "res://presentation/menu/title_logo.png"
 const LOGO_WIDTH: float = 190.0  # game pixels (the logo is 1800 px wide, drawn smooth)
 var logo_sprite: Sprite2D
@@ -54,10 +59,9 @@ const CREDIT_LINES: Array[String] = [
 	"SOUND AND MUSIC (CC0):",
 	"STARNINJAS, ARTISTICDUDE, KENNEY,",
 	"BRIAN MACINTOSH (BMACZERO), MINTODOG",
-	"FONTS (SIL OFL 1.1): CINZEL AND PIXELIFY SANS,",
-	"BY THE CINZEL AND PIXELIFY SANS PROJECT AUTHORS",
-	"LICENCES: PRESENTATION/AUDIO/LICENSES",
-	"AND PRESENTATION/FONTS",
+	"FONTS (SIL OFL 1.1): CINZEL, PIXELIFY SANS",
+	"BY THEIR PROJECT AUTHORS",
+	"LICENCES: PRESENTATION/AUDIO, /FONTS",
 ]
 
 var screen: StringName = SCREEN_TITLE
@@ -106,39 +110,53 @@ func _ready() -> void:
 		logo_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		logo_sprite.show_behind_parent = true
 		add_child(logo_sprite)
-	_add_pixel_filter()
+	_add_text_layer()
 	profile = SaveStore.load_profile()
 	queue_redraw()
 
 
-## A last, full-screen layer that reads everything drawn so far and redraws it as 320x180 pixel art in the Totoy
-## palette (see pixel_filter.gdshader), so the painting, the logo and the lettering all look like the game.
-func _add_pixel_filter() -> void:
-	if not ResourceLoader.exists(PIXEL_FILTER_PATH):
-		return
-	var colors_in_palette: PackedVector3Array = PackedVector3Array()
+## The menu lettering: drawn at game resolution in its own transparent viewport, then cut to hard pixels in the
+## Totoy palette, so the text looks like pixel art while the painting behind it stays smooth.
+func _add_text_layer() -> void:
+	var palette_vectors: PackedVector3Array = PackedVector3Array()
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))
 	var reserved: Array = (data as Dictionary).get("reserved", [])
 	for entry: Dictionary in (data as Dictionary).get("colors", []):
 		if not reserved.has(entry["symbol"]):
 			var tone: Color = Color.html(entry["hex"])
-			colors_in_palette.append(Vector3(tone.r, tone.g, tone.b))
-	var count: int = colors_in_palette.size()
-	while colors_in_palette.size() < 36:
-		colors_in_palette.append(colors_in_palette[count - 1])
-	var material: ShaderMaterial = ShaderMaterial.new()
-	material.shader = load(PIXEL_FILTER_PATH) as Shader
-	material.set_shader_parameter("palette", colors_in_palette)
-	material.set_shader_parameter("palette_size", count)
-	pixel_overlay = ColorRect.new()
-	pixel_overlay.size = Vector2(320, 180)
-	pixel_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pixel_overlay.material = material
-	add_child(pixel_overlay)
+			palette_vectors.append(Vector3(tone.r, tone.g, tone.b))
+	var count: int = palette_vectors.size()
+	while palette_vectors.size() < 36:
+		palette_vectors.append(palette_vectors[count - 1])
+	text_viewport = SubViewport.new()
+	text_viewport.size = Vector2i(320, 180)
+	text_viewport.transparent_bg = true
+	text_viewport.disable_3d = true
+	text_viewport.gui_disable_input = true
+	text_viewport.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+	text_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	text_layer = TitleText.new()
+	text_layer.view = self
+	text_layer.colors = colors
+	text_viewport.add_child(text_layer)
+	add_child(text_viewport)
+	text_display = Sprite2D.new()
+	text_display.texture = text_viewport.get_texture()
+	text_display.centered = false
+	text_display.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	if ResourceLoader.exists(PIXEL_TEXT_SHADER):
+		var material: ShaderMaterial = ShaderMaterial.new()
+		material.shader = load(PIXEL_TEXT_SHADER) as Shader
+		material.set_shader_parameter("palette", palette_vectors)
+		material.set_shader_parameter("palette_size", count)
+		text_display.material = material
+	add_child(text_display)
 
 
 func _process(delta: float) -> void:
 	time += delta
+	if text_layer != null:
+		text_layer.queue_redraw()
 	if logo_sprite != null:
 		logo_sprite.visible = screen == SCREEN_TITLE
 	queue_redraw()  # the background is alive: mist and fireflies
@@ -218,13 +236,17 @@ func _draw() -> void:
 	if colors.is_empty():
 		return
 	_draw_background()
+
+
+## Called by the lettering layer (title_text.gd) to draw the current screen's text onto `canvas`.
+func draw_text_layer(canvas: Object) -> void:
 	match screen:
 		SCREEN_CONTROLS:
-			_draw_page("CONTROLS", CONTROL_LINES, CONTROL_FOOTER)
+			_draw_page(canvas, "CONTROLS", CONTROL_LINES, CONTROL_FOOTER)
 		SCREEN_CREDITS:
-			_draw_page("CREDITS", CREDIT_LINES, [])
+			_draw_page(canvas, "CREDITS", CREDIT_LINES, [])
 		_:
-			_draw_title()
+			_draw_title(canvas)
 
 
 ## The dusk arena picture (made from the game's own tiles and props), drifting mist and fireflies. On the pages
@@ -262,38 +284,39 @@ func _draw_background() -> void:
 		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], 0.74))
 
 
-func _draw_title() -> void:
+func _draw_title(canvas: Object) -> void:
 	if logo_sprite == null:  # without the logo image the title is plain lettering
-		centered(160, 30, "ADVENTURE OF TOTOY", colors["1"], colors["0"], 1, menu_font(), FALLBACK_TITLE_SIZE)
-	var face: Font = menu_font()
+		canvas.centered(160, 30, "ADVENTURE OF TOTOY", colors["1"], colors["0"], 1, canvas.menu_font(), FALLBACK_TITLE_SIZE)
+	var face: Font = canvas.menu_font()
 	for i: int in ITEMS.size():
 		var selected: bool = i == index
 		var y: float = MENU_TOP + i * MENU_STEP
 		if selected:
-			# a soft violet plate behind the chosen item with a thin cream line under it
-			draw_rect(Rect2(96, y - 3, 128, MENU_STEP - 1), Color(colors["v"], 0.30))
-			draw_rect(Rect2(96, y - 3 + MENU_STEP - 2, 128, 1), Color(colors["1"], 0.55))
-			outlined(Vector2(100, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
-		centered(160, y, ITEMS[i], colors["1"] if selected else colors["j"], colors["0"], 1, face, MENU_SIZE)
+			# an opaque dark plate behind the chosen item with a cream line under it (the layer is hard pixels:
+			# translucent fills would be cut away)
+			canvas.draw_rect(Rect2(96, y - 3, 128, MENU_STEP - 1), colors["k"])
+			canvas.draw_rect(Rect2(96, y - 3 + MENU_STEP - 2, 128, 1), colors["1"])
+			canvas.outlined(Vector2(100, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
+		canvas.centered(160, y, ITEMS[i], colors["1"] if selected else colors["p"], colors["0"], 1, face, MENU_SIZE)
 	var note: String = String(profile.load_note) if profile != null else ""
 	if note != "":
-		centered(160, 175, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)
+		canvas.centered(160, 175, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)
 
 
-func _draw_page(heading: String, lines: Array[String], footer: Array[String]) -> void:
-	var face: Font = menu_font()
-	centered(160, 4, heading, colors["1"], colors["0"], 1, face, 20)
+func _draw_page(canvas: Object, heading: String, lines: Array[String], footer: Array[String]) -> void:
+	var face: Font = canvas.menu_font()
+	canvas.centered(160, 4, heading, colors["1"], colors["0"], 1, face, 20)
 	var y: int = 26
 	for line: String in lines:
 		var split: int = line.find(":")
 		if split > 0 and lines == CONTROL_LINES:
-			outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"], 1, face, PAGE_SIZE)
-			outlined(Vector2(88, y), line.substr(split + 1), colors["j"], colors["0"], 1, face, PAGE_SIZE)
+			canvas.outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"], 1, face, PAGE_SIZE)
+			canvas.outlined(Vector2(104, y), line.substr(split + 1), colors["j"], colors["0"], 1, face, PAGE_SIZE)
 		else:
-			outlined(Vector2(20, y), line, colors["j"], colors["0"], 1, face, PAGE_SIZE)
-		y += 9
+			canvas.outlined(Vector2(20, y), line, colors["j"], colors["0"], 1, face, PAGE_SIZE)
+		y += 10
 	y += 4
 	for line: String in footer:
-		outlined(Vector2(20, y), line, colors["o"], colors["0"], 1, face, PAGE_SIZE)
-		y += 9
-	outlined(Vector2(20, 168), "ESC OR ENTER: BACK", colors["1"], colors["0"], 1, face, PAGE_SIZE)
+		canvas.outlined(Vector2(20, y), line, colors["o"], colors["0"], 1, face, PAGE_SIZE)
+		y += 10
+	canvas.outlined(Vector2(20, 168), "ESC OR ENTER: BACK", colors["1"], colors["0"], 1, face, PAGE_SIZE)
