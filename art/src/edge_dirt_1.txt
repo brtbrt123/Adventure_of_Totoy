@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Transition.png (Gemini), cell 1
+4554444454343334
+4444455554444334
+5544555444344444
+5434334444443445
+4354434444444454
+4334344454544444
+3444444445434445
+4445443435434444
+34353aaba35babab
+aaabqqqqqqaaaaqq
+qqqqqqqqqqqqaaqa
+qqqqqqqqqqqqqaaq
+qqbbqqqqqqqqqaaa
+qqaaqqqqqqqqaaqq
+qqaqqaqqqqqqqaqq
+qqqqaqqaqqqqqaaq

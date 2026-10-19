@@ -9,6 +9,8 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
+const SaveStore := preload("res://core/save_store.gd")
+const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
@@ -23,6 +25,12 @@ var buff_textures: Dictionary = {}
 var buff_events: Dictionary = {}
 var buff_transition: Dictionary = {}
 var combat_audio: CombatAudio
+## Progress is saved only when the game was started from the title screen (it sets this Engine meta).
+var persist: bool = false
+var profile: Object = null
+var new_best: bool = false
+## Replaced by tests so going back to the title does not leave the scene they run in.
+var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
 var previous_combo_index: int = 0
 var previous_skill_id: StringName = &""
 var core: GameCore = GameCore.new(17)
@@ -116,6 +124,7 @@ func _ready() -> void:
 	snapshot = core.snapshot()
 	prepare_visuals()
 	_update_hud()
+	_begin_persistence()
 
 func _read_json(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -130,6 +139,8 @@ func _physics_process(_delta: float) -> void:
 		debug_enabled = not debug_enabled
 	if snapshot.result != &"playing" and Input.is_action_just_pressed("arena_restart"):
 		_restart()
+	elif snapshot.result != &"playing" and persist and Input.is_action_just_pressed("menu_back"):
+		change_scene.call(TITLE_SCENE)
 	# Node-local mouse coordinates already account for viewport scaling and canvas transforms.
 	var intent: InputFrame = Bindings.read_frame(snapshot.player.position, get_local_mouse_position())
 	core.step(intent)
@@ -141,7 +152,31 @@ func _physics_process(_delta: float) -> void:
 	_update_hud()
 	queue_redraw()
 
+func _begin_persistence() -> void:
+	persist = Engine.has_meta(&"totoy_persist")
+	if persist:
+		profile = SaveStore.load_profile()
+		profile.record_run_started()
+		SaveStore.save(profile)
+
+func _record_result(event: GameEvent) -> void:
+	if not persist or profile == null:
+		return
+	new_best = profile.record_result(StringName(event.data["result"]), core.tick)
+	SaveStore.save(profile)
+	var lines: Array[String] = []
+	if event.data["result"] == &"victory":
+		lines.append("TIME " + Hud.format_ticks(core.tick))
+		lines.append("NEW BEST!" if new_best else "BEST " + Hud.format_ticks(profile.best_victory_ticks))
+	hud.result_lines = lines
+	hud.result_hint = "ESC: TITLE"
+
 func _restart() -> void:
+	new_best = false
+	hud.result_lines = []
+	if persist and profile != null:
+		profile.record_run_started()
+		SaveStore.save(profile)
 	buff_events.clear()
 	buff_transition.clear()
 	combat_audio.reset()
@@ -291,7 +326,9 @@ func _on_event(event: GameEvent) -> void:
 		&"boss_phase_changed":
 			reactions[int(event.data["entity_id"])] = {"pose": "roar", "tick": snapshot.tick, "duration": 30}
 			_sound_boss_phase_changed(event)
-		&"game_result": _sound_game_result(event)
+		&"game_result":
+			_sound_game_result(event)
+			_record_result(event)
 
 func _burst(at: Vector2, count: int, color: Color, speed: float) -> void:
 	for i: int in range(count):

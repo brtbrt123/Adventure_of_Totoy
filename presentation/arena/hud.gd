@@ -5,6 +5,9 @@ const Snapshots := preload("res://core/snapshots.gd")
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var debug_enabled: bool = false
+# Extra result-screen lines (the arena fills them when progress is saved).
+var result_lines: Array[String] = []
+var result_hint: String = ""
 # Snapshot weapon identity selects the matching blade glyph.
 var weapon_icon_key: String = "ui_weapon_totoy_blade_1"
 var counter_max: int = 1
@@ -63,8 +66,20 @@ const GLYPHS: Dictionary = {
 	"-": "000000111000000",
 	"_": "000000000000111",
 	"?": "110001010000010",
+	".": "000000000000010",
+	",": "000000000010100",
+	"'": "010010000000000",
+	"(": "001010010010001",
+	")": "100010010010100",
+	"!": "010010010000010",
+	">": "100010001010100",
 	" ": "000000000000000",
 }
+
+## 3600 ticks -> "1:00.0".
+static func format_ticks(ticks: int) -> String:
+	var tenths: int = int(round(ticks / 6.0))
+	return "%d:%02d.%d" % [tenths / 600, (tenths / 10) % 60, tenths % 10]
 
 func lettering(at: Vector2, text: String, color: Color, scale_px: int = 1) -> void:
 	var cursor: Vector2 = at.round()
@@ -145,10 +160,18 @@ func _draw() -> void:
 		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"])
 		lettering(Vector2(8, 141), "PLAYER " + String(snapshot.player.state), colors["p"])
 	if snapshot.result != &"playing":
-		draw_rect(Rect2(60, 67, 200, 43), colors["0"])
+		var extra: int = result_lines.size() + (1 if result_hint != "" else 0)
+		draw_rect(Rect2(60, 67, 200, 43 + extra * 8), colors["0"])
 		var title: String = "VICTORY" if snapshot.result == &"victory" else "DEFEAT"
 		lettering(Vector2(160 - title.length() * 4, 75), title, colors["1"], 2)
 		outlined(Vector2(136, 96), "R TO RESTART", colors["o"], colors["0"])
+		var line_y: int = 105
+		for line: String in result_lines:
+			outlined(Vector2(160 - line.length() * 2, line_y), line, colors["1"], colors["0"])
+			line_y += 8
+		if result_hint != "":
+			outlined(Vector2(160 - result_hint.length() * 2, line_y), result_hint, colors["o"], colors["0"])
+
 
 ## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:

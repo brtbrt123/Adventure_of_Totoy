@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Damaged_Ground.png (Gemini), cell 1
+hhih3332hhhiiih2
+gghh333hhgggghhf
+gggb3bhggggggggh
+gggfihgggggggggg
+ff3hggfggggggggf
+ff3fhfghggggggfg
+gffffehgggggffgg
+effhgeghgggffggg
+hhggegffggffhggg
+ggggfggeefeggggf
+ggggg2ebifgeffge
+gggggf2hhffef222
+gggggf32ehghg343
+ggggg333hggggf33
+ggggf3hhhggggg22
+effe2hggggffff22

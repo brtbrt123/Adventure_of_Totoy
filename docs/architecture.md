@@ -115,6 +115,14 @@ The buff is active from the activation tick through the `duration`-th tick; `wea
 4. HUD: show the active's remaining duration and the cooldown (`hud.weapon_buff_*`), and the Edge cost, near the weapon icon.
 5. Add a smoke test that every frame requested while the buff speeds up the swings exists.
 
+### Save system (core)
+
+`core/save_profile.gd` is the saved progress (`SaveProfile`): `runs_started`, `victories`, `defeats`, `best_victory_ticks` (0 = none yet), `last_result`, `weapon_id`, plus `load_note` (why a profile is fresh instead of loaded; empty otherwise). `record_run_started()` and `record_result(result, ticks)` (returns true on a new best victory time) are the only mutators. Serialisation is versioned JSON (`VERSION` 1); reading is forgiving: invalid JSON, a missing/invalid version or a newer version gives a fresh profile with a `load_note`, and bad field values are cleaned (negatives and non-numbers become 0, unknown results/weapons are dropped).
+
+`core/save_store.gd` reads and writes the file (`user://totoy_save.json`; the environment variable `TOTOY_SAVE_PATH` redirects it, the test runner sets it so tests never touch a real save). `save()` writes a temp file, keeps the previous save as `.bak` until the new one is in place, then removes it; `load_profile()` always returns a profile (the file, else the `.bak`, else a fresh one with a note if a file existed but was unreadable). Nothing in a running fight depends on it.
+
+**Presentation use (implemented):** the arena saves only when the game was started from the title screen (the title sets `Engine` meta `totoy_persist`): it records a started run on load and on every restart, and the result (with `core.tick` as the time) on the `game_result` event; the title screen shows the record. Saved progress is a profile only: there is no mid-fight save, and no quest or inventory data exists yet.
+
 `TelegraphSnapshot`: `id`, `owner_id`, `muzzle` (where the attack leaves the boss), `attack` (`gold_slam`, `gold_combo`, `red_sweep`, `red_shards`, `red_stomp`, `red_charge`), `kind` (`gold` = parry it, `red` = dodge it), `shape` + parameters, `start_tick`, `hit_tick`, `end_tick`.
 - `circle`: `center`, `size` = radius
 - `cone`: `center` = origin, `direction`, `size` = radius, `half_angle` (radians)

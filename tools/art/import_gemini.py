@@ -245,25 +245,37 @@ def import_extra(spec: tuple[str, str, int, int, int, str, int, list[str] | None
     return written
 
 
-TILE_SHEETS = {"Grass": "grass", "Dirt": "dirt", "Stone": "stone", "Water": "water"}  # 4x4 grids of 16 tiles, no gaps
+# Tile sheets are 4x4 grids of 16 tiles, no gaps. Each entry: sheet stem -> [(name prefix, first cell, count)].
+# Cells run left to right, top to bottom. The two Transition sheets in art/reference are the same picture.
+TILE_SHEETS: dict[str, list[tuple[str, int, int]]] = {
+    "Grass": [("grass", 0, 16)],
+    "Dirt": [("dirt", 0, 16)],
+    "Stone": [("stone", 0, 16)],
+    "Water": [("water", 0, 16)],
+    "Damaged_Ground": [("cracked", 0, 8), ("mossstone", 8, 8)],  # prompt T05: 8 cracked, 8 mossy stone
+    "Transition": [("edge_dirt", 0, 8), ("edge_water", 8, 8)],  # prompt T06: 8 grass-to-dirt, 8 grass-to-water edges
+}
 
 
 def import_tiles(stem: str, out: Path, palette: artlib.Palette) -> int:
-    """Cut a 4x4 tile sheet into sixteen 16x16 tiles (area average, palette snap, no outline)."""
-    prefix = TILE_SHEETS[stem]
+    """Cut a 4x4 tile sheet into 16x16 tiles (area average, palette snap, no outline)."""
     image = Image.open(REF_DIR / f"{stem}.png").convert("RGB")
     quant = Quantizer(palette, False)
     cell = image.width / 4
-    for old in out.glob(f"{prefix}_*.txt"):
-        old.unlink()
-    for i in range(16):
-        c, r = i % 4, i // 4
-        box = (round(c * cell), round(r * cell), round((c + 1) * cell), round((r + 1) * cell))
-        small = image.crop(box).resize((16, 16), Image.BOX)
-        rows = ["".join(quant.symbol(small.getpixel((x, y))) for x in range(16)) for y in range(16)]
-        lines = ["# kind: tile", f"# imported from {stem}.png (Gemini), cell {i + 1}"] + rows
-        (out / f"{prefix}_{i + 1}.txt").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
-    return 16
+    written = 0
+    for prefix, first, count in TILE_SHEETS[stem]:
+        for old in out.glob(f"{prefix}_*.txt"):
+            old.unlink()
+        for n in range(count):
+            i = first + n
+            c, r = i % 4, i // 4
+            box = (round(c * cell), round(r * cell), round((c + 1) * cell), round((r + 1) * cell))
+            small = image.crop(box).resize((16, 16), Image.BOX)
+            rows = ["".join(quant.symbol(small.getpixel((x, y))) for x in range(16)) for y in range(16)]
+            lines = ["# kind: tile", f"# imported from {stem}.png (Gemini), cell {i + 1}"] + rows
+            (out / f"{prefix}_{n + 1}.txt").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+            written += 1
+    return written
 
 
 def main() -> int:

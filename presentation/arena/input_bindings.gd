@@ -9,6 +9,8 @@ static func register() -> void:
 		"arena_attack": [], "arena_weapon_active": [], "arena_parry": [KEY_SPACE],
 		"arena_dash": [KEY_SHIFT], "arena_restart": [KEY_R],
 		"arena_debug": [KEY_F1],
+		"menu_up": [KEY_W, KEY_UP], "menu_down": [KEY_S, KEY_DOWN],
+		"menu_accept": [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE], "menu_back": [KEY_ESCAPE],
 		"arena_skill_1": [KEY_Z], "arena_skill_2": [KEY_X], "arena_skill_3": [KEY_C],
 	}
 	for action: String in keys:
@@ -34,6 +36,10 @@ static func register() -> void:
 				click.button_index = MOUSE_BUTTON_RIGHT
 				InputMap.action_add_event(action, click)
 				_button(action, JOY_BUTTON_Y)
+			"menu_up": _button(action, JOY_BUTTON_DPAD_UP)
+			"menu_down": _button(action, JOY_BUTTON_DPAD_DOWN)
+			"menu_accept": _button(action, JOY_BUTTON_A)
+			"menu_back": _button(action, JOY_BUTTON_B)
 			"arena_parry": _button(action, JOY_BUTTON_A)
 			"arena_dash": _button(action, JOY_BUTTON_B)
 
