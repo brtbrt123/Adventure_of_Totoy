@@ -1,8 +1,8 @@
 extends "res://tests/test_case.gd"
 ## The combat language: gold can be parried, red must be dodged.
 
-const FAR_FROM_BOSS: Vector2 = Vector2(64.0, 88.0)
-const IN_SWEEP_RANGE: Vector2 = Vector2(200.0, 88.0)
+const FAR_FROM_BOSS: Vector2 = Tuning.PLAYER_START
+const IN_SWEEP_RANGE: Vector2 = Tuning.BOSS_START + Vector2(-40.0, 0.0)
 
 
 func test_boss_starts_its_first_attack_after_the_delay() -> void:
@@ -116,7 +116,7 @@ func test_warning_matches_the_real_hit_area() -> void:
 	for gx: int in range(-2, 11):
 		for gy: int in range(-6, 7):
 			var core: GameCore = GameCore.new()
-			var pos: Vector2 = Vector2(240.0 - 100.0 + gx * 14.0, 88.0 + gy * 14.0)
+			var pos: Vector2 = Tuning.BOSS_START + Vector2(-100.0 + gx * 14.0, gy * 14.0)
 			var hit_tick: int = begin_attack(core, BossState.ATTACK_SWEEP, pos)
 			var telegraph: Telegraph = core.boss.telegraphs[0]
 			core.player.position = pos

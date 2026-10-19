@@ -12,6 +12,7 @@ const FAR: Vector2 = Vector2(300.0, 20.0)  # a corner the dash and the projectil
 ## `player_at`, facing right.
 func _core(player_at: Vector2 = Vector2(40.0, 88.0), boss_at: Vector2 = FAR) -> GameCore:
 	var core: GameCore = GameCore.new()
+	core.obstacles.clear()  # these tests pin positions in an open field; the props have their own tests
 	core.boss.state = BossState.STATE_RECOVER
 	core.boss._recover_ticks = 1000000
 	core.boss.position = boss_at
@@ -66,7 +67,7 @@ func _gale(core: GameCore, move: Vector2 = Vector2.RIGHT) -> Array[GameEvent]:
 # --- direction: skills go where the player is moving ---
 
 func test_skill_direction_prefers_the_move_input_over_the_aim() -> void:
-	var core: GameCore = _core(Vector2(160.0, 120.0))
+	var core: GameCore = _core(Vector2(300.0, 300.0))
 	core.player.edge = 100.0
 	_press(core, 2, Vector2.UP, Vector2.RIGHT)  # moving up while the mouse points right
 	assert_near(core.player.skill_dir.y, -1.0, 0.001, "the skill goes up, where the player moves")
@@ -91,7 +92,7 @@ func test_skill_direction_falls_back_to_the_aim_then_the_facing() -> void:
 
 
 func test_diagonal_movement_gives_a_unit_direction() -> void:
-	var core: GameCore = _core(Vector2(160.0, 120.0))
+	var core: GameCore = _core(Vector2(300.0, 300.0))
 	core.player.edge = 100.0
 	_press(core, 3, Vector2(1.0, 1.0))
 	assert_near(core.player.skill_dir.length(), 1.0, 0.001, "normalised")
@@ -99,13 +100,13 @@ func test_diagonal_movement_gives_a_unit_direction() -> void:
 
 
 func test_moon_cleave_and_breaking_edge_also_follow_the_move_input() -> void:
-	var moon: GameCore = _core(Vector2(160.0, 120.0))
+	var moon: GameCore = _core(Vector2(300.0, 300.0))
 	moon.player.edge = 100.0
 	_press(moon, 3, Vector2.UP, Vector2.RIGHT)
 	run(moon, Tuning.MOON_CLEAVE_WINDUP_TICKS)
 	assert_eq(moon.skill_attacks.size(), 1)
 	assert_near(moon.skill_attacks[0].direction.y, -1.0, 0.001, "the projectile flies up")
-	var breaking: GameCore = _core(Vector2(160.0, 120.0))
+	var breaking: GameCore = _core(Vector2(300.0, 300.0))
 	_after_parry(breaking, 50.0)
 	var start: Vector2 = breaking.player.position
 	_press(breaking, 1, Vector2.LEFT, Vector2.RIGHT)
@@ -277,16 +278,17 @@ func test_gale_cut_that_ends_inside_the_boss_is_moved_out() -> void:
 
 
 func test_gale_cut_ending_inside_a_boss_next_to_a_wall_still_ends_free() -> void:
-	var core: GameCore = _core(Vector2(190.0, 88.0), Vector2(300.0, 88.0))  # the dash ends at x=310, inside the boss, by the wall
+	var wall: float = Tuning.ARENA_SIZE.x - Tuning.ARENA_MARGIN
+	var core: GameCore = _core(Vector2(wall - 122.0, 240.0), Vector2(wall - 12.0, 240.0))  # the dash ends inside the boss, by the wall
 	_gale(core)
 	assert_true(_clear_of_boss(core), "a free spot was found although the wall blocks the forward side")
 	assert_true(_inside_arena(core), "and it is inside the arena")
 
 
 func test_gale_cut_stops_at_the_wall_even_when_passing_through_the_boss() -> void:
-	var core: GameCore = _core(Vector2(250.0, 88.0), Vector2(280.0, 88.0))
-	var hits: Array[GameEvent] = _gale(core)
 	var wall: float = Tuning.ARENA_SIZE.x - Tuning.ARENA_MARGIN
+	var core: GameCore = _core(Vector2(wall - 62.0, 240.0), Vector2(wall - 32.0, 240.0))
+	var hits: Array[GameEvent] = _gale(core)
 	assert_near(core.player.position.x, wall, 0.01, "stopped by the right wall, 62 px of the 120 px dash")
 	assert_eq(hits.size(), 1, "the boss on the way was hit once")
 	assert_true(_inside_arena(core))
@@ -294,12 +296,20 @@ func test_gale_cut_stops_at_the_wall_even_when_passing_through_the_boss() -> voi
 
 
 func test_gale_cut_stops_at_every_wall() -> void:
-	for dir: Vector2 in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
-		var core: GameCore = _core(Vector2(160.0, 88.0))
-		_gale(core, dir)
-		assert_true(_inside_arena(core), "inside the arena after dashing %s" % str(dir))
-		var travelled: float = core.player.position.distance_to(Vector2(160.0, 88.0))
-		assert_true(travelled <= Tuning.GALE_CUT_DISTANCE + 0.01, "never farther than the dash distance")
+	var low: float = Tuning.ARENA_MARGIN
+	var high: Vector2 = Tuning.ARENA_SIZE - Vector2(low, low)
+	var cases: Array = [
+		[Vector2.LEFT, Vector2(low + 40.0, 240.0), "x", low],
+		[Vector2.RIGHT, Vector2(high.x - 40.0, 240.0), "x", high.x],
+		[Vector2.UP, Vector2(400.0, low + 40.0), "y", low],
+		[Vector2.DOWN, Vector2(400.0, high.y - 40.0), "y", high.y],
+	]
+	for case: Array in cases:
+		var core: GameCore = _core(case[1])
+		_gale(core, case[0])
+		var axis: String = case[2]
+		assert_near(core.player.position[axis], float(case[3]), 0.01, "stopped by the wall dashing %s" % str(case[0]))
+		assert_true(_inside_arena(core), "inside the arena after dashing %s" % str(case[0]))
 
 
 func test_normal_collision_returns_after_the_dash() -> void:

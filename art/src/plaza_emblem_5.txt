@@ -1,0 +1,18 @@
+# kind: tile
+# overlay tile, the plaza medallion, 4x4 tiles row by row (tools/art/make_plaza_tiles.py)
+.....ejjjjehghhh
+.....ejjjehghhhh
+....ejjjjeghhhhh
+....ejjjeghhhhhh
+...ejjjjehhhhhhg
+...ejjjehhhhhhgh
+..eejjjehhhhhghh
+..ejjjehhhhhghhh
+..ejjjehhhhghhhh
+..ejjjehhhghhhhh
+.eejjjehhghhhhhh
+.ejjjehhghhhhhhg
+.ejjjehghhhhhhgh
+.ejjjeghhhhhhghh
+.ejjjehhhhhhghhh
+.ejjjehhhhhghhhh

@@ -18,6 +18,7 @@ func _expect(ok: bool, message: String) -> void:
 
 func _observe() -> void:
 	arena.snapshot = arena.core.snapshot()
+	arena._update_camera(true)
 	arena.prepare_visuals()
 	arena._update_hud()
 	arena.queue_redraw()
@@ -94,8 +95,9 @@ func _catalog() -> void:
 func _fight(attack: StringName, left: bool) -> void:
 	arena._restart()
 	arena.core.boss.phase = 2
-	arena.core.boss.position = Vector2(210 if left else 120, 110)
-	arena.core.player.position = Vector2(140 if left else 190, 110)
+	# in the open middle of the plaza (no props in the way)
+	arena.core.boss.position = Vector2(450 if left else 360, 240)
+	arena.core.player.position = Vector2(380 if left else 430, 240)
 	arena.core.boss.next_attack_override = attack
 	arena.core.boss.cooldown = 1
 	_observe()
@@ -115,7 +117,8 @@ func _fight(attack: StringName, left: bool) -> void:
 		var tell: Snapshots.TelegraphSnapshot = ArenaAnimation.attack_tell(boss.id, arena.snapshot)
 		if tell != null and tell.attack == &"red_charge":
 			charge_mirrored.append(mirrored)
-		var target: Vector2 = HeadAnchors.world(boss.position, arena.frames[name_key], arena.head_anchors[name_key], mirrored)
+		# the HUD is in screen space: the head's world position minus the camera's top-left corner
+		var target: Vector2 = HeadAnchors.world(boss.position, arena.frames[name_key], arena.head_anchors[name_key], mirrored) - arena.view_origin
 		_expect(arena.hud.head_position.distance_to(target) < 20.0, "panel trails head too far: %s tick %d head %s target %s" % [attack, arena.snapshot.tick, arena.hud.head_position, target])
 		_expect(arena.hud.head_tick == arena.snapshot.tick, "head not updated for fight frame")
 		if capture and attack == &"gold_slam" and not saved and name_key == "golem2_slam_3":

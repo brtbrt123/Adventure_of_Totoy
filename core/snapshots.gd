@@ -63,6 +63,17 @@ class SkillAttackSnapshot:
 	var hit_target_ids: Array[int] = []
 
 
+class ObstacleSnapshot:
+	extends RefCounted
+	## A solid static prop (see core/arena_layout.gd). The same list is used for collision and for drawing.
+	var id: int = 0
+	var visual_id: StringName = &""  # the sprite to draw at `feet`; empty for an extra collider of a larger prop
+	var feet: Vector2 = Vector2.ZERO
+	var visual_scale: float = 1.0
+	var center: Vector2 = Vector2.ZERO  # the collision circle
+	var radius: float = 0.0
+
+
 class HudSnapshot:
 	extends RefCounted
 	var player_hp: int = 0
@@ -93,4 +104,5 @@ class GameSnapshot:
 	var entities: Array[EntitySnapshot] = []  # everything except the player
 	var telegraphs: Array[TelegraphSnapshot] = []
 	var skill_attacks: Array[SkillAttackSnapshot] = []
+	var obstacles: Array[ObstacleSnapshot] = []  # the solid props, the same every tick
 	var hud: HudSnapshot = null

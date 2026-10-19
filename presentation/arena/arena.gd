@@ -18,7 +18,16 @@ const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
-const DECORATIONS: Array[Dictionary] = [{"name": "prop_nature_1", "at": Vector2(18, 91), "scale": Vector2.ONE}, {"name": "prop_nature_4", "at": Vector2(289, 172), "scale": Vector2(2, 2)}, {"name": "prop_ruins_2", "at": Vector2(290, 80), "scale": Vector2(2, 2)}, {"name": "prop_small_3", "at": Vector2(35, 170), "scale": Vector2.ONE}]
+const ArenaDecor := preload("res://presentation/arena/arena_decor.gd")
+const GROUND_PATH: String = "res://presentation/arena/arena_ground.png"
+const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
+## Non-solid decoration (the solid props come from the core's snapshot).
+var decor: Array[Dictionary] = []
+## The camera follows the player on the same 320x180 screen. `view_origin` is the world position of the screen's
+## top-left corner, whole pixels, kept inside the arena.
+var camera: Camera2D
+var camera_focus: Vector2 = Vector2.ZERO
+var view_origin: Vector2 = Vector2.ZERO
 const Hud := preload("res://presentation/arena/hud.gd")
 
 var empowered_sprites: Texture2D
@@ -121,10 +130,18 @@ func _ready() -> void:
 			white_image.set_pixel(x, y, Color(1, 1, 1, alpha))
 	white_sprites = ImageTexture.create_from_image(white_image)
 	tiles = load("res://art/build/tiles.png") as Texture2D
-	var tile_entries: Dictionary = _read_json("res://art/build/tiles.json").get("tiles", {})
-	var ground: Image = GroundView.build(tiles.get_image(), tile_entries)
-	ground_texture = ImageTexture.create_from_image(ground)
+	if ResourceLoader.exists(GROUND_PATH):
+		ground_texture = load(GROUND_PATH) as Texture2D
+	else:
+		var tile_entries: Dictionary = _read_json("res://art/build/tiles.json").get("tiles", {})
+		ground_texture = ImageTexture.create_from_image(GroundView.build(tiles.get_image(), tile_entries))
+	decor = ArenaDecor.build(core.obstacles)
+	camera = Camera2D.new()
+	camera.position_smoothing_enabled = false
+	add_child(camera)
+	camera.make_current()
 	snapshot = core.snapshot()
+	_update_camera(true)
 	prepare_visuals()
 	_update_hud()
 	_begin_persistence()
@@ -154,6 +171,7 @@ func _physics_process(delta: float) -> void:
 	var intent: InputFrame = Bindings.read_frame(snapshot.player.position, get_local_mouse_position())
 	core.step(intent)
 	snapshot = core.snapshot()
+	_update_camera(false)
 	_age_effects()
 	prepare_visuals()
 	for event: GameEvent in core.last_events:
@@ -180,6 +198,17 @@ func _record_result(event: GameEvent) -> void:
 	hud.result_lines = lines
 	hud.result_hint = "ESC: TITLE"
 
+## Follows the player on a fixed 320x180 screen, locked to the player's own rounded position (the same rounding the
+## sprite uses), so the player never wobbles against the screen. No smoothing or boss lean: both made the view shake.
+## Never shows anything outside the arena.
+func _update_camera(_snap: bool) -> void:
+	if camera == null or snapshot == null:
+		return
+	camera_focus = snapshot.player.position.round()
+	var half: Vector2 = VIEW_SIZE * 0.5
+	view_origin = (camera_focus - half).clamp(Vector2.ZERO, Tuning.ARENA_SIZE - VIEW_SIZE)
+	camera.position = view_origin + half
+
 func _restart() -> void:
 	new_best = false
 	hud.result_lines = []
@@ -196,6 +225,8 @@ func _restart() -> void:
 	previous_skill_id = &""
 	core = GameCore.new(17)
 	snapshot = core.snapshot()
+	decor = ArenaDecor.build(core.obstacles)
+	_update_camera(true)
 	facing_left = false
 	previous_player_state = &""
 	dash_ghosts.clear()
@@ -233,7 +264,8 @@ func _update_hud() -> void:
 			var chosen: String = String(selected_frames.get(actor.id, ""))
 			if frames.has(chosen) and head_anchors.has(chosen):
 				var mirrored: bool = ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {}))
-				hud.track_head(HeadAnchors.world(actor.position, frames[chosen], head_anchors[chosen], mirrored), snapshot.tick, actor.id, actor.position.round())
+				# the HUD lives in screen space: convert the boss's head from world to screen coordinates
+				hud.track_head(HeadAnchors.world(actor.position, frames[chosen], head_anchors[chosen], mirrored) - view_origin, snapshot.tick, actor.id, actor.position.round() - view_origin)
 	hud.snapshot = snapshot
 	hud.colors = colors
 	hud.debug_enabled = debug_enabled
@@ -355,8 +387,8 @@ func _draw() -> void:
 	if shake_left > 0:
 		offset = Vector2(1 if shake_left % 2 == 0 else -1, 1 if shake_left % 3 == 0 else -1)
 	draw_set_transform(offset)
-	draw_rect(Rect2(-2, -2, 324, 184), colors["2"])
-	draw_texture(ground_texture, Vector2.ZERO, Color(0.72, 0.72, 0.72))
+	draw_rect(Rect2(-2, -2, Tuning.ARENA_SIZE.x + 4.0, Tuning.ARENA_SIZE.y + 4.0), colors["2"])
+	draw_texture(ground_texture, Vector2.ZERO, Color(0.92, 0.92, 0.92))
 	for trace: Dictionary in skill_trails:
 		CombatEffects.draw_plan(self, SkillEffects.trail(trace["from"], trace["to"], snapshot.tick + snapshot.result_ticks - int(trace["tick"]), colors))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
@@ -373,8 +405,13 @@ func _draw() -> void:
 	actors.append_array(snapshot.entities)
 	actors.sort_custom(_behind)
 	var drawables: Array[Dictionary] = []
-	for decoration: Dictionary in DECORATIONS:
-		drawables.append(decoration)
+	var view: Rect2 = Rect2(view_origin - Vector2(90, 90), VIEW_SIZE + Vector2(180, 200))  # a margin for tall props
+	for decoration: Dictionary in decor:
+		if view.has_point(decoration["at"]):
+			drawables.append(decoration)
+	for obstacle: Snapshots.ObstacleSnapshot in snapshot.obstacles:
+		if obstacle.visual_id != &"" and view.has_point(obstacle.feet):
+			drawables.append({"name": String(obstacle.visual_id), "at": obstacle.feet, "scale": Vector2(obstacle.visual_scale, obstacle.visual_scale)})
 	for actor: Snapshots.EntitySnapshot in actors:
 		drawables.append({"actor": actor, "at": actor.position})
 	drawables.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
@@ -430,7 +467,7 @@ func _draw() -> void:
 			draw_circle(actor.position, Tuning.BOSS_RADIUS, colors["p"], false, 1.0)
 	draw_set_transform(Vector2.ZERO)
 	if snapshot.tick < screen_flash_until:
-		draw_rect(Rect2(0, 0, 320, 180), Color(colors["1"], 0.10))
+		draw_rect(Rect2(view_origin, VIEW_SIZE), Color(colors["1"], 0.10))
 
 func _behind(a: Snapshots.EntitySnapshot, b: Snapshots.EntitySnapshot) -> bool:
 	return a.position.y < b.position.y

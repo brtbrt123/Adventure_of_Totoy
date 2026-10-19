@@ -5,6 +5,7 @@ const Snapshots := preload("res://core/snapshots.gd")
 
 func _core(boss_at: Vector2 = Vector2(300.0, 20.0), player_at: Vector2 = Vector2(40.0, 88.0)) -> GameCore:
 	var core: GameCore = GameCore.new()
+	core.obstacles.clear()  # these tests pin positions in an open field; the props have their own tests
 	core.boss.state = BossState.STATE_RECOVER  # a pinned boss: it does not walk or attack
 	core.boss._recover_ticks = 1000000
 	core.boss.position = boss_at

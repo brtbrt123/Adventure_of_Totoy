@@ -11,6 +11,8 @@ const Snapshots := preload("res://core/snapshots.gd")
 const PlayerState := preload("res://core/player.gd")
 const BossState := preload("res://core/boss.gd")
 const SkillAttack := preload("res://core/skill_attack.gd")
+const Obstacle := preload("res://core/obstacle.gd")
+const ArenaLayout := preload("res://core/arena_layout.gd")
 
 const RESULT_PLAYING: StringName = &"playing"
 const RESULT_VICTORY: StringName = &"victory"
@@ -31,6 +33,9 @@ var last_events: Array[GameEvent] = []
 ## Live skill attacks (melee arcs, dash lanes, travelling projectiles). A projectile outlives the player's state.
 var skill_attacks: Array[SkillAttack] = []
 
+## The solid props of the ruins (pillars, trees, boulders): the player and the boss cannot walk through them.
+var obstacles: Array[Obstacle] = ArenaLayout.build()
+
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _next_attack_id: int = 1
 
@@ -48,9 +53,12 @@ func step(input: InputFrame) -> void:
 	var events: Array[GameEvent] = []
 	var player_before: Vector2 = player.position
 	player.step(input, tick, events)
+	player.position = move_resolved(player_before, player.position, Tuning.PLAYER_RADIUS)
 	_resolve_player_attack(events)
 	_spawn_released_skill(events)
+	var boss_before: Vector2 = boss.position
 	boss.step(tick, player.position, _rng, events)
+	boss.position = move_resolved(boss_before, boss.position, Tuning.BOSS_RADIUS)
 	_resolve_telegraphs(events)
 	_clamp_to_arena()
 	_resolve_skill_attacks(player_before, events)
@@ -104,6 +112,15 @@ func snapshot() -> Snapshots.GameSnapshot:
 		a.ticks_left = maxi(0, attack.end_tick - tick)
 		a.hit_target_ids = attack.hit_targets.duplicate()
 		snap.skill_attacks.append(a)
+	for obstacle: Obstacle in obstacles:
+		var o: Snapshots.ObstacleSnapshot = Snapshots.ObstacleSnapshot.new()
+		o.id = obstacle.id
+		o.visual_id = obstacle.visual_id
+		o.feet = obstacle.feet
+		o.visual_scale = obstacle.visual_scale
+		o.center = obstacle.center
+		o.radius = obstacle.radius
+		snap.obstacles.append(o)
 	var hud: Snapshots.HudSnapshot = Snapshots.HudSnapshot.new()
 	hud.player_hp = player.hp
 	hud.player_max_hp = Tuning.PLAYER_MAX_HP
@@ -326,8 +343,35 @@ func _resolve_telegraphs(events: Array[GameEvent]) -> void:
 func _clamp_to_arena() -> void:
 	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
 	var high: Vector2 = Tuning.ARENA_SIZE - low
-	player.position = player.position.clamp(low, high)
-	boss.position = boss.position.clamp(low, high)
+	player.position = push_out_of_obstacles(player.position.clamp(low, high), Tuning.PLAYER_RADIUS).clamp(low, high)
+	boss.position = push_out_of_obstacles(boss.position.clamp(low, high), Tuning.BOSS_RADIUS).clamp(low, high)
+
+
+## Moves a circle of `radius` from `before` towards `after` in steps of at most OBSTACLE_SWEEP_STEP pixels, pushing
+## it out of every solid prop after each step: it slides along them and cannot tunnel, however fast it moves.
+func move_resolved(before: Vector2, after: Vector2, radius: float) -> Vector2:
+	var delta: Vector2 = after - before
+	var steps: int = maxi(1, ceili(delta.length() / Tuning.OBSTACLE_SWEEP_STEP))
+	var step_delta: Vector2 = delta / steps
+	var current: Vector2 = before
+	for i: int in steps:
+		current = push_out_of_obstacles(current + step_delta, radius)
+	return current
+
+
+## The nearest position at which a circle of `radius` at `point` touches no solid prop.
+func push_out_of_obstacles(point: Vector2, radius: float) -> Vector2:
+	var current: Vector2 = point
+	for pass_index: int in 2:  # a second pass settles a circle squeezed between two props
+		for obstacle: Obstacle in obstacles:
+			var offset: Vector2 = current - obstacle.center
+			var reach: float = obstacle.radius + radius
+			var dist_sq: float = offset.length_squared()
+			if dist_sq < reach * reach:
+				var dist: float = sqrt(dist_sq)
+				var dir: Vector2 = offset / dist if dist > 0.0001 else Vector2.DOWN
+				current = obstacle.center + dir * reach
+	return current
 
 
 ## Gale Cut passes through the boss only while the dash itself runs (skill_active). Skill attacks are

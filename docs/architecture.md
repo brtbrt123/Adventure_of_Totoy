@@ -57,7 +57,16 @@ One `InputFrame` per tick:
 - `player: EntitySnapshot`, `entities: Array[EntitySnapshot]` (the boss; more later)
 - `telegraphs: Array[TelegraphSnapshot]`
 - `skill_attacks: Array[SkillAttackSnapshot]` (live skill attacks, see "Sword skills")
+- `obstacles: Array[ObstacleSnapshot]` (the solid props of the arena, the same list every tick)
 - `hud: HudSnapshot`
+
+### The arena: size, solid props, camera
+
+- **Size.** `Tuning.ARENA_SIZE` is **800x480** (50x30 tiles). Bodies stay `Tuning.ARENA_MARGIN` (28 px) inside the edge. Spawns: `Tuning.PLAYER_START` (312, 250), `Tuning.BOSS_START` (488, 250); no prop overlaps them.
+- **Solid props (core).** `core/arena_layout.gd` builds a fixed list of `core/obstacle.gd` circles (pillars, the statue, two chests, the altar, two fallen columns, four corner trees). `game_core.gd` resolves the player and the boss against them in small steps (no tunnelling, also for dashes, Gale Cut and the boss charge). A large prop is one sprite plus extra colliders with an empty `visual_id`. Nothing solid stands inside the stone ring in the middle (x 232..568, y 134..346).
+- **`ObstacleSnapshot`:** `id`, `visual_id` (sprite name, empty for an extra collider), `feet` (where presentation places the sprite by its anchor), `visual_scale`, `center` and `radius` (the collision circle). Presentation draws the props only from this list; it must not add solid-looking things the core does not know about.
+- **Ground and decoration (presentation).** The floor is `presentation/arena/arena_ground.png`, laid on the 16x16 grid from the tiles in `art/src` by `tools/art/make_arena_ground.py` (overlay tiles for the ring and the medallion come from `tools/art/make_plaza_tiles.py`). Non-solid decoration (wall pieces along the edge, flowers, rubble) is a short hand-placed list in `presentation/arena/arena_decor.gd`.
+- **Camera (presentation).** The screen stays 320x180. `arena.gd` owns a `Camera2D` that follows the player (leaning 22% towards the boss), snapped to whole pixels and clamped so the view never leaves the arena. `view_origin` is the world position of the screen's top-left corner; the HUD is in screen space, so world positions given to it (the boss head for the boss panel) are converted with `world - view_origin`.
 
 `EntitySnapshot`: `id`, `visual_id` (`&"totoy"`, `&"mossbound_colossus"`), `state`, `state_ticks`, `position` (pixels), `facing`, `hp`, `max_hp`, `posture`, `posture_max`, `invulnerable`, `combo_index` (player only, see the sword combo below; `0` for the boss), `skill_id` (player only: `breaking_edge`, `gale_cut` or `moon_cleave` during the `skill_*` states, otherwise empty), and for the player the weapon fields `weapon_id`, `weapon_buff_active`, `weapon_buff_ticks_left`, `attack_speed_mult` (see "Weapon active").
 

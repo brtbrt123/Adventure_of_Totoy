@@ -6,6 +6,7 @@ const Snapshots := preload("res://core/snapshots.gd")
 
 func _core_next_to_boss() -> GameCore:
 	var core: GameCore = GameCore.new()
+	core.obstacles.clear()  # these tests pin positions in an open field; the props have their own tests
 	core.boss.cooldown = 100000  # keep the boss passive
 	core.player.position = core.boss.position + Vector2(-30.0, 0.0)
 	core.player.facing = Vector2.RIGHT

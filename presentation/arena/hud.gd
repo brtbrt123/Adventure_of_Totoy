@@ -240,8 +240,10 @@ func _draw() -> void:
 	if not snapshot.entities.is_empty():
 		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
 		var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
+		if head_position.x < -12.0 or head_position.x > 332.0 or head_position.y < -24.0 or head_position.y > 196.0:
+			panel.position = Vector2(206.0, 3.0)  # the boss is off screen: its panel waits in the top right corner
 		ui("ui_boss", Rect2(panel.position + Vector2(0, 7), Vector2(104, 24)))
-		outlined(panel.position + Vector2(18, 0), "MOSSBOUND COLOSSUS", colors["z"], colors["0"])
+		centered(panel.position.x + 52.0, panel.position.y, "MOSSBOUND COLOSSUS", colors["z"], colors["0"])
 		bar(panel.position + Vector2(8, 18), 88, h.boss_hp, h.boss_max_hp, colors["7"], 3, float(health_ghosts.get("boss", h.boss_hp)))
 		bar(panel.position + Vector2(20, 27), 64, h.boss_posture, h.boss_posture_max, colors["p"] if boss.state == &"posture_broken" else colors["v"], 2)
 		if h.counter_window_ticks_left > 0:

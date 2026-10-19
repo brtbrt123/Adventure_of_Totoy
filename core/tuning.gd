@@ -4,11 +4,15 @@ extends RefCounted
 
 const TICK_DT: float = 1.0 / 60.0
 
-# Arena (one room, 20x11 tiles)
-const ARENA_SIZE: Vector2 = Vector2(320.0, 176.0)
-const ARENA_MARGIN: float = 8.0
-const PLAYER_START: Vector2 = Vector2(64.0, 88.0)
-const BOSS_START: Vector2 = Vector2(240.0, 88.0)
+# Arena: the ruins, 50x30 tiles (800x480 px). The screen stays 320x180; presentation scrolls a camera that follows the
+# player. The walls stand ARENA_MARGIN px inside the edge (the ruined wall and the tree line are drawn there).
+const ARENA_SIZE: Vector2 = Vector2(800.0, 480.0)
+const ARENA_MARGIN: float = 28.0
+const PLAYER_START: Vector2 = Vector2(312.0, 250.0)
+const BOSS_START: Vector2 = Vector2(488.0, 250.0)
+# Collision with the solid props (core/arena_layout.gd) is resolved in steps of at most this many pixels, so a fast
+# dash or charge cannot jump over a pillar.
+const OBSTACLE_SWEEP_STEP: float = 3.0
 
 # Player
 const PLAYER_MAX_HP: int = 100

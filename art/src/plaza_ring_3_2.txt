@@ -1,0 +1,18 @@
+# kind: tile
+# overlay tile, top-left quarter of the plaza ring, drawn over the floor (tools/art/make_plaza_tiles.py)
+..........eejjjj
+........eejjjjjj
+......eejjjjjjjj
+.....eejeejjjjih
+...eejjjjjejihhe
+..eejjjjjjjeeee.
+.ejjjjjjjihhee..
+ejjjjjjjhhee....
+jjjjjjihhe....ee
+jjjjjhhee.....ej
+jjjihhe.......ej
+jjhhee........ei
+ihhee.........ei
+eee...........ei
+ee............ee
+................

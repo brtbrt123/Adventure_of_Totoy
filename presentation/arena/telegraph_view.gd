@@ -2,6 +2,7 @@ extends RefCounted
 ## Geometry only. Line attacks are capsules: core uses distance to a SEGMENT,
 ## so their round end caps are part of the hit area, not decorative extensions.
 const Snapshots := preload("res://core/snapshots.gd")
+const Tuning := preload("res://core/tuning.gd")
 
 static func outline(t: Snapshots.TelegraphSnapshot) -> PackedVector2Array:
 	var points: PackedVector2Array = PackedVector2Array()
@@ -88,4 +89,4 @@ static func marker_position(t: Snapshots.TelegraphSnapshot) -> Vector2:
 		marker.y -= t.size
 	elif t.shape == &"ring":
 		marker = t.center + t.direction * (t.inner_size + t.size) * 0.5
-	return marker.clamp(Vector2(8, 37), Vector2(312, 143))
+	return marker.clamp(Vector2(8, 8), Tuning.ARENA_SIZE - Vector2(8, 8))

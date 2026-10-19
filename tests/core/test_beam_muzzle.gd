@@ -3,7 +3,7 @@ extends "res://tests/test_case.gd"
 
 const Snapshots := preload("res://core/snapshots.gd")
 
-const PLAYER_AT: Vector2 = Vector2(160.0, 88.0)
+const PLAYER_AT: Vector2 = Tuning.BOSS_START + Vector2(-80.0, 0.0)
 
 
 func _shards() -> Array:
