@@ -1,5 +1,6 @@
 extends "res://presentation/arena/hud.gd"
-## Title screen: START, CONTROLS, CREDITS, QUIT, with the saved record underneath. Presentation only: it reads
+## Title screen: START, CONTROLS, CREDITS, QUIT. (The saved record is kept and can be shown with record_text(),
+## but the menu no longer displays it.) Presentation only: it reads
 ## the save profile through the core's save store and starts the arena; it holds no game rules. It reuses the
 ## HUD's 3x5 bitmap lettering and draws on the 320x180 canvas.
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
@@ -15,6 +16,8 @@ const MENU_STEP: int = 14
 const MENU_SIZE: int = 12  # menu item font size (Cinzel capitals)
 const PAGE_SIZE: int = 8  # body text on the controls and credits pages
 const FALLBACK_TITLE_SIZE: int = 15  # the plain-lettering title used when the logo image is missing
+const PIXEL_FILTER_PATH: String = "res://presentation/menu/pixel_filter.gdshader"
+var pixel_overlay: ColorRect
 const LOGO_PATH: String = "res://presentation/menu/title_logo.png"
 const LOGO_WIDTH: float = 190.0  # game pixels (the logo is 1800 px wide, drawn smooth)
 var logo_sprite: Sprite2D
@@ -103,8 +106,35 @@ func _ready() -> void:
 		logo_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		logo_sprite.show_behind_parent = true
 		add_child(logo_sprite)
+	_add_pixel_filter()
 	profile = SaveStore.load_profile()
 	queue_redraw()
+
+
+## A last, full-screen layer that reads everything drawn so far and redraws it as 320x180 pixel art in the Totoy
+## palette (see pixel_filter.gdshader), so the painting, the logo and the lettering all look like the game.
+func _add_pixel_filter() -> void:
+	if not ResourceLoader.exists(PIXEL_FILTER_PATH):
+		return
+	var colors_in_palette: PackedVector3Array = PackedVector3Array()
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))
+	var reserved: Array = (data as Dictionary).get("reserved", [])
+	for entry: Dictionary in (data as Dictionary).get("colors", []):
+		if not reserved.has(entry["symbol"]):
+			var tone: Color = Color.html(entry["hex"])
+			colors_in_palette.append(Vector3(tone.r, tone.g, tone.b))
+	var count: int = colors_in_palette.size()
+	while colors_in_palette.size() < 36:
+		colors_in_palette.append(colors_in_palette[count - 1])
+	var material: ShaderMaterial = ShaderMaterial.new()
+	material.shader = load(PIXEL_FILTER_PATH) as Shader
+	material.set_shader_parameter("palette", colors_in_palette)
+	material.set_shader_parameter("palette_size", count)
+	pixel_overlay = ColorRect.new()
+	pixel_overlay.size = Vector2(320, 180)
+	pixel_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pixel_overlay.material = material
+	add_child(pixel_overlay)
 
 
 func _process(delta: float) -> void:
@@ -245,9 +275,6 @@ func _draw_title() -> void:
 			draw_rect(Rect2(96, y - 3 + MENU_STEP - 2, 128, 1), Color(colors["1"], 0.55))
 			outlined(Vector2(100, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
 		centered(160, y, ITEMS[i], colors["1"] if selected else colors["j"], colors["0"], 1, face, MENU_SIZE)
-	var record: String = record_text()
-	if record != "":
-		centered(160, 167, record, colors["j"], colors["0"], 1, face, 8)
 	var note: String = String(profile.load_note) if profile != null else ""
 	if note != "":
 		centered(160, 175, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)

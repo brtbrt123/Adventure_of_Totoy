@@ -111,7 +111,7 @@ static func stat_font() -> Font:
 ## The menu face: Cinzel (OFL, see presentation/fonts/README.md), carved-looking capitals like the title logo.
 ## Falls back to the pixel font if the file is missing.
 const MENU_FONT_PATH: String = "res://presentation/fonts/Cinzel.ttf"
-const MENU_FONT_WEIGHT: int = 700
+const MENU_FONT_WEIGHT: int = 900
 static var _menu_font: Font = null
 
 static func menu_font() -> Font:
