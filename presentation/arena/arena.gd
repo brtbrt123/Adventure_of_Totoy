@@ -10,6 +10,7 @@ const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
 const SaveStore := preload("res://core/save_store.gd")
+const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
@@ -27,6 +28,8 @@ var buff_transition: Dictionary = {}
 var combat_audio: CombatAudio
 ## Progress is saved only when the game was started from the title screen (it sets this Engine meta).
 var persist: bool = false
+## The Black Form cut-in (drawn on the HUD layer). While it plays the arena does not step the core.
+var cutin: BlackFormCutIn
 var profile: Object = null
 var new_best: bool = false
 ## Replaced by tests so going back to the title does not leave the scene they run in.
@@ -125,6 +128,8 @@ func _ready() -> void:
 	prepare_visuals()
 	_update_hud()
 	_begin_persistence()
+	cutin = BlackFormCutIn.new()
+	$HUD.add_child(cutin)
 
 func _read_json(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -134,7 +139,11 @@ func _read_json(path: String) -> Dictionary:
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	return parsed as Dictionary if parsed is Dictionary else {}
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	# The Black Form cut-in freezes the world: no core steps, so no game time passes and nothing is missed.
+	if cutin != null and cutin.active:
+		cutin.advance(delta)
+		return
 	if Input.is_action_just_pressed("arena_debug"):
 		debug_enabled = not debug_enabled
 	if snapshot.result != &"playing" and Input.is_action_just_pressed("arena_restart"):
@@ -179,6 +188,8 @@ func _restart() -> void:
 		SaveStore.save(profile)
 	buff_events.clear()
 	buff_transition.clear()
+	if cutin != null:
+		cutin.stop()
 	combat_audio.reset()
 	combat_audio.set_music_active(true)
 	previous_combo_index = 0
@@ -263,6 +274,8 @@ func _on_event(event: GameEvent) -> void:
 				return
 			buff_events[identity] = true
 			var started: bool = event.type == &"weapon_buff_started"
+			if started and cutin != null:
+				cutin.start()
 			buff_transition = {"tick": event.tick, "started": started, "at": snapshot.player.position}
 			combat_audio.cue("weapon_buff_start" if started else "weapon_buff_end", event.tick)
 			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["k"], 0.8)
