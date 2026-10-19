@@ -43,7 +43,11 @@ var poses: Dictionary = {}
 var aura_texture: Texture2D
 var aura_frames: Array = []
 var vignette: GradientTexture2D
-var dots: Array[Vector3] = []  # x, y, radius of the halftone dots (fixed on the screen, like the preview)
+var dots_texture: Texture2D  # the halftone dots, fixed on the screen like the preview, built once
+var _warming: bool = false
+## Title sizes the slam uses (the glyph cache for each size and outline is built once in the warm-up pass;
+## building them during the slam cost hundreds of milliseconds per frame).
+const TITLE_SIZES: Array[int] = [56, 60, 66, 72, 78, 81]
 
 signal finished
 
@@ -74,12 +78,25 @@ func _ready() -> void:
 	vignette.fill_to = Vector2(1.0, 0.5)
 	vignette.width = 128
 	vignette.height = 128
+	dots_texture = _make_dots()
+	available = true
+	_warming = true  # one invisible pass so textures and glyphs are ready before the first real cut-in
+	queue_redraw()
+
+
+func _make_dots() -> Texture2D:
+	var image: Image = Image.create(800, 450, false, Image.FORMAT_RGBA8)
+	var color: Color = Color(0.51, 0.31, 0.86, 0.27)
 	for yy: int in range(0, 450, 16):
 		for xx: int in range(0 if (yy / 16) % 2 == 0 else 8, 800, 16):
 			var radius: float = 3.4 * (yy / 450.0) - 0.3
-			if radius > 0.7:
-				dots.append(Vector3(xx, yy, radius))
-	available = true
+			if radius <= 0.7:
+				continue
+			for dy: int in range(-4, 5):
+				for dx: int in range(-4, 5):
+					if dx * dx + dy * dy <= radius * radius and xx + dx >= 0 and xx + dx < 800 and yy + dy >= 0 and yy + dy < 450:
+						image.set_pixel(xx + dx, yy + dy, color)
+	return ImageTexture.create_from_image(image)
 
 
 ## Preview time in seconds.
@@ -154,6 +171,10 @@ static func beat_at(t: float) -> Array:
 
 # ---------------------------------------------------------------- drawing
 func _draw() -> void:
+	if _warming:
+		_warming = false
+		_draw_warmup()
+		return
 	if not active or not available:
 		return
 	var t: float = preview_time()
@@ -206,9 +227,11 @@ func _draw() -> void:
 
 func _draw_banner(poly: PackedVector2Array, t: float, step: int, off: float, burst: float) -> void:
 	draw_polygon(poly, PackedColorArray([BAN_TOP, BAN_TOP, BAN_BOT, BAN_BOT]))
-	for dot: Vector3 in dots:
-		if Geometry2D.is_point_in_polygon(Vector2(dot.x, dot.y), poly):
-			draw_circle(Vector2(dot.x, dot.y), dot.z, Color(0.51, 0.31, 0.86, 0.27))
+	# the halftone dots: one texture mapped onto the banner polygon
+	var uvs: PackedVector2Array = PackedVector2Array()
+	for point: Vector2 in poly:
+		uvs.append(point / Vector2(800.0, 450.0))
+	draw_polygon(poly, PackedColorArray([Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE]), uvs, dots_texture)
 	var rnd: RandomNumberGenerator = RandomNumberGenerator.new()
 	rnd.seed = 300 + step
 	# speed lines running along the banner, streaming left
@@ -352,7 +375,7 @@ func _draw_sweep(poly: PackedVector2Array, t: float, start: float, duration: flo
 
 func _draw_title(t: float, step: int, off: float, shake: Vector2) -> void:
 	var tx: float = ramp(t, SLAM, SLAM + 0.12)
-	var size: int = int(round(56.0 * (1.0 + 0.45 * (1.0 - ease_out(tx)))))
+	var size: int = _title_size(56.0 * (1.0 + 0.45 * (1.0 - ease_out(tx))))
 	if t >= SLAM + 0.10 and t < SLAM + 0.15:
 		size = 60  # overshoot punch on landing
 	var glitch: bool = (t >= SLAM + 0.10 and t < SLAM + 0.20) or (t >= 1.85 and t < 1.9)
@@ -375,8 +398,7 @@ func _draw_title(t: float, step: int, off: float, shake: Vector2) -> void:
 		draw_string(font, pen + Vector2(-8.0, 0.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Color(VIOLET, 0.75 * alpha))
 		draw_string(font, pen + Vector2(8.0, 0.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Color(1, 1, 1, 0.7 * alpha))
 		pen.x += [-6.0, 0.0, 6.0, 9.0][rnd.randi() % 4]
-	draw_string_outline(font, pen, label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, 30, Color(VIOLET, 0.22 * alpha))
-	draw_string_outline(font, pen, label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, 20, Color(VIOLET, 0.45 * alpha))
+	draw_string_outline(font, pen, label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, 22, Color(VIOLET, 0.4 * alpha))
 	draw_string_outline(font, pen + Vector2(4.0, 5.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, 12, Color(INK, alpha))
 	draw_string_outline(font, pen, label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, 12, Color(Color8(40, 14, 84), alpha))
 	draw_string(font, pen, label, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Color(CREAM, alpha))
@@ -393,6 +415,37 @@ func _draw_title(t: float, step: int, off: float, shake: Vector2) -> void:
 		draw_colored_polygon(bar, Color(INK, 0.88 * so))
 		draw_line(bar[0], bar[1], Color(VIOLET, so), 2.0)
 		draw_string(font, Vector2(sx + 20.0, sy + 7.0 + font.get_ascent(sub_font_size)), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, sub_font_size, Color(0.82, 0.71, 1.0, so))
+
+
+## The nearest of the sizes the warm-up prepared.
+static func _title_size(wanted: float) -> int:
+	var best: int = TITLE_SIZES[0]
+	for candidate: int in TITLE_SIZES:
+		if absf(float(candidate) - wanted) < absf(float(best) - wanted):
+			best = candidate
+	return best
+
+
+## Draws everything the cut-in uses once at almost no opacity, so the first real cut-in does not hitch on texture
+## uploads or glyph rasterisation.
+func _draw_warmup() -> void:
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(SCALE, SCALE))
+	var faint: Color = Color(1, 1, 1, 0.01)
+	for key: String in poses:
+		var pose: Dictionary = poses[key]
+		draw_texture_rect(pose["tex"], Rect2(0, 0, 8, 8), false, faint)
+		draw_texture_rect(pose["sil"], Rect2(0, 0, 8, 8), false, faint)
+	_draw_aura(0, 8.0, false, 0.01, Vector2(8, 8))
+	draw_texture_rect(vignette, Rect2(0, 0, 8, 8), false, faint)
+	var uvs: PackedVector2Array = PackedVector2Array([Vector2(0, 0), Vector2(0.01, 0), Vector2(0.01, 0.01), Vector2(0, 0.01)])
+	draw_polygon(PackedVector2Array([Vector2(0, 0), Vector2(8, 0), Vector2(8, 8), Vector2(0, 8)]), PackedColorArray([faint, faint, faint, faint]), uvs, dots_texture)
+	var font: Font = Hud.ui_font()
+	for size: int in TITLE_SIZES:
+		for outline: int in [12, 22]:
+			draw_string_outline(font, Vector2(0, 0), "BLACK FORM", HORIZONTAL_ALIGNMENT_LEFT, -1, size, outline, faint)
+		draw_string(font, Vector2(0, 0), "BLACK FORM", HORIZONTAL_ALIGNMENT_LEFT, -1, size, faint)
+	draw_string(font, Vector2(0, 0), "ATTACK SPEED +50%  /  DAMAGE +40%", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, faint)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 func _draw_exit_smear(t: float, off: float, step: int) -> void:
