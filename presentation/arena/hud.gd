@@ -81,19 +81,35 @@ static func format_ticks(ticks: int) -> String:
 	var tenths: int = int(round(ticks / 6.0))
 	return "%d:%02d.%d" % [tenths / 600, (tenths / 10) % 60, tenths % 10]
 
+## Text is a real font drawn at the window resolution (the project stretches the canvas, so a font size of 7
+## "game pixels" is rendered with 28 screen pixels at the default 4x window): crisp at any size. The old
+## 3x5 bitmap glyph table above is no longer used for drawing.
+const FONT_SIZE: int = 7  # cap height is about 5 game pixels, like the old bitmap letters
+static var _font: Font = null
+
+static func ui_font() -> Font:
+	if _font == null:
+		var bold: FontVariation = FontVariation.new()
+		bold.base_font = ThemeDB.fallback_font
+		bold.variation_embolden = 0.55
+		_font = bold
+	return _font
+
+## Width of `text` in game pixels at a size multiplier.
+static func text_width(text: String, scale_px: int = 1) -> float:
+	return ui_font().get_string_size(text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE * scale_px).x
+
+## `at` is the top-left of the letters, as with the old bitmap text.
 func lettering(at: Vector2, text: String, color: Color, scale_px: int = 1) -> void:
-	var cursor: Vector2 = at.round()
-	for character: String in text.to_upper():
-		var bits: String = GLYPHS.get(character, GLYPHS["?"])
-		for index: int in range(15):
-			if bits[index] == "1":
-				draw_rect(Rect2(cursor + Vector2(index % 3, floori(index / 3.0)) * scale_px, Vector2.ONE * scale_px), color)
-		cursor.x += 4 * scale_px
+	draw_string(ui_font(), Vector2(at.x, at.y + 5.0 * scale_px), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE * scale_px, color)
 
 func outlined(at: Vector2, text: String, color: Color, outline: Color, scale_px: int = 1) -> void:
-	for offset: Vector2 in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
-		lettering(at + offset, text, outline, scale_px)
+	draw_string_outline(ui_font(), Vector2(at.x, at.y + 5.0 * scale_px), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE * scale_px, 2 * scale_px, outline)
 	lettering(at, text, color, scale_px)
+
+## Text centred on `center_x`.
+func centered(center_x: float, y: float, text: String, color: Color, outline: Color, scale_px: int = 1) -> void:
+	outlined(Vector2(center_x - text_width(text, scale_px) * 0.5, y), text, color, outline, scale_px)
 
 func track_health() -> void:
 	if snapshot == null:
@@ -127,17 +143,46 @@ func bar(at: Vector2, width: int, value: float, maximum: float, color: Color, he
 		if height > 2:
 			draw_line(at + Vector2(0, height - 1), at + Vector2(amount - 1, height - 1), colors["f"])
 
+## The round portrait is cut from the owner's original high-resolution portrait (not the 48 px palette copy), so
+## it stays sharp when the HUD is drawn at the window resolution. It is a smooth-filtered sprite behind the
+## frame; everything else in the HUD stays nearest-neighbour. Falls back to the palette portrait if the file is missing.
+const PORTRAIT_SIZE: int = 200
+const PORTRAIT_SOURCE: String = "res://art/reference/hero_portrait.jpg"
+const PORTRAIT_CROP: Rect2i = Rect2i(330, 0, 1260, 1260)  # square around the head (the same crop import_reference.py uses)
+var portrait_sprite: Sprite2D = null
+
 func prepare_portrait() -> void:
-	if portrait_mask != null or portrait_atlas == null or portrait_frame.is_empty():
+	if portrait_mask != null:
 		return
-	var image: Image = portrait_atlas.get_image().get_region(Rect2i(int(portrait_frame["x"]), int(portrait_frame["y"]), int(portrait_frame["w"]), int(portrait_frame["h"])))
-	image.convert(Image.FORMAT_RGBA8)
-	image.resize(44, 44, Image.INTERPOLATE_NEAREST)
-	for y: int in range(44):
-		for x: int in range(44):
-			if Vector2(x - 21.5, y - 21.5).length_squared() > 22.0 * 22.0:
-				image.set_pixel(x, y, Color(0, 0, 0, 0))
+	var image: Image = null
+	var source: Texture2D = load(PORTRAIT_SOURCE) as Texture2D if ResourceLoader.exists(PORTRAIT_SOURCE) else null
+	if source != null:
+		image = source.get_image().get_region(PORTRAIT_CROP)
+		image.convert(Image.FORMAT_RGBA8)
+		image.resize(PORTRAIT_SIZE, PORTRAIT_SIZE, Image.INTERPOLATE_LANCZOS)
+	elif portrait_atlas != null and not portrait_frame.is_empty():
+		image = portrait_atlas.get_image().get_region(Rect2i(int(portrait_frame["x"]), int(portrait_frame["y"]), int(portrait_frame["w"]), int(portrait_frame["h"])))
+		image.convert(Image.FORMAT_RGBA8)
+		image.resize(PORTRAIT_SIZE, PORTRAIT_SIZE, Image.INTERPOLATE_NEAREST)
+	else:
+		return
+	var centre: float = (PORTRAIT_SIZE - 1) * 0.5
+	var radius: float = PORTRAIT_SIZE * 0.5 - 1.0
+	for y: int in range(PORTRAIT_SIZE):
+		for x: int in range(PORTRAIT_SIZE):
+			# a one pixel soft edge on the circle
+			var coverage: float = clampf(radius - Vector2(x - centre, y - centre).length() + 0.5, 0.0, 1.0)
+			var pixel: Color = image.get_pixel(x, y)
+			image.set_pixel(x, y, Color(pixel.r, pixel.g, pixel.b, pixel.a * coverage))
 	portrait_mask = ImageTexture.create_from_image(image)
+	portrait_sprite = Sprite2D.new()
+	portrait_sprite.texture = portrait_mask
+	portrait_sprite.centered = false
+	portrait_sprite.position = Vector2(11, 12)
+	portrait_sprite.scale = Vector2.ONE * (25.0 / PORTRAIT_SIZE)
+	portrait_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	portrait_sprite.show_behind_parent = true
+	add_child(portrait_sprite)
 
 func _draw() -> void:
 	if snapshot == null or colors.is_empty():
@@ -163,21 +208,19 @@ func _draw() -> void:
 		var extra: int = result_lines.size() + (1 if result_hint != "" else 0)
 		draw_rect(Rect2(60, 67, 200, 43 + extra * 8), colors["0"])
 		var title: String = "VICTORY" if snapshot.result == &"victory" else "DEFEAT"
-		lettering(Vector2(160 - title.length() * 4, 75), title, colors["1"], 2)
-		outlined(Vector2(136, 96), "R TO RESTART", colors["o"], colors["0"])
+		centered(160, 74, title, colors["1"], colors["0"], 2)
+		centered(160, 96, "R TO RESTART", colors["o"], colors["0"])
 		var line_y: int = 105
 		for line: String in result_lines:
-			outlined(Vector2(160 - line.length() * 2, line_y), line, colors["1"], colors["0"])
+			centered(160, line_y, line, colors["1"], colors["0"])
 			line_y += 8
 		if result_hint != "":
-			outlined(Vector2(160 - result_hint.length() * 2, line_y), result_hint, colors["o"], colors["0"])
+			centered(160, line_y, result_hint, colors["o"], colors["0"])
 
 
 ## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	prepare_portrait()
-	if portrait_mask != null:
-		draw_texture_rect(portrait_mask, Rect2(11, 12, 25, 25), false)
 	bar(Vector2(47, 20), 68, h.player_hp, h.player_max_hp, colors["t"], 5, float(health_ghosts.get("player", h.player_hp)))
 	bar(Vector2(47, 33), 66, h.edge, h.edge_max, colors["v"], 2)
 	bar(Vector2(47, 40), 66, dash_fraction(h), 1.0, colors["n"], 2)
@@ -186,7 +229,7 @@ func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	ui("ui_icon_dash_1", Rect2(39, 38, 6, 6))
 	ui("ui_icon_parry_1", Rect2(116, 32, 7, 7))
 	var hp: String = "%d/%d" % [h.player_hp, h.player_max_hp]
-	outlined(Vector2(81 - hp.length() * 2, 20), hp, colors["1"], colors["0"])
+	centered(81, 20, hp, colors["1"], colors["0"])
 
 func ui(key: String, rect: Rect2) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
@@ -268,13 +311,14 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 				arc.append((centre + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * 11.0).round())
 			draw_polyline(arc, colors["o"], 1.0, false)
 			var seconds: String = str(ceili(int(row["cooldown"]) * Tuning.TICK_DT))
-			draw_rect(Rect2(centre + Vector2(-seconds.length() * 2 - 1, -3), Vector2(seconds.length() * 4 + 1, 7)), colors["0"])
-			lettering(centre + Vector2(-seconds.length() * 2, -2), seconds, colors["p"])
+			var seconds_width: float = text_width(seconds)
+			draw_rect(Rect2(centre + Vector2(-seconds_width * 0.5 - 1, -3), Vector2(seconds_width + 2, 7)), colors["0"])
+			lettering(centre + Vector2(-seconds_width * 0.5, -2), seconds, colors["p"])
 		var badge: Vector2 = socket.position + Vector2(-2, 16)
 		draw_rect(Rect2(badge - Vector2.ONE, Vector2(7, 7)), colors["0"])
 		lettering(badge, row["key"], colors["1"])
 		var cost: String = "%dE" % int(row["cost"])
-		outlined(centre + Vector2(-cost.length() * 2, 14), cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"])
+		centered(centre.x, centre.y + 14, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"])
 		if socket.has_point(get_local_mouse_position()):
 			_draw_aspect_hint(row)
 	if h.retaliate_ticks_left > 0:

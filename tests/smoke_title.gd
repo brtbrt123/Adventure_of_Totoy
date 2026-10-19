@@ -57,7 +57,7 @@ func _title_screen() -> void:
 	_expect(title.index == Title.ITEMS.size() - 1, "up from the first item wraps to the last")
 	title.move_selection(1)
 	_expect(title.index == 0, "down from the last wraps to the first")
-	_expect(title.item_at(Vector2(130, 103)) == 0 and title.item_at(Vector2(130, 115)) == 1 and title.item_at(Vector2(10, 10)) == -1, "mouse hit boxes line up with the menu rows")
+	_expect(title.item_at(Vector2(160, Title.MENU_TOP + 4)) == 0 and title.item_at(Vector2(160, Title.MENU_TOP + Title.MENU_STEP + 4)) == 1 and title.item_at(Vector2(10, 10)) == -1, "mouse hit boxes line up with the menu rows")
 	title.index = 1
 	title.activate()
 	_expect(title.screen == Title.SCREEN_CONTROLS, "CONTROLS opens the controls page")
@@ -76,7 +76,7 @@ func _title_screen() -> void:
 	_expect(changed_to == [Title.ARENA_SCENE], "START opens the arena exactly once: %s" % str(changed_to))
 	_expect(Engine.has_meta(Title.PERSIST_META), "START turns saving on")
 	Engine.remove_meta(Title.PERSIST_META)
-	# every character on every page and menu line has a glyph (nothing is drawn as '?')
+	# every character on every page and menu line exists in the UI font (nothing falls back to a missing-glyph box)
 	var strings: Array[String] = []
 	strings.append_array(Title.ITEMS)
 	strings.append_array(Title.CONTROL_LINES)
@@ -85,7 +85,7 @@ func _title_screen() -> void:
 	strings.append_array(["ADVENTURE OF TOTOY", "GOLD CAN BE PARRIED. RED MUST BE DODGED.", "VICTORIES 0  DEFEATS 0  BEST 1:00.0", "SAVE RESET: NOT VALID JSON", "ESC OR ENTER: BACK", "> START", "NEW BEST!", "ESC: TITLE", "R TO RESTART", "TIME 1:23.4"])
 	for line: String in strings:
 		for character: String in line.to_upper():
-			_expect(Title.GLYPHS.has(character), "no glyph for '%s' in \"%s\"" % [character, line])
+			_expect(Title.ui_font().has_char(character.unicode_at(0)), "the UI font has no glyph for '%s' in \"%s\"" % [character, line])
 	# the controls page covers every binding the game uses
 	var controls: String = " ".join(Title.CONTROL_LINES).to_upper()
 	for needle: String in ["WASD", "LEFT CLICK", "RIGHT CLICK", "SHIFT", "SPACE", "Z:", "X:", "C:", "R:", "ESC"]:

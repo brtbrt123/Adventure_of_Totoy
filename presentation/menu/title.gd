@@ -10,6 +10,8 @@ const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 ## not set it and never touch the player's save).
 const PERSIST_META: StringName = &"totoy_persist"
 
+const MENU_TOP: int = 82  # y of the first menu line, in game pixels
+const MENU_STEP: int = 16
 const ITEMS: Array[String] = ["START", "CONTROLS", "CREDITS", "QUIT"]
 const SCREEN_TITLE: StringName = &"title"
 const SCREEN_CONTROLS: StringName = &"controls"
@@ -126,7 +128,7 @@ func start_game() -> void:
 ## The menu line under a canvas point, or -1.
 func item_at(point: Vector2) -> int:
 	for i: int in ITEMS.size():
-		if Rect2(120, 100 + i * 12, 80, 10).has_point(point):
+		if Rect2(100, MENU_TOP + i * MENU_STEP - 2, 120, MENU_STEP - 1).has_point(point):
 			return i
 	return -1
 
@@ -159,26 +161,34 @@ func _draw_title() -> void:
 	_draw_frame("hero2_idle_right_1", Vector2(70, 150))
 	_draw_frame("golem2_idle_1", Vector2(250, 150))
 	var title: String = "ADVENTURE OF TOTOY"
-	outlined(Vector2(160 - title.length() * 6, 24), title, colors["1"], colors["0"], 3)
+	centered(160, 22, title, colors["1"], colors["0"], 3)
 	var tagline: String = "GOLD CAN BE PARRIED. RED MUST BE DODGED."
-	outlined(Vector2(160 - tagline.length() * 2, 52), tagline, colors["o"], colors["0"])
+	centered(160, 50, tagline, colors["o"], colors["0"])
 	for i: int in ITEMS.size():
 		var selected: bool = i == index
-		var label: String = ("> " if selected else "  ") + ITEMS[i]
-		outlined(Vector2(124, 102 + i * 12), label, colors["1"] if selected else colors["p"], colors["0"])
+		var y: float = MENU_TOP + i * MENU_STEP
+		if selected:
+			draw_rect(Rect2(100, y - 3, 120, MENU_STEP - 2), Color(colors["1"], 0.14))
+			outlined(Vector2(104, y), ">", colors["1"], colors["0"], 2)
+		centered(160, y, ITEMS[i], colors["1"] if selected else colors["p"], colors["0"], 2)
 	var record: String = record_text()
 	if record != "":
-		outlined(Vector2(160 - record.length() * 2, 160), record, colors["p"], colors["0"])
+		centered(160, 158, record, colors["p"], colors["0"])
 	var note: String = String(profile.load_note) if profile != null else ""
 	if note != "":
-		outlined(Vector2(160 - ("SAVE RESET: " + note).length() * 2, 168), "SAVE RESET: " + note, colors["o"], colors["0"])
+		centered(160, 168, "SAVE RESET: " + note, colors["o"], colors["0"])
 
 
 func _draw_page(heading: String, lines: Array[String], footer: Array[String]) -> void:
-	outlined(Vector2(160 - heading.length() * 6, 10), heading, colors["1"], colors["0"], 3)
+	centered(160, 8, heading, colors["1"], colors["0"], 3)
 	var y: int = 36
 	for line: String in lines:
-		outlined(Vector2(20, y), line, colors["p"], colors["0"])
+		var split: int = line.find(":")
+		if split > 0 and lines == CONTROL_LINES:
+			outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"])
+			outlined(Vector2(74, y), line.substr(split + 1), colors["p"], colors["0"])
+		else:
+			outlined(Vector2(20, y), line, colors["p"], colors["0"])
 		y += 9
 	y += 6
 	for line: String in footer:

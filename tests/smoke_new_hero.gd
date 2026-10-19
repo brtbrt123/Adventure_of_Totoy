@@ -44,8 +44,10 @@ func _run() -> void:
 	await save("idle")
 	arena.hud.prepare_portrait()
 	var mask: Image = arena.hud.portrait_mask.get_image()
-	check(mask.get_size() == Vector2i(44, 44), "portrait size")
-	check(mask.get_pixel(0, 0).a == 0 and mask.get_pixel(22, 22).a == 1, "portrait circular clipping")
+	var portrait_size: int = arena.hud.PORTRAIT_SIZE
+	check(mask.get_size() == Vector2i(portrait_size, portrait_size), "portrait size")
+	check(mask.get_pixel(0, 0).a == 0 and mask.get_pixel(portrait_size / 2, portrait_size / 2).a == 1, "portrait circular clipping")
+	check(arena.hud.portrait_sprite != null and arena.hud.portrait_sprite.show_behind_parent, "portrait draws behind the frame")
 	for direction: Vector2 in [Vector2.LEFT, Vector2.UP, Vector2.DOWN, Vector2.RIGHT]:
 		var move: InputFrame = InputFrame.new()
 		move.move = direction
