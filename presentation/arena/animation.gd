@@ -3,6 +3,13 @@ extends RefCounted
 const PlayerState := preload("res://core/player.gd")
 const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
+const Weapons := preload("res://core/weapons.gd")
+## Hero frame sets by equipped weapon (same numbering per state): katana, dagger, dagger in Lightning Form.
+const SET_KATANA: String = "hero2"
+const SET_DAGGER: String = "totoy_dagger"
+const SET_LIGHTNING: String = "totoy_lightning"
+## Poses the Lightning Form set has art for; any other pose (victory) uses the plain dagger frame.
+const LIGHTNING_POSES: Array[String] = ["idle", "walk", "dash", "parry", "hurt", "attack1", "attack2", "attack3", "attack4"]
 const DIRECTIONS: Array[String] = ["right"]
 # [frame count, ticks per frame, loop]. Sword phases use per-swing tuning;
 # boss windups use telegraph progress. Attack entries only declare frame counts.
@@ -47,19 +54,25 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 		if snap.result == &"victory":
 			state = "victory"
 			ticks = snap.result_ticks
+		var prefix: String = hero_set(actor)
 		if state == "dead":
-			return "hero2_hurt_right_4"
+			return hero_frame(prefix, "hurt", 4)
 		if state.begins_with("skill_"):
-			return skill_frame(actor.skill_id, actor.state, ticks)
+			return skill_frame(actor.skill_id, actor.state, ticks, prefix)
 		if state.begins_with("attack_"):
-			var swing: int = clampi(actor.combo_index, 1, 3)
-			var offset: int = 0 if state == "attack_windup" else (2 if state == "attack_active" else 4)
-			var durations: Array[int] = Tuning.SWING_WINDUP_TICKS if state == "attack_windup" else (Tuning.SWING_ACTIVE_TICKS if state == "attack_active" else Tuning.SWING_RECOVERY_TICKS)
-			var index: int = mini(1, maxi(0, ticks) * 2 / maxi(1, PlayerState.scaled_ticks(durations[swing - 1], actor.attack_speed_mult))) + 1
-			return "hero2_attack%d_right_%d" % [swing, offset + index]
+			# Per-weapon swing tables (the dagger has 4 swings) at the speed core locked for this swing.
+			var swing: int = clampi(actor.combo_index, 1, Weapons.combo_max(actor.weapon_id))
+			var phase: int = 0 if state == "attack_windup" else (1 if state == "attack_active" else 2)
+			var base: int = Weapons.swing_phases(actor.weapon_id, swing)[phase]
+			var duration: int = maxi(1, PlayerState.scaled_ticks(base, actor.attack_speed_mult))
+			# A one-tick phase (dagger swings in Lightning Form) shows its key pose, the second frame (the strike).
+			var index: int = 2 if duration == 1 else mini(1, maxi(0, ticks) * 2 / duration) + 1
+			return hero_frame(prefix, "attack%d" % swing, phase * 2 + index)
 		if state == "parry_recovery":
-			return "hero2_parry_right_6"
-		return "hero2_%s_right_%d" % [state, frame_index(PLAYER.get(state, PLAYER["idle"]), ticks)]
+			return hero_frame(prefix, "parry", 6)
+		if not PLAYER.has(state):
+			state = "idle"
+		return hero_frame(prefix, state, frame_index(PLAYER[state], ticks))
 	if state == "dead":
 		return "golem2_death_%d" % frame_index(BOSS["death"], snap.result_ticks)
 	if state == "attack":
@@ -84,14 +97,36 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 		state = "idle"
 	return "golem2_%s_%d" % [state, frame_index(BOSS.get(state, BOSS["idle"]), actor.state_ticks)]
 
-static func all_names() -> Array[String]:
+## Which hero frame set the actor is drawn with: the equipped weapon, and the Lightning Form look while it runs.
+static func hero_set(actor: Snapshots.EntitySnapshot) -> String:
+	if actor.weapon_form == Weapons.FORM_LIGHTNING:
+		return SET_LIGHTNING
+	return SET_DAGGER if actor.weapon_id == Tuning.WEAPON_DUAL_DAGGER else SET_KATANA
+
+## `<set>_<pose>_right_<n>`; the Lightning set borrows the dagger frame for poses it has no art for.
+static func hero_frame(prefix: String, pose: String, n: int) -> String:
+	if prefix == SET_LIGHTNING and pose not in LIGHTNING_POSES:
+		prefix = SET_DAGGER
+	return "%s_%s_right_%d" % [prefix, pose, n]
+
+## Every frame a hero set can request (all states, swings 1..combo_max of its weapon).
+static func hero_names(prefix: String) -> Array[String]:
 	var names: Array[String] = []
 	for state: String in ["idle", "walk", "dash", "parry", "hurt", "victory"]:
 		for n: int in range(1, int(PLAYER[state][0]) + 1):
-			names.append("hero2_%s_right_%d" % [state, n])
-	for swing: int in range(1, 4):
+			names.append(hero_frame(prefix, state, n))
+	var swings: int = Weapons.combo_max(Tuning.WEAPON_BLACK_KATANA if prefix == SET_KATANA else Tuning.WEAPON_DUAL_DAGGER)
+	for swing: int in range(1, swings + 1):
 		for n: int in range(1, 7):
-			names.append("hero2_attack%d_right_%d" % [swing, n])
+			names.append(hero_frame(prefix, "attack%d" % swing, n))
+	return names
+
+static func all_names() -> Array[String]:
+	var names: Array[String] = []
+	for prefix: String in [SET_KATANA, SET_DAGGER, SET_LIGHTNING]:
+		for name_key: String in hero_names(prefix):
+			if not names.has(name_key):
+				names.append(name_key)
 	for state: String in BOSS:
 		for n: int in range(1, int(BOSS[state][0]) + 1):
 			names.append("golem2_%s_%d" % [state, n])
@@ -134,19 +169,19 @@ static func skill_durations(skill: StringName) -> Array[int]:
 		&"moon_cleave": return [Tuning.MOON_CLEAVE_WINDUP_TICKS, Tuning.MOON_CLEAVE_ACTIVE_TICKS, Tuning.MOON_CLEAVE_RECOVERY_TICKS]
 	return [1, 1, 1]
 
-static func skill_frame(skill: StringName, state: StringName, ticks: int) -> String:
+static func skill_frame(skill: StringName, state: StringName, ticks: int, prefix: String = SET_KATANA) -> String:
 	var phase: int = 0 if state == &"skill_windup" else (1 if state == &"skill_active" else 2)
 	var duration: int = maxi(1, skill_durations(skill)[phase])
 	var elapsed: int = clampi(ticks, 0, duration - 1)
 	if skill == &"gale_cut" and phase == 1:
-		return "hero2_dash_right_%d" % (mini(3, elapsed * 4 / duration) + 1)
+		return hero_frame(prefix, "dash", mini(3, elapsed * 4 / duration) + 1)
 	var part: int = mini(1, elapsed * 2 / duration)
 	if skill == &"moon_cleave" and phase == 0:
 		# Establish the pose, then hold frame 2 through the committed charge.
 		part = 0 if elapsed < maxi(1, duration / 5) else 1
-	return "hero2_attack%d_right_%d" % [1 if skill == &"gale_cut" else 3, phase * 2 + part + 1]
+	return hero_frame(prefix, "attack%d" % (1 if skill == &"gale_cut" else 3), phase * 2 + part + 1)
 
 ## Shared phase lengths for cosmetic trails, using the speed locked by core per swing.
 static func swing_durations(actor: Snapshots.EntitySnapshot) -> Array[int]:
-	var index: int = clampi(actor.combo_index, 1, 3) - 1
-	return [PlayerState.scaled_ticks(Tuning.SWING_WINDUP_TICKS[index], actor.attack_speed_mult), PlayerState.scaled_ticks(Tuning.SWING_ACTIVE_TICKS[index], actor.attack_speed_mult), PlayerState.scaled_ticks(Tuning.SWING_RECOVERY_TICKS[index], actor.attack_speed_mult)]
+	var base: Array[int] = Weapons.swing_phases(actor.weapon_id, clampi(actor.combo_index, 1, Weapons.combo_max(actor.weapon_id)))
+	return [PlayerState.scaled_ticks(base[0], actor.attack_speed_mult), PlayerState.scaled_ticks(base[1], actor.attack_speed_mult), PlayerState.scaled_ticks(base[2], actor.attack_speed_mult)]

@@ -16,8 +16,15 @@ class EntitySnapshot:
 	var posture: float = 0.0
 	var posture_max: float = 0.0
 	var invulnerable: bool = false
-	var combo_index: int = 0  # player only (1-3, see docs/architecture.md); 0 for other entities
-	var weapon_id: StringName = &""  # player only: the equipped weapon, e.g. &"black_katana"
+	var combo_index: int = 0  # player only (1..combo_max, see docs/architecture.md); 0 for other entities
+	var combo_max: int = 0  # player only: swings in the equipped weapon's combo (katana 3, dagger 4)
+	var weapon_id: StringName = &""  # player only: the equipped weapon, &"black_katana" or &"dual_dagger"
+	var weapon_form: StringName = &""  # player only: the running active, &"black_katana_buff" / &"lightning_form", else empty
+	var move_speed_mult: float = 1.0  # player only: walking speed multiplier right now (Lightning Form 1.25)
+	var lightning_blink_index: int = -1  # player only: direction (0-7) of the latest lightning blink, -1 before any
+	var lightning_blink_tick: int = -1  # player only: tick of the latest lightning blink (it equals snapshot.tick on the blink tick)
+	var lightning_blink_from: Vector2 = Vector2.ZERO  # player only: where the latest blink started
+	var lightning_blink_to: Vector2 = Vector2.ZERO  # player only: where it landed
 	var weapon_buff_active: bool = false  # player only
 	var weapon_buff_ticks_left: int = 0  # player only: ticks of buff left, 0 when not active
 	var attack_speed_mult: float = 1.0  # player only: the speed of the swing in progress (locked at its start), else the current buff speed
@@ -92,6 +99,9 @@ class HudSnapshot:
 	var weapon_buff_cooldown_ticks: int = 0  # ticks until the weapon active can be used again
 	var weapon_buff_cooldown_max: int = 0
 	var weapon_buff_edge_cost: float = 0.0
+	var weapon_cooldowns: Dictionary = {}  # weapon_id -> ticks until that weapon's active is ready (every weapon, equipped or not)
+	var weapon_swap_lockout_ticks: int = 0  # ticks until the next swap is allowed
+	var weapon_swap_lockout_max: int = 0
 	var retaliate_ticks_left: int = 0  # Breaking Edge: ticks left after a successful parry
 
 

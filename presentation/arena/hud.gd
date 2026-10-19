@@ -10,6 +10,14 @@ var result_lines: Array[String] = []
 var result_hint: String = ""
 # Snapshot weapon identity selects the matching blade glyph.
 var weapon_icon_key: String = "ui_weapon_totoy_blade_1"
+## The Dual Dagger medallion is a whole 48 px socket (its own ring), drawn in place of the frame plus blade.
+const DAGGER_MEDALLION: String = "ui_weapon_dual_dagger_1"
+## The Lightning Form's slot icon (24 px, like the Aspect sockets), left of the weapon active box.
+const LIGHTNING_FORM_ICON: String = "ui_aspect_lightning_form_1"
+static func form_icon_rect() -> Rect2:
+	return Rect2(154, 151, 24, 24)
+static func swap_hint_position() -> Vector2:
+	return Vector2(181, 135)
 var counter_max: int = 1
 var portrait_atlas: Texture2D
 var portrait_frame: Dictionary = {}
@@ -341,9 +349,13 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var rows: Array[Dictionary] = skill_rows(h)
 	var sockets: Array[Rect2] = aspect_rects()
 	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
-	ui("ui_weapon_frame_1", weapon_rect())
-	ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
-	outlined(weapon_rect().get_center() + Vector2(-10, 14), "BLACK" if snapshot.player.weapon_id == Tuning.WEAPON_BLACK_KATANA else "SWORD", colors["j"], colors["0"])
+	if snapshot.player.weapon_id == Tuning.WEAPON_DUAL_DAGGER:
+		ui(DAGGER_MEDALLION, weapon_rect())
+	else:
+		ui("ui_weapon_frame_1", weapon_rect())
+		ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
+	centered(weapon_rect().get_center().x, weapon_rect().get_center().y + 14, weapon_label(snapshot.player.weapon_id), colors["j"], colors["0"])
+	_draw_swap_hint()
 	_draw_weapon_active()
 	for slot: int in range(3):
 		var row: Dictionary = rows[slot]
@@ -382,20 +394,48 @@ func _draw_aspect_hint(row: Dictionary) -> void:
 	lettering(at + Vector2(0, 10), "%d EDGE" % int(row["cost"]), colors["v"], 1, null, 10)
 	lettering(at + Vector2(0, 20), row["status"], colors["o"], 1, null, 10)
 
+static func weapon_label(weapon: StringName) -> String:
+	match weapon:
+		Tuning.WEAPON_BLACK_KATANA: return "BLACK"
+		Tuning.WEAPON_DUAL_DAGGER: return "DAGGER"
+	return "SWORD"
+
+## The weapon swap (Q): ready, or why not (a form runs, the short lockout after a swap, or the hero is busy).
+## Display only; the core accepts or refuses the press.
+static func swap_status(snap: Snapshots.GameSnapshot) -> Dictionary:
+	var h: Snapshots.HudSnapshot = snap.hud
+	var busy: bool = snap.player.state not in [&"idle", &"walk"]
+	var reason: String = "FORM" if snap.player.weapon_buff_active else ("WAIT" if h.weapon_swap_lockout_ticks > 0 else ("BUSY" if busy else ""))
+	return {"text": "Q SWAP", "ready": reason.is_empty(), "reason": reason, "lockout_fraction": clampf(float(h.weapon_swap_lockout_ticks) / maxi(1, h.weapon_swap_lockout_max), 0.0, 1.0)}
+
+func _draw_swap_hint() -> void:
+	var data: Dictionary = swap_status(snapshot)
+	var at: Vector2 = swap_hint_position()
+	var label: String = String(data["text"])
+	var width: float = text_width(label, 1, null, 10)
+	draw_rect(Rect2(at - Vector2(2, 2), Vector2(width + 4, 11)), colors["0"])
+	lettering(at, label, colors["1"] if bool(data["ready"]) else colors["i"], 1, null, 10)
+	var fraction: float = float(data["lockout_fraction"])
+	if fraction > 0.0:
+		draw_rect(Rect2(at + Vector2(0, 8), Vector2(ceilf(width * fraction), 1)), colors["o"])
+
 static func weapon_status(snap: Snapshots.GameSnapshot) -> Dictionary:
 	var h: Snapshots.HudSnapshot = snap.hud
 	if h.weapon_buff_duration <= 0:
 		return {}
-	return {"active": snap.player.weapon_buff_active, "remaining": ceili(snap.player.weapon_buff_ticks_left * Tuning.TICK_DT), "cooldown": ceili(h.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "cost": h.weapon_buff_edge_cost, "duration_fraction": clampf(float(snap.player.weapon_buff_ticks_left) / h.weapon_buff_duration, 0.0, 1.0), "cooldown_fraction": clampf(float(h.weapon_buff_cooldown_ticks) / maxi(1, h.weapon_buff_cooldown_max), 0.0, 1.0)}
+	return {"weapon": snap.player.weapon_id, "active": snap.player.weapon_buff_active, "remaining": ceili(snap.player.weapon_buff_ticks_left * Tuning.TICK_DT), "cooldown": ceili(h.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "cost": h.weapon_buff_edge_cost, "duration_fraction": clampf(float(snap.player.weapon_buff_ticks_left) / h.weapon_buff_duration, 0.0, 1.0), "cooldown_fraction": clampf(float(h.weapon_buff_cooldown_ticks) / maxi(1, h.weapon_buff_cooldown_max), 0.0, 1.0)}
 
 func _draw_weapon_active() -> void:
 	var data: Dictionary = weapon_status(snapshot)
 	if data.is_empty():
 		return
 	var at: Vector2 = Vector2(181, 147)
+	var dagger: bool = data["weapon"] == Tuning.WEAPON_DUAL_DAGGER
 	draw_rect(Rect2(at - Vector2(2, 2), Vector2(62, 33)), colors["0"])
 	lettering(at, "RMB %dE" % int(data["cost"]), colors["v"], 1, null, 10)
-	lettering(at + Vector2(0, 10), "FORM %dS" % int(data["remaining"]) if bool(data["active"]) else "FORM OFF", colors["p"] if bool(data["active"]) else colors["j"], 1, null, 10)
+	lettering(at + Vector2(0, 10), weapon_active_line(data), colors["p"] if bool(data["active"]) else colors["j"], 1, null, 10)
+	if dagger:
+		_draw_form_icon(data)
 	lettering(at + Vector2(0, 20), "CD %dS" % int(data["cooldown"]) if int(data["cooldown"]) > 0 else "CD READY", colors["o"], 1, null, 10)
 	for active: bool in [false, true]:
 		var fraction: float = float(data["duration_fraction" if active else "cooldown_fraction"])
@@ -405,3 +445,26 @@ func _draw_weapon_active() -> void:
 		for point: int in range(33):
 			arc.append((weapon_rect().get_center() + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * (21.0 if active else 24.0)).round())
 		draw_polyline(arc, colors["v"] if active else colors["o"], 1.0, false)
+
+## Second line of the weapon active box: the time left while it runs, else what right click does.
+static func weapon_active_line(data: Dictionary) -> String:
+	if bool(data["active"]):
+		return "FORM %dS" % int(data["remaining"])
+	return "LIGHTNING" if data.get("weapon", &"") == Tuning.WEAPON_DUAL_DAGGER else "FORM OFF"
+
+## Lightning Form slot: its icon, a bright ring while it runs, the cooldown arc and seconds while it recharges.
+func _draw_form_icon(data: Dictionary) -> void:
+	var rect: Rect2 = form_icon_rect()
+	var centre: Vector2 = rect.get_center()
+	ui(LIGHTNING_FORM_ICON, rect)
+	var fraction: float = float(data["duration_fraction"]) if bool(data["active"]) else float(data["cooldown_fraction"])
+	if fraction > 0.0:
+		var arc: PackedVector2Array = PackedVector2Array()
+		for point: int in range(33):
+			arc.append((centre + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * 12.0).round())
+		draw_polyline(arc, colors["p"] if bool(data["active"]) else colors["o"], 1.0, false)
+	if not bool(data["active"]) and int(data["cooldown"]) > 0:
+		var seconds: String = str(int(data["cooldown"]))
+		var seconds_width: float = text_width(seconds, 1, null, 12)
+		draw_rect(Rect2(centre + Vector2(-seconds_width * 0.5 - 1, -5), Vector2(seconds_width + 2, 10)), colors["0"])
+		lettering(centre + Vector2(-seconds_width * 0.5, -4), seconds, colors["p"], 1, null, 12)

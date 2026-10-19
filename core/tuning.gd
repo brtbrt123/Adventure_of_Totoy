@@ -128,6 +128,49 @@ const BLACK_KATANA_BUFF_COOLDOWN_TICKS: int = 1800  # 30 seconds, counted from t
 const BLACK_KATANA_BUFF_EDGE_COST: float = 50.0  # half the Edge meter, spent on activation
 const BLACK_KATANA_ATTACK_SPEED_MULT: float = 1.5
 const BLACK_KATANA_DAMAGE_MULT: float = 1.4
+const BLACK_KATANA_MOVE_SPEED_MULT: float = 1.0  # the katana buff does not change walking speed
+
+# Weapon swap (Q in presentation: InputFrame.weapon_swap_pressed). Black Katana <-> Dual Dagger. A free action, only
+# from idle or walk, never while a weapon buff/form runs. After a swap the next swap waits WEAPON_SWAP_LOCKOUT_TICKS.
+# Every weapon keeps its own active cooldown, so swapping never resets one. The player always starts with the katana.
+const WEAPON_SWAP_LOCKOUT_TICKS: int = 20
+
+# Dual Dagger (second weapon), first guesses set on 2026-10-19, nobody has played it yet. A fast, short-reach 4-hit
+# combo; hands alternate in the art only. Same buffer/grace/reset rules as the katana combo. Per swing (index 0 = hit 1).
+# Swing totals 12/12/12/21 ticks against the katana's 19/18/29. Damage multiplies ATTACK_DAMAGE like the katana's table:
+# hits 1-3 are 60% of a katana hit 1, hit 4 is 90%. Reach is 0.75 of the katana's.
+const WEAPON_DUAL_DAGGER: StringName = &"dual_dagger"
+const DAGGER_COMBO_MAX: int = 4
+const DAGGER_SWING_WINDUP_TICKS: Array[int] = [4, 4, 4, 6]
+const DAGGER_SWING_ACTIVE_TICKS: Array[int] = [2, 2, 2, 3]
+const DAGGER_SWING_RECOVERY_TICKS: Array[int] = [6, 6, 6, 12]
+const DAGGER_SWING_DAMAGE_MULT: Array[float] = [0.6, 0.6, 0.6, 0.9]
+const DAGGER_SWING_RANGE_MULT: Array[float] = [0.75, 0.75, 0.75, 0.75]
+const DAGGER_EDGE_PER_HIT: float = 20.0  # the katana gains EDGE_PER_HIT (25) per hit; the dagger hits more often
+# Lightning strike: when the 4th dagger swing CONNECTS, a bolt from the sky also hits that boss (no telegraph, never on
+# a whiff). Same rules as a normal hit: reduced by ARMOR_DAMAGE_FACTOR, x COUNTER_DAMAGE_MULT if the swing was a
+# counter, posture only when it was not. It gains no Edge.
+const LIGHTNING_STRIKE_DAMAGE: float = 20.0
+const LIGHTNING_STRIKE_POSTURE: float = 8.0
+
+# Lightning Form: the Dual Dagger's active (right click). Same plumbing as the katana buff: a free action, costs Edge on
+# the press, no refresh while it runs, cooldown counted from the activation, ends on timeout or death.
+const LIGHTNING_FORM_DURATION_TICKS: int = 360  # 6 seconds
+const LIGHTNING_FORM_COOLDOWN_TICKS: int = 1500  # 25 seconds
+const LIGHTNING_FORM_EDGE_COST: float = 60.0
+const LIGHTNING_FORM_ATTACK_SPEED_MULT: float = 2.0
+const LIGHTNING_FORM_DAMAGE_MULT: float = 1.0  # the speed and the blink are the bonus
+const LIGHTNING_FORM_MOVE_SPEED_MULT: float = 1.25
+# Lightning blink: during the form every swing that starts while the boss is alive and its centre is within
+# LIGHTNING_BLINK_RANGE px of the player first teleports the player next to the boss and the swing comes from there.
+# The side cycles through 8 directions around the boss (direction d = Vector2.RIGHT rotated by d * 45 degrees) in
+# LIGHTNING_BLINK_ORDER; a fresh form starts at the first entry. The spot is LIGHTNING_BLINK_DISTANCE px from the
+# boss centre: outside the boss (>= BOSS_RADIUS + PLAYER_RADIUS = 26) and inside the dagger reach
+# (<= BOSS_RADIUS + ATTACK_RANGE * 0.75 = 39.5). A wall or prop in the way moves it to the nearest free direction.
+const LIGHTNING_BLINK_RANGE: float = 150.0
+const LIGHTNING_BLINK_DISTANCE: float = 30.0
+const LIGHTNING_BLINK_INVULN_TICKS: int = 6
+const LIGHTNING_BLINK_ORDER: Array[int] = [0, 3, 6, 1, 4, 7, 2, 5]
 
 # Edge (sword mechanic): close hits and parries build it, a counter spends all of it for extra damage
 const EDGE_MAX: float = 100.0

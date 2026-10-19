@@ -1,0 +1,832 @@
+{
+  "generator": "tools/art/make_dual_dagger_art.py (procedural, Pillow only, deterministic seeds)",
+  "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+  "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+  "status": "Reference layers; not imported into gameplay",
+  "layout": "8 columns x 3 rows of 64x64 cells, all sharing the feet anchor (32,56). Row 1: the hero body with the katana removed. Row 2: far-hand dagger (draw BEHIND the body). Row 3: near-hand dagger (draw IN FRONT).",
+  "draw_order": [
+    "wpn_dual_dagger_back_*",
+    "hero2_unarmed_*",
+    "wpn_dual_dagger_front_*"
+  ],
+  "angle_convention": "0 deg = right (facing direction), 90 deg = down; mirror the whole stack for left",
+  "frames": [
+    {
+      "name": "hero2_unarmed_ready_1",
+      "cell": 0,
+      "rect": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_idle_right_1",
+      "hands": [
+        {
+          "hand": [
+            26,
+            43
+          ],
+          "blade_angle_deg": 115,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            37,
+            43
+          ],
+          "blade_angle_deg": 35,
+          "layer": "back"
+        }
+      ],
+      "pose": "ready_1"
+    },
+    {
+      "name": "hero2_unarmed_ready_2",
+      "cell": 1,
+      "rect": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_parry_right_1",
+      "hands": [
+        {
+          "hand": [
+            43,
+            41
+          ],
+          "blade_angle_deg": -20,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            34,
+            42
+          ],
+          "blade_angle_deg": 55,
+          "layer": "back"
+        }
+      ],
+      "pose": "ready_2"
+    },
+    {
+      "name": "hero2_unarmed_slash_1",
+      "cell": 2,
+      "rect": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack1_right_4",
+      "hands": [
+        {
+          "hand": [
+            49,
+            38
+          ],
+          "blade_angle_deg": -4,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            26,
+            40
+          ],
+          "blade_angle_deg": 150,
+          "layer": "back"
+        }
+      ],
+      "pose": "slash_1"
+    },
+    {
+      "name": "hero2_unarmed_slash_2",
+      "cell": 3,
+      "rect": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack2_right_4",
+      "hands": [
+        {
+          "hand": [
+            31,
+            28
+          ],
+          "blade_angle_deg": -105,
+          "layer": "back"
+        },
+        {
+          "hand": [
+            42,
+            41
+          ],
+          "blade_angle_deg": 25,
+          "layer": "front"
+        }
+      ],
+      "pose": "slash_2"
+    },
+    {
+      "name": "hero2_unarmed_slash_3",
+      "cell": 4,
+      "rect": [
+        256,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack3_right_4",
+      "hands": [
+        {
+          "hand": [
+            35,
+            49
+          ],
+          "blade_angle_deg": 12,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            37,
+            41
+          ],
+          "blade_angle_deg": -35,
+          "layer": "back"
+        }
+      ],
+      "pose": "slash_3"
+    },
+    {
+      "name": "hero2_unarmed_charge",
+      "cell": 5,
+      "rect": [
+        320,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack1_right_1",
+      "hands": [
+        {
+          "hand": [
+            23,
+            43
+          ],
+          "blade_angle_deg": 175,
+          "layer": "back"
+        },
+        {
+          "hand": [
+            44,
+            45
+          ],
+          "blade_angle_deg": 18,
+          "layer": "front"
+        }
+      ],
+      "pose": "charge"
+    },
+    {
+      "name": "hero2_unarmed_blink",
+      "cell": 6,
+      "rect": [
+        384,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_dash_right_3",
+      "hands": [
+        {
+          "hand": [
+            56,
+            45
+          ],
+          "blade_angle_deg": 2,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            30,
+            41
+          ],
+          "blade_angle_deg": 178,
+          "layer": "back"
+        }
+      ],
+      "pose": "blink"
+    },
+    {
+      "name": "hero2_unarmed_burst",
+      "cell": 7,
+      "rect": [
+        448,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_victory_right_3",
+      "hands": [
+        {
+          "hand": [
+            26,
+            27
+          ],
+          "blade_angle_deg": -100,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            39,
+            44
+          ],
+          "blade_angle_deg": 60,
+          "layer": "back"
+        }
+      ],
+      "pose": "burst"
+    },
+    {
+      "name": "wpn_dual_dagger_back_ready_1",
+      "cell": 8,
+      "rect": [
+        0,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_idle_right_1",
+      "hands": [
+        {
+          "hand": [
+            26,
+            43
+          ],
+          "blade_angle_deg": 115,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            37,
+            43
+          ],
+          "blade_angle_deg": 35,
+          "layer": "back"
+        }
+      ],
+      "pose": "ready_1"
+    },
+    {
+      "name": "wpn_dual_dagger_back_ready_2",
+      "cell": 9,
+      "rect": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_parry_right_1",
+      "hands": [
+        {
+          "hand": [
+            43,
+            41
+          ],
+          "blade_angle_deg": -20,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            34,
+            42
+          ],
+          "blade_angle_deg": 55,
+          "layer": "back"
+        }
+      ],
+      "pose": "ready_2"
+    },
+    {
+      "name": "wpn_dual_dagger_back_slash_1",
+      "cell": 10,
+      "rect": [
+        128,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack1_right_4",
+      "hands": [
+        {
+          "hand": [
+            49,
+            38
+          ],
+          "blade_angle_deg": -4,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            26,
+            40
+          ],
+          "blade_angle_deg": 150,
+          "layer": "back"
+        }
+      ],
+      "pose": "slash_1"
+    },
+    {
+      "name": "wpn_dual_dagger_back_slash_2",
+      "cell": 11,
+      "rect": [
+        192,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack2_right_4",
+      "hands": [
+        {
+          "hand": [
+            31,
+            28
+          ],
+          "blade_angle_deg": -105,
+          "layer": "back"
+        },
+        {
+          "hand": [
+            42,
+            41
+          ],
+          "blade_angle_deg": 25,
+          "layer": "front"
+        }
+      ],
+      "pose": "slash_2"
+    },
+    {
+      "name": "wpn_dual_dagger_back_slash_3",
+      "cell": 12,
+      "rect": [
+        256,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack3_right_4",
+      "hands": [
+        {
+          "hand": [
+            35,
+            49
+          ],
+          "blade_angle_deg": 12,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            37,
+            41
+          ],
+          "blade_angle_deg": -35,
+          "layer": "back"
+        }
+      ],
+      "pose": "slash_3"
+    },
+    {
+      "name": "wpn_dual_dagger_back_charge",
+      "cell": 13,
+      "rect": [
+        320,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack1_right_1",
+      "hands": [
+        {
+          "hand": [
+            23,
+            43
+          ],
+          "blade_angle_deg": 175,
+          "layer": "back"
+        },
+        {
+          "hand": [
+            44,
+            45
+          ],
+          "blade_angle_deg": 18,
+          "layer": "front"
+        }
+      ],
+      "pose": "charge"
+    },
+    {
+      "name": "wpn_dual_dagger_back_blink",
+      "cell": 14,
+      "rect": [
+        384,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_dash_right_3",
+      "hands": [
+        {
+          "hand": [
+            56,
+            45
+          ],
+          "blade_angle_deg": 2,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            30,
+            41
+          ],
+          "blade_angle_deg": 178,
+          "layer": "back"
+        }
+      ],
+      "pose": "blink"
+    },
+    {
+      "name": "wpn_dual_dagger_back_burst",
+      "cell": 15,
+      "rect": [
+        448,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_victory_right_3",
+      "hands": [
+        {
+          "hand": [
+            26,
+            27
+          ],
+          "blade_angle_deg": -100,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            39,
+            44
+          ],
+          "blade_angle_deg": 60,
+          "layer": "back"
+        }
+      ],
+      "pose": "burst"
+    },
+    {
+      "name": "wpn_dual_dagger_front_ready_1",
+      "cell": 16,
+      "rect": [
+        0,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_idle_right_1",
+      "hands": [
+        {
+          "hand": [
+            26,
+            43
+          ],
+          "blade_angle_deg": 115,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            37,
+            43
+          ],
+          "blade_angle_deg": 35,
+          "layer": "back"
+        }
+      ],
+      "pose": "ready_1"
+    },
+    {
+      "name": "wpn_dual_dagger_front_ready_2",
+      "cell": 17,
+      "rect": [
+        64,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_parry_right_1",
+      "hands": [
+        {
+          "hand": [
+            43,
+            41
+          ],
+          "blade_angle_deg": -20,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            34,
+            42
+          ],
+          "blade_angle_deg": 55,
+          "layer": "back"
+        }
+      ],
+      "pose": "ready_2"
+    },
+    {
+      "name": "wpn_dual_dagger_front_slash_1",
+      "cell": 18,
+      "rect": [
+        128,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack1_right_4",
+      "hands": [
+        {
+          "hand": [
+            49,
+            38
+          ],
+          "blade_angle_deg": -4,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            26,
+            40
+          ],
+          "blade_angle_deg": 150,
+          "layer": "back"
+        }
+      ],
+      "pose": "slash_1"
+    },
+    {
+      "name": "wpn_dual_dagger_front_slash_2",
+      "cell": 19,
+      "rect": [
+        192,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack2_right_4",
+      "hands": [
+        {
+          "hand": [
+            31,
+            28
+          ],
+          "blade_angle_deg": -105,
+          "layer": "back"
+        },
+        {
+          "hand": [
+            42,
+            41
+          ],
+          "blade_angle_deg": 25,
+          "layer": "front"
+        }
+      ],
+      "pose": "slash_2"
+    },
+    {
+      "name": "wpn_dual_dagger_front_slash_3",
+      "cell": 20,
+      "rect": [
+        256,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack3_right_4",
+      "hands": [
+        {
+          "hand": [
+            35,
+            49
+          ],
+          "blade_angle_deg": 12,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            37,
+            41
+          ],
+          "blade_angle_deg": -35,
+          "layer": "back"
+        }
+      ],
+      "pose": "slash_3"
+    },
+    {
+      "name": "wpn_dual_dagger_front_charge",
+      "cell": 21,
+      "rect": [
+        320,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_attack1_right_1",
+      "hands": [
+        {
+          "hand": [
+            23,
+            43
+          ],
+          "blade_angle_deg": 175,
+          "layer": "back"
+        },
+        {
+          "hand": [
+            44,
+            45
+          ],
+          "blade_angle_deg": 18,
+          "layer": "front"
+        }
+      ],
+      "pose": "charge"
+    },
+    {
+      "name": "wpn_dual_dagger_front_blink",
+      "cell": 22,
+      "rect": [
+        384,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_dash_right_3",
+      "hands": [
+        {
+          "hand": [
+            56,
+            45
+          ],
+          "blade_angle_deg": 2,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            30,
+            41
+          ],
+          "blade_angle_deg": 178,
+          "layer": "back"
+        }
+      ],
+      "pose": "blink"
+    },
+    {
+      "name": "wpn_dual_dagger_front_burst",
+      "cell": 23,
+      "rect": [
+        448,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "source_frame": "hero2_victory_right_3",
+      "hands": [
+        {
+          "hand": [
+            26,
+            27
+          ],
+          "blade_angle_deg": -100,
+          "layer": "front"
+        },
+        {
+          "hand": [
+            39,
+            44
+          ],
+          "blade_angle_deg": 60,
+          "layer": "back"
+        }
+      ],
+      "pose": "burst"
+    }
+  ],
+  "note": "The current hero2_* frames have the katana baked in, so a dual-dagger runtime needs the unarmed body row (or the body frames re-imported without a weapon)."
+}

@@ -1,9 +1,10 @@
 extends RefCounted
-## Player simulation (sword). No rendering. Positions in pixels, times in ticks.
+## Player simulation (Black Katana or Dual Dagger). No rendering. Positions in pixels, times in ticks.
 
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
+const Weapons := preload("res://core/weapons.gd")
 
 const VISUAL_ID: StringName = &"totoy"
 const STATE_IDLE: StringName = &"idle"
@@ -34,9 +35,23 @@ var state_ticks: int = 0
 var dash_cooldown: int = 0
 var edge: float = 0.0
 var attack_hit_done: bool = false  # one hit per swing: set when a swing connects, cleared when the next swing starts
-var weapon_id: StringName = Tuning.WEAPON_BLACK_KATANA  # the equipped weapon; only the Black Katana has an active so far
-var buff_ticks: int = 0  # weapon buff ticks left (0 = not active)
-var buff_cooldown: int = 0  # ticks until the weapon active can be used again
+var weapon_id: StringName = Tuning.WEAPON_BLACK_KATANA  # the equipped weapon (black_katana or dual_dagger)
+var buff_ticks: int = 0  # weapon buff / form ticks left (0 = not active); always the equipped weapon's (no swap while it runs)
+## Ticks until each weapon's active can be used again, per weapon id. They all count down, equipped or not.
+var active_cooldowns: Dictionary[StringName, int] = {}
+## The equipped weapon's active cooldown (reads and writes its entry in active_cooldowns).
+var buff_cooldown: int:
+	get:
+		return active_cooldowns.get(weapon_id, 0)
+	set(value):
+		active_cooldowns[weapon_id] = value
+var swap_lockout: int = 0  # ticks until the next weapon swap is allowed
+var blink_requested: bool = false  # set when a swing starts during Lightning Form; the core reads and clears it
+var blink_count: int = 0  # blinks since the current Lightning Form started (picks the side from LIGHTNING_BLINK_ORDER)
+var last_blink_direction: int = -1  # direction index (0-7) of the latest blink, -1 before the first
+var last_blink_tick: int = -1
+var last_blink_from: Vector2 = Vector2.ZERO
+var last_blink_to: Vector2 = Vector2.ZERO
 var swing_speed_mult: float = 1.0  # locked at the start of each swing
 var swing_damage_mult: float = 1.0  # locked at the start of each swing
 var skill_id: StringName = &""  # the skill in progress during skill_* states, empty otherwise
@@ -52,6 +67,8 @@ var _combo_queued: bool = false
 var _combo_grace: int = 0  # ticks left in which a press after a finished swing still continues the chain
 var _hurt_invuln: int = 0
 var _dash_invuln: int = 0  # dash i-frames run on their own counter, so a short dash can keep a forgiving window
+var _blink_invuln: int = 0  # Lightning blink i-frames
+var _facing_locked: bool = false  # a blink swing keeps facing the boss through its windup and active ticks
 
 
 func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
@@ -63,12 +80,19 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		_hurt_invuln -= 1
 	if _dash_invuln > 0:
 		_dash_invuln -= 1
-	if buff_cooldown > 0:
-		buff_cooldown -= 1
+	if _blink_invuln > 0:
+		_blink_invuln -= 1
+	if swap_lockout > 0:
+		swap_lockout -= 1
+	for weapon: StringName in active_cooldowns.keys():
+		if active_cooldowns[weapon] > 0:
+			active_cooldowns[weapon] -= 1
 	if buff_ticks > 0:
 		buff_ticks -= 1
 		if buff_ticks == 0:
 			_emit_buff_end(tick, events, &"expired")
+	if input.weapon_swap_pressed:
+		_try_weapon_swap(tick, events)
 	if input.weapon_active_pressed:
 		_try_weapon_active(tick, events)
 	for i: int in skill_cooldowns.size():
@@ -85,16 +109,20 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		if _combo_grace == 0:
 			combo_index = 1
 	var move: Vector2 = input.move.limit_length(1.0)
-	if input.aim.length_squared() > 0.0001:
+	var locked: bool = _facing_locked and (state == STATE_ATTACK_WINDUP or state == STATE_ATTACK_ACTIVE)
+	if locked:
+		pass
+	elif input.aim.length_squared() > 0.0001:
 		facing = input.aim.normalized()
 	elif move.length_squared() > 0.0001:
 		facing = move.normalized()
+	var speed: float = Tuning.PLAYER_SPEED * move_speed_mult()
 
 	match state:
 		STATE_IDLE, STATE_WALK:
 			if _try_actions(input, move, tick, events, true):
 				return
-			position += move * Tuning.PLAYER_SPEED
+			position += move * speed
 			_set_state(STATE_WALK if move.length_squared() > 0.0001 else STATE_IDLE)
 		STATE_DASH:
 			position += _dash_dir * Tuning.DASH_SPEED
@@ -107,23 +135,23 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 				events.append(GameEvent.new(GameEvent.PARRY_FAILED, tick, {"entity_id": id, "reason": &"whiff"}))
 				_set_state(STATE_PARRY_RECOVERY)
 		STATE_PARRY_RECOVERY:
-			position += move * Tuning.PLAYER_SPEED * Tuning.PARRY_RECOVERY_MOVE_FACTOR
+			position += move * speed * Tuning.PARRY_RECOVERY_MOVE_FACTOR
 			if state_ticks >= Tuning.PARRY_WHIFF_RECOVERY_TICKS:
 				_set_state(STATE_IDLE)
 		STATE_ATTACK_WINDUP:
-			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
-			if state_ticks >= _swing_ticks(Tuning.SWING_WINDUP_TICKS):
+			position += move * speed * Tuning.ATTACK_MOVE_FACTOR
+			if state_ticks >= _swing_ticks(0):
 				_set_state(STATE_ATTACK_ACTIVE)
 		STATE_ATTACK_ACTIVE:
-			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
-			if state_ticks >= _swing_ticks(Tuning.SWING_ACTIVE_TICKS):
+			position += move * speed * Tuning.ATTACK_MOVE_FACTOR
+			if state_ticks >= _swing_ticks(1):
 				_set_state(STATE_ATTACK_RECOVERY)
 		STATE_SKILL_WINDUP:
 			match skill_id:
 				SKILL_BREAKING_EDGE:
 					position += skill_dir * (Tuning.BREAKING_EDGE_STEP / Tuning.BREAKING_EDGE_WINDUP_TICKS)
 				SKILL_MOON_CLEAVE:
-					position += move * Tuning.PLAYER_SPEED * Tuning.MOON_CLEAVE_WINDUP_MOVE_FACTOR
+					position += move * speed * Tuning.MOON_CLEAVE_WINDUP_MOVE_FACTOR
 			if state_ticks >= _skill_ticks("windup"):
 				_set_state(STATE_SKILL_ACTIVE)
 				pending_release = skill_id
@@ -139,13 +167,13 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		STATE_ATTACK_RECOVERY:
 			if _try_actions(input, move, tick, events, false):
 				return
-			var recovery: int = _swing_ticks(Tuning.SWING_RECOVERY_TICKS)
+			var recovery: int = _swing_ticks(2)
 			if input.attack_pressed and state_ticks >= recovery - Tuning.COMBO_BUFFER_TICKS:
 				_combo_queued = true
-			position += move * Tuning.PLAYER_SPEED * Tuning.ATTACK_MOVE_FACTOR
+			position += move * speed * Tuning.ATTACK_MOVE_FACTOR
 			if state_ticks >= recovery:
 				if _combo_queued:
-					_start_swing(combo_index + 1 if combo_index < Tuning.COMBO_MAX else 1)
+					_start_swing(combo_index + 1 if combo_index < combo_max() else 1)
 				else:
 					_finish_combo_swing()
 
@@ -158,7 +186,7 @@ func parry_ticks_since_press() -> int:
 func is_invulnerable() -> bool:
 	if state == STATE_DEAD:
 		return false
-	return _dash_invuln > 0 or _hurt_invuln > 0
+	return _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0
 
 
 ## Returns true when the damage was applied (false while invulnerable or dead).
@@ -204,7 +232,7 @@ func _try_actions(input: InputFrame, move: Vector2, tick: int, events: Array[Gam
 	if _try_skill(input, tick, events):
 		return true
 	if allow_attack and input.attack_pressed:
-		var chaining: bool = _combo_grace > 0 and combo_index < Tuning.COMBO_MAX
+		var chaining: bool = _combo_grace > 0 and combo_index < combo_max()
 		_start_swing(combo_index + 1 if chaining else 1)
 		return true
 	return false
@@ -277,40 +305,96 @@ static func skill_profile(skill: StringName) -> Dictionary:
 			return {"damage": Tuning.MOON_CLEAVE_DAMAGE, "posture": Tuning.MOON_CLEAVE_POSTURE, "edge_gain": Tuning.MOON_CLEAVE_EDGE_GAIN}
 
 
-## The Black Katana active (right click): a timed buff of attack speed and damage. It is a free action (no
-## state change), costs Edge, has its own cooldown and cannot be refreshed while it is running. It lasts through
-## movement, attacks, dashes, parries, skills and damage; it ends when it runs out or the player dies.
+## The equipped weapon's active (right click): Black Katana buff or Dual Dagger Lightning Form. A timed buff (numbers
+## per weapon in core/weapons.gd). It is a free action (no state change), costs Edge, has the weapon's own cooldown
+## and cannot be refreshed while it is running. It lasts through movement, attacks, dashes, parries, skills and
+## damage; it ends when it runs out or the player dies.
 func _try_weapon_active(tick: int, events: Array[GameEvent]) -> bool:
-	if weapon_id != Tuning.WEAPON_BLACK_KATANA or state == STATE_DEAD or buff_ticks > 0 or buff_cooldown > 0:
+	if not Weapons.has_active(weapon_id) or state == STATE_DEAD or buff_ticks > 0 or buff_cooldown > 0:
 		return false
-	if edge < Tuning.BLACK_KATANA_BUFF_EDGE_COST:
+	var cost: float = Weapons.active_edge_cost(weapon_id)
+	if edge < cost:
 		return false
-	edge -= Tuning.BLACK_KATANA_BUFF_EDGE_COST
-	buff_ticks = Tuning.BLACK_KATANA_BUFF_DURATION_TICKS
-	buff_cooldown = Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS
+	edge -= cost
+	buff_ticks = Weapons.active_duration(weapon_id)
+	buff_cooldown = Weapons.active_cooldown(weapon_id)
+	blink_count = 0
 	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, tick, {
-		"entity_id": id, "weapon_id": weapon_id, "duration": buff_ticks,
-		"attack_speed_mult": Tuning.BLACK_KATANA_ATTACK_SPEED_MULT, "damage_mult": Tuning.BLACK_KATANA_DAMAGE_MULT,
+		"entity_id": id, "weapon_id": weapon_id, "form": Weapons.active_form(weapon_id), "duration": buff_ticks,
+		"attack_speed_mult": Weapons.active_attack_speed_mult(weapon_id), "damage_mult": Weapons.active_damage_mult(weapon_id),
+		"move_speed_mult": Weapons.active_move_speed_mult(weapon_id),
 	}))
 	return true
 
 
+## Q: swap to the next weapon. A free action from idle or walk only, never while a buff/form runs or during the
+## swap lockout. The combo starts over; each weapon keeps its own active cooldown.
+func _try_weapon_swap(tick: int, events: Array[GameEvent]) -> bool:
+	if state != STATE_IDLE and state != STATE_WALK:
+		return false
+	if buff_ticks > 0 or swap_lockout > 0:
+		return false
+	var previous: StringName = weapon_id
+	var target: StringName = Weapons.next(weapon_id)
+	if target == previous:
+		return false
+	weapon_id = target
+	swap_lockout = Tuning.WEAPON_SWAP_LOCKOUT_TICKS
+	reset_combo()
+	events.append(GameEvent.new(GameEvent.WEAPON_SWAPPED, tick, {"entity_id": id, "weapon_id": weapon_id, "previous_weapon_id": previous}))
+	return true
+
+
 func _emit_buff_end(tick: int, events: Array[GameEvent], reason: StringName) -> void:
-	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_ENDED, tick, {"entity_id": id, "weapon_id": weapon_id, "reason": reason}))
+	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_ENDED, tick, {"entity_id": id, "weapon_id": weapon_id, "form": Weapons.active_form(weapon_id), "reason": reason}))
 
 
 func is_buff_active() -> bool:
 	return buff_ticks > 0
 
 
+## True while the Dual Dagger's Lightning Form runs.
+func is_lightning_form() -> bool:
+	return buff_ticks > 0 and weapon_id == Tuning.WEAPON_DUAL_DAGGER
+
+
+## The active form's id while it runs (black_katana_buff, lightning_form), else empty.
+func active_form() -> StringName:
+	return Weapons.active_form(weapon_id) if buff_ticks > 0 else &""
+
+
 ## Current attack speed multiplier (1.0 without the buff).
 func attack_speed_mult() -> float:
-	return Tuning.BLACK_KATANA_ATTACK_SPEED_MULT if buff_ticks > 0 else 1.0
+	return Weapons.active_attack_speed_mult(weapon_id) if buff_ticks > 0 else 1.0
 
 
 ## Current damage multiplier (1.0 without the buff).
 func damage_mult() -> float:
-	return Tuning.BLACK_KATANA_DAMAGE_MULT if buff_ticks > 0 else 1.0
+	return Weapons.active_damage_mult(weapon_id) if buff_ticks > 0 else 1.0
+
+
+## Current walking speed multiplier (1.0 without the buff; Lightning Form is faster).
+func move_speed_mult() -> float:
+	return Weapons.active_move_speed_mult(weapon_id) if buff_ticks > 0 else 1.0
+
+
+## Swings in the equipped weapon's combo (katana 3, dagger 4).
+func combo_max() -> int:
+	return Weapons.combo_max(weapon_id)
+
+
+## The core found a blink spot for the swing that just started: move there, face the boss for this swing's windup and
+## active ticks, and take the blink i-frames.
+func apply_blink(to: Vector2, face: Vector2, direction_index: int, tick: int) -> void:
+	last_blink_from = position
+	last_blink_to = to
+	last_blink_direction = direction_index
+	last_blink_tick = tick
+	position = to
+	if face.length_squared() > 0.0001:
+		facing = face.normalized()
+	_facing_locked = true
+	_blink_invuln = Tuning.LIGHTNING_BLINK_INVULN_TICKS
 
 
 ## A phase length in ticks at an attack speed: base / mult, rounded, at least 1.
@@ -318,9 +402,10 @@ static func scaled_ticks(base: int, mult: float) -> int:
 	return maxi(1, roundi(float(base) / maxf(mult, 0.01)))
 
 
-## Length of a phase of the swing in progress (windup, active or recovery), using the speed locked at its start.
-func _swing_ticks(table: Array[int]) -> int:
-	return scaled_ticks(table[combo_index - 1], swing_speed_mult)
+## Length of a phase of the swing in progress (0 windup, 1 active, 2 recovery) for the equipped weapon, using the
+## speed locked at its start.
+func _swing_ticks(phase: int) -> int:
+	return scaled_ticks(Weapons.swing_phases(weapon_id, combo_index)[phase], swing_speed_mult)
 
 
 func _start_swing(index: int) -> void:
@@ -330,13 +415,15 @@ func _start_swing(index: int) -> void:
 	attack_hit_done = false
 	_combo_queued = false
 	_combo_grace = 0
+	_facing_locked = false
+	blink_requested = is_lightning_form()
 	_set_state(STATE_ATTACK_WINDUP)
 
 
 ## A swing ran out without a buffered press. After the finisher the combo is over; otherwise a late press
 ## still counts for COMBO_GRACE_TICKS.
 func _finish_combo_swing() -> void:
-	if combo_index >= Tuning.COMBO_MAX:
+	if combo_index >= combo_max():
 		reset_combo()
 	else:
 		_combo_grace = Tuning.COMBO_GRACE_TICKS

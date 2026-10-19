@@ -2,11 +2,20 @@ extends RefCounted
 ## Snapshot-only cosmetic plans; no buff rules or multipliers live here.
 const Snapshots := preload("res://core/snapshots.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+const Tuning := preload("res://core/tuning.gd")
+
+const Weapons := preload("res://core/weapons.gd")
+## Lightning Form aura: 10 back/front pairs looping at about 67 ms per frame (README of the dual dagger art).
+const LIGHTNING_AURA_FRAMES: int = 10
+const LIGHTNING_AURA_TICKS: int = 4
 
 static func all_names() -> Array[String]:
 	var names: Array[String] = []
 	for prefix: String in ["fx_black_aura_back", "fx_black_aura_front", "fx_black_slash"]:
 		for frame: int in range(1, 7):
+			names.append("%s_%d" % [prefix, frame])
+	for prefix: String in ["fx_lightning_aura_back", "fx_lightning_aura_front"]:
+		for frame: int in range(1, LIGHTNING_AURA_FRAMES + 1):
 			names.append("%s_%d" % [prefix, frame])
 	return names
 
@@ -20,9 +29,15 @@ static func plan(snap: Snapshots.GameSnapshot) -> Dictionary:
 	var hero: Snapshots.EntitySnapshot = snap.player
 	if not hero.weapon_buff_active:
 		return {}
+	if hero.weapon_form == Weapons.FORM_LIGHTNING:
+		# The dagger's speed arcs are painted into its frames: no detached slash for the Lightning Form.
+		var bolt: int = posmod(snap.tick / LIGHTNING_AURA_TICKS, LIGHTNING_AURA_FRAMES) + 1
+		return {"back": "fx_lightning_aura_back_%d" % bolt, "front": "fx_lightning_aura_front_%d" % bolt, "level": fade_level(hero, snap.hud.weapon_buff_duration), "at": hero.position, "slash": "", "form": Weapons.FORM_LIGHTNING}
+	if hero.weapon_id == Tuning.WEAPON_DUAL_DAGGER:
+		return {}
 	# World time keeps the aura rolling when the character pose/state changes.
 	var index: int = posmod(snap.tick / 5, 6) + 1
-	var data: Dictionary = {"back": "fx_black_aura_back_%d" % index, "front": "fx_black_aura_front_%d" % index, "level": fade_level(hero, snap.hud.weapon_buff_duration), "at": hero.position, "slash": ""}
+	var data: Dictionary = {"back": "fx_black_aura_back_%d" % index, "front": "fx_black_aura_front_%d" % index, "level": fade_level(hero, snap.hud.weapon_buff_duration), "at": hero.position, "slash": "", "form": Weapons.FORM_BLACK_KATANA_BUFF}
 	# No detached slash during anticipation or a long recovery hold.
 	# The imported hero paints a side-view sword; arena attaches the trail to that pose.
 	if snap.result != &"playing":

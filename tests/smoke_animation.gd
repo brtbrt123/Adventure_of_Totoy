@@ -4,6 +4,9 @@ const Arena := preload("res://presentation/arena/arena.gd")
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+const Weapons := preload("res://core/weapons.gd")
+const Tuning := preload("res://core/tuning.gd")
+const PlayerState := preload("res://core/player.gd")
 const GameCore := preload("res://core/game_core.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const Snapshots := preload("res://core/snapshots.gd")
@@ -68,7 +71,7 @@ func _catalog() -> void:
 		_expect(int(atlas["totoy_portrait"]["w"]) == 48 and int(atlas["totoy_portrait"]["h"]) == 48, "portrait canvas")
 	for name_key: String in ArenaAnimation.all_names() + SkillEffects.all_names() + WeaponBuffView.all_names():
 		_expect(atlas.has(name_key), "atlas missing " + name_key)
-		if atlas.has(name_key) and name_key.begins_with("hero2_"):
+		if atlas.has(name_key) and (name_key.begins_with("hero2_") or name_key.begins_with("totoy_dagger_") or name_key.begins_with("totoy_lightning_")):
 			var frame: Dictionary = atlas[name_key]
 			_expect(frame.has("ax") and frame.has("ay"), "feet anchor missing: " + name_key)
 			var at: Vector2 = Vector2(64, 88)
@@ -88,6 +91,43 @@ func _catalog() -> void:
 			for t: int in range(int(ArenaAnimation.PLAYER[state][0]) * int(ArenaAnimation.PLAYER[state][1]) + 2):
 				actor.state_ticks = t
 				_expect(atlas.has(ArenaAnimation.choose(actor, snap, {})), "selector missing player %s %s tick %d" % [state, facing, t])
+	# The same for the Dual Dagger and its Lightning Form: every state, and every phase tick of swings 1-4 (also at
+	# the form's doubled speed), must name a frame of the right set.
+	for look: Array in [[Tuning.WEAPON_DUAL_DAGGER, &"", "totoy_dagger_"], [Tuning.WEAPON_DUAL_DAGGER, Weapons.FORM_LIGHTNING, "totoy_lightning_"]]:
+		actor.weapon_id = look[0]
+		actor.weapon_form = look[1]
+		for state: String in ArenaAnimation.PLAYER:
+			actor.state = StringName(state)
+			for swing: int in range(1, Weapons.combo_max(actor.weapon_id) + 1):
+				actor.combo_index = swing
+				for mult: float in [1.0, Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT]:
+					actor.attack_speed_mult = mult
+					for t: int in range(int(ArenaAnimation.PLAYER[state][0]) * int(ArenaAnimation.PLAYER[state][1]) + 24):
+						actor.state_ticks = t
+						var chosen: String = ArenaAnimation.choose(actor, snap, {})
+						_expect(atlas.has(chosen), "selector missing %s %s swing %d tick %d: %s" % [look[2], state, swing, t, chosen])
+						_expect(chosen.begins_with(look[2]) or (state == "victory" and chosen.begins_with("totoy_dagger_")), "wrong set for %s %s: %s" % [look[2], state, chosen])
+		for skill: StringName in [&"breaking_edge", &"gale_cut", &"moon_cleave"]:
+			actor.skill_id = skill
+			for state: StringName in [&"skill_windup", &"skill_active", &"skill_recovery"]:
+				actor.state = state
+				for t: int in range(40):
+					actor.state_ticks = t
+					_expect(atlas.has(ArenaAnimation.choose(actor, snap, {})), "dagger skill frame missing %s %s %d" % [skill, state, t])
+		actor.skill_id = &""
+		actor.combo_index = 4
+		actor.state = &"attack_recovery"
+		_expect(ArenaAnimation.swing_durations(actor)[2] == PlayerState.scaled_ticks(Tuning.DAGGER_SWING_RECOVERY_TICKS[3], actor.attack_speed_mult), "dagger swing 4 uses its own table")
+	for prefix: String in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING]:
+		var expected: int = 6 * (3 if prefix == ArenaAnimation.SET_KATANA else 4)
+		var attacks: int = 0
+		for name_key: String in ArenaAnimation.hero_names(prefix):
+			_expect(atlas.has(name_key), "set %s misses %s" % [prefix, name_key])
+			if name_key.contains("_attack"):
+				attacks += 1
+		_expect(attacks == expected, "set %s lists %d swing frames" % [prefix, attacks])
+	actor.weapon_id = &""
+	actor.weapon_form = &""
 	_expect(ArenaAnimation.mirrored(Vector2.LEFT), "left must mirror right")
 	_expect(not ArenaAnimation.mirrored(Vector2.UP), "up must not mirror")
 # Follow real core state lifetimes so a pose that is unreachable before a state
@@ -118,6 +158,45 @@ func _hero_timelines() -> void:
 		for name_key: String in ArenaAnimation.all_names():
 			if name_key.begins_with("hero2_") and name_key.contains("_" + ArenaAnimation.direction(facing) + "_") and not name_key.contains("_hurt_") and not name_key.contains("_victory_"):
 				_expect(requested.has(name_key), "real state lifetime never requests " + name_key)
+
+## Real core lifetimes with the Dual Dagger: swap with the swap intent, chain all four swings, then the same in
+## Lightning Form. Every swing frame of both sets must be requested, and none may be missing.
+func _dagger_timelines() -> void:
+	for form: bool in [false, true]:
+		_reset()
+		arena.core.player.edge = 100.0
+		var swap: InputFrame = _frame()
+		swap.weapon_swap_pressed = true
+		_step(swap)
+		_expect(arena.snapshot.player.weapon_id == Tuning.WEAPON_DUAL_DAGGER, "swap intent did not equip the dagger")
+		_expect(String(arena.selected_frames[arena.snapshot.player.id]).begins_with("totoy_dagger_"), "dagger not drawn after the swap")
+		if form:
+			var active: InputFrame = _frame()
+			active.weapon_active_pressed = true
+			_step(active)
+			_expect(arena.snapshot.player.weapon_form == Weapons.FORM_LIGHTNING, "Lightning Form did not start")
+		var prefix: String = "totoy_lightning_" if form else "totoy_dagger_"
+		var requested: Dictionary = {}
+		for round_index: int in range(3):
+			_step(_frame(Vector2.ZERO, false, false, true))
+			for i: int in range(80):
+				var hero: Snapshots.EntitySnapshot = arena.snapshot.player
+				requested[arena.selected_frames[hero.id]] = true
+				var chain: bool = hero.state == &"attack_recovery" and hero.combo_index < 4
+				_step(_frame(Vector2.ZERO, false, false, chain))
+				if not form and hero.state == &"idle" and i > 10:
+					break
+		var mult: float = Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT if form else 1.0
+		for swing: int in range(1, 5):
+			var phases: Array[int] = Weapons.swing_phases(Tuning.WEAPON_DUAL_DAGGER, swing)
+			for n: int in range(1, 7):
+				# a phase that lasts one tick shows only its key (second) frame
+				if PlayerState.scaled_ticks(phases[(n - 1) / 2], mult) == 1 and n % 2 == 1:
+					continue
+				var name_key: String = "%sattack%d_right_%d" % [prefix, swing, n]
+				_expect(requested.has(name_key), "dagger timeline never requests " + name_key)
+		for name_key: String in requested:
+			_expect(String(name_key).begins_with(prefix) or String(name_key).begins_with("totoy_dagger_"), "%s timeline drew another set: %s" % [prefix, name_key])
 
 func _encounter(attack: StringName, parry_slam: bool) -> void:
 	_reset()
@@ -152,6 +231,7 @@ func _run() -> void:
 	root.add_child(arena)
 	arena.set_physics_process(false)
 	_hero_timelines()
+	_dagger_timelines()
 	_reset()
 	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
 		for i: int in range(24):

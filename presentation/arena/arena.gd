@@ -11,6 +11,9 @@ const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
 const SaveStore := preload("res://core/save_store.gd")
 const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
+const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cutin.gd")
+const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
+const Weapons := preload("res://core/weapons.gd")
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
@@ -39,6 +42,12 @@ var combat_audio: CombatAudio
 var persist: bool = false
 ## The Black Form cut-in (drawn on the HUD layer). While it plays the arena does not step the core.
 var cutin: BlackFormCutIn
+## The Lightning Form cut-in (Dual Dagger right click); freezes the world the same way.
+var lightning_cutin: LightningFormCutIn
+## Lightning effects from core events, in world coordinates: {"kind", "tick", ...}; aged by the cosmetic tick.
+var lightning_fx: Array[Dictionary] = []
+## Short full-screen flashes: {"tick", "color", "strengths": Array[float]} (one strength per tick of age).
+var screen_flashes: Array[Dictionary] = []
 var profile: Object = null
 var new_best: bool = false
 ## Replaced by tests so going back to the title does not leave the scene they run in.
@@ -147,6 +156,12 @@ func _ready() -> void:
 	_begin_persistence()
 	cutin = BlackFormCutIn.new()
 	$HUD.add_child(cutin)
+	lightning_cutin = LightningFormCutIn.new()
+	$HUD.add_child(lightning_cutin)
+
+## True while either weapon cut-in plays (the world does not step).
+func cutin_playing() -> bool:
+	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active)
 
 func _read_json(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -157,9 +172,12 @@ func _read_json(path: String) -> Dictionary:
 	return parsed as Dictionary if parsed is Dictionary else {}
 
 func _physics_process(delta: float) -> void:
-	# The Black Form cut-in freezes the world: no core steps, so no game time passes and nothing is missed.
-	if cutin != null and cutin.active:
-		cutin.advance(delta)
+	# A weapon cut-in freezes the world: no core steps, so no game time passes and nothing is missed.
+	if cutin_playing():
+		if cutin.active:
+			cutin.advance(delta)
+		if lightning_cutin.active:
+			lightning_cutin.advance(delta)
 		return
 	if Input.is_action_just_pressed("arena_debug"):
 		debug_enabled = not debug_enabled
@@ -219,6 +237,10 @@ func _restart() -> void:
 	buff_transition.clear()
 	if cutin != null:
 		cutin.stop()
+	if lightning_cutin != null:
+		lightning_cutin.stop()
+	lightning_fx.clear()
+	screen_flashes.clear()
 	combat_audio.reset()
 	combat_audio.set_music_active(true)
 	previous_combo_index = 0
@@ -281,6 +303,12 @@ func _age_effects() -> void:
 	if not snapshot.player.invulnerable:
 		hurt_blink = false
 	shake_left = maxi(0, shake_left - 1)
+	for i: int in range(lightning_fx.size() - 1, -1, -1):
+		if cosmetic_tick - int(lightning_fx[i]["tick"]) >= int(lightning_fx[i]["life"]):
+			lightning_fx.remove_at(i)
+	for i: int in range(screen_flashes.size() - 1, -1, -1):
+		if cosmetic_tick - int(screen_flashes[i]["tick"]) >= Array(screen_flashes[i]["strengths"]).size():
+			screen_flashes.remove_at(i)
 	for i: int in range(hit_bursts.size() - 1, -1, -1):
 		if cosmetic_tick - int(hit_bursts[i]["tick"]) >= 12:
 			hit_bursts.remove_at(i)
@@ -306,11 +334,24 @@ func _on_event(event: GameEvent) -> void:
 				return
 			buff_events[identity] = true
 			var started: bool = event.type == &"weapon_buff_started"
-			if started and cutin != null:
-				cutin.start()
-			buff_transition = {"tick": event.tick, "started": started, "at": snapshot.player.position}
+			# Older events have no form: the weapon says which active it was.
+			var form: StringName = StringName(event.data.get("form", Weapons.active_form(StringName(event.data.get("weapon_id", Tuning.WEAPON_BLACK_KATANA)))))
+			var lightning: bool = form == Weapons.FORM_LIGHTNING
+			if started:
+				if lightning and lightning_cutin != null:
+					lightning_cutin.start()
+				elif not lightning and cutin != null:
+					cutin.start()
+			buff_transition = {"tick": event.tick, "started": started, "at": snapshot.player.position, "form": form}
 			combat_audio.cue("weapon_buff_start" if started else "weapon_buff_end", event.tick)
-			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["k"], 0.8)
+			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["o"] if lightning else colors["k"], 0.8)
+		&"weapon_swapped":
+			combat_audio.cue("swing", event.tick, 0.5)
+			_burst(snapshot.player.position - Vector2(0, 12), 8, colors["j"], 0.6)
+		&"lightning_blink":
+			_on_lightning_blink(event)
+		&"lightning_strike":
+			_on_lightning_strike(event)
 		&"damage_taken":
 			reactions[int(event.data["entity_id"])] = {"pose": "hurt", "tick": snapshot.tick, "duration": 12}
 			flashes[int(event.data["entity_id"])] = maxi(6, int(flashes.get(int(event.data["entity_id"]), 0)))
@@ -322,7 +363,7 @@ func _on_event(event: GameEvent) -> void:
 			var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["player_id"]), int(event.data["attacker_id"]))
 			_burst(contact, 16 if perfect else 7, colors["x"], 1.6 if perfect else 1.0)
 			parry_impacts.append({"position": event.data["position"], "tick": event.tick, "perfect": perfect, "contact": contact})
-			selected_frames[snapshot.player.id] = _resolve_frame("hero2_parry_right_6", snapshot.player)
+			selected_frames[snapshot.player.id] = _resolve_frame(ArenaAnimation.hero_frame(ArenaAnimation.hero_set(snapshot.player), "parry", 6), snapshot.player)
 			shake_left = maxi(shake_left, 7 if perfect else 3)
 			screen_flash_until = event.tick + (2 if perfect else 1)
 			for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -353,8 +394,10 @@ func _on_event(event: GameEvent) -> void:
 			var counter: bool = event.data["kind"] == &"counter"
 			if int(event.data["attacker_id"]) == snapshot.player.id:
 				var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["target_id"]), int(event.data["attacker_id"]))
-				var finisher: bool = int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") == &"moon_cleave"
+				var finisher: bool = _is_finisher(event) or event.data.get("skill_id", &"") == &"moon_cleave"
 				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher, "skill_id": event.data.get("skill_id", &""), "facing": snapshot.player.facing})
+				if snapshot.player.weapon_form == Weapons.FORM_LIGHTNING:
+					_add_lightning_fx({"kind": "spark", "tick": event.tick, "at": contact, "life": LightningEffects.sequence_length(LightningEffects.SPARK_TICKS)})
 				shake_left = maxi(shake_left, 3 if finisher else 1)
 				_burst(contact, 16 if counter or finisher else 8, colors["1"], 1.8 if counter else 0.9)
 				if counter:
@@ -374,6 +417,58 @@ func _on_event(event: GameEvent) -> void:
 		&"game_result":
 			_sound_game_result(event)
 			_record_result(event)
+
+## The last swing of the weapon's combo (katana 3, dagger 4).
+func _is_finisher(event: GameEvent) -> bool:
+	if not event.data.has("combo_index"):
+		return false
+	return int(event.data["combo_index"]) >= Weapons.combo_max(StringName(event.data.get("weapon_id", snapshot.player.weapon_id)))
+
+func _add_lightning_fx(effect: Dictionary) -> void:
+	lightning_fx.append(effect)
+
+func _flash(tick: int, color: Color, strengths: Array[float]) -> void:
+	screen_flashes.append({"tick": tick, "color": color, "strengths": strengths})
+
+## Lightning Form blink: the player snapshot already stands at `to`. Departure burst and afterimage at `from`, a
+## chain bolt from `from` to `to`, an arrival burst, then the cut through the boss once the swing's windup is over.
+func _on_lightning_blink(event: GameEvent) -> void:
+	var from: Vector2 = event.data["from"]
+	var to: Vector2 = event.data["to"]
+	var side: int = int(event.data.get("direction_index", 0))
+	var target: Vector2 = to - Weapons.blink_direction(side) * Tuning.LIGHTNING_BLINK_DISTANCE
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.id == int(event.data.get("target_id", -1)):
+			target = actor.position
+	var windup: int = ArenaAnimation.swing_durations(snapshot.player)[0] if snapshot.player.state == &"attack_windup" else 0
+	var tick: int = event.tick
+	var depart_left: bool = from.x > to.x if absf(from.x - to.x) > 2.0 else facing_left
+	_add_lightning_fx({"kind": "depart", "tick": tick, "at": from, "life": LightningEffects.sequence_length(LightningEffects.DEPART_TICKS)})
+	_add_lightning_fx({"kind": "afterimage", "tick": tick, "at": from, "left": depart_left, "life": LightningEffects.sequence_length(LightningEffects.AFTERIMAGE_TICKS)})
+	_add_lightning_fx({"kind": "afterimage", "tick": tick, "at": from.lerp(to, 0.5), "left": depart_left, "flicker": true, "life": LightningEffects.sequence_length(LightningEffects.AFTERIMAGE_TICKS)})
+	_add_lightning_fx({"kind": "chain", "tick": tick, "from": from + LightningEffects.CHEST, "to": to + LightningEffects.CHEST, "life": LightningEffects.CHAIN_TICKS})
+	_add_lightning_fx({"kind": "arrive", "tick": tick, "at": to, "life": LightningEffects.sequence_length(LightningEffects.BLINK_TICKS)})
+	_add_lightning_fx({"kind": "cut", "tick": tick + windup, "at": (target + LightningEffects.BOSS_BODY).round(), "direction": LightningEffects.cut_direction(side, to, target), "life": LightningEffects.sequence_length(LightningEffects.CUT_TICKS)})
+	shake_left = maxi(shake_left, 2)
+	_flash(tick, colors["p"], [0.14])
+	combat_audio.cue("dash", tick, 0.6)
+
+## Dual Dagger finisher: a bolt from the sky onto the boss (the event position), white flash, shake, scorch decal.
+## The boss's own hit flash and hurt pose come from its damage_taken event as for any hit.
+func _on_lightning_strike(event: GameEvent) -> void:
+	var at: Vector2 = event.data["position"]
+	var tick: int = event.tick
+	_add_lightning_fx({"kind": "ground", "tick": tick, "at": at, "life": LightningEffects.sequence_length(LightningEffects.GROUND_TICKS)})
+	_add_lightning_fx({"kind": "strike", "tick": tick, "at": at, "life": LightningEffects.sequence_length(LightningEffects.STRIKE_TICKS)})
+	_add_lightning_fx({"kind": "spark", "tick": tick + 2, "at": at + LightningEffects.BOSS_BODY, "life": 2 + LightningEffects.sequence_length(LightningEffects.SPARK_TICKS)})
+	hit_bursts.append({"position": at, "contact": at + LightningEffects.BOSS_BODY, "tick": tick, "counter": event.data.get("kind", &"normal") == &"counter", "finisher": true, "skill_id": &"", "facing": snapshot.player.facing})
+	var strengths: Array[float] = []
+	for age: int in range(4):
+		strengths.append(LightningEffects.strike_flash(age))
+	_flash(tick, colors["p"], strengths)
+	shake_left = maxi(shake_left, 8)
+	_burst(at + LightningEffects.BOSS_BODY, 18, colors["1"], 1.6)
+	combat_audio.cue("posture_break", tick)
 
 func _burst(at: Vector2, count: int, color: Color, speed: float) -> void:
 	for i: int in range(count):
@@ -400,6 +495,7 @@ func _draw() -> void:
 		_draw_imported("fx_dust_%d" % (clampi((snapshot.tick - int(ring["start_tick"])) / 2, 0, 5) + 1), ring["position"])
 	for trail: Dictionary in trails:
 		_draw_imported("fx_dust_%d" % (6 - int(trail["life"])), trail["position"])
+	_draw_lightning_ground()
 	_draw_dash()
 	var actors: Array[Snapshots.EntitySnapshot] = [snapshot.player]
 	actors.append_array(snapshot.entities)
@@ -461,13 +557,25 @@ func _draw() -> void:
 	_draw_skill_contacts()
 	_draw_buff_slash(offset)
 	_draw_buff_transition()
+	_draw_lightning(offset)
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
 			draw_circle(actor.position, Tuning.BOSS_RADIUS, colors["p"], false, 1.0)
+		# aim check: a line from the player along the core's facing, and a cross where the mouse is in the world
+		draw_line(snapshot.player.position, snapshot.player.position + snapshot.player.facing * 60.0, colors["p"], 1.0)
+		var mouse: Vector2 = get_local_mouse_position()
+		draw_line(mouse - Vector2(4, 0), mouse + Vector2(4, 0), colors["p"], 1.0)
+		draw_line(mouse - Vector2(0, 4), mouse + Vector2(0, 4), colors["p"], 1.0)
 	draw_set_transform(Vector2.ZERO)
 	if snapshot.tick < screen_flash_until:
 		draw_rect(Rect2(view_origin, VIEW_SIZE), Color(colors["1"], 0.10))
+	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
+	for flash: Dictionary in screen_flashes:
+		var strengths: Array = flash["strengths"]
+		var age: int = cosmetic_tick - int(flash["tick"])
+		if age >= 0 and age < strengths.size():
+			draw_rect(Rect2(view_origin, VIEW_SIZE), Color(flash["color"], float(strengths[age])))
 
 func _behind(a: Snapshots.EntitySnapshot, b: Snapshots.EntitySnapshot) -> bool:
 	return a.position.y < b.position.y
@@ -499,7 +607,7 @@ func prepare_visuals() -> void:
 		var changed: bool = previous_player_state != hero.state or previous_combo_index != hero.combo_index or previous_skill_id != hero.skill_id
 		var attack_started: bool = hero.state == &"attack_windup" and changed
 		if hero.state == &"attack_active" and changed:
-			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index == 3 else 0.75)
+			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index >= Weapons.combo_max(hero.weapon_id) else 0.75)
 		if ((moved and hero.state != &"dead") or attack_started or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
 			facing_left = hero.facing.x < 0.0
 		for i: int in range(dash_ghosts.size() - 1, -1, -1):
@@ -575,7 +683,7 @@ func prepare_visuals() -> void:
 		if actor.id == snapshot.player.id and actor.state == &"idle":
 			for impact: Dictionary in parry_impacts:
 				if snapshot.tick - int(impact["tick"]) < 3:
-					requested = "hero2_parry_right_6"
+					requested = ArenaAnimation.hero_frame(ArenaAnimation.hero_set(actor), "parry", 6)
 		var impact_pose: bool = false
 		if actor.visual_id == &"mossbound_colossus":
 			var active_tell: Snapshots.TelegraphSnapshot = ArenaAnimation.attack_tell(actor.id, snapshot)
@@ -586,7 +694,10 @@ func prepare_visuals() -> void:
 			if age < int(reaction["duration"]):
 				var pose: String = reaction["pose"]
 				var spec: Array = ArenaAnimation.PLAYER[pose] if actor.id == snapshot.player.id else ArenaAnimation.BOSS[pose]
-				requested = ("hero2_%s_right_%d" if actor.id == snapshot.player.id else "golem2_%s_%d") % [pose, ArenaAnimation.frame_index(spec, age)]
+				if actor.id == snapshot.player.id:
+					requested = ArenaAnimation.hero_frame(ArenaAnimation.hero_set(actor), pose, ArenaAnimation.frame_index(spec, age))
+				else:
+					requested = "golem2_%s_%d" % [pose, ArenaAnimation.frame_index(spec, age)]
 		selected_frames[actor.id] = _resolve_frame(requested, actor)
 
 func _resolve_frame(requested: String, actor: Snapshots.EntitySnapshot) -> String:
@@ -622,7 +733,7 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	if not silhouette_only:
 		if actor.id == snapshot.player.id:
 			_draw_buff_aura(actor, false)
-		var actor_texture: Texture2D = empowered_sprites if actor.id == snapshot.player.id and actor.weapon_buff_active else sprites
+		var actor_texture: Texture2D = empowered_sprites if actor.id == snapshot.player.id and black_form_look(actor) else sprites
 		draw_texture_rect_region(actor_texture, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 	if silhouette_only:
 		draw_texture_rect_region(white_sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
@@ -630,12 +741,20 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 		_draw_buff_aura(actor, true)
 
 func _draw_dash() -> void:
-	var frame: Dictionary = frames.get("hero2_dash_right_1", {})
+	var frame: Dictionary = frames.get(ArenaAnimation.hero_frame(ArenaAnimation.hero_set(snapshot.player), "dash", 1), frames.get("hero2_dash_right_1", {}))
 	if frame.is_empty():
 		return
+	var lightning: bool = snapshot.player.weapon_form == Weapons.FORM_LIGHTNING
 	for ghost: Dictionary in dash_ghosts:
 		var fade: float = float(ghost["life"]) / 6.0
-		if snapshot.player.weapon_buff_active:
+		if lightning:
+			# Flickering lightning afterimages (frames 1-3 fade out as the ghost ages).
+			if (snapshot.tick + int(ghost["life"])) % 2 == 0:
+				var key: String = "fx_lightning_afterimage_%d" % clampi(4 - ceili(float(ghost["life"]) / 2.0), 1, 3)
+				if frames.has(key):
+					var f: Dictionary = frames[key]
+					draw_texture_rect_region(sprites, ArenaAnimation.destination(ghost["position"], f, bool(ghost["left"])), Rect2(f["x"], f["y"], f["w"], f["h"]))
+		elif black_form_look(snapshot.player):
 			draw_texture_rect_region(empowered_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 			_draw_buff_frame("fx_black_aura_back_%d" % (posmod(snapshot.tick / 5, 6) + 1), ghost["position"], 1, bool(ghost["left"]))
 		else:
@@ -713,7 +832,7 @@ func _sound_dash_started(event: GameEvent) -> void:
 
 func _sound_attack_hit(event: GameEvent) -> void:
 	if int(event.data["attacker_id"]) == snapshot.player.id:
-		var heavy: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3 or event.data.get("skill_id", &"") in [&"moon_cleave", &"breaking_edge"]
+		var heavy: bool = event.data["kind"] == &"counter" or _is_finisher(event) or event.data.get("skill_id", &"") in [&"moon_cleave", &"breaking_edge"]
 		combat_audio.cue("counter_hit" if heavy else "armor_hit", event.tick)
 
 func _sound_attack_telegraphed(event: GameEvent) -> void:
@@ -907,4 +1026,71 @@ func _draw_buff_transition() -> void:
 		return
 	var level: int = maxi(1, 4 - age / 3)
 	var at: Vector2 = snapshot.player.position if bool(buff_transition["started"]) else Vector2(buff_transition["at"])
+	if buff_transition.get("form", &"") == Weapons.FORM_LIGHTNING:
+		_draw_buff_frame("fx_lightning_aura_back_%d" % (mini(9, age) + 1), at, level, facing_left)
+		return
 	_draw_buff_frame("fx_black_aura_back_%d" % (mini(5, age / 2) + 1), at, level, facing_left)
+
+## The darkened Black Form hero and its black dash ghosts: only the katana's buff, never the dagger.
+func black_form_look(actor: Snapshots.EntitySnapshot) -> bool:
+	return actor.weapon_buff_active and actor.weapon_form != Weapons.FORM_LIGHTNING and actor.weapon_id != Tuning.WEAPON_DUAL_DAGGER
+
+## Scorch decals of sky strikes, on the floor under everything standing.
+func _draw_lightning_ground() -> void:
+	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
+	for effect: Dictionary in lightning_fx:
+		if effect["kind"] == "ground":
+			var frame: int = LightningEffects.sequence_frame(LightningEffects.GROUND_TICKS, cosmetic_tick - int(effect["tick"]))
+			if frame > 0:
+				_draw_imported("fx_lightning_ground_%d" % frame, effect["at"], Vector2(2, 2))
+
+## Blink bursts, afterimages, chain bolts, the cut through the boss, sparks and the sky strike (world space).
+func _draw_lightning(shake_offset: Vector2) -> void:
+	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
+	for effect: Dictionary in lightning_fx:
+		var age: int = cosmetic_tick - int(effect["tick"])
+		match String(effect["kind"]):
+			"afterimage":
+				var frame: int = LightningEffects.sequence_frame(LightningEffects.AFTERIMAGE_TICKS, age)
+				if frame > 0 and not (bool(effect.get("flicker", false)) and age % 2 == 1):
+					var key: String = "fx_lightning_afterimage_%d" % frame
+					if frames.has(key):
+						var f: Dictionary = frames[key]
+						draw_texture_rect_region(sprites, ArenaAnimation.destination(effect["at"], f, bool(effect["left"])), Rect2(f["x"], f["y"], f["w"], f["h"]))
+			"chain":
+				var from: Vector2 = effect["from"]
+				var to: Vector2 = effect["to"]
+				var angle: float = (to - from).angle()
+				var segments: Array[Dictionary] = LightningEffects.chain_segments(from, to)
+				for index: int in range(segments.size()):
+					var frame: int = LightningEffects.chain_frame(age, index)
+					var key: String = "fx_lightning_chain_%d" % frame
+					if frame == 0 or not frames.has(key):
+						continue
+					var f: Dictionary = frames[key]
+					var length: float = float(segments[index]["length"])
+					draw_set_transform(from.round() + shake_offset, angle)
+					draw_texture_rect_region(sprites, Rect2(Vector2(float(segments[index]["offset"]), -float(f["ay"])), Vector2(length, f["h"])), Rect2(f["x"], f["y"], length, f["h"]))
+					draw_set_transform(shake_offset)
+			"depart":
+				var frame: int = LightningEffects.sequence_frame(LightningEffects.DEPART_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_lightning_blink_%d" % frame, effect["at"])
+			"arrive":
+				var frame: int = LightningEffects.sequence_frame(LightningEffects.BLINK_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_lightning_blink_%d" % frame, effect["at"])
+			"cut":
+				var frame: int = LightningEffects.sequence_frame(LightningEffects.CUT_TICKS, age)
+				if frame > 0:
+					_draw_imported(LightningEffects.cut_key(int(effect["direction"]), frame), effect["at"])
+			"spark":
+				var frame: int = LightningEffects.sequence_frame(LightningEffects.SPARK_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_lightning_spark_%d" % frame, effect["at"])
+			"strike":
+				var frame: int = LightningEffects.sequence_frame(LightningEffects.STRIKE_TICKS, age)
+				if frame > 0:
+					var at: Vector2 = effect["at"]
+					var scale_px: int = LightningEffects.strike_scale(at.y - view_origin.y)
+					_draw_imported("fx_lightning_strike_%d" % frame, at, Vector2(scale_px, scale_px))

@@ -1,0 +1,598 @@
+{
+  "generator": "tools/art/make_dual_dagger_art.py (procedural, Pillow only, deterministic seeds)",
+  "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+  "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+  "status": "Reference layers; not imported into gameplay",
+  "layout": "10 columns of 64x64 cells, feet anchor (32,56) like fx_black_aura_*. Row 1: aura back (behind hero), row 2: aura front, row 3: lightning-body poses (body only, add the dagger layers on top), row 4: charged poses (normal colours with pale rim light), row 5: afterimages (3 fading steps each for blink and slash_1).",
+  "aura_loop": "10 frames, loop at about 60-70 ms per frame; back and front frames with the same number belong together",
+  "frames": [
+    {
+      "name": "fx_lightning_aura_back_1",
+      "cell": 0,
+      "rect": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_2",
+      "cell": 1,
+      "rect": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_3",
+      "cell": 2,
+      "rect": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_4",
+      "cell": 3,
+      "rect": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_5",
+      "cell": 4,
+      "rect": [
+        256,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_6",
+      "cell": 5,
+      "rect": [
+        320,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_7",
+      "cell": 6,
+      "rect": [
+        384,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_8",
+      "cell": 7,
+      "rect": [
+        448,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_9",
+      "cell": 8,
+      "rect": [
+        512,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_back_10",
+      "cell": 9,
+      "rect": [
+        576,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_1",
+      "cell": 10,
+      "rect": [
+        0,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_2",
+      "cell": 11,
+      "rect": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_3",
+      "cell": 12,
+      "rect": [
+        128,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_4",
+      "cell": 13,
+      "rect": [
+        192,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_5",
+      "cell": 14,
+      "rect": [
+        256,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_6",
+      "cell": 15,
+      "rect": [
+        320,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_7",
+      "cell": 16,
+      "rect": [
+        384,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_8",
+      "cell": 17,
+      "rect": [
+        448,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_9",
+      "cell": 18,
+      "rect": [
+        512,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_aura_front_10",
+      "cell": 19,
+      "rect": [
+        576,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_ready_1",
+      "cell": 20,
+      "rect": [
+        0,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_ready_2",
+      "cell": 21,
+      "rect": [
+        64,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_slash_1",
+      "cell": 22,
+      "rect": [
+        128,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_slash_2",
+      "cell": 23,
+      "rect": [
+        192,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_slash_3",
+      "cell": 24,
+      "rect": [
+        256,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_charge",
+      "cell": 25,
+      "rect": [
+        320,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_blink",
+      "cell": 26,
+      "rect": [
+        384,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_lightning_burst",
+      "cell": 27,
+      "rect": [
+        448,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_ready_1",
+      "cell": 30,
+      "rect": [
+        0,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_ready_2",
+      "cell": 31,
+      "rect": [
+        64,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_slash_1",
+      "cell": 32,
+      "rect": [
+        128,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_slash_2",
+      "cell": 33,
+      "rect": [
+        192,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_slash_3",
+      "cell": 34,
+      "rect": [
+        256,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_charge",
+      "cell": 35,
+      "rect": [
+        320,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_blink",
+      "cell": 36,
+      "rect": [
+        384,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "hero2_charged_burst",
+      "cell": 37,
+      "rect": [
+        448,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_afterimage_blink_1",
+      "cell": 40,
+      "rect": [
+        0,
+        256,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_afterimage_blink_2",
+      "cell": 41,
+      "rect": [
+        64,
+        256,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_afterimage_blink_3",
+      "cell": 42,
+      "rect": [
+        128,
+        256,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_afterimage_slash_1",
+      "cell": 43,
+      "rect": [
+        192,
+        256,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_afterimage_slash_2",
+      "cell": 44,
+      "rect": [
+        256,
+        256,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "fx_lightning_afterimage_slash_3",
+      "cell": 45,
+      "rect": [
+        320,
+        256,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    }
+  ]
+}

@@ -251,6 +251,34 @@ func slash_attachment() -> void:
 	arena.snapshot.player.skill_id = &"moon_cleave"
 	check(String(View.plan(arena.snapshot)["slash"]).is_empty(), "Moon hold shows a premature black cut")
 
+## The same HUD and look contract for the Dual Dagger's Lightning Form (its own numbers, its own aura, no slash).
+func dagger_form() -> void:
+	fixture()
+	var swap: InputFrame = InputFrame.new()
+	swap.weapon_swap_pressed = true
+	step(swap)
+	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_DUAL_DAGGER, "dagger swap")
+	var idle: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(int(idle["cost"]) == int(Tuning.LIGHTNING_FORM_EDGE_COST) and not bool(idle["active"]), "dagger HUD cost")
+	check(Hud.weapon_active_line(idle) == "LIGHTNING", "dagger HUD label")
+	var input: InputFrame = InputFrame.new()
+	input.weapon_active_pressed = true
+	step(input)
+	check(arena.snapshot.player.weapon_form == &"lightning_form", "form did not start")
+	var status: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(int(status["remaining"]) == ceili(Tuning.LIGHTNING_FORM_DURATION_TICKS * Tuning.TICK_DT) or int(status["remaining"]) == ceili((Tuning.LIGHTNING_FORM_DURATION_TICKS - 1) * Tuning.TICK_DT), "form HUD time")
+	check(Hud.weapon_active_line(status) == "FORM %dS" % int(status["remaining"]), "form HUD line")
+	check(int(status["cooldown"]) == ceili(arena.snapshot.hud.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "form HUD cooldown from the snapshot")
+	var plan: Dictionary = View.plan(arena.snapshot)
+	check(String(plan["back"]).begins_with("fx_lightning_aura_back_") and String(plan["slash"]).is_empty(), "form aura plan")
+	check(not arena.black_form_look(arena.snapshot.player), "Black Form darkening on the dagger")
+	check(int(arena.combat_audio.played.get("weapon_buff_start", 0)) == 1, "form start cue")
+	arena.lightning_cutin.stop()
+	while arena.snapshot.player.weapon_buff_active:
+		step(InputFrame.new())
+	check(View.plan(arena.snapshot).is_empty(), "form aura persists after the form")
+	check(int(arena.combat_audio.played.get("weapon_buff_end", 0)) == 1, "form end cue")
+
 func run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	arena = load("res://presentation/arena/arena.tscn").instantiate() as Arena
@@ -267,6 +295,7 @@ func run() -> void:
 	await swings()
 	await actions()
 	await slash_attachment()
+	dagger_form()
 	arena.queue_free()
 	await process_frame
 	for message: String in failures:

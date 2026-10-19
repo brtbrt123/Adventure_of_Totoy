@@ -12,6 +12,7 @@ static func register() -> void:
 		"menu_up": [KEY_W, KEY_UP], "menu_down": [KEY_S, KEY_DOWN],
 		"menu_accept": [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE], "menu_back": [KEY_ESCAPE],
 		"arena_skill_1": [KEY_Z], "arena_skill_2": [KEY_X], "arena_skill_3": [KEY_C],
+		"arena_weapon_swap": [KEY_Q],
 	}
 	for action: String in keys:
 		if not InputMap.has_action(action):
@@ -42,6 +43,7 @@ static func register() -> void:
 			"menu_back": _button(action, JOY_BUTTON_B)
 			"arena_parry": _button(action, JOY_BUTTON_A)
 			"arena_dash": _button(action, JOY_BUTTON_B)
+			"arena_weapon_swap": _button(action, JOY_BUTTON_RIGHT_SHOULDER)
 
 static func _axis(action: String, axis: int, value: float) -> void:
 	var event: InputEventJoypadMotion = InputEventJoypadMotion.new()
@@ -58,6 +60,7 @@ static func read_frame(player_position: Vector2 = Vector2.ZERO, mouse_position: 
 	var frame: InputFrame = InputFrame.new()
 	frame.move = Input.get_vector("arena_left", "arena_right", "arena_up", "arena_down")
 	frame.weapon_active_pressed = Input.is_action_just_pressed("arena_weapon_active")
+	frame.weapon_swap_pressed = Input.is_action_just_pressed("arena_weapon_swap")
 	frame.attack_pressed = Input.is_action_just_pressed("arena_attack")
 	for slot: int in range(1, 4):
 		if Input.is_action_just_pressed("arena_skill_%d" % slot):

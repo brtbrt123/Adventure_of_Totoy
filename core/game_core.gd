@@ -13,6 +13,7 @@ const BossState := preload("res://core/boss.gd")
 const SkillAttack := preload("res://core/skill_attack.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const ArenaLayout := preload("res://core/arena_layout.gd")
+const Weapons := preload("res://core/weapons.gd")
 
 const RESULT_PLAYING: StringName = &"playing"
 const RESULT_VICTORY: StringName = &"victory"
@@ -54,6 +55,7 @@ func step(input: InputFrame) -> void:
 	var player_before: Vector2 = player.position
 	player.step(input, tick, events)
 	player.position = move_resolved(player_before, player.position, Tuning.PLAYER_RADIUS)
+	_resolve_lightning_blink(events)
 	_resolve_player_attack(events)
 	_spawn_released_skill(events)
 	var boss_before: Vector2 = boss.position
@@ -135,11 +137,14 @@ func snapshot() -> Snapshots.GameSnapshot:
 	hud.counter_window_ticks_left = boss.broken_ticks_left if boss.state == BossState.STATE_BROKEN else 0
 	hud.skill_cooldown_ticks = player.skill_cooldowns.duplicate()
 	hud.retaliate_ticks_left = player.retaliate_ticks
-	var has_active: bool = player.weapon_id == Tuning.WEAPON_BLACK_KATANA
-	hud.weapon_buff_duration = Tuning.BLACK_KATANA_BUFF_DURATION_TICKS if has_active else 0
+	hud.weapon_buff_duration = Weapons.active_duration(player.weapon_id)
 	hud.weapon_buff_cooldown_ticks = player.buff_cooldown
-	hud.weapon_buff_cooldown_max = Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS if has_active else 0
-	hud.weapon_buff_edge_cost = Tuning.BLACK_KATANA_BUFF_EDGE_COST if has_active else 0.0
+	hud.weapon_buff_cooldown_max = Weapons.active_cooldown(player.weapon_id)
+	hud.weapon_buff_edge_cost = Weapons.active_edge_cost(player.weapon_id)
+	for weapon: StringName in Weapons.IDS:
+		hud.weapon_cooldowns[weapon] = player.active_cooldowns.get(weapon, 0)
+	hud.weapon_swap_lockout_ticks = player.swap_lockout
+	hud.weapon_swap_lockout_max = Tuning.WEAPON_SWAP_LOCKOUT_TICKS
 	snap.hud = hud
 	return snap
 
@@ -161,6 +166,13 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.weapon_buff_active = player.is_buff_active()
 	e.weapon_buff_ticks_left = player.buff_ticks
 	e.attack_speed_mult = player.swing_speed_mult if String(player.state).begins_with("attack_") else player.attack_speed_mult()
+	e.weapon_form = player.active_form()
+	e.move_speed_mult = player.move_speed_mult()
+	e.combo_max = player.combo_max()
+	e.lightning_blink_index = player.last_blink_direction
+	e.lightning_blink_tick = player.last_blink_tick
+	e.lightning_blink_from = player.last_blink_from
+	e.lightning_blink_to = player.last_blink_to
 	return e
 
 
@@ -179,33 +191,103 @@ func _boss_snapshot() -> Snapshots.EntitySnapshot:
 	return e
 
 
-## The normal sword swing (skills are resolved from their SkillAttack objects instead).
+## The normal weapon swing (skills are resolved from their SkillAttack objects instead). Reach, damage and Edge gain come
+## from the equipped weapon's tables (core/weapons.gd). The Dual Dagger's last swing also calls a lightning strike.
 func _resolve_player_attack(events: Array[GameEvent]) -> void:
 	if player.attack_hit_done or boss.state == BossState.STATE_DEAD or player.state != PlayerState.STATE_ATTACK_ACTIVE:
 		return
+	var weapon: StringName = player.weapon_id
 	var swing: int = player.combo_index - 1
 	var to_boss: Vector2 = boss.position - player.position
 	var dist: float = to_boss.length()
-	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE * Tuning.SWING_RANGE_MULT[swing]:
+	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[swing]:
 		return
 	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Tuning.ATTACK_ARC_DOT:
 		return
 	player.attack_hit_done = true
 	var counter: bool = boss.state == BossState.STATE_BROKEN
+	var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult
 	var damage: int
 	if counter:
-		damage = roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * player.swing_damage_mult * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
+		damage = roundi(base * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
 		player.edge = 0.0  # the counter spends all Edge
 	else:
-		damage = maxi(1, roundi(Tuning.ATTACK_DAMAGE * Tuning.SWING_DAMAGE_MULT[swing] * player.swing_damage_mult * Tuning.ARMOR_DAMAGE_FACTOR))
-		player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.EDGE_PER_HIT)
+		damage = maxi(1, roundi(base * Tuning.ARMOR_DAMAGE_FACTOR))
+		player.edge = minf(Tuning.EDGE_MAX, player.edge + Weapons.edge_per_hit(weapon))
 	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
 		"attacker_id": player.id, "target_id": boss.id, "damage": damage,
 		"kind": &"counter" if counter else &"normal", "position": boss.position, "combo_index": player.combo_index,
+		"weapon_id": weapon,
 	}))
 	boss.take_damage(damage, tick, events, player.id)
 	if not counter:
 		boss.add_posture(Tuning.NORMAL_HIT_POSTURE, tick, events)
+	if Weapons.has_lightning_finisher(weapon) and player.combo_index == Weapons.combo_max(weapon):
+		_lightning_strike(counter, events)
+
+
+## The Dual Dagger finisher connected: a bolt from the sky hits the same boss (no telegraph, it always lands). It uses
+## the swing's counter flag (a swing that just broke the posture does not turn the bolt into a counter).
+func _lightning_strike(counter: bool, events: Array[GameEvent]) -> void:
+	if boss.state == BossState.STATE_DEAD:
+		return  # the swing itself finished the boss
+	var base: float = Tuning.LIGHTNING_STRIKE_DAMAGE * player.swing_damage_mult
+	var damage: int = roundi(base * Tuning.COUNTER_DAMAGE_MULT) if counter else maxi(1, roundi(base * Tuning.ARMOR_DAMAGE_FACTOR))
+	events.append(GameEvent.new(GameEvent.LIGHTNING_STRIKE, tick, {
+		"attacker_id": player.id, "target_id": boss.id, "position": boss.position, "damage": damage,
+		"combo_index": player.combo_index, "kind": &"counter" if counter else &"normal",
+	}))
+	boss.take_damage(damage, tick, events, player.id)
+	if not counter:
+		boss.add_posture(Tuning.LIGHTNING_STRIKE_POSTURE, tick, events)
+
+
+## Lightning Form: a swing that started this tick blinks the player next to the boss first (if the boss is alive and
+## within LIGHTNING_BLINK_RANGE). The side comes from LIGHTNING_BLINK_ORDER; if that spot is blocked (wall, prop, out of
+## reach) the nearest free direction is used. No spot at all: no blink, the swing happens where the player stands.
+func _resolve_lightning_blink(events: Array[GameEvent]) -> void:
+	if not player.blink_requested:
+		return
+	player.blink_requested = false
+	if not player.is_lightning_form() or player.state != PlayerState.STATE_ATTACK_WINDUP or boss.state == BossState.STATE_DEAD:
+		return
+	if player.position.distance_to(boss.position) > Tuning.LIGHTNING_BLINK_RANGE:
+		return
+	var order: Array[int] = Tuning.LIGHTNING_BLINK_ORDER
+	var wanted: int = order[player.blink_count % order.size()]
+	player.blink_count += 1
+	var reach: float = Tuning.BOSS_RADIUS + Tuning.ATTACK_RANGE * Weapons.range_mults(player.weapon_id)[player.combo_index - 1]
+	for offset: int in [0, 1, -1, 2, -2, 3, -3, 4]:
+		var index: int = posmod(wanted + offset, 8)
+		var spot: Vector2 = blink_spot(index)
+		if _blink_spot_ok(spot, reach):
+			var from: Vector2 = player.position
+			player.apply_blink(spot, boss.position - spot, index, tick)
+			events.append(GameEvent.new(GameEvent.LIGHTNING_BLINK, tick, {
+				"entity_id": player.id, "from": from, "to": spot, "direction_index": index, "target_id": boss.id,
+			}))
+			return
+
+
+## Where a blink in direction `index` (0-7) would land: next to the boss, kept in the arena and out of solid props.
+func blink_spot(index: int) -> Vector2:
+	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
+	var high: Vector2 = Tuning.ARENA_SIZE - low
+	var spot: Vector2 = (boss.position + Weapons.blink_direction(index) * Tuning.LIGHTNING_BLINK_DISTANCE).clamp(low, high)
+	return push_out_of_obstacles(spot, Tuning.PLAYER_RADIUS).clamp(low, high)
+
+
+## A blink spot must be inside the arena, outside the boss and every prop, and within the swing's reach of the boss.
+func _blink_spot_ok(spot: Vector2, reach: float) -> bool:
+	var dist: float = spot.distance_to(boss.position)
+	if dist < Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS or dist > reach:
+		return false
+	for obstacle: Obstacle in obstacles:
+		if spot.distance_to(obstacle.center) < obstacle.radius + Tuning.PLAYER_RADIUS - 0.001:
+			return false
+	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
+	var high: Vector2 = Tuning.ARENA_SIZE - low
+	return spot == spot.clamp(low, high)
 
 
 ## The player just entered skill_active: create the attack that belongs to the skill (once per cast).
