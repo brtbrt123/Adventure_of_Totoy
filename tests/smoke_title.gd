@@ -103,13 +103,13 @@ func _title_screen() -> void:
 	_expect(FileAccess.file_exists("res://presentation/fonts/PixelifySans.ttf"), "the pixel font file is missing")
 	_expect(FileAccess.get_file_as_string("res://presentation/fonts/OFL-PixelifySans.txt").contains("SIL Open Font License"), "the font licence text is missing")
 	_expect(Title.ui_font() is FontVariation and (Title.ui_font() as FontVariation).base_font is FontFile, "titles and names use the pixel font, not the fallback")
-	_expect(Title.stat_font() != Title.ui_font(), "numbers use the clearer sans face")
+	_expect(Title.stat_font() == Title.ui_font(), "numbers use the pixel font too (the human's choice)")
 	# nothing runs off the page: credit lines fit in 280 game pixels, control keys and actions in their columns
 	for line: String in Title.CREDIT_LINES:
 		_expect(Title.text_width(line) <= 280.0, "credit line too wide (%d px): %s" % [int(Title.text_width(line)), line])
 	for line: String in Title.CONTROL_LINES:
 		var colon: int = line.find(":")
-		_expect(Title.text_width(line.substr(0, colon), 1, Title.stat_font()) <= 52.0, "control key too wide: " + line)
+		_expect(Title.text_width(line.substr(0, colon)) <= 52.0, "control key too wide: " + line)
 		_expect(Title.text_width(line.substr(colon + 1)) <= 216.0, "control action too wide: " + line)
 	for line: String in Title.CONTROL_FOOTER:
 		_expect(Title.text_width(line) <= 280.0, "controls footer too wide: " + line)
