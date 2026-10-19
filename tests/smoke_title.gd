@@ -114,28 +114,32 @@ func _title_screen() -> void:
 	for line: String in Title.CONTROL_FOOTER:
 		_expect(Title.text_width(line) <= 280.0, "controls footer too wide: " + line)
 	_expect(Title.text_width("ADVENTURE OF TOTOY", 3) <= 300.0, "the title fits the screen")
-	# the background: the game's own art, palette-bound, with the live characters' shadows baked in under their feet
-	_expect(title.background != null and title.background.get_size() == Vector2(320, 180), "the menu background loads at 320x180")
+	# the background: the owner's painting, graded; a smooth sprite behind everything
+	_expect(title.painted and title.background != null and title.background.get_size() == Vector2(1920, 1080), "the painted menu background loads at 1920x1080")
+	_expect(title.background_sprite != null and title.background_sprite.show_behind_parent and absf(title.background_sprite.scale.x * 1920.0 - 320.0) < 0.01, "it fills the 320x180 canvas, behind everything")
+	_expect(FileAccess.file_exists("res://art/reference/menu_background_source.jpg"), "the original painting is kept in art/reference")
+	# the pixel-art fallback (composed from the game's own tiles) stays palette-bound with shadows baked in
+	var fallback: Image = (load(Title.BACKGROUND_PATH) as Texture2D).get_image()
+	_expect(fallback.get_size() == Vector2i(320, 180), "the pixel-art fallback is 320x180")
 	var allowed: Dictionary = {}
 	var palette: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json")) as Dictionary
 	var reserved: Array = palette.get("reserved", [])
 	for entry: Dictionary in palette["colors"]:
 		if not reserved.has(entry["symbol"]):
 			allowed[Color.html(entry["hex"])] = true
-	var image: Image = title.background.get_image()
 	var stray: int = 0
 	for y: int in 180:
 		for x: int in 320:
-			if not allowed.has(image.get_pixel(x, y)):
+			if not allowed.has(fallback.get_pixel(x, y)):
 				stray += 1
-	_expect(stray == 0, "%d background pixels are outside the Totoy 36 palette (or use a reserved gold/red)" % stray)
+	_expect(stray == 0, "%d fallback background pixels are outside the Totoy 36 palette (or use a reserved gold/red)" % stray)
 	for feet: Vector2 in [Title.FEET_HERO, Title.FEET_GOLEM]:
 		var under: float = 0.0
 		var beside: float = 0.0
 		for dx: int in range(-3, 4):
-			under += image.get_pixel(int(feet.x) + dx, int(feet.y) + 1).get_luminance()
-			beside += image.get_pixel(int(feet.x) + dx, int(feet.y) + 22).get_luminance()
-		_expect(under < beside, "a shadow is baked under the feet at %s" % str(feet))
+			under += fallback.get_pixel(int(feet.x) + dx, int(feet.y) + 1).get_luminance()
+			beside += fallback.get_pixel(int(feet.x) + dx, int(feet.y) + 22).get_luminance()
+		_expect(under < beside, "a shadow is baked under the feet in the fallback at %s" % str(feet))
 	for n: int in range(1, 5):
 		_expect(title.sprite_frames.has("hero2_idle_right_%d" % n) and title.sprite_frames.has("golem2_idle_%d" % n), "idle frame %d exists for the live menu characters" % n)
 	title.time = 0.9

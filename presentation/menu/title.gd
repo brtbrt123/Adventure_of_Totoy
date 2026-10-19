@@ -38,6 +38,7 @@ const CREDIT_LINES: Array[String] = [
 	"ADVENTURE OF TOTOY",
 	"GAME DESIGN AND ART DIRECTION: THE OWNER",
 	"HERO REFERENCE ART: THE OWNER",
+	"MENU PAINTING: SUPPLIED BY THE OWNER",
 	"SPRITES AND TILES: GENERATED WITH GEMINI",
 	"FROM THE OWNER'S DESIGNS",
 	"BUILT WITH GODOT 4, CLAUDE CODE AND CODEX",
@@ -64,7 +65,13 @@ var time: float = 0.0
 ## (tools/art/make_menu_background.py FEET_HERO / FEET_GOLEM).
 const FEET_HERO: Vector2 = Vector2(70, 150)
 const FEET_GOLEM: Vector2 = Vector2(250, 150)
+## The owner's painted scene, graded to dusk by tools/art/grade_menu_background.py (1920x1080). It is shown by a
+## smooth-filtered sprite behind everything. If it is missing the pixel-art arena (menu_background.png, composed
+## from the game's own tiles by tools/art/make_menu_background.py) is drawn instead.
+const PAINTED_PATH: String = "res://presentation/menu/menu_background.jpg"
 const BACKGROUND_PATH: String = "res://presentation/menu/menu_background.png"
+var painted: bool = false
+var background_sprite: Sprite2D
 const FIREFLIES: int = 14
 ## Replaced by tests so choosing START does not leave the scene they run in.
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
@@ -78,7 +85,17 @@ func _ready() -> void:
 	var atlas: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))
 	sprite_frames = (atlas as Dictionary).get("frames", {})
 	sprite_texture = load("res://art/build/sprites.png") as Texture2D
-	if ResourceLoader.exists(BACKGROUND_PATH):
+	if ResourceLoader.exists(PAINTED_PATH):
+		background = load(PAINTED_PATH) as Texture2D
+		painted = true
+		background_sprite = Sprite2D.new()
+		background_sprite.texture = background
+		background_sprite.centered = false
+		background_sprite.scale = Vector2(320.0, 180.0) / background.get_size()
+		background_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		background_sprite.show_behind_parent = true
+		add_child(background_sprite)
+	elif ResourceLoader.exists(BACKGROUND_PATH):
 		background = load(BACKGROUND_PATH) as Texture2D
 	profile = SaveStore.load_profile()
 	queue_redraw()
@@ -177,11 +194,14 @@ func _draw() -> void:
 func _draw_background() -> void:
 	if background == null:
 		draw_rect(Rect2(0, 0, 320, 180), colors["2"])
-	else:
+	elif not painted:
 		draw_texture_rect(background, Rect2(0, 0, 320, 180), false)
-	# mist: thin pale bands that drift sideways at different speeds (pixel rows, so it stays pixel art)
+	if painted:
+		_draw_soft_shadow(FEET_HERO + Vector2(0, 1), 13.0, 4.0)
+		_draw_soft_shadow(FEET_GOLEM + Vector2(0, 1), 24.0, 7.0)
+	# mist: thin pale bands that drift sideways at different speeds (pixel rows; only over the pixel-art fallback)
 	var mist: Color = colors["p"]
-	for band: int in 6:
+	for band: int in (0 if painted else 6):
 		var y: float = 58.0 + band * 21.0
 		var speed: float = (6.0 + band * 2.5) * (1.0 if band % 2 == 0 else -1.0)
 		for piece: int in 4:
@@ -205,6 +225,18 @@ func _draw_background() -> void:
 		draw_rect(Rect2(dot, Vector2(1, 1)), Color(colors["p"], 0.55 + 0.45 * pulse))
 	if screen != SCREEN_TITLE:
 		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], 0.74))
+
+
+## A dark ellipse under a character's feet (the painted background has no baked shadows).
+func _draw_soft_shadow(centre: Vector2, rx: float, ry: float) -> void:
+	var points: PackedVector2Array = PackedVector2Array()
+	for i: int in 28:
+		points.append(centre + Vector2(cos(TAU * i / 28.0) * rx, sin(TAU * i / 28.0) * ry))
+	draw_colored_polygon(points, Color(colors["0"], 0.55))
+	var inner: PackedVector2Array = PackedVector2Array()
+	for i: int in 28:
+		inner.append(centre + Vector2(cos(TAU * i / 28.0) * rx * 0.6, sin(TAU * i / 28.0) * ry * 0.6))
+	draw_colored_polygon(inner, Color(colors["0"], 0.3))
 
 
 func _draw_title() -> void:
