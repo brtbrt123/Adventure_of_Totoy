@@ -89,7 +89,7 @@ Three skills for testing the Aspect system, selected by `skill_pressed` 1-3 (Z, 
 
 The equipped weapon is `snapshot.player.weapon_id` (`black_katana`, the only weapon so far). Its active is **right click**: input field `InputFrame.weapon_active_pressed` (true for the tick of the press; mapping the mouse button is presentation's job). The core owns everything else.
 
-**All numbers are PLACEHOLDERS** (`core/tuning.gd`, `BLACK_KATANA_*`): the design has not fixed duration (480 ticks = 8 s), cooldown (1200 ticks = 20 s, counted from the activation), Edge cost (30), attack speed (x1.35) or damage (x1.25). Replace them after a design decision; nothing else in core hard-codes them. Open design questions: should it cost Edge at all, can it be re-pressed to refresh, does the buff change skill speed (it does not now), should damage taken or a parry affect it.
+**Numbers** (`core/tuning.gd`, `BLACK_KATANA_*`, set by the human on 2026-10-19, not yet playtested): duration 600 ticks (10 s), cooldown 1800 ticks (30 s, counted from the activation), Edge cost 50, attack speed x1.5, damage x1.4. Nothing else in core hard-codes them; presentation must read them from `Tuning` or the snapshot. Open design questions: can it be re-pressed to refresh (not now), does the buff change skill speed (it does not now), should damage taken or a parry affect it (they do not now).
 
 **Rules (as built):**
 - Needs: weapon `black_katana`, not dead, enough Edge, cooldown ready, and **no buff running** (it cannot be refreshed). A refused press does nothing and emits no event.

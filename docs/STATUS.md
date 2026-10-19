@@ -2,6 +2,10 @@
 
 Last updated: 2026-10-16 · Branch: `main` · **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
+## Black Katana buff numbers set (2026-10-19, NOT merged)
+
+The human chose: duration 600 ticks (10 s), cooldown 1800 ticks (30 s from activation), cost 50 Edge, attack speed x1.5, damage x1.4. They are in `core/tuning.gd` (`BLACK_KATANA_*`) and no longer placeholders in `docs/architecture.md`; the earlier "placeholder" wording in the entries below is superseded. Core and presentation suites pass with the new numbers; the feel is unplayed (cost 50 means two parries to afford it, and it competes with Moon Cleave's 80).
+
 ## Everything-list pass: tiles, save system, title screen (2026-10-19, NOT merged)
 
 Done by Claude Code while Codex's limit was out (the human allowed Claude to do Codex's presentation work).

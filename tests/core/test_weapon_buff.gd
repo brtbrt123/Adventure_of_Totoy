@@ -3,9 +3,6 @@ extends "res://tests/test_case.gd"
 
 const Snapshots := preload("res://core/snapshots.gd")
 
-const D: int = 480  # the placeholder buff duration; the tests read Tuning, this is only a readable alias
-
-
 func _core(boss_at: Vector2 = Vector2(300.0, 20.0), player_at: Vector2 = Vector2(40.0, 88.0)) -> GameCore:
 	var core: GameCore = GameCore.new()
 	core.boss.state = BossState.STATE_RECOVER  # a pinned boss: it does not walk or attack
