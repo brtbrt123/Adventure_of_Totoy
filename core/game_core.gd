@@ -57,6 +57,7 @@ func step(input: InputFrame) -> void:
 	player.step(input, tick, events)
 	player.position = move_resolved(player_before, player.position, Tuning.PLAYER_RADIUS)
 	_resolve_lightning_barrage(events)
+	_resolve_reaper_coil(events)
 	_resolve_player_attack(events)
 	_spawn_released_skill(events)
 	var boss_before: Vector2 = boss.position
@@ -176,6 +177,11 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.lightning_blink_to = player.last_blink_to
 	e.lightning_barrage_slash = player.barrage_slash if player.barrage_running else 0
 	e.lightning_barrage_slash_tick = player.barrage_slash_tick if player.barrage_running else -1
+	e.reaper_coil_phase = player.coil_phase if player.coil_running else &""
+	e.reaper_coil_phase_tick = player.coil_phase_tick if player.coil_running else 0
+	e.reaper_coil_from = player.position if player.coil_running else Vector2.ZERO
+	e.reaper_coil_target = player.coil_target if player.coil_running else Vector2.ZERO
+	e.reaper_coil_spin_hit = player.coil_spin_hit if player.coil_running else 0
 	return e
 
 
@@ -191,6 +197,8 @@ func _boss_snapshot() -> Snapshots.EntitySnapshot:
 	e.max_hp = Tuning.BOSS_MAX_HP
 	e.posture = boss.posture
 	e.posture_max = Tuning.BOSS_POSTURE_MAX
+	e.dragged = boss.dragged
+	e.stagger_ticks_left = boss.stagger_ticks_left if boss.state == BossState.STATE_STAGGERED else 0
 	return e
 
 
@@ -205,19 +213,20 @@ func _resolve_player_attack(events: Array[GameEvent]) -> void:
 	var dist: float = to_boss.length()
 	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[swing]:
 		return
-	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Tuning.ATTACK_ARC_DOT:
+	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Weapons.arc_dot(weapon):
 		return
 	player.attack_hit_done = true
 	var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult
-	var counter: bool = _land_player_hit(base, Weapons.edge_per_hit(weapon), {"combo_index": player.combo_index, "weapon_id": weapon}, events)
+	var posture: float = Weapons.swing_posture(weapon, player.combo_index)
+	var counter: bool = _land_player_hit(base, Weapons.edge_per_hit(weapon), {"combo_index": player.combo_index, "weapon_id": weapon}, events, posture)
 	if Weapons.has_lightning_finisher(weapon) and player.combo_index == Weapons.combo_max(weapon):
 		_lightning_strike(counter, player.swing_damage_mult, {"combo_index": player.combo_index, "source": &"swing"}, events)
 
 
 ## One player weapon hit on the boss under the normal-hit rules: armored (x ARMOR_DAMAGE_FACTOR, gains `edge_gain`
-## Edge, NORMAL_HIT_POSTURE posture) or, while the boss's posture is broken, a counter (x COUNTER_DAMAGE_MULT plus the
+## Edge, `posture` posture) or, while the boss's posture is broken, a counter (x COUNTER_DAMAGE_MULT plus the
 ## Edge bonus; spends all Edge). `extra` is merged into the attack_hit event. Returns true for a counter.
-func _land_player_hit(base: float, edge_gain: float, extra: Dictionary, events: Array[GameEvent]) -> bool:
+func _land_player_hit(base: float, edge_gain: float, extra: Dictionary, events: Array[GameEvent], posture: float = Tuning.NORMAL_HIT_POSTURE) -> bool:
 	var counter: bool = boss.state == BossState.STATE_BROKEN
 	var damage: int
 	if counter:
@@ -234,7 +243,7 @@ func _land_player_hit(base: float, edge_gain: float, extra: Dictionary, events: 
 	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, data))
 	boss.take_damage(damage, tick, events, player.id)
 	if not counter:
-		boss.add_posture(Tuning.NORMAL_HIT_POSTURE, tick, events)
+		boss.add_posture(posture, tick, events)
 	return counter
 
 
@@ -337,6 +346,201 @@ func _barrage_hit(slash: int, events: Array[GameEvent]) -> void:
 	var counter: bool = _land_player_hit(base, Tuning.LIGHTNING_BARRAGE_EDGE_PER_HIT, {"barrage_slash": slash + 1, "weapon_id": player.weapon_id}, events)
 	if slash + 1 == Weapons.barrage_slashes():
 		_lightning_strike(counter, mult, {"combo_index": 0, "source": &"barrage", "barrage_slash": slash + 1}, events)
+
+
+## Reaper's Coil (Chain Scythe active): started on the activation tick when the boss is alive; then, one phase after
+## the other (player.coil_phase, its tick counted by player.coil_phase_tick): HOOK (the chain flies out) -> DRAG (the
+## boss is pulled in, then stunned) -> SPIN (two hits) -> RECOVERY, or on a miss HOOK -> PULL (the player is pulled to
+## where the chain stopped) -> RECOVERY. Ends when the timeline is over, the boss dies (boss_dead) or the player dies
+## (death, see Player.die).
+func _resolve_reaper_coil(events: Array[GameEvent]) -> void:
+	if player.coil_requested:
+		player.coil_requested = false
+		if boss.state != BossState.STATE_DEAD and player.state != PlayerState.STATE_DEAD:
+			for attack: SkillAttack in skill_attacks.duplicate():
+				if attack.shape != SkillAttack.SHAPE_PROJECTILE:
+					skill_attacks.erase(attack)
+			player.start_reaper_coil(tick, events)
+		return
+	if boss.dragged and not (player.coil_running and player.coil_phase == PlayerState.COIL_DRAG):
+		boss.end_drag(Tuning.REAPER_COIL_STAGGER_TICKS)  # the coil ended mid-drag (the player died): never leave it held
+	if not player.coil_running or player.state != PlayerState.STATE_REAPER_COIL:
+		return
+	if boss.state == BossState.STATE_DEAD:
+		player.end_reaper_coil(tick, events, &"boss_dead")
+		return
+	player.coil_phase_tick += 1
+	match player.coil_phase:
+		PlayerState.COIL_HOOK:
+			_coil_hook(events)
+		PlayerState.COIL_DRAG:
+			_coil_drag(events)
+		PlayerState.COIL_PULL:
+			_coil_pull()
+		PlayerState.COIL_SPIN:
+			_coil_spin(events)
+		PlayerState.COIL_RECOVERY:
+			var recovery: int = Tuning.REAPER_COIL_RECOVERY_TICKS if player.coil_hooked else Tuning.REAPER_COIL_PULL_RECOVERY_TICKS
+			if player.coil_phase_tick >= recovery:
+				player.end_reaper_coil(tick, events, &"complete" if player.coil_hooked else &"missed")
+				return
+	if player.coil_running and boss.state == BossState.STATE_DEAD:
+		player.end_reaper_coil(tick, events, &"boss_dead")
+
+
+## HOOK: the chain's tip is coil_phase_tick * REAPER_COIL_HOOK_SPEED px out. The first thing along the whole chain
+## decides: the boss (hooked, DRAG next), a solid prop or the arena wall (missed, PULL next); nothing yet within range:
+## it keeps flying; full range without contact: missed at the tip.
+func _coil_hook(events: Array[GameEvent]) -> void:
+	var origin: Vector2 = player.coil_from
+	var dir: Vector2 = player.coil_dir
+	var length: float = float(player.coil_phase_tick) * Tuning.REAPER_COIL_HOOK_SPEED
+	var contact: Dictionary = coil_chain_contact(origin, dir, length)
+	var point: Vector2 = origin + dir * float(contact["distance"])
+	player.coil_target = point
+	var kind: StringName = contact["kind"]
+	if kind == &"":
+		return
+	if kind == &"boss":
+		player.coil_hooked = true
+		player.coil_drag_from = boss.position
+		var cancelled: StringName = boss.interrupt_for_drag()
+		events.append(GameEvent.new(GameEvent.REAPER_COIL_HOOKED, tick, {
+			"entity_id": player.id, "target_id": boss.id, "from": origin, "to": point, "cancelled_attack": cancelled,
+		}))
+		player.set_coil_phase(PlayerState.COIL_DRAG)
+	else:
+		events.append(GameEvent.new(GameEvent.REAPER_COIL_MISSED, tick, {
+			"entity_id": player.id, "from": origin, "to": point, "blocked_by": kind,
+		}))
+		player.set_coil_phase(PlayerState.COIL_PULL)
+
+
+## What a chain of `length` px from `origin` in unit direction `dir` touches first: {"kind", "distance"}. kind is
+## `boss` (the boss circle widened by half the chain width), `prop` (a solid prop, widened the same way), `wall` (it
+## reached the arena edge), `range` (it reached REAPER_COIL_HOOK_RANGE) or empty (nothing yet: distance is the tip).
+func coil_chain_contact(origin: Vector2, dir: Vector2, length: float) -> Dictionary:
+	var half: float = Tuning.REAPER_COIL_CHAIN_WIDTH * 0.5
+	var wall: float = _ray_arena_exit(origin, dir)
+	var limit: float = minf(Tuning.REAPER_COIL_HOOK_RANGE, wall)
+	var reach: float = minf(length, limit)
+	var kind: StringName = &""
+	var best: float = INF
+	if boss.state != BossState.STATE_DEAD:
+		var to_boss: float = ray_circle_entry(origin, dir, boss.position, Tuning.BOSS_RADIUS + half)
+		if to_boss >= 0.0 and to_boss <= reach:
+			kind = &"boss"
+			best = to_boss
+	for obstacle: Obstacle in obstacles:
+		var to_prop: float = ray_circle_entry(origin, dir, obstacle.center, obstacle.radius + half)
+		if to_prop >= 0.0 and to_prop <= reach and to_prop < best:
+			kind = &"prop"
+			best = to_prop
+	if kind != &"":
+		return {"kind": kind, "distance": best}
+	if length >= limit:
+		return {"kind": &"wall" if wall < Tuning.REAPER_COIL_HOOK_RANGE else &"range", "distance": limit}
+	return {"kind": &"", "distance": reach}
+
+
+## Distance along the ray from `origin` (unit `dir`) at which it first comes within `radius` of `center`; 0 when it
+## starts inside, -1 when it never does.
+static func ray_circle_entry(origin: Vector2, dir: Vector2, center: Vector2, radius: float) -> float:
+	var to_center: Vector2 = center - origin
+	var dist_sq: float = to_center.length_squared()
+	if dist_sq <= radius * radius:
+		return 0.0
+	var along: float = to_center.dot(dir)
+	if along <= 0.0:
+		return -1.0
+	var off_sq: float = dist_sq - along * along
+	if off_sq > radius * radius:
+		return -1.0
+	return along - sqrt(radius * radius - off_sq)
+
+
+## How far the ray from `origin` (inside the arena) in unit `dir` goes before it leaves the walkable arena.
+func _ray_arena_exit(origin: Vector2, dir: Vector2) -> float:
+	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
+	var high: Vector2 = Tuning.ARENA_SIZE - low
+	var exit: float = INF
+	if dir.x > 0.0001:
+		exit = minf(exit, (high.x - origin.x) / dir.x)
+	elif dir.x < -0.0001:
+		exit = minf(exit, (low.x - origin.x) / dir.x)
+	if dir.y > 0.0001:
+		exit = minf(exit, (high.y - origin.y) / dir.y)
+	elif dir.y < -0.0001:
+		exit = minf(exit, (low.y - origin.y) / dir.y)
+	return maxf(0.0, exit)
+
+
+## DRAG: pull the boss REAPER_COIL_DRAG_SPEED px toward the player (through the prop sweep, kept in the arena) until
+## it is adjacent. It ends when the boss arrived, a tick gains less than REAPER_COIL_DRAG_BLOCKED_PX (props block it)
+## or after REAPER_COIL_DRAG_MAX_TICKS; then the boss's stun starts and the spin begins.
+func _coil_drag(events: Array[GameEvent]) -> void:
+	var goal: float = Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS + Tuning.REAPER_COIL_DRAG_GAP
+	var before: Vector2 = boss.position
+	var dist: float = before.distance_to(player.position)
+	var gained: float = 0.0
+	if dist > goal + 0.01:
+		var step: float = minf(Tuning.REAPER_COIL_DRAG_SPEED, dist - goal)
+		var wanted: Vector2 = before + (player.position - before) / dist * step
+		boss.position = arena_point(move_resolved(before, wanted, Tuning.BOSS_RADIUS), Tuning.BOSS_RADIUS)
+		gained = dist - boss.position.distance_to(player.position)
+	var to_boss: Vector2 = boss.position - player.position
+	if to_boss.length_squared() > 0.0001:
+		player.facing = to_boss.normalized()
+		boss.facing = -player.facing
+		player.coil_target = boss.position - player.facing * Tuning.BOSS_RADIUS
+	var arrived: bool = to_boss.length() <= goal + 0.01
+	if arrived or gained < Tuning.REAPER_COIL_DRAG_BLOCKED_PX or player.coil_phase_tick >= Tuning.REAPER_COIL_DRAG_MAX_TICKS:
+		boss.end_drag(Tuning.REAPER_COIL_STAGGER_TICKS)
+		events.append(GameEvent.new(GameEvent.REAPER_COIL_DRAG, tick, {
+			"entity_id": player.id, "target_id": boss.id, "from": player.coil_drag_from, "to": boss.position,
+			"ticks": player.coil_phase_tick, "stagger_ticks": Tuning.REAPER_COIL_STAGGER_TICKS if boss.state == BossState.STATE_STAGGERED else 0,
+		}))
+		player.set_coil_phase(PlayerState.COIL_SPIN)
+
+
+## PULL (missed hook): move the player REAPER_COIL_PULL_SPEED px toward the anchor (coil_target) through the prop
+## sweep, never into the boss. Ends on arrival, when blocked or after Weapons.reaper_coil_pull_max_ticks().
+func _coil_pull() -> void:
+	var anchor: Vector2 = player.coil_target
+	var before: Vector2 = player.position
+	var dist: float = before.distance_to(anchor)
+	var done: bool = dist <= Tuning.REAPER_COIL_DRAG_BLOCKED_PX
+	if not done:
+		var wanted: Vector2 = before + (anchor - before) / dist * minf(Tuning.REAPER_COIL_PULL_SPEED, dist)
+		var moved: Vector2 = arena_point(move_resolved(before, wanted, Tuning.PLAYER_RADIUS), Tuning.PLAYER_RADIUS)
+		if moved.distance_to(boss.position) < Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS:
+			moved = before  # the boss stands in the way: stop here
+		player.position = moved
+		var left: float = moved.distance_to(anchor)
+		done = left <= Tuning.REAPER_COIL_DRAG_BLOCKED_PX or dist - left < Tuning.REAPER_COIL_DRAG_BLOCKED_PX
+	if done or player.coil_phase_tick >= Weapons.reaper_coil_pull_max_ticks():
+		player.set_coil_phase(PlayerState.COIL_RECOVERY)
+
+
+## SPIN: a full circle around the player. Spin hit k lands on spin tick Weapons.reaper_coil_spin_hit_tick(k) and
+## hits the boss when its edge is within REAPER_COIL_SPIN_RADIUS (normal-hit rules: armor, counter, posture).
+func _coil_spin(events: Array[GameEvent]) -> void:
+	var to_boss: Vector2 = boss.position - player.position
+	if to_boss.length_squared() > 0.0001:
+		player.facing = to_boss.normalized()
+	var next_hit: int = player.coil_spin_hit + 1
+	if next_hit <= Tuning.REAPER_COIL_SPIN_HITS and player.coil_phase_tick == Weapons.reaper_coil_spin_hit_tick(next_hit):
+		player.coil_spin_hit = next_hit
+		var connects: bool = to_boss.length() - Tuning.BOSS_RADIUS <= Tuning.REAPER_COIL_SPIN_RADIUS
+		events.append(GameEvent.new(GameEvent.REAPER_COIL_SPIN, tick, {
+			"entity_id": player.id, "hit_index": next_hit, "position": player.position,
+			"radius": Tuning.REAPER_COIL_SPIN_RADIUS, "connects": connects,
+		}))
+		if connects:
+			var base: float = Tuning.ATTACK_DAMAGE * Tuning.REAPER_COIL_SPIN_DAMAGE_MULT * player.damage_mult()
+			_land_player_hit(base, Tuning.REAPER_COIL_EDGE_PER_HIT, {"weapon_id": player.weapon_id, "reaper_coil_hit": next_hit}, events, Tuning.REAPER_COIL_SPIN_POSTURE)
+	if player.coil_phase_tick >= Tuning.REAPER_COIL_SPIN_TICKS:
+		player.set_coil_phase(PlayerState.COIL_RECOVERY)
 
 
 ## Where a blink in direction `index` (0-7) would land: next to the boss, kept in the arena and out of solid props.
@@ -493,10 +697,33 @@ func _resolve_telegraphs(events: Array[GameEvent]) -> void:
 
 
 func _clamp_to_arena() -> void:
+	player.position = arena_point(player.position, Tuning.PLAYER_RADIUS)
+	boss.position = arena_point(boss.position, Tuning.BOSS_RADIUS)
+
+
+## `point` kept inside the walkable arena and pushed out of the solid props (for a body of `radius`). When a prop stands
+## too close to the wall for the body to fit straight out of it (the wall clamp pushes it back in), the nearest spot
+## that fits is searched on small rings around it (2 px steps, 16 directions), so nothing is left inside a prop.
+func arena_point(point: Vector2, radius: float) -> Vector2:
 	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
 	var high: Vector2 = Tuning.ARENA_SIZE - low
-	player.position = push_out_of_obstacles(player.position.clamp(low, high), Tuning.PLAYER_RADIUS).clamp(low, high)
-	boss.position = push_out_of_obstacles(boss.position.clamp(low, high), Tuning.BOSS_RADIUS).clamp(low, high)
+	var spot: Vector2 = push_out_of_obstacles(point.clamp(low, high), radius).clamp(low, high)
+	if _fits_props(spot, radius):
+		return spot
+	for ring: int in range(1, 17):
+		for k: int in 16:
+			var candidate: Vector2 = spot + Vector2.RIGHT.rotated(float(k) * TAU / 16.0) * (2.0 * ring)
+			candidate = push_out_of_obstacles(candidate.clamp(low, high), radius).clamp(low, high)
+			if _fits_props(candidate, radius):
+				return candidate
+	return spot
+
+
+func _fits_props(point: Vector2, radius: float) -> bool:
+	for obstacle: Obstacle in obstacles:
+		if point.distance_to(obstacle.center) < obstacle.radius + radius - 0.001:
+			return false
+	return true
 
 
 ## Moves a circle of `radius` from `before` towards `after` in steps of at most OBSTACLE_SWEEP_STEP pixels, pushing
@@ -545,18 +772,16 @@ func _separate_from_boss() -> void:
 	player.position = _free_spot(push_dir, min_dist)
 
 
-## boss + dir * min_dist, kept inside the arena. If the wall pulls that back into the boss (the boss stands near
-## a wall), try the other directions around the boss, nearest to `dir` first.
+## boss + dir * min_dist, kept inside the arena and out of the props. If the wall or a prop pushes that back into the
+## boss (the boss stands near a wall or a prop), try the other directions around the boss, nearest to `dir` first.
 func _free_spot(dir: Vector2, min_dist: float) -> Vector2:
-	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
-	var high: Vector2 = Tuning.ARENA_SIZE - low
-	var best: Vector2 = (boss.position + dir * min_dist).clamp(low, high)
+	var best: Vector2 = arena_point(boss.position + dir * min_dist, Tuning.PLAYER_RADIUS)
 	if best.distance_to(boss.position) >= min_dist - 0.01:
 		return best
 	var farthest: float = best.distance_to(boss.position)
 	for step: int in range(1, 9):
 		for sign: float in [1.0, -1.0]:
-			var candidate: Vector2 = (boss.position + dir.rotated(sign * step * PI / 8.0) * min_dist).clamp(low, high)
+			var candidate: Vector2 = arena_point(boss.position + dir.rotated(sign * step * PI / 8.0) * min_dist, Tuning.PLAYER_RADIUS)
 			var d: float = candidate.distance_to(boss.position)
 			if d >= min_dist - 0.01:
 				return candidate

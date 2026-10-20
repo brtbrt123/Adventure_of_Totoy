@@ -13,6 +13,13 @@ const SaveStore := preload("res://core/save_store.gd")
 const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
 const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cutin.gd")
 const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
+const ReapersCoilCutIn := preload("res://presentation/arena/reapers_coil_cutin.gd")
+const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
+const PlayerState := preload("res://core/player.gd")
+## Per-frame data of the scythe import (chain_origin of the Reaper's Coil whip/pull frames).
+const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
+## Height above the ground plane where the Reaper's Coil chain flies and bites (the hand is at about this height).
+const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
 const Weapons := preload("res://core/weapons.gd")
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
@@ -46,6 +53,17 @@ var cutin: BlackFormCutIn
 var lightning_cutin: LightningFormCutIn
 ## Lightning effects from core events, in world coordinates: {"kind", "tick", ...}; aged by the cosmetic tick.
 var lightning_fx: Array[Dictionary] = []
+## The Reaper's Coil cut-in (Chain Scythe right click); freezes the world the same way.
+var coil_cutin: ReapersCoilCutIn
+## Chain Scythe / Reaper's Coil event effects in world coordinates ({"kind", "tick", "life", ...}), capped at
+## ScytheEffects.MAX_LIVE. The chain, flying head, ring halves, pull streaks and dizzy stars are drawn from the snapshot.
+var coil_fx: Array[Dictionary] = []
+## Tick of the latest reaper_coil_hooked (the chain flashes spectral on it).
+var coil_hook_tick: int = -1
+## Boss id -> the tick its current drag began (paces the dust puffs and scuff decals).
+var drag_started: Dictionary = {}
+## Frame name -> where the chain leaves the fist (relative to the feet, facing right), from the scythe manifest.
+var chain_origins: Dictionary = {}
 ## Short full-screen flashes: {"tick", "color", "strengths": Array[float]} (one strength per tick of age).
 var screen_flashes: Array[Dictionary] = []
 var profile: Object = null
@@ -158,10 +176,20 @@ func _ready() -> void:
 	$HUD.add_child(cutin)
 	lightning_cutin = LightningFormCutIn.new()
 	$HUD.add_child(lightning_cutin)
+	coil_cutin = ReapersCoilCutIn.new()
+	$HUD.add_child(coil_cutin)
+	_load_chain_origins()
 
-## True while either weapon cut-in plays (the world does not step).
+## True while any weapon cut-in plays (the world does not step).
 func cutin_playing() -> bool:
-	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active)
+	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active)
+
+func _load_chain_origins() -> void:
+	var sprites_data: Dictionary = _read_json(SCYTHE_MANIFEST).get("sprites", {})
+	for group: String in sprites_data:
+		var origins: Array = Dictionary(sprites_data[group]).get("chain_origin", [])
+		for index: int in range(origins.size()):
+			chain_origins["%s_%d" % [group, index + 1]] = Vector2(float(origins[index][0]), float(origins[index][1]))
 
 func _read_json(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -178,6 +206,8 @@ func _physics_process(delta: float) -> void:
 			cutin.advance(delta)
 		if lightning_cutin.active:
 			lightning_cutin.advance(delta)
+		if coil_cutin.active:
+			coil_cutin.advance(delta)
 		return
 	if Input.is_action_just_pressed("arena_debug"):
 		debug_enabled = not debug_enabled
@@ -239,7 +269,12 @@ func _restart() -> void:
 		cutin.stop()
 	if lightning_cutin != null:
 		lightning_cutin.stop()
+	if coil_cutin != null:
+		coil_cutin.stop()
 	lightning_fx.clear()
+	coil_fx.clear()
+	coil_hook_tick = -1
+	drag_started.clear()
 	screen_flashes.clear()
 	combat_audio.reset()
 	combat_audio.set_music_active(true)
@@ -306,6 +341,9 @@ func _age_effects() -> void:
 	for i: int in range(lightning_fx.size() - 1, -1, -1):
 		if cosmetic_tick - int(lightning_fx[i]["tick"]) >= int(lightning_fx[i]["life"]):
 			lightning_fx.remove_at(i)
+	for i: int in range(coil_fx.size() - 1, -1, -1):
+		if cosmetic_tick - int(coil_fx[i]["tick"]) >= int(coil_fx[i]["life"]):
+			coil_fx.remove_at(i)
 	for i: int in range(screen_flashes.size() - 1, -1, -1):
 		if cosmetic_tick - int(screen_flashes[i]["tick"]) >= Array(screen_flashes[i]["strengths"]).size():
 			screen_flashes.remove_at(i)
@@ -337,14 +375,18 @@ func _on_event(event: GameEvent) -> void:
 			# Older events have no form: the weapon says which active it was.
 			var form: StringName = StringName(event.data.get("form", Weapons.active_form(StringName(event.data.get("weapon_id", Tuning.WEAPON_BLACK_KATANA)))))
 			var lightning: bool = form == Weapons.FORM_LIGHTNING
+			var coil: bool = form == Weapons.FORM_REAPER_COIL
+			# Each active plays its own cut-in: Lightning Form, Reaper's Coil, else the katana's Black Form.
 			if started:
 				if lightning and lightning_cutin != null:
 					lightning_cutin.start()
-				elif not lightning and cutin != null:
+				elif coil and coil_cutin != null:
+					coil_cutin.start()
+				elif not lightning and not coil and cutin != null:
 					cutin.start()
 			buff_transition = {"tick": event.tick, "started": started, "at": snapshot.player.position, "form": form}
 			combat_audio.cue("weapon_buff_start" if started else "weapon_buff_end", event.tick)
-			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["o"] if lightning else colors["k"], 0.8)
+			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["o"] if lightning else (colors["u"] if coil else colors["k"]), 0.8)
 		&"weapon_swapped":
 			combat_audio.cue("swing", event.tick, 0.5)
 			_burst(snapshot.player.position - Vector2(0, 12), 8, colors["j"], 0.6)
@@ -352,6 +394,8 @@ func _on_event(event: GameEvent) -> void:
 			_on_lightning_blink(event)
 		&"lightning_strike":
 			_on_lightning_strike(event)
+		&"reaper_coil_started", &"reaper_coil_hooked", &"reaper_coil_missed", &"reaper_coil_drag", &"reaper_coil_spin", &"reaper_coil_ended":
+			_on_reaper_coil(event)
 		&"lightning_barrage_ended":
 			# The barrage's slashes and finisher draw from lightning_blink / attack_hit / lightning_strike; only a small
 			# discharge marks the hero getting control back.
@@ -425,8 +469,11 @@ func _on_event(event: GameEvent) -> void:
 			_sound_game_result(event)
 			_record_result(event)
 
-## The last swing of the weapon's combo (katana 3, dagger 4), or the Lightning Barrage's last slash.
+## The last swing of the weapon's combo (katana 3, dagger 4, scythe 3), the Lightning Barrage's last slash, or a
+## Reaper's Coil spin hit.
 func _is_finisher(event: GameEvent) -> bool:
+	if event.data.has("reaper_coil_hit"):
+		return true
 	if event.data.has("barrage_slash"):
 		return int(event.data["barrage_slash"]) >= Weapons.barrage_slashes()
 	if not event.data.has("combo_index"):
@@ -480,6 +527,79 @@ func _on_lightning_strike(event: GameEvent) -> void:
 	_burst(at + LightningEffects.BOSS_BODY, 18, colors["1"], 1.6)
 	combat_audio.cue("posture_break", tick)
 
+func _add_coil_fx(effect: Dictionary) -> void:
+	ScytheEffects.add(coil_fx, effect)
+
+## The boss snapshot with this id (or the first entity).
+func _entity(id: int) -> Snapshots.EntitySnapshot:
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.id == id:
+			return actor
+	return snapshot.entities[0] if not snapshot.entities.is_empty() else null
+
+## Reaper's Coil, from the core's events only (the chain itself is drawn from the snapshot every frame):
+## throw: a whoosh; hooked: a clink at the bite with shake and flash; missed: a poof where the hook lands (the hero is
+## then pulled there); drag end: the stagger burst on the golem's chest; spin: a whoosh per pass, sparks and a flash
+## when it connects; end: a small burst. Sounds reuse the combat cues (no new audio).
+func _on_reaper_coil(event: GameEvent) -> void:
+	var tick: int = event.tick
+	match event.type:
+		&"reaper_coil_started":
+			combat_audio.cue("swing", tick, 1.0)
+		&"reaper_coil_hooked":
+			coil_hook_tick = tick
+			var bite: Vector2 = Vector2(event.data["to"]) + CHAIN_HEIGHT
+			_add_coil_fx({"kind": "hook", "tick": tick, "at": bite.round(), "life": ScytheEffects.sequence_length(ScytheEffects.HOOK_TICKS)})
+			_burst(bite, 10, colors["u"], 1.0)
+			shake_left = maxi(shake_left, 3)
+			_flash(tick, colors["p"], [0.16, 0.06])
+			combat_audio.cue("deflect", tick, 0.9)
+			combat_audio.cue("dash", tick, 0.7)
+		&"reaper_coil_missed":
+			var anchor: Vector2 = event.data["to"]
+			_add_coil_fx({"kind": "land", "tick": tick, "at": anchor.round(), "life": ScytheEffects.sequence_length(ScytheEffects.LAND_TICKS)})
+			if event.data.get("blocked_by", &"range") != &"range":
+				_add_coil_fx({"kind": "spark", "tick": tick, "at": (anchor + CHAIN_HEIGHT).round(), "life": ScytheEffects.sequence_length(ScytheEffects.SPARK_TICKS)})
+			_dust(anchor)
+			shake_left = maxi(shake_left, 1)
+			combat_audio.cue("deflect", tick, 0.5)
+			combat_audio.cue("dash", tick, 0.7)
+		&"reaper_coil_drag":
+			var boss: Snapshots.EntitySnapshot = _entity(int(event.data.get("target_id", -1)))
+			var chest: Vector2 = boss_core_position(boss) if boss != null else Vector2(event.data["to"]) + ScytheEffects.BOSS_BODY
+			_add_coil_fx({"kind": "stagger", "tick": tick, "at": chest.round(), "life": ScytheEffects.sequence_length(ScytheEffects.STAGGER_TICKS)})
+			_burst(chest, 14, colors["p"], 1.2)
+			shake_left = maxi(shake_left, 5)
+			combat_audio.cue("posture_break", tick)
+		&"reaper_coil_spin":
+			var connects: bool = bool(event.data.get("connects", false))
+			combat_audio.cue("swing", tick, 1.0 if connects else 0.7)
+			if connects:
+				for actor: Snapshots.EntitySnapshot in snapshot.entities:
+					var contact: Vector2 = boss_core_position(actor)
+					_add_coil_fx({"kind": "spark", "tick": tick, "at": contact.round(), "life": ScytheEffects.sequence_length(ScytheEffects.SPARK_TICKS)})
+				shake_left = maxi(shake_left, 2)
+				_flash(tick, colors["p"], [0.12])
+		&"reaper_coil_ended":
+			if event.data.get("reason", &"") in [&"complete", &"missed"]:
+				_burst(snapshot.player.position - Vector2(0, 12), 6, colors["u"], 0.6)
+
+## Per fresh tick while the boss is dragged: dust puffs at its leading foot and scuff decals where it slid.
+func _coil_drag_trail() -> void:
+	var hero: Snapshots.EntitySnapshot = snapshot.player
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if not actor.dragged:
+			drag_started.erase(actor.id)
+			continue
+		if not drag_started.has(actor.id):
+			drag_started[actor.id] = snapshot.tick
+		var toward_right: bool = hero.position.x > actor.position.x
+		var tick: int = snapshot.tick - int(drag_started[actor.id])  # from the hook tick: a short drag still leaves marks
+		if tick % ScytheEffects.DUST_EVERY == 0:
+			_add_coil_fx({"kind": "dust", "tick": snapshot.tick, "at": (actor.position + Vector2(12 if toward_right else -12, 0)).round(), "left": toward_right, "life": ScytheEffects.sequence_length(ScytheEffects.DUST_TICKS)})
+		if tick % ScytheEffects.SCUFF_EVERY == 0:
+			_add_coil_fx({"kind": "scuff", "tick": snapshot.tick, "at": actor.position.round(), "left": toward_right, "life": ScytheEffects.sequence_length(ScytheEffects.SCUFF_TICKS)})
+
 func _burst(at: Vector2, count: int, color: Color, speed: float) -> void:
 	for i: int in range(count):
 		particles.append({"position": at, "velocity": Vector2.from_angle(TAU * i / count) * speed, "life": 7 if i % 3 == 0 else 11, "color": colors["p"] if color == colors["1"] and i % 3 == 0 else (colors["o"] if color == colors["1"] and i % 3 == 1 else color)})
@@ -506,6 +626,7 @@ func _draw() -> void:
 	for trail: Dictionary in trails:
 		_draw_imported("fx_dust_%d" % (6 - int(trail["life"])), trail["position"])
 	_draw_lightning_ground()
+	_draw_coil_ground()
 	_draw_dash()
 	var actors: Array[Snapshots.EntitySnapshot] = [snapshot.player]
 	actors.append_array(snapshot.entities)
@@ -568,6 +689,7 @@ func _draw() -> void:
 	_draw_buff_slash(offset)
 	_draw_buff_transition()
 	_draw_lightning(offset)
+	_draw_scythe(offset)
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -618,7 +740,8 @@ func prepare_visuals() -> void:
 		var attack_started: bool = hero.state == &"attack_windup" and changed
 		if hero.state == &"attack_active" and changed:
 			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index >= Weapons.combo_max(hero.weapon_id) else 0.75)
-		if ((moved and hero.state != &"dead") or attack_started or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
+		var coiling: bool = hero.state == PlayerState.STATE_REAPER_COIL  # faces the chain's direction (core facing)
+		if ((moved and hero.state != &"dead") or attack_started or coiling or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
 			facing_left = hero.facing.x < 0.0
 		for i: int in range(dash_ghosts.size() - 1, -1, -1):
 			dash_ghosts[i]["life"] -= 1
@@ -631,6 +754,7 @@ func prepare_visuals() -> void:
 			dash_ghosts.append({"position": previous_player_position, "left": facing_left, "life": 6})
 			if dash_ghosts.size() > 3:
 				dash_ghosts.pop_front()
+		_coil_drag_trail()
 		previous_player_position = hero.position
 		previous_player_state = hero.state
 		previous_combo_index = hero.combo_index
@@ -743,12 +867,14 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	if not silhouette_only:
 		if actor.id == snapshot.player.id:
 			_draw_buff_aura(actor, false)
+			_draw_spin_ring(actor, false)
 		var actor_texture: Texture2D = empowered_sprites if actor.id == snapshot.player.id and black_form_look(actor) else sprites
 		draw_texture_rect_region(actor_texture, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 	if silhouette_only:
 		draw_texture_rect_region(white_sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 	if not silhouette_only and actor.id == snapshot.player.id:
 		_draw_buff_aura(actor, true)
+		_draw_spin_ring(actor, true)
 
 func _draw_dash() -> void:
 	var frame: Dictionary = frames.get(ArenaAnimation.hero_frame(ArenaAnimation.hero_set(snapshot.player), "dash", 1), frames.get("hero2_dash_right_1", {}))
@@ -1031,11 +1157,13 @@ func _draw_buff_transition() -> void:
 	if buff_transition.get("form", &"") == Weapons.FORM_LIGHTNING:
 		_draw_buff_frame("fx_lightning_aura_back_%d" % (mini(9, age) + 1), at, level, facing_left)
 		return
+	if buff_transition.get("form", &"") == Weapons.FORM_REAPER_COIL:
+		return  # no aura: the coil's chain and ring are its look
 	_draw_buff_frame("fx_black_aura_back_%d" % (mini(5, age / 2) + 1), at, level, facing_left)
 
-## The darkened Black Form hero and its black dash ghosts: only the katana's buff, never the dagger.
+## The darkened Black Form hero and its black dash ghosts: only the katana's buff, never the dagger or the scythe.
 func black_form_look(actor: Snapshots.EntitySnapshot) -> bool:
-	return actor.weapon_buff_active and actor.weapon_form != Weapons.FORM_LIGHTNING and actor.weapon_id != Tuning.WEAPON_DUAL_DAGGER
+	return actor.weapon_buff_active and actor.weapon_id == Tuning.WEAPON_BLACK_KATANA and actor.weapon_form not in [Weapons.FORM_LIGHTNING, Weapons.FORM_REAPER_COIL]
 
 ## Scorch decals of sky strikes, on the floor under everything standing.
 func _draw_lightning_ground() -> void:
@@ -1096,3 +1224,112 @@ func _draw_lightning(shake_offset: Vector2) -> void:
 					var at: Vector2 = effect["at"]
 					var scale_px: int = LightningEffects.strike_scale(at.y - view_origin.y)
 					_draw_imported("fx_lightning_strike_%d" % frame, at, Vector2(scale_px, scale_px))
+
+
+# ---------------------------------------------------------------- Chain Scythe / Reaper's Coil (world space)
+
+## A frame by its own anchor, mirrored around it for `left` (the same rule as the hero frames).
+func _draw_anchored(key: String, at: Vector2, left: bool) -> void:
+	if not frames.has(key):
+		return
+	var f: Dictionary = frames[key]
+	draw_texture_rect_region(sprites, ArenaAnimation.destination(at, f, left), Rect2(f["x"], f["y"], f["w"], f["h"]))
+
+## The spin ring around the hero: the back half before the sprite, the front half after it.
+func _draw_spin_ring(actor: Snapshots.EntitySnapshot, front: bool) -> void:
+	if actor.state != PlayerState.STATE_REAPER_COIL or actor.reaper_coil_phase != PlayerState.COIL_SPIN:
+		return
+	var ring: int = ScytheEffects.ring_phase(actor.reaper_coil_phase_tick)
+	if ring > 0:
+		_draw_anchored("fx_scythe_spin_%s_%d" % ["front" if front else "back", ring], actor.position, facing_left)
+
+## Where the chain leaves the fist this frame (world), from the frame's chain_origin (mirrored when facing left).
+func chain_hand() -> Vector2:
+	var hero: Snapshots.EntitySnapshot = snapshot.player
+	var origin: Vector2 = chain_origins.get(String(selected_frames.get(hero.id, "")), ScytheEffects.DEFAULT_HAND)
+	if facing_left:
+		origin.x = -origin.x
+	return hero.position.round() + origin
+
+## Where the chain ends (world): the flying tip or the bite on the golem at chain height, the anchor on the ground.
+func chain_tip() -> Vector2:
+	var hero: Snapshots.EntitySnapshot = snapshot.player
+	var tip: Vector2 = hero.reaper_coil_target.round()
+	return tip if hero.reaper_coil_phase == PlayerState.COIL_PULL else tip + CHAIN_HEIGHT
+
+## The swing arc of a scythe swing in progress (empty when none), anchored at the hero's feet.
+func scythe_arc_effect() -> Dictionary:
+	if snapshot.result != &"playing":
+		return {}
+	var key: String = ScytheEffects.arc_key(snapshot.player)
+	if key.is_empty() or not String(selected_frames.get(snapshot.player.id, "")).begins_with(ArenaAnimation.SET_SCYTHE + "_attack"):
+		return {}
+	return {"key": key, "at": snapshot.player.position.round(), "left": facing_left}
+
+## Scuff decals of the drag, on the floor under everything standing.
+func _draw_coil_ground() -> void:
+	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
+	for effect: Dictionary in coil_fx:
+		if effect["kind"] == "scuff":
+			var frame: int = ScytheEffects.sequence_frame(ScytheEffects.SCUFF_TICKS, cosmetic_tick - int(effect["tick"]))
+			if frame > 0:
+				_draw_imported("fx_chain_scuff_%d" % frame, effect["at"], Vector2(-1 if bool(effect["left"]) else 1, 1))
+
+## Swing arcs, the chain with its flying head, the pull streaks on a dragged golem, dizzy stars over a stunned one, and
+## the event sequences (clink, poof, stagger burst, sparks, dust).
+func _draw_scythe(shake_offset: Vector2) -> void:
+	var arc: Dictionary = scythe_arc_effect()
+	if not arc.is_empty():
+		_draw_anchored(arc["key"], arc["at"], bool(arc["left"]))
+	var hero: Snapshots.EntitySnapshot = snapshot.player
+	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.dragged:
+			_draw_imported("fx_chain_pull_%d" % ScytheEffects.pull_frame(snapshot.tick), actor.position.round(), Vector2(-1 if hero.position.x > actor.position.x else 1, 1))
+		elif actor.state == &"staggered" and actor.stagger_ticks_left > 0:
+			var key: String = String(selected_frames.get(actor.id, ""))
+			var head: Vector2 = actor.position + Vector2(0, -44)
+			if frames.has(key) and head_anchors.has(key):
+				head = HeadAnchors.world(actor.position, frames[key], head_anchors[key], ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {})))
+			_draw_imported("fx_chain_stars_%d" % ScytheEffects.stars_frame(snapshot.tick), (head + Vector2(0, -2)).round())
+	if ScytheEffects.chain_visible(hero):
+		var from: Vector2 = chain_hand()
+		var to: Vector2 = chain_tip()
+		var line: Vector2 = to - from
+		var segments: Array[Dictionary] = ScytheEffects.chain_segments(line.length())
+		for index: int in range(segments.size()):
+			var key: String = "fx_chain_link_%d" % ScytheEffects.link_frame(index, segments.size(), snapshot.tick, hero.reaper_coil_phase, snapshot.tick == coil_hook_tick)
+			if not frames.has(key):
+				continue
+			var f: Dictionary = frames[key]
+			var length: float = float(segments[index]["length"])
+			draw_set_transform(from + shake_offset, line.angle())
+			draw_texture_rect_region(sprites, Rect2(Vector2(float(segments[index]["offset"]), -float(f["ay"])), Vector2(length, f["h"])), Rect2(f["x"], f["y"], length, f["h"]))
+			draw_set_transform(shake_offset)
+		# the scythe at the chain's end: tumbling while it flies, biting along the chain once it holds
+		var frame: int = posmod(snapshot.tick, 8) + 1 if hero.reaper_coil_phase == PlayerState.COIL_HOOK else ScytheEffects.flying_frame(line)
+		if line.length() > 2.0:
+			_draw_imported("fx_scythe_flying_%d" % frame, to)
+	for effect: Dictionary in coil_fx:
+		var age: int = cosmetic_tick - int(effect["tick"])
+		match String(effect["kind"]):
+			"hook":
+				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.HOOK_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_chain_hook_%d" % frame, effect["at"])
+			"land":
+				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.LAND_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_chain_land_%d" % frame, effect["at"])
+			"stagger":
+				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.STAGGER_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_chain_stagger_%d" % frame, effect["at"])
+			"spark":
+				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.SPARK_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_chain_hook_%d" % (frame + 3), effect["at"])
+			"dust":
+				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.DUST_TICKS, age)
+				if frame > 0:
+					_draw_imported("fx_chain_dust_%d" % frame, effect["at"], Vector2(-1 if bool(effect["left"]) else 1, 1))

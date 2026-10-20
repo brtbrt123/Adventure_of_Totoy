@@ -130,7 +130,8 @@ const BLACK_KATANA_ATTACK_SPEED_MULT: float = 1.5
 const BLACK_KATANA_DAMAGE_MULT: float = 1.4
 const BLACK_KATANA_MOVE_SPEED_MULT: float = 1.0  # the katana buff does not change walking speed
 
-# Weapon swap (Q in presentation: InputFrame.weapon_swap_pressed). Black Katana <-> Dual Dagger. A free action, only
+# Weapon swap (Q in presentation: InputFrame.weapon_swap_pressed). Cycles Black Katana -> Dual Dagger -> Chain Scythe
+# -> Black Katana (the order is Weapons.IDS). A free action, only
 # from idle or walk, never while a weapon buff/form runs. After a swap the next swap waits WEAPON_SWAP_LOCKOUT_TICKS.
 # Every weapon keeps its own active cooldown, so swapping never resets one. The player always starts with the katana.
 const WEAPON_SWAP_LOCKOUT_TICKS: int = 20
@@ -178,6 +179,57 @@ const LIGHTNING_BARRAGE_HIT_DELAY_TICKS: int = 2  # must stay below the interval
 const LIGHTNING_BARRAGE_RECOVERY_TICKS: int = 10
 const LIGHTNING_BARRAGE_DAMAGE_MULT: float = 0.6  # x ATTACK_DAMAGE: a dagger swing 1-3
 const LIGHTNING_BARRAGE_EDGE_PER_HIT: float = 5.0  # less than a swing (20) so the barrage does not refund its cost
+
+# Chain Scythe (third weapon), first guesses set on 2026-10-20, nobody has played it yet. A slow, heavy, wide 3-hit
+# combo: swing totals 22/21/34 ticks against the katana's 19/18/29 (the dagger's 12/12/12/21). Reach x1.3 of the
+# katana's ATTACK_RANGE (34 px; the finisher 36 px), and a wider arc: SCYTHE_ARC_DOT -0.2 is a half arc of about 102
+# degrees (the katana's ATTACK_ARC_DOT 0.2 is about 78), so it also hits straight to the sides. Damage multiplies
+# ATTACK_DAMAGE like the other tables; posture per hit replaces NORMAL_HIT_POSTURE (4) for scythe swings.
+const WEAPON_CHAIN_SCYTHE: StringName = &"chain_scythe"
+const SCYTHE_COMBO_MAX: int = 3
+const SCYTHE_SWING_WINDUP_TICKS: Array[int] = [8, 7, 11]
+const SCYTHE_SWING_ACTIVE_TICKS: Array[int] = [4, 4, 5]
+const SCYTHE_SWING_RECOVERY_TICKS: Array[int] = [10, 10, 18]
+const SCYTHE_SWING_DAMAGE_MULT: Array[float] = [1.0, 1.1, 1.7]
+const SCYTHE_SWING_RANGE_MULT: Array[float] = [1.3, 1.3, 1.4]
+const SCYTHE_SWING_POSTURE: Array[float] = [5.0, 5.0, 9.0]
+const SCYTHE_ARC_DOT: float = -0.2
+const SCYTHE_EDGE_PER_HIT: float = 25.0  # like the katana
+
+# Reaper's Coil: the Chain Scythe's active (right click), first guesses set on 2026-10-20. A free action on the press
+# (needs the boss alive, at any distance; costs Edge, cooldown from the activation, no use while it runs) that runs a
+# scripted skill (player state reaper_coil: no movement, no actions, invulnerable):
+# HOOK: the chain flies from the player in the aim direction (else the facing), REAPER_COIL_HOOK_SPEED px per tick, up
+#   to REAPER_COIL_HOOK_RANGE px (12 ticks), stopped by solid props and the arena wall.
+# Boss hooked -> DRAG: the boss's attack is cancelled and it is pulled REAPER_COIL_DRAG_SPEED px per tick toward the
+#   player until its centre is BOSS_RADIUS + PLAYER_RADIUS + REAPER_COIL_DRAG_GAP px away (or props block it, or
+#   REAPER_COIL_DRAG_MAX_TICKS ran out). Then it is staggered for REAPER_COIL_STAGGER_TICKS (no attacks, no walking).
+#   SPIN: REAPER_COIL_SPIN_TICKS ticks, hits on spin ticks FIRST_HIT and FIRST_HIT + INTERVAL (anything within
+#   REAPER_COIL_SPIN_RADIUS px of the player, plus the target's radius), then REAPER_COIL_RECOVERY_TICKS.
+# Missed -> PULL: the player is pulled to where the chain stopped, REAPER_COIL_PULL_SPEED px per tick, then
+#   REAPER_COIL_PULL_RECOVERY_TICKS. No stagger, no spin.
+const REAPER_COIL_EDGE_COST: float = 50.0
+const REAPER_COIL_COOLDOWN_TICKS: int = 1200  # 20 seconds
+const REAPER_COIL_HOOK_RANGE: float = 150.0
+const REAPER_COIL_HOOK_SPEED: float = 12.5  # 150 / 12.5 = 12 ticks to full range
+const REAPER_COIL_CHAIN_WIDTH: float = 8.0  # the chain touches a circle within half of this
+const REAPER_COIL_DRAG_SPEED: float = 10.0
+const REAPER_COIL_DRAG_GAP: float = 8.0  # boss edge to player edge after the drag
+const REAPER_COIL_DRAG_MAX_TICKS: int = 16
+const REAPER_COIL_DRAG_BLOCKED_PX: float = 0.5  # a drag (or pull) tick that gains less than this is blocked: it ends
+const REAPER_COIL_STAGGER_TICKS: int = 45  # the boss's stun, counted from the tick the drag ends
+const BOSS_STAGGER_RECOVER_TICKS: int = 12  # the boss's recover state after the stun, then its normal cooldown
+const REAPER_COIL_PULL_SPEED: float = 8.0
+const REAPER_COIL_PULL_RECOVERY_TICKS: int = 8
+const REAPER_COIL_SPIN_TICKS: int = 20
+const REAPER_COIL_SPIN_FIRST_HIT_TICK: int = 4
+const REAPER_COIL_SPIN_HIT_INTERVAL_TICKS: int = 8
+const REAPER_COIL_SPIN_HITS: int = 2
+const REAPER_COIL_SPIN_RADIUS: float = 36.0
+const REAPER_COIL_SPIN_DAMAGE_MULT: float = 1.2  # x ATTACK_DAMAGE per spin hit
+const REAPER_COIL_SPIN_POSTURE: float = 10.0
+const REAPER_COIL_EDGE_PER_HIT: float = 5.0  # small, like the barrage
+const REAPER_COIL_RECOVERY_TICKS: int = 10
 
 # Edge (sword mechanic): close hits and parries build it, a counter spends all of it for extra damage
 const EDGE_MAX: float = 100.0

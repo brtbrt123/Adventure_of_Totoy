@@ -1,6 +1,7 @@
 extends RefCounted
 ## Mossbound Colossus simulation. No rendering. Three attacks: a gold slam and sweep (parry them), and
-## red shards (dodge them). Posture break opens a counter window. Phase 2 at half health.
+## red shards (dodge them). Posture break opens a counter window. Phase 2 at half health. Reaper's Coil (the Chain
+## Scythe's active) can drag it (interrupt_for_drag / end_drag) and stun it (STATE_STAGGERED).
 
 const Tuning := preload("res://core/tuning.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -11,6 +12,8 @@ const STATE_IDLE: StringName = &"idle"
 const STATE_ATTACK: StringName = &"attack"  # from the first warning tick to the end of the danger window
 const STATE_RECOVER: StringName = &"recover"
 const STATE_BROKEN: StringName = &"posture_broken"
+## Stunned by Reaper's Coil: no attacks, no walking. Held while dragged, then REAPER_COIL_STAGGER_TICKS.
+const STATE_STAGGERED: StringName = &"staggered"
 const STATE_DEAD: StringName = &"dead"
 
 const ATTACK_SLAM: StringName = &"gold_slam"
@@ -35,6 +38,9 @@ var state_ticks: int = 0
 var telegraphs: Array[Telegraph] = []
 var cooldown: int = Tuning.BOSS_FIRST_ATTACK_DELAY_TICKS
 var broken_ticks_left: int = 0
+## True while Reaper's Coil drags the boss: it does nothing on its own (no timers, no attacks, no walking).
+var dragged: bool = false
+var stagger_ticks_left: int = 0  # ticks of the stun left in STATE_STAGGERED once the drag is over
 ## Tests and scripted encounters can force the next attack (one of ATTACKS).
 var next_attack_override: StringName = &""
 
@@ -47,10 +53,17 @@ var _next_telegraph_id: int = 1
 
 
 func step(tick: int, player_pos: Vector2, rng: RandomNumberGenerator, events: Array[GameEvent]) -> void:
-	if state == STATE_DEAD:
+	if state == STATE_DEAD or dragged:
 		return
 	state_ticks += 1
 	match state:
+		STATE_STAGGERED:
+			_decay_posture()
+			if stagger_ticks_left <= 0:
+				_recover_ticks = Tuning.BOSS_STAGGER_RECOVER_TICKS
+				_set_state(STATE_RECOVER)
+			else:
+				stagger_ticks_left -= 1
 		STATE_IDLE:
 			_decay_posture()
 			var to_player: Vector2 = player_pos - position
@@ -99,6 +112,8 @@ func take_damage(amount: int, tick: int, events: Array[GameEvent], source_id: in
 		var was_broken: bool = state == STATE_BROKEN
 		state = STATE_DEAD
 		state_ticks = 0
+		dragged = false
+		stagger_ticks_left = 0
 		telegraphs.clear()
 		if was_broken:
 			events.append(GameEvent.new(GameEvent.COUNTER_WINDOW_CLOSED, tick, {"entity_id": id}))
@@ -112,10 +127,38 @@ func _break(tick: int, events: Array[GameEvent]) -> void:
 	posture = Tuning.BOSS_POSTURE_MAX
 	telegraphs.clear()  # a broken boss drops its current attack
 	_charge = null
+	stagger_ticks_left = 0  # a break during a Reaper's Coil stun replaces the stun
 	broken_ticks_left = Tuning.BOSS_BREAK_TICKS
 	_set_state(STATE_BROKEN)
 	events.append(GameEvent.new(GameEvent.POSTURE_BROKEN, tick, {"entity_id": id, "window_ticks": Tuning.BOSS_BREAK_TICKS}))
 	events.append(GameEvent.new(GameEvent.COUNTER_WINDOW_OPENED, tick, {"entity_id": id, "window_ticks": Tuning.BOSS_BREAK_TICKS}))
+
+
+## Reaper's Coil hooked the boss: whatever attack it was winding up or swinging is cancelled (its telegraphs are
+## dropped, so nothing of it can hit any more; a charge stops where the body is) and it does nothing until end_drag().
+## A boss whose posture is broken stays broken (its counter window is only paused while dragged); any other state
+## becomes STATE_STAGGERED. Returns the cancelled attack (one of ATTACKS), or empty when none was running.
+func interrupt_for_drag() -> StringName:
+	if state == STATE_DEAD:
+		return &""
+	var cancelled: StringName = _last_attack if state == STATE_ATTACK else &""
+	telegraphs.clear()
+	_charge = null
+	dragged = true
+	if state != STATE_BROKEN:
+		stagger_ticks_left = 0
+		_set_state(STATE_STAGGERED)
+	return cancelled
+
+
+## The drag is over: a staggered boss now stays stunned for `stun_ticks` more ticks (counting this one), then recovers
+## (BOSS_STAGGER_RECOVER_TICKS) and goes back to its normal cooldown. A broken boss's counter window just goes on.
+func end_drag(stun_ticks: int) -> void:
+	if not dragged:
+		return
+	dragged = false
+	if state == STATE_STAGGERED:
+		stagger_ticks_left = stun_ticks
 
 
 func _decay_posture() -> void:

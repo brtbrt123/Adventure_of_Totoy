@@ -67,7 +67,7 @@ static func from_dict(data: Dictionary) -> Object:
 	var result: String = String(data.get("last_result", "")) if data.get("last_result", "") is String else ""
 	profile.last_result = StringName(result) if result in ["victory", "defeat"] else &""
 	var weapon: String = String(data.get("weapon_id", "black_katana")) if data.get("weapon_id", "") is String else ""
-	profile.weapon_id = StringName(weapon) if weapon in ["black_katana", "dual_dagger"] else &"black_katana"
+	profile.weapon_id = StringName(weapon) if weapon in ["black_katana", "dual_dagger", "chain_scythe"] else &"black_katana"
 	return profile
 
 

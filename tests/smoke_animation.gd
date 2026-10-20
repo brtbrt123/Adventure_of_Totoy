@@ -2,6 +2,7 @@ extends SceneTree
 ## Run after validate/build/preview and Godot import.
 const Arena := preload("res://presentation/arena/arena.gd")
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
+const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const Weapons := preload("res://core/weapons.gd")
@@ -69,9 +70,9 @@ func _catalog() -> void:
 	_expect(atlas.has("totoy_portrait"), "portrait missing")
 	if atlas.has("totoy_portrait"):
 		_expect(int(atlas["totoy_portrait"]["w"]) == 48 and int(atlas["totoy_portrait"]["h"]) == 48, "portrait canvas")
-	for name_key: String in ArenaAnimation.all_names() + SkillEffects.all_names() + WeaponBuffView.all_names():
-		_expect(atlas.has(name_key), "atlas missing " + name_key)
-		if atlas.has(name_key) and (name_key.begins_with("hero2_") or name_key.begins_with("totoy_dagger_") or name_key.begins_with("totoy_lightning_")):
+	for name_key: String in ArenaAnimation.all_names() + SkillEffects.all_names() + WeaponBuffView.all_names() + ScytheEffects.all_names():
+		_expect(atlas.has(name_key) or name_key in ["fx_scythe_spin_front_1", "fx_scythe_spin_back_4"], "atlas missing " + name_key)
+		if atlas.has(name_key) and (name_key.begins_with("hero2_") or name_key.begins_with("totoy_dagger_") or name_key.begins_with("totoy_lightning_") or name_key.begins_with("totoy_scythe_")):
 			var frame: Dictionary = atlas[name_key]
 			_expect(frame.has("ax") and frame.has("ay"), "feet anchor missing: " + name_key)
 			var at: Vector2 = Vector2(64, 88)
@@ -93,7 +94,7 @@ func _catalog() -> void:
 				_expect(atlas.has(ArenaAnimation.choose(actor, snap, {})), "selector missing player %s %s tick %d" % [state, facing, t])
 	# The same for the Dual Dagger and its Lightning Form: every state, and every phase tick of swings 1-4 (also at
 	# the form's doubled speed), must name a frame of the right set.
-	for look: Array in [[Tuning.WEAPON_DUAL_DAGGER, &"", "totoy_dagger_"], [Tuning.WEAPON_DUAL_DAGGER, Weapons.FORM_LIGHTNING, "totoy_lightning_"]]:
+	for look: Array in [[Tuning.WEAPON_DUAL_DAGGER, &"", "totoy_dagger_"], [Tuning.WEAPON_DUAL_DAGGER, Weapons.FORM_LIGHTNING, "totoy_lightning_"], [Tuning.WEAPON_CHAIN_SCYTHE, &"", "totoy_scythe_"]]:
 		actor.weapon_id = look[0]
 		actor.weapon_form = look[1]
 		for state: String in ArenaAnimation.PLAYER:
@@ -117,7 +118,27 @@ func _catalog() -> void:
 		actor.skill_id = &""
 		actor.combo_index = 4
 		actor.state = &"attack_recovery"
-		_expect(ArenaAnimation.swing_durations(actor)[2] == PlayerState.scaled_ticks(Tuning.DAGGER_SWING_RECOVERY_TICKS[3], actor.attack_speed_mult), "dagger swing 4 uses its own table")
+		if actor.weapon_id == Tuning.WEAPON_DUAL_DAGGER:
+			_expect(ArenaAnimation.swing_durations(actor)[2] == PlayerState.scaled_ticks(Tuning.DAGGER_SWING_RECOVERY_TICKS[3], actor.attack_speed_mult), "dagger swing 4 uses its own table")
+		else:
+			actor.combo_index = 3
+			_expect(ArenaAnimation.swing_durations(actor)[2] == PlayerState.scaled_ticks(Tuning.SCYTHE_SWING_RECOVERY_TICKS[2], actor.attack_speed_mult), "scythe swing 3 uses its own table")
+	# Reaper's Coil: every phase at every phase tick names an existing scythe coil frame; the spin shows all 8 turns.
+	actor.weapon_id = Tuning.WEAPON_CHAIN_SCYTHE
+	actor.weapon_form = Weapons.FORM_REAPER_COIL
+	actor.state = PlayerState.STATE_REAPER_COIL
+	var coil_frames: Dictionary = {}
+	for phase: StringName in [PlayerState.COIL_HOOK, PlayerState.COIL_DRAG, PlayerState.COIL_SPIN, PlayerState.COIL_PULL, PlayerState.COIL_RECOVERY, &""]:
+		actor.reaper_coil_phase = phase
+		for t: int in range(0, Weapons.reaper_coil_total_ticks() + 2):
+			actor.reaper_coil_phase_tick = t
+			var chosen: String = ArenaAnimation.choose(actor, snap, {})
+			coil_frames[chosen] = true
+			_expect(atlas.has(chosen) and chosen.begins_with("totoy_scythe_coil_"), "coil %s tick %d: %s" % [phase, t, chosen])
+	for name_key: String in ScytheEffects.coil_names():
+		_expect(coil_frames.has(name_key), "the coil never shows " + name_key)
+	actor.reaper_coil_phase = &""
+	actor.weapon_form = &""
 	# Lightning Barrage: every slash (0 = the activation tick) at every age shows a Lightning dagger attack frame.
 	actor.weapon_id = Tuning.WEAPON_DUAL_DAGGER
 	actor.weapon_form = Weapons.FORM_LIGHTNING
@@ -136,8 +157,8 @@ func _catalog() -> void:
 	actor.lightning_barrage_slash = 0
 	actor.lightning_barrage_slash_tick = -1
 	snap.tick = 0
-	for prefix: String in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING]:
-		var expected: int = 6 * (3 if prefix == ArenaAnimation.SET_KATANA else 4)
+	for prefix: String in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING, ArenaAnimation.SET_SCYTHE]:
+		var expected: int = 6 * (4 if prefix in [ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING] else 3)
 		var attacks: int = 0
 		for name_key: String in ArenaAnimation.hero_names(prefix):
 			_expect(atlas.has(name_key), "set %s misses %s" % [prefix, name_key])
@@ -225,6 +246,60 @@ func _dagger_timelines() -> void:
 		for name_key: String in requested:
 			_expect(String(name_key).begins_with(prefix) or String(name_key).begins_with("totoy_dagger_"), "%s timeline drew another set: %s" % [prefix, name_key])
 
+## Real core lifetimes with the Chain Scythe: swap twice (lockout in between), chain swings 1-3 next to the boss, then
+## Reaper's Coil on the boss (hook, drag, spin, recovery) and a missed coil (pull): every scythe swing frame and every
+## coil phase is requested, and nothing outside the scythe set is drawn.
+func _scythe_timelines() -> void:
+	_reset()
+	arena.core.player.edge = 100.0
+	arena.core.boss.position = Vector2(400, 240)
+	arena.core.player.position = Vector2(370, 240)
+	var swap: InputFrame = _frame()
+	swap.weapon_swap_pressed = true
+	_step(swap)
+	_wait(Tuning.WEAPON_SWAP_LOCKOUT_TICKS)
+	_step(swap)
+	_expect(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "two swaps did not equip the scythe")
+	var requested: Dictionary = {}
+	var attack: InputFrame = _frame(Vector2.ZERO, false, false, true)
+	attack.aim = Vector2.RIGHT
+	_step(attack)
+	for i: int in range(100):
+		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
+		requested[arena.selected_frames[hero.id]] = true
+		var chain: InputFrame = _frame(Vector2.ZERO, false, false, hero.state == &"attack_recovery" and hero.combo_index < 3)
+		chain.aim = Vector2.RIGHT
+		_step(chain)
+	for swing: int in range(1, 4):
+		for n: int in range(1, 7):
+			_expect(requested.has("totoy_scythe_attack%d_right_%d" % [swing, n]), "scythe timeline never requests totoy_scythe_attack%d_right_%d" % [swing, n])
+	var phases: Dictionary = {}
+	for miss: bool in [false, true]:
+		_reset()
+		arena.core.player.edge = 100.0
+		arena.core.boss.position = Vector2(400, 240)
+		arena.core.player.position = Vector2(300, 240)
+		_step(swap)
+		_wait(Tuning.WEAPON_SWAP_LOCKOUT_TICKS)
+		_step(swap)
+		var coil: InputFrame = _frame()
+		coil.weapon_active_pressed = true
+		coil.aim = Vector2.LEFT if miss else Vector2.RIGHT
+		_step(coil)
+		_expect(arena.snapshot.player.state == PlayerState.STATE_REAPER_COIL, "Reaper's Coil did not start")
+		for i: int in range(Weapons.reaper_coil_total_ticks() + 4):
+			var hero: Snapshots.EntitySnapshot = arena.snapshot.player
+			if hero.state == PlayerState.STATE_REAPER_COIL:
+				phases[hero.reaper_coil_phase] = true
+				var chosen: String = String(arena.selected_frames[hero.id])
+				requested[chosen] = true
+				_expect(chosen.begins_with("totoy_scythe_coil_"), "coil drew " + chosen)
+			_step(_frame())
+	for phase: StringName in [PlayerState.COIL_HOOK, PlayerState.COIL_DRAG, PlayerState.COIL_SPIN, PlayerState.COIL_PULL, PlayerState.COIL_RECOVERY]:
+		_expect(phases.has(phase), "the coil timelines never reached phase " + String(phase))
+	for name_key: String in requested:
+		_expect(String(name_key).begins_with("totoy_scythe_"), "scythe timeline drew another set: " + String(name_key))
+
 func _encounter(attack: StringName, parry_slam: bool) -> void:
 	_reset()
 	if attack in [&"gold_combo", &"red_charge"]:
@@ -259,6 +334,7 @@ func _run() -> void:
 	arena.set_physics_process(false)
 	_hero_timelines()
 	_dagger_timelines()
+	_scythe_timelines()
 	_reset()
 	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
 		for i: int in range(24):
@@ -277,6 +353,7 @@ func _run() -> void:
 		if state not in ["dead", "hurt", "victory"]:
 			_expect(player_states.has(state), "script never reached player " + state)
 	_expect(player_states.has(String(PlayerState.STATE_LIGHTNING_BARRAGE)), "the Lightning Form timeline never ran the barrage")
+	_expect(player_states.has(String(PlayerState.STATE_REAPER_COIL)), "the scythe timeline never ran Reaper's Coil")
 	for name_key: String in ArenaAnimation.all_names():
 		if name_key.begins_with("mossbound_colossus_") and (name_key.contains("windup") or name_key.contains("strike") or name_key.contains("red_sweep_recover")):
 			_expect(boss_poses.has(name_key), "fight never requested " + name_key)

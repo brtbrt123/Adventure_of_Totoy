@@ -88,6 +88,10 @@ func test_the_player_starts_with_the_katana_and_swap_toggles_weapons() -> void:
 	assert_eq(snap.player.weapon_id, Tuning.WEAPON_DUAL_DAGGER)
 	assert_eq(snap.player.combo_max, Tuning.DAGGER_COMBO_MAX)
 	assert_eq(snap.player.state, PlayerState.STATE_IDLE, "a free action")
+	# Since 2026-10-20 the swap cycles three weapons: dagger -> chain scythe -> katana.
+	run(core, Tuning.WEAPON_SWAP_LOCKOUT_TICKS)
+	_swap(core)
+	assert_eq(core.player.weapon_id, Tuning.WEAPON_CHAIN_SCYTHE, "then the scythe")
 	run(core, Tuning.WEAPON_SWAP_LOCKOUT_TICKS)
 	_swap(core)
 	assert_eq(core.player.weapon_id, Tuning.WEAPON_BLACK_KATANA, "and back")
@@ -103,7 +107,7 @@ func test_swap_lockout_blocks_a_second_swap_for_the_lockout_ticks() -> void:
 		assert_eq(core.player.weapon_id, Tuning.WEAPON_DUAL_DAGGER, "locked out %d ticks after the swap" % (i + 1))
 		assert_eq(_count(core, GameEvent.WEAPON_SWAPPED), 0, "no event for a refused swap")
 	_swap(core)
-	assert_eq(core.player.weapon_id, Tuning.WEAPON_BLACK_KATANA, "allowed exactly WEAPON_SWAP_LOCKOUT_TICKS later")
+	assert_eq(core.player.weapon_id, Tuning.WEAPON_CHAIN_SCYTHE, "allowed exactly WEAPON_SWAP_LOCKOUT_TICKS later (next in the 3-weapon cycle)")
 
 
 func test_swap_works_while_walking_but_not_mid_swing_skill_dash_parry_or_death() -> void:
@@ -159,7 +163,7 @@ func test_swap_is_refused_while_a_buff_or_form_runs() -> void:
 	assert_eq(refused, Weapons.barrage_total_ticks() - 1)
 	assert_false(dagger.player.is_buff_active())
 	_swap(dagger)
-	assert_eq(dagger.player.weapon_id, Tuning.WEAPON_BLACK_KATANA, "allowed right after the barrage")
+	assert_eq(dagger.player.weapon_id, Tuning.WEAPON_CHAIN_SCYTHE, "allowed right after the barrage (next in the 3-weapon cycle)")
 
 
 func test_swap_resets_the_combo() -> void:
@@ -196,13 +200,17 @@ func test_each_weapon_keeps_its_own_active_cooldown() -> void:
 	assert_eq(core.player.buff_cooldown, Tuning.LIGHTNING_FORM_COOLDOWN_TICKS)
 	run(core, Weapons.barrage_total_ticks())
 	since += Weapons.barrage_total_ticks()
-	_swap(core)
+	_swap(core)  # dagger -> chain scythe (the swap cycles three weapons since 2026-10-20)
+	since += 1
+	run(core, Tuning.WEAPON_SWAP_LOCKOUT_TICKS)
+	since += Tuning.WEAPON_SWAP_LOCKOUT_TICKS
+	_swap(core)  # chain scythe -> katana
 	since += 1
 	snap = core.snapshot()
 	assert_eq(snap.player.weapon_id, Tuning.WEAPON_BLACK_KATANA)
 	assert_eq(snap.hud.weapon_buff_cooldown_ticks, Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS - since + 1, "swapping back did not reset the katana cooldown")
 	assert_eq(snap.hud.weapon_buff_cooldown_max, Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS)
-	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_DUAL_DAGGER], Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - Weapons.barrage_total_ticks() - 1)
+	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_DUAL_DAGGER], Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - Weapons.barrage_total_ticks() - 1 - Tuning.WEAPON_SWAP_LOCKOUT_TICKS - 1)
 	core.player.edge = 100.0
 	core.step(_frame(false, true))
 	assert_false(core.player.is_buff_active(), "the katana is still on cooldown")

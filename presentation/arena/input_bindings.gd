@@ -66,7 +66,8 @@ static func read_frame(player_position: Vector2 = Vector2.ZERO, mouse_position: 
 		if Input.is_action_just_pressed("arena_skill_%d" % slot):
 			frame.skill_pressed = slot
 			break
-	if frame.attack_pressed or frame.skill_pressed > 0:
+	# Reaper's Coil (the scythe's right click) throws its chain toward the mouse: the core reads the press tick's aim.
+	if frame.attack_pressed or frame.skill_pressed > 0 or frame.weapon_active_pressed:
 		frame.aim = (mouse_position - player_position).normalized()
 	frame.attack_held = Input.is_action_pressed("arena_attack")
 	frame.parry_pressed = Input.is_action_just_pressed("arena_parry")

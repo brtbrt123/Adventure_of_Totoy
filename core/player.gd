@@ -1,5 +1,5 @@
 extends RefCounted
-## Player simulation (Black Katana or Dual Dagger). No rendering. Positions in pixels, times in ticks.
+## Player simulation (Black Katana, Dual Dagger or Chain Scythe). No rendering. Positions in pixels, times in ticks.
 
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
@@ -20,7 +20,16 @@ const STATE_SKILL_ACTIVE: StringName = &"skill_active"
 const STATE_SKILL_RECOVERY: StringName = &"skill_recovery"
 ## The automatic Lightning Barrage (Dual Dagger active): the core moves the player and lands the slashes.
 const STATE_LIGHTNING_BARRAGE: StringName = &"lightning_barrage"
+## Reaper's Coil (Chain Scythe active): the core runs the hook, drag, spin or pull; no movement, no actions.
+const STATE_REAPER_COIL: StringName = &"reaper_coil"
 const STATE_DEAD: StringName = &"dead"
+
+## Reaper's Coil phases (snapshot.player.reaper_coil_phase).
+const COIL_HOOK: StringName = &"hook"
+const COIL_DRAG: StringName = &"drag"
+const COIL_SPIN: StringName = &"spin"
+const COIL_PULL: StringName = &"pull"
+const COIL_RECOVERY: StringName = &"recovery"
 
 ## skill_pressed 1, 2, 3 select these (test bindings Z, X, C).
 const SKILL_BREAKING_EDGE: StringName = &"breaking_edge"
@@ -37,7 +46,7 @@ var state_ticks: int = 0
 var dash_cooldown: int = 0
 var edge: float = 0.0
 var attack_hit_done: bool = false  # one hit per swing: set when a swing connects, cleared when the next swing starts
-var weapon_id: StringName = Tuning.WEAPON_BLACK_KATANA  # the equipped weapon (black_katana or dual_dagger)
+var weapon_id: StringName = Tuning.WEAPON_BLACK_KATANA  # the equipped weapon (black_katana, dual_dagger or chain_scythe)
 var buff_ticks: int = 0  # weapon buff / form ticks left (0 = not active); always the equipped weapon's (no swap while it runs)
 ## Ticks until each weapon's active can be used again, per weapon id. They all count down, equipped or not.
 var active_cooldowns: Dictionary[StringName, int] = {}
@@ -59,6 +68,16 @@ var barrage_running: bool = false
 var barrage_slash: int = 0  # slashes of the running barrage started so far (1-8 once the first one blinked)
 var barrage_slash_tick: int = -1  # tick the latest barrage slash started
 var barrage_sides: Array[int] = []  # directions already used by the running barrage
+var coil_requested: bool = false  # set when Reaper's Coil is activated; the core reads and clears it
+var coil_running: bool = false
+var coil_phase: StringName = &""  # one of the COIL_* phases while it runs
+var coil_phase_tick: int = 0  # ticks since the phase began (the core advances it)
+var coil_dir: Vector2 = Vector2.RIGHT  # the chain's direction, fixed on the press (aim, else facing)
+var coil_from: Vector2 = Vector2.ZERO  # where the chain starts (the player's position)
+var coil_target: Vector2 = Vector2.ZERO  # the chain's end: hook tip, the held boss edge, or the pull anchor
+var coil_hooked: bool = false  # true once the hook caught the boss
+var coil_spin_hit: int = 0  # spin hits done (0-2)
+var coil_drag_from: Vector2 = Vector2.ZERO  # where the boss was when it was hooked
 var swing_speed_mult: float = 1.0  # locked at the start of each swing
 var swing_damage_mult: float = 1.0  # locked at the start of each swing
 var skill_id: StringName = &""  # the skill in progress during skill_* states, empty otherwise
@@ -94,8 +113,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		if active_cooldowns[weapon] > 0:
 			active_cooldowns[weapon] -= 1
 	if buff_ticks > 0:
-		if barrage_running:
-			buff_ticks = maxi(1, buff_ticks - 1)  # Lightning Form ends with its barrage (end_barrage), not by the timer
+		if barrage_running or coil_running:
+			buff_ticks = maxi(1, buff_ticks - 1)  # Lightning Form / Reaper's Coil end with their skill, not by the timer
 		else:
 			buff_ticks -= 1
 			if buff_ticks == 0:
@@ -103,7 +122,7 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 	if input.weapon_swap_pressed:
 		_try_weapon_swap(tick, events)
 	if input.weapon_active_pressed:
-		_try_weapon_active(tick, events)
+		_try_weapon_active(tick, events, input)
 	for i: int in skill_cooldowns.size():
 		if skill_cooldowns[i] > 0:
 			skill_cooldowns[i] -= 1
@@ -117,10 +136,10 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		_combo_grace -= 1
 		if _combo_grace == 0:
 			combo_index = 1
-	if barrage_requested:
-		return  # the core starts the barrage this tick; the rest of this input is not used
+	if barrage_requested or coil_requested:
+		return  # the core starts the barrage / coil this tick; the rest of this input is not used
 	var move: Vector2 = input.move.limit_length(1.0)
-	if state == STATE_LIGHTNING_BARRAGE:
+	if state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL:
 		pass
 	elif input.aim.length_squared() > 0.0001:
 		facing = input.aim.normalized()
@@ -176,6 +195,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 				_set_state(STATE_IDLE)
 		STATE_LIGHTNING_BARRAGE:
 			pass  # scripted by the core (GameCore._resolve_lightning_barrage): no movement, no actions
+		STATE_REAPER_COIL:
+			pass  # scripted by the core (GameCore._resolve_reaper_coil): no movement, no actions
 		STATE_ATTACK_RECOVERY:
 			if _try_actions(input, move, tick, events, false):
 				return
@@ -198,7 +219,7 @@ func parry_ticks_since_press() -> int:
 func is_invulnerable() -> bool:
 	if state == STATE_DEAD:
 		return false
-	return state == STATE_LIGHTNING_BARRAGE or _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0
+	return state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0
 
 
 ## Returns true when the damage was applied (false while invulnerable or dead).
@@ -227,6 +248,8 @@ func die(tick: int, events: Array[GameEvent]) -> void:
 	skill_id = &""
 	if barrage_running:
 		end_barrage(tick, events, &"death")
+	if coil_running:
+		end_reaper_coil(tick, events, &"death")
 	if buff_ticks > 0:
 		buff_ticks = 0
 		_emit_buff_end(tick, events, &"death")
@@ -259,6 +282,53 @@ func end_barrage(tick: int, events: Array[GameEvent], reason: StringName) -> voi
 		buff_ticks = 0
 		_emit_buff_end(tick, events, &"death" if reason == &"death" else &"expired")
 	if state == STATE_LIGHTNING_BARRAGE:
+		_set_state(STATE_IDLE)
+
+
+## The core starts Reaper's Coil: whatever the player was doing stops; the hook phase begins (the chain leaves from
+## here in coil_dir). No movement or actions until it ends.
+func start_reaper_coil(tick: int, events: Array[GameEvent]) -> void:
+	coil_requested = false
+	coil_running = true
+	coil_phase = COIL_HOOK
+	coil_phase_tick = 0
+	coil_from = position
+	coil_target = position
+	coil_hooked = false
+	coil_spin_hit = 0
+	pending_release = &""
+	attack_hit_done = true
+	reset_combo()
+	facing = coil_dir
+	_set_state(STATE_REAPER_COIL)
+	state_ticks = 0
+	events.append(GameEvent.new(GameEvent.REAPER_COIL_STARTED, tick, {
+		"entity_id": id, "direction": coil_dir, "from": position, "range": Tuning.REAPER_COIL_HOOK_RANGE,
+	}))
+
+
+## The core moves the coil to its next phase (phase tick 0 on this tick).
+func set_coil_phase(phase: StringName) -> void:
+	coil_phase = phase
+	coil_phase_tick = 0
+
+
+## Reaper's Coil is over: `complete` (after the spin), `missed` (after the pull), `boss_dead` or `death`. The form
+## (weapon_form reaper_coil) is only the skill, so it ends here too (weapon_buff_ended: death on death, else expired).
+func end_reaper_coil(tick: int, events: Array[GameEvent], reason: StringName) -> void:
+	if not coil_running:
+		return
+	coil_running = false
+	events.append(GameEvent.new(GameEvent.REAPER_COIL_ENDED, tick, {
+		"entity_id": id, "reason": reason, "hooked": coil_hooked, "spin_hits": coil_spin_hit,
+	}))
+	coil_phase = &""
+	coil_phase_tick = 0
+	coil_spin_hit = 0
+	if buff_ticks > 0:
+		buff_ticks = 0
+		_emit_buff_end(tick, events, &"death" if reason == &"death" else &"expired")
+	if state == STATE_REAPER_COIL:
 		_set_state(STATE_IDLE)
 
 
@@ -358,13 +428,14 @@ static func skill_profile(skill: StringName) -> Dictionary:
 
 ## The equipped weapon's active (right click): the Black Katana buff (a timed buff that lasts through movement,
 ## attacks, dashes, parries, skills and damage; it ends when it runs out or the player dies) or the Dual Dagger's
-## Lightning Form, which is only the Lightning Barrage (it needs a living boss and ends with the barrage). Numbers per
-## weapon in core/weapons.gd. Costs Edge, has the weapon's own cooldown, cannot be refreshed while it is running.
-func _try_weapon_active(tick: int, events: Array[GameEvent]) -> bool:
+## Lightning Form, which is only the Lightning Barrage (it needs a living boss and ends with the barrage), or the Chain
+## Scythe's Reaper's Coil (the same: a living boss, ends with the skill; aimed by input.aim, else the facing). Numbers
+## per weapon in core/weapons.gd. Costs Edge, has the weapon's own cooldown, cannot be refreshed while it is running.
+func _try_weapon_active(tick: int, events: Array[GameEvent], input: InputFrame) -> bool:
 	if not Weapons.has_active(weapon_id) or state == STATE_DEAD or buff_ticks > 0 or buff_cooldown > 0:
 		return false
-	if Weapons.has_lightning_barrage(weapon_id) and not barrage_target_alive:
-		return false  # the barrage needs a living boss
+	if Weapons.active_needs_target(weapon_id) and not barrage_target_alive:
+		return false  # the barrage and the coil need a living boss
 	var cost: float = Weapons.active_edge_cost(weapon_id)
 	if edge < cost:
 		return false
@@ -372,6 +443,9 @@ func _try_weapon_active(tick: int, events: Array[GameEvent]) -> bool:
 	buff_ticks = Weapons.active_duration(weapon_id)
 	buff_cooldown = Weapons.active_cooldown(weapon_id)
 	barrage_requested = Weapons.has_lightning_barrage(weapon_id)
+	coil_requested = Weapons.has_reaper_coil(weapon_id)
+	if coil_requested:
+		coil_dir = input.aim.normalized() if input.aim.length_squared() > 0.0001 else facing.normalized()
 	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, tick, {
 		"entity_id": id, "weapon_id": weapon_id, "form": Weapons.active_form(weapon_id), "duration": buff_ticks,
 		"attack_speed_mult": Weapons.active_attack_speed_mult(weapon_id), "damage_mult": Weapons.active_damage_mult(weapon_id),

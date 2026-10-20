@@ -4,10 +4,12 @@ const PlayerState := preload("res://core/player.gd")
 const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
-## Hero frame sets by equipped weapon (same numbering per state): katana, dagger, dagger in Lightning Form.
+const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
+## Hero frame sets by equipped weapon (same numbering per state): katana, dagger, dagger in Lightning Form, scythe.
 const SET_KATANA: String = "hero2"
 const SET_DAGGER: String = "totoy_dagger"
 const SET_LIGHTNING: String = "totoy_lightning"
+const SET_SCYTHE: String = "totoy_scythe"
 ## Poses the Lightning Form set has art for; any other pose (victory) uses the plain dagger frame.
 const LIGHTNING_POSES: Array[String] = ["idle", "walk", "dash", "parry", "hurt", "attack1", "attack2", "attack3", "attack4"]
 const DIRECTIONS: Array[String] = ["right"]
@@ -59,6 +61,9 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 			return hero_frame(prefix, "hurt", 4)
 		if state.begins_with("skill_"):
 			return skill_frame(actor.skill_id, actor.state, ticks, prefix)
+		if state == String(PlayerState.STATE_REAPER_COIL):
+			# Reaper's Coil poses by the core's phase and phase tick (wind-up/throw, haul, spin, catch).
+			return ScytheEffects.coil_frame(actor.reaper_coil_phase, actor.reaper_coil_phase_tick)
 		if state == String(PlayerState.STATE_LIGHTNING_BARRAGE):
 			return barrage_frame(prefix, actor.lightning_barrage_slash, snap.tick - actor.lightning_barrage_slash_tick)
 		if state.begins_with("attack_"):
@@ -122,7 +127,17 @@ static func barrage_frame(prefix: String, slash: int, age: int) -> String:
 static func hero_set(actor: Snapshots.EntitySnapshot) -> String:
 	if actor.weapon_form == Weapons.FORM_LIGHTNING:
 		return SET_LIGHTNING
-	return SET_DAGGER if actor.weapon_id == Tuning.WEAPON_DUAL_DAGGER else SET_KATANA
+	match actor.weapon_id:
+		Tuning.WEAPON_DUAL_DAGGER: return SET_DAGGER
+		Tuning.WEAPON_CHAIN_SCYTHE: return SET_SCYTHE
+	return SET_KATANA
+
+## The weapon a hero frame set belongs to.
+static func set_weapon(prefix: String) -> StringName:
+	match prefix:
+		SET_DAGGER, SET_LIGHTNING: return Tuning.WEAPON_DUAL_DAGGER
+		SET_SCYTHE: return Tuning.WEAPON_CHAIN_SCYTHE
+	return Tuning.WEAPON_BLACK_KATANA
 
 ## `<set>_<pose>_right_<n>`; the Lightning set borrows the dagger frame for poses it has no art for.
 static func hero_frame(prefix: String, pose: String, n: int) -> String:
@@ -136,7 +151,7 @@ static func hero_names(prefix: String) -> Array[String]:
 	for state: String in ["idle", "walk", "dash", "parry", "hurt", "victory"]:
 		for n: int in range(1, int(PLAYER[state][0]) + 1):
 			names.append(hero_frame(prefix, state, n))
-	var swings: int = Weapons.combo_max(Tuning.WEAPON_BLACK_KATANA if prefix == SET_KATANA else Tuning.WEAPON_DUAL_DAGGER)
+	var swings: int = Weapons.combo_max(set_weapon(prefix))
 	for swing: int in range(1, swings + 1):
 		for n: int in range(1, 7):
 			names.append(hero_frame(prefix, "attack%d" % swing, n))
@@ -144,10 +159,11 @@ static func hero_names(prefix: String) -> Array[String]:
 
 static func all_names() -> Array[String]:
 	var names: Array[String] = []
-	for prefix: String in [SET_KATANA, SET_DAGGER, SET_LIGHTNING]:
+	for prefix: String in [SET_KATANA, SET_DAGGER, SET_LIGHTNING, SET_SCYTHE]:
 		for name_key: String in hero_names(prefix):
 			if not names.has(name_key):
 				names.append(name_key)
+	names.append_array(ScytheEffects.coil_names())
 	for state: String in BOSS:
 		for n: int in range(1, int(BOSS[state][0]) + 1):
 			names.append("golem2_%s_%d" % [state, n])

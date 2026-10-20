@@ -173,7 +173,11 @@ func swap_and_hud() -> void:
 		await process_frame
 	check(swings.size() == 4, "the dagger combo did not reach 4 swings: %s" % str(swings.keys()))
 	check(int(seen.get(GameEvent.LIGHTNING_STRIKE, 0)) >= 1, "the connecting 4th swing called no lightning strike")
-	# swap back: katana set again
+	# Q cycles katana -> dagger -> scythe -> katana: the next swap draws the scythe, the one after the katana again
+	press("weapon_swap_pressed")
+	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE and chosen().begins_with("totoy_scythe_"), "swap from the dagger to the scythe set: " + chosen())
+	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
+		step()
 	press("weapon_swap_pressed")
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_BLACK_KATANA and chosen().begins_with("hero2_"), "swap back to the katana set")
 

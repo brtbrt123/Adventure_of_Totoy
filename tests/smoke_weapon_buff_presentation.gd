@@ -282,6 +282,40 @@ func dagger_form() -> void:
 	var after: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9 and Hud.weapon_active_line(after) == "LIGHTNING", "after the barrage the slot shows the cooldown ring")
 
+## The same HUD contract for the Chain Scythe's Reaper's Coil: its own numbers, no aura, no slash, no Black Form
+## darkening, the run ring while the coil runs and the cooldown ring after it, one start and one end cue.
+func scythe_coil() -> void:
+	fixture()
+	arena.core.boss.position = Vector2(200, 110)
+	var swap: InputFrame = InputFrame.new()
+	swap.weapon_swap_pressed = true
+	step(swap)
+	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
+		step(InputFrame.new())
+	step(swap)
+	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "scythe swap")
+	var idle: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(int(idle["cost"]) == int(Tuning.REAPER_COIL_EDGE_COST) and not bool(idle["active"]), "scythe HUD cost")
+	check(Hud.weapon_active_line(idle) in ["REAPER'S COIL", "COIL"], "scythe HUD label")
+	check(View.plan(arena.snapshot).is_empty(), "an idle scythe draws a buff look")
+	var input: InputFrame = InputFrame.new()
+	input.weapon_active_pressed = true
+	input.aim = Vector2.RIGHT
+	step(input)
+	check(arena.snapshot.player.weapon_form == Weapons.FORM_REAPER_COIL, "the coil did not start")
+	arena.coil_cutin.stop()
+	var status: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(arena.snapshot.hud.weapon_buff_duration == Weapons.reaper_coil_total_ticks() and float(status["duration_fraction"]) > 0.9, "the coil shows its run ring")
+	check(Hud.weapon_active_line(status) == "COILING", "coil HUD line")
+	check(View.plan(arena.snapshot).is_empty() and arena.weapon_slash_effect().is_empty(), "the coil draws the katana aura or slash")
+	check(not arena.black_form_look(arena.snapshot.player), "Black Form darkening on the scythe")
+	check(int(arena.combat_audio.played.get("weapon_buff_start", 0)) == 1, "coil start cue")
+	while arena.snapshot.player.weapon_buff_active:
+		step(InputFrame.new())
+	check(int(arena.combat_audio.played.get("weapon_buff_end", 0)) == 1, "coil end cue")
+	var after: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9, "after the coil the slot shows the cooldown ring")
+
 func run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	arena = load("res://presentation/arena/arena.tscn").instantiate() as Arena
@@ -299,6 +333,7 @@ func run() -> void:
 	await actions()
 	await slash_attachment()
 	dagger_form()
+	scythe_coil()
 	arena.queue_free()
 	await process_frame
 	for message: String in failures:

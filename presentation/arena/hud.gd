@@ -2,6 +2,7 @@ extends Node2D
 ## Original 3x5 bitmap lettering, drawn on integer pixels; no external font assets.
 const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
+const Weapons := preload("res://core/weapons.gd")
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var debug_enabled: bool = false
@@ -14,6 +15,13 @@ var weapon_icon_key: String = "ui_weapon_totoy_blade_1"
 const DAGGER_MEDALLION: String = "ui_weapon_dual_dagger_1"
 ## The Lightning Form's slot icon (24 px, like the Aspect sockets), left of the weapon active box.
 const LIGHTNING_FORM_ICON: String = "ui_aspect_lightning_form_1"
+## The Chain Scythe medallion (a whole 48 px socket like the dagger's) and its Reaper's Coil slot icon (24 px).
+const SCYTHE_MEDALLION: String = "ui_weapon_chain_scythe_1"
+const REAPER_COIL_ICON: String = "ui_aspect_reapers_coil_1"
+## Whole-socket medallions by weapon (the katana draws the frame plus its blade glyph instead).
+const MEDALLIONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: DAGGER_MEDALLION, Tuning.WEAPON_CHAIN_SCYTHE: SCYTHE_MEDALLION}
+## Active slot icons by weapon (the katana's buff has none: its box only).
+const FORM_ICONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: LIGHTNING_FORM_ICON, Tuning.WEAPON_CHAIN_SCYTHE: REAPER_COIL_ICON}
 static func form_icon_rect() -> Rect2:
 	return Rect2(154, 151, 24, 24)
 static func swap_hint_position() -> Vector2:
@@ -349,8 +357,8 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var rows: Array[Dictionary] = skill_rows(h)
 	var sockets: Array[Rect2] = aspect_rects()
 	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
-	if snapshot.player.weapon_id == Tuning.WEAPON_DUAL_DAGGER:
-		ui(DAGGER_MEDALLION, weapon_rect())
+	if MEDALLIONS.has(snapshot.player.weapon_id):
+		ui(MEDALLIONS[snapshot.player.weapon_id], weapon_rect())
 	else:
 		ui("ui_weapon_frame_1", weapon_rect())
 		ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
@@ -398,15 +406,22 @@ static func weapon_label(weapon: StringName) -> String:
 	match weapon:
 		Tuning.WEAPON_BLACK_KATANA: return "BLACK"
 		Tuning.WEAPON_DUAL_DAGGER: return "DAGGER"
+		Tuning.WEAPON_CHAIN_SCYTHE: return "SCYTHE"
 	return "SWORD"
 
-## The weapon swap (Q): ready, or why not (a form runs, the short lockout after a swap, or the hero is busy).
-## Display only; the core accepts or refuses the press.
+## The weapon swap (Q): ready, or why not (a form runs, the short lockout after a swap, or the hero is busy), and the
+## weapon the next press equips (Q cycles katana -> dagger -> scythe -> katana, Weapons.IDS). Display only; the core
+## accepts or refuses the press.
 static func swap_status(snap: Snapshots.GameSnapshot) -> Dictionary:
 	var h: Snapshots.HudSnapshot = snap.hud
 	var busy: bool = snap.player.state not in [&"idle", &"walk"]
 	var reason: String = "FORM" if snap.player.weapon_buff_active else ("WAIT" if h.weapon_swap_lockout_ticks > 0 else ("BUSY" if busy else ""))
-	return {"text": "Q SWAP", "ready": reason.is_empty(), "reason": reason, "lockout_fraction": clampf(float(h.weapon_swap_lockout_ticks) / maxi(1, h.weapon_swap_lockout_max), 0.0, 1.0)}
+	return {"text": "Q SWAP", "ready": reason.is_empty(), "reason": reason, "next": next_weapon(snap.player.weapon_id), "lockout_fraction": clampf(float(h.weapon_swap_lockout_ticks) / maxi(1, h.weapon_swap_lockout_max), 0.0, 1.0)}
+
+## The weapon after `weapon` in the swap cycle.
+static func next_weapon(weapon: StringName) -> StringName:
+	var index: int = Weapons.IDS.find(weapon)
+	return Weapons.IDS[posmod(index + 1, Weapons.IDS.size())] if index >= 0 else Weapons.IDS[0]
 
 func _draw_swap_hint() -> void:
 	var data: Dictionary = swap_status(snapshot)
@@ -430,11 +445,10 @@ func _draw_weapon_active() -> void:
 	if data.is_empty():
 		return
 	var at: Vector2 = Vector2(181, 147)
-	var dagger: bool = data["weapon"] == Tuning.WEAPON_DUAL_DAGGER
 	draw_rect(Rect2(at - Vector2(2, 2), Vector2(62, 33)), colors["0"])
 	lettering(at, "RMB %dE" % int(data["cost"]), colors["v"], 1, null, 10)
 	lettering(at + Vector2(0, 10), weapon_active_line(data), colors["p"] if bool(data["active"]) else colors["j"], 1, null, 10)
-	if dagger:
+	if FORM_ICONS.has(data["weapon"]):
 		_draw_form_icon(data)
 	lettering(at + Vector2(0, 20), "CD %dS" % int(data["cooldown"]) if int(data["cooldown"]) > 0 else "CD READY", colors["o"], 1, null, 10)
 	for active: bool in [false, true]:
@@ -446,18 +460,30 @@ func _draw_weapon_active() -> void:
 			arc.append((weapon_rect().get_center() + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * (21.0 if active else 24.0)).round())
 		draw_polyline(arc, colors["v"] if active else colors["o"], 1.0, false)
 
-## Second line of the weapon active box: the time left while it runs (the dagger's active is the barrage), else what
-## right click does.
+## Second line of the weapon active box: the time left while it runs (the dagger's active is the barrage, the
+## scythe's the coil), else what right click does.
 static func weapon_active_line(data: Dictionary) -> String:
+	var weapon: StringName = data.get("weapon", &"")
 	if bool(data["active"]):
-		return "BARRAGE" if data.get("weapon", &"") == Tuning.WEAPON_DUAL_DAGGER else "FORM %dS" % int(data["remaining"])
-	return "LIGHTNING" if data.get("weapon", &"") == Tuning.WEAPON_DUAL_DAGGER else "FORM OFF"
+		match weapon:
+			Tuning.WEAPON_DUAL_DAGGER: return "BARRAGE"
+			Tuning.WEAPON_CHAIN_SCYTHE: return "COILING"
+		return "FORM %dS" % int(data["remaining"])
+	match weapon:
+		Tuning.WEAPON_DUAL_DAGGER: return "LIGHTNING"
+		Tuning.WEAPON_CHAIN_SCYTHE: return REAPER_COIL_LINE if text_width(REAPER_COIL_LINE, 1, null, 10) <= ACTIVE_LINE_WIDTH else "COIL"
+	return "FORM OFF"
 
-## Lightning Form slot: its icon, a bright ring while it runs, the cooldown arc and seconds while it recharges.
+## The full skill name, used when it fits the 62 px box (else "COIL").
+const REAPER_COIL_LINE: String = "REAPER'S COIL"
+const ACTIVE_LINE_WIDTH: float = 58.0
+
+## The weapon's active slot (Lightning Form, Reaper's Coil): its icon, a bright ring while it runs, the cooldown arc
+## and seconds while it recharges.
 func _draw_form_icon(data: Dictionary) -> void:
 	var rect: Rect2 = form_icon_rect()
 	var centre: Vector2 = rect.get_center()
-	ui(LIGHTNING_FORM_ICON, rect)
+	ui(FORM_ICONS[data["weapon"]], rect)
 	var fraction: float = float(data["duration_fraction"]) if bool(data["active"]) else float(data["cooldown_fraction"])
 	if fraction > 0.0:
 		var arc: PackedVector2Array = PackedVector2Array()

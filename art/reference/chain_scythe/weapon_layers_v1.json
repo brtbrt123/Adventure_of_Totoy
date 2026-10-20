@@ -1,0 +1,1978 @@
+{
+ "generator": "tools/art/make_chain_scythe_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "layout": "10 columns x 3 rows of 64x64 cells, all with the feet anchor (32,56). Row 1: the leaning hero body with the katana removed (same bodies as the dagger set). Row 2: scythe/chain parts BEHIND the body. Row 3: scythe/chain parts IN FRONT of the body.",
+ "draw_order": [
+  "wpn_chain_scythe_back_*",
+  "hero2_unarmed_cs_*",
+  "wpn_chain_scythe_front_*"
+ ],
+ "point_convention": "cell pixels, x right, y down; hands = the two fists (index 0, 1) of the body; scythe = haft from pommel (chain ring) to head; blade_side +1 = the blade leaves the haft clockwise from the pommel-to-head direction (screen), -1 = counter-clockwise; chains start at the pommel or at hand0/hand1",
+ "bodies": "built by tools/art/import_dagger_sprites.build_dagger_frame (leaned hero2 frames, katana removed); spin and pull use their own lean of the upright frame (make_hero_lean_sheet.build_frame with a custom Pose: spin lean 8, pull lean -14)",
+ "frames": [
+  {
+   "name": "hero2_unarmed_cs_ready",
+   "rect": [
+    0,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "ready",
+   "hands": [
+    [
+     26,
+     43
+    ],
+    [
+     37,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     35.4,
+     51.9
+    ],
+    "head": [
+     41.3,
+     18.4
+    ],
+    "blade_side": 1,
+    "blade_len": 14,
+    "grip_hands": [
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       31,
+       55
+      ],
+      [
+       26,
+       52
+      ],
+      "hand0"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       24,
+       49
+      ],
+      [
+       23,
+       54
+      ],
+      [
+       20,
+       56
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_walk_carry",
+   "rect": [
+    64,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "walk_carry",
+   "hands": [
+    [
+     26,
+     44
+    ],
+    [
+     40,
+     44
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     45.9,
+     47.7
+    ],
+    "head": [
+     19.6,
+     31.3
+    ],
+    "blade_side": -1,
+    "blade_len": 12,
+    "grip_hands": [
+     1
+    ],
+    "layer": "back"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       53
+      ],
+      [
+       45,
+       56
+      ],
+      [
+       39,
+       56
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    1
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_swing_1",
+   "rect": [
+    128,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_1",
+   "hands": [
+    [
+     31,
+     42
+    ],
+    [
+     53,
+     39
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     23.1,
+     43.1
+    ],
+    "head": [
+     59.9,
+     38.1
+    ],
+    "blade_side": 1,
+    "blade_len": 14,
+    "grip_hands": [
+     1,
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       17,
+       44
+      ],
+      [
+       11,
+       48
+      ],
+      [
+       5,
+       45
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_swing_2",
+   "rect": [
+    192,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_2",
+   "hands": [
+    [
+     36,
+     28
+    ],
+    [
+     42,
+     41
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     44.5,
+     46.4
+    ],
+    "head": [
+     31.8,
+     18.9
+    ],
+    "blade_side": -1,
+    "blade_len": 14,
+    "grip_hands": [
+     0,
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       51
+      ],
+      [
+       55,
+       52
+      ],
+      [
+       60,
+       55
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_swing_3",
+   "rect": [
+    256,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_3",
+   "hands": [
+    [
+     34,
+     50
+    ],
+    [
+     32,
+     49
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     19.4,
+     43.5
+    ],
+    "head": [
+     45.0,
+     54.9
+    ],
+    "blade_side": -1,
+    "blade_len": 13,
+    "grip_hands": [
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       13,
+       38
+      ],
+      [
+       10,
+       31
+      ],
+      [
+       13,
+       25
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_spin",
+   "rect": [
+    320,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "spin",
+   "hands": [
+    [
+     30,
+     28
+    ],
+    [
+     39,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     47,
+     19
+    ],
+    "head": [
+     60,
+     26
+    ],
+    "blade_side": 1,
+    "blade_len": 11,
+    "grip_hands": [],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "hand0",
+      [
+       41,
+       13
+      ],
+      "pommel"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       28,
+       33
+      ],
+      [
+       27,
+       38
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_windup",
+   "rect": [
+    384,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "windup",
+   "hands": [
+    [
+     29,
+     42
+    ],
+    [
+     46,
+     45
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     34.9,
+     41.2
+    ],
+    "head": [
+     8.2,
+     44.9
+    ],
+    "blade_side": 1,
+    "blade_len": 13,
+    "grip_hands": [
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       38,
+       49
+      ],
+      "hand1"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand1",
+      [
+       47,
+       51
+      ],
+      [
+       45,
+       55
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_whip",
+   "rect": [
+    448,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "whip",
+   "hands": [
+    [
+     52,
+     38
+    ],
+    [
+     36,
+     40
+    ]
+   ],
+   "chains": [
+    {
+     "points": [
+      "hand0",
+      [
+       56,
+       34
+      ],
+      [
+       60,
+       33
+      ],
+      [
+       64,
+       30
+      ]
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       51,
+       43
+      ],
+      [
+       49,
+       47
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_pull",
+   "rect": [
+    512,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "pull",
+   "hands": [
+    [
+     42,
+     42
+    ],
+    [
+     41,
+     44
+    ]
+   ],
+   "chains": [
+    {
+     "points": [
+      [
+       64,
+       40
+      ],
+      "hand0",
+      "hand1",
+      [
+       38,
+       50
+      ],
+      [
+       41,
+       53
+      ],
+      [
+       43,
+       49
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "hero2_unarmed_cs_recovery",
+   "rect": [
+    576,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "recovery",
+   "hands": [
+    [
+     27,
+     44
+    ],
+    [
+     40,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     46.0,
+     42.5
+    ],
+    "head": [
+     17.0,
+     44.8
+    ],
+    "blade_side": -1,
+    "blade_len": 13,
+    "grip_hands": [
+     0,
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       47
+      ],
+      [
+       47,
+       52
+      ],
+      [
+       50,
+       55
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_ready",
+   "rect": [
+    0,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "ready",
+   "hands": [
+    [
+     26,
+     43
+    ],
+    [
+     37,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     35.4,
+     51.9
+    ],
+    "head": [
+     41.3,
+     18.4
+    ],
+    "blade_side": 1,
+    "blade_len": 14,
+    "grip_hands": [
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       31,
+       55
+      ],
+      [
+       26,
+       52
+      ],
+      "hand0"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       24,
+       49
+      ],
+      [
+       23,
+       54
+      ],
+      [
+       20,
+       56
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_walk_carry",
+   "rect": [
+    64,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "walk_carry",
+   "hands": [
+    [
+     26,
+     44
+    ],
+    [
+     40,
+     44
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     45.9,
+     47.7
+    ],
+    "head": [
+     19.6,
+     31.3
+    ],
+    "blade_side": -1,
+    "blade_len": 12,
+    "grip_hands": [
+     1
+    ],
+    "layer": "back"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       53
+      ],
+      [
+       45,
+       56
+      ],
+      [
+       39,
+       56
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_swing_1",
+   "rect": [
+    128,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_1",
+   "hands": [
+    [
+     31,
+     42
+    ],
+    [
+     53,
+     39
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     23.1,
+     43.1
+    ],
+    "head": [
+     59.9,
+     38.1
+    ],
+    "blade_side": 1,
+    "blade_len": 14,
+    "grip_hands": [
+     1,
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       17,
+       44
+      ],
+      [
+       11,
+       48
+      ],
+      [
+       5,
+       45
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_swing_2",
+   "rect": [
+    192,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_2",
+   "hands": [
+    [
+     36,
+     28
+    ],
+    [
+     42,
+     41
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     44.5,
+     46.4
+    ],
+    "head": [
+     31.8,
+     18.9
+    ],
+    "blade_side": -1,
+    "blade_len": 14,
+    "grip_hands": [
+     0,
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       51
+      ],
+      [
+       55,
+       52
+      ],
+      [
+       60,
+       55
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_swing_3",
+   "rect": [
+    256,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_3",
+   "hands": [
+    [
+     34,
+     50
+    ],
+    [
+     32,
+     49
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     19.4,
+     43.5
+    ],
+    "head": [
+     45.0,
+     54.9
+    ],
+    "blade_side": -1,
+    "blade_len": 13,
+    "grip_hands": [
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       13,
+       38
+      ],
+      [
+       10,
+       31
+      ],
+      [
+       13,
+       25
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_spin",
+   "rect": [
+    320,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "spin",
+   "hands": [
+    [
+     30,
+     28
+    ],
+    [
+     39,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     47,
+     19
+    ],
+    "head": [
+     60,
+     26
+    ],
+    "blade_side": 1,
+    "blade_len": 11,
+    "grip_hands": [],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "hand0",
+      [
+       41,
+       13
+      ],
+      "pommel"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       28,
+       33
+      ],
+      [
+       27,
+       38
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_windup",
+   "rect": [
+    384,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "windup",
+   "hands": [
+    [
+     29,
+     42
+    ],
+    [
+     46,
+     45
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     34.9,
+     41.2
+    ],
+    "head": [
+     8.2,
+     44.9
+    ],
+    "blade_side": 1,
+    "blade_len": 13,
+    "grip_hands": [
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       38,
+       49
+      ],
+      "hand1"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand1",
+      [
+       47,
+       51
+      ],
+      [
+       45,
+       55
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_whip",
+   "rect": [
+    448,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "whip",
+   "hands": [
+    [
+     52,
+     38
+    ],
+    [
+     36,
+     40
+    ]
+   ],
+   "chains": [
+    {
+     "points": [
+      "hand0",
+      [
+       56,
+       34
+      ],
+      [
+       60,
+       33
+      ],
+      [
+       64,
+       30
+      ]
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       51,
+       43
+      ],
+      [
+       49,
+       47
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_pull",
+   "rect": [
+    512,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "pull",
+   "hands": [
+    [
+     42,
+     42
+    ],
+    [
+     41,
+     44
+    ]
+   ],
+   "chains": [
+    {
+     "points": [
+      [
+       64,
+       40
+      ],
+      "hand0",
+      "hand1",
+      [
+       38,
+       50
+      ],
+      [
+       41,
+       53
+      ],
+      [
+       43,
+       49
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_back_recovery",
+   "rect": [
+    576,
+    64,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "recovery",
+   "hands": [
+    [
+     27,
+     44
+    ],
+    [
+     40,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     46.0,
+     42.5
+    ],
+    "head": [
+     17.0,
+     44.8
+    ],
+    "blade_side": -1,
+    "blade_len": 13,
+    "grip_hands": [
+     0,
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       47
+      ],
+      [
+       47,
+       52
+      ],
+      [
+       50,
+       55
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_ready",
+   "rect": [
+    0,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "ready",
+   "hands": [
+    [
+     26,
+     43
+    ],
+    [
+     37,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     35.4,
+     51.9
+    ],
+    "head": [
+     41.3,
+     18.4
+    ],
+    "blade_side": 1,
+    "blade_len": 14,
+    "grip_hands": [
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       31,
+       55
+      ],
+      [
+       26,
+       52
+      ],
+      "hand0"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       24,
+       49
+      ],
+      [
+       23,
+       54
+      ],
+      [
+       20,
+       56
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_walk_carry",
+   "rect": [
+    64,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "walk_carry",
+   "hands": [
+    [
+     26,
+     44
+    ],
+    [
+     40,
+     44
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     45.9,
+     47.7
+    ],
+    "head": [
+     19.6,
+     31.3
+    ],
+    "blade_side": -1,
+    "blade_len": 12,
+    "grip_hands": [
+     1
+    ],
+    "layer": "back"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       53
+      ],
+      [
+       45,
+       56
+      ],
+      [
+       39,
+       56
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_swing_1",
+   "rect": [
+    128,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_1",
+   "hands": [
+    [
+     31,
+     42
+    ],
+    [
+     53,
+     39
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     23.1,
+     43.1
+    ],
+    "head": [
+     59.9,
+     38.1
+    ],
+    "blade_side": 1,
+    "blade_len": 14,
+    "grip_hands": [
+     1,
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       17,
+       44
+      ],
+      [
+       11,
+       48
+      ],
+      [
+       5,
+       45
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_swing_2",
+   "rect": [
+    192,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_2",
+   "hands": [
+    [
+     36,
+     28
+    ],
+    [
+     42,
+     41
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     44.5,
+     46.4
+    ],
+    "head": [
+     31.8,
+     18.9
+    ],
+    "blade_side": -1,
+    "blade_len": 14,
+    "grip_hands": [
+     0,
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       51
+      ],
+      [
+       55,
+       52
+      ],
+      [
+       60,
+       55
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_swing_3",
+   "rect": [
+    256,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "swing_3",
+   "hands": [
+    [
+     34,
+     50
+    ],
+    [
+     32,
+     49
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     19.4,
+     43.5
+    ],
+    "head": [
+     45.0,
+     54.9
+    ],
+    "blade_side": -1,
+    "blade_len": 13,
+    "grip_hands": [
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       13,
+       38
+      ],
+      [
+       10,
+       31
+      ],
+      [
+       13,
+       25
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_spin",
+   "rect": [
+    320,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "spin",
+   "hands": [
+    [
+     30,
+     28
+    ],
+    [
+     39,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     47,
+     19
+    ],
+    "head": [
+     60,
+     26
+    ],
+    "blade_side": 1,
+    "blade_len": 11,
+    "grip_hands": [],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "hand0",
+      [
+       41,
+       13
+      ],
+      "pommel"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       28,
+       33
+      ],
+      [
+       27,
+       38
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_windup",
+   "rect": [
+    384,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "windup",
+   "hands": [
+    [
+     29,
+     42
+    ],
+    [
+     46,
+     45
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     34.9,
+     41.2
+    ],
+    "head": [
+     8.2,
+     44.9
+    ],
+    "blade_side": 1,
+    "blade_len": 13,
+    "grip_hands": [
+     0
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       38,
+       49
+      ],
+      "hand1"
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand1",
+      [
+       47,
+       51
+      ],
+      [
+       45,
+       55
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_whip",
+   "rect": [
+    448,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "whip",
+   "hands": [
+    [
+     52,
+     38
+    ],
+    [
+     36,
+     40
+    ]
+   ],
+   "chains": [
+    {
+     "points": [
+      "hand0",
+      [
+       56,
+       34
+      ],
+      [
+       60,
+       33
+      ],
+      [
+       64,
+       30
+      ]
+     ],
+     "layer": "front"
+    },
+    {
+     "points": [
+      "hand0",
+      [
+       51,
+       43
+      ],
+      [
+       49,
+       47
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_pull",
+   "rect": [
+    512,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "pull",
+   "hands": [
+    [
+     42,
+     42
+    ],
+    [
+     41,
+     44
+    ]
+   ],
+   "chains": [
+    {
+     "points": [
+      [
+       64,
+       40
+      ],
+      "hand0",
+      "hand1",
+      [
+       38,
+       50
+      ],
+      [
+       41,
+       53
+      ],
+      [
+       43,
+       49
+      ]
+     ],
+     "layer": "front"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  },
+  {
+   "name": "wpn_chain_scythe_front_recovery",
+   "rect": [
+    576,
+    128,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "pose": "recovery",
+   "hands": [
+    [
+     27,
+     44
+    ],
+    [
+     40,
+     43
+    ]
+   ],
+   "scythe": {
+    "pommel": [
+     46.0,
+     42.5
+    ],
+    "head": [
+     17.0,
+     44.8
+    ],
+    "blade_side": -1,
+    "blade_len": 13,
+    "grip_hands": [
+     0,
+     1
+    ],
+    "layer": "front"
+   },
+   "chains": [
+    {
+     "points": [
+      "pommel",
+      [
+       49,
+       47
+      ],
+      [
+       47,
+       52
+      ],
+      [
+       50,
+       55
+      ]
+     ],
+     "layer": "back"
+    }
+   ],
+   "fists_over_weapon": [
+    0,
+    1
+   ]
+  }
+ ]
+}

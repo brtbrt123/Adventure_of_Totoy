@@ -33,7 +33,9 @@ static func plan(snap: Snapshots.GameSnapshot) -> Dictionary:
 		# The dagger's speed arcs are painted into its frames: no detached slash for the Lightning Form.
 		var bolt: int = posmod(snap.tick / LIGHTNING_AURA_TICKS, LIGHTNING_AURA_FRAMES) + 1
 		return {"back": "fx_lightning_aura_back_%d" % bolt, "front": "fx_lightning_aura_front_%d" % bolt, "level": fade_level(hero, snap.hud.weapon_buff_duration), "at": hero.position, "slash": "", "form": Weapons.FORM_LIGHTNING}
-	if hero.weapon_id == Tuning.WEAPON_DUAL_DAGGER:
+	# The Black Form look (aura, detached slash) belongs to the katana only: the dagger outside its form and the
+	# scythe (Reaper's Coil has no aura; its chain and ring are drawn by the arena) show nothing here.
+	if hero.weapon_id != Tuning.WEAPON_BLACK_KATANA or hero.weapon_form == Weapons.FORM_REAPER_COIL:
 		return {}
 	# World time keeps the aura rolling when the character pose/state changes.
 	var index: int = posmod(snap.tick / 5, 6) + 1
