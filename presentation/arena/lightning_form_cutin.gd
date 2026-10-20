@@ -351,10 +351,10 @@ func _draw_title(t: float, off: float, shake: Vector2) -> void:
 	draw_string_outline(font, pen, TITLE, HORIZONTAL_ALIGNMENT_LEFT, -1, size, 12, Color(DEEP, alpha))
 	draw_string(font, pen, TITLE, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Color(CREAM, alpha))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(SCALE, SCALE))
-	# the subtitle states the form's real numbers
+	# the subtitle states what the form does (the 8-slash barrage and its sky bolt)
 	var so: float = ramp(t, SLAM + 0.06, SLAM + 0.2)
 	if so > 0.0:
-		var sub: String = "ATTACK SPEED x%s  /  BLINK STRIKES" % _number(Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT)
+		var sub: String = "%d BLINK STRIKES  /  SKY BOLT" % Tuning.LIGHTNING_BLINK_ORDER.size()
 		var sub_size: Vector2 = font.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 18)
 		var sx: float = off + 260.0 - (sub_size.x + 40.0) * 0.5 + 20.0 + 40.0 * (1.0 - ease_out(so))
 		var sy: float = cy + 30.0
@@ -403,5 +403,5 @@ func _draw_warmup() -> void:
 	for size: int in TITLE_SIZES:
 		draw_string_outline(font, Vector2.ZERO, TITLE, HORIZONTAL_ALIGNMENT_LEFT, -1, size, 12, faint)
 		draw_string(font, Vector2.ZERO, TITLE, HORIZONTAL_ALIGNMENT_LEFT, -1, size, faint)
-	draw_string(font, Vector2.ZERO, "ATTACK SPEED x2  /  BLINK STRIKES", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, faint)
+	draw_string(font, Vector2.ZERO, "8 BLINK STRIKES  /  SKY BOLT", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, faint)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

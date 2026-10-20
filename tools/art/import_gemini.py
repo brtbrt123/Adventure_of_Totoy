@@ -6,6 +6,8 @@ about HERO_HEIGHT px and the golem about GOLEM_HEIGHT px tall), snaps to the Tot
 ink outline and writes `art/src/<visual_id>_<state>[_right]_<n>.txt` with an `# anchor:` at the feet.
 
 Visual ids are `hero2` (right-facing side view, left is mirrored at runtime) and `golem2` (one direction).
+The hero2 frames are written UPRIGHT to art/reference/hero_lean/upright/ and then leaned into art/src by
+tools/art/make_hero_lean_sheet.py (the lean step runs automatically at the end when a hero sheet was imported).
 They are new names on purpose: the old `totoy_*` / `mossbound_colossus_*` frames stay until presentation
 (Codex) has switched `presentation/arena/animation.gd` over to the new frames.
 
@@ -24,6 +26,7 @@ import artlib
 from import_reference import Quantizer, despeckle, outline, shrink, srgb_to_lab, to_grid, trim, write_sprite
 
 REF_DIR = artlib.ROOT / "art" / "reference"
+HERO_UPRIGHT_DIR = REF_DIR / "hero_lean" / "upright"  # upright hero2 frames, input of make_hero_lean_sheet.py
 
 HERO_HEIGHT = 32  # game pixels for a standing hero
 GOLEM_HEIGHT = 48  # game pixels for a standing golem (the old placeholder boss was 44)
@@ -295,14 +298,25 @@ def main() -> int:
         print(f"unknown sheets: {unknown}", file=sys.stderr)
         return 2
     total = 0
+    hero_sheets = 0
     for stem in stems:
         visual_id, state, _c, _r, _n, direction = SHEETS[stem]
+        # The hero is imported UPRIGHT into art/reference/hero_lean/upright/; the lean step below writes art/src.
+        dest = HERO_UPRIGHT_DIR if (visual_id == "hero2" and args.out == artlib.SRC_DIR) else args.out
+        dest.mkdir(parents=True, exist_ok=True)
         if args.replace:
-            for old in args.out.glob(f"{visual_id}_{state}{direction}_*.txt"):
+            for old in dest.glob(f"{visual_id}_{state}{direction}_*.txt"):
                 old.unlink()
-        names = import_sheet(stem, args.out, palette)
+        names = import_sheet(stem, dest, palette)
         total += len(names)
+        hero_sheets += visual_id == "hero2" and dest == HERO_UPRIGHT_DIR
         print(f"{stem}: {len(names)} frames")
+    if hero_sheets:
+        # Pipeline step: lean the upright hero into the in-game hero2_* frames (approved 2026-10-20).
+        import make_hero_lean_sheet
+        lean = {st: [make_hero_lean_sheet.build_frame(st, n) for n in range(1, c + 1)] for st, c in make_hero_lean_sheet.STATES}
+        print(f"lean step: {make_hero_lean_sheet.install(lean)} hero2_* frames written to art/src "
+              "(then run tools/art/import_dagger_sprites.py for the dagger set)")
     wanted = {x for x in args.only.split(",") if x}
     for spec in EXTRA:
         if not wanted or spec[0] in wanted:

@@ -13,6 +13,10 @@ Writes (all deterministic: fixed seeds, sorted iteration; running twice gives id
   art/build/dagger_sprites_manifest.json          name -> frames, size, anchor (for the wiring task)
   docs/previews/dual_dagger_import_*.png          review sheets at 4x (viewing only, not game art)
 
+Bodies lean (since 2026-10-20): every body is the make_hero_lean_sheet.py warp of the UPRIGHT frame in
+art/reference/hero_lean/upright/ (the same pose as the in-game hero2_* katana frame; DAGGER_POSES for swing 4), and the
+HANDS points are carried through that warp (lean_hands). Run make_hero_lean_sheet.py --install first.
+
 Gold (x, y) and red (z, A) are never used. Anchors of the hero frames are the feet point of the matching
 hero2_* frame (the canvas only grows when a dagger reaches past it; the anchor moves with it, so feet line up).
 
@@ -35,6 +39,7 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import artlib  # noqa: E402
 import make_dual_dagger_art as M  # noqa: E402  (no side effects on import)
+import make_hero_lean_sheet as L  # noqa: E402  (the lean step; no side effects on import)
 
 ROOT = artlib.ROOT
 SRC = artlib.SRC_DIR
@@ -63,7 +68,9 @@ SWING4: list[str] = ["hero2_parry_right_3", "hero2_victory_right_3", "hero2_atta
                      "hero2_attack3_right_5", "hero2_attack1_right_6"]
 LIGHTNING_STATES = ["idle", "walk", "dash", "parry", "hurt", "attack1", "attack2", "attack3", "attack4"]
 
-# Hand points, measured by eye on 9x grids of the katana-stripped hero2_* frames (frame pixels, x right, y down):
+# Hand points, measured by eye on 9x grids of the katana-stripped UPRIGHT hero2_* frames
+# (art/reference/hero_lean/upright/; frame pixels, x right, y down). The bodies are leaned since 2026-10-20:
+# lean_hands() moves each point with the lean warp, LEAN_HANDS overrides it per frame.
 # frame -> [(x, y, blade angle deg, layer, lead)]. Angle 0 = right (facing), 90 = down. Layer "f" = in front of
 # the body, "b" = behind. lead = 1 marks the hand that strikes in an attack frame (longer blade in the active
 # frames plus the speed arc). Relaxed poses hold both daggers in reverse grip, blades down.
@@ -125,6 +132,8 @@ HANDS: dict[str, list[tuple[int, int, float, str, int]]] = {
     "swing4:5": [(23, 18, 40, "f", 0), (21, 15, 10, "b", 0)],
     "swing4:6": [(6, 21, 120, "f", 0), (19, 20, 45, "b", 0)],
 }
+# Hand points on the LEANED bodies, same format, for frames where carrying HANDS through the warp was not right.
+LEAN_HANDS: dict[str, list[tuple[int, int, float, str, int]]] = {}
 # Katana hilt crumbs the automatic removal cannot tell from the body: frame -> [(x0, y0, x1, y1)] cleared (inclusive).
 CRUMBS: dict[str, list[tuple[int, int, int, int]]] = {"hero2_victory_right_1": [(15, 12, 17, 20)]}
 
@@ -191,6 +200,27 @@ def strip_katana(src: Grid, name: str = "") -> Grid:
                         rm.append((x, y))
         for x, y in rm:
             g[y][x] = T
+    # loose crumbs of the katana's outline that the lean warp carried away from the body (a few pixels, not touching
+    # the figure): drop every 8-connected island of at most 6 pixels
+    seen = set()
+    for y in range(h):
+        for x in range(w):
+            if g[y][x] == T or (x, y) in seen:
+                continue
+            comp, stack = [], [(x, y)]
+            seen.add((x, y))
+            while stack:
+                cx, cy = stack.pop()
+                comp.append((cx, cy))
+                for dx in (-1, 0, 1):
+                    for dy in (-1, 0, 1):
+                        p = (cx + dx, cy + dy)
+                        if p not in seen and 0 <= p[0] < w and 0 <= p[1] < h and g[p[1]][p[0]] != T:
+                            seen.add(p)
+                            stack.append(p)
+            if len(comp) <= 6:
+                for cx, cy in comp:
+                    g[cy][cx] = T
     return g
 
 
@@ -333,11 +363,33 @@ def speed_arc(g: Grid, hx: int, hy: int, ang: float, radius: float, sweep: float
 MARGIN = 16
 
 
+def lean_body(state: str, src_name: str, n: int) -> "L.Frame":
+    """The leaning body this dagger frame is built on: the same warp as the in-game hero2_* katana frame
+    (make_hero_lean_sheet.POSES), or DAGGER_POSES for swing 4, applied to the UPRIGHT source frame."""
+    if state == "attack4":
+        return L.build_frame("attack4", n, src_name, L.DAGGER_POSES[f"attack4_{n}"])
+    return L.build_frame(state, n)
+
+
+def lean_hands(key: str, lf: "L.Frame") -> list[tuple[int, int, float, str, int]]:
+    """HANDS (measured on the upright frames) carried through the lean warp: each fist moves where the warp moves
+    that body pixel and its blade turns with the torso there. LEAN_HANDS replaces a frame's entry where the
+    automatic result did not sit in the fist (checked by eye on 9x grids of the leaned frames)."""
+    if key in LEAN_HANDS:
+        return LEAN_HANDS[key]
+    out = []
+    for x, y, ang, lay, lead in HANDS[key]:
+        X, Y = lf.map_point(x + 0.5, y + 0.5)
+        out.append((math.floor(X), math.floor(Y), ang + lf.turn_at(x + 0.5, y + 0.5), lay, lead))
+    return out
+
+
 def build_dagger_frame(state: str, src_name: str, n: int, phase: str) -> dict:
-    s = artlib.parse_sprite(SRC / f"{src_name}.txt")
-    src = [list(r) for r in s.rows]
+    lf = lean_body(state, src_name, n)
+    src = [row[:] for row in lf.grid]
     body = strip_katana(src, src_name)
-    table = HANDS.get(src_name if state != "attack4" else f"swing4:{n}")
+    key = src_name if state != "attack4" else f"swing4:{n}"
+    table = lean_hands(key, lf) if key in HANDS else None
     swing = int(state[-1]) if state.startswith("attack") else 0
     if table is not None:
         hands = [(x, y, a, "front" if lay == "f" else "back") for x, y, a, lay, _ in table]
@@ -374,7 +426,7 @@ def build_dagger_frame(state: str, src_name: str, n: int, phase: str) -> dict:
     paste(big, body, MARGIN, MARGIN)
     paste(big, front, 0, 0)
     return {"state": state, "n": n, "phase": phase, "source": src_name, "grid": big, "body": body,
-            "back": back, "front": front, "arcs": arcs, "orig_size": (w, h), "orig_anchor": s.anchor, "hands": hands}
+            "back": back, "front": front, "arcs": arcs, "orig_size": (w, h), "orig_anchor": lf.anchor, "hands": hands}
 
 
 def crop_canvas(grids: list[Grid], orig_size: tuple[int, int], orig_anchor: tuple[int, int]) -> tuple[int, int, int, int, tuple[int, int]]:

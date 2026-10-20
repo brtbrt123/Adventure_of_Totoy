@@ -153,24 +153,31 @@ const DAGGER_EDGE_PER_HIT: float = 20.0  # the katana gains EDGE_PER_HIT (25) pe
 const LIGHTNING_STRIKE_DAMAGE: float = 20.0
 const LIGHTNING_STRIKE_POSTURE: float = 8.0
 
-# Lightning Form: the Dual Dagger's active (right click). Same plumbing as the katana buff: a free action, costs Edge on
-# the press, no refresh while it runs, cooldown counted from the activation, ends on timeout or death.
-const LIGHTNING_FORM_DURATION_TICKS: int = 360  # 6 seconds
+# Lightning Form: the Dual Dagger's active (right click). Since 2026-10-19 (the human removed the 6 s form) it is ONLY
+# the automatic Lightning Barrage below: a free action that costs Edge on the press, cannot be used again while it
+# runs, and its cooldown counts from the activation. The "form" (weapon_form lightning_form, the buff state) lasts
+# exactly as long as the barrage; there is no attack speed, walking speed or damage bonus and no blinking swings after.
 const LIGHTNING_FORM_COOLDOWN_TICKS: int = 1500  # 25 seconds
 const LIGHTNING_FORM_EDGE_COST: float = 60.0
-const LIGHTNING_FORM_ATTACK_SPEED_MULT: float = 2.0
-const LIGHTNING_FORM_DAMAGE_MULT: float = 1.0  # the speed and the blink are the bonus
-const LIGHTNING_FORM_MOVE_SPEED_MULT: float = 1.25
-# Lightning blink: during the form every swing that starts while the boss is alive and its centre is within
-# LIGHTNING_BLINK_RANGE px of the player first teleports the player next to the boss and the swing comes from there.
-# The side cycles through 8 directions around the boss (direction d = Vector2.RIGHT rotated by d * 45 degrees) in
-# LIGHTNING_BLINK_ORDER; a fresh form starts at the first entry. The spot is LIGHTNING_BLINK_DISTANCE px from the
-# boss centre: outside the boss (>= BOSS_RADIUS + PLAYER_RADIUS = 26) and inside the dagger reach
-# (<= BOSS_RADIUS + ATTACK_RANGE * 0.75 = 39.5). A wall or prop in the way moves it to the nearest free direction.
-const LIGHTNING_BLINK_RANGE: float = 150.0
+# Barrage blinks: the spot is LIGHTNING_BLINK_DISTANCE px from the boss centre in direction d (Vector2.RIGHT rotated
+# by d * 45 degrees): outside the boss (>= BOSS_RADIUS + PLAYER_RADIUS = 26) and inside the dagger reach
+# (<= BOSS_RADIUS + ATTACK_RANGE * 0.75 = 39.5). Each blink also gives LIGHTNING_BLINK_INVULN_TICKS of i-frames.
 const LIGHTNING_BLINK_DISTANCE: float = 30.0
 const LIGHTNING_BLINK_INVULN_TICKS: int = 6
 const LIGHTNING_BLINK_ORDER: Array[int] = [0, 3, 6, 1, 4, 7, 2, 5]
+# Lightning Barrage (first guesses set on 2026-10-19, nobody has played it): activating Lightning Form needs the boss
+# alive (at any distance). One slash per entry of LIGHTNING_BLINK_ORDER (8): each blinks the player next to the boss
+# from that side (nearest free side not used yet when it is blocked by a wall or prop) and hits
+# LIGHTNING_BARRAGE_HIT_DELAY_TICKS later through the normal hit rules (armor, counter, posture).
+# Slash k (0-based) blinks LIGHTNING_BARRAGE_START_DELAY_TICKS + k * LIGHTNING_BARRAGE_INTERVAL_TICKS ticks after the
+# activation; the barrage ends LIGHTNING_BARRAGE_RECOVERY_TICKS after the last hit (1 + 42 + 2 + 10 = 55 ticks, about
+# 0.9 s). The player cannot move or act and is invulnerable meanwhile. The last slash also calls the lightning strike.
+const LIGHTNING_BARRAGE_START_DELAY_TICKS: int = 1
+const LIGHTNING_BARRAGE_INTERVAL_TICKS: int = 6
+const LIGHTNING_BARRAGE_HIT_DELAY_TICKS: int = 2  # must stay below the interval
+const LIGHTNING_BARRAGE_RECOVERY_TICKS: int = 10
+const LIGHTNING_BARRAGE_DAMAGE_MULT: float = 0.6  # x ATTACK_DAMAGE: a dagger swing 1-3
+const LIGHTNING_BARRAGE_EDGE_PER_HIT: float = 5.0  # less than a swing (20) so the barrage does not refund its cost
 
 # Edge (sword mechanic): close hits and parries build it, a counter spends all of it for extra damage
 const EDGE_MAX: float = 100.0

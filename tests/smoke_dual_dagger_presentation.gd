@@ -2,8 +2,8 @@ extends SceneTree
 ## godot_console --headless --path . --script res://tests/smoke_dual_dagger_presentation.gd
 ## Dual Dagger presentation: the Q binding, the swap changing the drawn frame set, the HUD (medallion, form slot,
 ## labels, swap hint), the Lightning Form look (no Black Form aura, darkening or slash), the Lightning Form cut-in
-## (starts only for the form, freezes and resumes the world), and the blink / sky strike effects from real core
-## events. With `-- --capture` in a window it also saves art/build/arena_dagger_*.png for a visual check.
+## (starts only for the form, freezes and resumes the world), the blink / sky strike effects from real core
+## events, and the automatic Lightning Barrage the form starts with. With `-- --capture` in a window it also saves art/build/arena_dagger_*.png for a visual check.
 const Arena := preload("res://presentation/arena/arena.gd")
 const Anim := preload("res://presentation/arena/animation.gd")
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
@@ -211,6 +211,9 @@ func strike_effects() -> void:
 	check(arena.lightning_fx.is_empty() and arena.screen_flashes.is_empty(), "lightning effects never expire")
 
 
+## Lightning Form is only the barrage: the form look (lightning set, aura) and the HUD's run ring last exactly as long
+## as the barrage; afterwards the hero is the plain dagger again (no aura, no blinking swings, no lightning dash
+## afterimages) and the slot shows the cooldown ring.
 func lightning_form() -> void:
 	fixture(90.0)
 	press("weapon_swap_pressed")
@@ -226,42 +229,37 @@ func lightning_form() -> void:
 	check(not effect.is_empty() and String(effect["back"]).begins_with("fx_lightning_aura_back_") and String(effect["front"]).begins_with("fx_lightning_aura_front_"), "form aura layers")
 	check(String(effect["slash"]).is_empty(), "form adds a detached slash")
 	check(not arena.black_form_look(arena.snapshot.player), "form uses the Black Form darkening")
-	check(Hud.weapon_active_line(Hud.weapon_status(arena.snapshot)).begins_with("FORM "), "HUD shows the form time")
+	var running: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(Hud.weapon_active_line(running) == "BARRAGE" and bool(running["active"]), "HUD shows the barrage running")
 	check(Hud.swap_status(arena.snapshot)["reason"] == "FORM", "swap hint shows the form lock")
 	await save("form_aura")
+	while arena.snapshot.player.state == &"lightning_barrage":
+		check(arena.snapshot.player.weapon_form == Weapons.FORM_LIGHTNING and not arena.weapon_buff_effect().is_empty(), "the form look runs through the barrage")
+		step()
+	# The barrage is over: so is the form.
+	check(not arena.snapshot.player.weapon_buff_active and arena.snapshot.player.weapon_form == &"", "the form outlived the barrage")
+	check(arena.weapon_buff_effect().is_empty(), "the lightning aura lingers after the barrage")
+	var after: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9 and int(after["cooldown"]) > 0, "the slot shows the cooldown ring after the barrage")
+	check(Hud.weapon_active_line(after) == "LIGHTNING", "HUD line after the barrage")
 	var left: InputFrame = InputFrame.new()
 	left.move = Vector2.LEFT
 	for i: int in range(6):
 		step(left)
-	check(arena.facing_left and chosen().begins_with("totoy_lightning_walk_right_"), "form walking left draws the mirrored lightning walk")
-	await save("form_walk_left")
-	# blink strikes: every swing within range teleports next to the boss
-	var blinks: int = 0
-	for i: int in range(90):
+	check(arena.facing_left and chosen().begins_with("totoy_dagger_walk_right_"), "after the barrage the hero walks as the plain dagger: " + chosen())
+	await save("after_barrage_walk")
+	# swings after the barrage do not blink
+	var blinks_before: int = int(seen.get(GameEvent.LIGHTNING_BLINK, 0))
+	for i: int in range(60):
 		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
 		var chain: InputFrame = InputFrame.new()
 		chain.attack_pressed = hero.state == &"idle" or (hero.state == &"attack_recovery" and hero.combo_index < 4)
 		chain.aim = Vector2.RIGHT
-		var before: int = int(seen.get(GameEvent.LIGHTNING_BLINK, 0))
 		step(chain)
-		await process_frame
-		if int(seen.get(GameEvent.LIGHTNING_BLINK, 0)) > before:
-			blinks += 1
-			var kinds: Dictionary = {}
-			for fx: Dictionary in arena.lightning_fx:
-				kinds[fx["kind"]] = true
-			for kind: String in ["depart", "arrive", "chain", "cut", "afterimage"]:
-				check(kinds.has(kind), "blink effect missing: " + kind)
-			check(arena.shake_left > 0 and not arena.screen_flashes.is_empty(), "blink has no shake or flash")
-			if blinks <= 2:
-				await save("blink%d_0" % blinks)
-				step()
-				await save("blink%d_1" % blinks)
-				step()
-				await save("blink%d_2" % blinks)
-	check(blinks >= 3, "only %d blinks in Lightning Form" % blinks)
-	check(arena.missing_frames.is_empty(), "missing frames: %s" % str(arena.missing_frames.keys()))
-	# dash in the form leaves lightning afterimages
+		if arena.snapshot.player.state.begins_with("attack_"):
+			check(chosen().begins_with("totoy_dagger_attack"), "a swing after the barrage drew " + chosen())
+	check(int(seen.get(GameEvent.LIGHTNING_BLINK, 0)) == blinks_before, "a swing after the barrage blinked")
+	# a dash after the barrage leaves the plain ghosts, no lightning afterimages
 	var dash: InputFrame = InputFrame.new()
 	dash.dash_pressed = true
 	dash.move = Vector2.LEFT
@@ -270,11 +268,106 @@ func lightning_form() -> void:
 	step(dash)
 	step()
 	step()
-	check(not arena.dash_ghosts.is_empty(), "dash leaves no afterimages in the form")
-	await save("form_dash")
-	while arena.snapshot.player.weapon_buff_active:
+	var kinds: Dictionary = {}
+	for fx: Dictionary in arena.lightning_fx:
+		kinds[fx["kind"]] = true
+	check(not kinds.has("afterimage"), "lightning afterimages after the barrage")
+	await save("after_barrage_dash")
+	check(arena.missing_frames.is_empty(), "missing frames: %s" % str(arena.missing_frames.keys()))
+
+
+## The Lightning Barrage from a real activation: 8 blinks, each drawn as departure/arrival bursts, afterimages, a chain
+## bolt and a cut with a small shake and flash; the last slash calls the sky bolt; the effect count stays bounded and
+## everything expires; every frame exists. Then, with the arena's own physics loop: the cut-in freezes the world, the
+## barrage then runs on (not frozen by it), and a restart in the middle cancels it.
+func barrage() -> void:
+	fixture(90.0)
+	press("weapon_swap_pressed")
+	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
 		step()
-	check(arena.weapon_buff_effect().is_empty() and chosen().begins_with("totoy_dagger_"), "form look stays after it ended")
+	seen.clear()
+	arena.missing_frames.clear()
+	press("weapon_active_pressed")
+	check(int(seen.get(GameEvent.LIGHTNING_BARRAGE_STARTED, 0)) == 1, "no lightning_barrage_started on the activation")
+	check(arena.snapshot.player.state == &"lightning_barrage", "the hero is not in the barrage")
+	check(arena.lightning_cutin.active, "the cut-in plays before the barrage")
+	arena.lightning_cutin.stop()
+	var blinks: int = 0
+	var most_fx: int = 0
+	var most_particles: int = 0
+	var blink_tick: int = -1
+	var sides: Dictionary = {}
+	for i: int in range(Weapons.barrage_total_ticks() + 5):
+		var before: int = int(seen.get(GameEvent.LIGHTNING_BLINK, 0))
+		var strikes_before: int = int(seen.get(GameEvent.LIGHTNING_STRIKE, 0))
+		step()
+		await process_frame
+		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
+		if hero.state == &"lightning_barrage":
+			check(chosen().begins_with("totoy_lightning_attack"), "barrage pose is not a lightning dagger attack: " + chosen())
+		most_fx = maxi(most_fx, arena.lightning_fx.size())
+		most_particles = maxi(most_particles, arena.particles.size())
+		if int(seen.get(GameEvent.LIGHTNING_BLINK, 0)) > before:
+			blinks += 1
+			blink_tick = arena.snapshot.tick
+			sides[hero.lightning_blink_index] = true
+			var kinds: Dictionary = {}
+			for fx: Dictionary in arena.lightning_fx:
+				kinds[fx["kind"]] = true
+			for kind: String in ["depart", "arrive", "chain", "cut", "afterimage"]:
+				check(kinds.has(kind), "barrage blink %d effect missing: %s" % [blinks, kind])
+			check(arena.shake_left > 0 and not arena.screen_flashes.is_empty(), "barrage blink %d has no shake or flash" % blinks)
+			if blinks in [1, 2, 5]:
+				await save("barrage%d_blink" % blinks)
+		elif blinks in [1, 2, 5] and arena.snapshot.tick - blink_tick == Tuning.LIGHTNING_BARRAGE_HIT_DELAY_TICKS:
+			check(chosen().ends_with("_right_4"), "the hit tick shows the strike pose: " + chosen())
+			await save("barrage%d_hit" % blinks)
+		elif blinks in [2, 5] and arena.snapshot.tick - blink_tick == Tuning.LIGHTNING_BARRAGE_INTERVAL_TICKS - 1:
+			check(not arena.flashes.has(arena.snapshot.entities[0].id), "the boss stays white between barrage slashes")
+			await save("barrage%d_gap" % blinks)
+		if int(seen.get(GameEvent.LIGHTNING_STRIKE, 0)) > strikes_before:
+			var kinds: Dictionary = {}
+			for fx: Dictionary in arena.lightning_fx:
+				kinds[fx["kind"]] = true
+			check(kinds.has("strike") and kinds.has("ground"), "the barrage finisher has no sky bolt: %s" % str(kinds.keys()))
+			check(arena.shake_left >= 8, "the finisher has no big shake")
+			await save("barrage_strike_0")
+			step()
+			step()
+			await save("barrage_strike_2")
+	check(blinks == Weapons.barrage_slashes(), "barrage drew %d blinks" % blinks)
+	check(sides.size() == 8, "the barrage did not come from all 8 sides: %s" % str(sides.keys()))
+	check(int(seen.get(GameEvent.LIGHTNING_STRIKE, 0)) == 1, "the barrage called %d sky bolts" % int(seen.get(GameEvent.LIGHTNING_STRIKE, 0)))
+	check(int(seen.get(GameEvent.LIGHTNING_BARRAGE_ENDED, 0)) == 1, "no lightning_barrage_ended")
+	check(arena.snapshot.player.state != &"lightning_barrage" and arena.snapshot.player.weapon_form == &"", "the form ends with the barrage")
+	check(most_fx <= 48, "lightning effects pile up: %d live at once" % most_fx)
+	check(most_particles <= 160, "particles pile up: %d live at once" % most_particles)
+	for i: int in range(120):
+		step()
+	check(arena.lightning_fx.is_empty() and arena.screen_flashes.is_empty(), "barrage effects never expire")
+	check(arena.missing_frames.is_empty(), "missing frames: %s" % str(arena.missing_frames.keys()))
+	# The arena's own loop: the cut-in freezes, then the barrage runs on, and a restart cancels it midway.
+	fixture(90.0)
+	press("weapon_swap_pressed")
+	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
+		step()
+	press("weapon_active_pressed")
+	var frozen_at: int = arena.core.tick
+	arena.set_physics_process(true)
+	var frames: int = 0
+	while arena.cutin_playing() and frames < 300:
+		await physics_frame
+		frames += 1
+	check(not arena.cutin_playing(), "the cut-in never ended")
+	check(arena.core.tick == frozen_at, "the world stepped during the cut-in")
+	for i: int in 20:
+		await physics_frame
+	check(arena.core.tick >= frozen_at + 15, "the world is frozen during the barrage (%d ticks)" % (arena.core.tick - frozen_at))
+	check(arena.snapshot.player.state == &"lightning_barrage" and arena.snapshot.player.lightning_barrage_slash >= 2, "the barrage does not progress in the arena loop")
+	arena._restart()
+	arena.set_physics_process(false)
+	check(arena.snapshot.player.state == &"idle" and not arena.core.player.barrage_running, "restart did not cancel the barrage")
+	check(arena.lightning_fx.is_empty() and arena.screen_flashes.is_empty() and not arena.cutin_playing(), "restart left barrage effects")
 
 
 ## The cut-in freezes the world while it plays and lets it run afterwards; Black Form stays katana-only.
@@ -282,7 +375,7 @@ func cutin_freeze() -> void:
 	fixture(90.0)
 	press("weapon_swap_pressed")
 	arena.set_physics_process(true)
-	arena._on_event(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, 5, {"entity_id": 1, "weapon_id": Tuning.WEAPON_DUAL_DAGGER, "form": Weapons.FORM_LIGHTNING, "duration": 360, "attack_speed_mult": 2.0, "damage_mult": 1.0, "move_speed_mult": 1.25}))
+	arena._on_event(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, 5, {"entity_id": 1, "weapon_id": Tuning.WEAPON_DUAL_DAGGER, "form": Weapons.FORM_LIGHTNING, "duration": 55, "attack_speed_mult": 1.0, "damage_mult": 1.0, "move_speed_mult": 1.0}))
 	check(arena.lightning_cutin.active and not arena.cutin.active, "lightning event starts only the lightning cut-in")
 	check(arena.cutin_playing(), "cut-in playing")
 	var tick_before: int = arena.core.tick
@@ -323,6 +416,7 @@ func run() -> void:
 	await swap_and_hud()
 	await strike_effects()
 	await lightning_form()
+	await barrage()
 	await cutin_freeze()
 	arena.queue_free()
 	await process_frame

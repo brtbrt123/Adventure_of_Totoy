@@ -25,6 +25,8 @@ class EntitySnapshot:
 	var lightning_blink_tick: int = -1  # player only: tick of the latest lightning blink (it equals snapshot.tick on the blink tick)
 	var lightning_blink_from: Vector2 = Vector2.ZERO  # player only: where the latest blink started
 	var lightning_blink_to: Vector2 = Vector2.ZERO  # player only: where it landed
+	var lightning_barrage_slash: int = 0  # player only: slash (1-8) of the running Lightning Barrage, 0 when none runs or before its first slash
+	var lightning_barrage_slash_tick: int = -1  # player only: tick that slash started (its blink), -1 when none
 	var weapon_buff_active: bool = false  # player only
 	var weapon_buff_ticks_left: int = 0  # player only: ticks of buff left, 0 when not active
 	var attack_speed_mult: float = 1.0  # player only: the speed of the swing in progress (locked at its start), else the current buff speed

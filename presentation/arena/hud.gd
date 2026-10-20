@@ -446,10 +446,11 @@ func _draw_weapon_active() -> void:
 			arc.append((weapon_rect().get_center() + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * (21.0 if active else 24.0)).round())
 		draw_polyline(arc, colors["v"] if active else colors["o"], 1.0, false)
 
-## Second line of the weapon active box: the time left while it runs, else what right click does.
+## Second line of the weapon active box: the time left while it runs (the dagger's active is the barrage), else what
+## right click does.
 static func weapon_active_line(data: Dictionary) -> String:
 	if bool(data["active"]):
-		return "FORM %dS" % int(data["remaining"])
+		return "BARRAGE" if data.get("weapon", &"") == Tuning.WEAPON_DUAL_DAGGER else "FORM %dS" % int(data["remaining"])
 	return "LIGHTNING" if data.get("weapon", &"") == Tuning.WEAPON_DUAL_DAGGER else "FORM OFF"
 
 ## Lightning Form slot: its icon, a bright ring while it runs, the cooldown arc and seconds while it recharges.

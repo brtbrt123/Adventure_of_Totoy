@@ -18,6 +18,8 @@ const STATE_ATTACK_RECOVERY: StringName = &"attack_recovery"
 const STATE_SKILL_WINDUP: StringName = &"skill_windup"
 const STATE_SKILL_ACTIVE: StringName = &"skill_active"
 const STATE_SKILL_RECOVERY: StringName = &"skill_recovery"
+## The automatic Lightning Barrage (Dual Dagger active): the core moves the player and lands the slashes.
+const STATE_LIGHTNING_BARRAGE: StringName = &"lightning_barrage"
 const STATE_DEAD: StringName = &"dead"
 
 ## skill_pressed 1, 2, 3 select these (test bindings Z, X, C).
@@ -46,12 +48,17 @@ var buff_cooldown: int:
 	set(value):
 		active_cooldowns[weapon_id] = value
 var swap_lockout: int = 0  # ticks until the next weapon swap is allowed
-var blink_requested: bool = false  # set when a swing starts during Lightning Form; the core reads and clears it
-var blink_count: int = 0  # blinks since the current Lightning Form started (picks the side from LIGHTNING_BLINK_ORDER)
 var last_blink_direction: int = -1  # direction index (0-7) of the latest blink, -1 before the first
 var last_blink_tick: int = -1
 var last_blink_from: Vector2 = Vector2.ZERO
 var last_blink_to: Vector2 = Vector2.ZERO
+## Set by the core before each step: Lightning Form (only the barrage) can be activated only while the boss is alive.
+var barrage_target_alive: bool = true
+var barrage_requested: bool = false  # set when an active with a barrage starts; the core reads and clears it
+var barrage_running: bool = false
+var barrage_slash: int = 0  # slashes of the running barrage started so far (1-8 once the first one blinked)
+var barrage_slash_tick: int = -1  # tick the latest barrage slash started
+var barrage_sides: Array[int] = []  # directions already used by the running barrage
 var swing_speed_mult: float = 1.0  # locked at the start of each swing
 var swing_damage_mult: float = 1.0  # locked at the start of each swing
 var skill_id: StringName = &""  # the skill in progress during skill_* states, empty otherwise
@@ -68,7 +75,6 @@ var _combo_grace: int = 0  # ticks left in which a press after a finished swing 
 var _hurt_invuln: int = 0
 var _dash_invuln: int = 0  # dash i-frames run on their own counter, so a short dash can keep a forgiving window
 var _blink_invuln: int = 0  # Lightning blink i-frames
-var _facing_locked: bool = false  # a blink swing keeps facing the boss through its windup and active ticks
 
 
 func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
@@ -88,9 +94,12 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		if active_cooldowns[weapon] > 0:
 			active_cooldowns[weapon] -= 1
 	if buff_ticks > 0:
-		buff_ticks -= 1
-		if buff_ticks == 0:
-			_emit_buff_end(tick, events, &"expired")
+		if barrage_running:
+			buff_ticks = maxi(1, buff_ticks - 1)  # Lightning Form ends with its barrage (end_barrage), not by the timer
+		else:
+			buff_ticks -= 1
+			if buff_ticks == 0:
+				_emit_buff_end(tick, events, &"expired")
 	if input.weapon_swap_pressed:
 		_try_weapon_swap(tick, events)
 	if input.weapon_active_pressed:
@@ -108,9 +117,10 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		_combo_grace -= 1
 		if _combo_grace == 0:
 			combo_index = 1
+	if barrage_requested:
+		return  # the core starts the barrage this tick; the rest of this input is not used
 	var move: Vector2 = input.move.limit_length(1.0)
-	var locked: bool = _facing_locked and (state == STATE_ATTACK_WINDUP or state == STATE_ATTACK_ACTIVE)
-	if locked:
+	if state == STATE_LIGHTNING_BARRAGE:
 		pass
 	elif input.aim.length_squared() > 0.0001:
 		facing = input.aim.normalized()
@@ -164,6 +174,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		STATE_SKILL_RECOVERY:
 			if state_ticks >= _skill_ticks("recovery"):
 				_set_state(STATE_IDLE)
+		STATE_LIGHTNING_BARRAGE:
+			pass  # scripted by the core (GameCore._resolve_lightning_barrage): no movement, no actions
 		STATE_ATTACK_RECOVERY:
 			if _try_actions(input, move, tick, events, false):
 				return
@@ -186,7 +198,7 @@ func parry_ticks_since_press() -> int:
 func is_invulnerable() -> bool:
 	if state == STATE_DEAD:
 		return false
-	return _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0
+	return state == STATE_LIGHTNING_BARRAGE or _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0
 
 
 ## Returns true when the damage was applied (false while invulnerable or dead).
@@ -199,16 +211,55 @@ func take_damage(amount: int, tick: int, events: Array[GameEvent], source_id: in
 	_hurt_invuln = Tuning.PLAYER_HURT_INVULN_TICKS
 	events.append(GameEvent.new(GameEvent.DAMAGE_TAKEN, tick, {"entity_id": id, "amount": amount, "source_id": source_id}))
 	if hp == 0:
-		state = STATE_DEAD
-		state_ticks = 0
-		skill_id = &""
-		if buff_ticks > 0:
-			buff_ticks = 0
-			_emit_buff_end(tick, events, &"death")
-		events.append(GameEvent.new(GameEvent.ENTITY_DIED, tick, {"entity_id": id, "visual_id": VISUAL_ID}))
+		die(tick, events)
 	elif state != STATE_DASH:
 		_set_state(STATE_IDLE)  # a hit interrupts attacks and parries
 	return true
+
+
+## The player dies: a running barrage and weapon buff/form end (reason death), then entity_died.
+func die(tick: int, events: Array[GameEvent]) -> void:
+	if state == STATE_DEAD:
+		return
+	hp = 0
+	state = STATE_DEAD
+	state_ticks = 0
+	skill_id = &""
+	if barrage_running:
+		end_barrage(tick, events, &"death")
+	if buff_ticks > 0:
+		buff_ticks = 0
+		_emit_buff_end(tick, events, &"death")
+	events.append(GameEvent.new(GameEvent.ENTITY_DIED, tick, {"entity_id": id, "visual_id": VISUAL_ID}))
+
+
+## The core starts the Lightning Barrage: whatever the player was doing stops; no movement or actions until it ends.
+func start_barrage(tick: int, events: Array[GameEvent]) -> void:
+	barrage_requested = false
+	barrage_running = true
+	barrage_slash = 0
+	barrage_slash_tick = -1
+	barrage_sides.clear()
+	pending_release = &""
+	attack_hit_done = true
+	reset_combo()
+	_set_state(STATE_LIGHTNING_BARRAGE)
+	state_ticks = 0
+	events.append(GameEvent.new(GameEvent.LIGHTNING_BARRAGE_STARTED, tick, {"entity_id": id, "slashes": Weapons.barrage_slashes()}))
+
+
+## The barrage is over (complete, boss_dead or death). `slashes` in the event is how many slashes started. Lightning
+## Form is only the barrage, so it ends here too (weapon_buff_ended: death on death, else expired).
+func end_barrage(tick: int, events: Array[GameEvent], reason: StringName) -> void:
+	if not barrage_running:
+		return
+	barrage_running = false
+	events.append(GameEvent.new(GameEvent.LIGHTNING_BARRAGE_ENDED, tick, {"entity_id": id, "slashes": barrage_slash, "reason": reason}))
+	if buff_ticks > 0:
+		buff_ticks = 0
+		_emit_buff_end(tick, events, &"death" if reason == &"death" else &"expired")
+	if state == STATE_LIGHTNING_BARRAGE:
+		_set_state(STATE_IDLE)
 
 
 ## A gold hit was parried: build Edge and take a short riposte step toward the attacker.
@@ -305,20 +356,22 @@ static func skill_profile(skill: StringName) -> Dictionary:
 			return {"damage": Tuning.MOON_CLEAVE_DAMAGE, "posture": Tuning.MOON_CLEAVE_POSTURE, "edge_gain": Tuning.MOON_CLEAVE_EDGE_GAIN}
 
 
-## The equipped weapon's active (right click): Black Katana buff or Dual Dagger Lightning Form. A timed buff (numbers
-## per weapon in core/weapons.gd). It is a free action (no state change), costs Edge, has the weapon's own cooldown
-## and cannot be refreshed while it is running. It lasts through movement, attacks, dashes, parries, skills and
-## damage; it ends when it runs out or the player dies.
+## The equipped weapon's active (right click): the Black Katana buff (a timed buff that lasts through movement,
+## attacks, dashes, parries, skills and damage; it ends when it runs out or the player dies) or the Dual Dagger's
+## Lightning Form, which is only the Lightning Barrage (it needs a living boss and ends with the barrage). Numbers per
+## weapon in core/weapons.gd. Costs Edge, has the weapon's own cooldown, cannot be refreshed while it is running.
 func _try_weapon_active(tick: int, events: Array[GameEvent]) -> bool:
 	if not Weapons.has_active(weapon_id) or state == STATE_DEAD or buff_ticks > 0 or buff_cooldown > 0:
 		return false
+	if Weapons.has_lightning_barrage(weapon_id) and not barrage_target_alive:
+		return false  # the barrage needs a living boss
 	var cost: float = Weapons.active_edge_cost(weapon_id)
 	if edge < cost:
 		return false
 	edge -= cost
 	buff_ticks = Weapons.active_duration(weapon_id)
 	buff_cooldown = Weapons.active_cooldown(weapon_id)
-	blink_count = 0
+	barrage_requested = Weapons.has_lightning_barrage(weapon_id)
 	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, tick, {
 		"entity_id": id, "weapon_id": weapon_id, "form": Weapons.active_form(weapon_id), "duration": buff_ticks,
 		"attack_speed_mult": Weapons.active_attack_speed_mult(weapon_id), "damage_mult": Weapons.active_damage_mult(weapon_id),
@@ -373,7 +426,7 @@ func damage_mult() -> float:
 	return Weapons.active_damage_mult(weapon_id) if buff_ticks > 0 else 1.0
 
 
-## Current walking speed multiplier (1.0 without the buff; Lightning Form is faster).
+## Current walking speed multiplier (1.0 without the buff; the katana buff's own value while it runs).
 func move_speed_mult() -> float:
 	return Weapons.active_move_speed_mult(weapon_id) if buff_ticks > 0 else 1.0
 
@@ -383,8 +436,7 @@ func combo_max() -> int:
 	return Weapons.combo_max(weapon_id)
 
 
-## The core found a blink spot for the swing that just started: move there, face the boss for this swing's windup and
-## active ticks, and take the blink i-frames.
+## The core found a blink spot for a barrage slash: move there, face the boss and take the blink i-frames.
 func apply_blink(to: Vector2, face: Vector2, direction_index: int, tick: int) -> void:
 	last_blink_from = position
 	last_blink_to = to
@@ -393,7 +445,6 @@ func apply_blink(to: Vector2, face: Vector2, direction_index: int, tick: int) ->
 	position = to
 	if face.length_squared() > 0.0001:
 		facing = face.normalized()
-	_facing_locked = true
 	_blink_invuln = Tuning.LIGHTNING_BLINK_INVULN_TICKS
 
 
@@ -415,8 +466,6 @@ func _start_swing(index: int) -> void:
 	attack_hit_done = false
 	_combo_queued = false
 	_combo_grace = 0
-	_facing_locked = false
-	blink_requested = is_lightning_form()
 	_set_state(STATE_ATTACK_WINDUP)
 
 

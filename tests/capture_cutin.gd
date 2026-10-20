@@ -18,7 +18,7 @@ func _run() -> void:
 	await physics_frame
 	await process_frame
 	Input.action_release("arena_weapon_active")
-	var wanted: Array[float] = [0.2, 0.45, 0.64, 0.74, 0.9, 1.1, 1.3, 1.6]  # preview seconds
+	var wanted: Array[float] = [0.02, 0.12, 0.25, 0.38, 0.45, 0.61, 0.65, 0.75, 0.92]  # preview seconds
 	var shot: int = 0
 	for i: int in 200:
 		await physics_frame

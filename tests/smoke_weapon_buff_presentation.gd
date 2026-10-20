@@ -7,6 +7,7 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 const PlayerState := preload("res://core/player.gd")
 const Tuning := preload("res://core/tuning.gd")
+const Weapons := preload("res://core/weapons.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -266,8 +267,8 @@ func dagger_form() -> void:
 	step(input)
 	check(arena.snapshot.player.weapon_form == &"lightning_form", "form did not start")
 	var status: Dictionary = Hud.weapon_status(arena.snapshot)
-	check(int(status["remaining"]) == ceili(Tuning.LIGHTNING_FORM_DURATION_TICKS * Tuning.TICK_DT) or int(status["remaining"]) == ceili((Tuning.LIGHTNING_FORM_DURATION_TICKS - 1) * Tuning.TICK_DT), "form HUD time")
-	check(Hud.weapon_active_line(status) == "FORM %dS" % int(status["remaining"]), "form HUD line")
+	check(arena.snapshot.hud.weapon_buff_duration == Weapons.barrage_total_ticks() and float(status["duration_fraction"]) > 0.9, "the form (only the barrage) shows its run ring")
+	check(Hud.weapon_active_line(status) == "BARRAGE", "form HUD line")
 	check(int(status["cooldown"]) == ceili(arena.snapshot.hud.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "form HUD cooldown from the snapshot")
 	var plan: Dictionary = View.plan(arena.snapshot)
 	check(String(plan["back"]).begins_with("fx_lightning_aura_back_") and String(plan["slash"]).is_empty(), "form aura plan")
@@ -278,6 +279,8 @@ func dagger_form() -> void:
 		step(InputFrame.new())
 	check(View.plan(arena.snapshot).is_empty(), "form aura persists after the form")
 	check(int(arena.combat_audio.played.get("weapon_buff_end", 0)) == 1, "form end cue")
+	var after: Dictionary = Hud.weapon_status(arena.snapshot)
+	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9 and Hud.weapon_active_line(after) == "LIGHTNING", "after the barrage the slot shows the cooldown ring")
 
 func run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"

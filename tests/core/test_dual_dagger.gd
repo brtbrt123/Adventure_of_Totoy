@@ -1,6 +1,6 @@
 extends "res://tests/test_case.gd"
 ## The Dual Dagger: weapon swap (Q), the fast 4-hit combo, the lightning strike finisher and Lightning Form (right
-## click) with its blink.
+## click), which is only the Lightning Barrage (more in test_lightning_barrage.gd).
 
 const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
@@ -55,6 +55,14 @@ func _collect(core: GameCore, ticks: int, type: StringName, frame: InputFrame = 
 			if event.type == type:
 				found.append(event)
 	return found
+
+
+## Step idle input until the Lightning Barrage that the activation started is over.
+func _finish_barrage(core: GameCore) -> void:
+	var guard: int = 0
+	while core.player.barrage_running and guard < 300:
+		core.step(InputFrame.new())
+		guard += 1
 
 
 func _swing_total(weapon: StringName, swing: int, mult: float = 1.0) -> int:
@@ -141,12 +149,17 @@ func test_swap_is_refused_while_a_buff_or_form_runs() -> void:
 	var dagger: GameCore = _dagger_core()
 	dagger.step(_frame(false, true))
 	assert_true(dagger.player.is_lightning_form())
-	_swap(dagger)
-	assert_eq(dagger.player.weapon_id, Tuning.WEAPON_DUAL_DAGGER, "not while Lightning Form runs")
-	run(dagger, Tuning.LIGHTNING_FORM_DURATION_TICKS)
+	var refused: int = 0
+	while dagger.player.barrage_running and refused < 300:
+		_swap(dagger)
+		if dagger.player.barrage_running:
+			assert_eq(dagger.player.weapon_id, Tuning.WEAPON_DUAL_DAGGER, "not during the barrage (tick %d)" % dagger.tick)
+			refused += 1
+	assert_eq(dagger.player.weapon_id, Tuning.WEAPON_DUAL_DAGGER, "not on the tick the barrage ends either (the press came first)")
+	assert_eq(refused, Weapons.barrage_total_ticks() - 1)
 	assert_false(dagger.player.is_buff_active())
 	_swap(dagger)
-	assert_eq(dagger.player.weapon_id, Tuning.WEAPON_BLACK_KATANA, "allowed once the form is over")
+	assert_eq(dagger.player.weapon_id, Tuning.WEAPON_BLACK_KATANA, "allowed right after the barrage")
 
 
 func test_swap_resets_the_combo() -> void:
@@ -173,7 +186,7 @@ func test_each_weapon_keeps_its_own_active_cooldown() -> void:
 	var snap: Snapshots.GameSnapshot = core.snapshot()
 	assert_eq(snap.hud.weapon_buff_cooldown_ticks, 0, "the dagger's cooldown is its own: ready")
 	assert_eq(snap.hud.weapon_buff_cooldown_max, Tuning.LIGHTNING_FORM_COOLDOWN_TICKS)
-	assert_eq(snap.hud.weapon_buff_duration, Tuning.LIGHTNING_FORM_DURATION_TICKS)
+	assert_eq(snap.hud.weapon_buff_duration, Weapons.barrage_total_ticks())
 	assert_near(snap.hud.weapon_buff_edge_cost, Tuning.LIGHTNING_FORM_EDGE_COST, 0.0001)
 	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_BLACK_KATANA], Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS - since + 1, "the katana's keeps counting while it is put away")
 	core.player.edge = 100.0
@@ -181,15 +194,15 @@ func test_each_weapon_keeps_its_own_active_cooldown() -> void:
 	since += 1
 	assert_true(core.player.is_lightning_form())
 	assert_eq(core.player.buff_cooldown, Tuning.LIGHTNING_FORM_COOLDOWN_TICKS)
-	run(core, Tuning.LIGHTNING_FORM_DURATION_TICKS)
-	since += Tuning.LIGHTNING_FORM_DURATION_TICKS
+	run(core, Weapons.barrage_total_ticks())
+	since += Weapons.barrage_total_ticks()
 	_swap(core)
 	since += 1
 	snap = core.snapshot()
 	assert_eq(snap.player.weapon_id, Tuning.WEAPON_BLACK_KATANA)
 	assert_eq(snap.hud.weapon_buff_cooldown_ticks, Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS - since + 1, "swapping back did not reset the katana cooldown")
 	assert_eq(snap.hud.weapon_buff_cooldown_max, Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS)
-	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_DUAL_DAGGER], Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - Tuning.LIGHTNING_FORM_DURATION_TICKS - 1)
+	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_DUAL_DAGGER], Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - Weapons.barrage_total_ticks() - 1)
 	core.player.edge = 100.0
 	core.step(_frame(false, true))
 	assert_false(core.player.is_buff_active(), "the katana is still on cooldown")
@@ -352,52 +365,94 @@ func test_lightning_strike_on_a_counter_uses_the_counter_multiplier() -> void:
 		assert_eq(strikes[0].data["kind"], &"counter")
 
 
-# --- Lightning Form ---
+# --- Lightning Form: only the Lightning Barrage (the 6 s form was removed on 2026-10-19) ---
 
-func test_form_costs_edge_lasts_its_duration_and_emits_events() -> void:
+func test_form_is_only_the_barrage_and_ends_with_it() -> void:
 	var core: GameCore = _dagger_core(Vector2(-200.0, 0.0))
 	core.step(_frame(false, true))
 	assert_true(core.player.is_lightning_form())
 	assert_near(core.player.edge, 100.0 - Tuning.LIGHTNING_FORM_EDGE_COST, 0.001, "Edge spent")
-	assert_eq(core.player.state, PlayerState.STATE_IDLE, "a free action")
+	assert_eq(core.player.state, PlayerState.STATE_LIGHTNING_BARRAGE, "the activation starts the barrage")
 	var started: GameEvent = find_event(core, GameEvent.WEAPON_BUFF_STARTED)
 	assert_true(started != null)
 	if started != null:
 		assert_eq(started.data["weapon_id"], Tuning.WEAPON_DUAL_DAGGER)
 		assert_eq(started.data["form"], Weapons.FORM_LIGHTNING)
-		assert_eq(started.data["duration"], Tuning.LIGHTNING_FORM_DURATION_TICKS)
-		assert_near(float(started.data["attack_speed_mult"]), Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT, 0.0001)
-		assert_near(float(started.data["damage_mult"]), Tuning.LIGHTNING_FORM_DAMAGE_MULT, 0.0001)
-		assert_near(float(started.data["move_speed_mult"]), Tuning.LIGHTNING_FORM_MOVE_SPEED_MULT, 0.0001)
+		assert_eq(started.data["duration"], Weapons.barrage_total_ticks(), "the form lasts as long as the barrage")
+		assert_near(float(started.data["attack_speed_mult"]), 1.0, 0.0001, "no attack speed bonus")
+		assert_near(float(started.data["damage_mult"]), 1.0, 0.0001)
+		assert_near(float(started.data["move_speed_mult"]), 1.0, 0.0001, "no walking bonus")
 	var snap: Snapshots.GameSnapshot = core.snapshot()
-	assert_eq(snap.player.weapon_form, Weapons.FORM_LIGHTNING)
+	assert_eq(snap.player.weapon_form, Weapons.FORM_LIGHTNING, "the form look during the barrage")
 	assert_true(snap.player.weapon_buff_active)
-	assert_eq(snap.player.weapon_buff_ticks_left, Tuning.LIGHTNING_FORM_DURATION_TICKS)
-	assert_near(snap.player.attack_speed_mult, Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT, 0.0001)
-	assert_near(snap.player.move_speed_mult, Tuning.LIGHTNING_FORM_MOVE_SPEED_MULT, 0.0001)
+	assert_eq(snap.hud.weapon_buff_duration, Weapons.barrage_total_ticks())
 	var ended_on: int = -1
-	for i: int in Tuning.LIGHTNING_FORM_DURATION_TICKS + 5:
+	var barrage_ended_on: int = -1
+	for i: int in Weapons.barrage_total_ticks() + 30:
 		core.step(input())
+		var types: Array[StringName] = event_types(core)
+		if types.has(GameEvent.LIGHTNING_BARRAGE_ENDED):
+			barrage_ended_on = core.tick
 		var ended: GameEvent = find_event(core, GameEvent.WEAPON_BUFF_ENDED)
 		if ended != null:
-			ended_on = i + 1
+			assert_eq(ended_on, -1, "weapon_buff_ended only once")
+			ended_on = core.tick
 			assert_eq(ended.data["reason"], &"expired")
 			assert_eq(ended.data["form"], Weapons.FORM_LIGHTNING)
-	assert_eq(ended_on, Tuning.LIGHTNING_FORM_DURATION_TICKS, "ends on tick activation + duration")
-	assert_eq(core.snapshot().player.weapon_form, &"")
+			assert_true(types.find(GameEvent.LIGHTNING_BARRAGE_ENDED) < types.find(GameEvent.WEAPON_BUFF_ENDED), "the barrage ends first")
+		if core.player.state == PlayerState.STATE_LIGHTNING_BARRAGE:
+			assert_true(core.player.is_buff_active(), "the form runs through the whole barrage (tick %d)" % core.tick)
+	assert_eq(ended_on, 1 + Weapons.barrage_total_ticks(), "the form ends with the barrage")
+	assert_eq(barrage_ended_on, ended_on)
+	snap = core.snapshot()
+	assert_eq(snap.player.weapon_form, &"", "no lingering form")
+	assert_false(snap.player.weapon_buff_active)
+	assert_eq(snap.player.weapon_buff_ticks_left, 0)
+	assert_eq(snap.hud.weapon_buff_cooldown_ticks, Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - Weapons.barrage_total_ticks() - 30, "the cooldown runs from the activation")
+
+
+func test_after_the_barrage_nothing_lingers() -> void:
+	var core: GameCore = _dagger_core(Vector2(-100.0, 0.0))
+	core.step(_frame(false, true))
+	_finish_barrage(core)
+	assert_false(core.player.is_buff_active())
+	run(core, Tuning.LIGHTNING_BLINK_INVULN_TICKS)
+	assert_false(core.player.is_invulnerable(), "no lingering invulnerability")
+	# A swing near the boss: normal speed, no blink.
+	core.player.position = BOSS_AT + Vector2(-100.0, 0.0)
+	var at: Vector2 = core.player.position
+	core.step(input(Vector2.ZERO, false, false, true))
+	assert_eq(_count(core, GameEvent.LIGHTNING_BLINK), 0, "manual swings do not blink")
+	assert_true(core.player.position.distance_to(at) < 1.0, "the swing happens where the player stands")
+	var ticks: int = 0
+	while core.player.state.begins_with("attack_") and ticks < 100:
+		core.step(input())
+		ticks += 1
+	assert_eq(ticks, _swing_total(Tuning.WEAPON_DUAL_DAGGER, 1), "no attack speed bonus")
+	var start: Vector2 = core.player.position
+	run(core, 10, input(Vector2.UP))
+	assert_near(start.distance_to(core.player.position), 10.0 * Tuning.PLAYER_SPEED, 0.01, "no walking bonus")
 	assert_near(core.snapshot().player.move_speed_mult, 1.0, 0.0001)
 
 
-func test_form_needs_edge_and_its_cooldown_counts_from_activation() -> void:
+func test_form_needs_edge_a_living_boss_and_its_cooldown_counts_from_activation() -> void:
 	var poor: GameCore = _dagger_core(Vector2(-200.0, 0.0))
 	poor.player.edge = Tuning.LIGHTNING_FORM_EDGE_COST - 1.0
 	poor.step(_frame(false, true))
 	assert_false(poor.player.is_buff_active(), "not enough Edge")
 	assert_eq(_count(poor, GameEvent.WEAPON_BUFF_STARTED), 0)
+	var dead: GameCore = _dagger_core(Vector2(-200.0, 0.0))
+	dead.boss.take_damage(Tuning.BOSS_MAX_HP, 0, [], dead.player.id)
+	dead.step(_frame(false, true))
+	assert_false(dead.player.is_buff_active(), "no barrage without a living boss")
+	assert_eq(_count(dead, GameEvent.WEAPON_BUFF_STARTED) + _count(dead, GameEvent.LIGHTNING_BARRAGE_STARTED), 0)
+	assert_near(dead.player.edge, 100.0, 0.001, "nothing spent")
+	assert_eq(dead.player.buff_cooldown, 0, "no cooldown")
 	var core: GameCore = _dagger_core(Vector2(-200.0, 0.0))
 	core.step(_frame(false, true))
 	run(core, Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - 2)
 	core.player.edge = 100.0
+	core.boss.hp = Tuning.BOSS_MAX_HP
 	core.step(_frame(false, true))  # activation + 1499 ticks
 	assert_false(core.player.is_buff_active(), "one tick short of the cooldown")
 	core.step(_frame(false, true))  # activation + 1500 ticks
@@ -407,182 +462,22 @@ func test_form_needs_edge_and_its_cooldown_counts_from_activation() -> void:
 func test_form_cannot_be_refreshed_and_death_ends_it() -> void:
 	var core: GameCore = _dagger_core(Vector2(-200.0, 0.0))
 	core.step(_frame(false, true))
-	run(core, 50)
+	run(core, 20)
 	core.player.buff_cooldown = 0
 	var left: int = core.player.buff_ticks
 	var edge: float = core.player.edge
 	core.step(_frame(false, true))
 	assert_eq(core.player.buff_ticks, left - 1, "not refreshed")
-	assert_near(core.player.edge, edge, 0.001, "no second cost")
-	assert_eq(_count(core, GameEvent.WEAPON_BUFF_STARTED), 0)
+	assert_true(core.player.edge >= edge - 0.001, "no second cost (a barrage hit may add Edge)")
+	assert_eq(_count(core, GameEvent.WEAPON_BUFF_STARTED) + _count(core, GameEvent.LIGHTNING_BARRAGE_STARTED), 0)
 	var events: Array[GameEvent] = []
-	core.player.take_damage(Tuning.PLAYER_MAX_HP, core.tick, events, core.boss.id)
+	core.player.die(core.tick, events)
 	var ended: Array[GameEvent] = events.filter(func(e: GameEvent) -> bool: return e.type == GameEvent.WEAPON_BUFF_ENDED)
-	assert_eq(ended.size(), 1, "weapon_buff_ended on death")
+	assert_eq(ended.size(), 1, "weapon_buff_ended once on death")
 	if ended.size() == 1:
 		assert_eq(ended[0].data["reason"], &"death")
 		assert_eq(ended[0].data["form"], Weapons.FORM_LIGHTNING)
 	assert_false(core.player.is_lightning_form())
-
-
-func test_form_doubles_attack_speed_and_speeds_up_walking() -> void:
-	var plain: GameCore = _dagger_core(Vector2(-200.0, 0.0))
-	plain.step(input(Vector2.ZERO, false, false, true))
-	var normal: int = 0
-	while plain.player.state.begins_with("attack_") and normal < 100:
-		plain.step(input())
-		normal += 1
-	assert_eq(normal, _swing_total(Tuning.WEAPON_DUAL_DAGGER, 1))
-	var fast: GameCore = _dagger_core(Vector2(-200.0, 0.0))
-	fast.step(_frame(false, true))
-	fast.step(input(Vector2.ZERO, false, false, true))
-	var formed: int = 0
-	while fast.player.state.begins_with("attack_") and formed < 100:
-		fast.step(input())
-		formed += 1
-	assert_eq(formed, _swing_total(Tuning.WEAPON_DUAL_DAGGER, 1, Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT), "every phase at x2")
-	var walker: GameCore = _dagger_core(Vector2(-200.0, 0.0))
-	walker.step(_frame(false, true))
-	var start: Vector2 = walker.player.position
-	run(walker, 10, input(Vector2.UP))
-	assert_near(start.distance_to(walker.player.position), 10.0 * Tuning.PLAYER_SPEED * Tuning.LIGHTNING_FORM_MOVE_SPEED_MULT, 0.01, "walks x1.25")
-
-
-# --- the blink ---
-
-func _form_core(offset: Vector2 = Vector2(-100.0, 0.0), boss_at: Vector2 = BOSS_AT, clear_props: bool = true) -> GameCore:
-	var core: GameCore = _dagger_core(offset, boss_at, clear_props)
-	core.step(_frame(false, true))
-	assert_true(core.player.is_lightning_form(), "the form started")
-	return core
-
-
-func test_a_swing_in_the_form_blinks_next_to_the_boss_and_connects() -> void:
-	var core: GameCore = _form_core()
-	var from: Vector2 = core.player.position
-	core.step(_frame(false, false, true, Vector2.LEFT))
-	var blink: GameEvent = find_event(core, GameEvent.LIGHTNING_BLINK)
-	assert_true(blink != null, "lightning_blink emitted")
-	if blink == null:
-		return
-	var expected: Vector2 = BOSS_AT + Weapons.blink_direction(Tuning.LIGHTNING_BLINK_ORDER[0]) * Tuning.LIGHTNING_BLINK_DISTANCE
-	assert_eq(blink.data["from"], from)
-	assert_eq(blink.data["to"], expected)
-	assert_eq(blink.data["direction_index"], Tuning.LIGHTNING_BLINK_ORDER[0])
-	assert_eq(blink.data["entity_id"], core.player.id)
-	assert_eq(core.player.position, expected, "the player is there")
-	var dist: float = core.player.position.distance_to(core.boss.position)
-	assert_true(dist >= Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS, "outside the boss")
-	assert_true(dist - Tuning.BOSS_RADIUS <= Tuning.ATTACK_RANGE * Tuning.DAGGER_SWING_RANGE_MULT[0], "within reach")
-	var snap: Snapshots.GameSnapshot = core.snapshot()
-	assert_eq(snap.player.lightning_blink_index, Tuning.LIGHTNING_BLINK_ORDER[0])
-	assert_eq(snap.player.lightning_blink_tick, core.tick)
-	assert_eq(snap.player.lightning_blink_from, from)
-	assert_eq(snap.player.lightning_blink_to, expected)
-	assert_true(snap.player.facing.dot((core.boss.position - core.player.position).normalized()) > 0.99, "facing the boss")
-	# Walking away during the swing does not turn the slash away from the boss.
-	var hits: Array[GameEvent] = _collect(core, 12, GameEvent.ATTACK_HIT, input(Vector2.RIGHT))
-	assert_eq(hits.size(), 1, "the blink swing connects")
-
-
-func test_blink_gives_short_invulnerability() -> void:
-	var core: GameCore = _form_core()
-	assert_false(core.player.is_invulnerable())
-	core.step(input(Vector2.ZERO, false, false, true))
-	assert_true(find_event(core, GameEvent.LIGHTNING_BLINK) != null)
-	var invulnerable: int = 1 if core.player.is_invulnerable() else 0
-	assert_true(core.snapshot().player.invulnerable, "the snapshot shows it")
-	for i: int in 20:
-		core.step(input())
-		if core.player.is_invulnerable():
-			invulnerable += 1
-	assert_eq(invulnerable, Tuning.LIGHTNING_BLINK_INVULN_TICKS, "invulnerable for the blink ticks, counting the blink tick")
-
-
-func test_blinks_cycle_through_the_directions_deterministically() -> void:
-	var core: GameCore = _form_core()
-	var seen: Array[int] = []
-	for i: int in 200:
-		core.boss.hp = Tuning.BOSS_MAX_HP  # the mashing would finish the boss (and freeze the core) otherwise
-		core.step(input(Vector2.ZERO, false, false, true))  # mash: every swing blinks
-		var blink: GameEvent = find_event(core, GameEvent.LIGHTNING_BLINK)
-		if blink != null:
-			seen.append(int(blink.data["direction_index"]))
-	assert_true(seen.size() >= 10, "many blinks, got %d" % seen.size())
-	for i: int in seen.size():
-		assert_eq(seen[i], Tuning.LIGHTNING_BLINK_ORDER[i % Tuning.LIGHTNING_BLINK_ORDER.size()], "blink %d" % (i + 1))
-	# A fresh form starts the cycle over.
-	run(core, Tuning.LIGHTNING_FORM_DURATION_TICKS)
-	assert_false(core.player.is_buff_active())
-	core.player.buff_cooldown = 0
-	core.player.edge = 100.0
-	core.player.position = BOSS_AT + Vector2(-100.0, 0.0)
-	core.step(_frame(false, true))
-	core.step(input(Vector2.ZERO, false, false, true))
-	var first: GameEvent = find_event(core, GameEvent.LIGHTNING_BLINK)
-	assert_true(first != null)
-	if first != null:
-		assert_eq(first.data["direction_index"], Tuning.LIGHTNING_BLINK_ORDER[0], "a new form starts at the first direction")
-
-
-func test_no_blink_out_of_range_or_without_the_form() -> void:
-	var far: GameCore = _form_core(Vector2(-(Tuning.LIGHTNING_BLINK_RANGE + 5.0), 0.0))
-	var at: Vector2 = far.player.position
-	far.step(input(Vector2.ZERO, false, false, true))
-	assert_eq(_count(far, GameEvent.LIGHTNING_BLINK), 0, "boss out of range")
-	assert_true(far.player.position.distance_to(at) < 1.0, "the swing happens where the player stands")
-	var plain: GameCore = _dagger_core(Vector2(-100.0, 0.0))
-	plain.step(input(Vector2.ZERO, false, false, true))
-	assert_eq(_count(plain, GameEvent.LIGHTNING_BLINK), 0, "no form, no blink")
-	var dead_boss: GameCore = _form_core()
-	dead_boss.boss.take_damage(Tuning.BOSS_MAX_HP, dead_boss.tick, [], dead_boss.player.id)
-	dead_boss.step(input(Vector2.ZERO, false, false, true))
-	assert_eq(_count(dead_boss, GameEvent.LIGHTNING_BLINK), 0)
-
-
-## Every blink spot, for every slot of the cycle, with the boss next to walls, corners and props: inside the arena,
-## outside the boss and every prop, within the swing's reach.
-func test_blink_spots_respect_walls_props_and_the_boss() -> void:
-	var low: float = Tuning.ARENA_MARGIN
-	var high: Vector2 = Tuning.ARENA_SIZE - Vector2(low, low)
-	var spots: Array[Vector2] = [
-		Vector2(low + 4.0, 240.0), Vector2(high.x - 4.0, 240.0), Vector2(400.0, low + 4.0), Vector2(400.0, high.y - 4.0),
-		Vector2(low, low), Vector2(high.x, high.y), Vector2(152.0, 100.0), Vector2(400.0, 120.0), Vector2(400.0, 395.0),
-		Vector2(96.0, 230.0), Vector2(256.0, 112.0),
-	]
-	var reach: float = Tuning.BOSS_RADIUS + Tuning.ATTACK_RANGE * Tuning.DAGGER_SWING_RANGE_MULT[0]
-	for boss_at: Vector2 in spots:
-		for slot: int in Tuning.LIGHTNING_BLINK_ORDER.size():
-			var core: GameCore = _form_core(Vector2.ZERO, boss_at, false)
-			core.boss.position = core.push_out_of_obstacles(boss_at, Tuning.BOSS_RADIUS).clamp(Vector2(low, low), high)
-			core.player.position = core.push_out_of_obstacles(core.boss.position + (Vector2(400.0, 240.0) - core.boss.position).normalized() * 70.0, Tuning.PLAYER_RADIUS)
-			core.player.blink_count = slot
-			core.step(input(Vector2.ZERO, false, false, true))
-			var blink: GameEvent = find_event(core, GameEvent.LIGHTNING_BLINK)
-			var label: String = "boss %s slot %d" % [str(boss_at), slot]
-			assert_true(blink != null, "a free spot was found, " + label)
-			if blink == null:
-				continue
-			var to: Vector2 = blink.data["to"]
-			assert_true(to.x >= low and to.y >= low and to.x <= high.x and to.y <= high.y, "inside the arena, " + label)
-			var dist: float = to.distance_to(core.boss.position)
-			assert_true(dist >= Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS - 0.02, "not inside the boss (%.2f), %s" % [dist, label])
-			assert_true(dist <= reach + 0.01, "within reach (%.2f), %s" % [dist, label])
-			for obstacle: Obstacle in core.obstacles:
-				assert_true(to.distance_to(obstacle.center) >= obstacle.radius + Tuning.PLAYER_RADIUS - 0.02, "not inside prop %d, %s" % [obstacle.id, label])
-			assert_true(core.player.position.distance_to(to) < 0.01, "nothing moved the player off the spot, " + label)
-			assert_eq(_collect(core, 10, GameEvent.ATTACK_HIT).size(), 1, "and the swing connects, " + label)
-
-
-func test_a_blocked_direction_falls_back_to_the_nearest_free_one() -> void:
-	var core: GameCore = _form_core(Vector2(100.0, 0.0), Vector2(Tuning.ARENA_MARGIN + 4.0, 240.0))
-	core.player.blink_count = Tuning.LIGHTNING_BLINK_ORDER.find(4)  # direction 4 = left, into the wall
-	core.step(input(Vector2.ZERO, false, false, true))
-	var blink: GameEvent = find_event(core, GameEvent.LIGHTNING_BLINK)
-	assert_true(blink != null)
-	if blink != null:
-		# 4 (left) is in the wall; its neighbours 5 and 3 are clamped back into the boss; 6 (up) is the next one tried.
-		assert_eq(int(blink.data["direction_index"]), 6, "the nearest free direction")
 
 
 # --- save profile ---

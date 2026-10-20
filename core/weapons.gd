@@ -66,6 +66,21 @@ static func has_lightning_finisher(weapon: StringName) -> bool:
 
 # --- the active (right click) ---
 
+## True when activating the weapon's active also runs the automatic Lightning Barrage (Dual Dagger).
+static func has_lightning_barrage(weapon: StringName) -> bool:
+	return weapon == Tuning.WEAPON_DUAL_DAGGER
+
+
+## Slashes in a Lightning Barrage: one per side in LIGHTNING_BLINK_ORDER.
+static func barrage_slashes() -> int:
+	return Tuning.LIGHTNING_BLINK_ORDER.size()
+
+
+## Ticks from the activation to the end of a full barrage.
+static func barrage_total_ticks() -> int:
+	return Tuning.LIGHTNING_BARRAGE_START_DELAY_TICKS + (barrage_slashes() - 1) * Tuning.LIGHTNING_BARRAGE_INTERVAL_TICKS + Tuning.LIGHTNING_BARRAGE_HIT_DELAY_TICKS + Tuning.LIGHTNING_BARRAGE_RECOVERY_TICKS
+
+
 static func has_active(weapon: StringName) -> bool:
 	return is_known(weapon)
 
@@ -84,7 +99,7 @@ static func active_duration(weapon: StringName) -> int:
 		Tuning.WEAPON_BLACK_KATANA:
 			return Tuning.BLACK_KATANA_BUFF_DURATION_TICKS
 		Tuning.WEAPON_DUAL_DAGGER:
-			return Tuning.LIGHTNING_FORM_DURATION_TICKS
+			return barrage_total_ticks()  # Lightning Form is only the barrage
 	return 0
 
 
@@ -110,8 +125,6 @@ static func active_attack_speed_mult(weapon: StringName) -> float:
 	match weapon:
 		Tuning.WEAPON_BLACK_KATANA:
 			return Tuning.BLACK_KATANA_ATTACK_SPEED_MULT
-		Tuning.WEAPON_DUAL_DAGGER:
-			return Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT
 	return 1.0
 
 
@@ -119,8 +132,6 @@ static func active_damage_mult(weapon: StringName) -> float:
 	match weapon:
 		Tuning.WEAPON_BLACK_KATANA:
 			return Tuning.BLACK_KATANA_DAMAGE_MULT
-		Tuning.WEAPON_DUAL_DAGGER:
-			return Tuning.LIGHTNING_FORM_DAMAGE_MULT
 	return 1.0
 
 
@@ -128,8 +139,6 @@ static func active_move_speed_mult(weapon: StringName) -> float:
 	match weapon:
 		Tuning.WEAPON_BLACK_KATANA:
 			return Tuning.BLACK_KATANA_MOVE_SPEED_MULT
-		Tuning.WEAPON_DUAL_DAGGER:
-			return Tuning.LIGHTNING_FORM_MOVE_SPEED_MULT
 	return 1.0
 
 

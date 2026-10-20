@@ -59,6 +59,15 @@ Importing means writing text grids into `art/src/` with `# anchor:` headers. Eac
 - The lightning palette has only the water ramp plus cream and lilac. Pure white is not available; water_6 `#e0f0ec` is the brightest.
 - Bolts are 1px lines. They read at 4x but are thin at 1x on light grass, so the cuts get a dark `k` rim.
 
+## Shared cut-in format (approved 2026-10-19: "this will be our cutout art format")
+
+Every form cut-in (Lightning Form, Black Form, later ones) uses the structure below. Exporters: `tools/art/export_lightning_cutin.py` (the reference; it owns the shared helpers) and `tools/art/export_black_form_cutin.py` (imports them). Players: `presentation/arena/lightning_form_cutin.gd` and `presentation/arena/black_form_cutin.gd` (parallel scripts with the same timeline and API).
+
+- Canvas 800x450, drawn at 0.4 on the 320x180 game canvas, nearest filtering. All PNGs are Totoy 36 with hard alpha, no gold/red, drawn at 1x and scaled up with integer nearest-neighbour.
+- Files `<form>_pose_<crouch|ready|burst>.png` (lit pose: rim light on the body, 1px dark gap, coloured rim with a ramp falloff, small effect shapes off the rim) and `_sil.png` (ink silhouette, cream line, coloured outline: the impact frame); `<form>_aura.png` (12 frames, 6x2 atlas, 384x448 cells, bottom-centred, behind the figure); 4 backdrop effect frames 800x450 (lead, strike, afterglow, fragments; the strike breaks out of the banner over the whole screen); `<form>_flash_1..3.png` 800x450 (the pop, dense speed lines, thinning lines); `<form>_cutin.json` (pose `w/h/pad/inner_w/inner_h/feet_x`, aura frames, file lists, timings); untracked review aids `<form>_cutin_preview.gif` and `<form>_cutin_contact.png`.
+- Timeline (preview seconds, played at SPEED 0.85, about 1.25 s of frozen world): pop 0-0.167, banner slam 0.03-0.17 (ease-back), crouch 0.10, cut to ready 0.37, cut to burst 0.60 (one impact-silhouette frame on a pale banner with radial lines, then one veiled frame), effect strike sequence 1,2,2,3,3,4,4 then 3/4 flicker, title slam 0.66 in the pixel font with the real numbers as a subtitle, banner exit 0.88-1.04 with speed-line smears.
+- Per form: colour language, the effect shapes, the title and subtitle, the exit direction and the pose source. Lightning: pale blue/cream bolts, poses from the 64px dagger concept at x12, exits right. Black Form: ink/indigo/lilac with cream and pale highlights, smoke tendrils, dark flames and a black katana crescent (`black_form_slash_*`), poses from the painted black-katana concept reduced to pixel art (smoke stripped, 50-72 px tall) at x6, exits left.
+
 ## Lightning Form cut-in (v1, 2026-10-19, NOT wired into the game)
 
 The full-screen "pop" for the right-click skill, built like the Black Form cut-in (`presentation/arena/black_form_cutin.gd`) so a sibling script can play it.
@@ -120,6 +129,8 @@ Review sheets (4x, viewing only): `docs/previews/dual_dagger_import_hero_dark.pn
 189 sprites in total: 54 dagger hero (48 matching the hero2 frames + 6 for swing 4), 48 lightning hero, 85 effects, 2 icons.
 
 How the hero frames are made: each `hero2_*` frame's katana is removed (water-ramp blade pixels, a body-colour fill where it crossed the body, the ink crumbs and a hilt crumb on `victory_1`), then two daggers are drawn at hand points measured by eye per frame (table `HANDS` in the script, with blade angle, layer and which hand leads). Far-hand dagger behind the body, near-hand dagger in front. Relaxed poses use a reverse grip with the blades down; parry is a crossed-dagger guard at the grip. The canvas only grows (in steps of 8) where a dagger reaches past it; then the anchor moves by the same amount (walk_2, walk_6, hurt_3, victory_1, attack2_4, attack3_2), so the feet still line up.
+
+Since 2026-10-20 the bodies lean like the approved katana set: `import_dagger_sprites.py` builds each body with `tools/art/make_hero_lean_sheet.py` (`POSES`, plus `DAGGER_POSES` for the swing-4 bodies) from the upright frames in `art/reference/hero_lean/upright/`, and carries every `HANDS` point (measured on the upright frames) through the same warp; the blade angle turns with the torso there. `LEAN_HANDS` can override a frame (empty: every frame was checked on 9x grids and the daggers sit in the fists). Islands of at most 6 pixels left from the katana outline are dropped.
 Attack swings: 1 front-hand thrust (speed streaks), 2 rising cut with the other hand (arc from below), 3 overhead-to-low cut (arc from above), 4 twin finisher: gather, dagger raised to the sky (cue for `fx_lightning_strike`), both daggers drive down with two arcs, settle. The striking dagger is one pixel longer in the active frames.
 Lightning bodies use the approved concept look (`lightning_body` in the reference script: pale blue body, bright rim, inner bolt); daggers stay steel, speed arcs turn white.
 

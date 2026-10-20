@@ -100,7 +100,7 @@ func _catalog() -> void:
 			actor.state = StringName(state)
 			for swing: int in range(1, Weapons.combo_max(actor.weapon_id) + 1):
 				actor.combo_index = swing
-				for mult: float in [1.0, Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT]:
+				for mult: float in [1.0, Tuning.BLACK_KATANA_ATTACK_SPEED_MULT]:
 					actor.attack_speed_mult = mult
 					for t: int in range(int(ArenaAnimation.PLAYER[state][0]) * int(ArenaAnimation.PLAYER[state][1]) + 24):
 						actor.state_ticks = t
@@ -118,6 +118,24 @@ func _catalog() -> void:
 		actor.combo_index = 4
 		actor.state = &"attack_recovery"
 		_expect(ArenaAnimation.swing_durations(actor)[2] == PlayerState.scaled_ticks(Tuning.DAGGER_SWING_RECOVERY_TICKS[3], actor.attack_speed_mult), "dagger swing 4 uses its own table")
+	# Lightning Barrage: every slash (0 = the activation tick) at every age shows a Lightning dagger attack frame.
+	actor.weapon_id = Tuning.WEAPON_DUAL_DAGGER
+	actor.weapon_form = Weapons.FORM_LIGHTNING
+	actor.state = PlayerState.STATE_LIGHTNING_BARRAGE
+	snap.tick = 500
+	var barrage_frames: Dictionary = {}
+	for slash: int in range(0, Weapons.barrage_slashes() + 1):
+		actor.lightning_barrage_slash = slash
+		for age: int in range(0, Tuning.LIGHTNING_BARRAGE_INTERVAL_TICKS + Tuning.LIGHTNING_BARRAGE_RECOVERY_TICKS + 2):
+			actor.lightning_barrage_slash_tick = snap.tick - age if slash > 0 else -1
+			var chosen: String = ArenaAnimation.choose(actor, snap, {})
+			barrage_frames[chosen] = true
+			_expect(atlas.has(chosen) and chosen.begins_with("totoy_lightning_attack"), "barrage slash %d age %d: %s" % [slash, age, chosen])
+	for swing: int in range(1, 5):
+		_expect(barrage_frames.has("totoy_lightning_attack%d_right_4" % swing), "the barrage never shows swing %d's strike" % swing)
+	actor.lightning_barrage_slash = 0
+	actor.lightning_barrage_slash_tick = -1
+	snap.tick = 0
 	for prefix: String in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING]:
 		var expected: int = 6 * (3 if prefix == ArenaAnimation.SET_KATANA else 4)
 		var attacks: int = 0
@@ -159,8 +177,9 @@ func _hero_timelines() -> void:
 			if name_key.begins_with("hero2_") and name_key.contains("_" + ArenaAnimation.direction(facing) + "_") and not name_key.contains("_hurt_") and not name_key.contains("_victory_"):
 				_expect(requested.has(name_key), "real state lifetime never requests " + name_key)
 
-## Real core lifetimes with the Dual Dagger: swap with the swap intent, chain all four swings, then the same in
-## Lightning Form. Every swing frame of both sets must be requested, and none may be missing.
+## Real core lifetimes with the Dual Dagger: swap with the swap intent, chain all four swings; then activate Lightning
+## Form (only the barrage): the barrage draws the lightning attack frames, and the swings after it are plain dagger
+## swings again. Every swing frame must be requested, and none may be missing.
 func _dagger_timelines() -> void:
 	for form: bool in [false, true]:
 		_reset()
@@ -177,24 +196,32 @@ func _dagger_timelines() -> void:
 			_expect(arena.snapshot.player.weapon_form == Weapons.FORM_LIGHTNING, "Lightning Form did not start")
 		var prefix: String = "totoy_lightning_" if form else "totoy_dagger_"
 		var requested: Dictionary = {}
+		var after_barrage: Dictionary = {}
 		for round_index: int in range(3):
 			_step(_frame(Vector2.ZERO, false, false, true))
 			for i: int in range(80):
 				var hero: Snapshots.EntitySnapshot = arena.snapshot.player
 				requested[arena.selected_frames[hero.id]] = true
+				if round_index > 0:
+					after_barrage[arena.selected_frames[hero.id]] = true
 				var chain: bool = hero.state == &"attack_recovery" and hero.combo_index < 4
 				_step(_frame(Vector2.ZERO, false, false, chain))
 				if not form and hero.state == &"idle" and i > 10:
 					break
-		var mult: float = Tuning.LIGHTNING_FORM_ATTACK_SPEED_MULT if form else 1.0
 		for swing: int in range(1, 5):
 			var phases: Array[int] = Weapons.swing_phases(Tuning.WEAPON_DUAL_DAGGER, swing)
 			for n: int in range(1, 7):
 				# a phase that lasts one tick shows only its key (second) frame
-				if PlayerState.scaled_ticks(phases[(n - 1) / 2], mult) == 1 and n % 2 == 1:
+				if PlayerState.scaled_ticks(phases[(n - 1) / 2], 1.0) == 1 and n % 2 == 1:
 					continue
-				var name_key: String = "%sattack%d_right_%d" % [prefix, swing, n]
+				var name_key: String = "totoy_dagger_attack%d_right_%d" % [swing, n]
 				_expect(requested.has(name_key), "dagger timeline never requests " + name_key)
+			if form:
+				_expect(requested.has("totoy_lightning_attack%d_right_4" % swing), "the barrage never shows swing %d's strike" % swing)
+		if form:
+			_expect(arena.snapshot.player.weapon_form == &"", "the form outlived its barrage")
+			for name_key: String in after_barrage:
+				_expect(String(name_key).begins_with("totoy_dagger_"), "after the barrage the hero must be the plain dagger: " + String(name_key))
 		for name_key: String in requested:
 			_expect(String(name_key).begins_with(prefix) or String(name_key).begins_with("totoy_dagger_"), "%s timeline drew another set: %s" % [prefix, name_key])
 
@@ -249,6 +276,7 @@ func _run() -> void:
 	for state: String in ArenaAnimation.PLAYER:
 		if state not in ["dead", "hurt", "victory"]:
 			_expect(player_states.has(state), "script never reached player " + state)
+	_expect(player_states.has(String(PlayerState.STATE_LIGHTNING_BARRAGE)), "the Lightning Form timeline never ran the barrage")
 	for name_key: String in ArenaAnimation.all_names():
 		if name_key.begins_with("mossbound_colossus_") and (name_key.contains("windup") or name_key.contains("strike") or name_key.contains("red_sweep_recover")):
 			_expect(boss_poses.has(name_key), "fight never requested " + name_key)

@@ -18,6 +18,9 @@ const GROUND_TICKS: Array[int] = [20, 25, 25, 30]
 const AFTERIMAGE_TICKS: Array[int] = [3, 3, 3]
 const CHAIN_TICKS: int = 8
 const CHAIN_SEGMENT: float = 32.0
+## White hit flash on the boss per Lightning Barrage slash (a normal hit flashes 6 ticks; barrage slashes come every
+## LIGHTNING_BARRAGE_INTERVAL_TICKS, so a shorter flash lets the boss show between them).
+const BARRAGE_HIT_FLASH_TICKS: int = 3
 ## Chest height above the feet, where chains and blink bursts connect.
 const CHEST: Vector2 = Vector2(0, -14)
 ## How far above its feet the bolt cuts through the boss.

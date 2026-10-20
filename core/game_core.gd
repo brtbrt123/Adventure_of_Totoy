@@ -53,9 +53,10 @@ func step(input: InputFrame) -> void:
 	tick += 1
 	var events: Array[GameEvent] = []
 	var player_before: Vector2 = player.position
+	player.barrage_target_alive = boss.state != BossState.STATE_DEAD
 	player.step(input, tick, events)
 	player.position = move_resolved(player_before, player.position, Tuning.PLAYER_RADIUS)
-	_resolve_lightning_blink(events)
+	_resolve_lightning_barrage(events)
 	_resolve_player_attack(events)
 	_spawn_released_skill(events)
 	var boss_before: Vector2 = boss.position
@@ -173,6 +174,8 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.lightning_blink_tick = player.last_blink_tick
 	e.lightning_blink_from = player.last_blink_from
 	e.lightning_blink_to = player.last_blink_to
+	e.lightning_barrage_slash = player.barrage_slash if player.barrage_running else 0
+	e.lightning_barrage_slash_tick = player.barrage_slash_tick if player.barrage_running else -1
 	return e
 
 
@@ -205,68 +208,135 @@ func _resolve_player_attack(events: Array[GameEvent]) -> void:
 	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Tuning.ATTACK_ARC_DOT:
 		return
 	player.attack_hit_done = true
-	var counter: bool = boss.state == BossState.STATE_BROKEN
 	var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult
+	var counter: bool = _land_player_hit(base, Weapons.edge_per_hit(weapon), {"combo_index": player.combo_index, "weapon_id": weapon}, events)
+	if Weapons.has_lightning_finisher(weapon) and player.combo_index == Weapons.combo_max(weapon):
+		_lightning_strike(counter, player.swing_damage_mult, {"combo_index": player.combo_index, "source": &"swing"}, events)
+
+
+## One player weapon hit on the boss under the normal-hit rules: armored (x ARMOR_DAMAGE_FACTOR, gains `edge_gain`
+## Edge, NORMAL_HIT_POSTURE posture) or, while the boss's posture is broken, a counter (x COUNTER_DAMAGE_MULT plus the
+## Edge bonus; spends all Edge). `extra` is merged into the attack_hit event. Returns true for a counter.
+func _land_player_hit(base: float, edge_gain: float, extra: Dictionary, events: Array[GameEvent]) -> bool:
+	var counter: bool = boss.state == BossState.STATE_BROKEN
 	var damage: int
 	if counter:
 		damage = roundi(base * Tuning.COUNTER_DAMAGE_MULT + player.edge * Tuning.EDGE_COUNTER_BONUS)
 		player.edge = 0.0  # the counter spends all Edge
 	else:
 		damage = maxi(1, roundi(base * Tuning.ARMOR_DAMAGE_FACTOR))
-		player.edge = minf(Tuning.EDGE_MAX, player.edge + Weapons.edge_per_hit(weapon))
-	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
+		player.edge = minf(Tuning.EDGE_MAX, player.edge + edge_gain)
+	var data: Dictionary = {
 		"attacker_id": player.id, "target_id": boss.id, "damage": damage,
-		"kind": &"counter" if counter else &"normal", "position": boss.position, "combo_index": player.combo_index,
-		"weapon_id": weapon,
-	}))
+		"kind": &"counter" if counter else &"normal", "position": boss.position,
+	}
+	data.merge(extra)
+	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, data))
 	boss.take_damage(damage, tick, events, player.id)
 	if not counter:
 		boss.add_posture(Tuning.NORMAL_HIT_POSTURE, tick, events)
-	if Weapons.has_lightning_finisher(weapon) and player.combo_index == Weapons.combo_max(weapon):
-		_lightning_strike(counter, events)
+	return counter
 
 
-## The Dual Dagger finisher connected: a bolt from the sky hits the same boss (no telegraph, it always lands). It uses
-## the swing's counter flag (a swing that just broke the posture does not turn the bolt into a counter).
-func _lightning_strike(counter: bool, events: Array[GameEvent]) -> void:
+## A Dual Dagger finisher connected (swing 4, or the barrage's last slash): a bolt from the sky hits the same boss (no
+## telegraph, it always lands). It uses the hit's counter flag (a hit that just broke the posture does not turn the
+## bolt into a counter). `extra` (combo_index, source, barrage_slash) is merged into the lightning_strike event.
+func _lightning_strike(counter: bool, damage_mult: float, extra: Dictionary, events: Array[GameEvent]) -> void:
 	if boss.state == BossState.STATE_DEAD:
-		return  # the swing itself finished the boss
-	var base: float = Tuning.LIGHTNING_STRIKE_DAMAGE * player.swing_damage_mult
+		return  # the hit itself finished the boss
+	var base: float = Tuning.LIGHTNING_STRIKE_DAMAGE * damage_mult
 	var damage: int = roundi(base * Tuning.COUNTER_DAMAGE_MULT) if counter else maxi(1, roundi(base * Tuning.ARMOR_DAMAGE_FACTOR))
-	events.append(GameEvent.new(GameEvent.LIGHTNING_STRIKE, tick, {
+	var data: Dictionary = {
 		"attacker_id": player.id, "target_id": boss.id, "position": boss.position, "damage": damage,
-		"combo_index": player.combo_index, "kind": &"counter" if counter else &"normal",
-	}))
+		"kind": &"counter" if counter else &"normal",
+	}
+	data.merge(extra)
+	events.append(GameEvent.new(GameEvent.LIGHTNING_STRIKE, tick, data))
 	boss.take_damage(damage, tick, events, player.id)
 	if not counter:
 		boss.add_posture(Tuning.LIGHTNING_STRIKE_POSTURE, tick, events)
 
 
-## Lightning Form: a swing that started this tick blinks the player next to the boss first (if the boss is alive and
-## within LIGHTNING_BLINK_RANGE). The side comes from LIGHTNING_BLINK_ORDER; if that spot is blocked (wall, prop, out of
-## reach) the nearest free direction is used. No spot at all: no blink, the swing happens where the player stands.
-func _resolve_lightning_blink(events: Array[GameEvent]) -> void:
-	if not player.blink_requested:
+## Lightning Barrage (Dual Dagger active): started on the activation tick when the boss is alive; then, on a fixed
+## timeline counted from the activation (player.state_ticks), one blink-slash per side of LIGHTNING_BLINK_ORDER. Ends
+## when the timeline is over, the boss dies (boss_dead) or the player dies (death, see Player.die).
+func _resolve_lightning_barrage(events: Array[GameEvent]) -> void:
+	if player.barrage_requested:
+		player.barrage_requested = false
+		if boss.state != BossState.STATE_DEAD and player.state != PlayerState.STATE_DEAD:
+			# Melee skill attacks that follow the player (arc, lane) stop with whatever the player was doing.
+			for attack: SkillAttack in skill_attacks.duplicate():
+				if attack.shape != SkillAttack.SHAPE_PROJECTILE:
+					skill_attacks.erase(attack)
+			player.start_barrage(tick, events)
 		return
-	player.blink_requested = false
-	if not player.is_lightning_form() or player.state != PlayerState.STATE_ATTACK_WINDUP or boss.state == BossState.STATE_DEAD:
+	if not player.barrage_running or player.state != PlayerState.STATE_LIGHTNING_BARRAGE:
 		return
-	if player.position.distance_to(boss.position) > Tuning.LIGHTNING_BLINK_RANGE:
+	if boss.state == BossState.STATE_DEAD:
+		player.end_barrage(tick, events, &"boss_dead")
 		return
-	var order: Array[int] = Tuning.LIGHTNING_BLINK_ORDER
-	var wanted: int = order[player.blink_count % order.size()]
-	player.blink_count += 1
-	var reach: float = Tuning.BOSS_RADIUS + Tuning.ATTACK_RANGE * Weapons.range_mults(player.weapon_id)[player.combo_index - 1]
+	var t: int = player.state_ticks - Tuning.LIGHTNING_BARRAGE_START_DELAY_TICKS
+	if t < 0:
+		return
+	var slash: int = t / Tuning.LIGHTNING_BARRAGE_INTERVAL_TICKS
+	var phase: int = t % Tuning.LIGHTNING_BARRAGE_INTERVAL_TICKS
+	if slash < Weapons.barrage_slashes():
+		if phase == 0:
+			_barrage_blink(slash, events)
+		if phase == Tuning.LIGHTNING_BARRAGE_HIT_DELAY_TICKS:
+			_barrage_hit(slash, events)
+	if boss.state == BossState.STATE_DEAD:
+		player.end_barrage(tick, events, &"boss_dead")
+	elif player.state_ticks >= Weapons.barrage_total_ticks():
+		player.end_barrage(tick, events, &"complete")
+
+
+## Barrage slash `slash` (0-based) starts: blink to its side of LIGHTNING_BLINK_ORDER. A blocked side falls back to the
+## nearest free side this barrage has not used yet (else the nearest free one). No free spot: the slash stays put.
+func _barrage_blink(slash: int, events: Array[GameEvent]) -> void:
+	player.barrage_slash = slash + 1
+	player.barrage_slash_tick = tick
+	var wanted: int = Tuning.LIGHTNING_BLINK_ORDER[slash % Tuning.LIGHTNING_BLINK_ORDER.size()]
+	var reach: float = Tuning.BOSS_RADIUS + Tuning.ATTACK_RANGE * Weapons.range_mults(player.weapon_id)[0]
+	var chosen: int = -1
+	var fallback: int = -1
 	for offset: int in [0, 1, -1, 2, -2, 3, -3, 4]:
 		var index: int = posmod(wanted + offset, 8)
-		var spot: Vector2 = blink_spot(index)
-		if _blink_spot_ok(spot, reach):
-			var from: Vector2 = player.position
-			player.apply_blink(spot, boss.position - spot, index, tick)
-			events.append(GameEvent.new(GameEvent.LIGHTNING_BLINK, tick, {
-				"entity_id": player.id, "from": from, "to": spot, "direction_index": index, "target_id": boss.id,
-			}))
-			return
+		if not _blink_spot_ok(blink_spot(index), reach):
+			continue
+		if not player.barrage_sides.has(index):
+			chosen = index
+			break
+		if fallback < 0:
+			fallback = index
+	if chosen < 0:
+		chosen = fallback
+	if chosen < 0:
+		return
+	player.barrage_sides.append(chosen)
+	var spot: Vector2 = blink_spot(chosen)
+	var from: Vector2 = player.position
+	player.apply_blink(spot, boss.position - spot, chosen, tick)
+	events.append(GameEvent.new(GameEvent.LIGHTNING_BLINK, tick, {
+		"entity_id": player.id, "from": from, "to": spot, "direction_index": chosen, "target_id": boss.id,
+		"barrage_slash": slash + 1,
+	}))
+
+
+## Barrage slash `slash` (0-based) lands: it turns to the boss and hits if the boss is within the dagger's reach (one hit
+## per slash, normal-hit rules). The last slash also calls the lightning strike.
+func _barrage_hit(slash: int, events: Array[GameEvent]) -> void:
+	var to_boss: Vector2 = boss.position - player.position
+	var dist: float = to_boss.length()
+	if dist > 0.0001:
+		player.facing = to_boss / dist
+	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE * Weapons.range_mults(player.weapon_id)[0]:
+		return
+	var mult: float = player.damage_mult()
+	var base: float = Tuning.ATTACK_DAMAGE * Tuning.LIGHTNING_BARRAGE_DAMAGE_MULT * mult
+	var counter: bool = _land_player_hit(base, Tuning.LIGHTNING_BARRAGE_EDGE_PER_HIT, {"barrage_slash": slash + 1, "weapon_id": player.weapon_id}, events)
+	if slash + 1 == Weapons.barrage_slashes():
+		_lightning_strike(counter, mult, {"combo_index": 0, "source": &"barrage", "barrage_slash": slash + 1}, events)
 
 
 ## Where a blink in direction `index` (0-7) would land: next to the boss, kept in the arena and out of solid props.

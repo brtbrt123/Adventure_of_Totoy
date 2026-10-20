@@ -352,9 +352,16 @@ func _on_event(event: GameEvent) -> void:
 			_on_lightning_blink(event)
 		&"lightning_strike":
 			_on_lightning_strike(event)
+		&"lightning_barrage_ended":
+			# The barrage's slashes and finisher draw from lightning_blink / attack_hit / lightning_strike; only a small
+			# discharge marks the hero getting control back.
+			if event.data.get("reason", &"") == &"complete":
+				_burst(snapshot.player.position - Vector2(0, 12), 8, colors["o"], 0.7)
 		&"damage_taken":
 			reactions[int(event.data["entity_id"])] = {"pose": "hurt", "tick": snapshot.tick, "duration": 12}
-			flashes[int(event.data["entity_id"])] = maxi(6, int(flashes.get(int(event.data["entity_id"]), 0)))
+			# Barrage slashes land every few ticks: a short flash so the boss does not stay a white silhouette.
+			var flash_ticks: int = LightningEffects.BARRAGE_HIT_FLASH_TICKS if snapshot.player.state == &"lightning_barrage" else 6
+			flashes[int(event.data["entity_id"])] = maxi(flash_ticks, int(flashes.get(int(event.data["entity_id"]), 0)))
 			if int(event.data["entity_id"]) == snapshot.player.id:
 				hurt_blink = true
 			_sound_damage_taken(event)
@@ -418,8 +425,10 @@ func _on_event(event: GameEvent) -> void:
 			_sound_game_result(event)
 			_record_result(event)
 
-## The last swing of the weapon's combo (katana 3, dagger 4).
+## The last swing of the weapon's combo (katana 3, dagger 4), or the Lightning Barrage's last slash.
 func _is_finisher(event: GameEvent) -> bool:
+	if event.data.has("barrage_slash"):
+		return int(event.data["barrage_slash"]) >= Weapons.barrage_slashes()
 	if not event.data.has("combo_index"):
 		return false
 	return int(event.data["combo_index"]) >= Weapons.combo_max(StringName(event.data.get("weapon_id", snapshot.player.weapon_id)))
@@ -440,12 +449,13 @@ func _on_lightning_blink(event: GameEvent) -> void:
 	for actor: Snapshots.EntitySnapshot in snapshot.entities:
 		if actor.id == int(event.data.get("target_id", -1)):
 			target = actor.position
-	var windup: int = ArenaAnimation.swing_durations(snapshot.player)[0] if snapshot.player.state == &"attack_windup" else 0
+	var windup: int = Tuning.LIGHTNING_BARRAGE_HIT_DELAY_TICKS  # a barrage slash lands this many ticks after its blink
 	var tick: int = event.tick
 	var depart_left: bool = from.x > to.x if absf(from.x - to.x) > 2.0 else facing_left
 	_add_lightning_fx({"kind": "depart", "tick": tick, "at": from, "life": LightningEffects.sequence_length(LightningEffects.DEPART_TICKS)})
 	_add_lightning_fx({"kind": "afterimage", "tick": tick, "at": from, "left": depart_left, "life": LightningEffects.sequence_length(LightningEffects.AFTERIMAGE_TICKS)})
-	_add_lightning_fx({"kind": "afterimage", "tick": tick, "at": from.lerp(to, 0.5), "left": depart_left, "flicker": true, "life": LightningEffects.sequence_length(LightningEffects.AFTERIMAGE_TICKS)})
+	if not event.data.has("barrage_slash"):  # barrage blinks cross the boss: their midpoint is the boss itself
+		_add_lightning_fx({"kind": "afterimage", "tick": tick, "at": from.lerp(to, 0.5), "left": depart_left, "flicker": true, "life": LightningEffects.sequence_length(LightningEffects.AFTERIMAGE_TICKS)})
 	_add_lightning_fx({"kind": "chain", "tick": tick, "from": from + LightningEffects.CHEST, "to": to + LightningEffects.CHEST, "life": LightningEffects.CHAIN_TICKS})
 	_add_lightning_fx({"kind": "arrive", "tick": tick, "at": to, "life": LightningEffects.sequence_length(LightningEffects.BLINK_TICKS)})
 	_add_lightning_fx({"kind": "cut", "tick": tick + windup, "at": (target + LightningEffects.BOSS_BODY).round(), "direction": LightningEffects.cut_direction(side, to, target), "life": LightningEffects.sequence_length(LightningEffects.CUT_TICKS)})
@@ -744,17 +754,9 @@ func _draw_dash() -> void:
 	var frame: Dictionary = frames.get(ArenaAnimation.hero_frame(ArenaAnimation.hero_set(snapshot.player), "dash", 1), frames.get("hero2_dash_right_1", {}))
 	if frame.is_empty():
 		return
-	var lightning: bool = snapshot.player.weapon_form == Weapons.FORM_LIGHTNING
 	for ghost: Dictionary in dash_ghosts:
 		var fade: float = float(ghost["life"]) / 6.0
-		if lightning:
-			# Flickering lightning afterimages (frames 1-3 fade out as the ghost ages).
-			if (snapshot.tick + int(ghost["life"])) % 2 == 0:
-				var key: String = "fx_lightning_afterimage_%d" % clampi(4 - ceili(float(ghost["life"]) / 2.0), 1, 3)
-				if frames.has(key):
-					var f: Dictionary = frames[key]
-					draw_texture_rect_region(sprites, ArenaAnimation.destination(ghost["position"], f, bool(ghost["left"])), Rect2(f["x"], f["y"], f["w"], f["h"]))
-		elif black_form_look(snapshot.player):
+		if black_form_look(snapshot.player):
 			draw_texture_rect_region(empowered_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 			_draw_buff_frame("fx_black_aura_back_%d" % (posmod(snapshot.tick / 5, 6) + 1), ghost["position"], 1, bool(ghost["left"]))
 		else:

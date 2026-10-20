@@ -59,6 +59,8 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 			return hero_frame(prefix, "hurt", 4)
 		if state.begins_with("skill_"):
 			return skill_frame(actor.skill_id, actor.state, ticks, prefix)
+		if state == String(PlayerState.STATE_LIGHTNING_BARRAGE):
+			return barrage_frame(prefix, actor.lightning_barrage_slash, snap.tick - actor.lightning_barrage_slash_tick)
 		if state.begins_with("attack_"):
 			# Per-weapon swing tables (the dagger has 4 swings) at the speed core locked for this swing.
 			var swing: int = clampi(actor.combo_index, 1, Weapons.combo_max(actor.weapon_id))
@@ -96,6 +98,25 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 	if state == "recover":
 		state = "idle"
 	return "golem2_%s_%d" % [state, frame_index(BOSS.get(state, BOSS["idle"]), actor.state_ticks)]
+
+## Lightning Barrage pose: slash n (1-8) cycles the four dagger swings; `age` ticks after its blink it shows the windup
+## key frame, then the strike (on the hit tick, LIGHTNING_BARRAGE_HIT_DELAY_TICKS after the blink) and the follow
+## through. Before the first slash (the activation tick) the swing 1 start pose.
+static func barrage_frame(prefix: String, slash: int, age: int) -> String:
+	if slash <= 0:
+		return hero_frame(prefix, "attack1", 1)
+	var swing: int = (slash - 1) % 4 + 1
+	var hit: int = Tuning.LIGHTNING_BARRAGE_HIT_DELAY_TICKS
+	var n: int
+	if age < hit:
+		n = 2 if age < hit - 1 or hit < 2 else 3
+	elif age == hit:
+		n = 4
+	elif age <= hit + 1:
+		n = 5
+	else:
+		n = 6
+	return hero_frame(prefix, "attack%d" % swing, n)
 
 ## Which hero frame set the actor is drawn with: the equipped weapon, and the Lightning Form look while it runs.
 static func hero_set(actor: Snapshots.EntitySnapshot) -> String:
