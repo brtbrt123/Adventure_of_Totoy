@@ -56,7 +56,9 @@ static func _button(action: String, button: int) -> void:
 	event.button_index = button
 	InputMap.action_add_event(action, event)
 
-static func read_frame(player_position: Vector2 = Vector2.ZERO, mouse_position: Vector2 = Vector2.ZERO) -> InputFrame:
+## Attacks, skills and the weapon active go where the character is heading (the movement direction), or the way he already
+## faces when standing still. The mouse is not used for aiming; the parameters stay so callers need not change.
+static func read_frame(_player_position: Vector2 = Vector2.ZERO, _mouse_position: Vector2 = Vector2.ZERO) -> InputFrame:
 	var frame: InputFrame = InputFrame.new()
 	frame.move = Input.get_vector("arena_left", "arena_right", "arena_up", "arena_down")
 	frame.weapon_active_pressed = Input.is_action_just_pressed("arena_weapon_active")
@@ -66,9 +68,9 @@ static func read_frame(player_position: Vector2 = Vector2.ZERO, mouse_position: 
 		if Input.is_action_just_pressed("arena_skill_%d" % slot):
 			frame.skill_pressed = slot
 			break
-	# Reaper's Coil (the scythe's right click) throws its chain toward the mouse: the core reads the press tick's aim.
-	if frame.attack_pressed or frame.skill_pressed > 0 or frame.weapon_active_pressed:
-		frame.aim = (mouse_position - player_position).normalized()
+	# the core reads the aim on the press tick; no aim means "keep facing" (the last heading)
+	if (frame.attack_pressed or frame.skill_pressed > 0 or frame.weapon_active_pressed) and frame.move.length_squared() > 0.0001:
+		frame.aim = frame.move.normalized()
 	frame.attack_held = Input.is_action_pressed("arena_attack")
 	frame.parry_pressed = Input.is_action_just_pressed("arena_parry")
 	frame.dash_pressed = Input.is_action_just_pressed("arena_dash")

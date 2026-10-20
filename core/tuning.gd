@@ -158,7 +158,7 @@ const LIGHTNING_STRIKE_POSTURE: float = 8.0
 # the automatic Lightning Barrage below: a free action that costs Edge on the press, cannot be used again while it
 # runs, and its cooldown counts from the activation. The "form" (weapon_form lightning_form, the buff state) lasts
 # exactly as long as the barrage; there is no attack speed, walking speed or damage bonus and no blinking swings after.
-const LIGHTNING_FORM_COOLDOWN_TICKS: int = 1500  # 25 seconds
+const LIGHTNING_FORM_COOLDOWN_TICKS: int = 750  # 12.5 seconds (it deals little damage)
 const LIGHTNING_FORM_EDGE_COST: float = 60.0
 # Barrage blinks: the spot is LIGHTNING_BLINK_DISTANCE px from the boss centre in direction d (Vector2.RIGHT rotated
 # by d * 45 degrees): outside the boss (>= BOSS_RADIUS + PLAYER_RADIUS = 26) and inside the dagger reach
@@ -209,7 +209,7 @@ const SCYTHE_EDGE_PER_HIT: float = 25.0  # like the katana
 # Missed -> PULL: the player is pulled to where the chain stopped, REAPER_COIL_PULL_SPEED px per tick, then
 #   REAPER_COIL_PULL_RECOVERY_TICKS. No stagger, no spin.
 const REAPER_COIL_EDGE_COST: float = 50.0
-const REAPER_COIL_COOLDOWN_TICKS: int = 1200  # 20 seconds
+const REAPER_COIL_COOLDOWN_TICKS: int = 600  # 10 seconds (it deals little damage)
 const REAPER_COIL_HOOK_RANGE: float = 150.0
 const REAPER_COIL_HOOK_SPEED: float = 12.5  # 150 / 12.5 = 12 ticks to full range
 const REAPER_COIL_CHAIN_WIDTH: float = 8.0  # the chain touches a circle within half of this

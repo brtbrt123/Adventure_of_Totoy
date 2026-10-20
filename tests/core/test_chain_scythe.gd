@@ -123,7 +123,7 @@ func test_tuning_is_sane() -> void:
 	assert_true(spin_last <= Tuning.REAPER_COIL_SPIN_TICKS, "every spin hit lands inside the spin")
 	assert_true(Tuning.REAPER_COIL_STAGGER_TICKS > Tuning.REAPER_COIL_SPIN_TICKS + Tuning.REAPER_COIL_RECOVERY_TICKS, "the boss is still stunned when the player can act again")
 	assert_eq(Weapons.active_duration(SCYTHE), Weapons.reaper_coil_total_ticks())
-	assert_eq(Weapons.active_cooldown(SCYTHE), 1200)
+	assert_eq(Weapons.active_cooldown(SCYTHE), 600)
 	assert_near(Weapons.active_edge_cost(SCYTHE), 50.0, 0.0001)
 	assert_eq(Weapons.active_form(SCYTHE), Weapons.FORM_REAPER_COIL)
 

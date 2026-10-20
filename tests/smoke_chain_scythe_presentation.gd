@@ -273,7 +273,7 @@ func coil_hit() -> void:
 	check(int(seen.get(GameEvent.REAPER_COIL_ENDED, 0)) == 1, "no reaper_coil_ended")
 	check(most_fx <= Fx.MAX_LIVE, "coil effects pile up: %d" % most_fx)
 	var after: Dictionary = Hud.weapon_status(arena.snapshot)
-	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9 and int(after["cooldown"]) > 0 and Hud.weapon_active_line(after) in ["REAPER'S COIL", "COIL"], "after the coil the slot shows the cooldown ring: %s" % str(after))
+	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.8 and int(after["cooldown"]) > 0 and Hud.weapon_active_line(after) in ["REAPER'S COIL", "COIL"], "after the coil the slot shows the cooldown ring: %s" % str(after))
 	await save("after_cd_hud")
 	for i: int in range(120):
 		step()

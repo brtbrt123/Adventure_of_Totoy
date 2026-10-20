@@ -61,7 +61,11 @@ func _controls() -> void:
 	Input.action_press("arena_attack")
 	var frame: InputFrame = Bindings.read_frame(Vector2(20, 30), Vector2(30, 20))
 	_expect(frame.attack_pressed, "attack intent missing")
-	_expect(frame.aim.is_equal_approx(Vector2(1,-1).normalized()), "mouse aim direction incorrect")
+	_expect(frame.aim == Vector2.ZERO, "standing still sends no aim (the mouse is ignored; the core keeps the facing)")
+	Input.action_press("arena_up")
+	frame = Bindings.read_frame(Vector2(20, 30), Vector2(30, 20))
+	_expect(frame.aim.is_equal_approx(Vector2.UP), "aim follows the heading, not the mouse")
+	Input.action_release("arena_up")
 	Input.action_release("arena_attack")
 
 func _step(frame: InputFrame) -> void:
