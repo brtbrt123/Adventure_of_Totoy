@@ -32,9 +32,10 @@ func _activate(aim: Vector2 = Vector2.ZERO) -> InputFrame:
 	return frame
 
 
-func _swap_frame() -> InputFrame:
+## The old Q press: an equip request for the weapon after the one `core`'s player holds (Weapons.IDS order).
+func _swap_frame(core: GameCore) -> InputFrame:
 	var frame: InputFrame = InputFrame.new()
-	frame.weapon_swap_pressed = true
+	frame.weapon_equip = Weapons.next(core.player.weapon_id)
 	return frame
 
 
@@ -136,7 +137,7 @@ func test_swap_cycles_katana_dagger_scythe_and_back() -> void:
 	var order: Array[StringName] = [Tuning.WEAPON_DUAL_DAGGER, SCYTHE, Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER]
 	var previous: StringName = Tuning.WEAPON_BLACK_KATANA
 	for expected: StringName in order:
-		core.step(_swap_frame())
+		core.step(_swap_frame(core))
 		assert_eq(core.player.weapon_id, expected, "swap to " + String(expected))
 		var swapped: GameEvent = find_event(core, GameEvent.WEAPON_SWAPPED)
 		assert_true(swapped != null, "weapon_swapped for " + String(expected))
@@ -147,7 +148,7 @@ func test_swap_cycles_katana_dagger_scythe_and_back() -> void:
 		previous = expected
 		# the lockout still blocks the next press for WEAPON_SWAP_LOCKOUT_TICKS - 1 ticks
 		for i: int in Tuning.WEAPON_SWAP_LOCKOUT_TICKS - 1:
-			core.step(_swap_frame())
+			core.step(_swap_frame(core))
 			assert_eq(core.player.weapon_id, expected, "locked out after the swap to " + String(expected))
 			assert_true(find_event(core, GameEvent.WEAPON_SWAPPED) == null)
 
@@ -171,7 +172,7 @@ func test_swap_refusals_are_unchanged_with_the_scythe() -> void:
 				core.player.take_damage(Tuning.PLAYER_MAX_HP, core.tick, [], core.boss.id)
 			"coil":
 				core.step(_activate())
-		core.step(_swap_frame())
+		core.step(_swap_frame(core))
 		assert_eq(core.player.weapon_id, SCYTHE, "no swap during " + setup)
 		assert_true(find_event(core, GameEvent.WEAPON_SWAPPED) == null, "no event during " + setup)
 	# During the whole coil the swap is refused, the tick after it ends it is allowed.
@@ -179,12 +180,12 @@ func test_swap_refusals_are_unchanged_with_the_scythe() -> void:
 	coil.step(_activate())
 	var refused: int = 0
 	while coil.player.coil_running and refused < 400:
-		coil.step(_swap_frame())
+		coil.step(_swap_frame(coil))
 		if coil.player.coil_running:
 			assert_eq(coil.player.weapon_id, SCYTHE, "refused during the coil (tick %d)" % coil.tick)
 			refused += 1
 	assert_eq(coil.player.weapon_id, SCYTHE, "not on the tick the coil ends (the press came first)")
-	coil.step(_swap_frame())
+	coil.step(_swap_frame(coil))
 	assert_eq(coil.player.weapon_id, Tuning.WEAPON_BLACK_KATANA, "allowed right after the coil")
 
 
@@ -194,7 +195,7 @@ func test_three_weapons_keep_their_own_cooldowns() -> void:
 	var dagger_at: int = core.tick
 	while core.player.barrage_running:
 		core.step(InputFrame.new())
-	core.step(_swap_frame())  # -> scythe
+	core.step(_swap_frame(core))  # -> scythe
 	assert_eq(core.player.weapon_id, SCYTHE)
 	assert_eq(core.snapshot().hud.weapon_buff_cooldown_ticks, 0, "the scythe's own cooldown: ready")
 	core.player.edge = 100.0
@@ -204,7 +205,7 @@ func test_three_weapons_keep_their_own_cooldowns() -> void:
 	assert_true(core.player.coil_running, "the coil started")
 	while core.player.coil_running:
 		core.step(InputFrame.new())
-	core.step(_swap_frame())  # -> katana
+	core.step(_swap_frame(core))  # -> katana
 	assert_eq(core.player.weapon_id, Tuning.WEAPON_BLACK_KATANA)
 	core.player.edge = 100.0
 	core.step(_activate())

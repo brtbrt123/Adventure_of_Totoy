@@ -58,6 +58,13 @@ func press(field: String, aim: Vector2 = Vector2.RIGHT) -> void:
 	step(frame)
 
 
+## The old Q press as an equip request: the weapon after the equipped one in Weapons.IDS.
+func swap() -> void:
+	var frame: InputFrame = InputFrame.new()
+	frame.weapon_equip = Weapons.next(arena.snapshot.player.weapon_id)
+	step(frame)
+
+
 func save(label: String) -> void:
 	if not capture:
 		return
@@ -77,12 +84,12 @@ func fixture(gap: float = 30.0) -> void:
 	observe()
 
 
-## Q twice (with the lockout in between): katana -> dagger -> scythe.
+## Two equip requests (with the lockout in between): katana -> dagger -> scythe.
 func equip_scythe() -> void:
-	press("weapon_swap_pressed")
+	swap()
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
 		step()
-	press("weapon_swap_pressed")
+	swap()
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "two swaps did not equip the scythe")
 
 
@@ -119,7 +126,6 @@ func pure_helpers() -> void:
 	check(Vector2(arena.frames[Hud.REAPER_COIL_ICON]["w"], arena.frames[Hud.REAPER_COIL_ICON]["h"]) == Hud.form_icon_rect().size, "coil icon must be drawn at its native 24 px")
 	for key: String in ["totoy_scythe_coil_whip_1", "totoy_scythe_coil_whip_3", "totoy_scythe_coil_pull_2"]:
 		check(arena.chain_origins.has(key), "chain_origin not loaded for " + key)
-	check(Hud.next_weapon(Tuning.WEAPON_BLACK_KATANA) == Tuning.WEAPON_DUAL_DAGGER and Hud.next_weapon(Tuning.WEAPON_DUAL_DAGGER) == Tuning.WEAPON_CHAIN_SCYTHE and Hud.next_weapon(Tuning.WEAPON_CHAIN_SCYTHE) == Tuning.WEAPON_BLACK_KATANA, "swap cycle")
 	check(Fx.flying_frame(Vector2.UP) == 1 and Fx.flying_frame(Vector2.RIGHT) == 3 and Fx.flying_frame(Vector2.DOWN) == 5 and Fx.flying_frame(Vector2.LEFT) == 7, "flying head rotation")
 	check(Fx.ring_phase(0) == 1 and Fx.ring_phase(8) == 2 and Fx.ring_phase(Tuning.REAPER_COIL_SPIN_TICKS - 1) == 4 and Fx.ring_phase(Tuning.REAPER_COIL_SPIN_TICKS) == 0, "spin ring phases")
 	var effects: Array[Dictionary] = []
@@ -142,8 +148,7 @@ func swap_swings_hud() -> void:
 	check(Hud.weapon_label(arena.snapshot.player.weapon_id) == "SCYTHE", "scythe label")
 	var status: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(status["weapon"] == Tuning.WEAPON_CHAIN_SCYTHE and int(status["cost"]) == int(Tuning.REAPER_COIL_EDGE_COST), "HUD shows the coil's cost")
-	check(Hud.weapon_active_line(status) in ["REAPER'S COIL", "COIL"], "idle scythe active line: " + Hud.weapon_active_line(status))
-	check(Hud.swap_status(arena.snapshot)["next"] == Tuning.WEAPON_BLACK_KATANA, "after the scythe Q goes to the katana")
+	check(not bool(status["active"]), "idle scythe: the coil is not running")
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS + 1):
 		step()
 	await save("idle_hud")
@@ -199,7 +204,7 @@ func swap_swings_hud() -> void:
 	# the third swap returns to the katana
 	for i: int in range(60):
 		step()
-	press("weapon_swap_pressed")
+	swap()
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_BLACK_KATANA and chosen().begins_with("hero2_"), "third swap must return to the katana set")
 	check(arena.missing_frames.is_empty(), "missing frames: %s" % str(arena.missing_frames.keys()))
 
@@ -219,8 +224,7 @@ func coil_hit() -> void:
 	arena.coil_cutin.stop()
 	check(not arena.black_form_look(arena.snapshot.player) and arena.weapon_buff_effect().is_empty(), "the coil uses the Black Form look")
 	var running: Dictionary = Hud.weapon_status(arena.snapshot)
-	check(bool(running["active"]) and Hud.weapon_active_line(running) == "COILING" and float(running["duration_fraction"]) > 0.9, "HUD shows the coil running with its run ring")
-	check(Hud.swap_status(arena.snapshot)["reason"] == "FORM", "swap hint shows the lock")
+	check(bool(running["active"]) and float(running["duration_fraction"]) > 0.9, "HUD shows the coil running with its run ring")
 	await save("coil_windup")
 	var boss_start: Vector2 = boss().position
 	var most_fx: int = 0
@@ -273,7 +277,7 @@ func coil_hit() -> void:
 	check(int(seen.get(GameEvent.REAPER_COIL_ENDED, 0)) == 1, "no reaper_coil_ended")
 	check(most_fx <= Fx.MAX_LIVE, "coil effects pile up: %d" % most_fx)
 	var after: Dictionary = Hud.weapon_status(arena.snapshot)
-	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.8 and int(after["cooldown"]) > 0 and Hud.weapon_active_line(after) in ["REAPER'S COIL", "COIL"], "after the coil the slot shows the cooldown ring: %s" % str(after))
+	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.8 and int(after["cooldown"]) > 0, "after the coil the slot shows the cooldown ring: %s" % str(after))
 	await save("after_cd_hud")
 	for i: int in range(120):
 		step()

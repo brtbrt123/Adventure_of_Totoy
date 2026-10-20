@@ -130,11 +130,11 @@ const BLACK_KATANA_ATTACK_SPEED_MULT: float = 1.5
 const BLACK_KATANA_DAMAGE_MULT: float = 1.4
 const BLACK_KATANA_MOVE_SPEED_MULT: float = 1.0  # the katana buff does not change walking speed
 
-# Weapon swap (Q in presentation: InputFrame.weapon_swap_pressed). Cycles Black Katana -> Dual Dagger -> Chain Scythe
-# -> Black Katana (the order is Weapons.IDS). A free action, only
+# Weapon swap: InputFrame.weapon_equip names the weapon to equip (presentation sends it from the character menu's
+# inventory; the Q cycle was removed on 2026-10-21). A free action, only
 # from idle or walk, never while a weapon buff/form runs. After a swap the next swap waits WEAPON_SWAP_LOCKOUT_TICKS.
 # Every weapon keeps its own active cooldown, so swapping never resets one. The player always starts with the katana.
-const WEAPON_SWAP_LOCKOUT_TICKS: int = 20
+const WEAPON_SWAP_LOCKOUT_TICKS: int = 0  # no lockout: weapons are only equipped from the paused character menu
 
 # Dual Dagger (second weapon), first guesses set on 2026-10-19, nobody has played it yet. A fast, short-reach 4-hit
 # combo; hands alternate in the art only. Same buffer/grace/reset rules as the katana combo. Per swing (index 0 = hit 1).

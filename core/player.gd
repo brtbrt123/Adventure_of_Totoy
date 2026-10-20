@@ -119,8 +119,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 			buff_ticks -= 1
 			if buff_ticks == 0:
 				_emit_buff_end(tick, events, &"expired")
-	if input.weapon_swap_pressed:
-		_try_weapon_swap(tick, events)
+	if input.weapon_equip != &"":
+		try_weapon_equip(input.weapon_equip, tick, events)
 	if input.weapon_active_pressed:
 		_try_weapon_active(tick, events, input)
 	for i: int in skill_cooldowns.size():
@@ -454,17 +454,17 @@ func _try_weapon_active(tick: int, events: Array[GameEvent], input: InputFrame) 
 	return true
 
 
-## Q: swap to the next weapon. A free action from idle or walk only, never while a buff/form runs or during the
-## swap lockout. The combo starts over; each weapon keeps its own active cooldown.
-func _try_weapon_swap(tick: int, events: Array[GameEvent]) -> bool:
+## Equip exactly `target` (InputFrame.weapon_equip, sent by the character menu). A free action from idle or walk only,
+## never while a buff/form runs or during the swap lockout. Unknown ids and the weapon already equipped do nothing (no
+## lockout, no event). The combo starts over; each weapon keeps its own active cooldown. Returns true if it equipped.
+func try_weapon_equip(target: StringName, tick: int, events: Array[GameEvent]) -> bool:
+	if not Weapons.is_known(target) or target == weapon_id:
+		return false
 	if state != STATE_IDLE and state != STATE_WALK:
 		return false
 	if buff_ticks > 0 or swap_lockout > 0:
 		return false
 	var previous: StringName = weapon_id
-	var target: StringName = Weapons.next(weapon_id)
-	if target == previous:
-		return false
 	weapon_id = target
 	swap_lockout = Tuning.WEAPON_SWAP_LOCKOUT_TICKS
 	reset_combo()

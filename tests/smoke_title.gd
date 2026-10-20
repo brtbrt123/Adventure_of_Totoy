@@ -88,7 +88,7 @@ func _title_screen() -> void:
 			_expect(Title.menu_font().has_char(character.unicode_at(0)), "the menu font has no glyph for '%s' in \"%s\"" % [character, line])
 	# the controls page covers every binding the game uses
 	var controls: String = " ".join(Title.CONTROL_LINES).to_upper()
-	for needle: String in ["WASD", "LEFT CLICK", "RIGHT CLICK", "SHIFT", "SPACE", "Z:", "X:", "C:", "R:", "ESC"]:
+	for needle: String in ["WASD", "LEFT CLICK", "RIGHT CLICK", "SHIFT", "SPACE", "Z:", "X:", "C:", "R:", "ESC", "TAB"]:
 		_expect(controls.contains(needle), "controls page misses " + needle)
 	# the credits name every creator in the audio source list and licence notes
 	var credits: String = " ".join(Title.CREDIT_LINES).to_upper()

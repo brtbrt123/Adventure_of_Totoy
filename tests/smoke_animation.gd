@@ -206,7 +206,7 @@ func _dagger_timelines() -> void:
 		_reset()
 		arena.core.player.edge = 100.0
 		var swap: InputFrame = _frame()
-		swap.weapon_swap_pressed = true
+		swap.weapon_equip = Tuning.WEAPON_DUAL_DAGGER
 		_step(swap)
 		_expect(arena.snapshot.player.weapon_id == Tuning.WEAPON_DUAL_DAGGER, "swap intent did not equip the dagger")
 		_expect(String(arena.selected_frames[arena.snapshot.player.id]).begins_with("totoy_dagger_"), "dagger not drawn after the swap")
@@ -255,11 +255,9 @@ func _scythe_timelines() -> void:
 	arena.core.boss.position = Vector2(400, 240)
 	arena.core.player.position = Vector2(370, 240)
 	var swap: InputFrame = _frame()
-	swap.weapon_swap_pressed = true
+	swap.weapon_equip = Tuning.WEAPON_CHAIN_SCYTHE
 	_step(swap)
-	_wait(Tuning.WEAPON_SWAP_LOCKOUT_TICKS)
-	_step(swap)
-	_expect(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "two swaps did not equip the scythe")
+	_expect(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "the equip request did not equip the scythe")
 	var requested: Dictionary = {}
 	var attack: InputFrame = _frame(Vector2.ZERO, false, false, true)
 	attack.aim = Vector2.RIGHT

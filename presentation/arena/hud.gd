@@ -3,6 +3,7 @@ extends Node2D
 const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
+const UiPanel := preload("res://presentation/arena/ui_panel.gd")
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var debug_enabled: bool = false
@@ -24,9 +25,12 @@ const MEDALLIONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: DAGGER_MEDALLION, Tun
 const FORM_ICONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: LIGHTNING_FORM_ICON, Tuning.WEAPON_CHAIN_SCYTHE: REAPER_COIL_ICON}
 static func form_icon_rect() -> Rect2:
 	return Rect2(154, 151, 24, 24)
-static func swap_hint_position() -> Vector2:
-	return Vector2(181, 135)
 var counter_max: int = 1
+## Tests and captures: draw this Aspect socket's (0-2) hover tooltip as if the mouse were on it; -1 = off.
+var hint_slot_override: int = -1
+## True while the character menu is open: the boss panel (which follows the boss and can sit above the menu panel,
+## under only the thin veil) is not drawn.
+var menu_open: bool = false
 var portrait_atlas: Texture2D
 var portrait_frame: Dictionary = {}
 var profile_frame: Dictionary = {}
@@ -253,7 +257,7 @@ func _draw() -> void:
 	var h: Snapshots.HudSnapshot = snapshot.hud
 	_draw_profile(h)
 	_draw_skills(h)
-	if not snapshot.entities.is_empty():
+	if not snapshot.entities.is_empty() and not menu_open:
 		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
 		var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
 		if head_position.x < -12.0 or head_position.x > 332.0 or head_position.y < -24.0 or head_position.y > 196.0:
@@ -270,18 +274,39 @@ func _draw() -> void:
 		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"], 1, stat_font())
 		lettering(Vector2(8, 141), "PLAYER " + String(snapshot.player.state), colors["p"], 1, stat_font())
 	if snapshot.result != &"playing":
-		var extra: int = result_lines.size() + (1 if result_hint != "" else 0)
-		draw_rect(Rect2(60, 67, 200, 43 + extra * 8), colors["0"])
-		var title: String = "VICTORY" if snapshot.result == &"victory" else "DEFEAT"
-		centered(160, 74, title, colors["1"], colors["0"], 2)
-		centered(160, 96, "R TO RESTART", colors["o"], colors["0"])
-		var line_y: int = 105
-		for line: String in result_lines:
-			centered(160, line_y, line, colors["1"], colors["0"], 1, stat_font())
-			line_y += 8
-		if result_hint != "":
-			centered(160, line_y, result_hint, colors["o"], colors["0"])
+		_draw_result()
 
+
+## The DEFEAT / VICTORY panel in the shared frame (UiPanel) with a banner title in Cinzel; every line is kept
+## (R TO RESTART, the saved TIME / BEST lines, ESC: TITLE when the game came from the title screen).
+static func result_panel_rect(line_count: int, has_hint: bool) -> Rect2:
+	var h: int = 34 + (line_count * 9 + 4 if line_count > 0 else 0) + (12 if has_hint else 0)
+	return Rect2(64, 86 - h / 2, 192, h)
+
+func _draw_result() -> void:
+	var victory: bool = snapshot.result == &"victory"
+	var theme: StringName = &"victory" if victory else &"defeat"
+	var rect: Rect2 = result_panel_rect(result_lines.size(), result_hint != "")
+	var top: int = int(rect.position.y)
+	UiPanel.draw_panel(self, rect, theme, colors)
+	UiPanel.banner(self, 160, top - 8, 112, 22, theme, colors)
+	centered(160, top - 2, "VICTORY" if victory else "DEFEAT", colors["1"], colors["0"], 1, menu_font(), 13)
+	var hint_color: Color = colors["o"] if victory else colors["j"]
+	var y: int = top + 21
+	lettering(Vector2(160 - text_width("R TO RESTART") * 0.5, y), "R TO RESTART", hint_color)
+	y += 10
+	if not result_lines.is_empty():
+		draw_rect(Rect2(110, y - 2, 100, 1), colors["f"])
+		y += 2
+		for line: String in result_lines:
+			lettering(Vector2(160 - text_width(line, 1, stat_font()) * 0.5, y), line, colors["1"], 1, stat_font())
+			y += 9
+	if result_hint != "":
+		var t: Dictionary = UiPanel.theme(theme)
+		draw_rect(Rect2(124, y, 72, 1), colors[t["accent"]])
+		UiPanel.px(self, 160, y, colors[t["gem"]])
+		y += 4
+		lettering(Vector2(160 - text_width(result_hint) * 0.5, y), result_hint, hint_color)
 
 ## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
@@ -326,18 +351,18 @@ static func boss_panel(head: Vector2, counter: bool) -> Rect2:
 	var height: float = 47.0 if counter else 33.0
 	return Rect2(Vector2(clampf(head.x - 52, 2, 214), clampf(head.y - 4 - height, 2, 164 - height)).round(), Vector2(104, height))
 
-## Display facts from HUD snapshots; these labels do not gate input or predict hits.
+## The Aspect socket icons (24 px), slot 1-3 = Z X C.
+const ASPECT_ICONS: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
+
+## Display facts from HUD snapshots; these labels do not gate input or predict hits. The cooldown is shown only on
+## the icons (ring and seconds), never as text in a box.
 static func skill_rows(h: Snapshots.HudSnapshot) -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
 	var names: Array[String] = ["BREAKING EDGE", "GALE CUT", "MOON CLEAVE"]
 	var keys: Array[String] = ["Z", "X", "C"]
 	var costs: Array[float] = [Tuning.BREAKING_EDGE_EDGE_COST, Tuning.GALE_CUT_EDGE_COST, Tuning.MOON_CLEAVE_EDGE_COST]
 	for slot: int in range(3):
-		var left: int = h.skill_cooldown_ticks[slot]
-		var status: String = "%dS" % ceili(left * Tuning.TICK_DT) if left > 0 else "CD READY"
-		if slot == 0 and left <= 0:
-			status = "PARRY WINDOW" if h.retaliate_ticks_left <= 0 else "READY"
-		rows.append({"key": keys[slot], "name": names[slot], "cost": costs[slot], "cooldown": left, "status": status})
+		rows.append({"key": keys[slot], "name": names[slot], "cost": costs[slot], "cooldown": h.skill_cooldown_ticks[slot], "icon": ASPECT_ICONS[slot]})
 	return rows
 
 
@@ -356,20 +381,18 @@ static func cooldown_fraction(slot: int, h: Snapshots.HudSnapshot) -> float:
 func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var rows: Array[Dictionary] = skill_rows(h)
 	var sockets: Array[Rect2] = aspect_rects()
-	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
 	if MEDALLIONS.has(snapshot.player.weapon_id):
 		ui(MEDALLIONS[snapshot.player.weapon_id], weapon_rect())
 	else:
 		ui("ui_weapon_frame_1", weapon_rect())
 		ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
 	centered(weapon_rect().get_center().x, weapon_rect().get_center().y + 14, weapon_label(snapshot.player.weapon_id), colors["j"], colors["0"])
-	_draw_swap_hint()
 	_draw_weapon_active()
 	for slot: int in range(3):
 		var row: Dictionary = rows[slot]
 		var socket: Rect2 = sockets[slot]
 		var centre: Vector2 = socket.get_center()
-		ui(icons[slot], socket)
+		ui(row["icon"], socket)
 		if int(row["cooldown"]) > 0:
 			# Snapshot-only countdown. The core still accepts or rejects every press.
 			var arc: PackedVector2Array = PackedVector2Array()
@@ -386,7 +409,7 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 		lettering(badge, row["key"], colors["1"], 1, stat_font())
 		var cost: String = "%dE" % int(row["cost"])
 		centered(centre.x, centre.y + 12, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"], 1, null, 12)
-		if socket.has_point(get_local_mouse_position()):
+		if socket.has_point(get_local_mouse_position()) or slot == hint_slot_override:
 			_draw_aspect_hint(row)
 	if h.retaliate_ticks_left > 0:
 		outlined(Vector2(216, 91), "Z BREAKING EDGE READY", colors["x"], colors["0"], 1, stat_font())
@@ -395,12 +418,20 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 			ring.append((sockets[0].get_center() + Vector2.from_angle(TAU * point / 32.0) * 12.0).round())
 		draw_polyline(ring, colors["x"], 1.0, false)
 
+## The skill hover tooltip in the shared frame (info theme): the key in a badge, the name, a divider, the Edge cost,
+## the Aspect's icon on the right. No cooldown text (the icon's ring shows it).
+static func aspect_hint_rect() -> Rect2:
+	return Rect2(156, 60, 160, 34)
+
 func _draw_aspect_hint(row: Dictionary) -> void:
-	var at: Vector2 = Vector2(163, 68)
-	draw_rect(Rect2(at - Vector2(3, 3), Vector2(154, 36)), colors["0"])
-	lettering(at, "%s %s" % [row["key"], row["name"]], colors["1"], 1, null, 10)
-	lettering(at + Vector2(0, 10), "%d EDGE" % int(row["cost"]), colors["v"], 1, null, 10)
-	lettering(at + Vector2(0, 20), row["status"], colors["o"], 1, null, 10)
+	var rect: Rect2 = aspect_hint_rect()
+	UiPanel.draw_panel(self, rect, &"info", colors)
+	ui(row["icon"], Rect2(rect.position + Vector2(130, 5), Vector2(24, 24)))
+	UiPanel.key_badge(self, rect.position + Vector2(5, 5), colors)
+	lettering(rect.position + Vector2(9 - text_width(row["key"]) * 0.5, 6), row["key"], colors["1"])
+	lettering(rect.position + Vector2(16, 6), row["name"], colors["1"], 1, null, 10)
+	draw_rect(Rect2(rect.position + Vector2(5, 15), Vector2(120, 1)), colors["f"])
+	lettering(rect.position + Vector2(5, 19), "%d EDGE" % int(row["cost"]), colors["v"], 1, null, 10)
 
 static func weapon_label(weapon: StringName) -> String:
 	match weapon:
@@ -409,48 +440,21 @@ static func weapon_label(weapon: StringName) -> String:
 		Tuning.WEAPON_CHAIN_SCYTHE: return "SCYTHE"
 	return "SWORD"
 
-## The weapon swap (Q): ready, or why not (a form runs, the short lockout after a swap, or the hero is busy), and the
-## weapon the next press equips (Q cycles katana -> dagger -> scythe -> katana, Weapons.IDS). Display only; the core
-## accepts or refuses the press.
-static func swap_status(snap: Snapshots.GameSnapshot) -> Dictionary:
-	var h: Snapshots.HudSnapshot = snap.hud
-	var busy: bool = snap.player.state not in [&"idle", &"walk"]
-	var reason: String = "FORM" if snap.player.weapon_buff_active else ("WAIT" if h.weapon_swap_lockout_ticks > 0 else ("BUSY" if busy else ""))
-	return {"text": "Q SWAP", "ready": reason.is_empty(), "reason": reason, "next": next_weapon(snap.player.weapon_id), "lockout_fraction": clampf(float(h.weapon_swap_lockout_ticks) / maxi(1, h.weapon_swap_lockout_max), 0.0, 1.0)}
-
-## The weapon after `weapon` in the swap cycle.
-static func next_weapon(weapon: StringName) -> StringName:
-	var index: int = Weapons.IDS.find(weapon)
-	return Weapons.IDS[posmod(index + 1, Weapons.IDS.size())] if index >= 0 else Weapons.IDS[0]
-
-func _draw_swap_hint() -> void:
-	var data: Dictionary = swap_status(snapshot)
-	var at: Vector2 = swap_hint_position()
-	var label: String = String(data["text"])
-	var width: float = text_width(label, 1, null, 10)
-	draw_rect(Rect2(at - Vector2(2, 2), Vector2(width + 4, 11)), colors["0"])
-	lettering(at, label, colors["1"] if bool(data["ready"]) else colors["i"], 1, null, 10)
-	var fraction: float = float(data["lockout_fraction"])
-	if fraction > 0.0:
-		draw_rect(Rect2(at + Vector2(0, 8), Vector2(ceilf(width * fraction), 1)), colors["o"])
-
 static func weapon_status(snap: Snapshots.GameSnapshot) -> Dictionary:
 	var h: Snapshots.HudSnapshot = snap.hud
 	if h.weapon_buff_duration <= 0:
 		return {}
 	return {"weapon": snap.player.weapon_id, "active": snap.player.weapon_buff_active, "remaining": ceili(snap.player.weapon_buff_ticks_left * Tuning.TICK_DT), "cooldown": ceili(h.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "cost": h.weapon_buff_edge_cost, "duration_fraction": clampf(float(snap.player.weapon_buff_ticks_left) / h.weapon_buff_duration, 0.0, 1.0), "cooldown_fraction": clampf(float(h.weapon_buff_cooldown_ticks) / maxi(1, h.weapon_buff_cooldown_max), 0.0, 1.0)}
 
+## The weapon active's state lives only on the icons (approved 2026-10-21: the RMB / FORM / CD text box is gone): the
+## run ring and the cooldown ring around the weapon medallion, and for the dagger and the scythe their active slot icon
+## with its own ring and the cooldown seconds.
 func _draw_weapon_active() -> void:
 	var data: Dictionary = weapon_status(snapshot)
 	if data.is_empty():
 		return
-	var at: Vector2 = Vector2(181, 147)
-	draw_rect(Rect2(at - Vector2(2, 2), Vector2(62, 33)), colors["0"])
-	lettering(at, "RMB %dE" % int(data["cost"]), colors["v"], 1, null, 10)
-	lettering(at + Vector2(0, 10), weapon_active_line(data), colors["p"] if bool(data["active"]) else colors["j"], 1, null, 10)
 	if FORM_ICONS.has(data["weapon"]):
 		_draw_form_icon(data)
-	lettering(at + Vector2(0, 20), "CD %dS" % int(data["cooldown"]) if int(data["cooldown"]) > 0 else "CD READY", colors["o"], 1, null, 10)
 	for active: bool in [false, true]:
 		var fraction: float = float(data["duration_fraction" if active else "cooldown_fraction"])
 		if fraction <= 0.0:
@@ -459,24 +463,6 @@ func _draw_weapon_active() -> void:
 		for point: int in range(33):
 			arc.append((weapon_rect().get_center() + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * (21.0 if active else 24.0)).round())
 		draw_polyline(arc, colors["v"] if active else colors["o"], 1.0, false)
-
-## Second line of the weapon active box: the time left while it runs (the dagger's active is the barrage, the
-## scythe's the coil), else what right click does.
-static func weapon_active_line(data: Dictionary) -> String:
-	var weapon: StringName = data.get("weapon", &"")
-	if bool(data["active"]):
-		match weapon:
-			Tuning.WEAPON_DUAL_DAGGER: return "BARRAGE"
-			Tuning.WEAPON_CHAIN_SCYTHE: return "COILING"
-		return "FORM %dS" % int(data["remaining"])
-	match weapon:
-		Tuning.WEAPON_DUAL_DAGGER: return "LIGHTNING"
-		Tuning.WEAPON_CHAIN_SCYTHE: return REAPER_COIL_LINE if text_width(REAPER_COIL_LINE, 1, null, 10) <= ACTIVE_LINE_WIDTH else "COIL"
-	return "FORM OFF"
-
-## The full skill name, used when it fits the 62 px box (else "COIL").
-const REAPER_COIL_LINE: String = "REAPER'S COIL"
-const ACTIVE_LINE_WIDTH: float = 58.0
 
 ## The weapon's active slot (Lightning Form, Reaper's Coil): its icon, a bright ring while it runs, the cooldown arc
 ## and seconds while it recharges.

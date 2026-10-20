@@ -256,19 +256,17 @@ func slash_attachment() -> void:
 func dagger_form() -> void:
 	fixture()
 	var swap: InputFrame = InputFrame.new()
-	swap.weapon_swap_pressed = true
+	swap.weapon_equip = Tuning.WEAPON_DUAL_DAGGER
 	step(swap)
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_DUAL_DAGGER, "dagger swap")
 	var idle: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(int(idle["cost"]) == int(Tuning.LIGHTNING_FORM_EDGE_COST) and not bool(idle["active"]), "dagger HUD cost")
-	check(Hud.weapon_active_line(idle) == "LIGHTNING", "dagger HUD label")
 	var input: InputFrame = InputFrame.new()
 	input.weapon_active_pressed = true
 	step(input)
 	check(arena.snapshot.player.weapon_form == &"lightning_form", "form did not start")
 	var status: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(arena.snapshot.hud.weapon_buff_duration == Weapons.barrage_total_ticks() and float(status["duration_fraction"]) > 0.9, "the form (only the barrage) shows its run ring")
-	check(Hud.weapon_active_line(status) == "BARRAGE", "form HUD line")
 	check(int(status["cooldown"]) == ceili(arena.snapshot.hud.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "form HUD cooldown from the snapshot")
 	var plan: Dictionary = View.plan(arena.snapshot)
 	check(String(plan["back"]).begins_with("fx_lightning_aura_back_") and String(plan["slash"]).is_empty(), "form aura plan")
@@ -280,7 +278,7 @@ func dagger_form() -> void:
 	check(View.plan(arena.snapshot).is_empty(), "form aura persists after the form")
 	check(int(arena.combat_audio.played.get("weapon_buff_end", 0)) == 1, "form end cue")
 	var after: Dictionary = Hud.weapon_status(arena.snapshot)
-	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9 and Hud.weapon_active_line(after) == "LIGHTNING", "after the barrage the slot shows the cooldown ring")
+	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9, "after the barrage the slot shows the cooldown ring")
 
 ## The same HUD contract for the Chain Scythe's Reaper's Coil: its own numbers, no aura, no slash, no Black Form
 ## darkening, the run ring while the coil runs and the cooldown ring after it, one start and one end cue.
@@ -288,15 +286,11 @@ func scythe_coil() -> void:
 	fixture()
 	arena.core.boss.position = Vector2(200, 110)
 	var swap: InputFrame = InputFrame.new()
-	swap.weapon_swap_pressed = true
-	step(swap)
-	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
-		step(InputFrame.new())
+	swap.weapon_equip = Tuning.WEAPON_CHAIN_SCYTHE
 	step(swap)
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "scythe swap")
 	var idle: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(int(idle["cost"]) == int(Tuning.REAPER_COIL_EDGE_COST) and not bool(idle["active"]), "scythe HUD cost")
-	check(Hud.weapon_active_line(idle) in ["REAPER'S COIL", "COIL"], "scythe HUD label")
 	check(View.plan(arena.snapshot).is_empty(), "an idle scythe draws a buff look")
 	var input: InputFrame = InputFrame.new()
 	input.weapon_active_pressed = true
@@ -306,7 +300,6 @@ func scythe_coil() -> void:
 	arena.coil_cutin.stop()
 	var status: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(arena.snapshot.hud.weapon_buff_duration == Weapons.reaper_coil_total_ticks() and float(status["duration_fraction"]) > 0.9, "the coil shows its run ring")
-	check(Hud.weapon_active_line(status) == "COILING", "coil HUD line")
 	check(View.plan(arena.snapshot).is_empty() and arena.weapon_slash_effect().is_empty(), "the coil draws the katana aura or slash")
 	check(not arena.black_form_look(arena.snapshot.player), "Black Form darkening on the scythe")
 	check(int(arena.combat_audio.played.get("weapon_buff_start", 0)) == 1, "coil start cue")

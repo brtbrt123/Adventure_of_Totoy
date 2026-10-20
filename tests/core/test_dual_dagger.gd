@@ -29,17 +29,18 @@ func _dagger_core(offset: Vector2 = Vector2(-30.0, 0.0), boss_at: Vector2 = BOSS
 	return core
 
 
-func _frame(swap: bool = false, active: bool = false, attack: bool = false, move: Vector2 = Vector2.ZERO) -> InputFrame:
+func _frame(equip: StringName = &"", active: bool = false, attack: bool = false, move: Vector2 = Vector2.ZERO) -> InputFrame:
 	var frame: InputFrame = InputFrame.new()
-	frame.weapon_swap_pressed = swap
+	frame.weapon_equip = equip
 	frame.weapon_active_pressed = active
 	frame.attack_pressed = attack
 	frame.move = move
 	return frame
 
 
+## The old Q press, as an equip request for the next weapon in Weapons.IDS (katana -> dagger -> scythe -> katana).
 func _swap(core: GameCore) -> void:
-	core.step(_frame(true))
+	core.step(_frame(Weapons.next(core.player.weapon_id)))
 
 
 func _count(core: GameCore, type: StringName) -> int:
@@ -113,7 +114,7 @@ func test_swap_lockout_blocks_a_second_swap_for_the_lockout_ticks() -> void:
 func test_swap_works_while_walking_but_not_mid_swing_skill_dash_parry_or_death() -> void:
 	var walking: GameCore = _core(Vector2(-100.0, 0.0))
 	walking.step(input(Vector2.UP))
-	walking.step(_frame(true, false, false, Vector2.UP))
+	walking.step(_frame(Tuning.WEAPON_DUAL_DAGGER, false, false, Vector2.UP))
 	assert_eq(walking.player.weapon_id, Tuning.WEAPON_DUAL_DAGGER, "walking: allowed")
 	for setup: String in ["attack", "recovery", "dash", "parry", "skill", "dead"]:
 		var core: GameCore = _core(Vector2(-100.0, 0.0))
@@ -146,12 +147,12 @@ func test_swap_works_while_walking_but_not_mid_swing_skill_dash_parry_or_death()
 
 func test_swap_is_refused_while_a_buff_or_form_runs() -> void:
 	var katana: GameCore = _core()
-	katana.step(_frame(false, true))
+	katana.step(_frame(&"", true))
 	assert_true(katana.player.is_buff_active())
 	_swap(katana)
 	assert_eq(katana.player.weapon_id, Tuning.WEAPON_BLACK_KATANA, "not while the katana buff runs")
 	var dagger: GameCore = _dagger_core()
-	dagger.step(_frame(false, true))
+	dagger.step(_frame(&"", true))
 	assert_true(dagger.player.is_lightning_form())
 	var refused: int = 0
 	while dagger.player.barrage_running and refused < 300:
@@ -180,7 +181,7 @@ func test_swap_resets_the_combo() -> void:
 
 func test_each_weapon_keeps_its_own_active_cooldown() -> void:
 	var core: GameCore = _core()
-	core.step(_frame(false, true))  # katana buff: its cooldown starts
+	core.step(_frame(&"", true))  # katana buff: its cooldown starts
 	var since: int = 1
 	run(core, Tuning.BLACK_KATANA_BUFF_DURATION_TICKS)
 	since += Tuning.BLACK_KATANA_BUFF_DURATION_TICKS
@@ -194,7 +195,7 @@ func test_each_weapon_keeps_its_own_active_cooldown() -> void:
 	assert_near(snap.hud.weapon_buff_edge_cost, Tuning.LIGHTNING_FORM_EDGE_COST, 0.0001)
 	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_BLACK_KATANA], Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS - since + 1, "the katana's keeps counting while it is put away")
 	core.player.edge = 100.0
-	core.step(_frame(false, true))  # Lightning Form
+	core.step(_frame(&"", true))  # Lightning Form
 	since += 1
 	assert_true(core.player.is_lightning_form())
 	assert_eq(core.player.buff_cooldown, Tuning.LIGHTNING_FORM_COOLDOWN_TICKS)
@@ -212,7 +213,7 @@ func test_each_weapon_keeps_its_own_active_cooldown() -> void:
 	assert_eq(snap.hud.weapon_buff_cooldown_max, Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS)
 	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_DUAL_DAGGER], Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - Weapons.barrage_total_ticks() - 1 - Tuning.WEAPON_SWAP_LOCKOUT_TICKS - 1)
 	core.player.edge = 100.0
-	core.step(_frame(false, true))
+	core.step(_frame(&"", true))
 	assert_false(core.player.is_buff_active(), "the katana is still on cooldown")
 	# Swapping repeatedly never readies an active early.
 	var dagger_cd: int = core.player.active_cooldowns[Tuning.WEAPON_DUAL_DAGGER]
@@ -377,7 +378,7 @@ func test_lightning_strike_on_a_counter_uses_the_counter_multiplier() -> void:
 
 func test_form_is_only_the_barrage_and_ends_with_it() -> void:
 	var core: GameCore = _dagger_core(Vector2(-200.0, 0.0))
-	core.step(_frame(false, true))
+	core.step(_frame(&"", true))
 	assert_true(core.player.is_lightning_form())
 	assert_near(core.player.edge, 100.0 - Tuning.LIGHTNING_FORM_EDGE_COST, 0.001, "Edge spent")
 	assert_eq(core.player.state, PlayerState.STATE_LIGHTNING_BARRAGE, "the activation starts the barrage")
@@ -421,7 +422,7 @@ func test_form_is_only_the_barrage_and_ends_with_it() -> void:
 
 func test_after_the_barrage_nothing_lingers() -> void:
 	var core: GameCore = _dagger_core(Vector2(-100.0, 0.0))
-	core.step(_frame(false, true))
+	core.step(_frame(&"", true))
 	_finish_barrage(core)
 	assert_false(core.player.is_buff_active())
 	run(core, Tuning.LIGHTNING_BLINK_INVULN_TICKS)
@@ -446,35 +447,35 @@ func test_after_the_barrage_nothing_lingers() -> void:
 func test_form_needs_edge_a_living_boss_and_its_cooldown_counts_from_activation() -> void:
 	var poor: GameCore = _dagger_core(Vector2(-200.0, 0.0))
 	poor.player.edge = Tuning.LIGHTNING_FORM_EDGE_COST - 1.0
-	poor.step(_frame(false, true))
+	poor.step(_frame(&"", true))
 	assert_false(poor.player.is_buff_active(), "not enough Edge")
 	assert_eq(_count(poor, GameEvent.WEAPON_BUFF_STARTED), 0)
 	var dead: GameCore = _dagger_core(Vector2(-200.0, 0.0))
 	dead.boss.take_damage(Tuning.BOSS_MAX_HP, 0, [], dead.player.id)
-	dead.step(_frame(false, true))
+	dead.step(_frame(&"", true))
 	assert_false(dead.player.is_buff_active(), "no barrage without a living boss")
 	assert_eq(_count(dead, GameEvent.WEAPON_BUFF_STARTED) + _count(dead, GameEvent.LIGHTNING_BARRAGE_STARTED), 0)
 	assert_near(dead.player.edge, 100.0, 0.001, "nothing spent")
 	assert_eq(dead.player.buff_cooldown, 0, "no cooldown")
 	var core: GameCore = _dagger_core(Vector2(-200.0, 0.0))
-	core.step(_frame(false, true))
+	core.step(_frame(&"", true))
 	run(core, Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - 2)
 	core.player.edge = 100.0
 	core.boss.hp = Tuning.BOSS_MAX_HP
-	core.step(_frame(false, true))  # activation + 1499 ticks
+	core.step(_frame(&"", true))  # activation + 1499 ticks
 	assert_false(core.player.is_buff_active(), "one tick short of the cooldown")
-	core.step(_frame(false, true))  # activation + 1500 ticks
+	core.step(_frame(&"", true))  # activation + 1500 ticks
 	assert_true(core.player.is_lightning_form(), "ready exactly LIGHTNING_FORM_COOLDOWN_TICKS after the activation")
 
 
 func test_form_cannot_be_refreshed_and_death_ends_it() -> void:
 	var core: GameCore = _dagger_core(Vector2(-200.0, 0.0))
-	core.step(_frame(false, true))
+	core.step(_frame(&"", true))
 	run(core, 20)
 	core.player.buff_cooldown = 0
 	var left: int = core.player.buff_ticks
 	var edge: float = core.player.edge
-	core.step(_frame(false, true))
+	core.step(_frame(&"", true))
 	assert_eq(core.player.buff_ticks, left - 1, "not refreshed")
 	assert_true(core.player.edge >= edge - 0.001, "no second cost (a barrage hit may add Edge)")
 	assert_eq(_count(core, GameEvent.WEAPON_BUFF_STARTED) + _count(core, GameEvent.LIGHTNING_BARRAGE_STARTED), 0)
@@ -508,7 +509,7 @@ func _scripted_frame(core: GameCore, i: int) -> InputFrame:
 	frame.move = to_boss.normalized() if to_boss.length() > 40.0 else Vector2.ZERO
 	frame.aim = to_boss.normalized()
 	frame.attack_pressed = i % 3 == 0 and i % 400 >= 60
-	frame.weapon_swap_pressed = i % 400 >= 45 and i % 400 <= 55  # the lockout makes the first press count
+	frame.weapon_equip = Weapons.next(core.player.weapon_id) if i % 400 >= 45 and i % 400 <= 55 else &""  # the lockout makes the first request count
 	frame.weapon_active_pressed = i % 50 == 7
 	frame.dash_pressed = i % 97 == 11
 	frame.parry_pressed = i % 131 == 17

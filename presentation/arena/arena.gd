@@ -39,6 +39,10 @@ var camera: Camera2D
 var camera_focus: Vector2 = Vector2.ZERO
 var view_origin: Vector2 = Vector2.ZERO
 const Hud := preload("res://presentation/arena/hud.gd")
+const CharacterMenu := preload("res://presentation/arena/character_menu.gd")
+## The character menu (TAB) on the HUD layer. While it is open the arena does not step the core (like the cut-ins),
+## except once for each weapon equip request it sends.
+var character_menu: CharacterMenu
 
 var empowered_sprites: Texture2D
 var buff_textures: Dictionary = {}
@@ -178,6 +182,10 @@ func _ready() -> void:
 	$HUD.add_child(lightning_cutin)
 	coil_cutin = ReapersCoilCutIn.new()
 	$HUD.add_child(coil_cutin)
+	character_menu = CharacterMenu.new()
+	character_menu.equip_request = request_equip
+	$HUD.add_child(character_menu)
+	_update_hud()
 	_load_chain_origins()
 
 ## True while any weapon cut-in plays (the world does not step).
@@ -209,6 +217,13 @@ func _physics_process(delta: float) -> void:
 		if coil_cutin.active:
 			coil_cutin.advance(delta)
 		return
+	# The character menu freezes the world the same way; TAB / ESC close it (the closing frame does not step either).
+	if character_menu != null and character_menu.is_open:
+		if not character_menu.poll_input():
+			_update_hud()
+		return
+	if Input.is_action_just_pressed("menu_toggle") and open_menu():
+		return
 	if Input.is_action_just_pressed("arena_debug"):
 		debug_enabled = not debug_enabled
 	if snapshot.result != &"playing" and Input.is_action_just_pressed("arena_restart"):
@@ -217,6 +232,10 @@ func _physics_process(delta: float) -> void:
 		change_scene.call(TITLE_SCENE)
 	# Node-local mouse coordinates already account for viewport scaling and canvas transforms.
 	var intent: InputFrame = Bindings.read_frame(snapshot.player.position, get_local_mouse_position())
+	advance(intent)
+
+## One core step with `intent`, then everything presentation derives from it (camera, effects, events, HUD).
+func advance(intent: InputFrame) -> void:
 	core.step(intent)
 	snapshot = core.snapshot()
 	_update_camera(false)
@@ -226,6 +245,28 @@ func _physics_process(delta: float) -> void:
 		_on_event(event)
 	_update_hud()
 	queue_redraw()
+
+## Opens the character menu; refused during a cut-in and on the result screen. Returns true if it opened.
+func open_menu() -> bool:
+	if character_menu == null or character_menu.is_open or cutin_playing() or snapshot.result != &"playing":
+		return false
+	character_menu.open()
+	_update_hud()
+	return true
+
+func close_menu() -> void:
+	if character_menu != null and character_menu.is_open:
+		character_menu.close()
+		_update_hud()
+
+## The character menu's equip request: one core step whose only intent is InputFrame.weapon_equip. The core applies
+## or refuses it under the swap rules; the menu reads the result from the snapshot.
+func request_equip(weapon: StringName) -> void:
+	var frame: InputFrame = InputFrame.new()
+	frame.weapon_equip = weapon
+	advance(frame)
+	if snapshot.result != &"playing":
+		close_menu()
 
 func _begin_persistence() -> void:
 	persist = Engine.has_meta(&"totoy_persist")
@@ -271,6 +312,7 @@ func _restart() -> void:
 		lightning_cutin.stop()
 	if coil_cutin != null:
 		coil_cutin.stop()
+	close_menu()
 	lightning_fx.clear()
 	coil_fx.clear()
 	coil_hook_tick = -1
@@ -326,9 +368,16 @@ func _update_hud() -> void:
 	hud.snapshot = snapshot
 	hud.colors = colors
 	hud.debug_enabled = debug_enabled
+	hud.menu_open = character_menu != null and character_menu.is_open
 	hud.prepare_portrait()
 	hud.track_health()
 	hud.queue_redraw()
+	if character_menu != null:
+		character_menu.snapshot = snapshot
+		character_menu.colors = colors
+		character_menu.atlas = sprites
+		character_menu.frames = frames
+		character_menu.queue_redraw()
 
 func _age_effects() -> void:
 	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
@@ -387,9 +436,6 @@ func _on_event(event: GameEvent) -> void:
 			buff_transition = {"tick": event.tick, "started": started, "at": snapshot.player.position, "form": form}
 			combat_audio.cue("weapon_buff_start" if started else "weapon_buff_end", event.tick)
 			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["o"] if lightning else (colors["u"] if coil else colors["k"]), 0.8)
-		&"weapon_swapped":
-			combat_audio.cue("swing", event.tick, 0.5)
-			_burst(snapshot.player.position - Vector2(0, 12), 8, colors["j"], 0.6)
 		&"lightning_blink":
 			_on_lightning_blink(event)
 		&"lightning_strike":

@@ -245,7 +245,7 @@ func test_the_player_cannot_move_or_act_during_the_barrage() -> void:
 		frame.dash_pressed = i % 2 == 0
 		frame.parry_pressed = i % 3 == 0
 		frame.skill_pressed = 1 + i % 3
-		frame.weapon_swap_pressed = true
+		frame.weapon_equip = Tuning.WEAPON_BLACK_KATANA
 		frame.weapon_active_pressed = true
 		core.step(frame)
 		assert_eq(core.player.state, PlayerState.STATE_LIGHTNING_BARRAGE, "still in the barrage at tick %d" % core.tick)

@@ -6,7 +6,7 @@ extends RefCounted
 
 const Tuning := preload("res://core/tuning.gd")
 
-## The swap order (weapon_swap_pressed goes to the next one, wrapping).
+## Every weapon, in the inventory's order (InputFrame.weapon_equip picks one by id).
 const IDS: Array[StringName] = [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE]
 ## What the weapon's active is called in events and in snapshot.player.weapon_form.
 const FORM_BLACK_KATANA_BUFF: StringName = &"black_katana_buff"
@@ -18,7 +18,8 @@ static func is_known(weapon: StringName) -> bool:
 	return IDS.has(weapon)
 
 
-## The weapon a swap changes to (the same id for an unknown weapon: no swap).
+## The weapon after `weapon` in IDS, wrapping (the same id for an unknown weapon). A helper only: the old Q cycle is
+## gone, the core equips by id.
 static func next(weapon: StringName) -> StringName:
 	var i: int = IDS.find(weapon)
 	return weapon if i < 0 else IDS[(i + 1) % IDS.size()]

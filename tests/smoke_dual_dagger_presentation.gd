@@ -1,6 +1,6 @@
 extends SceneTree
 ## godot_console --headless --path . --script res://tests/smoke_dual_dagger_presentation.gd
-## Dual Dagger presentation: the Q binding, the swap changing the drawn frame set, the HUD (medallion, form slot,
+## Dual Dagger presentation: Q no longer swaps (equip requests come from the character menu), the swap changing the drawn frame set, the HUD (medallion, form slot,
 ## labels, swap hint), the Lightning Form look (no Black Form aura, darkening or slash), the Lightning Form cut-in
 ## (starts only for the form, freezes and resumes the world), the blink / sky strike effects from real core
 ## events, and the automatic Lightning Barrage the form starts with. With `-- --capture` in a window it also saves art/build/arena_dagger_*.png for a visual check.
@@ -57,6 +57,13 @@ func press(field: String) -> void:
 	step(frame)
 
 
+## The old Q press as an equip request: the weapon after the equipped one in Weapons.IDS.
+func swap() -> void:
+	var frame: InputFrame = InputFrame.new()
+	frame.weapon_equip = Weapons.next(arena.snapshot.player.weapon_id)
+	step(frame)
+
+
 func save(label: String) -> void:
 	if not capture:
 		return
@@ -80,20 +87,29 @@ func chosen() -> String:
 	return String(arena.selected_frames.get(arena.snapshot.player.id, ""))
 
 
+## Q no longer swaps in the arena (2026-10-21): no arena_weapon_swap action, and Q only switches the menu's tabs.
 func input_binding() -> void:
-	var q: bool = false
-	for event: InputEvent in InputMap.action_get_events("arena_weapon_swap"):
-		if event is InputEventKey and (event as InputEventKey).physical_keycode == KEY_Q:
-			q = true
-	check(q, "Q is not bound to arena_weapon_swap")
+	Bindings.register()
+	check(not InputMap.has_action("arena_weapon_swap"), "arena_weapon_swap must be gone")
+	for action: StringName in InputMap.get_actions():
+		if not String(action).begins_with("arena_"):
+			continue
+		for event: InputEvent in InputMap.action_get_events(action):
+			check(not (event is InputEventKey and (event as InputEventKey).physical_keycode == KEY_Q), "Q is still bound to " + action)
+	var q_tab: bool = false
+	for event: InputEvent in InputMap.action_get_events("menu_tab_prev"):
+		q_tab = q_tab or (event is InputEventKey and (event as InputEventKey).physical_keycode == KEY_Q)
+	check(q_tab, "Q must switch the character menu's tab")
 	await process_frame
-	Input.action_press("arena_weapon_swap")
+	var key: InputEventKey = InputEventKey.new()
+	key.physical_keycode = KEY_Q
+	key.pressed = true
+	Input.parse_input_event(key)
+	await process_frame
 	var frame: InputFrame = Bindings.read_frame()
-	check(frame.weapon_swap_pressed and not frame.weapon_active_pressed and not frame.attack_pressed, "Q must only set weapon_swap_pressed")
-	await process_frame
-	await process_frame
-	check(not Bindings.read_frame().weapon_swap_pressed, "held Q repeats the swap")
-	Input.action_release("arena_weapon_swap")
+	check(frame.weapon_equip == &"" and not frame.weapon_active_pressed and not frame.attack_pressed, "Q must send no arena intent")
+	key.pressed = false
+	Input.parse_input_event(key)
 	await process_frame
 
 
@@ -131,19 +147,18 @@ func swap_and_hud() -> void:
 	fixture(60.0)
 	check(chosen().begins_with("hero2_"), "the fight starts with the katana set")
 	check(Hud.weapon_label(arena.snapshot.player.weapon_id) == "BLACK", "katana label")
-	press("weapon_swap_pressed")
+	swap()
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_DUAL_DAGGER, "swap did not equip the dagger")
 	check(int(seen.get(GameEvent.WEAPON_SWAPPED, 0)) >= 1, "no weapon_swapped event")
 	check(chosen().begins_with("totoy_dagger_idle_right_"), "Q swap must change the drawn set: " + chosen())
 	check(Hud.weapon_label(arena.snapshot.player.weapon_id) == "DAGGER", "dagger label")
 	var status: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(status["weapon"] == Tuning.WEAPON_DUAL_DAGGER and int(status["cost"]) == int(Tuning.LIGHTNING_FORM_EDGE_COST), "HUD shows the dagger's active cost")
-	check(Hud.weapon_active_line(status) == "LIGHTNING", "idle dagger active line")
-	var swap: Dictionary = Hud.swap_status(arena.snapshot)
-	check(not bool(swap["ready"]) and swap["reason"] == "WAIT" and float(swap["lockout_fraction"]) > 0.0, "lockout after a swap is shown")
+	check(not bool(status["active"]) and float(status["cooldown_fraction"]) == 0.0, "idle dagger: no ring")
+	check(arena.snapshot.hud.weapon_swap_lockout_ticks == 0, "no swap lockout after an equip")
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS + 1):
 		step()
-	check(bool(Hud.swap_status(arena.snapshot)["ready"]), "swap hint ready after the lockout")
+	check(arena.snapshot.hud.weapon_swap_lockout_ticks == 0, "lockout over")
 	await save("idle")
 	var walk_left: InputFrame = InputFrame.new()
 	walk_left.move = Vector2.LEFT
@@ -174,17 +189,17 @@ func swap_and_hud() -> void:
 	check(swings.size() == 4, "the dagger combo did not reach 4 swings: %s" % str(swings.keys()))
 	check(int(seen.get(GameEvent.LIGHTNING_STRIKE, 0)) >= 1, "the connecting 4th swing called no lightning strike")
 	# Q cycles katana -> dagger -> scythe -> katana: the next swap draws the scythe, the one after the katana again
-	press("weapon_swap_pressed")
+	swap()
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE and chosen().begins_with("totoy_scythe_"), "swap from the dagger to the scythe set: " + chosen())
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
 		step()
-	press("weapon_swap_pressed")
+	swap()
 	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_BLACK_KATANA and chosen().begins_with("hero2_"), "swap back to the katana set")
 
 
 func strike_effects() -> void:
 	fixture()
-	press("weapon_swap_pressed")
+	swap()
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
 		step()
 	seen.clear()
@@ -220,7 +235,7 @@ func strike_effects() -> void:
 ## afterimages) and the slot shows the cooldown ring.
 func lightning_form() -> void:
 	fixture(90.0)
-	press("weapon_swap_pressed")
+	swap()
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
 		step()
 	seen.clear()
@@ -234,8 +249,7 @@ func lightning_form() -> void:
 	check(String(effect["slash"]).is_empty(), "form adds a detached slash")
 	check(not arena.black_form_look(arena.snapshot.player), "form uses the Black Form darkening")
 	var running: Dictionary = Hud.weapon_status(arena.snapshot)
-	check(Hud.weapon_active_line(running) == "BARRAGE" and bool(running["active"]), "HUD shows the barrage running")
-	check(Hud.swap_status(arena.snapshot)["reason"] == "FORM", "swap hint shows the form lock")
+	check(bool(running["active"]) and float(running["duration_fraction"]) > 0.9, "HUD shows the barrage running (run ring)")
 	await save("form_aura")
 	while arena.snapshot.player.state == &"lightning_barrage":
 		check(arena.snapshot.player.weapon_form == Weapons.FORM_LIGHTNING and not arena.weapon_buff_effect().is_empty(), "the form look runs through the barrage")
@@ -245,7 +259,6 @@ func lightning_form() -> void:
 	check(arena.weapon_buff_effect().is_empty(), "the lightning aura lingers after the barrage")
 	var after: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(not bool(after["active"]) and float(after["cooldown_fraction"]) > 0.9 and int(after["cooldown"]) > 0, "the slot shows the cooldown ring after the barrage")
-	check(Hud.weapon_active_line(after) == "LIGHTNING", "HUD line after the barrage")
 	var left: InputFrame = InputFrame.new()
 	left.move = Vector2.LEFT
 	for i: int in range(6):
@@ -286,7 +299,7 @@ func lightning_form() -> void:
 ## barrage then runs on (not frozen by it), and a restart in the middle cancels it.
 func barrage() -> void:
 	fixture(90.0)
-	press("weapon_swap_pressed")
+	swap()
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
 		step()
 	seen.clear()
@@ -352,7 +365,7 @@ func barrage() -> void:
 	check(arena.missing_frames.is_empty(), "missing frames: %s" % str(arena.missing_frames.keys()))
 	# The arena's own loop: the cut-in freezes, then the barrage runs on, and a restart cancels it midway.
 	fixture(90.0)
-	press("weapon_swap_pressed")
+	swap()
 	for i: int in range(Tuning.WEAPON_SWAP_LOCKOUT_TICKS):
 		step()
 	press("weapon_active_pressed")
@@ -377,7 +390,7 @@ func barrage() -> void:
 ## The cut-in freezes the world while it plays and lets it run afterwards; Black Form stays katana-only.
 func cutin_freeze() -> void:
 	fixture(90.0)
-	press("weapon_swap_pressed")
+	swap()
 	arena.set_physics_process(true)
 	arena._on_event(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, 5, {"entity_id": 1, "weapon_id": Tuning.WEAPON_DUAL_DAGGER, "form": Weapons.FORM_LIGHTNING, "duration": 55, "attack_speed_mult": 1.0, "damage_mult": 1.0, "move_speed_mult": 1.0}))
 	check(arena.lightning_cutin.active and not arena.cutin.active, "lightning event starts only the lightning cut-in")
