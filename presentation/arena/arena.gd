@@ -73,6 +73,19 @@ var chain_origins: Dictionary = {}
 ## Spirit Lantern / Phantom Cut event effects in world coordinates ({"kind", "tick", "life", ...}), capped at
 ## AspectEffects.MAX_LIVE. The lantern prop, its pool, the Phantom glow and the echo marker draw from the snapshot.
 var aspect_fx: Array[Dictionary] = []
+## Echo Step / Stone Ward / Sprint event effects in world coordinates ({"kind", "tick", "life", ...}), capped at
+## WardEchoSprintEffects.MAX_LIVE. The echo anchor, the ward pose/barrier/glow and the sprint look draw from the snapshot.
+var wes_fx: Array[Dictionary] = []
+## Past hero samples for the sprint afterimages: {"at", "frame", "left"}, one per fresh tick while Sprint runs (capped at
+## WardEchoSprintEffects.TRAIL_CAP; cleared when Sprint ends, on an Echo Step recall and on restart).
+var sprint_trail: Array[Dictionary] = []
+## True when the hero moved on the latest fresh tick (speed lines, dust and wind only show while moving).
+var hero_moving: bool = false
+## Cosmetic tick until which the hero is not drawn (arrive frame 1 of an Echo Step recall); -1 = none.
+var hero_hidden_until: int = -1
+## Tick of the latest ward_blocked (the barrier shows the absorb flash for a few ticks).
+var ward_absorb_tick: int = -1000
+const WardEchoSprintEffects := preload("res://presentation/arena/ward_echo_sprint_effects.gd")
 ## True between a Phantom echo's attack_hit and its damage_taken (the echo flashes the boss less than a real hit).
 var echo_hit_pending: bool = false
 ## Frame name -> top row of its visible pixels (the Phantom marker floats over the head).
@@ -135,40 +148,18 @@ func _ready() -> void:
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
 	sprites = load("res://art/build/sprites.png") as Texture2D
-	var empowered_image: Image = sprites.get_image().duplicate() as Image
-	empowered_image.convert(Image.FORMAT_RGBA8)
-	var dark_colors: Dictionary = {colors["e"]: colors["0"], colors["f"]: colors["0"], colors["g"]: colors["e"], colors["h"]: colors["k"], colors["k"]: colors["0"], colors["l"]: colors["e"], colors["m"]: colors["k"]}
-	for key: String in frames:
-		if not key.begins_with("hero2_"):
-			continue
-		var region: Dictionary = frames[key]
-		for y: int in range(region["y"], region["y"] + region["h"]):
-			for x: int in range(region["x"], region["x"] + region["w"]):
-				var pixel: Color = empowered_image.get_pixel(x, y)
-				if pixel.a > 0.0 and dark_colors.has(pixel):
-					empowered_image.set_pixel(x, y, dark_colors[pixel])
-	empowered_sprites = ImageTexture.create_from_image(empowered_image)
-	var gold_image: Image = sprites.get_image().duplicate() as Image
-	gold_image.convert(Image.FORMAT_RGBA8)
-	for y: int in range(gold_image.get_height()):
-		for x: int in range(gold_image.get_width()):
-			var pixel: Color = gold_image.get_pixel(x, y)
-			if pixel == colors["z"]:
-				gold_image.set_pixel(x, y, colors["x"])
-			elif pixel == colors["A"]:
-				gold_image.set_pixel(x, y, colors["y"])
-	gold_sprites = ImageTexture.create_from_image(gold_image)
-	var white_image: Image = sprites.get_image().duplicate() as Image
-	white_image.convert(Image.FORMAT_RGBA8)
+	# The Black Form, gold-impact and hit-flash copies of the atlas are built by tools/art/build_art.py (they used to be
+	# recoloured here pixel by pixel, about 1 s of _ready); the runtime recolour stays only as a fallback.
+	empowered_sprites = _variant_atlas(DARK_ATLAS, &"dark")
+	gold_sprites = _variant_atlas(GOLD_ATLAS, &"gold")
+	white_sprites = _variant_atlas(WHITE_ATLAS, &"white")
+	var atlas_image: Image = sprites.get_image()
+	if atlas_image.get_format() != Image.FORMAT_RGBA8:
+		atlas_image.convert(Image.FORMAT_RGBA8)
 	for name_key: String in frames:
 		if (name_key.begins_with("mossbound_colossus_") or name_key.begins_with("golem2_")):
-			head_anchors[name_key] = HeadAnchors.measure(white_image, frames[name_key])
-			core_anchors[name_key] = CoreAnchors.measure(white_image, frames[name_key], colors["1"])
-	for y: int in range(white_image.get_height()):
-		for x: int in range(white_image.get_width()):
-			var alpha: float = white_image.get_pixel(x, y).a
-			white_image.set_pixel(x, y, Color(1, 1, 1, alpha))
-	white_sprites = ImageTexture.create_from_image(white_image)
+			head_anchors[name_key] = HeadAnchors.measure(atlas_image, frames[name_key])
+			core_anchors[name_key] = CoreAnchors.measure(atlas_image, frames[name_key], colors["1"])
 	tiles = load("res://art/build/tiles.png") as Texture2D
 	if ResourceLoader.exists(GROUND_PATH):
 		ground_texture = load(GROUND_PATH) as Texture2D
@@ -197,6 +188,52 @@ func _ready() -> void:
 	$HUD.add_child(character_menu)
 	_update_hud()
 	_load_chain_origins()
+
+## Recoloured atlas copies written by tools/art/build_art.py next to sprites.png (same frame rectangles).
+const GOLD_ATLAS: String = "res://art/build/sprites_gold.png"
+const WHITE_ATLAS: String = "res://art/build/sprites_white.png"
+const DARK_ATLAS: String = "res://art/build/sprites_dark.png"
+
+## The built copy, else (a stale build) the same recolour done here at runtime, slowly, with a warning.
+func _variant_atlas(path: String, kind: StringName) -> Texture2D:
+	if ResourceLoader.exists(path):
+		var texture: Texture2D = load(path) as Texture2D
+		if texture != null and texture.get_size() == sprites.get_size():
+			return texture
+	push_warning("Arena: %s is missing or stale (run tools/art/build_art.py); recolouring at runtime" % path)
+	return ImageTexture.create_from_image(recolour_atlas(sprites.get_image(), kind, frames, colors))
+
+## The recolour rules of the atlas copies (the same as build_art.build_variant_atlases): `gold` turns the reserved reds
+## gold (z -> x, A -> y) everywhere; `white` makes every pixel white with its own alpha; `dark` darkens the stone and
+## blue ramps inside each hero2_* frame rectangle (the Black Form look). Used as the fallback and by the tests.
+static func recolour_atlas(source: Image, kind: StringName, frame_table: Dictionary, palette: Dictionary) -> Image:
+	var image: Image = source.duplicate() as Image
+	image.convert(Image.FORMAT_RGBA8)
+	match kind:
+		&"gold":
+			for y: int in range(image.get_height()):
+				for x: int in range(image.get_width()):
+					var pixel: Color = image.get_pixel(x, y)
+					if pixel == palette["z"]:
+						image.set_pixel(x, y, palette["x"])
+					elif pixel == palette["A"]:
+						image.set_pixel(x, y, palette["y"])
+		&"white":
+			for y: int in range(image.get_height()):
+				for x: int in range(image.get_width()):
+					image.set_pixel(x, y, Color(1, 1, 1, image.get_pixel(x, y).a))
+		&"dark":
+			var dark_colors: Dictionary = {palette["e"]: palette["0"], palette["f"]: palette["0"], palette["g"]: palette["e"], palette["h"]: palette["k"], palette["k"]: palette["0"], palette["l"]: palette["e"], palette["m"]: palette["k"]}
+			for key: String in frame_table:
+				if not key.begins_with("hero2_"):
+					continue
+				var region: Dictionary = frame_table[key]
+				for y: int in range(region["y"], region["y"] + region["h"]):
+					for x: int in range(region["x"], region["x"] + region["w"]):
+						var pixel: Color = image.get_pixel(x, y)
+						if pixel.a > 0.0 and dark_colors.has(pixel):
+							image.set_pixel(x, y, dark_colors[pixel])
+	return image
 
 ## True while any weapon cut-in plays (the world does not step).
 func cutin_playing() -> bool:
@@ -358,6 +395,11 @@ func _restart() -> void:
 	lightning_fx.clear()
 	coil_fx.clear()
 	aspect_fx.clear()
+	wes_fx.clear()
+	sprint_trail.clear()
+	hero_moving = false
+	hero_hidden_until = -1
+	ward_absorb_tick = -1000
 	echo_hit_pending = false
 	coil_hook_tick = -1
 	drag_started.clear()
@@ -442,6 +484,9 @@ func _age_effects() -> void:
 	for i: int in range(aspect_fx.size() - 1, -1, -1):
 		if cosmetic_tick - int(aspect_fx[i]["tick"]) >= int(aspect_fx[i]["life"]):
 			aspect_fx.remove_at(i)
+	for i: int in range(wes_fx.size() - 1, -1, -1):
+		if cosmetic_tick - int(wes_fx[i]["tick"]) >= int(wes_fx[i]["life"]):
+			wes_fx.remove_at(i)
 	for i: int in range(screen_flashes.size() - 1, -1, -1):
 		if cosmetic_tick - int(screen_flashes[i]["tick"]) >= Array(screen_flashes[i]["strengths"]).size():
 			screen_flashes.remove_at(i)
@@ -493,6 +538,8 @@ func _on_event(event: GameEvent) -> void:
 			_on_reaper_coil(event)
 		&"lantern_placed", &"lantern_pulse", &"lantern_expired", &"phantom_cut_started", &"phantom_cut_ended", &"phantom_echo":
 			_on_aspect_event(event)
+		&"sprint_started", &"sprint_ended", &"echo_placed", &"echo_recall", &"echo_expired", &"ward_raised", &"ward_blocked", &"ward_released":
+			_on_ward_echo_sprint(event)
 		&"lightning_barrage_ended":
 			# The barrage's slashes and finisher draw from lightning_blink / attack_hit / lightning_strike; only a small
 			# discharge marks the hero getting control back.
@@ -552,8 +599,14 @@ func _on_event(event: GameEvent) -> void:
 			var counter: bool = event.data["kind"] == &"counter"
 			if int(event.data["attacker_id"]) == snapshot.player.id:
 				var contact: Vector2 = _impact_contact(event.data["position"], int(event.data["target_id"]), int(event.data["attacker_id"]))
-				var finisher: bool = _is_finisher(event) or event.data.get("skill_id", &"") == &"moon_cleave"
-				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher, "skill_id": event.data.get("skill_id", &""), "facing": snapshot.player.facing})
+				# A Stone Ward release is a skill hit, not a swing (no combo index, no swing sound): a heavy burst on the boss.
+				var ward_release: bool = bool(event.data.get("ward_release", false))
+				if ward_release:
+					for actor: Snapshots.EntitySnapshot in snapshot.entities:
+						if actor.id == int(event.data["target_id"]):
+							contact = boss_core_position(actor)
+				var finisher: bool = _is_finisher(event) or event.data.get("skill_id", &"") == &"moon_cleave" or ward_release
+				hit_bursts.append({"position": event.data["position"], "contact": contact, "tick": event.tick, "counter": counter, "finisher": finisher, "skill_id": event.data.get("skill_id", event.data.get("aspect_id", &"")), "facing": snapshot.player.facing})
 				if snapshot.player.weapon_form == Weapons.FORM_LIGHTNING:
 					_add_lightning_fx({"kind": "spark", "tick": event.tick, "at": contact, "life": LightningEffects.sequence_length(LightningEffects.SPARK_TICKS)})
 				shake_left = maxi(shake_left, 3 if finisher else 1)
@@ -773,6 +826,7 @@ func _draw() -> void:
 	_draw_lightning_ground()
 	_draw_coil_ground()
 	_draw_lantern_ground()
+	_draw_ward_echo_ground()
 	_draw_dash()
 	var actors: Array[Snapshots.EntitySnapshot] = [snapshot.player]
 	actors.append_array(snapshot.entities)
@@ -786,6 +840,7 @@ func _draw() -> void:
 		if obstacle.visual_id != &"" and view.has_point(obstacle.feet):
 			drawables.append({"name": String(obstacle.visual_id), "at": obstacle.feet, "scale": Vector2(obstacle.visual_scale, obstacle.visual_scale)})
 	drawables.append_array(lantern_drawables())
+	drawables.append_array(echo_drawables())
 	for actor: Snapshots.EntitySnapshot in actors:
 		drawables.append({"actor": actor, "at": actor.position})
 	drawables.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
@@ -838,6 +893,7 @@ func _draw() -> void:
 	_draw_lightning(offset)
 	_draw_scythe(offset)
 	_draw_aspects_front()
+	_draw_ward_echo_front(offset)
 	if debug_enabled:
 		draw_circle(snapshot.player.position, Tuning.PLAYER_RADIUS, colors["p"], false, 1.0)
 		for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -889,8 +945,19 @@ func prepare_visuals() -> void:
 		if hero.state == &"attack_active" and changed:
 			combat_audio.cue("swing", snapshot.tick, 1.0 if hero.combo_index >= Weapons.combo_max(hero.weapon_id) else 0.75)
 		var coiling: bool = hero.state == PlayerState.STATE_REAPER_COIL  # faces the chain's direction (core facing)
-		if ((moved and hero.state != &"dead") or attack_started or coiling or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
+		var warding: bool = hero.state == PlayerState.STATE_WARD  # the ward's facing is locked by the core
+		var was_left: bool = facing_left
+		if ((moved and hero.state != &"dead") or attack_started or coiling or warding or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
 			facing_left = hero.facing.x < 0.0
+		hero_moving = moved and hero.state != &"dead"
+		# Sprint afterimages: one sample per tick of where the hero was drawn on the previous tick.
+		if hero.sprint_ticks_left > 0 and snapshot.result == &"playing":
+			if visual_tick >= 0 and selected_frames.has(hero.id):
+				sprint_trail.append({"at": previous_player_position.round(), "frame": String(selected_frames[hero.id]), "left": was_left})
+				while sprint_trail.size() > WardEchoSprintEffects.TRAIL_CAP:
+					sprint_trail.pop_front()
+		else:
+			sprint_trail.clear()
 		for i: int in range(dash_ghosts.size() - 1, -1, -1):
 			dash_ghosts[i]["life"] -= 1
 			if int(dash_ghosts[i]["life"]) <= 0:
@@ -998,6 +1065,8 @@ func _dust(at: Vector2) -> void:
 		particles.append({"position": at + Vector2(i - 2, 2), "velocity": Vector2((i - 2) * 0.18, -0.22), "life": 6, "color": colors["c"] if i % 2 == 0 else colors["d"]})
 
 func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false) -> void:
+	if actor.id == snapshot.player.id and hero_hidden():
+		return  # an Echo Step arrival's first frame: only the echo flares
 	var chosen: String = String(selected_frames.get(actor.id, ""))
 	var at: Vector2 = actor.position.round()
 	var radius: float = 10.0 if actor.visual_id == &"totoy" else 20.0
@@ -1014,12 +1083,14 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	var destination: Rect2 = ArenaAnimation.destination(at, frame, left)
 	if not silhouette_only:
 		if actor.id == snapshot.player.id:
+			_draw_sprint_back(actor, at, left)
 			_draw_buff_aura(actor, false)
 			_draw_spin_ring(actor, false)
 		var actor_texture: Texture2D = empowered_sprites if actor.id == snapshot.player.id and black_form_look(actor) else sprites
 		draw_texture_rect_region(actor_texture, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 		if actor.id == snapshot.player.id:
 			_draw_phantom_glow(actor, chosen, at, left)
+			_draw_hero_aspect_overlays(actor, chosen, at, left)
 	if silhouette_only:
 		draw_texture_rect_region(white_sprites, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 	if not silhouette_only and actor.id == snapshot.player.id:
@@ -1110,7 +1181,7 @@ func _sound_dash_started(event: GameEvent) -> void:
 
 func _sound_attack_hit(event: GameEvent) -> void:
 	if int(event.data["attacker_id"]) == snapshot.player.id:
-		var heavy: bool = event.data["kind"] == &"counter" or _is_finisher(event) or event.data.get("skill_id", &"") in [&"moon_cleave", &"breaking_edge"]
+		var heavy: bool = event.data["kind"] == &"counter" or _is_finisher(event) or event.data.get("skill_id", &"") in [&"moon_cleave", &"breaking_edge"] or bool(event.data.get("ward_release", false))
 		combat_audio.cue("counter_hit" if heavy else "armor_hit", event.tick)
 
 func _sound_attack_telegraphed(event: GameEvent) -> void:
@@ -1541,7 +1612,7 @@ func lantern_drawables() -> Array[Dictionary]:
 func phantom_glow_key(actor: Snapshots.EntitySnapshot, hero_frame: String) -> String:
 	if actor.phantom_ticks_left <= 0 or snapshot.result != &"playing":
 		return ""
-	var key: String = AspectEffects.glow_key(hero_frame, AspectEffects.since_start(actor.phantom_ticks_left))
+	var key: String = AspectEffects.glow_key(ArenaAnimation.overlay_frame(hero_frame), AspectEffects.since_start(actor.phantom_ticks_left))
 	return key if frames.has(key) else ""
 
 func _draw_phantom_glow(actor: Snapshots.EntitySnapshot, hero_frame: String, at: Vector2, left: bool) -> void:
@@ -1611,3 +1682,253 @@ func _draw_aspects_front() -> void:
 					_draw_imported("fx_lantern_spark_%d" % frame, feet + chest)
 	if hero.phantom_pending_echoes > 0 and snapshot.result == &"playing":
 		_draw_imported(AspectEffects.marker_key(snapshot.tick), phantom_marker_position())
+
+
+# ---------------------------------------------------------------- Echo Step / Stone Ward / Sprint (world space)
+# Every draw below goes through a plan (an Array of {"key", "at", "left", ...}) so the tests can check exactly what is
+# drawn without a renderer. "left" mirrors a frame around its own anchor, like the hero frames.
+
+func _cosmetic_tick() -> int:
+	return snapshot.tick + snapshot.result_ticks
+
+## True for the first frame of an Echo Step arrival (the echo flares; the hero appears with arrive frame 2).
+func hero_hidden() -> bool:
+	return hero_hidden_until >= 0 and _cosmetic_tick() < hero_hidden_until
+
+func _add_wes_fx(effect: Dictionary) -> void:
+	WardEchoSprintEffects.add(wes_fx, effect)
+
+func _mirror(offset: Vector2, left: bool) -> Vector2:
+	return Vector2(-offset.x, offset.y) if left else offset
+
+## Events of the three aspects. Sounds reuse the combat cues (no new audio).
+func _on_ward_echo_sprint(event: GameEvent) -> void:
+	var tick: int = event.tick
+	match event.type:
+		&"sprint_started":
+			_add_wes_fx({"kind": "sprint_start", "tick": tick, "at": snapshot.player.position.round(), "left": facing_left, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.SPRINT_START_TICKS)})
+			combat_audio.cue("dash", tick, 0.5)
+		&"sprint_ended":
+			sprint_trail.clear()
+			if event.data.get("reason", &"expired") == &"expired":
+				_add_wes_fx({"kind": "sprint_end", "tick": tick, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.SPRINT_END_TICKS)})
+				combat_audio.cue("weapon_buff_end", tick, 0.3)
+		&"echo_placed":
+			var at: Vector2 = Vector2(event.data["position"]).round()
+			_add_wes_fx({"kind": "echo_place", "tick": tick, "at": at, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.PLACE_TICKS)})
+			_add_wes_fx({"kind": "echo_dust", "tick": tick, "at": at, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.ECHO_DUST_TICKS)})
+			combat_audio.cue("deflect", tick, 0.45)
+		&"echo_recall":
+			var from: Vector2 = Vector2(event.data["from"]).round()
+			var to: Vector2 = Vector2(event.data["to"]).round()
+			_add_wes_fx({"kind": "echo_vanish", "tick": tick, "at": from, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.VANISH_TICKS)})
+			_add_wes_fx({"kind": "echo_dust", "tick": tick, "at": from, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.ECHO_DUST_TICKS)})
+			if from.distance_to(to) > 2.0:
+				_add_wes_fx({"kind": "echo_trail", "tick": tick, "from": from + WardEchoSprintEffects.CHEST, "to": to + WardEchoSprintEffects.CHEST, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.TRAIL_TICKS)})
+			_add_wes_fx({"kind": "echo_arrive", "tick": tick, "at": to, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.ARRIVE_TICKS)})
+			_add_wes_fx({"kind": "echo_dust", "tick": tick + WardEchoSprintEffects.ARRIVE_HIDE_TICKS, "at": to, "life": WardEchoSprintEffects.ARRIVE_HIDE_TICKS + WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.ECHO_DUST_TICKS)})
+			hero_hidden_until = tick + WardEchoSprintEffects.ARRIVE_HIDE_TICKS
+			# a teleport: nothing may smear across it (afterimages, dash ghosts, the dust/trail bookkeeping); the camera
+			# already follows the snapshot position without smoothing
+			sprint_trail.clear()
+			dash_ghosts.clear()
+			previous_player_position = snapshot.player.position
+			shake_left = maxi(shake_left, 2)
+			_flash(tick, colors["p"], [0.10])
+			combat_audio.cue("dash", tick, 0.9)
+		&"echo_expired":
+			_add_wes_fx({"kind": "echo_vanish", "tick": tick, "at": Vector2(event.data["position"]).round(), "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.VANISH_TICKS)})
+		&"ward_raised":
+			var facing: Vector2 = event.data.get("facing", snapshot.player.facing)
+			if absf(facing.x) > 0.3:
+				facing_left = facing.x < 0.0
+			ward_absorb_tick = -1000
+			_dust(snapshot.player.position)
+			combat_audio.cue("deflect", tick, 0.5)
+		&"ward_blocked":
+			ward_absorb_tick = tick
+			_add_wes_fx({"kind": "ward_block", "tick": tick, "left": facing_left, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.BLOCK_TICKS)})
+			shake_left = maxi(shake_left, 2)
+			combat_audio.cue("deflect", tick, 1.0)
+		&"ward_released":
+			var at: Vector2 = Vector2(event.data["position"]).round()
+			var radius: float = float(event.data.get("radius", Tuning.STONE_WARD_RADIUS))
+			_add_wes_fx({"kind": "ward_shockwave", "tick": tick, "at": at, "scale": WardEchoSprintEffects.shockwave_scale(radius), "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.SHOCKWAVE_TICKS)})
+			_add_wes_fx({"kind": "ward_cracks", "tick": tick, "at": at, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.CRACKS_TICKS)})
+			_burst(at - Vector2(0, 4), 10, colors["g"], 1.2)
+			shake_left = maxi(shake_left, 4)
+			combat_audio.cue("posture_break", tick, 0.6 if bool(event.data.get("hit", false)) else 0.4)
+
+## The echo anchors as y-sorted drawables ({"name", "at", "scale"} like the lantern): the anchor loop, the countdown
+## for the last ticks; nothing during the placement burst.
+func echo_drawables() -> Array[Dictionary]:
+	var items: Array[Dictionary] = []
+	for echo: Snapshots.EchoSnapshot in snapshot.echoes:
+		var key: String = WardEchoSprintEffects.anchor_key(snapshot.tick - echo.placed_tick, echo.ticks_left)
+		if key != "" and frames.has(key):
+			items.append({"name": key, "at": echo.position.round() + LANTERN_SORT_BIAS, "scale": Vector2.ONE})
+	return items
+
+## Floor layer (under every character): the ward's shockwave ring and its crack decal.
+func ward_echo_ground_plan() -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	var cosmetic_tick: int = _cosmetic_tick()
+	for effect: Dictionary in wes_fx:
+		var age: int = cosmetic_tick - int(effect["tick"])
+		match String(effect["kind"]):
+			"ward_cracks":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.CRACKS_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_ward_cracks_%d" % frame, "at": effect["at"], "scale": 1.0})
+			"ward_shockwave":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.SHOCKWAVE_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_ward_shockwave_%d" % frame, "at": effect["at"], "scale": float(effect["scale"]), "radius": WardEchoSprintEffects.shockwave_radius(frame, float(effect["scale"]))})
+	return plan
+
+func _draw_ward_echo_ground() -> void:
+	for item: Dictionary in ward_echo_ground_plan():
+		_draw_scaled(item["key"], item["at"], float(item["scale"]))
+
+## Behind the hero sprite while Sprint runs: the afterimages where he was (farthest first), and while he moves the
+## speed lines and the foot dust.
+func sprint_back_plan(actor: Snapshots.EntitySnapshot, at: Vector2, left: bool) -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	if actor.sprint_ticks_left <= 0 or snapshot.result != &"playing":
+		return plan
+	for k: int in range(WardEchoSprintEffects.AFTERIMAGES, 0, -1):
+		var index: int = sprint_trail.size() - k * WardEchoSprintEffects.AFTERIMAGE_STEP
+		if index < 0:
+			continue
+		var sample: Dictionary = sprint_trail[index]
+		if Vector2(sample["at"]).distance_to(at) < WardEchoSprintEffects.AFTERIMAGE_MIN_GAP:
+			continue
+		var key: String = WardEchoSprintEffects.after_key(ArenaAnimation.overlay_frame(String(sample["frame"])), k)
+		if frames.has(key):
+			plan.append({"key": key, "at": sample["at"], "left": bool(sample["left"])})
+	if hero_moving:
+		plan.append({"key": WardEchoSprintEffects.lines_key(snapshot.tick), "at": at, "left": left})
+		plan.append({"key": WardEchoSprintEffects.dust_key(snapshot.tick), "at": at, "left": left})
+	return plan
+
+func _draw_sprint_back(actor: Snapshots.EntitySnapshot, at: Vector2, left: bool) -> void:
+	for item: Dictionary in sprint_back_plan(actor, at, left):
+		_draw_anchored(item["key"], item["at"], bool(item["left"]))
+
+## Over the hero sprite: the sprint aura and wind, the Echo Step i-frame shield (the per-frame outline, else the
+## bubble), and the Stone Ward's barrier (or its absorb flash) with the stored glow (and the slab, should the drawn
+## frame not have it painted in).
+func hero_overlay_plan(actor: Snapshots.EntitySnapshot, hero_frame: String, at: Vector2, left: bool) -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	if snapshot.result != &"playing":
+		return plan
+	var base: String = ArenaAnimation.overlay_frame(hero_frame)
+	if actor.sprint_ticks_left > 0:
+		var aura: String = WardEchoSprintEffects.aura_key(base, WardEchoSprintEffects.since_sprint_start(actor.sprint_ticks_left))
+		if frames.has(aura):
+			plan.append({"key": aura, "at": at, "left": left})
+		if hero_moving:
+			plan.append({"key": WardEchoSprintEffects.wind_key(snapshot.tick), "at": at, "left": left})
+	if actor.state == PlayerState.STATE_WARD and actor.ward_ticks_left > 0:
+		if not hero_frame.contains("_ward_"):
+			plan.append({"key": WardEchoSprintEffects.slab_key(actor.ward_ticks_left), "at": at, "left": left})
+		if WardEchoSprintEffects.barrier_visible(actor.ward_ticks_left):
+			var absorb: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.ABSORB_TICKS, snapshot.tick - ward_absorb_tick)
+			plan.append({"key": "fx_ward_absorb_%d" % absorb if absorb > 0 else WardEchoSprintEffects.barrier_key(actor.ward_ticks_left), "at": at, "left": left})
+			var level: int = WardEchoSprintEffects.store_level(actor.ward_stored)
+			if level > 0:
+				plan.append({"key": WardEchoSprintEffects.store_key(level, snapshot.tick), "at": at, "left": left})
+	if actor.echo_invuln_ticks > 0:
+		var phase: int = WardEchoSprintEffects.shield_phase(actor.echo_invuln_ticks)
+		var shield: String = WardEchoSprintEffects.shield_key(base, phase)
+		plan.append({"key": shield if frames.has(shield) else WardEchoSprintEffects.bubble_key(phase), "at": at, "left": left})
+	return plan
+
+func _draw_hero_aspect_overlays(actor: Snapshots.EntitySnapshot, hero_frame: String, at: Vector2, left: bool) -> void:
+	for item: Dictionary in hero_overlay_plan(actor, hero_frame, at, left):
+		_draw_anchored(item["key"], item["at"], bool(item["left"]))
+
+## Over everything standing: the echo placement burst, the recall's vanish column, pull streak, comet head and arrival,
+## dust, the sprint start/end bursts and the ward's block sparks.
+func ward_echo_front_plan() -> Array[Dictionary]:
+	var plan: Array[Dictionary] = []
+	var hero: Snapshots.EntitySnapshot = snapshot.player
+	var feet: Vector2 = hero.position.round()
+	var cosmetic_tick: int = _cosmetic_tick()
+	for effect: Dictionary in wes_fx:
+		var age: int = cosmetic_tick - int(effect["tick"])
+		match String(effect["kind"]):
+			"echo_place":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.PLACE_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_echo_place_%d" % frame, "at": effect["at"], "left": false})
+			"echo_dust":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.ECHO_DUST_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_echo_dust_%d" % frame, "at": effect["at"], "left": false})
+			"echo_vanish":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.VANISH_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_echo_vanish_%d" % frame, "at": effect["at"], "left": false})
+			"echo_trail":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.TRAIL_TICKS, age)
+				if frame > 0:
+					var from: Vector2 = effect["from"]
+					var to: Vector2 = effect["to"]
+					var family: Dictionary = WardEchoSprintEffects.trail_family((to - from).angle())
+					plan.append({"key": WardEchoSprintEffects.trail_key(family["family"], frame), "trail": true, "from": from, "to": to, "family": family["family"], "rotation": float(family["rotation"])})
+					plan.append({"key": "fx_echo_trail_head_%d" % frame, "at": to, "left": false})
+			"echo_arrive":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.ARRIVE_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_echo_arrive_%d" % frame, "at": effect["at"], "left": false})
+			"sprint_start":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.SPRINT_START_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_sprint_start_%d" % frame, "at": effect["at"], "left": bool(effect["left"])})
+			"sprint_end":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.SPRINT_END_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_sprint_end_%d" % frame, "at": feet, "left": facing_left})
+			"ward_block":
+				var frame: int = WardEchoSprintEffects.sequence_frame(WardEchoSprintEffects.BLOCK_TICKS, age)
+				if frame > 0:
+					plan.append({"key": "fx_ward_block_%d" % frame, "at": feet + _mirror(WardEchoSprintEffects.BLOCK_POINT, bool(effect["left"])), "left": bool(effect["left"])})
+	return plan
+
+func _draw_ward_echo_front(shake_offset: Vector2) -> void:
+	for item: Dictionary in ward_echo_front_plan():
+		if bool(item.get("trail", false)):
+			_draw_echo_trail(item, shake_offset)
+		else:
+			_draw_anchored(item["key"], item["at"], bool(item["left"]))
+
+## The recall streak: trail tiles of the chosen family end to end from `from` to `to`, rotated so the art runs along
+## the streak (pixel-exact for the 8 main directions), the last tile cropped to the remaining length.
+func _draw_echo_trail(item: Dictionary, shake_offset: Vector2) -> void:
+	var key: String = item["key"]
+	if not frames.has(key):
+		return
+	var f: Dictionary = frames[key]
+	var from: Vector2 = item["from"]
+	var to: Vector2 = item["to"]
+	var family: String = item["family"]
+	var step: Vector2 = WardEchoSprintEffects.TRAIL_FAMILIES[family]["step"]
+	var unit: Vector2 = step.normalized()
+	var anchor: Vector2 = Vector2(float(f.get("ax", 0)), float(f.get("ay", 0)))
+	draw_set_transform(from + shake_offset, float(item["rotation"]))
+	for tile: Dictionary in WardEchoSprintEffects.trail_tiles(from.distance_to(to), family):
+		var fraction: float = float(tile["fraction"])
+		var size: Vector2 = Vector2(f["w"], f["h"])
+		# crop along the tile's own axis: h by width, v by height, d by both
+		if family == "h":
+			size.x = ceilf(size.x * fraction)
+		elif family == "v":
+			size.y = ceilf(size.y * fraction)
+		else:
+			size = (size * fraction).ceil()
+		if size.x < 1.0 or size.y < 1.0:
+			continue
+		var origin: Vector2 = unit * float(tile["offset"]) - anchor
+		draw_texture_rect_region(sprites, Rect2(origin.round(), size), Rect2(Vector2(f["x"], f["y"]), size))
+	draw_set_transform(shake_offset)

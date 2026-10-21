@@ -32,6 +32,8 @@ def main() -> int:
         for png in sorted(args.build.rglob("*.png")):
             if png.name.startswith(("contact_sheet", "arena_")):
                 continue  # contact sheet pages and in-game screenshots are previews, not game art
+            if png.name == "sprites_white.png":
+                continue  # the hit-flash silhouette atlas is pure white by design (built by build_art.py), not palette art
             checked_png += 1
             for message in artlib.check_png(png, palette):
                 errors.append(f"{png.relative_to(args.build).as_posix()}: {message}")

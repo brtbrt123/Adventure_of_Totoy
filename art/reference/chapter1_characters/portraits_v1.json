@@ -1,0 +1,188 @@
+{
+ "version": 1,
+ "size": [
+  64,
+  64
+ ],
+ "note": "64x64 busts facing right, hard alpha, 1 px ink outline; draw at 1x inside ui_dialogue_portrait_frame (window at 4,4).",
+ "expressions": {
+  "totoy": [
+   "neutral",
+   "happy",
+   "worried",
+   "serious",
+   "surprised"
+  ],
+  "mira": [
+   "neutral",
+   "happy",
+   "worried",
+   "serious",
+   "surprised"
+  ],
+  "tovan": [
+   "neutral",
+   "happy",
+   "worried",
+   "serious",
+   "surprised"
+  ],
+  "edda": [
+   "neutral",
+   "happy",
+   "worried",
+   "serious",
+   "surprised"
+  ],
+  "villager_child": [
+   "neutral"
+  ],
+  "villager_farmer": [
+   "neutral"
+  ],
+  "villager_basket": [
+   "neutral"
+  ]
+ },
+ "image": "portraits_v1.png",
+ "frames": {
+  "portrait_totoy_neutral": {
+   "x": 0,
+   "y": 0,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_totoy_happy": {
+   "x": 64,
+   "y": 0,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_totoy_worried": {
+   "x": 128,
+   "y": 0,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_totoy_serious": {
+   "x": 192,
+   "y": 0,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_totoy_surprised": {
+   "x": 256,
+   "y": 0,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_mira_neutral": {
+   "x": 0,
+   "y": 64,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_mira_happy": {
+   "x": 64,
+   "y": 64,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_mira_worried": {
+   "x": 128,
+   "y": 64,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_mira_serious": {
+   "x": 192,
+   "y": 64,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_mira_surprised": {
+   "x": 256,
+   "y": 64,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_tovan_neutral": {
+   "x": 0,
+   "y": 128,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_tovan_happy": {
+   "x": 64,
+   "y": 128,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_tovan_worried": {
+   "x": 128,
+   "y": 128,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_tovan_serious": {
+   "x": 192,
+   "y": 128,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_tovan_surprised": {
+   "x": 256,
+   "y": 128,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_edda_neutral": {
+   "x": 0,
+   "y": 192,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_edda_happy": {
+   "x": 64,
+   "y": 192,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_edda_worried": {
+   "x": 128,
+   "y": 192,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_edda_serious": {
+   "x": 192,
+   "y": 192,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_edda_surprised": {
+   "x": 256,
+   "y": 192,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_villager_child_neutral": {
+   "x": 0,
+   "y": 256,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_villager_farmer_neutral": {
+   "x": 64,
+   "y": 256,
+   "w": 64,
+   "h": 64
+  },
+  "portrait_villager_basket_neutral": {
+   "x": 128,
+   "y": 256,
+   "w": 64,
+   "h": 64
+  }
+ }
+}

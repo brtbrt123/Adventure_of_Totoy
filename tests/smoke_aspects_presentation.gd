@@ -98,7 +98,10 @@ func catalog() -> void:
 	var covered: int = 0
 	for prefix: String in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_SCYTHE]:
 		for name_key: String in ArenaAnimation.hero_names(prefix):
-			var victory: bool = name_key.contains("_victory_")
+			# victory has no glow; a Stone Ward frame has none of its own (it borrows its idle frame's, overlay_frame)
+			var victory: bool = name_key.contains("_victory_") or name_key.contains("_ward_")
+			if name_key.contains("_ward_"):
+				check(arena.frames.has("fx_phantom_glow_%s_1" % ArenaAnimation.overlay_frame(name_key)), "no borrowed glow for " + name_key)
 			for phase: int in range(1, 7):
 				var glow: String = "fx_phantom_glow_%s_%d" % [name_key, phase]
 				check(arena.frames.has(glow) != victory, "glow coverage wrong for " + glow)

@@ -153,6 +153,49 @@ const PHANTOM_CUT_DURATION_TICKS: int = 300  # 5 seconds
 const PHANTOM_CUT_DELAY_TICKS: int = 14
 const PHANTOM_CUT_DAMAGE_MULT: float = 0.6
 const PHANTOM_CUT_POSTURE_MULT: float = 0.6
+# 6. Sprint (first guesses, 2026-10-21): a buff aspect, a free action like Phantom Cut (no state change; any state but
+# dead, the Lightning Barrage and Reaper's Coil). For SPRINT_DURATION_TICKS (from the press tick through press + 179)
+# every move that uses the walking speed is SPRINT_MOVE_SPEED_MULT faster: walking, the slowed movement in a swing,
+# the parry recovery, the Moon Cleave hold and the Stone Ward. Dash, Gale Cut, Breaking Edge's step, the barrage and
+# the coil keep their own fixed speeds. Edge cost on the press, cooldown from the activation, no refresh while it runs;
+# ends on timeout (sprint_ended expired on press + 180) or death.
+const SPRINT_EDGE_COST: float = 20.0
+const SPRINT_COOLDOWN_TICKS: int = 720  # 12 seconds, counted from the activation
+const SPRINT_DURATION_TICKS: int = 180  # 3 seconds
+const SPRINT_MOVE_SPEED_MULT: float = 2.0
+# 7. Echo Step (first guesses, 2026-10-21): a free action (no windup, no state change on the press; any state but dead,
+# the Lightning Barrage and Reaper's Coil). The press places an echo anchor where the player stands after this tick's
+# movement (kept in the arena and out of props); ECHO_STEP_DELAY_TICKS later the player is pulled back to it: an
+# instant teleport that cancels whatever they were doing (back to idle; a Stone Ward releases first) and gives
+# ECHO_STEP_INVULN_TICKS of invulnerability from the arrival tick. A running barrage or coil is never interrupted: the
+# recall waits until it ends (at most Weapons.reaper_coil_total_ticks(), 58 ticks). A boss standing on the anchor at
+# arrival: the nearest free spot next to it. One echo at a time: a press while one exists does nothing (no cost).
+# Cost on the press, cooldown from the placement (the press tick). Death removes the echo.
+const ECHO_STEP_EDGE_COST: float = 25.0
+const ECHO_STEP_COOLDOWN_TICKS: int = 840  # 14 seconds, counted from the placement
+const ECHO_STEP_DELAY_TICKS: int = 120  # 2 seconds from the placement to the recall
+const ECHO_STEP_INVULN_TICKS: int = 12  # from the arrival tick, inclusive
+# 8. Stone Ward (first guesses, 2026-10-21): a skill action from idle, walk or a swing's recovery. Instant raise: the
+# player is in state `ward` for STONE_WARD_DURATION_TICKS (no cancel), moves at STONE_WARD_MOVE_FACTOR of the walking
+# speed, facing locked, no dash, attack, parry, skill or weapon active. Every hit that would damage the player (any boss
+# attack, gold ones included: no parry bonus) is blocked: no damage, no hurt state, no combo reset, no hurt
+# invulnerability; its damage is stored (sum, capped at STONE_WARD_STORE_CAP). When the ward ends it releases a
+# shockwave of STONE_WARD_RADIUS px around the player: the boss (its circle) inside takes (STONE_WARD_BASE_DAMAGE +
+# stored x STONE_WARD_STORE_MULT) x the damage multiplier under the skill hit rules (armored x ARMOR_DAMAGE_FACTOR plus
+# STONE_WARD_POSTURE + stored x STONE_WARD_POSTURE_PER_STORED posture and STONE_WARD_EDGE_GAIN Edge; a counter while
+# the posture is broken x COUNTER_DAMAGE_MULT, no Edge change). The player's death ends it without a release. Cost on
+# the press, cooldown from the activation.
+const STONE_WARD_EDGE_COST: float = 30.0
+const STONE_WARD_COOLDOWN_TICKS: int = 720  # 12 seconds, counted from the activation
+const STONE_WARD_DURATION_TICKS: int = 60  # 1 second
+const STONE_WARD_MOVE_FACTOR: float = 0.3
+const STONE_WARD_STORE_CAP: int = 60
+const STONE_WARD_BASE_DAMAGE: float = 8.0
+const STONE_WARD_STORE_MULT: float = 1.0
+const STONE_WARD_RADIUS: float = 64.0
+const STONE_WARD_POSTURE: float = 12.0
+const STONE_WARD_POSTURE_PER_STORED: float = 0.5
+const STONE_WARD_EDGE_GAIN: float = 10.0
 
 # Black Katana active (right click). Values set by the human on 2026-10-19 (still to be judged by playtesting).
 # While the buff is active, normal swings are faster (each phase's ticks are divided by the multiplier, see

@@ -1,0 +1,202 @@
+{
+ "note": "Dialogue UI v2 at 1x game pixels (320x180), in the look of chapter1_dialogue_scene_target.png.",
+ "layout_320x180": {
+  "box": [
+   40,
+   110,
+   240,
+   68
+  ],
+  "socket": [
+   52,
+   119
+  ],
+  "nameplate": [
+   54,
+   104
+  ],
+  "moss": {
+   "ui_dlg_moss_tl": [
+    36,
+    107
+   ],
+   "ui_dlg_moss_tr": [
+    259,
+    107
+   ],
+   "ui_dlg_moss_bl": [
+    36,
+    150
+   ]
+  },
+  "text": [
+   110,
+   121
+  ],
+  "text_width": 156,
+  "line_step": 11,
+  "choice_arrow_dx": -8,
+  "badge": [
+   229,
+   169
+  ],
+  "next": [
+   272,
+   168
+  ],
+  "colours": {
+   "text": "1",
+   "name": "7",
+   "choice_selected": "o",
+   "choice_dim": "h",
+   "badge_text": "j"
+  },
+  "fonts": {
+   "text": "PixelifySans 9 game px (weight 400)",
+   "name": "Cinzel 7 game px (weight 700)",
+   "badge": "PixelifySans 6 game px"
+  }
+ },
+ "ticks": {
+  "next": [
+   24,
+   12,
+   12
+  ],
+  "choice_arrow": [
+   20,
+   20
+  ]
+ },
+ "image": "dialogue_ui_v2.png",
+ "frames": {
+  "ui_dlg_box": {
+   "x": 1,
+   "y": 1,
+   "w": 240,
+   "h": 68,
+   "nine_slice": {
+    "left": 11,
+    "right": 11,
+    "top": 12,
+    "bottom": 12
+   },
+   "axis_stretch": {
+    "horizontal": "tile",
+    "vertical": "tile_fit"
+   },
+   "note": "pillars and beams tile; keep the height CAP*2 + a multiple of 11 so the runes repeat whole"
+  },
+  "ui_dlg_socket": {
+   "x": 243,
+   "y": 1,
+   "w": 50,
+   "h": 50,
+   "window": [
+    3,
+    3,
+    44,
+    44
+   ],
+   "portrait_scale": 0.5
+  },
+  "ui_dlg_nameplate": {
+   "x": 485,
+   "y": 1,
+   "w": 60,
+   "h": 13,
+   "nine_slice": {
+    "left": 6,
+    "right": 9,
+    "top": 4,
+    "bottom": 4
+   },
+   "text_box": [
+    3,
+    3,
+    50,
+    7
+   ]
+  },
+  "ui_dlg_badge": {
+   "x": 727,
+   "y": 1,
+   "w": 38,
+   "h": 11,
+   "nine_slice": {
+    "left": 4,
+    "right": 4,
+    "top": 4,
+    "bottom": 4
+   },
+   "icon_at": [
+    2,
+    2
+   ],
+   "text_at": [
+    15,
+    3
+   ]
+  },
+  "ui_dlg_icon_gamepad": {
+   "x": 1,
+   "y": 71,
+   "w": 11,
+   "h": 7
+  },
+  "ui_dlg_icon_key": {
+   "x": 243,
+   "y": 71,
+   "w": 9,
+   "h": 7
+  },
+  "ui_dlg_choice_arrow_1": {
+   "x": 485,
+   "y": 71,
+   "w": 6,
+   "h": 7
+  },
+  "ui_dlg_choice_arrow_2": {
+   "x": 727,
+   "y": 71,
+   "w": 6,
+   "h": 7
+  },
+  "ui_dlg_next_1": {
+   "x": 1,
+   "y": 141,
+   "w": 5,
+   "h": 8
+  },
+  "ui_dlg_next_2": {
+   "x": 243,
+   "y": 141,
+   "w": 5,
+   "h": 8
+  },
+  "ui_dlg_next_3": {
+   "x": 485,
+   "y": 141,
+   "w": 5,
+   "h": 8
+  },
+  "ui_dlg_moss_tl": {
+   "x": 727,
+   "y": 141,
+   "w": 24,
+   "h": 22
+  },
+  "ui_dlg_moss_tr": {
+   "x": 1,
+   "y": 211,
+   "w": 24,
+   "h": 20
+  },
+  "ui_dlg_moss_bl": {
+   "x": 243,
+   "y": 211,
+   "w": 26,
+   "h": 14
+  }
+ }
+}

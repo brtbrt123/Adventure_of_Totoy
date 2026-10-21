@@ -357,10 +357,28 @@ static func boss_panel(head: Vector2, counter: bool) -> Rect2:
 const ASPECT_KEYS_ZXC: Array[String] = ["Z", "X", "C"]
 const LANTERN_LIT_TICKS: int = 7
 
-static func aspect_icon(aspect: StringName, lit: bool = false, tick: int = 0) -> String:
-	if lit and aspect == Aspects.SPIRIT_LANTERN:
-		return "ui_aspect_spirit_lantern_lit_%d" % (posmod(tick / LANTERN_LIT_TICKS, 4) + 1)
+## Aspects with a lit icon loop (ui_aspect_<id>_lit_1..4) while they run: a lantern standing, Sprint running, an Echo
+## Step anchor standing, the Stone Ward raised.
+const LIT_ASPECTS: Array[StringName] = [Aspects.SPIRIT_LANTERN, Aspects.SPRINT, Aspects.ECHO_STEP, Aspects.STONE_WARD]
+## Aspects whose socket shows the seconds they still run (instead of the cooldown seconds) while running.
+const RUN_SECONDS_ASPECTS: Array[StringName] = [Aspects.PHANTOM_CUT, Aspects.SPRINT, Aspects.ECHO_STEP, Aspects.STONE_WARD]
+
+## `stored` (Stone Ward's stored damage) makes the lit rune loop run faster: 7 ticks per frame empty, down to 3 at the cap.
+static func lit_ticks(aspect: StringName, stored: int = 0) -> int:
+	if aspect == Aspects.STONE_WARD and stored > 0:
+		return maxi(3, LANTERN_LIT_TICKS - ceili(4.0 * clampf(float(stored) / Tuning.STONE_WARD_STORE_CAP, 0.0, 1.0)))
+	return LANTERN_LIT_TICKS
+
+static func aspect_icon(aspect: StringName, lit: bool = false, tick: int = 0, stored: int = 0) -> String:
+	if lit and aspect in LIT_ASPECTS:
+		return "ui_aspect_%s_lit_%d" % [aspect, posmod(tick / lit_ticks(aspect, stored), 4) + 1]
 	return "ui_aspect_%s_1" % aspect
+
+## Stone Ward's stored-damage ring fill (0..1 of STONE_WARD_STORE_CAP) of a skill row; 0 for anything else.
+static func stored_fraction(row: Dictionary) -> float:
+	if row.get("aspect_id", &"") != Aspects.STONE_WARD or not bool(row.get("running", false)):
+		return 0.0
+	return clampf(float(row.get("stored", 0)) / Tuning.STONE_WARD_STORE_CAP, 0.0, 1.0)
 
 ## Display facts from the HUD snapshot's aspect_slots (one row per slot Z/X/C: whichever aspect is slotted there);
 ## these labels do not gate input or predict hits. The cooldown is shown only on the icons (ring and seconds), never as
@@ -378,7 +396,8 @@ static func skill_rows(h: Snapshots.HudSnapshot, tick: int = 0) -> Array[Diction
 			"cooldown_max": int(data.get("cooldown_max", Aspects.cooldown(aspect))), "running": running,
 			"ticks_left": int(data.get("ticks_left", 0)), "duration": int(data.get("duration", Aspects.duration(aspect))),
 			"needs_retaliation": bool(data.get("needs_retaliation", Aspects.needs_retaliation(aspect))),
-			"icon": aspect_icon(aspect, running, tick),
+			"stored": int(data.get("stored", 0)),
+			"icon": aspect_icon(aspect, running, tick, int(data.get("stored", 0))),
 		})
 	return rows
 
@@ -435,8 +454,11 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 			_ring(centre, cooldown_fraction(row), 11.0, colors["o"])
 		if running > 0.0:
 			_ring(centre, running, 12.0, colors["p"])
-		if running > 0.0 and row["kind"] == Aspects.KIND_BUFF:
-			_seconds(centre, int(row["ticks_left"]), colors["v"])  # Phantom Cut: the seconds it still runs
+		var stored: float = stored_fraction(row)
+		if stored > 0.0:
+			_ring(centre, stored, 13.0, colors["u"])  # Stone Ward: the damage stored so far, of the cap
+		if running > 0.0 and row["aspect_id"] in RUN_SECONDS_ASPECTS:
+			_seconds(centre, int(row["ticks_left"]), colors["v"])  # buffs, the echo countdown, the ward: seconds still running
 		elif running <= 0.0 and int(row["cooldown"]) > 0:
 			_seconds(centre, int(row["cooldown"]), colors["p"])
 		var badge: Vector2 = socket.position + Vector2(-2, 16)
@@ -474,6 +496,10 @@ func _draw_aspect_hint(row: Dictionary) -> void:
 	var cost: String = "%d EDGE" % int(row["cost"])
 	if row["kind"] == Aspects.KIND_BUFF:
 		cost += "  BUFF %s S" % str(ceili(int(row["duration"]) * Tuning.TICK_DT))
+	elif row["aspect_id"] == Aspects.ECHO_STEP:
+		cost += "  RECALL %s S" % str(ceili(int(row["duration"]) * Tuning.TICK_DT))
+	elif row["aspect_id"] == Aspects.STONE_WARD:
+		cost += "  GUARD %s S" % str(ceili(int(row["duration"]) * Tuning.TICK_DT))
 	lettering(rect.position + Vector2(5, 19), cost, colors["v"], 1, null, 10)
 
 static func weapon_label(weapon: StringName) -> String:

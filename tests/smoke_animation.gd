@@ -4,6 +4,7 @@ const Arena := preload("res://presentation/arena/arena.gd")
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
+const WardEchoSprintEffects := preload("res://presentation/arena/ward_echo_sprint_effects.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const Weapons := preload("res://core/weapons.gd")
 const Tuning := preload("res://core/tuning.gd")
@@ -165,6 +166,46 @@ func _catalog() -> void:
 			if name_key.contains("_attack"):
 				attacks += 1
 		_expect(attacks == expected, "set %s lists %d swing frames" % [prefix, attacks])
+	# Stone Ward poses by ward_ticks_left for every set (the Lightning set uses the dagger's), and the per-hero-frame
+	# overlays of Sprint / Echo Step / Phantom Cut exist for every idle / walk / dash / ward frame of the three weapons.
+	for name_key: String in WardEchoSprintEffects.all_names():
+		_expect(atlas.has(name_key), "atlas missing " + name_key)
+	actor.state = PlayerState.STATE_WARD
+	for look: Array in [[Tuning.WEAPON_BLACK_KATANA, &"", "hero2_ward_"], [Tuning.WEAPON_DUAL_DAGGER, &"", "totoy_dagger_ward_"], [Tuning.WEAPON_DUAL_DAGGER, Weapons.FORM_LIGHTNING, "totoy_dagger_ward_"], [Tuning.WEAPON_CHAIN_SCYTHE, &"", "totoy_scythe_ward_"]]:
+		actor.weapon_id = look[0]
+		actor.weapon_form = look[1]
+		var seen: Dictionary = {}
+		for left: int in range(Tuning.STONE_WARD_DURATION_TICKS, 0, -1):
+			actor.ward_ticks_left = left
+			var chosen: String = ArenaAnimation.choose(actor, snap, {})
+			seen[chosen] = true
+			_expect(atlas.has(chosen) and chosen.begins_with(look[2]), "ward %d ticks left: %s" % [left, chosen])
+		_expect(seen.size() == 11, "the %s ward shows %d of its 11 frames" % [look[2], seen.size()])
+		actor.ward_ticks_left = Tuning.STONE_WARD_DURATION_TICKS
+		_expect(ArenaAnimation.choose(actor, snap, {}).ends_with("_ward_raise_right_1"), "the ward starts with raise 1")
+		actor.ward_ticks_left = 1
+		_expect(ArenaAnimation.choose(actor, snap, {}).ends_with("_ward_drop_right_3"), "the ward ends with drop 3")
+	actor.ward_ticks_left = 0
+	for prefix: String in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_SCYTHE]:
+		for name_key: String in ArenaAnimation.hero_names(prefix):
+			var base: String = ArenaAnimation.overlay_frame(name_key)
+			if not (base.contains("_idle_") or base.contains("_walk_") or base.contains("_dash_")):
+				continue
+			for p: int in range(1, 7):
+				_expect(atlas.has(WardEchoSprintEffects.aura_key(base, (p - 1) * WardEchoSprintEffects.AURA_PHASE_TICKS)), "sprint aura missing for %s phase %d" % [name_key, p])
+			for k: int in range(1, 4):
+				_expect(atlas.has(WardEchoSprintEffects.after_key(base, k)), "sprint afterimage missing for %s %d" % [name_key, k])
+			for p: int in range(1, 5):
+				_expect(atlas.has(WardEchoSprintEffects.shield_key(base, p)), "echo shield missing for %s %d" % [name_key, p])
+	# the sprint walk cycle runs at the move speed's rate
+	actor.weapon_id = &""
+	actor.weapon_form = &""
+	actor.state = &"walk"
+	actor.move_speed_mult = Tuning.SPRINT_MOVE_SPEED_MULT
+	actor.state_ticks = int(ArenaAnimation.PLAYER["walk"][1])  # one normal frame later: two frames on while sprinting
+	_expect(ArenaAnimation.choose(actor, snap, {}) == "hero2_walk_right_3", "the sprint walk cycle is not twice as fast: " + ArenaAnimation.choose(actor, snap, {}))
+	actor.move_speed_mult = 1.0
+	_expect(ArenaAnimation.choose(actor, snap, {}) == "hero2_walk_right_2", "the normal walk cycle changed")
 	actor.weapon_id = &""
 	actor.weapon_form = &""
 	_expect(ArenaAnimation.mirrored(Vector2.LEFT), "left must mirror right")
@@ -194,9 +235,50 @@ func _hero_timelines() -> void:
 			var chain: bool = hero.state == &"attack_recovery" and hero.combo_index < 3
 			_step(_frame(Vector2.ZERO, false, false, chain))
 			requested[arena.selected_frames[arena.snapshot.player.id]] = true
+		_ward_use(requested, facing)
 		for name_key: String in ArenaAnimation.all_names():
 			if name_key.begins_with("hero2_") and name_key.contains("_" + ArenaAnimation.direction(facing) + "_") and not name_key.contains("_hurt_") and not name_key.contains("_victory_"):
 				_expect(requested.has(name_key), "real state lifetime never requests " + name_key)
+
+## Stone Ward through the real core: slot it on C, raise it (facing `facing`) and record every hero frame of its 60
+## ticks; also every overlay / effect the arena plans while it runs must exist.
+func _ward_use(requested: Dictionary, facing: Vector2 = Vector2.RIGHT) -> void:
+	arena.core.player.edge = 100.0
+	var equip: InputFrame = _frame()
+	equip.aspect_equip = &"stone_ward"
+	equip.aspect_equip_slot = 3
+	_step(equip)
+	_expect(arena.snapshot.player.equipped_aspects[2] == &"stone_ward", "Stone Ward was not slotted")
+	var press: InputFrame = _frame(facing)
+	press.skill_pressed = 3
+	_step(press)
+	_expect(arena.snapshot.player.state == PlayerState.STATE_WARD, "Stone Ward did not raise")
+	for i: int in range(Tuning.STONE_WARD_DURATION_TICKS + 2):
+		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
+		var chosen: String = String(arena.selected_frames[hero.id])
+		requested[chosen] = true
+		if hero.state == PlayerState.STATE_WARD:
+			_expect(chosen.contains("_ward_"), "the ward drew " + chosen)
+			for item: Dictionary in arena.hero_overlay_plan(hero, chosen, hero.position, false):
+				_expect(arena.frames.has(item["key"]), "ward overlay missing: " + String(item["key"]))
+		_step(_frame(Vector2.ZERO if i % 2 == 0 else facing))
+	for item: Dictionary in arena.ward_echo_ground_plan():
+		_expect(arena.frames.has(item["key"]), "ward ground effect missing: " + String(item["key"]))
+
+## Every Stone Ward frame of the three weapon sets is requested by a real ward.
+func _ward_timelines() -> void:
+	for weapon: StringName in [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE]:
+		_reset()
+		if weapon != Tuning.WEAPON_BLACK_KATANA:
+			var swap: InputFrame = _frame()
+			swap.weapon_equip = weapon
+			_step(swap)
+		var requested: Dictionary = {}
+		_ward_use(requested)
+		var prefix: String = ArenaAnimation.hero_set(arena.snapshot.player)
+		for pose: String in ArenaAnimation.WARD_POSES:
+			for n: int in range(1, int(ArenaAnimation.WARD_POSES[pose]) + 1):
+				_expect(requested.has(ArenaAnimation.hero_frame(prefix, pose, n)), "the %s ward never requests %s" % [weapon, ArenaAnimation.hero_frame(prefix, pose, n)])
 
 ## Real core lifetimes with the Dual Dagger: swap with the swap intent, chain all four swings; then activate Lightning
 ## Form (only the barrage): the barrage draws the lightning attack frames, and the swings after it are plain dagger
@@ -333,6 +415,7 @@ func _run() -> void:
 	_hero_timelines()
 	_dagger_timelines()
 	_scythe_timelines()
+	_ward_timelines()
 	_reset()
 	for facing: Vector2 in [Vector2.DOWN, Vector2.UP, Vector2.RIGHT, Vector2.LEFT]:
 		for i: int in range(24):

@@ -1,0 +1,1550 @@
+{
+ "generator": "tools/art/make_aspect_echo_ward_sprint_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+ "status": "Reference art for the human's approval; NOT imported into art/src, not in art/build, not wired into the game",
+ "frame_naming": "<group>_<n>, n from 1; mirror around the anchor for a left-facing hero, as with the hero frames",
+ "aspect": "Stone Ward (suggested display name: STONE WARD; subtitle idea: 'WHAT STRIKES, RETURNS')",
+ "request": "Totoy raises a stone ward for about 1 s; hits taken while it is up are blocked and stored, then released as a shockwave when the ward drops. Duration, stored-damage math and shockwave radius are owner/core decisions; the art ring reaches 64 px.",
+ "groups": {
+  "<set>_ward_raise|hold|drop_right_<n>": "hero2 / totoy_dagger 40x40, anchor (12,35); totoy_scythe 48x48, anchor (19,43) (= feet). Full hero frames (hero naming convention) for hero2, totoy_dagger, totoy_scythe: the idle frames 1-4 with the stone slab in front. raise 4 (ground splits, half up, full + overshoot, settle and the rune lights), hold 4 (loop about 100 ms, a glint runs down the rune), drop 3 (cracks glow, the slab splits and falls, rubble).",
+  "fx_ward_slab_raise|hold|drop_<n>": "40x40, anchor (12,35). The same slab as an overlay only (draw OVER any hero frame at the feet), for weapon sets or poses without composed frames.",
+  "fx_ward_barrier_<1..6>": "48x48, anchor (16,44) = Totoy's feet. The rune ward: a dithered stone-grey crescent dome in front of him with teal rune glints; loop about 90 ms from raise 3 to drop 1. Draw over the hero and slab.",
+  "fx_ward_absorb_<1..4>": "48x48, anchor (16,44). Replaces the barrier for 4 frames when a hit is absorbed: bright flash, ripple from the front, back to normal.",
+  "fx_ward_store_<level>_<1..4>": "48x48, anchor (16,44). Stored-energy glow drawn OVER the barrier, level 1 (1 hit), 2 (2 hits), 3 (3+ hits or max), loop about 90 ms each.",
+  "fx_ward_block_<1..5>": "32x32, anchor (16,16) = the hit point on the ward front (about feet + (22,-16)). Stone chips and teal/cream sparks; the chips fly back toward the attacker (+x).",
+  "fx_ward_shockwave_<1..8>": "144x80, anchor (72,50) = Totoy's feet. Release: ring radius 6, 18, 30, 41, 50, 57, 62, 64 px (floor squash ry = 0.45 rx) with stone shards thrown up and dust at the rim. Start with drop 1.",
+  "fx_ward_cracks_<1..4>": "96x48, anchor (48,24) = Totoy's feet. Floor decal, draw UNDER characters, with shockwave 1: cracks glow, cool, dark with glints, fade."
+ },
+ "suggested_timeline": "cast: <set>_ward_raise 1-4 (barrier from raise 3), hold loop for ~1 s. Each absorbed hit: fx_ward_block 1-5 at the hit point + fx_ward_absorb 1-4 instead of the barrier, then fx_ward_store_<hits> over the barrier. Drop: <set>_ward_drop 1-3, barrier and store off, fx_ward_shockwave 1-8 + fx_ward_cracks 1-4 at the feet.",
+ "group_table": {
+  "hero2_ward_raise_right": {
+   "frames": 4,
+   "ms": [
+    50,
+    60,
+    60,
+    80
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "hero2_ward_hold_right": {
+   "frames": 4,
+   "ms": [
+    100,
+    100,
+    100,
+    100
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "hero2_ward_drop_right": {
+   "frames": 3,
+   "ms": [
+    60,
+    70,
+    90
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "totoy_dagger_ward_raise_right": {
+   "frames": 4,
+   "ms": [
+    50,
+    60,
+    60,
+    80
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "totoy_dagger_ward_hold_right": {
+   "frames": 4,
+   "ms": [
+    100,
+    100,
+    100,
+    100
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "totoy_dagger_ward_drop_right": {
+   "frames": 3,
+   "ms": [
+    60,
+    70,
+    90
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "totoy_scythe_ward_raise_right": {
+   "frames": 4,
+   "ms": [
+    50,
+    60,
+    60,
+    80
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ]
+  },
+  "totoy_scythe_ward_hold_right": {
+   "frames": 4,
+   "ms": [
+    100,
+    100,
+    100,
+    100
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ]
+  },
+  "totoy_scythe_ward_drop_right": {
+   "frames": 3,
+   "ms": [
+    60,
+    70,
+    90
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ]
+  },
+  "fx_ward_slab_raise": {
+   "frames": 4,
+   "ms": [
+    50,
+    60,
+    60,
+    80
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "fx_ward_slab_hold": {
+   "frames": 4,
+   "ms": [
+    100,
+    100,
+    100,
+    100
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "fx_ward_slab_drop": {
+   "frames": 3,
+   "ms": [
+    60,
+    70,
+    90
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ]
+  },
+  "fx_ward_barrier": {
+   "frames": 6,
+   "ms": [
+    90,
+    90,
+    90,
+    90,
+    90,
+    90
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ]
+  },
+  "fx_ward_absorb": {
+   "frames": 4,
+   "ms": [
+    40,
+    50,
+    60,
+    70
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ]
+  },
+  "fx_ward_store_1": {
+   "frames": 4,
+   "ms": [
+    90,
+    90,
+    90,
+    90
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ]
+  },
+  "fx_ward_store_2": {
+   "frames": 4,
+   "ms": [
+    90,
+    90,
+    90,
+    90
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ]
+  },
+  "fx_ward_store_3": {
+   "frames": 4,
+   "ms": [
+    90,
+    90,
+    90,
+    90
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ]
+  },
+  "fx_ward_block": {
+   "frames": 5,
+   "ms": [
+    35,
+    45,
+    55,
+    60,
+    70
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  "fx_ward_shockwave": {
+   "frames": 8,
+   "ms": [
+    40,
+    45,
+    50,
+    55,
+    60,
+    60,
+    70,
+    90
+   ],
+   "size": [
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ]
+  },
+  "fx_ward_cracks": {
+   "frames": 4,
+   "ms": [
+    120,
+    160,
+    260,
+    300
+   ],
+   "size": [
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ]
+  }
+ },
+ "sprite_count": 83,
+ "frames": [
+  {
+   "name": "hero2_ward_raise_right_1",
+   "rect": [
+    0,
+    0,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 50
+  },
+  {
+   "name": "hero2_ward_raise_right_2",
+   "rect": [
+    40,
+    0,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "hero2_ward_raise_right_3",
+   "rect": [
+    80,
+    0,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "hero2_ward_raise_right_4",
+   "rect": [
+    120,
+    0,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 80
+  },
+  {
+   "name": "hero2_ward_hold_right_1",
+   "rect": [
+    0,
+    40,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "hero2_ward_hold_right_2",
+   "rect": [
+    40,
+    40,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "hero2_ward_hold_right_3",
+   "rect": [
+    80,
+    40,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "hero2_ward_hold_right_4",
+   "rect": [
+    120,
+    40,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "hero2_ward_drop_right_1",
+   "rect": [
+    0,
+    80,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "hero2_ward_drop_right_2",
+   "rect": [
+    40,
+    80,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 70
+  },
+  {
+   "name": "hero2_ward_drop_right_3",
+   "rect": [
+    80,
+    80,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 90
+  },
+  {
+   "name": "totoy_dagger_ward_raise_right_1",
+   "rect": [
+    0,
+    120,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 50
+  },
+  {
+   "name": "totoy_dagger_ward_raise_right_2",
+   "rect": [
+    40,
+    120,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "totoy_dagger_ward_raise_right_3",
+   "rect": [
+    80,
+    120,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "totoy_dagger_ward_raise_right_4",
+   "rect": [
+    120,
+    120,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 80
+  },
+  {
+   "name": "totoy_dagger_ward_hold_right_1",
+   "rect": [
+    0,
+    160,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_dagger_ward_hold_right_2",
+   "rect": [
+    40,
+    160,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_dagger_ward_hold_right_3",
+   "rect": [
+    80,
+    160,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_dagger_ward_hold_right_4",
+   "rect": [
+    120,
+    160,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_dagger_ward_drop_right_1",
+   "rect": [
+    0,
+    200,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "totoy_dagger_ward_drop_right_2",
+   "rect": [
+    40,
+    200,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 70
+  },
+  {
+   "name": "totoy_dagger_ward_drop_right_3",
+   "rect": [
+    80,
+    200,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 90
+  },
+  {
+   "name": "totoy_scythe_ward_raise_right_1",
+   "rect": [
+    0,
+    240,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 50
+  },
+  {
+   "name": "totoy_scythe_ward_raise_right_2",
+   "rect": [
+    48,
+    240,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 60
+  },
+  {
+   "name": "totoy_scythe_ward_raise_right_3",
+   "rect": [
+    96,
+    240,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 60
+  },
+  {
+   "name": "totoy_scythe_ward_raise_right_4",
+   "rect": [
+    144,
+    240,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 80
+  },
+  {
+   "name": "totoy_scythe_ward_hold_right_1",
+   "rect": [
+    0,
+    288,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_scythe_ward_hold_right_2",
+   "rect": [
+    48,
+    288,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_scythe_ward_hold_right_3",
+   "rect": [
+    96,
+    288,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_scythe_ward_hold_right_4",
+   "rect": [
+    144,
+    288,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 100
+  },
+  {
+   "name": "totoy_scythe_ward_drop_right_1",
+   "rect": [
+    0,
+    336,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 60
+  },
+  {
+   "name": "totoy_scythe_ward_drop_right_2",
+   "rect": [
+    48,
+    336,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 70
+  },
+  {
+   "name": "totoy_scythe_ward_drop_right_3",
+   "rect": [
+    96,
+    336,
+    48,
+    48
+   ],
+   "anchor": [
+    19,
+    43
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_slab_raise_1",
+   "rect": [
+    0,
+    384,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 50
+  },
+  {
+   "name": "fx_ward_slab_raise_2",
+   "rect": [
+    40,
+    384,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_ward_slab_raise_3",
+   "rect": [
+    80,
+    384,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_ward_slab_raise_4",
+   "rect": [
+    120,
+    384,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_ward_slab_hold_1",
+   "rect": [
+    0,
+    424,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_ward_slab_hold_2",
+   "rect": [
+    40,
+    424,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_ward_slab_hold_3",
+   "rect": [
+    80,
+    424,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_ward_slab_hold_4",
+   "rect": [
+    120,
+    424,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_ward_slab_drop_1",
+   "rect": [
+    0,
+    464,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_ward_slab_drop_2",
+   "rect": [
+    40,
+    464,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_ward_slab_drop_3",
+   "rect": [
+    80,
+    464,
+    40,
+    40
+   ],
+   "anchor": [
+    12,
+    35
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_barrier_1",
+   "rect": [
+    0,
+    504,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_barrier_2",
+   "rect": [
+    48,
+    504,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_barrier_3",
+   "rect": [
+    96,
+    504,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_barrier_4",
+   "rect": [
+    144,
+    504,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_barrier_5",
+   "rect": [
+    192,
+    504,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_barrier_6",
+   "rect": [
+    240,
+    504,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_absorb_1",
+   "rect": [
+    0,
+    552,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 40
+  },
+  {
+   "name": "fx_ward_absorb_2",
+   "rect": [
+    48,
+    552,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 50
+  },
+  {
+   "name": "fx_ward_absorb_3",
+   "rect": [
+    96,
+    552,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_ward_absorb_4",
+   "rect": [
+    144,
+    552,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_ward_store_1_1",
+   "rect": [
+    0,
+    600,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 1,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_1_2",
+   "rect": [
+    48,
+    600,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 1,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_1_3",
+   "rect": [
+    96,
+    600,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 1,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_1_4",
+   "rect": [
+    144,
+    600,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 1,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_2_1",
+   "rect": [
+    0,
+    648,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 2,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_2_2",
+   "rect": [
+    48,
+    648,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 2,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_2_3",
+   "rect": [
+    96,
+    648,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 2,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_2_4",
+   "rect": [
+    144,
+    648,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 2,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_3_1",
+   "rect": [
+    0,
+    696,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 3,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_3_2",
+   "rect": [
+    48,
+    696,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 3,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_3_3",
+   "rect": [
+    96,
+    696,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 3,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_store_3_4",
+   "rect": [
+    144,
+    696,
+    48,
+    48
+   ],
+   "anchor": [
+    16,
+    44
+   ],
+   "level": 3,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_block_1",
+   "rect": [
+    0,
+    744,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 35
+  },
+  {
+   "name": "fx_ward_block_2",
+   "rect": [
+    32,
+    744,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 45
+  },
+  {
+   "name": "fx_ward_block_3",
+   "rect": [
+    64,
+    744,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_ward_block_4",
+   "rect": [
+    96,
+    744,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_ward_block_5",
+   "rect": [
+    128,
+    744,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_ward_shockwave_1",
+   "rect": [
+    0,
+    776,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 6,
+   "ms": 40
+  },
+  {
+   "name": "fx_ward_shockwave_2",
+   "rect": [
+    144,
+    776,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 18,
+   "ms": 45
+  },
+  {
+   "name": "fx_ward_shockwave_3",
+   "rect": [
+    288,
+    776,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 30,
+   "ms": 50
+  },
+  {
+   "name": "fx_ward_shockwave_4",
+   "rect": [
+    432,
+    776,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 41,
+   "ms": 55
+  },
+  {
+   "name": "fx_ward_shockwave_5",
+   "rect": [
+    576,
+    776,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 50,
+   "ms": 60
+  },
+  {
+   "name": "fx_ward_shockwave_6",
+   "rect": [
+    0,
+    856,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 57,
+   "ms": 60
+  },
+  {
+   "name": "fx_ward_shockwave_7",
+   "rect": [
+    144,
+    856,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 62,
+   "ms": 70
+  },
+  {
+   "name": "fx_ward_shockwave_8",
+   "rect": [
+    288,
+    856,
+    144,
+    80
+   ],
+   "anchor": [
+    72,
+    50
+   ],
+   "radius_px": 64,
+   "ms": 90
+  },
+  {
+   "name": "fx_ward_cracks_1",
+   "rect": [
+    0,
+    936,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_ward_cracks_2",
+   "rect": [
+    96,
+    936,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 160
+  },
+  {
+   "name": "fx_ward_cracks_3",
+   "rect": [
+    192,
+    936,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 260
+  },
+  {
+   "name": "fx_ward_cracks_4",
+   "rect": [
+    288,
+    936,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 300
+  }
+ ]
+}

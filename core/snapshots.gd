@@ -20,7 +20,7 @@ class EntitySnapshot:
 	var combo_max: int = 0  # player only: swings in the equipped weapon's combo (katana 3, dagger 4)
 	var weapon_id: StringName = &""  # player only: the equipped weapon, &"black_katana", &"dual_dagger" or &"chain_scythe"
 	var weapon_form: StringName = &""  # player only: the running active, &"black_katana_buff" / &"lightning_form" / &"reaper_coil", else empty
-	var move_speed_mult: float = 1.0  # player only: walking speed multiplier right now (Lightning Form 1.25)
+	var move_speed_mult: float = 1.0  # player only: walking speed multiplier right now (x2 while Sprint runs)
 	var lightning_blink_index: int = -1  # player only: direction (0-7) of the latest lightning blink, -1 before any
 	var lightning_blink_tick: int = -1  # player only: tick of the latest lightning blink (it equals snapshot.tick on the blink tick)
 	var lightning_blink_from: Vector2 = Vector2.ZERO  # player only: where the latest blink started
@@ -41,6 +41,10 @@ class EntitySnapshot:
 	var equipped_aspects: Array[StringName] = []  # player only: the aspects in slots 1-3 (Z, X, C)
 	var phantom_ticks_left: int = 0  # player only: Phantom Cut ticks left, 0 when it does not run
 	var phantom_pending_echoes: int = 0  # player only: Phantom Cut echoes queued and not landed yet
+	var sprint_ticks_left: int = 0  # player only: Sprint ticks left, 0 when it does not run
+	var echo_invuln_ticks: int = 0  # player only: Echo Step arrival invulnerability left (12 on the arrival tick)
+	var ward_ticks_left: int = 0  # player only: Stone Ward ticks left in state ward (60 on the raise tick), else 0
+	var ward_stored: int = 0  # player only: damage the running Stone Ward has stored (capped), else 0
 
 
 class TelegraphSnapshot:
@@ -97,6 +101,17 @@ class LanternSnapshot:
 	var next_pulse_in: int = 0  # ticks until the next pulse (0 once all pulses are done)
 
 
+class EchoSnapshot:
+	extends RefCounted
+	## An Echo Step anchor in the world (it does not block movement): the player is pulled back to it.
+	var id: int = 0  # the same id appears in the echo_* events
+	var owner_id: int = 0
+	var position: Vector2 = Vector2.ZERO  # where the player will arrive (unless the boss stands on it then)
+	var placed_tick: int = 0
+	var duration: int = 0  # ticks from the placement to the recall (ECHO_STEP_DELAY_TICKS)
+	var ticks_left: int = 0  # ticks until the recall is due (duration on the placement tick; 0 while it waits for a barrage/coil)
+
+
 class ObstacleSnapshot:
 	extends RefCounted
 	## A solid static prop (see core/arena_layout.gd). The same list is used for collision and for drawing.
@@ -124,7 +139,8 @@ class HudSnapshot:
 	var skill_cooldown_ticks: Array[int] = [0, 0, 0]  # ticks left of the aspect in each slot 1-3
 	var equipped_aspects: Array[StringName] = []  # the aspect id in each slot 1-3
 	## One row per slot 1-3: slot, aspect_id, name, kind (skill/buff), edge_cost, cooldown_ticks, cooldown_max, running,
-	## ticks_left (lantern life / phantom buff left while running), duration, needs_retaliation.
+	## ticks_left (lantern life / phantom or sprint buff / echo until the recall / ward left while running), duration,
+	## needs_retaliation, stored (Stone Ward: damage stored by the running ward, else 0).
 	var aspect_slots: Array[Dictionary] = []
 	var aspect_cooldowns: Dictionary = {}  # aspect_id -> ticks until ready, for every aspect (slotted or not)
 	var phantom_ticks_left: int = 0
@@ -149,5 +165,6 @@ class GameSnapshot:
 	var telegraphs: Array[TelegraphSnapshot] = []
 	var skill_attacks: Array[SkillAttackSnapshot] = []
 	var lanterns: Array[LanternSnapshot] = []  # Spirit Lanterns in the world
+	var echoes: Array[EchoSnapshot] = []  # Echo Step anchors in the world (at most one per player)
 	var obstacles: Array[ObstacleSnapshot] = []  # the solid props, the same every tick
 	var hud: HudSnapshot = null

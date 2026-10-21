@@ -497,6 +497,79 @@ func aspect_picker() -> void:
 	check(arena.missing_frames.is_empty(), "missing frames: %s" % str(arena.missing_frames.keys()))
 
 
+## The picker lists all 8 aspects (Aspects.ALL) in a window of whole rows: the arrows scroll it so the highlighted row
+## stays in view, the mouse wheel scrolls it (pulling the highlight along), a scroll bar shows when rows are hidden, no
+## row is ever drawn past the picker's bottom, and the 8th aspect can be equipped by keyboard and by wheel + click.
+func picker_scroll() -> void:
+	fixture()
+	check(Aspects.ALL.size() == 8, "the picker should list 8 aspects, not %d" % Aspects.ALL.size())
+	check(arena.open_menu(), "open")
+	menu.stats_selection = &"aspect_slot_1"
+	await menu_with("menu_accept")
+	check(menu.picker_open() and menu.picker_scroll == 0, "the picker opens at the top")
+	check(Menu.picker_max_scroll() == Aspects.ALL.size() - Menu.PICKER_VISIBLE_ROWS and Menu.picker_max_scroll() > 0, "8 aspects need a scroll")
+	for index: int in range(Menu.PICKER_VISIBLE_ROWS):
+		check(Menu.picker_row_rect(index).end.y <= Menu.PICKER.end.y and Menu.picker_row_rect(index).position.y >= Menu.PICKER.position.y, "row %d leaves the picker" % index)
+	check(not Menu.picker_bar_rect().intersects(Menu.picker_row_rect(0)) and Menu.PICKER.encloses(Menu.picker_bar_rect().grow(3)), "the scroll bar overlaps the rows or leaves the picker")
+	# keyboard: down to the last aspect
+	for i: int in range(Aspects.ALL.size() - 1):
+		await menu_with("menu_down")
+		check(menu.row_visible(menu.picker_selection), "the highlighted row %d left the view" % menu.picker_selection)
+	check(menu.picker_selection == Aspects.ALL.size() - 1 and menu.picker_scroll == Menu.picker_max_scroll(), "down did not reach the 8th aspect (%d, scroll %d)" % [menu.picker_selection, menu.picker_scroll])
+	check(Aspects.ALL[menu.picker_selection] == &"stone_ward" and menu.description_key() == &"stone_ward", "the 8th row is Stone Ward")
+	await save("picker_scrolled")
+	var tick: int = arena.core.tick
+	await menu_with("menu_accept")
+	check(arena.core.tick == tick + 1 and arena.snapshot.player.equipped_aspects[0] == &"stone_ward", "ENTER did not slot Stone Ward into Z: %s" % str(arena.snapshot.player.equipped_aspects))
+	await menu_with("menu_up")
+	check(menu.picker_scroll == Menu.picker_max_scroll(), "up inside the window scrolled")
+	for i: int in range(Aspects.ALL.size()):
+		await menu_with("menu_up")
+	check(menu.picker_selection == 0 and menu.picker_scroll == 0, "up did not scroll back to the top")
+	menu.close_picker()
+	# the mouse wheel on slot X: scroll to the bottom, the highlight follows, then a click on the 7th aspect (Echo Step)
+	menu.open_picker(2)
+	check(menu.picker_scroll == 0 and menu.picker_selection == 1, "slot X opens on Gale Cut at the top")
+	for i: int in range(6):
+		var wheel: InputEventMouseButton = InputEventMouseButton.new()
+		wheel.button_index = MOUSE_BUTTON_WHEEL_DOWN
+		wheel.pressed = true
+		menu._input(wheel)
+	check(menu.picker_scroll == Menu.picker_max_scroll(), "the wheel did not scroll to the bottom (%d)" % menu.picker_scroll)
+	check(menu.row_visible(menu.picker_selection), "the wheel left the highlight out of view")
+	var echo: int = Aspects.ALL.find(&"echo_step")
+	check(menu.row_visible(echo), "Echo Step is not visible after the wheel")
+	menu.click(Menu.picker_row_rect(echo, menu.picker_scroll).get_center())
+	check(arena.snapshot.player.equipped_aspects[1] == &"echo_step", "a click after the wheel did not slot Echo Step: %s" % str(arena.snapshot.player.equipped_aspects))
+	# a hidden row's old position does not react: row 0 is scrolled away, its rect now belongs to row 3
+	menu.hover_at(Menu.picker_row_rect(0).get_center())
+	check(menu.picker_selection == menu.picker_scroll, "hover on the top row picks the first visible aspect")
+	await save("picker_wheel")
+	var wheel_up: InputEventMouseButton = InputEventMouseButton.new()
+	wheel_up.button_index = MOUSE_BUTTON_WHEEL_UP
+	wheel_up.pressed = true
+	menu._input(wheel_up)
+	check(menu.picker_scroll == Menu.picker_max_scroll() - 1, "the wheel up did not scroll one row")
+	# Sprint (6th) into C by keyboard from Moon Cleave
+	menu.close_picker()
+	menu.open_picker(3)
+	for i: int in range(Aspects.ALL.find(&"sprint") - Aspects.ALL.find(&"moon_cleave")):
+		await menu_with("menu_down")
+	await menu_with("menu_accept")
+	check(same(arena.snapshot.player.equipped_aspects, [&"stone_ward", &"echo_step", &"sprint"]), "the three new aspects are not slotted: %s" % str(arena.snapshot.player.equipped_aspects))
+	var rows: Array[Dictionary] = Hud.skill_rows(arena.snapshot.hud)
+	check(rows[0]["icon"] == "ui_aspect_stone_ward_1" and rows[1]["icon"] == "ui_aspect_echo_step_1" and rows[2]["icon"] == "ui_aspect_sprint_1", "HUD icons of the new aspects: %s" % str(rows.map(func(r: Dictionary) -> String: return r["icon"])))
+	# their descriptions carry the real numbers
+	var d: Dictionary = Menu.descriptions(Tuning.WEAPON_BLACK_KATANA, arena.snapshot.player.equipped_aspects)
+	check(String(d[&"sprint"][2][0]).contains("X2") and String(d[&"sprint"][2][2]).contains("%d EDGE" % int(Tuning.SPRINT_EDGE_COST)) and String(d[&"sprint"][2][2]).contains("CD 12 S"), "sprint description: %s" % str(d[&"sprint"]))
+	check(String(d[&"echo_step"][2][0]).contains("2 S") and String(d[&"echo_step"][2][2]).contains("12 TICKS") and String(d[&"echo_step"][2][2]).contains("CD 14 S"), "echo description: %s" % str(d[&"echo_step"]))
+	check(String(d[&"stone_ward"][2][1]).contains("60") and String(d[&"stone_ward"][2][1]).contains("64 PX") and String(d[&"stone_ward"][2][2]).contains("WAVE 8 + STORED"), "ward description: %s" % str(d[&"stone_ward"]))
+	check(d[&"stone_ward"][1] == "ASPECT  KEY Z" and d[&"sprint"][1] == "ASPECT  KEY C", "the new aspects' tags follow their slots")
+	await save("picker_new_three")
+	arena.close_menu()
+	fixture()
+
+
 ## The menu's equips are written to the profile (only when progress is saved) and a restart starts with them.
 ## Uses a throwaway TOTOY_SAVE_PATH so no real save is ever touched.
 func saved_loadout() -> void:
@@ -560,6 +633,7 @@ func run() -> void:
 	await descriptions()
 	await equip()
 	await aspect_picker()
+	await picker_scroll()
 	await saved_loadout()
 	await hud_contract()
 	await shared_frame()

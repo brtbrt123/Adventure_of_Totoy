@@ -16,6 +16,7 @@ const ArenaLayout := preload("res://core/arena_layout.gd")
 const Weapons := preload("res://core/weapons.gd")
 const Aspects := preload("res://core/aspects.gd")
 const Lantern := preload("res://core/lantern.gd")
+const Echo := preload("res://core/echo.gd")
 
 const RESULT_PLAYING: StringName = &"playing"
 const RESULT_VICTORY: StringName = &"victory"
@@ -43,10 +44,13 @@ var obstacles: Array[Obstacle] = ArenaLayout.build()
 var lanterns: Array[Lantern] = []
 ## Phantom Cut echoes waiting to land, in queue order: {land_tick, base, posture, combo_index, weapon_id, hit_tick}.
 var phantom_echoes: Array[Dictionary] = []
+## Echo Step anchors in the world (at most one per player).
+var echoes: Array[Echo] = []
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _next_attack_id: int = 1
 var _next_lantern_id: int = 1
+var _next_echo_id: int = 1
 
 
 func _init(seed_value: int = 1) -> void:
@@ -62,10 +66,15 @@ func step(input: InputFrame) -> void:
 	var events: Array[GameEvent] = []
 	var player_before: Vector2 = player.position
 	player.barrage_target_alive = boss.state != BossState.STATE_DEAD
+	player.echo_exists = _player_echo() != null
 	player.step(input, tick, events)
 	player.position = move_resolved(player_before, player.position, Tuning.PLAYER_RADIUS)
+	_place_echo(events)
 	_resolve_lightning_barrage(events)
 	_resolve_reaper_coil(events)
+	if player.ward_release_pending:
+		_release_ward(&"expired", events)
+	_resolve_echo_recall(events)
 	_resolve_player_attack(events)
 	_resolve_phantom_echoes(events)
 	_spawn_released_skill(events)
@@ -77,6 +86,9 @@ func step(input: InputFrame) -> void:
 	_resolve_skill_attacks(player_before, events)
 	_separate_from_boss()
 	_resolve_lanterns(events)
+	if player.state == PlayerState.STATE_DEAD:
+		for echo: Echo in echoes.duplicate():
+			_remove_echo(echo, &"death", events)
 	if boss.state == BossState.STATE_DEAD or player.state == PlayerState.STATE_DEAD:
 		phantom_echoes.clear()  # nobody left to hit, or nobody left to echo
 	_check_result(events)
@@ -152,6 +164,15 @@ func snapshot() -> Snapshots.GameSnapshot:
 		l.pulses = Tuning.SPIRIT_LANTERN_PULSES
 		l.next_pulse_in = maxi(0, lantern.pulse_tick(lantern.pulses_done + 1) - tick) if lantern.pulses_done < Tuning.SPIRIT_LANTERN_PULSES else 0
 		snap.lanterns.append(l)
+	for echo: Echo in echoes:
+		var s: Snapshots.EchoSnapshot = Snapshots.EchoSnapshot.new()
+		s.id = echo.id
+		s.owner_id = echo.owner_id
+		s.position = echo.position
+		s.placed_tick = echo.placed_tick
+		s.duration = Tuning.ECHO_STEP_DELAY_TICKS
+		s.ticks_left = maxi(0, echo.due_tick() - tick)
+		snap.echoes.append(s)
 	for obstacle: Obstacle in obstacles:
 		var o: Snapshots.ObstacleSnapshot = Snapshots.ObstacleSnapshot.new()
 		o.id = obstacle.id
@@ -206,6 +227,16 @@ func _aspect_slot_row(slot: int, aspect: StringName) -> Dictionary:
 			var lantern: Lantern = _player_lantern()
 			running = lantern != null
 			ticks_left = maxi(0, lantern.end_tick() - tick) if lantern != null else 0
+		Aspects.SPRINT:
+			running = player.sprint_ticks_left > 0
+			ticks_left = player.sprint_ticks_left
+		Aspects.ECHO_STEP:
+			var echo: Echo = _player_echo()
+			running = echo != null
+			ticks_left = maxi(0, echo.due_tick() - tick) if echo != null else 0
+		Aspects.STONE_WARD:
+			running = player.state == PlayerState.STATE_WARD
+			ticks_left = player.ward_ticks_left if running else 0
 		_:
 			running = player.skill_id == aspect
 	return {
@@ -213,6 +244,7 @@ func _aspect_slot_row(slot: int, aspect: StringName) -> Dictionary:
 		"edge_cost": Aspects.edge_cost(aspect), "cooldown_ticks": int(player.aspect_cooldowns.get(aspect, 0)),
 		"cooldown_max": Aspects.cooldown(aspect), "running": running, "ticks_left": ticks_left,
 		"duration": Aspects.duration(aspect), "needs_retaliation": Aspects.needs_retaliation(aspect),
+		"stored": player.ward_stored if aspect == Aspects.STONE_WARD and running else 0,
 	}
 
 
@@ -257,6 +289,10 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.equipped_aspects = player.equipped_aspects.duplicate()
 	e.phantom_ticks_left = player.phantom_ticks_left
 	e.phantom_pending_echoes = phantom_echoes.size()
+	e.sprint_ticks_left = player.sprint_ticks_left
+	e.echo_invuln_ticks = player.echo_invuln_ticks()
+	e.ward_ticks_left = player.ward_ticks_left if player.state == PlayerState.STATE_WARD else 0
+	e.ward_stored = player.ward_stored if player.state == PlayerState.STATE_WARD else 0
 	return e
 
 
@@ -386,6 +422,104 @@ func _remove_lantern(lantern: Lantern, reason: StringName, events: Array[GameEve
 		"lantern_id": lantern.id, "entity_id": lantern.owner_id, "position": lantern.position, "reason": reason,
 		"pulses_done": lantern.pulses_done,
 	}))
+
+
+func _player_echo() -> Echo:
+	for echo: Echo in echoes:
+		if echo.owner_id == player.id:
+			return echo
+	return null
+
+
+## Echo Step was pressed this tick (Player.echo_requested): place the anchor where the player stands after this tick's
+## movement, kept in the arena and out of the props (arena_point).
+func _place_echo(events: Array[GameEvent]) -> void:
+	if not player.echo_requested:
+		return
+	player.echo_requested = false
+	if player.state == PlayerState.STATE_DEAD:
+		return
+	var echo: Echo = Echo.new()
+	echo.id = _next_echo_id
+	_next_echo_id += 1
+	echo.owner_id = player.id
+	echo.position = arena_point(player.position, Tuning.PLAYER_RADIUS)
+	echo.placed_tick = tick
+	echoes.append(echo)
+	events.append(GameEvent.new(GameEvent.ECHO_PLACED, tick, {
+		"echo_id": echo.id, "entity_id": player.id, "position": echo.position, "duration": Tuning.ECHO_STEP_DELAY_TICKS,
+	}))
+
+
+## The player's echo is due (placed + ECHO_STEP_DELAY_TICKS, or later while a barrage or coil still runs): teleport the
+## player back to it. A raised ward releases first (where the player stood). Whatever else ran stops (Player.echo_recall):
+## melee skill attacks that follow the player (arc, lane) end with it, a projectile flies on. The arrival spot is the
+## anchor kept in the arena and out of props; if the boss stands on it, the nearest free spot next to the boss.
+func _resolve_echo_recall(events: Array[GameEvent]) -> void:
+	var echo: Echo = _player_echo()
+	if echo == null or tick < echo.due_tick() or player.state == PlayerState.STATE_DEAD:
+		return
+	if player.state == PlayerState.STATE_LIGHTNING_BARRAGE or player.state == PlayerState.STATE_REAPER_COIL:
+		return  # never interrupted: the recall waits until it ends
+	var from: Vector2 = player.position
+	if player.state == PlayerState.STATE_WARD:
+		player.end_ward_early()
+		_release_ward(&"recall", events)
+	for attack: SkillAttack in skill_attacks.duplicate():
+		if attack.shape != SkillAttack.SHAPE_PROJECTILE:
+			skill_attacks.erase(attack)
+	var spot: Vector2 = arena_point(echo.position, Tuning.PLAYER_RADIUS)
+	var min_dist: float = Tuning.BOSS_RADIUS + Tuning.PLAYER_RADIUS
+	if boss.state != BossState.STATE_DEAD and spot.distance_to(boss.position) < min_dist:
+		var away: Vector2 = spot - boss.position
+		if away.length_squared() < 0.0001:
+			away = from - boss.position
+		spot = _free_spot(away.normalized() if away.length_squared() > 0.0001 else Vector2.LEFT, min_dist)
+	player.echo_recall(spot)
+	echoes.erase(echo)
+	events.append(GameEvent.new(GameEvent.ECHO_RECALL, tick, {
+		"echo_id": echo.id, "entity_id": player.id, "from": from, "to": spot, "anchor": echo.position,
+		"invuln_ticks": Tuning.ECHO_STEP_INVULN_TICKS, "waited": tick - echo.due_tick(),
+	}))
+
+
+func _remove_echo(echo: Echo, reason: StringName, events: Array[GameEvent]) -> void:
+	echoes.erase(echo)
+	events.append(GameEvent.new(GameEvent.ECHO_EXPIRED, tick, {
+		"echo_id": echo.id, "entity_id": echo.owner_id, "position": echo.position, "reason": reason,
+	}))
+
+
+## The Stone Ward ended (`expired` on its timer, `recall` by an Echo Step): release the shockwave around the player. The
+## boss is hit when its circle is within STONE_WARD_RADIUS of the player: (base + stored x mult) x the damage multiplier
+## under the skill hit rules (armored: x ARMOR_DAMAGE_FACTOR, posture, Edge gain; counter while the posture is broken:
+## x COUNTER_DAMAGE_MULT, no Edge change). Events: ward_released, then on a hit attack_hit (aspect_id stone_ward,
+## ward_release true) and the boss's damage_taken.
+func _release_ward(reason: StringName, events: Array[GameEvent]) -> void:
+	player.ward_release_pending = false
+	var stored: int = player.ward_stored
+	player.ward_stored = 0
+	var hit: bool = boss.state != BossState.STATE_DEAD and player.position.distance_to(boss.position) - Tuning.BOSS_RADIUS <= Tuning.STONE_WARD_RADIUS
+	var counter: bool = boss.state == BossState.STATE_BROKEN
+	var damage: int = 0
+	var base: float = (Tuning.STONE_WARD_BASE_DAMAGE + float(stored) * Tuning.STONE_WARD_STORE_MULT) * player.damage_mult()
+	if hit:
+		damage = roundi(base * Tuning.COUNTER_DAMAGE_MULT) if counter else maxi(1, roundi(base * Tuning.ARMOR_DAMAGE_FACTOR))
+	events.append(GameEvent.new(GameEvent.WARD_RELEASED, tick, {
+		"entity_id": player.id, "position": player.position, "stored": stored, "radius": Tuning.STONE_WARD_RADIUS,
+		"damage": damage, "hit": hit, "reason": reason,
+	}))
+	if not hit:
+		return
+	if not counter:
+		player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.STONE_WARD_EDGE_GAIN)
+	events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
+		"attacker_id": player.id, "target_id": boss.id, "damage": damage, "kind": &"counter" if counter else &"normal",
+		"position": boss.position, "aspect_id": Aspects.STONE_WARD, "ward_release": true,
+	}))
+	boss.take_damage(damage, tick, events, player.id)
+	if not counter:
+		boss.add_posture(Tuning.STONE_WARD_POSTURE + float(stored) * Tuning.STONE_WARD_POSTURE_PER_STORED, tick, events)
 
 
 ## One player weapon hit on the boss under the normal-hit rules: armored (x ARMOR_DAMAGE_FACTOR, gains `edge_gain`
@@ -855,13 +989,17 @@ func _resolve_telegraphs(events: Array[GameEvent]) -> void:
 			player.on_parry_success(boss.position - player.position)
 			boss.add_posture(Tuning.BOSS_POSTURE_MAX if perfect else Tuning.PARRY_EARLY_POSTURE, tick, events)
 			continue
-		# Red attacks are never parried; gold attacks that were not parried hit like any other.
+		# Red attacks are never parried; gold attacks that were not parried hit like any other. A Stone Ward blocks the
+		# hit (Player.take_damage stores it): the telegraph is used up, so one attack is blocked and stored once.
+		var blocks_before: int = player.ward_blocks
 		if player.take_damage(telegraph.damage, tick, events, telegraph.owner_id):
 			telegraph.has_hit = true
 			events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
 				"attacker_id": telegraph.owner_id, "target_id": player.id, "damage": telegraph.damage,
 				"kind": telegraph.kind, "position": player.position,
 			}))
+		elif player.ward_blocks > blocks_before:
+			telegraph.has_hit = true
 
 
 func _clamp_to_arena() -> void:

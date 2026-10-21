@@ -1,0 +1,905 @@
+{
+ "note": "Chapter 1 NPCs and interactables v2, converted from art/reference/chapter1_cast_target.png. Review only.",
+ "cell": [
+  32,
+  40
+ ],
+ "anchor_rule": "feet: ax = centre of the soles, ay = one row under the soles",
+ "facing": "right (3/4); left = mirror around ax at runtime, like hero2_*",
+ "ticks_per_second": 60,
+ "states": {
+  "mira": {
+   "idle": {
+    "frames": 4,
+    "ticks": [
+     24,
+     14,
+     14,
+     8
+    ]
+   },
+   "walk": {
+    "frames": 6,
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "talk": {
+    "frames": 3,
+    "ticks": [
+     10,
+     8,
+     10
+    ]
+   },
+   "compass": {
+    "frames": 1,
+    "ticks": [
+     60
+    ]
+   }
+  },
+  "tovan": {
+   "idle": {
+    "frames": 4,
+    "ticks": [
+     24,
+     14,
+     14,
+     8
+    ]
+   },
+   "walk": {
+    "frames": 6,
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "talk": {
+    "frames": 3,
+    "ticks": [
+     10,
+     8,
+     10
+    ]
+   },
+   "anvil": {
+    "frames": 1,
+    "ticks": [
+     60
+    ]
+   }
+  },
+  "edda": {
+   "idle": {
+    "frames": 4,
+    "ticks": [
+     24,
+     14,
+     14,
+     8
+    ]
+   },
+   "walk": {
+    "frames": 6,
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   },
+   "talk": {
+    "frames": 3,
+    "ticks": [
+     10,
+     8,
+     10
+    ]
+   },
+   "cane": {
+    "frames": 1,
+    "ticks": [
+     60
+    ]
+   }
+  },
+  "elder": {
+   "idle": {
+    "frames": 4,
+    "ticks": [
+     24,
+     14,
+     14,
+     8
+    ]
+   },
+   "walk": {
+    "frames": 6,
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   }
+  },
+  "child": {
+   "idle": {
+    "frames": 4,
+    "ticks": [
+     24,
+     14,
+     14,
+     8
+    ]
+   },
+   "walk": {
+    "frames": 6,
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   }
+  },
+  "worker": {
+   "idle": {
+    "frames": 4,
+    "ticks": [
+     24,
+     14,
+     14,
+     8
+    ]
+   },
+   "walk": {
+    "frames": 6,
+    "ticks": [
+     7,
+     7,
+     7,
+     7,
+     7,
+     7
+    ]
+   }
+  }
+ },
+ "objects": {
+  "obj_lantern": {
+   "frames": 4,
+   "ticks": [
+    12,
+    10,
+    12,
+    10
+   ]
+  },
+  "obj_lantern_post": {
+   "frames": 4,
+   "ticks": [
+    12,
+    10,
+    12,
+    10
+   ]
+  },
+  "obj_dummy_hit": {
+   "frames": 2,
+   "ticks": [
+    4,
+    4
+   ],
+   "then": "obj_dummy_1"
+  }
+ },
+ "image": "npc_sprites_v2.png",
+ "frames": {
+  "npc_mira_idle_right_1": {
+   "x": 1,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_idle_right_2": {
+   "x": 35,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_idle_right_3": {
+   "x": 69,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_idle_right_4": {
+   "x": 103,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_walk_right_1": {
+   "x": 137,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_walk_right_2": {
+   "x": 171,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_walk_right_3": {
+   "x": 205,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_walk_right_4": {
+   "x": 239,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_walk_right_5": {
+   "x": 273,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_walk_right_6": {
+   "x": 307,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_talk_right_1": {
+   "x": 341,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_talk_right_2": {
+   "x": 375,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_talk_right_3": {
+   "x": 409,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_mira_compass_right_1": {
+   "x": 443,
+   "y": 1,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_idle_right_1": {
+   "x": 1,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_idle_right_2": {
+   "x": 35,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_idle_right_3": {
+   "x": 69,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_idle_right_4": {
+   "x": 103,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_walk_right_1": {
+   "x": 137,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_walk_right_2": {
+   "x": 171,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_walk_right_3": {
+   "x": 205,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_walk_right_4": {
+   "x": 239,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_walk_right_5": {
+   "x": 273,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_walk_right_6": {
+   "x": 307,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_talk_right_1": {
+   "x": 341,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_talk_right_2": {
+   "x": 375,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_talk_right_3": {
+   "x": 409,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_tovan_anvil_right_1": {
+   "x": 443,
+   "y": 43,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_idle_right_1": {
+   "x": 1,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_idle_right_2": {
+   "x": 35,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_idle_right_3": {
+   "x": 69,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_idle_right_4": {
+   "x": 103,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_walk_right_1": {
+   "x": 137,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_walk_right_2": {
+   "x": 171,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_walk_right_3": {
+   "x": 205,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_walk_right_4": {
+   "x": 239,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_walk_right_5": {
+   "x": 273,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_walk_right_6": {
+   "x": 307,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_talk_right_1": {
+   "x": 341,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_talk_right_2": {
+   "x": 375,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_talk_right_3": {
+   "x": 409,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_edda_cane_right_1": {
+   "x": 443,
+   "y": 85,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_idle_right_1": {
+   "x": 1,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_idle_right_2": {
+   "x": 35,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_idle_right_3": {
+   "x": 69,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_idle_right_4": {
+   "x": 103,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_walk_right_1": {
+   "x": 137,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_walk_right_2": {
+   "x": 171,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_walk_right_3": {
+   "x": 205,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_walk_right_4": {
+   "x": 239,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_walk_right_5": {
+   "x": 273,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_elder_walk_right_6": {
+   "x": 307,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_idle_right_1": {
+   "x": 341,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_idle_right_2": {
+   "x": 375,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_idle_right_3": {
+   "x": 409,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_idle_right_4": {
+   "x": 443,
+   "y": 127,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_walk_right_1": {
+   "x": 1,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_walk_right_2": {
+   "x": 35,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_walk_right_3": {
+   "x": 69,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_walk_right_4": {
+   "x": 103,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_walk_right_5": {
+   "x": 137,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_child_walk_right_6": {
+   "x": 171,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_idle_right_1": {
+   "x": 205,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_idle_right_2": {
+   "x": 239,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_idle_right_3": {
+   "x": 273,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_idle_right_4": {
+   "x": 307,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_walk_right_1": {
+   "x": 341,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_walk_right_2": {
+   "x": 375,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_walk_right_3": {
+   "x": 409,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_walk_right_4": {
+   "x": 443,
+   "y": 169,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_walk_right_5": {
+   "x": 1,
+   "y": 211,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "npc_worker_walk_right_6": {
+   "x": 35,
+   "y": 211,
+   "w": 32,
+   "h": 40,
+   "ax": 16,
+   "ay": 37
+  },
+  "obj_dummy_1": {
+   "x": 69,
+   "y": 211,
+   "w": 24,
+   "h": 32,
+   "ax": 12,
+   "ay": 31
+  },
+  "obj_dummy_hit_1": {
+   "x": 103,
+   "y": 211,
+   "w": 24,
+   "h": 32,
+   "ax": 12,
+   "ay": 31
+  },
+  "obj_dummy_hit_2": {
+   "x": 137,
+   "y": 211,
+   "w": 24,
+   "h": 32,
+   "ax": 12,
+   "ay": 31
+  },
+  "obj_chest_closed_1": {
+   "x": 171,
+   "y": 211,
+   "w": 24,
+   "h": 24,
+   "ax": 12,
+   "ay": 23
+  },
+  "obj_chest_open_1": {
+   "x": 205,
+   "y": 211,
+   "w": 32,
+   "h": 32,
+   "ax": 16,
+   "ay": 31
+  },
+  "obj_herbs_1": {
+   "x": 239,
+   "y": 211,
+   "w": 24,
+   "h": 24,
+   "ax": 12,
+   "ay": 23
+  },
+  "obj_lantern_1": {
+   "x": 273,
+   "y": 211,
+   "w": 16,
+   "h": 24,
+   "ax": 8,
+   "ay": 23
+  },
+  "obj_lantern_2": {
+   "x": 307,
+   "y": 211,
+   "w": 16,
+   "h": 24,
+   "ax": 8,
+   "ay": 23
+  },
+  "obj_lantern_3": {
+   "x": 341,
+   "y": 211,
+   "w": 16,
+   "h": 24,
+   "ax": 8,
+   "ay": 23
+  },
+  "obj_lantern_4": {
+   "x": 375,
+   "y": 211,
+   "w": 16,
+   "h": 24,
+   "ax": 8,
+   "ay": 23
+  },
+  "obj_lantern_post_1": {
+   "x": 409,
+   "y": 211,
+   "w": 16,
+   "h": 32,
+   "ax": 8,
+   "ay": 31
+  },
+  "obj_lantern_post_2": {
+   "x": 443,
+   "y": 211,
+   "w": 16,
+   "h": 32,
+   "ax": 8,
+   "ay": 31
+  },
+  "obj_lantern_post_3": {
+   "x": 1,
+   "y": 253,
+   "w": 16,
+   "h": 32,
+   "ax": 8,
+   "ay": 31
+  },
+  "obj_lantern_post_4": {
+   "x": 35,
+   "y": 253,
+   "w": 16,
+   "h": 32,
+   "ax": 8,
+   "ay": 31
+  }
+ }
+}

@@ -56,7 +56,7 @@ func test_the_default_slotting_is_the_old_fixed_set() -> void:
 	assert_eq(core.player.equipped_aspects, [Aspects.BREAKING_EDGE, Aspects.GALE_CUT, Aspects.MOON_CLEAVE] as Array[StringName])
 	assert_eq(PlayerState.SKILL_IDS, core.player.equipped_aspects, "SKILL_IDS stays the default slotting")
 	assert_eq(core.player.skill_cooldowns, [0, 0, 0] as Array[int])
-	assert_eq(Aspects.ALL.size(), 5)
+	assert_eq(Aspects.ALL.size(), 8)  # 5 until Sprint, Echo Step and Stone Ward joined (2026-10-21)
 	var hud = core.snapshot().hud
 	assert_eq(hud.equipped_aspects, core.player.equipped_aspects)
 	assert_eq(hud.aspect_slots.size(), 3)

@@ -46,6 +46,10 @@ const SLOT_LETTERS: Array[String] = ["Z", "X", "C"]
 const PICKER: Rect2 = Rect2(154, 18, 157, 104)
 const PICKER_ROW_TOP: float = 33.0
 const PICKER_ROW_STEP: float = 17.0
+## Whole rows that fit in the picker (33 + 5 x 17 <= its bottom); more aspects scroll (arrows / wheel), never a half row.
+const PICKER_VISIBLE_ROWS: int = 5
+## The scroll bar on the picker's right edge (shown only when the list is longer than the window).
+const PICKER_BAR_W: float = 3.0
 ## INVENTORY layout: 6x3 slots of 32 px, step 33; the weapons fill the first slots in Weapons.IDS order.
 const GRID_ORIGIN: Vector2 = Vector2(13, 23)
 const GRID_STEP: float = 33.0
@@ -75,6 +79,8 @@ var feedback: Dictionary = {}
 ## {"aspect", "ok", "reason", "left"} after a request.
 var picker_slot: int = 0
 var picker_selection: int = 0
+## The first Aspects.ALL index shown in the picker window (0 .. size - PICKER_VISIBLE_ROWS).
+var picker_scroll: int = 0
 var picker_feedback: Dictionary = {}
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
@@ -137,9 +143,14 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
-	if event is InputEventMouseButton and (event as InputEventMouseButton).pressed and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
-		click(get_local_mouse_position())
-		get_viewport().set_input_as_handled()
+	if event is InputEventMouseButton and (event as InputEventMouseButton).pressed:
+		var button: MouseButton = (event as InputEventMouseButton).button_index
+		if button == MOUSE_BUTTON_LEFT:
+			click(get_local_mouse_position())
+			get_viewport().set_input_as_handled()
+		elif (button == MOUSE_BUTTON_WHEEL_UP or button == MOUSE_BUTTON_WHEEL_DOWN) and picker_open():
+			scroll_picker(-1 if button == MOUSE_BUTTON_WHEEL_UP else 1)
+			get_viewport().set_input_as_handled()
 
 
 ## Keyboard / gamepad, once per physics frame while open (the arena calls it instead of stepping the core).
@@ -223,6 +234,7 @@ func move_selection(direction: Vector2i) -> void:
 		if direction.y != 0:
 			picker_selection = clampi(picker_selection + direction.y, 0, Aspects.ALL.size() - 1)
 			picker_feedback = {}
+			_scroll_to_selection()
 		queue_redraw()
 		return
 	if tab == TAB_INVENTORY:
@@ -265,7 +277,7 @@ func hover_at(pos: Vector2) -> void:
 	hover_key = &""
 	if picker_open():
 		for index: int in range(Aspects.ALL.size()):
-			if picker_row_rect(index).has_point(pos):
+			if row_visible(index) and picker_row_rect(index, picker_scroll).has_point(pos):
 				if index != picker_selection:
 					picker_feedback = {}
 				picker_selection = index
@@ -291,7 +303,7 @@ func click(pos: Vector2) -> void:
 			return
 	if picker_open():
 		for index: int in range(Aspects.ALL.size()):
-			if picker_row_rect(index).has_point(pos):
+			if row_visible(index) and picker_row_rect(index, picker_scroll).has_point(pos):
 				picker_selection = index
 				accept()
 				return
@@ -345,6 +357,8 @@ func picker_open() -> bool:
 func open_picker(slot: int) -> void:
 	picker_slot = clampi(slot, 1, 3)
 	picker_selection = maxi(0, Aspects.ALL.find(slot_aspect(picker_slot)))
+	picker_scroll = 0
+	_scroll_to_selection()
 	picker_feedback = {}
 	hover_key = &""
 	queue_redraw()
@@ -352,11 +366,43 @@ func open_picker(slot: int) -> void:
 
 func close_picker() -> void:
 	picker_slot = 0
+	picker_scroll = 0
 	picker_feedback = {}
 
 
-static func picker_row_rect(index: int) -> Rect2:
-	return Rect2(PICKER.position.x + 4, PICKER_ROW_TOP + index * PICKER_ROW_STEP, PICKER.size.x - 8, PICKER_ROW_STEP - 1)
+## The largest scroll offset (0 when every aspect fits).
+static func picker_max_scroll() -> int:
+	return maxi(0, Aspects.ALL.size() - PICKER_VISIBLE_ROWS)
+
+
+## True when picker row `index` is inside the scrolled window (only those are drawn, hovered or clicked).
+func row_visible(index: int) -> bool:
+	return index >= picker_scroll and index < picker_scroll + PICKER_VISIBLE_ROWS
+
+
+## Keeps the highlighted row inside the window (keyboard moves and opening).
+func _scroll_to_selection() -> void:
+	if picker_selection < picker_scroll:
+		picker_scroll = picker_selection
+	elif picker_selection >= picker_scroll + PICKER_VISIBLE_ROWS:
+		picker_scroll = picker_selection - PICKER_VISIBLE_ROWS + 1
+	picker_scroll = clampi(picker_scroll, 0, picker_max_scroll())
+
+
+## Mouse wheel: scrolls the window by whole rows; the highlighted row is pulled along so it never leaves the view.
+func scroll_picker(delta: int) -> void:
+	if not picker_open():
+		return
+	picker_scroll = clampi(picker_scroll + delta, 0, picker_max_scroll())
+	picker_selection = clampi(picker_selection, picker_scroll, picker_scroll + PICKER_VISIBLE_ROWS - 1)
+	picker_feedback = {}
+	queue_redraw()
+
+
+## Row `index` of the picker drawn with the window scrolled to `scroll` (whole rows, so nothing is ever half cut).
+static func picker_row_rect(index: int, scroll: int = 0) -> Rect2:
+	var width: float = PICKER.size.x - 8 - (PICKER_BAR_W + 2 if picker_max_scroll() > 0 else 0.0)
+	return Rect2(PICKER.position.x + 4, PICKER_ROW_TOP + (index - scroll) * PICKER_ROW_STEP, width, PICKER_ROW_STEP - 1)
 
 
 ## The slotted aspects (Z, X, C) from the snapshot.
@@ -535,6 +581,18 @@ static func descriptions(equipped: StringName, aspects: Array = Aspects.DEFAULT_
 		"FOR %s S A PHANTOM REPEATS EVERY SWING THAT LANDS, %s S LATER," % [secs(Tuning.PHANTOM_CUT_DURATION_TICKS), secs(Tuning.PHANTOM_CUT_DELAY_TICKS)],
 		"FOR %d%% OF ITS DAMAGE. NO ANIMATION LOCK: USE IT MID-SWING." % roundi(Tuning.PHANTOM_CUT_DAMAGE_MULT * 100),
 		"%s EDGE  CD %s S FROM ACTIVATION  ECHO %d%% DMG  %d%% POSTURE" % [num(Tuning.PHANTOM_CUT_EDGE_COST), secs(Tuning.PHANTOM_CUT_COOLDOWN_TICKS), roundi(Tuning.PHANTOM_CUT_DAMAGE_MULT * 100), roundi(Tuning.PHANTOM_CUT_POSTURE_MULT * 100)]]]
+	d[&"sprint"] = ["SPRINT", aspect_tag(&"sprint", aspects), [
+		"FOR %s S YOU MOVE X%s AS FAST: WALKING, SWINGING, WARDING." % [secs(Tuning.SPRINT_DURATION_TICKS), num(Tuning.SPRINT_MOVE_SPEED_MULT)],
+		"NO ANIMATION LOCK: USE IT ANY TIME. DASHES KEEP THEIR SPEED.",
+		"%s EDGE  CD %s S FROM ACTIVATION  %s PX/S" % [num(Tuning.SPRINT_EDGE_COST), secs(Tuning.SPRINT_COOLDOWN_TICKS), num(move_px_s * Tuning.SPRINT_MOVE_SPEED_MULT)]]]
+	d[&"echo_step"] = ["ECHO STEP", aspect_tag(&"echo_step", aspects), [
+		"LEAVE AN ECHO WHERE YOU STAND. %s S LATER YOU ARE PULLED BACK" % secs(Tuning.ECHO_STEP_DELAY_TICKS),
+		"TO IT, CANCELLING WHAT YOU WERE DOING, AND CANNOT BE HIT BRIEFLY.",
+		"%s EDGE  CD %s S  RECALL %s S  %s S (%d TICKS) INVULNERABLE" % [num(Tuning.ECHO_STEP_EDGE_COST), secs(Tuning.ECHO_STEP_COOLDOWN_TICKS), secs(Tuning.ECHO_STEP_DELAY_TICKS), secs(Tuning.ECHO_STEP_INVULN_TICKS), Tuning.ECHO_STEP_INVULN_TICKS]]]
+	d[&"stone_ward"] = ["STONE WARD", aspect_tag(&"stone_ward", aspects), [
+		"RAISE A STONE GUARD FOR %s S THAT BLOCKS EVERY HIT AND STORES" % secs(Tuning.STONE_WARD_DURATION_TICKS),
+		"ITS DAMAGE (UP TO %d). THEN A %s PX SHOCKWAVE HITS BACK." % [Tuning.STONE_WARD_STORE_CAP, num(Tuning.STONE_WARD_RADIUS)],
+		"%s EDGE  CD %s S  WAVE %s + STORED DMG  %s POSTURE" % [num(Tuning.STONE_WARD_EDGE_COST), secs(Tuning.STONE_WARD_COOLDOWN_TICKS), num(Tuning.STONE_WARD_BASE_DAMAGE), num(Tuning.STONE_WARD_POSTURE)]]]
 	d[Tuning.WEAPON_BLACK_KATANA] = ["BLACK KATANA", "WEAPON  EQUIPPED" if equipped == Tuning.WEAPON_BLACK_KATANA else "WEAPON", [
 		"BALANCED %d-HIT COMBO, %s DMG, REACH %s PX." % [kat["combo"], damage_text(kat), reach_text(kat)],
 		"RMB BLACK FORM: %s S OF X%s ATTACK SPEED AND X%s DAMAGE." % [secs(Tuning.BLACK_KATANA_BUFF_DURATION_TICKS), num(Tuning.BLACK_KATANA_ATTACK_SPEED_MULT), num(Tuning.BLACK_KATANA_DAMAGE_MULT)],
@@ -802,9 +860,13 @@ func _draw_picker() -> void:
 	else:
 		_text(Vector2(x0, title_y), "NOT NOW  " + String(picker_feedback["reason"]), colors["q"])
 	draw_rect(Rect2(x0, title_y + 9, PICKER.size.x - 12, 1), colors["f"])
+	if picker_max_scroll() > 0:
+		_draw_picker_bar()
 	for index: int in range(Aspects.ALL.size()):
+		if not row_visible(index):
+			continue
 		var aspect: StringName = Aspects.ALL[index]
-		var row: Rect2 = picker_row_rect(index)
+		var row: Rect2 = picker_row_rect(index, picker_scroll)
 		var on: bool = index == picker_selection
 		if on:
 			draw_rect(row, colors["k"])
@@ -817,6 +879,34 @@ func _draw_picker() -> void:
 		if slot > 0:
 			_key_badge(Vector2(row.end.x - 22, row.position.y + 4), SLOT_LETTERS[slot - 1])
 			_tick(Vector2(row.end.x - 11, row.position.y + 5), colors["u"])
+
+
+## The picker's scroll bar: a dark track along the rows, a thumb sized to the window, and a small arrow at each end
+## while more rows lie that way.
+static func picker_bar_rect() -> Rect2:
+	return Rect2(PICKER.end.x - 4 - PICKER_BAR_W, PICKER_ROW_TOP + 4, PICKER_BAR_W, PICKER_VISIBLE_ROWS * PICKER_ROW_STEP - 9)
+
+
+func picker_thumb_rect() -> Rect2:
+	var track: Rect2 = picker_bar_rect()
+	var total: int = Aspects.ALL.size()
+	var height: float = maxf(4.0, floorf(track.size.y * PICKER_VISIBLE_ROWS / total))
+	var top: float = track.position.y + roundf((track.size.y - height) * picker_scroll / maxi(1, picker_max_scroll()))
+	return Rect2(track.position.x, top, track.size.x, height)
+
+
+func _draw_picker_bar() -> void:
+	var track: Rect2 = picker_bar_rect()
+	draw_rect(track, colors["0"])
+	draw_rect(picker_thumb_rect(), colors["o"])
+	var cx: float = track.position.x + 1
+	var up: Color = colors["1"] if picker_scroll > 0 else colors["e"]
+	var down: Color = colors["1"] if picker_scroll < picker_max_scroll() else colors["e"]
+	# 3 px wide arrowheads just outside the track
+	draw_rect(Rect2(cx, track.position.y - 3, 1, 1), up)
+	draw_rect(Rect2(cx - 1, track.position.y - 2, 3, 1), up)
+	draw_rect(Rect2(cx - 1, track.end.y + 1, 3, 1), down)
+	draw_rect(Rect2(cx, track.end.y + 2, 1, 1), down)
 
 
 ## A 7x5 pixel check mark (top-left `at`).

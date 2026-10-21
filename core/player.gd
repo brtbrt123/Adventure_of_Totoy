@@ -23,6 +23,8 @@ const STATE_SKILL_RECOVERY: StringName = &"skill_recovery"
 const STATE_LIGHTNING_BARRAGE: StringName = &"lightning_barrage"
 ## Reaper's Coil (Chain Scythe active): the core runs the hook, drag, spin or pull; no movement, no actions.
 const STATE_REAPER_COIL: StringName = &"reaper_coil"
+## Stone Ward is up: every hit is blocked and stored; slow movement, facing locked, no actions until it ends.
+const STATE_WARD: StringName = &"ward"
 const STATE_DEAD: StringName = &"dead"
 
 ## Reaper's Coil phases (snapshot.player.reaper_coil_phase).
@@ -39,6 +41,9 @@ const SKILL_GALE_CUT: StringName = Aspects.GALE_CUT
 const SKILL_MOON_CLEAVE: StringName = Aspects.MOON_CLEAVE
 const SKILL_SPIRIT_LANTERN: StringName = Aspects.SPIRIT_LANTERN
 const SKILL_PHANTOM_CUT: StringName = Aspects.PHANTOM_CUT
+const SKILL_SPRINT: StringName = Aspects.SPRINT
+const SKILL_ECHO_STEP: StringName = Aspects.ECHO_STEP
+const SKILL_STONE_WARD: StringName = Aspects.STONE_WARD
 ## The default slotting (before 2026-10-21 the only one).
 const SKILL_IDS: Array[StringName] = Aspects.DEFAULT_EQUIPPED
 
@@ -98,6 +103,14 @@ var skill_cooldowns: Array[int]:
 			view.append(aspect_cooldowns.get(aspect, 0))
 		return view
 var phantom_ticks_left: int = 0  # Phantom Cut ticks left (0 = not running); its swings queue echoes in the core
+var sprint_ticks_left: int = 0  # Sprint ticks left (0 = not running); walking-speed moves are SPRINT_MOVE_SPEED_MULT faster
+## Set by the core before each step: true while this player's Echo Step anchor exists (a second one is refused).
+var echo_exists: bool = false
+var echo_requested: bool = false  # set when Echo Step is pressed; the core places the anchor this tick and clears it
+var ward_ticks_left: int = 0  # Stone Ward ticks left while in STATE_WARD
+var ward_stored: int = 0  # damage the running ward has blocked and stored (capped at STONE_WARD_STORE_CAP)
+var ward_blocks: int = 0  # hits blocked by wards so far (the core uses it to see that a telegraph was blocked)
+var ward_release_pending: bool = false  # the ward just ended on its timer; the core releases the shockwave and clears it
 var retaliate_ticks: int = 0  # Breaking Edge is usable while this is above zero (set by a successful parry)
 var skill_dir: Vector2 = Vector2.RIGHT  # direction fixed when the skill was pressed
 var skill_motion: bool = false  # true on a tick in which a skill moved the player (Gale Cut's dash)
@@ -110,6 +123,7 @@ var _combo_grace: int = 0  # ticks left in which a press after a finished swing 
 var _hurt_invuln: int = 0
 var _dash_invuln: int = 0  # dash i-frames run on their own counter, so a short dash can keep a forgiving window
 var _blink_invuln: int = 0  # Lightning blink i-frames
+var _echo_invuln: int = 0  # Echo Step arrival i-frames
 
 
 func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
@@ -123,6 +137,10 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		_dash_invuln -= 1
 	if _blink_invuln > 0:
 		_blink_invuln -= 1
+	if _echo_invuln > 0:
+		_echo_invuln -= 1
+	if state == STATE_WARD and ward_ticks_left > 0:
+		ward_ticks_left -= 1
 	if swap_lockout > 0:
 		swap_lockout -= 1
 	for weapon: StringName in active_cooldowns.keys():
@@ -132,6 +150,10 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		phantom_ticks_left -= 1
 		if phantom_ticks_left == 0:
 			events.append(GameEvent.new(GameEvent.PHANTOM_CUT_ENDED, tick, {"entity_id": id, "reason": &"expired"}))
+	if sprint_ticks_left > 0:
+		sprint_ticks_left -= 1
+		if sprint_ticks_left == 0:
+			events.append(GameEvent.new(GameEvent.SPRINT_ENDED, tick, {"entity_id": id, "reason": &"expired"}))
 	if buff_ticks > 0:
 		if barrage_running or coil_running:
 			buff_ticks = maxi(1, buff_ticks - 1)  # Lightning Form / Reaper's Coil end with their skill, not by the timer
@@ -148,8 +170,14 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 	for aspect: StringName in aspect_cooldowns.keys():
 		if aspect_cooldowns[aspect] > 0:
 			aspect_cooldowns[aspect] -= 1
-	if input.skill_pressed >= 1 and input.skill_pressed <= equipped_aspects.size() and Aspects.kind(equipped_aspects[input.skill_pressed - 1]) == Aspects.KIND_BUFF:
-		_try_phantom_cut(tick, events)
+	if input.skill_pressed >= 1 and input.skill_pressed <= equipped_aspects.size() and Aspects.is_free_action(equipped_aspects[input.skill_pressed - 1]):
+		match equipped_aspects[input.skill_pressed - 1]:
+			SKILL_PHANTOM_CUT:
+				_try_phantom_cut(tick, events)
+			SKILL_SPRINT:
+				_try_sprint(tick, events)
+			SKILL_ECHO_STEP:
+				_try_echo_step(tick, events)
 	if retaliate_ticks > 0:
 		retaliate_ticks -= 1
 	if dash_cooldown > 0:
@@ -163,8 +191,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 	if barrage_requested or coil_requested:
 		return  # the core starts the barrage / coil this tick; the rest of this input is not used
 	var move: Vector2 = input.move.limit_length(1.0)
-	if state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL:
-		pass
+	if state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or state == STATE_WARD:
+		pass  # facing is scripted (barrage, coil) or locked (ward)
 	elif input.aim.length_squared() > 0.0001:
 		facing = input.aim.normalized()
 	elif move.length_squared() > 0.0001:
@@ -221,6 +249,12 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 			pass  # scripted by the core (GameCore._resolve_lightning_barrage): no movement, no actions
 		STATE_REAPER_COIL:
 			pass  # scripted by the core (GameCore._resolve_reaper_coil): no movement, no actions
+		STATE_WARD:
+			if ward_ticks_left <= 0:
+				_set_state(STATE_IDLE)
+				ward_release_pending = true  # the core releases the shockwave this tick
+			else:
+				position += move * speed * Tuning.STONE_WARD_MOVE_FACTOR
 		STATE_ATTACK_RECOVERY:
 			if _try_actions(input, move, tick, events, false):
 				return
@@ -243,12 +277,24 @@ func parry_ticks_since_press() -> int:
 func is_invulnerable() -> bool:
 	if state == STATE_DEAD:
 		return false
-	return state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0
+	return state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0 or _echo_invuln > 0
 
 
-## Returns true when the damage was applied (false while invulnerable or dead).
+## Echo Step arrival i-frames left (0 when none).
+func echo_invuln_ticks() -> int:
+	return _echo_invuln
+
+
+## Returns true when the damage was applied (false while invulnerable, dead, or blocked by a Stone Ward). A ward blocks
+## the hit: nothing else happens to the player (no hurt state, no combo reset, no i-frames); the damage is stored
+## (capped), ward_blocks counts it and ward_blocked is emitted.
 func take_damage(amount: int, tick: int, events: Array[GameEvent], source_id: int) -> bool:
 	if state == STATE_DEAD or is_invulnerable():
+		return false
+	if state == STATE_WARD:
+		ward_stored = mini(Tuning.STONE_WARD_STORE_CAP, ward_stored + maxi(0, amount))
+		ward_blocks += 1
+		events.append(GameEvent.new(GameEvent.WARD_BLOCKED, tick, {"entity_id": id, "amount": amount, "stored": ward_stored, "source_id": source_id}))
 		return false
 	hp = maxi(0, hp - amount)
 	reset_combo()
@@ -270,6 +316,11 @@ func die(tick: int, events: Array[GameEvent]) -> void:
 	state = STATE_DEAD
 	state_ticks = 0
 	skill_id = &""
+	ward_ticks_left = 0  # a ward ends without a release
+	ward_stored = 0
+	ward_release_pending = false
+	echo_requested = false
+	_echo_invuln = 0
 	if barrage_running:
 		end_barrage(tick, events, &"death")
 	if coil_running:
@@ -280,6 +331,9 @@ func die(tick: int, events: Array[GameEvent]) -> void:
 	if phantom_ticks_left > 0:
 		phantom_ticks_left = 0
 		events.append(GameEvent.new(GameEvent.PHANTOM_CUT_ENDED, tick, {"entity_id": id, "reason": &"death"}))
+	if sprint_ticks_left > 0:
+		sprint_ticks_left = 0
+		events.append(GameEvent.new(GameEvent.SPRINT_ENDED, tick, {"entity_id": id, "reason": &"death"}))
 	events.append(GameEvent.new(GameEvent.ENTITY_DIED, tick, {"entity_id": id, "visual_id": VISUAL_ID}))
 
 
@@ -394,7 +448,7 @@ func _try_skill(input: InputFrame, tick: int, events: Array[GameEvent]) -> bool:
 	if slot < 1 or slot > equipped_aspects.size():
 		return false
 	var chosen: StringName = equipped_aspects[slot - 1]
-	if Aspects.kind(chosen) != Aspects.KIND_SKILL or aspect_cooldowns.get(chosen, 0) > 0:
+	if Aspects.is_free_action(chosen) or aspect_cooldowns.get(chosen, 0) > 0:
 		return false
 	if Aspects.needs_retaliation(chosen) and retaliate_ticks <= 0:
 		return false
@@ -402,6 +456,9 @@ func _try_skill(input: InputFrame, tick: int, events: Array[GameEvent]) -> bool:
 	if edge < cost:
 		return false
 	edge -= cost
+	if chosen == SKILL_STONE_WARD:
+		_start_ward(input, tick, events)
+		return true
 	# The Spirit Lantern's cooldown starts when the lantern is placed (GameCore), the others' on the press.
 	if chosen != SKILL_SPIRIT_LANTERN:
 		aspect_cooldowns[chosen] = Aspects.cooldown(chosen)
@@ -456,8 +513,8 @@ static func skill_profile(skill: StringName) -> Dictionary:
 ## Scythe's Reaper's Coil (the same: a living boss, ends with the skill; aimed by input.aim, else the facing). Numbers
 ## per weapon in core/weapons.gd. Costs Edge, has the weapon's own cooldown, cannot be refreshed while it is running.
 func _try_weapon_active(tick: int, events: Array[GameEvent], input: InputFrame) -> bool:
-	if not Weapons.has_active(weapon_id) or state == STATE_DEAD or buff_ticks > 0 or buff_cooldown > 0:
-		return false
+	if not Weapons.has_active(weapon_id) or state == STATE_DEAD or state == STATE_WARD or buff_ticks > 0 or buff_cooldown > 0:
+		return false  # (a raised Stone Ward is committed: no weapon active until it ends)
 	if Weapons.active_needs_target(weapon_id) and not barrage_target_alive:
 		return false  # the barrage and the coil need a living boss
 	var cost: float = Weapons.active_edge_cost(weapon_id)
@@ -512,6 +569,79 @@ func _try_phantom_cut(tick: int, events: Array[GameEvent]) -> bool:
 	phantom_ticks_left = Tuning.PHANTOM_CUT_DURATION_TICKS
 	events.append(GameEvent.new(GameEvent.PHANTOM_CUT_STARTED, tick, {"entity_id": id, "duration": phantom_ticks_left}))
 	return true
+
+
+## Sprint (a buff aspect in the pressed slot): the same free-action rules as Phantom Cut (any state but dead, the
+## barrage and the coil; Edge and cooldown on the press; no refresh while it runs). Returns true if it started.
+func _try_sprint(tick: int, events: Array[GameEvent]) -> bool:
+	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or barrage_requested or coil_requested:
+		return false
+	if sprint_ticks_left > 0 or aspect_cooldowns.get(SKILL_SPRINT, 0) > 0:
+		return false
+	var cost: float = Aspects.edge_cost(SKILL_SPRINT)
+	if edge < cost:
+		return false
+	edge -= cost
+	aspect_cooldowns[SKILL_SPRINT] = Aspects.cooldown(SKILL_SPRINT)
+	sprint_ticks_left = Tuning.SPRINT_DURATION_TICKS
+	events.append(GameEvent.new(GameEvent.SPRINT_STARTED, tick, {
+		"entity_id": id, "duration": sprint_ticks_left, "move_speed_mult": Tuning.SPRINT_MOVE_SPEED_MULT,
+	}))
+	return true
+
+
+## Echo Step (in the pressed slot): a free action with the same state rules as Phantom Cut. Refused while this player's
+## anchor exists (nothing spent). The Edge and the cooldown are spent on the press; the core places the anchor on this
+## same tick (after the movement) and emits echo_placed. Returns true if it was accepted.
+func _try_echo_step(tick: int, events: Array[GameEvent]) -> bool:
+	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or barrage_requested or coil_requested:
+		return false
+	if echo_exists or echo_requested or aspect_cooldowns.get(SKILL_ECHO_STEP, 0) > 0:
+		return false
+	var cost: float = Aspects.edge_cost(SKILL_ECHO_STEP)
+	if edge < cost:
+		return false
+	edge -= cost
+	aspect_cooldowns[SKILL_ECHO_STEP] = Aspects.cooldown(SKILL_ECHO_STEP)
+	echo_requested = true
+	return true
+
+
+## The core pulls the player back to an echo anchor: teleport to `to`, whatever was running stops (back to idle; the
+## core released a raised ward first), the combo starts over, and ECHO_STEP_INVULN_TICKS of i-frames begin now.
+func echo_recall(to: Vector2) -> void:
+	position = to
+	pending_release = &""
+	attack_hit_done = true
+	ward_ticks_left = 0
+	reset_combo()
+	_set_state(STATE_IDLE)
+	_echo_invuln = Tuning.ECHO_STEP_INVULN_TICKS
+
+
+## Stone Ward (a skill aspect, Edge already spent by _try_skill): raise it now. Facing is locked to the skill direction.
+func _start_ward(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
+	aspect_cooldowns[SKILL_STONE_WARD] = Aspects.cooldown(SKILL_STONE_WARD)
+	facing = _skill_direction(input)
+	skill_dir = facing
+	pending_release = &""
+	retaliate_ticks = 0
+	reset_combo()
+	ward_ticks_left = Tuning.STONE_WARD_DURATION_TICKS
+	ward_stored = 0
+	ward_release_pending = false
+	_set_state(STATE_WARD)
+	events.append(GameEvent.new(GameEvent.WARD_RAISED, tick, {
+		"entity_id": id, "duration": ward_ticks_left, "facing": facing, "position": position,
+	}))
+
+
+## The ward ends early (an Echo Step recall): back to idle; the core releases the shockwave right away.
+func end_ward_early() -> void:
+	if state != STATE_WARD:
+		return
+	ward_ticks_left = 0
+	_set_state(STATE_IDLE)
 
 
 ## Equip aspect `aspect` into slot `slot` (1-3) (InputFrame.aspect_equip / aspect_equip_slot, sent by the character
@@ -576,9 +706,13 @@ func damage_mult() -> float:
 	return Weapons.active_damage_mult(weapon_id) if buff_ticks > 0 else 1.0
 
 
-## Current walking speed multiplier (1.0 without the buff; the katana buff's own value while it runs).
+## Current walking speed multiplier: the weapon buff's own value while it runs (1.0 for every weapon now), times
+## SPRINT_MOVE_SPEED_MULT while Sprint runs.
 func move_speed_mult() -> float:
-	return Weapons.active_move_speed_mult(weapon_id) if buff_ticks > 0 else 1.0
+	var mult: float = Weapons.active_move_speed_mult(weapon_id) if buff_ticks > 0 else 1.0
+	if sprint_ticks_left > 0:
+		mult *= Tuning.SPRINT_MOVE_SPEED_MULT
+	return mult
 
 
 ## Swings in the equipped weapon's combo (katana 3, dagger 4).

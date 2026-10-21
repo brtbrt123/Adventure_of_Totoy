@@ -1,0 +1,289 @@
+{
+ "generator": "tools/art/make_aspect_echo_ward_sprint_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+ "status": "Reference art for the human's approval; NOT imported into art/src, not in art/build, not wired into the game",
+ "frame_naming": "<group>_<n>, n from 1; mirror around the anchor for a left-facing hero, as with the hero frames",
+ "style": "Ring copied from the existing ui_aspect_gale_cut_1 (24px), like every other Aspect icon; new interior drawn here. 24px only (no 48px versions exist for Aspects). _lit_1..4 are optional loops for the HUD while the aspect is active.",
+ "group_table": {
+  "ui_aspect_echo_step": {
+   "frames": 1,
+   "size": [
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ]
+  },
+  "ui_aspect_echo_step_lit": {
+   "frames": 4,
+   "size": [
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ]
+  },
+  "ui_aspect_stone_ward": {
+   "frames": 1,
+   "size": [
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ]
+  },
+  "ui_aspect_stone_ward_lit": {
+   "frames": 4,
+   "size": [
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ]
+  },
+  "ui_aspect_sprint": {
+   "frames": 1,
+   "size": [
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ]
+  },
+  "ui_aspect_sprint_lit": {
+   "frames": 4,
+   "size": [
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ]
+  }
+ },
+ "sprite_count": 15,
+ "frames": [
+  {
+   "name": "ui_aspect_echo_step_1",
+   "rect": [
+    0,
+    0,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "Aspect slot / HUD skill icon"
+  },
+  {
+   "name": "ui_aspect_echo_step_lit_1",
+   "rect": [
+    0,
+    24,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_echo_step_lit_2",
+   "rect": [
+    24,
+    24,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_echo_step_lit_3",
+   "rect": [
+    48,
+    24,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_echo_step_lit_4",
+   "rect": [
+    72,
+    24,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_stone_ward_1",
+   "rect": [
+    0,
+    48,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "Aspect slot / HUD skill icon"
+  },
+  {
+   "name": "ui_aspect_stone_ward_lit_1",
+   "rect": [
+    0,
+    72,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_stone_ward_lit_2",
+   "rect": [
+    24,
+    72,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_stone_ward_lit_3",
+   "rect": [
+    48,
+    72,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_stone_ward_lit_4",
+   "rect": [
+    72,
+    72,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_sprint_1",
+   "rect": [
+    0,
+    96,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "Aspect slot / HUD skill icon"
+  },
+  {
+   "name": "ui_aspect_sprint_lit_1",
+   "rect": [
+    0,
+    120,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_sprint_lit_2",
+   "rect": [
+    24,
+    120,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_sprint_lit_3",
+   "rect": [
+    48,
+    120,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_sprint_lit_4",
+   "rect": [
+    72,
+    120,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the aspect is active (loop about 120 ms)"
+  }
+ ]
+}

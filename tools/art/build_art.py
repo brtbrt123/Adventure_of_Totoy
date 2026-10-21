@@ -4,6 +4,7 @@ Outputs in art/build:
   tiles/<name>.png, sprites/<name>.png   individual images
   tiles.png + tiles.json + tileset.tres  16x16 tile atlas (1px extruded border, Godot TileSet)
   sprites.png + sprites.json             packed sprite atlas (1px extruded border)
+  sprites_gold/white/dark.png            recoloured copies of the atlas the arena loads (see build_variant_atlases)
 
 Refuses to build if the sources do not validate.
 
@@ -24,8 +25,9 @@ TILE_MARGIN = 1  # outer margin of the tile atlas
 TILE_SEPARATION = 2  # gap between tiles: one extruded pixel on each side
 EXTRUDE = 1
 # Shelf-packed sprite atlas. 256 wide reached 256x8126 with the Chain Scythe set; widened to 512 (2026-10-21) for the
-# Spirit Lantern / Phantom Cut set. Everything reads frame rectangles from sprites.json, so the width is free to change.
-SPRITE_ATLAS_WIDTH = 512
+# Spirit Lantern / Phantom Cut set, and to 1024 (2026-10-21) for the Echo Step / Stone Ward / Sprint set (512 would be
+# 512x8978). Everything reads frame rectangles from sprites.json, so the width is free to change.
+SPRITE_ATLAS_WIDTH = 1024
 SPRITE_ATLAS_MAX = 8192  # keep both sides at or under 8192 px (safe texture size for the gl_compatibility renderer)
 RES_BUILD = "res://art/build"
 
@@ -92,7 +94,45 @@ def build_tiles(tiles: dict[str, Image.Image], out: Path) -> None:
     (out / "tileset.tres").write_text("\n".join(lines), encoding="utf-8", newline="\n")
 
 
-def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path, anchors: dict[str, tuple[int, int]] | None = None) -> None:
+# Recoloured copies of the sprite atlas that the arena used to make pixel by pixel in _ready (about 1 s with the
+# 1024x4428 atlas). Same frame rectangles as sprites.png; the rules match presentation/arena/arena.gd exactly:
+#   sprites_gold.png   every reserved red pixel turned gold (z -> x, A -> y): the gold-parryable sweep's impact art
+#   sprites_white.png  every pixel white with its own alpha: the hit-flash silhouettes (not palette art: the validator
+#                      skips it)
+#   sprites_dark.png   the Black Form look: inside each hero2_* frame rectangle (not its extruded border) the stone and
+#                      blue ramps darkened (e,f,k -> 0; g,l -> e; h,m -> k)
+GOLD_SWAP = {"z": "x", "A": "y"}
+DARK_SWAP = {"e": "0", "f": "0", "g": "e", "h": "k", "k": "0", "l": "e", "m": "k"}
+DARK_PREFIX = "hero2_"
+VARIANT_ATLASES = ("sprites_gold.png", "sprites_white.png", "sprites_dark.png")
+
+
+def _swap_pixels(image: Image.Image, swap: dict[tuple[int, int, int, int], tuple[int, int, int, int]]) -> Image.Image:
+    flat = getattr(image, "get_flattened_data", None)  # Pillow 12+; getdata is deprecated there
+    data = list(flat() if flat is not None else image.getdata())
+    out = Image.new("RGBA", image.size)
+    out.putdata([swap.get(pixel, pixel) for pixel in data])
+    return out
+
+
+def build_variant_atlases(atlas: Image.Image, frames: dict[str, dict[str, int]], palette: "artlib.Palette", out: Path) -> None:
+    rgba = {symbol: rgb + (255,) for symbol, rgb in palette.by_symbol.items()}
+    gold = _swap_pixels(atlas, {rgba[a]: rgba[b] for a, b in GOLD_SWAP.items()})
+    gold.save(out / VARIANT_ATLASES[0])
+    white = Image.new("RGBA", atlas.size, (255, 255, 255, 255))
+    white.putalpha(atlas.getchannel("A"))
+    white.save(out / VARIANT_ATLASES[1])
+    dark = atlas.copy()
+    dark_swap = {rgba[a]: rgba[b] for a, b in DARK_SWAP.items()}
+    for name, rect in frames.items():
+        if not name.startswith(DARK_PREFIX):
+            continue
+        box = (rect["x"], rect["y"], rect["x"] + rect["w"], rect["y"] + rect["h"])
+        dark.paste(_swap_pixels(atlas.crop(box), dark_swap), box[:2])
+    dark.save(out / VARIANT_ATLASES[2])
+
+
+def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path, anchors: dict[str, tuple[int, int]] | None = None, palette: "artlib.Palette | None" = None) -> None:
     anchors = anchors or {}
     order = sorted(sprites, key=lambda n: (-sprites[n].height, n))
     width = max([SPRITE_ATLAS_WIDTH] + [sprites[n].width + 2 * EXTRUDE for n in order])
@@ -116,6 +156,7 @@ def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path, anchors: dict
         if name in anchors:  # ground point of the sprite in its own pixels, used by presentation to place and mirror it
             frames[name]["ax"], frames[name]["ay"] = anchors[name]
     atlas.save(out / "sprites.png")
+    build_variant_atlases(atlas, frames, palette or artlib.load_palette(), out)
     write_json(out / "sprites.json", {
         "texture": f"{RES_BUILD}/sprites.png",
         "extrude": EXTRUDE,
@@ -156,7 +197,7 @@ def main() -> int:
     if tiles:
         build_tiles(tiles, out)
     if sprites:
-        build_sprite_atlas(sprites, out, anchors)
+        build_sprite_atlas(sprites, out, anchors, palette)
     print(f"Built {len(tiles)} tile(s) and {len(sprites)} sprite(s) into {out}")
     return 0
 

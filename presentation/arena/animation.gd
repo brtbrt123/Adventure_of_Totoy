@@ -5,6 +5,9 @@ const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
+const WardEchoSprintEffects := preload("res://presentation/arena/ward_echo_sprint_effects.gd")
+## Stone Ward pose frame counts (raise, hold loop, drop) of every hero set.
+const WARD_POSES: Dictionary = {"ward_raise": 4, "ward_hold": 4, "ward_drop": 3}
 ## Hero frame sets by equipped weapon (same numbering per state): katana, dagger, dagger in Lightning Form, scythe.
 const SET_KATANA: String = "hero2"
 const SET_DAGGER: String = "totoy_dagger"
@@ -77,6 +80,12 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 			return hero_frame(prefix, "attack%d" % swing, phase * 2 + index)
 		if state == "parry_recovery":
 			return hero_frame(prefix, "parry", 6)
+		if state == String(PlayerState.STATE_WARD):
+			# Stone Ward: raise, hold loop, drop on the last ticks, timed by the core's ward_ticks_left.
+			return ward_frame(prefix, actor.ward_ticks_left)
+		if state == "walk":
+			# The walk cycle runs at the walking speed's rate (twice as fast while Sprint runs).
+			return hero_frame(prefix, "walk", frame_index(PLAYER["walk"], walk_ticks(ticks, actor.move_speed_mult)))
 		if not PLAYER.has(state):
 			state = "idle"
 		return hero_frame(prefix, state, frame_index(PLAYER[state], ticks))
@@ -103,6 +112,27 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 	if state == "recover":
 		state = "idle"
 	return "golem2_%s_%d" % [state, frame_index(BOSS.get(state, BOSS["idle"]), actor.state_ticks)]
+
+## Walk-cycle ticks scaled by the move speed multiplier (the cycle plays `mult` times as fast; 1.0 unchanged).
+static func walk_ticks(ticks: int, mult: float) -> int:
+	return floori(maxi(0, ticks) * maxf(1.0, mult))
+
+## `<set>_ward_<raise|hold|drop>_right_<n>` from ward_ticks_left (WardEchoSprintEffects.ward_pose has the timing).
+static func ward_frame(prefix: String, ward_ticks_left: int) -> String:
+	if prefix == SET_LIGHTNING:
+		prefix = SET_DAGGER
+	var pose: Array = WardEchoSprintEffects.ward_pose(maxi(1, ward_ticks_left))
+	return hero_frame(prefix, "ward_%s" % pose[0], int(pose[1]))
+
+## The hero frame whose per-frame overlays (Phantom glow, sprint aura and afterimages, echo shield) fit `frame`: a
+## Stone Ward frame is idle frame ((n - 1) % 4) + 1 of its set with the slab, same anchor (manifest idle_frame), so it
+## borrows that idle frame's overlays; every other frame is its own.
+static func overlay_frame(frame: String) -> String:
+	var at: int = frame.find("_ward_")
+	if at < 0:
+		return frame
+	var n: int = int(frame.get_slice("_", frame.get_slice_count("_") - 1))
+	return "%s_idle_right_%d" % [frame.substr(0, at), (maxi(1, n) - 1) % 4 + 1]
 
 ## Lightning Barrage pose: slash n (1-8) cycles the four dagger swings; `age` ticks after its blink it shows the windup
 ## key frame, then the strike (on the hit tick, LIGHTNING_BARRAGE_HIT_DELAY_TICKS after the blink) and the follow
@@ -155,6 +185,10 @@ static func hero_names(prefix: String) -> Array[String]:
 	for swing: int in range(1, swings + 1):
 		for n: int in range(1, 7):
 			names.append(hero_frame(prefix, "attack%d" % swing, n))
+	if prefix != SET_LIGHTNING:  # the Lightning set never wards (it uses the dagger frames)
+		for pose: String in WARD_POSES:
+			for n: int in range(1, int(WARD_POSES[pose]) + 1):
+				names.append(hero_frame(prefix, pose, n))
 	return names
 
 static func all_names() -> Array[String]:
