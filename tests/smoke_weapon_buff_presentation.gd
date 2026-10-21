@@ -38,8 +38,8 @@ func step(frame: InputFrame) -> void:
 func fixture() -> void:
 	arena._restart()
 	arena.core.boss.cooldown = 100000
-	arena.core.boss.position = Vector2(250, 100)
-	arena.core.player.position = Vector2(100, 110)
+	arena.core.boss.position = Vector2(450, 230)  # open plaza (the arena edges are solid since 2026-10-21)
+	arena.core.player.position = Vector2(300, 240)
 	arena.core.player.edge = Tuning.EDGE_MAX
 	observe()
 
@@ -284,7 +284,7 @@ func dagger_form() -> void:
 ## darkening, the run ring while the coil runs and the cooldown ring after it, one start and one end cue.
 func scythe_coil() -> void:
 	fixture()
-	arena.core.boss.position = Vector2(200, 110)
+	arena.core.boss.position = Vector2(400, 240)
 	var swap: InputFrame = InputFrame.new()
 	swap.weapon_equip = Tuning.WEAPON_CHAIN_SCYTHE
 	step(swap)

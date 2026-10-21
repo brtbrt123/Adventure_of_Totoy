@@ -5,6 +5,7 @@ const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
 const Weapons := preload("res://core/weapons.gd")
+const Aspects := preload("res://core/aspects.gd")
 
 const VISUAL_ID: StringName = &"totoy"
 const STATE_IDLE: StringName = &"idle"
@@ -31,11 +32,15 @@ const COIL_SPIN: StringName = &"spin"
 const COIL_PULL: StringName = &"pull"
 const COIL_RECOVERY: StringName = &"recovery"
 
-## skill_pressed 1, 2, 3 select these (test bindings Z, X, C).
-const SKILL_BREAKING_EDGE: StringName = &"breaking_edge"
-const SKILL_GALE_CUT: StringName = &"gale_cut"
-const SKILL_MOON_CLEAVE: StringName = &"moon_cleave"
-const SKILL_IDS: Array[StringName] = [SKILL_BREAKING_EDGE, SKILL_GALE_CUT, SKILL_MOON_CLEAVE]
+## The aspects (skills). skill_pressed 1, 2, 3 (test bindings Z, X, C) trigger the aspect in that slot of
+## equipped_aspects; the ids are core/aspects.gd's.
+const SKILL_BREAKING_EDGE: StringName = Aspects.BREAKING_EDGE
+const SKILL_GALE_CUT: StringName = Aspects.GALE_CUT
+const SKILL_MOON_CLEAVE: StringName = Aspects.MOON_CLEAVE
+const SKILL_SPIRIT_LANTERN: StringName = Aspects.SPIRIT_LANTERN
+const SKILL_PHANTOM_CUT: StringName = Aspects.PHANTOM_CUT
+## The default slotting (before 2026-10-21 the only one).
+const SKILL_IDS: Array[StringName] = Aspects.DEFAULT_EQUIPPED
 
 var id: int = 1
 var position: Vector2 = Tuning.PLAYER_START
@@ -81,7 +86,18 @@ var coil_drag_from: Vector2 = Vector2.ZERO  # where the boss was when it was hoo
 var swing_speed_mult: float = 1.0  # locked at the start of each swing
 var swing_damage_mult: float = 1.0  # locked at the start of each swing
 var skill_id: StringName = &""  # the skill in progress during skill_* states, empty otherwise
-var skill_cooldowns: Array[int] = [0, 0, 0]  # ticks left per skill 1-3
+## The aspects in slots 1-3 (skill_pressed N uses equipped_aspects[N - 1]). Always SKILL_COUNT different known ids.
+var equipped_aspects: Array[StringName] = Aspects.DEFAULT_EQUIPPED.duplicate()
+## Ticks until each aspect can be used again, per aspect id (slotted or not, they all count down).
+var aspect_cooldowns: Dictionary[StringName, int] = {}
+## Read-only view: ticks left of the aspect in each slot 1-3 (index 0 = slot 1).
+var skill_cooldowns: Array[int]:
+	get:
+		var view: Array[int] = []
+		for aspect: StringName in equipped_aspects:
+			view.append(aspect_cooldowns.get(aspect, 0))
+		return view
+var phantom_ticks_left: int = 0  # Phantom Cut ticks left (0 = not running); its swings queue echoes in the core
 var retaliate_ticks: int = 0  # Breaking Edge is usable while this is above zero (set by a successful parry)
 var skill_dir: Vector2 = Vector2.RIGHT  # direction fixed when the skill was pressed
 var skill_motion: bool = false  # true on a tick in which a skill moved the player (Gale Cut's dash)
@@ -112,6 +128,10 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 	for weapon: StringName in active_cooldowns.keys():
 		if active_cooldowns[weapon] > 0:
 			active_cooldowns[weapon] -= 1
+	if phantom_ticks_left > 0:
+		phantom_ticks_left -= 1
+		if phantom_ticks_left == 0:
+			events.append(GameEvent.new(GameEvent.PHANTOM_CUT_ENDED, tick, {"entity_id": id, "reason": &"expired"}))
 	if buff_ticks > 0:
 		if barrage_running or coil_running:
 			buff_ticks = maxi(1, buff_ticks - 1)  # Lightning Form / Reaper's Coil end with their skill, not by the timer
@@ -121,11 +141,15 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 				_emit_buff_end(tick, events, &"expired")
 	if input.weapon_equip != &"":
 		try_weapon_equip(input.weapon_equip, tick, events)
+	if input.aspect_equip != &"":
+		try_aspect_equip(input.aspect_equip, input.aspect_equip_slot, tick, events)
 	if input.weapon_active_pressed:
 		_try_weapon_active(tick, events, input)
-	for i: int in skill_cooldowns.size():
-		if skill_cooldowns[i] > 0:
-			skill_cooldowns[i] -= 1
+	for aspect: StringName in aspect_cooldowns.keys():
+		if aspect_cooldowns[aspect] > 0:
+			aspect_cooldowns[aspect] -= 1
+	if input.skill_pressed >= 1 and input.skill_pressed <= equipped_aspects.size() and Aspects.kind(equipped_aspects[input.skill_pressed - 1]) == Aspects.KIND_BUFF:
+		_try_phantom_cut(tick, events)
 	if retaliate_ticks > 0:
 		retaliate_ticks -= 1
 	if dash_cooldown > 0:
@@ -253,6 +277,9 @@ func die(tick: int, events: Array[GameEvent]) -> void:
 	if buff_ticks > 0:
 		buff_ticks = 0
 		_emit_buff_end(tick, events, &"death")
+	if phantom_ticks_left > 0:
+		phantom_ticks_left = 0
+		events.append(GameEvent.new(GameEvent.PHANTOM_CUT_ENDED, tick, {"entity_id": id, "reason": &"death"}))
 	events.append(GameEvent.new(GameEvent.ENTITY_DIED, tick, {"entity_id": id, "visual_id": VISUAL_ID}))
 
 
@@ -359,30 +386,25 @@ func _try_actions(input: InputFrame, move: Vector2, tick: int, events: Array[Gam
 	return false
 
 
-## Starts the skill chosen by input.skill_pressed (1-3) when it is allowed: off cooldown, enough Edge, and for
-## Breaking Edge inside the retaliation window after a successful parry.
+## Starts the skill action in the slot chosen by input.skill_pressed (1-3) when it is allowed: off cooldown, enough
+## Edge, and for Breaking Edge (in whatever slot) inside the retaliation window after a successful parry. A buff aspect
+## (Phantom Cut) is not a skill action: it was handled as a free action earlier in step().
 func _try_skill(input: InputFrame, tick: int, events: Array[GameEvent]) -> bool:
 	var slot: int = input.skill_pressed
-	if slot < 1 or slot > Tuning.SKILL_COUNT or skill_cooldowns[slot - 1] > 0:
+	if slot < 1 or slot > equipped_aspects.size():
 		return false
-	var chosen: StringName = SKILL_IDS[slot - 1]
-	var cost: float = 0.0
-	var cooldown: int = 0
-	match chosen:
-		SKILL_BREAKING_EDGE:
-			if retaliate_ticks <= 0:
-				return false
-			cost = Tuning.BREAKING_EDGE_EDGE_COST
-		SKILL_GALE_CUT:
-			cost = Tuning.GALE_CUT_EDGE_COST
-			cooldown = Tuning.GALE_CUT_COOLDOWN_TICKS
-		SKILL_MOON_CLEAVE:
-			cost = Tuning.MOON_CLEAVE_EDGE_COST
-			cooldown = Tuning.MOON_CLEAVE_COOLDOWN_TICKS
+	var chosen: StringName = equipped_aspects[slot - 1]
+	if Aspects.kind(chosen) != Aspects.KIND_SKILL or aspect_cooldowns.get(chosen, 0) > 0:
+		return false
+	if Aspects.needs_retaliation(chosen) and retaliate_ticks <= 0:
+		return false
+	var cost: float = Aspects.edge_cost(chosen)
 	if edge < cost:
 		return false
 	edge -= cost
-	skill_cooldowns[slot - 1] = cooldown
+	# The Spirit Lantern's cooldown starts when the lantern is placed (GameCore), the others' on the press.
+	if chosen != SKILL_SPIRIT_LANTERN:
+		aspect_cooldowns[chosen] = Aspects.cooldown(chosen)
 	skill_id = chosen
 	skill_dir = _skill_direction(input)
 	facing = skill_dir
@@ -411,6 +433,8 @@ func _skill_ticks(phase: String) -> int:
 			return {"windup": Tuning.BREAKING_EDGE_WINDUP_TICKS, "active": Tuning.BREAKING_EDGE_ACTIVE_TICKS, "recovery": Tuning.BREAKING_EDGE_RECOVERY_TICKS}[phase]
 		SKILL_GALE_CUT:
 			return {"windup": Tuning.GALE_CUT_WINDUP_TICKS, "active": Tuning.GALE_CUT_ACTIVE_TICKS, "recovery": Tuning.GALE_CUT_RECOVERY_TICKS}[phase]
+		SKILL_SPIRIT_LANTERN:
+			return {"windup": Tuning.SPIRIT_LANTERN_WINDUP_TICKS, "active": Tuning.SPIRIT_LANTERN_ACTIVE_TICKS, "recovery": Tuning.SPIRIT_LANTERN_RECOVERY_TICKS}[phase]
 		_:
 			return {"windup": Tuning.MOON_CLEAVE_WINDUP_TICKS, "active": Tuning.MOON_CLEAVE_ACTIVE_TICKS, "recovery": Tuning.MOON_CLEAVE_RECOVERY_TICKS}[phase]
 
@@ -469,6 +493,58 @@ func try_weapon_equip(target: StringName, tick: int, events: Array[GameEvent]) -
 	swap_lockout = Tuning.WEAPON_SWAP_LOCKOUT_TICKS
 	reset_combo()
 	events.append(GameEvent.new(GameEvent.WEAPON_SWAPPED, tick, {"entity_id": id, "weapon_id": weapon_id, "previous_weapon_id": previous}))
+	return true
+
+
+## Phantom Cut (a buff aspect in the pressed slot): a free action like the weapon active, no state change, allowed in
+## any state but dead, the Lightning Barrage and Reaper's Coil. Needs Edge and its cooldown; cannot be refreshed while
+## it runs. The cost is spent and the cooldown starts on the press. Returns true if it started.
+func _try_phantom_cut(tick: int, events: Array[GameEvent]) -> bool:
+	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or barrage_requested or coil_requested:
+		return false
+	if phantom_ticks_left > 0 or aspect_cooldowns.get(SKILL_PHANTOM_CUT, 0) > 0:
+		return false
+	var cost: float = Aspects.edge_cost(SKILL_PHANTOM_CUT)
+	if edge < cost:
+		return false
+	edge -= cost
+	aspect_cooldowns[SKILL_PHANTOM_CUT] = Aspects.cooldown(SKILL_PHANTOM_CUT)
+	phantom_ticks_left = Tuning.PHANTOM_CUT_DURATION_TICKS
+	events.append(GameEvent.new(GameEvent.PHANTOM_CUT_STARTED, tick, {"entity_id": id, "duration": phantom_ticks_left}))
+	return true
+
+
+## Equip aspect `aspect` into slot `slot` (1-3) (InputFrame.aspect_equip / aspect_equip_slot, sent by the character
+## menu). If it already sits in another slot the two slots swap. Same rules as the weapon equip: idle or walk only,
+## never while a weapon buff/form runs (a Phantom Cut buff or a lantern is no blocker); no lockout. Unknown ids, a bad
+## slot, or the aspect already in that slot do nothing (no event). Cooldowns belong to the aspect, so they move with it.
+func try_aspect_equip(aspect: StringName, slot: int, tick: int, events: Array[GameEvent]) -> bool:
+	if not Aspects.is_known(aspect) or slot < 1 or slot > equipped_aspects.size():
+		return false
+	if state != STATE_IDLE and state != STATE_WALK:
+		return false
+	if buff_ticks > 0 or barrage_running or coil_running:
+		return false
+	var previous: StringName = equipped_aspects[slot - 1]
+	if previous == aspect:
+		return false
+	var other: int = equipped_aspects.find(aspect)
+	equipped_aspects[slot - 1] = aspect
+	if other >= 0:
+		equipped_aspects[other] = previous
+	events.append(GameEvent.new(GameEvent.ASPECT_EQUIPPED, tick, {
+		"entity_id": id, "slot": slot, "aspect_id": aspect, "previous": previous, "swapped_slot": other + 1 if other >= 0 else 0,
+	}))
+	return true
+
+
+## Set the slots from a saved loadout (a fight's start). Ignored unless it is SKILL_COUNT different known aspects.
+func set_equipped_aspects(aspects: Array) -> bool:
+	if not Aspects.is_valid_loadout(aspects):
+		return false
+	equipped_aspects.clear()
+	for value: Variant in aspects:
+		equipped_aspects.append(StringName(value))
 	return true
 
 

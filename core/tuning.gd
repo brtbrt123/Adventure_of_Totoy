@@ -117,6 +117,43 @@ const MOON_CLEAVE_DAMAGE: float = 40.0
 const MOON_CLEAVE_POSTURE: float = 20.0
 const MOON_CLEAVE_EDGE_GAIN: float = 0.0
 
+# Equippable aspects (2026-10-21, human-approved design): the player owns every aspect in Aspects.ALL and equips exactly
+# SKILL_COUNT of them into the slots (skill_pressed 1-3 = Z, X, C) from the character menu (InputFrame.aspect_equip).
+# Cooldowns belong to the aspect, not to the slot, so re-slotting never resets or skips one. Equip rules are the
+# weapon equip's (idle or walk only, never while a weapon buff/form runs) with no lockout.
+# 4. Spirit Lantern (first guesses, 2026-10-21): a skill action (windup -> active -> recovery, no movement in it). On
+# the first skill_active tick a lantern is placed at the player's feet. It stays SPIRIT_LANTERN_DURATION_TICKS and
+# pulses every SPIRIT_LANTERN_PULSE_INTERVAL_TICKS (pulse k at placement + k * interval, the last one on its final
+# tick, then it expires): the player standing within SPIRIT_LANTERN_RADIUS px (centre distance, inclusive) heals and
+# gains Edge (both capped). The boss is unaffected. One lantern per player: a new one replaces the old one. The Edge
+# cost is spent on the press (not refunded if the windup is interrupted, like every skill); the cooldown starts when
+# the lantern is placed, so an interrupted windup costs no cooldown.
+const SPIRIT_LANTERN_EDGE_COST: float = 30.0
+const SPIRIT_LANTERN_COOLDOWN_TICKS: int = 900  # 15 seconds, counted from the placement
+const SPIRIT_LANTERN_WINDUP_TICKS: int = 10
+const SPIRIT_LANTERN_ACTIVE_TICKS: int = 1  # the placement pose; the lantern appears on this tick
+const SPIRIT_LANTERN_RECOVERY_TICKS: int = 8
+const SPIRIT_LANTERN_DURATION_TICKS: int = 300  # 5 seconds
+const SPIRIT_LANTERN_PULSE_INTERVAL_TICKS: int = 60
+const SPIRIT_LANTERN_PULSES: int = 5  # DURATION / INTERVAL
+const SPIRIT_LANTERN_RADIUS: float = 44.0  # the human asked for a bigger range than a small circle
+const SPIRIT_LANTERN_HEAL_PER_PULSE: int = 6
+const SPIRIT_LANTERN_EDGE_PER_PULSE: float = 8.0
+# 5. Phantom Cut (first guesses, 2026-10-21): a buff aspect, a free action like the weapon active (no state change; any
+# state but dead, the Lightning Barrage and Reaper's Coil). For PHANTOM_CUT_DURATION_TICKS every NORMAL swing that
+# connects queues a phantom echo that lands PHANTOM_CUT_DELAY_TICKS after the real hit on the boss wherever it is then
+# (no range check): damage = the swing's base damage x PHANTOM_CUT_DAMAGE_MULT under the normal armor/counter rules,
+# posture = the swing's posture x PHANTOM_CUT_POSTURE_MULT when not a counter. An echo never gains or spends Edge
+# (a counter echo has no Edge bonus), never advances the combo and never calls a finisher (no lightning strike).
+# Edge cost on the press, cooldown from the activation, cannot be refreshed while it runs. Ends on timeout or death;
+# echoes already queued still land after the timeout.
+const PHANTOM_CUT_EDGE_COST: float = 40.0
+const PHANTOM_CUT_COOLDOWN_TICKS: int = 1200  # 20 seconds, counted from the activation
+const PHANTOM_CUT_DURATION_TICKS: int = 300  # 5 seconds
+const PHANTOM_CUT_DELAY_TICKS: int = 14
+const PHANTOM_CUT_DAMAGE_MULT: float = 0.6
+const PHANTOM_CUT_POSTURE_MULT: float = 0.6
+
 # Black Katana active (right click). Values set by the human on 2026-10-19 (still to be judged by playtesting).
 # While the buff is active, normal swings are faster (each phase's ticks are divided by the multiplier, see
 # Player.scaled_ticks) and the player's damage is higher (normal swings and skills). Skill timings do not change.

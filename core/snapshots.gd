@@ -38,6 +38,9 @@ class EntitySnapshot:
 	var weapon_buff_ticks_left: int = 0  # player only: ticks of buff left, 0 when not active
 	var attack_speed_mult: float = 1.0  # player only: the speed of the swing in progress (locked at its start), else the current buff speed
 	var skill_id: StringName = &""  # player only: the skill in progress during skill_* states, else empty
+	var equipped_aspects: Array[StringName] = []  # player only: the aspects in slots 1-3 (Z, X, C)
+	var phantom_ticks_left: int = 0  # player only: Phantom Cut ticks left, 0 when it does not run
+	var phantom_pending_echoes: int = 0  # player only: Phantom Cut echoes queued and not landed yet
 
 
 class TelegraphSnapshot:
@@ -79,6 +82,21 @@ class SkillAttackSnapshot:
 	var hit_target_ids: Array[int] = []
 
 
+class LanternSnapshot:
+	extends RefCounted
+	## A Spirit Lantern in the world (it does not block movement).
+	var id: int = 0  # the same id appears in the lantern_* events
+	var owner_id: int = 0
+	var position: Vector2 = Vector2.ZERO  # where it stands (the player's feet when it was placed)
+	var radius: float = 0.0  # the light: the player's centre within this distance is inside
+	var placed_tick: int = 0
+	var duration: int = 0
+	var ticks_left: int = 0  # ticks until its last pulse / expiry (duration on the placement tick)
+	var pulse_index: int = 0  # pulses done so far (0-5)
+	var pulses: int = 0  # pulses in a full life (5)
+	var next_pulse_in: int = 0  # ticks until the next pulse (0 once all pulses are done)
+
+
 class ObstacleSnapshot:
 	extends RefCounted
 	## A solid static prop (see core/arena_layout.gd). The same list is used for collision and for drawing.
@@ -103,7 +121,14 @@ class HudSnapshot:
 	var boss_posture: float = 0.0
 	var boss_posture_max: float = 0.0
 	var counter_window_ticks_left: int = 0
-	var skill_cooldown_ticks: Array[int] = [0, 0, 0]  # ticks left per skill 1-3
+	var skill_cooldown_ticks: Array[int] = [0, 0, 0]  # ticks left of the aspect in each slot 1-3
+	var equipped_aspects: Array[StringName] = []  # the aspect id in each slot 1-3
+	## One row per slot 1-3: slot, aspect_id, name, kind (skill/buff), edge_cost, cooldown_ticks, cooldown_max, running,
+	## ticks_left (lantern life / phantom buff left while running), duration, needs_retaliation.
+	var aspect_slots: Array[Dictionary] = []
+	var aspect_cooldowns: Dictionary = {}  # aspect_id -> ticks until ready, for every aspect (slotted or not)
+	var phantom_ticks_left: int = 0
+	var phantom_duration: int = 0
 	var weapon_buff_duration: int = 0  # full duration of the weapon buff (0 if the weapon has none)
 	var weapon_buff_cooldown_ticks: int = 0  # ticks until the weapon active can be used again
 	var weapon_buff_cooldown_max: int = 0
@@ -123,5 +148,6 @@ class GameSnapshot:
 	var entities: Array[EntitySnapshot] = []  # everything except the player
 	var telegraphs: Array[TelegraphSnapshot] = []
 	var skill_attacks: Array[SkillAttackSnapshot] = []
+	var lanterns: Array[LanternSnapshot] = []  # Spirit Lanterns in the world
 	var obstacles: Array[ObstacleSnapshot] = []  # the solid props, the same every tick
 	var hud: HudSnapshot = null

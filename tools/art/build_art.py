@@ -23,7 +23,10 @@ TILE_COLUMNS = 8
 TILE_MARGIN = 1  # outer margin of the tile atlas
 TILE_SEPARATION = 2  # gap between tiles: one extruded pixel on each side
 EXTRUDE = 1
-SPRITE_ATLAS_WIDTH = 256
+# Shelf-packed sprite atlas. 256 wide reached 256x8126 with the Chain Scythe set; widened to 512 (2026-10-21) for the
+# Spirit Lantern / Phantom Cut set. Everything reads frame rectangles from sprites.json, so the width is free to change.
+SPRITE_ATLAS_WIDTH = 512
+SPRITE_ATLAS_MAX = 8192  # keep both sides at or under 8192 px (safe texture size for the gl_compatibility renderer)
 RES_BUILD = "res://art/build"
 
 
@@ -102,6 +105,8 @@ def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path, anchors: dict
         placements[name] = (x + EXTRUDE, y + EXTRUDE)
         x += cell_w
         shelf = max(shelf, cell_h)
+    if y + shelf > SPRITE_ATLAS_MAX or width > SPRITE_ATLAS_MAX:
+        raise SystemExit(f"FAIL: sprite atlas would be {width}x{y + shelf}, over {SPRITE_ATLAS_MAX} px; raise SPRITE_ATLAS_WIDTH in tools/art/build_art.py")
     atlas = Image.new("RGBA", (width, y + shelf), (0, 0, 0, 0))
     frames: dict[str, dict[str, int]] = {}
     for name in order:

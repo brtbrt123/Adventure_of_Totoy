@@ -62,17 +62,72 @@ func test_both_spawn_points_are_free() -> void:
 	assert_true(Tuning.PLAYER_START.distance_to(Tuning.BOSS_START) > 100.0, "they start apart")
 
 
-func test_the_altar_is_one_sprite_with_three_colliders() -> void:
+## The ground painting draws every structure (since 2026-10-21): the obstacles are colliders only. The altar used to
+## be one sprite with three colliders; it is now painted and blocked by ALTAR_COLLIDERS along its whole base.
+func test_the_props_are_colliders_on_the_painted_ground() -> void:
 	var core: GameCore = GameCore.new()
-	var altar_sprites: int = 0
 	var altar_colliders: int = 0
 	for o: Obstacle in core.obstacles:
-		if o.feet == Vector2(ArenaLayout.ALTAR[1], ArenaLayout.ALTAR[2]):
+		assert_eq(o.visual_id, &"", "obstacle %d draws nothing (the ground has the art)" % o.id)
+		if o.feet == Vector2(ArenaLayout.ALTAR[0], ArenaLayout.ALTAR[1]):
 			altar_colliders += 1
-			if o.visual_id != &"":
-				altar_sprites += 1
-	assert_eq(altar_sprites, 1, "drawn once")
-	assert_eq(altar_colliders, 3, "blocked along its base")
+	assert_eq(altar_colliders, ArenaLayout.ALTAR_COLLIDERS.size(), "the altar is blocked along its base")
+	assert_true(altar_colliders >= 3)
+	# walking straight into the altar from the north stops in front of it, anywhere along its width
+	for x: float in [372.0, 398.0, 424.0]:
+		var walker: GameCore = GameCore.new()
+		walker.boss.state = BossState.STATE_RECOVER
+		walker.boss._recover_ticks = 1000000
+		walker.boss.position = Vector2(600.0, 250.0)
+		walker.player.position = Vector2(x, 360.0)
+		run(walker, 120, input(Vector2.DOWN))
+		assert_true(walker.player.position.y < 392.0, "the altar stops the player at x %s (y=%s)" % [x, walker.player.position.y])
+		assert_false(_overlaps(walker, walker.player.position, Tuning.PLAYER_RADIUS))
+
+
+## The clearing is closed by the forest edge: walking out in any direction from the middle ends inside the outline,
+## never in the forest.
+func test_the_forest_edge_closes_the_clearing() -> void:
+	var outline: PackedVector2Array = PackedVector2Array(ArenaLayout.BOUNDARY)
+	for k: int in 16:
+		var dir: Vector2 = Vector2.RIGHT.rotated(TAU * k / 16.0)
+		var core: GameCore = _core_with(Vector2(-500.0, -500.0), Vector2(400.0, 240.0))
+		core.obstacles = ArenaLayout.build()
+		run(core, 900, input(dir))
+		var p: Vector2 = core.player.position
+		assert_true(Geometry2D.is_point_in_polygon(p, outline), "walking %s ends inside the clearing (at %s)" % [str(dir), str(p)])
+		assert_false(_overlaps(core, p, Tuning.PLAYER_RADIUS))
+
+
+## The boss charges at a player standing by the forest edge and the props (all four sides): it stays in the clearing,
+## never inside a collider, and is never stuck at its start.
+func test_boss_charges_stay_in_the_clearing() -> void:
+	var outline: PackedVector2Array = PackedVector2Array(ArenaLayout.BOUNDARY)
+	for target: Vector2 in [Vector2(96.0, 230.0), Vector2(720.0, 240.0), Vector2(396.0, 110.0), Vector2(398.0, 370.0)]:
+		var core: GameCore = GameCore.new(3)
+		core.player.hp = 100000
+		core.player.position = target
+		core.boss.phase = 2
+		var start: Vector2 = core.boss.position
+		var moved: float = 0.0
+		for i: int in 600:
+			if core.boss.cooldown > 1:
+				core.boss.next_attack_override = BossState.ATTACK_CHARGE
+			core.step(input())
+			core.player.position = target  # the player holds the spot
+			moved = maxf(moved, core.boss.position.distance_to(start))
+			assert_false(_overlaps(core, core.boss.position, Tuning.BOSS_RADIUS), "boss inside a prop at %s (target %s)" % [str(core.boss.position), str(target)])
+			assert_true(Geometry2D.is_point_in_polygon(core.boss.position, outline), "boss in the forest at %s (target %s)" % [str(core.boss.position), str(target)])
+		assert_true(moved > 60.0, "the boss went after the player at %s (%.0f px)" % [str(target), moved])
+
+
+## The middle of the plaza (the rune ring and the raised platform) is open ground: nothing solid anywhere in it.
+func test_the_rune_ring_and_platform_are_walkable() -> void:
+	var core: GameCore = GameCore.new()
+	for x: int in range(220, 581, 8):
+		for y: int in range(130, 351, 8):
+			var p: Vector2 = Vector2(x, y)
+			assert_false(_overlaps(core, p, Tuning.BOSS_RADIUS), "the boss fits at %s" % str(p))
 
 
 # --- blocking and sliding ---
@@ -182,12 +237,17 @@ func test_nobody_is_ever_inside_a_prop_in_a_long_fight() -> void:
 	var core: GameCore = GameCore.new(9)
 	core.player.hp = 100000  # keep the fight going
 	var inside: int = 0
+	var outside: int = 0
+	var outline: PackedVector2Array = PackedVector2Array(ArenaLayout.BOUNDARY)
 	for i: int in 2400:
 		var move: Vector2 = Vector2(sin(i * 0.013) + 0.3, cos(i * 0.011))
 		core.step(input(move, i % 70 == 0, false, i % 20 == 0))
 		if _overlaps(core, core.player.position, Tuning.PLAYER_RADIUS) or _overlaps(core, core.boss.position, Tuning.BOSS_RADIUS):
 			inside += 1
+		if not Geometry2D.is_point_in_polygon(core.player.position, outline) or not Geometry2D.is_point_in_polygon(core.boss.position, outline):
+			outside += 1
 	assert_eq(inside, 0, "ticks with a body inside a prop")
+	assert_eq(outside, 0, "ticks with a body out in the forest")
 
 
 # --- snapshots ---

@@ -3,7 +3,8 @@ extends RefCounted
 ## (see save_store.gd) and nothing that touches a running fight. Reading is forgiving: anything unreadable or
 ## from a newer version gives a fresh profile and says why in `load_note`.
 
-const VERSION: int = 1
+const VERSION: int = 1  # equipped_aspects (2026-10-21) is an optional field: older version-1 saves load with the defaults
+const Aspects := preload("res://core/aspects.gd")
 const RESULT_VICTORY: StringName = &"victory"
 const RESULT_DEFEAT: StringName = &"defeat"
 
@@ -14,6 +15,8 @@ var defeats: int = 0
 var best_victory_ticks: int = 0
 var last_result: StringName = &""
 var weapon_id: StringName = &"black_katana"
+## The aspects in skill slots 1-3 (three different Aspects.ALL ids). GameCore.apply_profile() starts a fight with them.
+var equipped_aspects: Array[StringName] = Aspects.DEFAULT_EQUIPPED.duplicate()
 ## Why this profile is a fresh one instead of a loaded one ("" when it was loaded or never saved before).
 var load_note: String = ""
 
@@ -44,6 +47,7 @@ func to_dict() -> Dictionary:
 		"best_victory_ticks": best_victory_ticks,
 		"last_result": String(last_result),
 		"weapon_id": String(weapon_id),
+		"equipped_aspects": equipped_aspects.map(func(aspect: StringName) -> String: return String(aspect)),
 	}
 
 
@@ -68,6 +72,11 @@ static func from_dict(data: Dictionary) -> Object:
 	profile.last_result = StringName(result) if result in ["victory", "defeat"] else &""
 	var weapon: String = String(data.get("weapon_id", "black_katana")) if data.get("weapon_id", "") is String else ""
 	profile.weapon_id = StringName(weapon) if weapon in ["black_katana", "dual_dagger", "chain_scythe"] else &"black_katana"
+	var aspects: Variant = data.get("equipped_aspects", null)
+	if aspects is Array and Aspects.is_valid_loadout(aspects):
+		profile.equipped_aspects.clear()
+		for value: Variant in aspects:
+			profile.equipped_aspects.append(StringName(value))
 	return profile
 
 

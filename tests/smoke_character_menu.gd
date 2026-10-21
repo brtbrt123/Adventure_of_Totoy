@@ -5,8 +5,11 @@ extends SceneTree
 ## while it is open and resumes after; tabs (Q/E, clicks); selection movement; a description for every aspect, weapon
 ## and stat (with real numbers, every line fits the box); equipping from the inventory through the core (EQUIPPED, the
 ## drawn frame set changes; NOT NOW when the core refuses); the HUD has no weapon info box, no Q SWAP and no CD text;
-## tooltip, result panels and menu draw with the shared frame. With `-- --capture` in a window it saves
-## art/build/arena_menu_*.png for a visual check (delete them afterwards).
+## tooltip, result panels and menu draw with the shared frame. Aspects (2026-10-21): ENTER/click on an Aspect slot opens
+## the picker, which equips through the core (one step: EQUIPPED!, a swap when the aspect sits in another slot, NOT NOW
+## when the hero is busy or a weapon form runs; ESC closes only the picker); the inventory lists the aspects; the
+## equipped weapon and aspects are saved in the profile (a temp TOTOY_SAVE_PATH) and used again at restart.
+## With `-- --capture` in a window it saves art/build/arena_menu_*.png for a visual check (delete them afterwards).
 const Arena := preload("res://presentation/arena/arena.gd")
 const Menu := preload("res://presentation/arena/character_menu.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
@@ -16,6 +19,8 @@ const Weapons := preload("res://core/weapons.gd")
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
+const Aspects := preload("res://core/aspects.gd")
+const SaveStore := preload("res://core/save_store.gd")
 
 var arena: Arena
 var menu: Menu
@@ -31,6 +36,11 @@ func _init() -> void:
 func check(ok: bool, message: String) -> void:
 	if not ok:
 		failures.append(message)
+
+
+## Same ids in the same order (typed and untyped arrays alike).
+func same(a: Array, b: Array) -> bool:
+	return str(a) == str(b)
 
 
 func observe() -> void:
@@ -194,7 +204,9 @@ func tabs_and_selection() -> void:
 	menu.move_selection(Vector2i.DOWN)
 	check(menu.stats_selection == &"stat_edge", "down the stat list")
 	menu.click(Menu.aspect_rect(1).get_center())
-	check(menu.stats_selection == &"gale_cut" and menu.description_key() == &"gale_cut", "a click selects an Aspect")
+	check(menu.stats_selection == &"aspect_slot_2" and menu.description_key() == &"gale_cut", "a click selects an Aspect")
+	check(menu.picker_open() and menu.picker_slot == 2, "a click on an Aspect slot opens the picker")
+	menu.close_picker()
 	# INVENTORY grid moves (clamped at the edges)
 	menu.set_tab(Menu.TAB_INVENTORY)
 	menu.inventory_selection = 0
@@ -210,7 +222,12 @@ func tabs_and_selection() -> void:
 	check(menu.inventory_selection == 0, "up clamps at the edge")
 	menu.hover_at(Menu.inventory_rect(2).get_center())
 	check(menu.inventory_selection == 2 and menu.description_key() == Tuning.WEAPON_CHAIN_SCYTHE, "hovering a slot selects it")
-	menu.hover_at(Menu.inventory_rect(10).get_center())
+	for i: int in range(Aspects.ALL.size()):
+		menu.hover_at(Menu.inventory_rect(Menu.ASPECT_GRID_START + i).get_center())
+		check(menu.description_key() == Aspects.ALL[i], "the inventory lists the aspect " + String(Aspects.ALL[i]))
+	menu.accept()
+	check(arena.snapshot.player.equipped_aspects == Aspects.DEFAULT_EQUIPPED, "ENTER on an inventory aspect changed the slots")
+	menu.hover_at(Menu.inventory_rect(15).get_center())
 	check(menu.description_key() == &"empty", "an empty slot")
 	arena.close_menu()
 
@@ -258,6 +275,14 @@ func descriptions() -> void:
 	check(String(d[&"gale_cut"][2][2]).begins_with("%d EDGE  CD %d S" % [int(Tuning.GALE_CUT_EDGE_COST), Tuning.GALE_CUT_COOLDOWN_TICKS / 60]), "Gale Cut numbers: " + String(d[&"gale_cut"][2][2]))
 	check(String(d[Tuning.WEAPON_DUAL_DAGGER][2][2]).contains("CD %s S" % Menu.secs(Tuning.LIGHTNING_FORM_COOLDOWN_TICKS)), "dagger cooldown from the tuning")
 	check(Menu.stat_rows(Tuning.WEAPON_BLACK_KATANA)[1][1] == str(Tuning.PLAYER_MAX_HP), "health from the tuning")
+	var lantern: String = String(d[&"spirit_lantern"][2][2])
+	check(lantern.begins_with("%d EDGE  CD %d S" % [int(Tuning.SPIRIT_LANTERN_EDGE_COST), Tuning.SPIRIT_LANTERN_COOLDOWN_TICKS / 60]) and lantern.contains("+%d HP" % Tuning.SPIRIT_LANTERN_HEAL_PER_PULSE), "lantern numbers: " + lantern)
+	check(String(d[&"spirit_lantern"][2][1]).contains("%d PX" % int(Tuning.SPIRIT_LANTERN_RADIUS)), "lantern radius")
+	check(String(d[&"phantom_cut"][2][0]).contains(Menu.secs(Tuning.PHANTOM_CUT_DELAY_TICKS) + " S"), "phantom echo delay: " + String(d[&"phantom_cut"][2][0]))
+	check(String(d[&"phantom_cut"][2][2]).contains("%d%% DMG" % roundi(Tuning.PHANTOM_CUT_DAMAGE_MULT * 100)), "phantom damage")
+	check(d[&"gale_cut"][1] == "ASPECT  KEY X" and d[&"spirit_lantern"][1] == "ASPECT", "aspect tags follow the default slots")
+	var moved: Dictionary = Menu.descriptions(Tuning.WEAPON_BLACK_KATANA, [&"spirit_lantern", &"gale_cut", &"phantom_cut"])
+	check(moved[&"spirit_lantern"][1] == "ASPECT  KEY Z" and moved[&"breaking_edge"][1] == "ASPECT", "aspect tags follow the slots")
 	check(Menu.secs(14) == "0.23" and Menu.secs(1800) == "30" and Menu.secs(750) == "12.5" and Menu.num(1.5) == "1.5" and Menu.num(50.0) == "50", "number formatting")
 
 
@@ -396,6 +421,130 @@ func shared_frame() -> void:
 	fixture()
 
 
+## The aspect picker: ENTER on a slot opens it, arrows move, ENTER equips through the core in one step (and swaps),
+## ESC closes only the picker, a click equips, busy / a weapon form running gives NOT NOW; the HUD follows.
+func aspect_picker() -> void:
+	fixture()
+	check(arena.open_menu(), "open")
+	menu.stats_selection = &"aspect_slot_1"
+	await menu_with("menu_accept")
+	check(menu.picker_open() and menu.picker_slot == 1, "ENTER on the Z slot did not open the picker")
+	check(menu.picker_selection == 0 and menu.description_key() == &"breaking_edge", "the picker starts on the slotted aspect")
+	await save("picker")
+	for i: int in range(3):
+		await menu_with("menu_down")
+	check(Aspects.ALL[menu.picker_selection] == &"spirit_lantern" and menu.description_key() == &"spirit_lantern", "down in the picker")
+	await save("picker_lantern")
+	var tick: int = arena.core.tick
+	await menu_with("menu_accept")
+	check(arena.core.tick == tick + 1, "an aspect equip is exactly one core step (%d)" % (arena.core.tick - tick))
+	check(arena.snapshot.player.equipped_aspects[0] == &"spirit_lantern", "ENTER did not slot the lantern into Z")
+	check(bool(menu.picker_feedback.get("ok", false)), "no EQUIPPED feedback: %s" % str(menu.picker_feedback))
+	check(Hud.skill_rows(arena.snapshot.hud)[0]["aspect_id"] == &"spirit_lantern" and Hud.skill_rows(arena.snapshot.hud)[0]["icon"] == "ui_aspect_spirit_lantern_1", "the HUD Z slot does not show the lantern")
+	await save("picker_equipped")
+	# Gale Cut (in X) into Z: the core swaps the two slots
+	menu.picker_selection = Aspects.ALL.find(&"gale_cut")
+	menu.accept()
+	check(same(arena.snapshot.player.equipped_aspects, [&"gale_cut", &"spirit_lantern", &"moon_cleave"]), "no swap: %s" % str(arena.snapshot.player.equipped_aspects))
+	# the aspect already in the slot sends nothing
+	tick = arena.core.tick
+	menu.accept()
+	check(arena.core.tick == tick and bool(menu.picker_feedback["ok"]), "re-slotting the same aspect stepped the core")
+	# ESC closes only the picker
+	await menu_with("menu_back")
+	check(not menu.picker_open() and menu.is_open, "ESC did not close only the picker")
+	# a click on the C slot, then on Phantom Cut
+	menu.click(Menu.aspect_rect(2).get_center())
+	check(menu.picker_open() and menu.picker_slot == 3, "a click on C did not open the picker")
+	menu.click(Menu.picker_row_rect(Aspects.ALL.find(&"phantom_cut")).get_center())
+	check(arena.snapshot.player.equipped_aspects[2] == &"phantom_cut", "a click did not slot Phantom Cut")
+	menu.hover_at(Menu.picker_row_rect(4).get_center())
+	check(menu.description_key() == &"phantom_cut", "hover in the picker")
+	menu.click(Vector2(20, 30))
+	check(not menu.picker_open() and menu.is_open, "a click outside did not close the picker")
+	menu.set_tab(Menu.TAB_INVENTORY)
+	menu.inventory_selection = Menu.ASPECT_GRID_START + Aspects.ALL.find(&"spirit_lantern")
+	await save("inventory_aspect")
+	arena.close_menu()
+	# busy (mid-swing): NOT NOW, nothing changes
+	fixture(30.0)
+	var attack: InputFrame = InputFrame.new()
+	attack.attack_pressed = true
+	attack.aim = Vector2.RIGHT
+	step(attack)
+	check(arena.open_menu(), "the menu opens mid-swing")
+	menu.open_picker(1)
+	menu.picker_selection = Aspects.ALL.find(&"phantom_cut")
+	menu.accept()
+	check(arena.snapshot.player.equipped_aspects[0] == &"breaking_edge", "slotted while busy")
+	check(not bool(menu.picker_feedback["ok"]) and menu.picker_feedback["reason"] == "TRY WHEN IDLE", "no NOT NOW (busy): %s" % str(menu.picker_feedback))
+	await save("picker_not_now")
+	arena.close_menu()
+	# a weapon form running: NOT NOW (ACTIVE RUNNING)
+	fixture()
+	var active: InputFrame = InputFrame.new()
+	active.weapon_active_pressed = true
+	step(active)
+	if arena.cutin.active:
+		arena.cutin.stop()
+	check(arena.snapshot.player.weapon_buff_active and arena.snapshot.player.state == &"idle", "fixture: no Black Form")
+	check(arena.open_menu(), "open with the form running")
+	menu.open_picker(2)
+	menu.picker_selection = Aspects.ALL.find(&"spirit_lantern")
+	menu.accept()
+	check(arena.snapshot.player.equipped_aspects[1] == &"gale_cut" and menu.picker_feedback["reason"] == "ACTIVE RUNNING", "no ACTIVE RUNNING refusal: %s" % str(menu.picker_feedback))
+	arena.close_menu()
+	check(arena.missing_frames.is_empty(), "missing frames: %s" % str(arena.missing_frames.keys()))
+
+
+## The menu's equips are written to the profile (only when progress is saved) and a restart starts with them.
+## Uses a throwaway TOTOY_SAVE_PATH so no real save is ever touched.
+func saved_loadout() -> void:
+	var old_env: String = OS.get_environment(SaveStore.PATH_ENV)
+	var path: String = "user://smoke_character_menu_loadout.json"
+	OS.set_environment(SaveStore.PATH_ENV, path)
+	check(SaveStore.default_path() == path, "the temp save path is not used")
+	for file: String in [path, path + ".bak", path + ".tmp"]:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(file)
+	var was_persist: bool = arena.persist
+	arena.persist = true
+	arena.profile = SaveStore.load_profile()
+	fixture()
+	check(arena.snapshot.player.equipped_aspects == Aspects.DEFAULT_EQUIPPED, "a fresh profile starts with the default slots")
+	arena.request_aspect_equip(&"phantom_cut", 1)
+	arena.request_aspect_equip(&"spirit_lantern", 3)
+	arena.request_equip(Tuning.WEAPON_CHAIN_SCYTHE)
+	var saved: Object = SaveStore.load_profile()
+	check(same(saved.equipped_aspects, [&"phantom_cut", &"gale_cut", &"spirit_lantern"]), "aspects not saved: %s" % str(saved.equipped_aspects))
+	check(saved.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "weapon not saved: %s" % saved.weapon_id)
+	arena._restart()
+	check(arena.snapshot.player.equipped_aspects == saved.equipped_aspects, "restart ignored the saved aspects: %s" % str(arena.snapshot.player.equipped_aspects))
+	check(arena.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "restart ignored the saved weapon")
+	check(Hud.skill_rows(arena.snapshot.hud)[0]["aspect_id"] == &"phantom_cut", "the HUD does not show the saved slots")
+	# a fresh arena from the title (persist meta) loads and applies the profile too
+	arena.profile = null
+	arena.persist = false
+	Engine.set_meta(&"totoy_persist", true)
+	var second: Arena = load("res://presentation/arena/arena.tscn").instantiate() as Arena
+	root.add_child(second)
+	await process_frame
+	second.set_physics_process(false)
+	check(second.snapshot.player.equipped_aspects == saved.equipped_aspects and second.snapshot.player.weapon_id == Tuning.WEAPON_CHAIN_SCYTHE, "a new arena did not apply the saved loadout")
+	second.queue_free()
+	Engine.remove_meta(&"totoy_persist")
+	await process_frame
+	arena.camera.make_current()
+	for file: String in [path, path + ".bak", path + ".tmp"]:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(file)
+	OS.set_environment(SaveStore.PATH_ENV, old_env)
+	arena.persist = was_persist
+	arena.profile = null
+	fixture()
+	check(arena.snapshot.player.equipped_aspects == Aspects.DEFAULT_EQUIPPED, "without a profile a restart uses the default slots")
+
+
 func run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	Bindings.register()
@@ -410,6 +559,8 @@ func run() -> void:
 	await tabs_and_selection()
 	await descriptions()
 	await equip()
+	await aspect_picker()
+	await saved_loadout()
 	await hud_contract()
 	await shared_frame()
 	arena.queue_free()

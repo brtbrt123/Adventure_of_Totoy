@@ -2,17 +2,22 @@ extends Node2D
 ## The character menu (approved mockups 2026-10-21, docs/previews/character_menu_*.png): a pop-up over the frozen arena
 ## with the tabs STATS and INVENTORY, drawn in the shared frame (ui_panel.gd) on the HUD layer.
 ##
-## Presentation only: it shows snapshot data and numbers read (read-only) from core/tuning.gd and core/weapons.gd, and
-## its one action, equipping a weapon, is a request to the core (InputFrame.weapon_equip) sent through `equip_request`
-## (the arena steps the core once with it). The core decides; the menu shows EQUIPPED or NOT NOW from the snapshot.
+## Presentation only: it shows snapshot data and numbers read (read-only) from core/tuning.gd, core/weapons.gd and
+## core/aspects.gd, and its two actions, equipping a weapon and slotting an aspect, are requests to the core
+## (InputFrame.weapon_equip, InputFrame.aspect_equip + aspect_equip_slot) sent through `equip_request` and
+## `aspect_request` (the arena steps the core once with each). The core decides; the menu shows EQUIPPED or NOT NOW
+## from the snapshot.
 ##
-## Controls: TAB (gamepad Back) opens and closes, ESC closes, Q/E (shoulders) or a click on a tab switches tabs,
-## arrows/WASD move the selection, ENTER/click selects (STATS) or equips (INVENTORY), the mouse hover shows descriptions.
+## Controls: TAB (gamepad Back) opens and closes, ESC closes (or only the aspect picker when it is open), Q/E
+## (shoulders) or a click on a tab switches tabs, arrows/WASD move the selection, ENTER/click selects (STATS), opens the
+## aspect picker on an Aspect slot, equips the picked aspect (picker) or equips a weapon (INVENTORY); the mouse hover
+## shows descriptions.
 ## The arena does not step the core while the menu is open (see arena.gd), except once per equip request.
 const Tuning := preload("res://core/tuning.gd")
 const Weapons := preload("res://core/weapons.gd")
 const PlayerState := preload("res://core/player.gd")
 const Snapshots := preload("res://core/snapshots.gd")
+const Aspects := preload("res://core/aspects.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
@@ -34,13 +39,21 @@ const STAT_X0: float = 159.0
 const STAT_X1: float = 307.0
 const STAT_TOP: float = 21.0
 const ROW_STEP: float = 8.0
-const ASPECT_KEYS: Array[StringName] = [&"breaking_edge", &"gale_cut", &"moon_cleave"]
+## The STATS items of the three Aspect slots (Z, X, C); their description is the aspect slotted there.
+const ASPECT_KEYS: Array[StringName] = [&"aspect_slot_1", &"aspect_slot_2", &"aspect_slot_3"]
+const SLOT_LETTERS: Array[String] = ["Z", "X", "C"]
+## The aspect picker (ENTER/click on an Aspect slot): every aspect in a list over the stat list, in the shared frame.
+const PICKER: Rect2 = Rect2(154, 18, 157, 104)
+const PICKER_ROW_TOP: float = 33.0
+const PICKER_ROW_STEP: float = 17.0
 ## INVENTORY layout: 6x3 slots of 32 px, step 33; the weapons fill the first slots in Weapons.IDS order.
 const GRID_ORIGIN: Vector2 = Vector2(13, 23)
 const GRID_STEP: float = 33.0
 const GRID_COLS: int = 6
 const GRID_ROWS: int = 3
 const CARD: Rect2 = Rect2(216, 21, 93, 101)
+## INVENTORY: the aspects fill the second grid row (view-only; they are slotted on STATS).
+const ASPECT_GRID_START: int = GRID_COLS
 const FEEDBACK_SECONDS: float = 1.6
 
 const WEAPON_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK KATANA", Tuning.WEAPON_DUAL_DAGGER: "DUAL DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "CHAIN SCYTHE"}
@@ -58,6 +71,11 @@ var inventory_selection: int = 0
 var hover_key: StringName = &""
 ## {"slot": int, "ok": bool, "reason": String, "left": float} after an equip request, else empty.
 var feedback: Dictionary = {}
+## The aspect picker: the slot (1-3) it fills, 0 when closed; the highlighted row (an Aspects.ALL index); its feedback
+## {"aspect", "ok", "reason", "left"} after a request.
+var picker_slot: int = 0
+var picker_selection: int = 0
+var picker_feedback: Dictionary = {}
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var atlas: Texture2D
@@ -65,6 +83,8 @@ var frames: Dictionary = {}
 ## Called with a weapon id; the arena steps the core once with InputFrame.weapon_equip and returns nothing (the menu
 ## reads the result from `snapshot`, which the arena refreshes).
 var equip_request: Callable = Callable()
+## Called with (aspect id, slot 1-3); the arena steps the core once with InputFrame.aspect_equip / aspect_equip_slot.
+var aspect_request: Callable = Callable()
 var _last_mouse: Vector2 = Vector2(-1000, -1000)
 var _atlas_image: Image = null
 var _used_rects: Dictionary = {}
@@ -82,6 +102,7 @@ func open() -> void:
 	stats_selection = &""
 	hover_key = &""
 	feedback = {}
+	close_picker()
 	inventory_selection = maxi(0, Weapons.IDS.find(_equipped()))
 	_last_mouse = get_local_mouse_position()
 	queue_redraw()
@@ -92,6 +113,7 @@ func close() -> void:
 	visible = false
 	hover_key = &""
 	feedback = {}
+	close_picker()
 
 
 func _process(delta: float) -> void:
@@ -101,6 +123,10 @@ func _process(delta: float) -> void:
 		feedback["left"] = float(feedback["left"]) - delta
 		if float(feedback["left"]) <= 0.0:
 			feedback = {}
+	if not picker_feedback.is_empty():
+		picker_feedback["left"] = float(picker_feedback["left"]) - delta
+		if float(picker_feedback["left"]) <= 0.0:
+			picker_feedback = {}
 	var mouse: Vector2 = get_local_mouse_position()
 	if mouse.distance_squared_to(_last_mouse) > 0.01:
 		_last_mouse = mouse
@@ -119,7 +145,14 @@ func _input(event: InputEvent) -> void:
 ## Keyboard / gamepad, once per physics frame while open (the arena calls it instead of stepping the core).
 ## TAB and ESC close the menu (returns false then).
 func poll_input() -> bool:
-	if Input.is_action_just_pressed("menu_toggle") or Input.is_action_just_pressed("menu_back"):
+	if Input.is_action_just_pressed("menu_toggle"):
+		close()
+		return false
+	if Input.is_action_just_pressed("menu_back"):
+		if picker_open():
+			close_picker()
+			queue_redraw()
+			return true
 		close()
 		return false
 	if Input.is_action_just_pressed("menu_tab_prev"):
@@ -150,6 +183,7 @@ func set_tab(index: int) -> void:
 	tab = clampi(index, 0, TAB_NAMES.size() - 1)
 	hover_key = &""
 	feedback = {}
+	close_picker()
 	queue_redraw()
 
 
@@ -185,6 +219,12 @@ static func tab_rect(index: int) -> Rect2:
 func move_selection(direction: Vector2i) -> void:
 	hover_key = &""
 	feedback = {}
+	if picker_open():
+		if direction.y != 0:
+			picker_selection = clampi(picker_selection + direction.y, 0, Aspects.ALL.size() - 1)
+			picker_feedback = {}
+		queue_redraw()
+		return
 	if tab == TAB_INVENTORY:
 		var col: int = clampi(inventory_selection % GRID_COLS + direction.x, 0, GRID_COLS - 1)
 		var row: int = clampi(inventory_selection / GRID_COLS + direction.y, 0, GRID_ROWS - 1)
@@ -223,6 +263,13 @@ func move_selection(direction: Vector2i) -> void:
 ## Mouse hover: STATS shows the hovered item's description; INVENTORY moves the selection to the hovered slot.
 func hover_at(pos: Vector2) -> void:
 	hover_key = &""
+	if picker_open():
+		for index: int in range(Aspects.ALL.size()):
+			if picker_row_rect(index).has_point(pos):
+				if index != picker_selection:
+					picker_feedback = {}
+				picker_selection = index
+		return
 	if tab == TAB_STATS:
 		for item: Dictionary in stats_items():
 			if Rect2(item["rect"]).has_point(pos):
@@ -242,11 +289,22 @@ func click(pos: Vector2) -> void:
 			if index != tab:
 				set_tab(index)
 			return
+	if picker_open():
+		for index: int in range(Aspects.ALL.size()):
+			if picker_row_rect(index).has_point(pos):
+				picker_selection = index
+				accept()
+				return
+		if not PICKER.has_point(pos):
+			close_picker()  # a click outside closes the picker and does nothing else
+		return
 	if tab == TAB_STATS:
 		for item: Dictionary in stats_items():
 			if Rect2(item["rect"]).has_point(pos):
 				stats_selection = item["key"]
 				hover_key = &""
+				if item["key"] in ASPECT_KEYS:
+					open_picker(ASPECT_KEYS.find(item["key"]) + 1)
 		return
 	for index: int in range(GRID_COLS * GRID_ROWS):
 		if inventory_rect(index).has_point(pos):
@@ -256,20 +314,88 @@ func click(pos: Vector2) -> void:
 
 ## ENTER: on INVENTORY equip the selected weapon through the core; on STATS pin the selection (first press: weapon).
 func accept() -> void:
+	if picker_open():
+		_equip_aspect(Aspects.ALL[picker_selection])
+		return
 	if tab == TAB_STATS:
 		if stats_selection == &"":
 			stats_selection = &"weapon"
+		elif stats_selection in ASPECT_KEYS:
+			open_picker(ASPECT_KEYS.find(stats_selection) + 1)
 		queue_redraw()
 		return
 	var weapon: StringName = slot_weapon(inventory_selection)
 	if weapon == &"":
-		feedback = {}
+		feedback = {}  # an empty slot or an aspect (aspects are slotted on STATS)
 		return
 	if weapon != _equipped() and equip_request.is_valid():
 		equip_request.call(weapon)
 	var ok: bool = _equipped() == weapon
 	feedback = {"slot": inventory_selection, "ok": ok, "reason": "" if ok else refusal_reason(snapshot), "left": FEEDBACK_SECONDS}
 	queue_redraw()
+
+
+# --- the aspect picker -----------------------------------------------------------------------------------------------
+
+func picker_open() -> bool:
+	return picker_slot > 0
+
+
+## Opens the picker for slot 1-3 with the aspect already there highlighted.
+func open_picker(slot: int) -> void:
+	picker_slot = clampi(slot, 1, 3)
+	picker_selection = maxi(0, Aspects.ALL.find(slot_aspect(picker_slot)))
+	picker_feedback = {}
+	hover_key = &""
+	queue_redraw()
+
+
+func close_picker() -> void:
+	picker_slot = 0
+	picker_feedback = {}
+
+
+static func picker_row_rect(index: int) -> Rect2:
+	return Rect2(PICKER.position.x + 4, PICKER_ROW_TOP + index * PICKER_ROW_STEP, PICKER.size.x - 8, PICKER_ROW_STEP - 1)
+
+
+## The slotted aspects (Z, X, C) from the snapshot.
+func equipped_aspects() -> Array[StringName]:
+	var list: Array[StringName] = []
+	if snapshot != null and snapshot.player != null and snapshot.player.equipped_aspects.size() == 3:
+		list.append_array(snapshot.player.equipped_aspects)
+	else:
+		list.append_array(Aspects.DEFAULT_EQUIPPED)
+	return list
+
+
+func slot_aspect(slot: int) -> StringName:
+	var list: Array[StringName] = equipped_aspects()
+	return list[slot - 1] if slot >= 1 and slot <= list.size() else &""
+
+
+## The slot (1-3) holding `aspect`, 0 when it is not slotted.
+func aspect_slot_of(aspect: StringName) -> int:
+	return equipped_aspects().find(aspect) + 1
+
+
+## One core step with aspect_equip + aspect_equip_slot (the core swaps when the aspect sits in another slot); the result
+## is read from the snapshot. The aspect already in the slot sends nothing.
+func _equip_aspect(aspect: StringName) -> void:
+	if aspect != slot_aspect(picker_slot) and aspect_request.is_valid():
+		aspect_request.call(aspect, picker_slot)
+	if not is_open:
+		return  # the step ended the fight and the arena closed the menu
+	var ok: bool = slot_aspect(picker_slot) == aspect
+	picker_feedback = {"aspect": aspect, "ok": ok, "reason": "" if ok else aspect_refusal_reason(snapshot), "left": FEEDBACK_SECONDS}
+	queue_redraw()
+
+
+## Why the core most likely refused an aspect equip (display text from snapshot facts; aspects have no lockout).
+static func aspect_refusal_reason(snap: Snapshots.GameSnapshot) -> String:
+	if snap != null and snap.player.weapon_buff_active:
+		return "ACTIVE RUNNING"
+	return "TRY WHEN IDLE"
 
 
 ## Why the core most likely refused, from snapshot facts only (display text; the core made the decision).
@@ -287,6 +413,12 @@ static func slot_weapon(index: int) -> StringName:
 	return Weapons.IDS[index] if index >= 0 and index < Weapons.IDS.size() else &""
 
 
+## The aspect shown in an INVENTORY slot (the second grid row), else empty.
+static func grid_aspect(index: int) -> StringName:
+	var i: int = index - ASPECT_GRID_START
+	return Aspects.ALL[i] if i >= 0 and i < Aspects.ALL.size() else &""
+
+
 func _equipped() -> StringName:
 	return snapshot.player.weapon_id if snapshot != null and snapshot.player != null else Tuning.WEAPON_BLACK_KATANA
 
@@ -295,10 +427,17 @@ func _equipped() -> StringName:
 func description_key() -> StringName:
 	if tab == TAB_INVENTORY:
 		var weapon: StringName = slot_weapon(inventory_selection)
-		return weapon if weapon != &"" else &"empty"
+		if weapon != &"":
+			return weapon
+		var aspect: StringName = grid_aspect(inventory_selection)
+		return aspect if aspect != &"" else &"empty"
+	if picker_open():
+		return Aspects.ALL[picker_selection]
 	var key: StringName = hover_key if hover_key != &"" else stats_selection
 	if key == &"weapon":
 		return _equipped()
+	if key in ASPECT_KEYS:
+		return slot_aspect(ASPECT_KEYS.find(key) + 1)
 	return key if key != &"" else &"none"
 
 
@@ -356,9 +495,15 @@ static func black_form_combo_ticks() -> int:
 	return total
 
 
+## The tag of an aspect's description: its key when slotted ("ASPECT  KEY X"), else "ASPECT".
+static func aspect_tag(aspect: StringName, aspects: Array) -> String:
+	var index: int = aspects.find(aspect)
+	return "ASPECT  KEY %s" % SLOT_LETTERS[index] if index >= 0 and index < 3 else "ASPECT"
+
+
 ## Every description: key -> [title, tag, [body line, body line, numbers line]]. Weapon-dependent ones (the stat rows
-## under the weapon header) follow `equipped`.
-static func descriptions(equipped: StringName) -> Dictionary:
+## under the weapon header) follow `equipped`; the aspects' tags follow the slotted `aspects` (Z, X, C).
+static func descriptions(equipped: StringName, aspects: Array = Aspects.DEFAULT_EQUIPPED) -> Dictionary:
 	var kat: Dictionary = weapon_data(Tuning.WEAPON_BLACK_KATANA)
 	var dag: Dictionary = weapon_data(Tuning.WEAPON_DUAL_DAGGER)
 	var scy: Dictionary = weapon_data(Tuning.WEAPON_CHAIN_SCYTHE)
@@ -370,18 +515,26 @@ static func descriptions(equipped: StringName) -> Dictionary:
 	var armor_pct: int = roundi(Tuning.ARMOR_DAMAGE_FACTOR * 100)
 	var spin_damage: String = num(Tuning.ATTACK_DAMAGE * Tuning.REAPER_COIL_SPIN_DAMAGE_MULT)
 	var d: Dictionary = {}
-	d[&"breaking_edge"] = ["BREAKING EDGE", "ASPECT  KEY Z", [
+	d[&"breaking_edge"] = ["BREAKING EDGE", aspect_tag(&"breaking_edge", aspects), [
 		"RIGHT AFTER A SUCCESSFUL PARRY: STEP IN %s PX AND STRIKE." % num(Tuning.BREAKING_EDGE_STEP),
 		"HEAVY POSTURE DAMAGE: TWO OF THEM BREAK THE COLOSSUS.",
 		"%s EDGE  %s S AFTER A PARRY  %s DMG  %s POSTURE" % [num(Tuning.BREAKING_EDGE_EDGE_COST), secs(Tuning.BREAKING_EDGE_WINDOW_TICKS), num(Tuning.BREAKING_EDGE_DAMAGE), num(Tuning.BREAKING_EDGE_POSTURE)]]]
-	d[&"gale_cut"] = ["GALE CUT", "ASPECT  KEY X", [
+	d[&"gale_cut"] = ["GALE CUT", aspect_tag(&"gale_cut", aspects), [
 		"AIMED DASH-SLASH: HITS ALL IN A %s PX CORRIDOR AND" % num(Tuning.GALE_CUT_DISTANCE),
 		"PASSES THROUGH THE BOSS. IT GIVES NO INVULNERABILITY.",
 		"%s EDGE  CD %s S  %s DMG  %s POSTURE  %s PX WIDE" % [num(Tuning.GALE_CUT_EDGE_COST), secs(Tuning.GALE_CUT_COOLDOWN_TICKS), num(Tuning.GALE_CUT_DAMAGE), num(Tuning.GALE_CUT_POSTURE), num(Tuning.GALE_CUT_LANE_WIDTH)]]]
-	d[&"moon_cleave"] = ["MOON CLEAVE", "ASPECT  KEY C", [
+	d[&"moon_cleave"] = ["MOON CLEAVE", aspect_tag(&"moon_cleave", aspects), [
 		"HOLD %s S, THEN RELEASE A CRESCENT WAVE THAT FLIES" % secs(Tuning.MOON_CLEAVE_WINDUP_TICKS),
 		"%s PX AND PIERCES. GETTING HIT DURING THE HOLD CANCELS IT." % num(Tuning.MOON_CLEAVE_TRAVEL),
 		"%s EDGE  CD %s S  %s DMG  %s POSTURE" % [num(Tuning.MOON_CLEAVE_EDGE_COST), secs(Tuning.MOON_CLEAVE_COOLDOWN_TICKS), num(Tuning.MOON_CLEAVE_DAMAGE), num(Tuning.MOON_CLEAVE_POSTURE)]]]
+	d[&"spirit_lantern"] = ["SPIRIT LANTERN", aspect_tag(&"spirit_lantern", aspects), [
+		"SET A LANTERN AT YOUR FEET FOR %s S. IT PULSES EVERY %s S:" % [secs(Tuning.SPIRIT_LANTERN_DURATION_TICKS), secs(Tuning.SPIRIT_LANTERN_PULSE_INTERVAL_TICKS)],
+		"STAND IN ITS %s PX LIGHT TO HEAL AND GAIN EDGE. ONE AT A TIME." % num(Tuning.SPIRIT_LANTERN_RADIUS),
+		"%s EDGE  CD %s S  %d PULSES  +%d HP  +%s EDGE EACH" % [num(Tuning.SPIRIT_LANTERN_EDGE_COST), secs(Tuning.SPIRIT_LANTERN_COOLDOWN_TICKS), Tuning.SPIRIT_LANTERN_PULSES, Tuning.SPIRIT_LANTERN_HEAL_PER_PULSE, num(Tuning.SPIRIT_LANTERN_EDGE_PER_PULSE)]]]
+	d[&"phantom_cut"] = ["PHANTOM CUT", aspect_tag(&"phantom_cut", aspects), [
+		"FOR %s S A PHANTOM REPEATS EVERY SWING THAT LANDS, %s S LATER," % [secs(Tuning.PHANTOM_CUT_DURATION_TICKS), secs(Tuning.PHANTOM_CUT_DELAY_TICKS)],
+		"FOR %d%% OF ITS DAMAGE. NO ANIMATION LOCK: USE IT MID-SWING." % roundi(Tuning.PHANTOM_CUT_DAMAGE_MULT * 100),
+		"%s EDGE  CD %s S FROM ACTIVATION  ECHO %d%% DMG  %d%% POSTURE" % [num(Tuning.PHANTOM_CUT_EDGE_COST), secs(Tuning.PHANTOM_CUT_COOLDOWN_TICKS), roundi(Tuning.PHANTOM_CUT_DAMAGE_MULT * 100), roundi(Tuning.PHANTOM_CUT_POSTURE_MULT * 100)]]]
 	d[Tuning.WEAPON_BLACK_KATANA] = ["BLACK KATANA", "WEAPON  EQUIPPED" if equipped == Tuning.WEAPON_BLACK_KATANA else "WEAPON", [
 		"BALANCED %d-HIT COMBO, %s DMG, REACH %s PX." % [kat["combo"], damage_text(kat), reach_text(kat)],
 		"RMB BLACK FORM: %s S OF X%s ATTACK SPEED AND X%s DAMAGE." % [secs(Tuning.BLACK_KATANA_BUFF_DURATION_TICKS), num(Tuning.BLACK_KATANA_ATTACK_SPEED_MULT), num(Tuning.BLACK_KATANA_DAMAGE_MULT)],
@@ -613,9 +766,9 @@ func _draw_stats() -> void:
 	_text(Vector2(MID_X, 89), "ASPECTS", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	for i: int in range(3):
 		var rect: Rect2 = aspect_rect(i)
-		UiPanel.slot(self, rect, lit == ASPECT_KEYS[i], colors)
-		_ui(Hud.ASPECT_ICONS[i], Rect2(rect.position + Vector2.ONE, Vector2(24, 24)))
-		_key_badge(rect.position + Vector2(-2, 17), ["Z", "X", "C"][i])
+		UiPanel.slot(self, rect, lit == ASPECT_KEYS[i] or picker_slot == i + 1, colors)
+		_ui(Hud.aspect_icon(slot_aspect(i + 1)), Rect2(rect.position + Vector2.ONE, Vector2(24, 24)))
+		_key_badge(rect.position + Vector2(-2, 17), SLOT_LETTERS[i])
 	# the stat list
 	var y: float = STAT_TOP
 	for row: Array in stat_rows(equipped):
@@ -631,6 +784,45 @@ func _draw_stats() -> void:
 			_text(Vector2(STAT_X0 + (5 if on else 0), y), row[0], colors["1"] if on else colors["i"])
 			_text(Vector2(STAT_X1, y), row[1], colors["1"] if on else colors["j"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
 		y += ROW_STEP
+	if picker_open():
+		_draw_picker()
+
+
+## The aspect picker over the stat list: a title (or the request's feedback), then one row per aspect: icon, name,
+## Edge cost, and for a slotted one its key badge and a tick.
+func _draw_picker() -> void:
+	UiPanel.draw_panel(self, PICKER, &"info", colors)
+	var x0: float = PICKER.position.x + 6
+	var title_y: float = PICKER.position.y + 6
+	if picker_feedback.is_empty():
+		_text(Vector2(x0, title_y), "ASPECT FOR SLOT " + SLOT_LETTERS[picker_slot - 1], colors["1"])
+		_text(Vector2(PICKER.end.x - 6, title_y), "ESC: BACK", colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
+	elif bool(picker_feedback["ok"]):
+		_text(Vector2(x0, title_y), "EQUIPPED!", colors["u"])
+	else:
+		_text(Vector2(x0, title_y), "NOT NOW  " + String(picker_feedback["reason"]), colors["q"])
+	draw_rect(Rect2(x0, title_y + 9, PICKER.size.x - 12, 1), colors["f"])
+	for index: int in range(Aspects.ALL.size()):
+		var aspect: StringName = Aspects.ALL[index]
+		var row: Rect2 = picker_row_rect(index)
+		var on: bool = index == picker_selection
+		if on:
+			draw_rect(row, colors["k"])
+			draw_rect(Rect2(row.position.x, row.end.y - 1, row.size.x, 1), colors["1"])
+		# the icon's inner 16x16 (the ring cropped) at native size
+		_ui(Hud.aspect_icon(aspect), Rect2(row.position + Vector2(2, 0), Vector2(16, 16)), Vector2(4, 4), Vector2(16, 16))
+		_text(Vector2(row.position.x + 22, row.position.y + 4), Aspects.display_name(aspect), colors["1"] if on else colors["j"])
+		_text(Vector2(row.end.x - 26, row.position.y + 4), "%sE" % num(Aspects.edge_cost(aspect)), colors["v"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
+		var slot: int = aspect_slot_of(aspect)
+		if slot > 0:
+			_key_badge(Vector2(row.end.x - 22, row.position.y + 4), SLOT_LETTERS[slot - 1])
+			_tick(Vector2(row.end.x - 11, row.position.y + 5), colors["u"])
+
+
+## A 7x5 pixel check mark (top-left `at`).
+func _tick(at: Vector2, color: Color) -> void:
+	for p: Vector2i in [Vector2i(0, 2), Vector2i(1, 3), Vector2i(2, 4), Vector2i(3, 3), Vector2i(4, 2), Vector2i(5, 1), Vector2i(6, 0), Vector2i(1, 2), Vector2i(2, 3), Vector2i(3, 2), Vector2i(4, 1), Vector2i(5, 0)]:
+		draw_rect(Rect2(at + Vector2(p), Vector2.ONE), color)
 
 
 ## The equipped weapon's idle frame (the arena's own frame sets).
@@ -681,6 +873,13 @@ func _draw_inventory() -> void:
 		var rect: Rect2 = inventory_rect(index)
 		UiPanel.slot(self, rect, index == inventory_selection, colors)
 		var weapon: StringName = slot_weapon(index)
+		var grid_item: StringName = grid_aspect(index)
+		if grid_item != &"":
+			_ui(Hud.aspect_icon(grid_item), Rect2(rect.position + Vector2(4, 4), Vector2(24, 24)))
+			var held: int = aspect_slot_of(grid_item)
+			if held > 0:
+				_key_badge(rect.position + Vector2(23, 1), SLOT_LETTERS[held - 1])
+			continue
 		if weapon == &"":
 			continue
 		_draw_item_icon(weapon, rect.position)
@@ -691,6 +890,10 @@ func _draw_inventory() -> void:
 	UiPanel.outline(self, CARD, colors["f"])
 	var cx: float = CARD.get_center().x
 	var weapon: StringName = slot_weapon(inventory_selection)
+	var card_aspect: StringName = grid_aspect(inventory_selection)
+	if card_aspect != &"":
+		_draw_aspect_card(card_aspect, cx)
+		return
 	if weapon == &"":
 		_text(Vector2(cx, 66), "EMPTY", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 		return
@@ -702,6 +905,20 @@ func _draw_inventory() -> void:
 	var lines: Array = card_lines(weapon)
 	_text(Vector2(cx, 99), lines[0], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	_text(Vector2(cx, 107), lines[1], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+## An aspect's card (view-only): its icon in a slot frame, name, the slot holding it, Edge cost and cooldown.
+func _draw_aspect_card(aspect: StringName, cx: float) -> void:
+	var frame: Rect2 = Rect2(cx - 13, 33, 26, 26)
+	UiPanel.slot(self, frame, false, colors)
+	_ui(Hud.aspect_icon(aspect), Rect2(frame.position + Vector2.ONE, Vector2(24, 24)))
+	_text(Vector2(cx, 76), Aspects.display_name(aspect), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	var slot: int = aspect_slot_of(aspect)
+	_text(Vector2(cx, 85), "SLOT " + SLOT_LETTERS[slot - 1] if slot > 0 else "NOT SLOTTED", colors["v"] if slot > 0 else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	draw_rect(Rect2(CARD.position.x + 6, 95, CARD.size.x - 12, 1), colors["f"])
+	var cd: int = Aspects.cooldown(aspect)
+	_text(Vector2(cx, 99), "%s EDGE" % num(Aspects.edge_cost(aspect)) + ("  CD %s S" % secs(cd) if cd > 0 else ""), colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(cx, 107), "SLOT ON STATS", colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 ## The two lines under the card's divider and their colour symbol: the equip feedback, else how to equip.
@@ -724,7 +941,7 @@ func _draw_item_icon(weapon: StringName, at: Vector2) -> void:
 
 
 func _draw_description(key: StringName) -> void:
-	var all: Dictionary = descriptions(_equipped())
+	var all: Dictionary = descriptions(_equipped(), equipped_aspects())
 	var entry: Array = all.get(key, all[&"none"])
 	UiPanel.draw_panel(self, DESC, &"info", colors, false)
 	var x0: float = DESC.position.x + 5

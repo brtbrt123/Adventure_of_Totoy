@@ -204,6 +204,7 @@ static func skill_durations(skill: StringName) -> Array[int]:
 		&"breaking_edge": return [Tuning.BREAKING_EDGE_WINDUP_TICKS, Tuning.BREAKING_EDGE_ACTIVE_TICKS, Tuning.BREAKING_EDGE_RECOVERY_TICKS]
 		&"gale_cut": return [Tuning.GALE_CUT_WINDUP_TICKS, Tuning.GALE_CUT_ACTIVE_TICKS, Tuning.GALE_CUT_RECOVERY_TICKS]
 		&"moon_cleave": return [Tuning.MOON_CLEAVE_WINDUP_TICKS, Tuning.MOON_CLEAVE_ACTIVE_TICKS, Tuning.MOON_CLEAVE_RECOVERY_TICKS]
+		&"spirit_lantern": return [Tuning.SPIRIT_LANTERN_WINDUP_TICKS, Tuning.SPIRIT_LANTERN_ACTIVE_TICKS, Tuning.SPIRIT_LANTERN_RECOVERY_TICKS]
 	return [1, 1, 1]
 
 static func skill_frame(skill: StringName, state: StringName, ticks: int, prefix: String = SET_KATANA) -> String:

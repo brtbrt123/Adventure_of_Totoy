@@ -494,8 +494,9 @@ func test_boss_is_dragged_adjacent_and_never_into_props_or_out_of_the_arena() ->
 	var low: float = Tuning.ARENA_MARGIN
 	var high: Vector2 = Tuning.ARENA_SIZE - Vector2(low, low)
 	var spots: Array[Vector2] = [
-		Vector2(low + 4.0, 240.0), Vector2(high.x - 4.0, 240.0), Vector2(400.0, low + 4.0), Vector2(400.0, high.y - 4.0),
-		Vector2(low, low), Vector2(high.x, high.y), Vector2(152.0, 100.0), Vector2(400.0, 120.0), Vector2(400.0, 395.0),
+		# the forest edge closing the clearing (core/arena_layout.gd BOUNDARY): west gap, east path, north, south, a corner, the east wall
+		Vector2(90.0, 222.0), Vector2(728.0, 240.0), Vector2(300.0, 96.0), Vector2(480.0, 396.0),
+		Vector2(124.0, 118.0), Vector2(672.0, 300.0), Vector2(152.0, 100.0), Vector2(400.0, 120.0), Vector2(400.0, 395.0),
 		Vector2(96.0, 230.0), Vector2(256.0, 112.0),
 	]
 	var hooked_total: int = 0

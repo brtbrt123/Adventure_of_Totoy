@@ -29,8 +29,8 @@ func _save(name_key: String) -> void:
 
 func _attack(attack: StringName, right_charge: bool = false) -> void:
 	arena._restart()
-	arena.core.boss.position = Vector2(110 if right_charge else 190, 110)
-	arena.core.player.position = Vector2(190 if right_charge else 110, 110)
+	arena.core.boss.position = Vector2(310 if right_charge else 390, 240)  # open plaza (the arena edges are solid since 2026-10-21)
+	arena.core.player.position = Vector2(390 if right_charge else 310, 240)
 	if attack in [&"gold_combo", &"red_charge"]:
 		arena.core.boss.phase = 2
 	arena.core.boss.next_attack_override = attack

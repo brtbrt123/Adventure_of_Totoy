@@ -14,6 +14,8 @@ const SkillAttack := preload("res://core/skill_attack.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const ArenaLayout := preload("res://core/arena_layout.gd")
 const Weapons := preload("res://core/weapons.gd")
+const Aspects := preload("res://core/aspects.gd")
+const Lantern := preload("res://core/lantern.gd")
 
 const RESULT_PLAYING: StringName = &"playing"
 const RESULT_VICTORY: StringName = &"victory"
@@ -37,8 +39,14 @@ var skill_attacks: Array[SkillAttack] = []
 ## The solid props of the ruins (pillars, trees, boulders): the player and the boss cannot walk through them.
 var obstacles: Array[Obstacle] = ArenaLayout.build()
 
+## Spirit Lanterns in the world (at most one per player; a new one replaces the old one).
+var lanterns: Array[Lantern] = []
+## Phantom Cut echoes waiting to land, in queue order: {land_tick, base, posture, combo_index, weapon_id, hit_tick}.
+var phantom_echoes: Array[Dictionary] = []
+
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _next_attack_id: int = 1
+var _next_lantern_id: int = 1
 
 
 func _init(seed_value: int = 1) -> void:
@@ -59,6 +67,7 @@ func step(input: InputFrame) -> void:
 	_resolve_lightning_barrage(events)
 	_resolve_reaper_coil(events)
 	_resolve_player_attack(events)
+	_resolve_phantom_echoes(events)
 	_spawn_released_skill(events)
 	var boss_before: Vector2 = boss.position
 	boss.step(tick, player.position, _rng, events)
@@ -67,10 +76,24 @@ func step(input: InputFrame) -> void:
 	_clamp_to_arena()
 	_resolve_skill_attacks(player_before, events)
 	_separate_from_boss()
+	_resolve_lanterns(events)
+	if boss.state == BossState.STATE_DEAD or player.state == PlayerState.STATE_DEAD:
+		phantom_echoes.clear()  # nobody left to hit, or nobody left to echo
 	_check_result(events)
 	last_events = events
 	for event: GameEvent in events:
 		event_emitted.emit(event)
+
+
+## Start the fight with a saved loadout (SaveProfile: weapon_id, equipped_aspects). Call it right after new(), before
+## the first step. Unknown weapons and invalid aspect lists are ignored (the defaults stay).
+func apply_profile(profile: Object) -> void:
+	var weapon: Variant = profile.get("weapon_id")
+	if weapon is StringName and Weapons.is_known(weapon):
+		player.weapon_id = weapon
+	var aspects: Variant = profile.get("equipped_aspects")
+	if aspects is Array:
+		player.set_equipped_aspects(aspects)
 
 
 func snapshot() -> Snapshots.GameSnapshot:
@@ -116,6 +139,19 @@ func snapshot() -> Snapshots.GameSnapshot:
 		a.ticks_left = maxi(0, attack.end_tick - tick)
 		a.hit_target_ids = attack.hit_targets.duplicate()
 		snap.skill_attacks.append(a)
+	for lantern: Lantern in lanterns:
+		var l: Snapshots.LanternSnapshot = Snapshots.LanternSnapshot.new()
+		l.id = lantern.id
+		l.owner_id = lantern.owner_id
+		l.position = lantern.position
+		l.radius = lantern.radius
+		l.placed_tick = lantern.placed_tick
+		l.duration = Tuning.SPIRIT_LANTERN_DURATION_TICKS
+		l.ticks_left = maxi(0, lantern.end_tick() - tick)
+		l.pulse_index = lantern.pulses_done
+		l.pulses = Tuning.SPIRIT_LANTERN_PULSES
+		l.next_pulse_in = maxi(0, lantern.pulse_tick(lantern.pulses_done + 1) - tick) if lantern.pulses_done < Tuning.SPIRIT_LANTERN_PULSES else 0
+		snap.lanterns.append(l)
 	for obstacle: Obstacle in obstacles:
 		var o: Snapshots.ObstacleSnapshot = Snapshots.ObstacleSnapshot.new()
 		o.id = obstacle.id
@@ -138,6 +174,13 @@ func snapshot() -> Snapshots.GameSnapshot:
 	hud.boss_posture_max = Tuning.BOSS_POSTURE_MAX
 	hud.counter_window_ticks_left = boss.broken_ticks_left if boss.state == BossState.STATE_BROKEN else 0
 	hud.skill_cooldown_ticks = player.skill_cooldowns.duplicate()
+	hud.equipped_aspects = player.equipped_aspects.duplicate()
+	for aspect: StringName in Aspects.ALL:
+		hud.aspect_cooldowns[aspect] = player.aspect_cooldowns.get(aspect, 0)
+	for i: int in player.equipped_aspects.size():
+		hud.aspect_slots.append(_aspect_slot_row(i + 1, player.equipped_aspects[i]))
+	hud.phantom_ticks_left = player.phantom_ticks_left
+	hud.phantom_duration = Tuning.PHANTOM_CUT_DURATION_TICKS
 	hud.retaliate_ticks_left = player.retaliate_ticks
 	hud.weapon_buff_duration = Weapons.active_duration(player.weapon_id)
 	hud.weapon_buff_cooldown_ticks = player.buff_cooldown
@@ -149,6 +192,35 @@ func snapshot() -> Snapshots.GameSnapshot:
 	hud.weapon_swap_lockout_max = Tuning.WEAPON_SWAP_LOCKOUT_TICKS
 	snap.hud = hud
 	return snap
+
+
+## One HUD row for skill slot `slot` (1-3) holding `aspect`: what to draw on the Z/X/C icon.
+func _aspect_slot_row(slot: int, aspect: StringName) -> Dictionary:
+	var running: bool = false
+	var ticks_left: int = 0
+	match aspect:
+		Aspects.PHANTOM_CUT:
+			running = player.phantom_ticks_left > 0
+			ticks_left = player.phantom_ticks_left
+		Aspects.SPIRIT_LANTERN:
+			var lantern: Lantern = _player_lantern()
+			running = lantern != null
+			ticks_left = maxi(0, lantern.end_tick() - tick) if lantern != null else 0
+		_:
+			running = player.skill_id == aspect
+	return {
+		"slot": slot, "aspect_id": aspect, "name": Aspects.display_name(aspect), "kind": Aspects.kind(aspect),
+		"edge_cost": Aspects.edge_cost(aspect), "cooldown_ticks": int(player.aspect_cooldowns.get(aspect, 0)),
+		"cooldown_max": Aspects.cooldown(aspect), "running": running, "ticks_left": ticks_left,
+		"duration": Aspects.duration(aspect), "needs_retaliation": Aspects.needs_retaliation(aspect),
+	}
+
+
+func _player_lantern() -> Lantern:
+	for lantern: Lantern in lanterns:
+		if lantern.owner_id == player.id:
+			return lantern
+	return null
 
 
 func _player_snapshot() -> Snapshots.EntitySnapshot:
@@ -182,6 +254,9 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.reaper_coil_from = player.position if player.coil_running else Vector2.ZERO
 	e.reaper_coil_target = player.coil_target if player.coil_running else Vector2.ZERO
 	e.reaper_coil_spin_hit = player.coil_spin_hit if player.coil_running else 0
+	e.equipped_aspects = player.equipped_aspects.duplicate()
+	e.phantom_ticks_left = player.phantom_ticks_left
+	e.phantom_pending_echoes = phantom_echoes.size()
 	return e
 
 
@@ -219,8 +294,98 @@ func _resolve_player_attack(events: Array[GameEvent]) -> void:
 	var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult
 	var posture: float = Weapons.swing_posture(weapon, player.combo_index)
 	var counter: bool = _land_player_hit(base, Weapons.edge_per_hit(weapon), {"combo_index": player.combo_index, "weapon_id": weapon}, events, posture)
+	if player.phantom_ticks_left > 0:
+		phantom_echoes.append({
+			"land_tick": tick + Tuning.PHANTOM_CUT_DELAY_TICKS, "hit_tick": tick, "combo_index": player.combo_index, "weapon_id": weapon,
+			"base": base * Tuning.PHANTOM_CUT_DAMAGE_MULT, "posture": posture * Tuning.PHANTOM_CUT_POSTURE_MULT,
+		})
 	if Weapons.has_lightning_finisher(weapon) and player.combo_index == Weapons.combo_max(weapon):
 		_lightning_strike(counter, player.swing_damage_mult, {"combo_index": player.combo_index, "source": &"swing"}, events)
+
+
+## Phantom Cut echoes whose time has come land on the boss where it stands now (no range check, the phantom steps
+## in), in queue order. An echo is its own hit: armored (x ARMOR_DAMAGE_FACTOR, the queued posture) or a counter while
+## the posture is broken (x COUNTER_DAMAGE_MULT, no Edge bonus); it never gains or spends Edge, never touches the
+## combo or the swing's one-hit rule and never calls a finisher. Events: phantom_echo, then attack_hit with echo true.
+func _resolve_phantom_echoes(events: Array[GameEvent]) -> void:
+	while not phantom_echoes.is_empty() and int(phantom_echoes[0]["land_tick"]) <= tick:
+		var echo: Dictionary = phantom_echoes.pop_front()
+		if boss.state == BossState.STATE_DEAD or player.state == PlayerState.STATE_DEAD:
+			phantom_echoes.clear()
+			return
+		var counter: bool = boss.state == BossState.STATE_BROKEN
+		var base: float = echo["base"]
+		var damage: int = roundi(base * Tuning.COUNTER_DAMAGE_MULT) if counter else maxi(1, roundi(base * Tuning.ARMOR_DAMAGE_FACTOR))
+		events.append(GameEvent.new(GameEvent.PHANTOM_ECHO, tick, {
+			"entity_id": player.id, "target_id": boss.id, "damage": damage, "swing_combo_index": echo["combo_index"],
+			"position": boss.position, "weapon_id": echo["weapon_id"], "hit_tick": echo["hit_tick"],
+			"kind": &"counter" if counter else &"normal",
+		}))
+		events.append(GameEvent.new(GameEvent.ATTACK_HIT, tick, {
+			"attacker_id": player.id, "target_id": boss.id, "damage": damage, "kind": &"counter" if counter else &"normal",
+			"position": boss.position, "echo": true, "swing_combo_index": echo["combo_index"], "weapon_id": echo["weapon_id"],
+		}))
+		boss.take_damage(damage, tick, events, player.id)
+		if not counter:
+			boss.add_posture(float(echo["posture"]), tick, events)
+
+
+## Spirit Lanterns: pulse k lands on placement + k x SPIRIT_LANTERN_PULSE_INTERVAL_TICKS (after this tick's movement and
+## the boss's hits); the player inside the radius heals and gains Edge (both capped). After the last pulse (its final
+## tick) the lantern expires. The player's death removes them (reason death).
+func _resolve_lanterns(events: Array[GameEvent]) -> void:
+	if lanterns.is_empty():
+		return
+	if player.state == PlayerState.STATE_DEAD:
+		for lantern: Lantern in lanterns.duplicate():
+			_remove_lantern(lantern, &"death", events)
+		return
+	for lantern: Lantern in lanterns.duplicate():
+		if lantern.pulses_done < Tuning.SPIRIT_LANTERN_PULSES and tick >= lantern.pulse_tick(lantern.pulses_done + 1):
+			lantern.pulses_done += 1
+			var inside: bool = lantern.covers(player.position)
+			var healed: int = 0
+			var gained: float = 0.0
+			if inside:
+				healed = mini(Tuning.SPIRIT_LANTERN_HEAL_PER_PULSE, Tuning.PLAYER_MAX_HP - player.hp)
+				gained = minf(Tuning.SPIRIT_LANTERN_EDGE_PER_PULSE, Tuning.EDGE_MAX - player.edge)
+				player.hp += healed
+				player.edge += gained
+			events.append(GameEvent.new(GameEvent.LANTERN_PULSE, tick, {
+				"lantern_id": lantern.id, "entity_id": lantern.owner_id, "position": lantern.position, "radius": lantern.radius,
+				"pulse_index": lantern.pulses_done, "healed": healed, "edge_gained": gained, "player_inside": inside,
+			}))
+		if tick >= lantern.end_tick():
+			_remove_lantern(lantern, &"expired", events)
+
+
+## The lantern skill reached skill_active: place the lantern at the player's feet (replacing the player's old one) and
+## start the aspect's cooldown.
+func _place_lantern(events: Array[GameEvent]) -> void:
+	for old: Lantern in lanterns.duplicate():
+		if old.owner_id == player.id:
+			_remove_lantern(old, &"replaced", events)
+	var lantern: Lantern = Lantern.new()
+	lantern.id = _next_lantern_id
+	_next_lantern_id += 1
+	lantern.owner_id = player.id
+	lantern.position = player.position
+	lantern.placed_tick = tick
+	lanterns.append(lantern)
+	player.aspect_cooldowns[Aspects.SPIRIT_LANTERN] = Aspects.cooldown(Aspects.SPIRIT_LANTERN)
+	events.append(GameEvent.new(GameEvent.LANTERN_PLACED, tick, {
+		"lantern_id": lantern.id, "entity_id": player.id, "position": lantern.position, "radius": lantern.radius,
+		"duration": Tuning.SPIRIT_LANTERN_DURATION_TICKS, "pulses": Tuning.SPIRIT_LANTERN_PULSES,
+		"pulse_interval": Tuning.SPIRIT_LANTERN_PULSE_INTERVAL_TICKS,
+	}))
+
+
+func _remove_lantern(lantern: Lantern, reason: StringName, events: Array[GameEvent]) -> void:
+	lanterns.erase(lantern)
+	events.append(GameEvent.new(GameEvent.LANTERN_EXPIRED, tick, {
+		"lantern_id": lantern.id, "entity_id": lantern.owner_id, "position": lantern.position, "reason": reason,
+		"pulses_done": lantern.pulses_done,
+	}))
 
 
 ## One player weapon hit on the boss under the normal-hit rules: armored (x ARMOR_DAMAGE_FACTOR, gains `edge_gain`
@@ -570,6 +735,9 @@ func _spawn_released_skill(events: Array[GameEvent]) -> void:
 	if skill == &"":
 		return
 	player.pending_release = &""
+	if skill == PlayerState.SKILL_SPIRIT_LANTERN:
+		_place_lantern(events)
+		return
 	var attack: SkillAttack = SkillAttack.new()
 	attack.id = _next_attack_id
 	_next_attack_id += 1

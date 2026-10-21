@@ -4,6 +4,7 @@ const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
+const Aspects := preload("res://core/aspects.gd")
 var snapshot: Snapshots.GameSnapshot
 var colors: Dictionary = {}
 var debug_enabled: bool = false
@@ -351,18 +352,34 @@ static func boss_panel(head: Vector2, counter: bool) -> Rect2:
 	var height: float = 47.0 if counter else 33.0
 	return Rect2(Vector2(clampf(head.x - 52, 2, 214), clampf(head.y - 4 - height, 2, 164 - height)).round(), Vector2(104, height))
 
-## The Aspect socket icons (24 px), slot 1-3 = Z X C.
-const ASPECT_ICONS: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1"]
+## The Aspect socket icons (24 px) by aspect id: "ui_aspect_<id>_1". While a Spirit Lantern stands its slot shows the
+## burning icon ui_aspect_spirit_lantern_lit_1..4 (about 120 ms per frame).
+const ASPECT_KEYS_ZXC: Array[String] = ["Z", "X", "C"]
+const LANTERN_LIT_TICKS: int = 7
 
-## Display facts from HUD snapshots; these labels do not gate input or predict hits. The cooldown is shown only on
-## the icons (ring and seconds), never as text in a box.
-static func skill_rows(h: Snapshots.HudSnapshot) -> Array[Dictionary]:
+static func aspect_icon(aspect: StringName, lit: bool = false, tick: int = 0) -> String:
+	if lit and aspect == Aspects.SPIRIT_LANTERN:
+		return "ui_aspect_spirit_lantern_lit_%d" % (posmod(tick / LANTERN_LIT_TICKS, 4) + 1)
+	return "ui_aspect_%s_1" % aspect
+
+## Display facts from the HUD snapshot's aspect_slots (one row per slot Z/X/C: whichever aspect is slotted there);
+## these labels do not gate input or predict hits. The cooldown is shown only on the icons (ring and seconds), never as
+## text in a box. A snapshot without aspect_slots (none should exist) falls back to the default slots.
+static func skill_rows(h: Snapshots.HudSnapshot, tick: int = 0) -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
-	var names: Array[String] = ["BREAKING EDGE", "GALE CUT", "MOON CLEAVE"]
-	var keys: Array[String] = ["Z", "X", "C"]
-	var costs: Array[float] = [Tuning.BREAKING_EDGE_EDGE_COST, Tuning.GALE_CUT_EDGE_COST, Tuning.MOON_CLEAVE_EDGE_COST]
 	for slot: int in range(3):
-		rows.append({"key": keys[slot], "name": names[slot], "cost": costs[slot], "cooldown": h.skill_cooldown_ticks[slot], "icon": ASPECT_ICONS[slot]})
+		var data: Dictionary = h.aspect_slots[slot] if slot < h.aspect_slots.size() else {}
+		var aspect: StringName = StringName(data.get("aspect_id", Aspects.DEFAULT_EQUIPPED[slot]))
+		var running: bool = bool(data.get("running", false))
+		rows.append({
+			"slot": slot + 1, "key": ASPECT_KEYS_ZXC[slot], "aspect_id": aspect, "name": Aspects.display_name(aspect).to_upper(),
+			"kind": StringName(data.get("kind", Aspects.kind(aspect))), "cost": float(data.get("edge_cost", Aspects.edge_cost(aspect))),
+			"cooldown": int(data.get("cooldown_ticks", h.skill_cooldown_ticks[slot] if slot < h.skill_cooldown_ticks.size() else 0)),
+			"cooldown_max": int(data.get("cooldown_max", Aspects.cooldown(aspect))), "running": running,
+			"ticks_left": int(data.get("ticks_left", 0)), "duration": int(data.get("duration", Aspects.duration(aspect))),
+			"needs_retaliation": bool(data.get("needs_retaliation", Aspects.needs_retaliation(aspect))),
+			"icon": aspect_icon(aspect, running, tick),
+		})
 	return rows
 
 
@@ -374,12 +391,30 @@ static func aspect_rects() -> Array[Rect2]:
 static func weapon_rect() -> Rect2:
 	return Rect2(269, 130, 48, 48)
 
-static func cooldown_fraction(slot: int, h: Snapshots.HudSnapshot) -> float:
-	var maximum: int = [1, Tuning.GALE_CUT_COOLDOWN_TICKS, Tuning.MOON_CLEAVE_COOLDOWN_TICKS][slot]
-	return clampf(float(h.skill_cooldown_ticks[slot]) / maxi(1, maximum), 0.0, 1.0)
+## The cooldown ring's fill (1 = just used) of a skill row.
+static func cooldown_fraction(row: Dictionary) -> float:
+	return clampf(float(row["cooldown"]) / maxi(1, int(row["cooldown_max"])), 0.0, 1.0)
+
+## The run ring's fill (1 = just started) while a lantern stands or a buff runs, else 0.
+static func run_fraction(row: Dictionary) -> float:
+	if not bool(row["running"]) or int(row["duration"]) <= 0:
+		return 0.0
+	return clampf(float(row["ticks_left"]) / int(row["duration"]), 0.0, 1.0)
+
+func _ring(centre: Vector2, fraction: float, radius: float, color: Color) -> void:
+	var arc: PackedVector2Array = PackedVector2Array()
+	for point: int in range(33):
+		arc.append((centre + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * radius).round())
+	draw_polyline(arc, color, 1.0, false)
+
+func _seconds(centre: Vector2, ticks: int, color: Color) -> void:
+	var seconds: String = str(ceili(ticks * Tuning.TICK_DT))
+	var seconds_width: float = text_width(seconds, 1, null, 12)
+	draw_rect(Rect2(centre + Vector2(-seconds_width * 0.5 - 1, -5), Vector2(seconds_width + 2, 10)), colors["0"])
+	lettering(centre + Vector2(-seconds_width * 0.5, -4), seconds, color, 1, null, 12)
 
 func _draw_skills(h: Snapshots.HudSnapshot) -> void:
-	var rows: Array[Dictionary] = skill_rows(h)
+	var rows: Array[Dictionary] = skill_rows(h, snapshot.tick)
 	var sockets: Array[Rect2] = aspect_rects()
 	if MEDALLIONS.has(snapshot.player.weapon_id):
 		ui(MEDALLIONS[snapshot.player.weapon_id], weapon_rect())
@@ -388,38 +423,43 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 		ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
 	centered(weapon_rect().get_center().x, weapon_rect().get_center().y + 14, weapon_label(snapshot.player.weapon_id), colors["j"], colors["0"])
 	_draw_weapon_active()
+	var hint: Dictionary = {}
 	for slot: int in range(3):
 		var row: Dictionary = rows[slot]
 		var socket: Rect2 = sockets[slot]
 		var centre: Vector2 = socket.get_center()
 		ui(row["icon"], socket)
+		# Snapshot-only rings. The core still accepts or rejects every press.
+		var running: float = run_fraction(row)
 		if int(row["cooldown"]) > 0:
-			# Snapshot-only countdown. The core still accepts or rejects every press.
-			var arc: PackedVector2Array = PackedVector2Array()
-			var fraction: float = cooldown_fraction(slot, h)
-			for point: int in range(33):
-				arc.append((centre + Vector2.from_angle(-PI * 0.5 + TAU * fraction * point / 32.0) * 11.0).round())
-			draw_polyline(arc, colors["o"], 1.0, false)
-			var seconds: String = str(ceili(int(row["cooldown"]) * Tuning.TICK_DT))
-			var seconds_width: float = text_width(seconds, 1, null, 12)
-			draw_rect(Rect2(centre + Vector2(-seconds_width * 0.5 - 1, -5), Vector2(seconds_width + 2, 10)), colors["0"])
-			lettering(centre + Vector2(-seconds_width * 0.5, -4), seconds, colors["p"], 1, null, 12)
+			_ring(centre, cooldown_fraction(row), 11.0, colors["o"])
+		if running > 0.0:
+			_ring(centre, running, 12.0, colors["p"])
+		if running > 0.0 and row["kind"] == Aspects.KIND_BUFF:
+			_seconds(centre, int(row["ticks_left"]), colors["v"])  # Phantom Cut: the seconds it still runs
+		elif running <= 0.0 and int(row["cooldown"]) > 0:
+			_seconds(centre, int(row["cooldown"]), colors["p"])
 		var badge: Vector2 = socket.position + Vector2(-2, 16)
 		draw_rect(Rect2(badge - Vector2.ONE, Vector2(7, 7)), colors["0"])
 		lettering(badge, row["key"], colors["1"], 1, stat_font())
 		var cost: String = "%dE" % int(row["cost"])
 		centered(centre.x, centre.y + 12, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"], 1, null, 12)
 		if socket.has_point(get_local_mouse_position()) or slot == hint_slot_override:
-			_draw_aspect_hint(row)
+			hint = row
 	if h.retaliate_ticks_left > 0:
-		outlined(Vector2(216, 91), "Z BREAKING EDGE READY", colors["x"], colors["0"], 1, stat_font())
-		var ring: PackedVector2Array = PackedVector2Array()
-		for point: int in range(33):
-			ring.append((sockets[0].get_center() + Vector2.from_angle(TAU * point / 32.0) * 12.0).round())
-		draw_polyline(ring, colors["x"], 1.0, false)
+		for slot: int in range(3):
+			if not bool(rows[slot]["needs_retaliation"]):
+				continue
+			outlined(Vector2(216, 91), "%s %s READY" % [rows[slot]["key"], rows[slot]["name"]], colors["x"], colors["0"], 1, stat_font())
+			var ring: PackedVector2Array = PackedVector2Array()
+			for point: int in range(33):
+				ring.append((sockets[slot].get_center() + Vector2.from_angle(TAU * point / 32.0) * 12.0).round())
+			draw_polyline(ring, colors["x"], 1.0, false)
+	if not hint.is_empty():
+		_draw_aspect_hint(hint)
 
-## The skill hover tooltip in the shared frame (info theme): the key in a badge, the name, a divider, the Edge cost,
-## the Aspect's icon on the right. No cooldown text (the icon's ring shows it).
+## The skill hover tooltip in the shared frame (info theme): the key in a badge, the slotted Aspect's name, a divider,
+## its Edge cost, its icon on the right. No cooldown text (the icon's ring shows it).
 static func aspect_hint_rect() -> Rect2:
 	return Rect2(156, 60, 160, 34)
 
@@ -431,7 +471,10 @@ func _draw_aspect_hint(row: Dictionary) -> void:
 	lettering(rect.position + Vector2(9 - text_width(row["key"]) * 0.5, 6), row["key"], colors["1"])
 	lettering(rect.position + Vector2(16, 6), row["name"], colors["1"], 1, null, 10)
 	draw_rect(Rect2(rect.position + Vector2(5, 15), Vector2(120, 1)), colors["f"])
-	lettering(rect.position + Vector2(5, 19), "%d EDGE" % int(row["cost"]), colors["v"], 1, null, 10)
+	var cost: String = "%d EDGE" % int(row["cost"])
+	if row["kind"] == Aspects.KIND_BUFF:
+		cost += "  BUFF %s S" % str(ceili(int(row["duration"]) * Tuning.TICK_DT))
+	lettering(rect.position + Vector2(5, 19), cost, colors["v"], 1, null, 10)
 
 static func weapon_label(weapon: StringName) -> String:
 	match weapon:
