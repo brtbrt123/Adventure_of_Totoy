@@ -8,6 +8,7 @@ Usage: python harness/checks/run_tests.py --worktree DIR [--timeout 300]
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -22,6 +23,8 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=300)
     args = parser.parse_args()
     wt: Path = args.worktree
+    # Godot suites must never touch the player's real save file.
+    os.environ["TOTOY_SAVE_PATH"] = "user://harness_check_save.json"
     failures: list[str] = []
 
     code, out = _common.run_limited([sys.executable, "-m", "unittest", "discover", "-s", "tests"], wt, args.timeout)

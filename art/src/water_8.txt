@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Water.png (Gemini), cell 8
+mmmlllllllllllmm
+lllllllllllllmll
+llllllllmlllllll
+lllllllllmmlllll
+llllllllllllllll
+lllllllllllmllll
+llllllllllllllll
+llllllllllllllll
+mlllllllllllllll
+lllllllllmmlllll
+lllllllllllmllll
+llllllllllllllll
+lllllllmmllllmll
+lllllllllllllllk
+mmllllllllllllll
+lmmmllllllllllll

@@ -16,6 +16,35 @@ class EntitySnapshot:
 	var posture: float = 0.0
 	var posture_max: float = 0.0
 	var invulnerable: bool = false
+	var combo_index: int = 0  # player only (1..combo_max, see docs/architecture.md); 0 for other entities
+	var combo_max: int = 0  # player only: swings in the equipped weapon's combo (katana 3, dagger 4)
+	var weapon_id: StringName = &""  # player only: the equipped weapon, &"black_katana", &"dual_dagger" or &"chain_scythe"
+	var weapon_form: StringName = &""  # player only: the running active, &"black_katana_buff" / &"lightning_form" / &"reaper_coil", else empty
+	var move_speed_mult: float = 1.0  # player only: walking speed multiplier right now (x2 while Sprint runs)
+	var lightning_blink_index: int = -1  # player only: direction (0-7) of the latest lightning blink, -1 before any
+	var lightning_blink_tick: int = -1  # player only: tick of the latest lightning blink (it equals snapshot.tick on the blink tick)
+	var lightning_blink_from: Vector2 = Vector2.ZERO  # player only: where the latest blink started
+	var lightning_blink_to: Vector2 = Vector2.ZERO  # player only: where it landed
+	var lightning_barrage_slash: int = 0  # player only: slash (1-8) of the running Lightning Barrage, 0 when none runs or before its first slash
+	var lightning_barrage_slash_tick: int = -1  # player only: tick that slash started (its blink), -1 when none
+	var reaper_coil_phase: StringName = &""  # player only: hook, drag, spin, pull, recovery while Reaper's Coil runs, else empty
+	var reaper_coil_phase_tick: int = 0  # player only: ticks since that phase began (0 on its first tick)
+	var reaper_coil_from: Vector2 = Vector2.ZERO  # player only: where the chain starts (the player), while the coil runs
+	var reaper_coil_target: Vector2 = Vector2.ZERO  # player only: the chain's end (hook: its tip; drag: the boss edge; pull: the anchor)
+	var reaper_coil_spin_hit: int = 0  # player only: spin hits done so far (0-2) during the coil, else 0
+	var dragged: bool = false  # boss only: true while Reaper's Coil drags it (state staggered or posture_broken)
+	var stagger_ticks_left: int = 0  # boss only: ticks of the Reaper's Coil stun left in state staggered (0 while dragged)
+	var weapon_buff_active: bool = false  # player only
+	var weapon_buff_ticks_left: int = 0  # player only: ticks of buff left, 0 when not active
+	var attack_speed_mult: float = 1.0  # player only: the speed of the swing in progress (locked at its start), else the current buff speed
+	var skill_id: StringName = &""  # player only: the skill in progress during skill_* states, else empty
+	var equipped_aspects: Array[StringName] = []  # player only: the aspects in slots 1-3 (Z, X, C)
+	var phantom_ticks_left: int = 0  # player only: Phantom Cut ticks left, 0 when it does not run
+	var phantom_pending_echoes: int = 0  # player only: Phantom Cut echoes queued and not landed yet
+	var sprint_ticks_left: int = 0  # player only: Sprint ticks left, 0 when it does not run
+	var echo_invuln_ticks: int = 0  # player only: Echo Step arrival invulnerability left (12 on the arrival tick)
+	var ward_ticks_left: int = 0  # player only: Stone Ward ticks left in state ward (60 on the raise tick), else 0
+	var ward_stored: int = 0  # player only: damage the running Stone Ward has stored (capped), else 0
 
 
 class TelegraphSnapshot:
@@ -26,6 +55,7 @@ class TelegraphSnapshot:
 	var kind: StringName = &"red"  # gold = parry it, red = dodge it
 	var shape: StringName = &"circle"  # circle, cone, line, ring
 	var center: Vector2 = Vector2.ZERO
+	var muzzle: Vector2 = Vector2.ZERO  # where the attack leaves the boss (red_shards: the chest core, equal to center)
 	var direction: Vector2 = Vector2.RIGHT
 	var size: float = 0.0
 	var inner_size: float = 0.0  # ring: inner radius, the inside is safe
@@ -34,6 +64,63 @@ class TelegraphSnapshot:
 	var start_tick: int = 0
 	var hit_tick: int = 0
 	var end_tick: int = 0
+
+
+class SkillAttackSnapshot:
+	extends RefCounted
+	## A skill attack that is live right now: a melee arc, a dash lane or a travelling projectile.
+	var id: int = 0  # the same id appears in the skill_released and attack_hit events
+	var owner_id: int = 0
+	var skill_id: StringName = &""
+	var shape: StringName = &"arc"  # arc (melee), lane (dash corridor), projectile
+	var position: Vector2 = Vector2.ZERO  # arc: the player; lane: the dash head (the player); projectile: its centre now
+	var direction: Vector2 = Vector2.RIGHT
+	var start: Vector2 = Vector2.ZERO  # lane/projectile: where it began
+	var end: Vector2 = Vector2.ZERO  # lane/projectile: where it ends if nothing shortens it
+	var width: float = 0.0  # lane width / projectile width
+	var size: float = 0.0  # arc: reach in pixels
+	var half_angle: float = 0.0  # arc: half the arc, radians
+	var start_tick: int = 0
+	var end_tick: int = 0  # last tick it can hit (projectile: when it runs out of travel)
+	var ticks_left: int = 0
+	var hit_target_ids: Array[int] = []
+
+
+class LanternSnapshot:
+	extends RefCounted
+	## A Spirit Lantern in the world (it does not block movement).
+	var id: int = 0  # the same id appears in the lantern_* events
+	var owner_id: int = 0
+	var position: Vector2 = Vector2.ZERO  # where it stands (the player's feet when it was placed)
+	var radius: float = 0.0  # the light: the player's centre within this distance is inside
+	var placed_tick: int = 0
+	var duration: int = 0
+	var ticks_left: int = 0  # ticks until its last pulse / expiry (duration on the placement tick)
+	var pulse_index: int = 0  # pulses done so far (0-5)
+	var pulses: int = 0  # pulses in a full life (5)
+	var next_pulse_in: int = 0  # ticks until the next pulse (0 once all pulses are done)
+
+
+class EchoSnapshot:
+	extends RefCounted
+	## An Echo Step anchor in the world (it does not block movement): the player is pulled back to it.
+	var id: int = 0  # the same id appears in the echo_* events
+	var owner_id: int = 0
+	var position: Vector2 = Vector2.ZERO  # where the player will arrive (unless the boss stands on it then)
+	var placed_tick: int = 0
+	var duration: int = 0  # ticks from the placement to the recall (ECHO_STEP_DELAY_TICKS)
+	var ticks_left: int = 0  # ticks until the recall is due (duration on the placement tick; 0 while it waits for a barrage/coil)
+
+
+class ObstacleSnapshot:
+	extends RefCounted
+	## A solid static prop (see core/arena_layout.gd). The same list is used for collision and for drawing.
+	var id: int = 0
+	var visual_id: StringName = &""  # the sprite to draw at `feet`; empty for an extra collider of a larger prop
+	var feet: Vector2 = Vector2.ZERO
+	var visual_scale: float = 1.0
+	var center: Vector2 = Vector2.ZERO  # the collision circle
+	var radius: float = 0.0
 
 
 class HudSnapshot:
@@ -49,6 +136,23 @@ class HudSnapshot:
 	var boss_posture: float = 0.0
 	var boss_posture_max: float = 0.0
 	var counter_window_ticks_left: int = 0
+	var skill_cooldown_ticks: Array[int] = [0, 0, 0]  # ticks left of the aspect in each slot 1-3
+	var equipped_aspects: Array[StringName] = []  # the aspect id in each slot 1-3
+	## One row per slot 1-3: slot, aspect_id, name, kind (skill/buff), edge_cost, cooldown_ticks, cooldown_max, running,
+	## ticks_left (lantern life / phantom or sprint buff / echo until the recall / ward left while running), duration,
+	## needs_retaliation, stored (Stone Ward: damage stored by the running ward, else 0).
+	var aspect_slots: Array[Dictionary] = []
+	var aspect_cooldowns: Dictionary = {}  # aspect_id -> ticks until ready, for every aspect (slotted or not)
+	var phantom_ticks_left: int = 0
+	var phantom_duration: int = 0
+	var weapon_buff_duration: int = 0  # full duration of the weapon buff (0 if the weapon has none)
+	var weapon_buff_cooldown_ticks: int = 0  # ticks until the weapon active can be used again
+	var weapon_buff_cooldown_max: int = 0
+	var weapon_buff_edge_cost: float = 0.0
+	var weapon_cooldowns: Dictionary = {}  # weapon_id -> ticks until that weapon's active is ready (every weapon, equipped or not)
+	var weapon_swap_lockout_ticks: int = 0  # ticks until the next swap is allowed
+	var weapon_swap_lockout_max: int = 0
+	var retaliate_ticks_left: int = 0  # Breaking Edge: ticks left after a successful parry
 
 
 class GameSnapshot:
@@ -59,4 +163,8 @@ class GameSnapshot:
 	var player: EntitySnapshot = null
 	var entities: Array[EntitySnapshot] = []  # everything except the player
 	var telegraphs: Array[TelegraphSnapshot] = []
+	var skill_attacks: Array[SkillAttackSnapshot] = []
+	var lanterns: Array[LanternSnapshot] = []  # Spirit Lanterns in the world
+	var echoes: Array[EchoSnapshot] = []  # Echo Step anchors in the world (at most one per player)
+	var obstacles: Array[ObstacleSnapshot] = []  # the solid props, the same every tick
 	var hud: HudSnapshot = null

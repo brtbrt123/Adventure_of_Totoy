@@ -1,0 +1,190 @@
+{
+ "generator": "tools/art/export_black_form_cutin.py (Pillow only, fixed seeds; shared format of export_lightning_cutin.py)",
+ "canvas": [
+  800,
+  450
+ ],
+ "palette": "Totoy 36, hard alpha; no gold x,y or red z,A",
+ "pose_scale": 6,
+ "aura_scale": 8,
+ "fx_scale": 4,
+ "poses": {
+  "crouch": {
+   "w": 618,
+   "h": 516,
+   "pad": 108,
+   "inner_w": 402,
+   "inner_h": 300,
+   "feet_x": 0.47,
+   "source": "concept_v1.png sheet cell 0"
+  },
+  "ready": {
+   "w": 492,
+   "h": 582,
+   "pad": 108,
+   "inner_w": 276,
+   "inner_h": 366,
+   "feet_x": 0.47,
+   "source": "concept_v1.png sheet cell 1"
+  },
+  "burst": {
+   "w": 624,
+   "h": 648,
+   "pad": 108,
+   "inner_w": 408,
+   "inner_h": 432,
+   "feet_x": 0.42,
+   "source": "concept_v1.png sheet cell 4"
+  }
+ },
+ "aura": {
+  "cell_w": 384,
+  "cell_h": 448,
+  "frames": [
+   {
+    "x": 0,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 384,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 768,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1152,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1536,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1920,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 0,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 384,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 768,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1152,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1536,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1920,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   }
+  ],
+  "anchor": "bottom centre"
+ },
+ "slashes": [
+  "black_form_slash_1.png",
+  "black_form_slash_2.png",
+  "black_form_slash_3.png",
+  "black_form_slash_4.png"
+ ],
+ "flashes": [
+  "black_form_flash_1.png",
+  "black_form_flash_2.png",
+  "black_form_flash_3.png"
+ ],
+ "timing_s": {
+  "note": "suggested, preview seconds at 30 fps; black_form_cutin.gd plays them at SPEED",
+  "flash_pop": [
+   0.0,
+   0.167
+  ],
+  "banner_in": [
+   0.03,
+   0.17
+  ],
+  "beats": [
+   [
+    "crouch",
+    0.1,
+    0.37
+   ],
+   [
+    "ready",
+    0.37,
+    0.6
+   ],
+   [
+    "burst",
+    0.6,
+    1.1
+   ]
+  ],
+  "cuts": [
+   0.37,
+   0.6
+  ],
+  "slash_on_burst": [
+   [
+    1,
+    0.033
+   ],
+   [
+    2,
+    0.067
+   ],
+   [
+    3,
+    0.067
+   ],
+   [
+    4,
+    0.067
+   ],
+   [
+    "3/4 flicker",
+    "until exit"
+   ]
+  ],
+  "title_slam": 0.66,
+  "exit": [
+   0.88,
+   1.04
+  ],
+  "end": 1.04
+ }
+}

@@ -1,0 +1,177 @@
+{
+ "generator": "tools/art/make_chain_scythe_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "weapon": "Chain Scythe (suggested skill name: Reaper's Coil)",
+ "layout": "10 columns x 1 row of 64x64 cells, feet anchor (32,56) in every cell. Right-facing; mirror around the anchor for left.",
+ "poses": [
+  {
+   "pose": "ready",
+   "cell": 0,
+   "rect": [
+    0,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_idle_right_1 (in-game lean)",
+   "description": "idle / ready: scythe upright in the lead fist, blade over the head; the chain loops up into the other fist"
+  },
+  {
+   "pose": "walk_carry",
+   "cell": 1,
+   "rect": [
+    64,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_walk_right_2 (in-game lean)",
+   "description": "walk: haft gripped low in the lead fist, trailed up over the back with the blade hanging behind"
+  },
+  {
+   "pose": "swing_1",
+   "cell": 2,
+   "rect": [
+    128,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_attack1_right_4 (in-game lean)",
+   "description": "combo 1: wide horizontal sweep, two-handed grip"
+  },
+  {
+   "pose": "swing_2",
+   "cell": 3,
+   "rect": [
+    192,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_attack2_right_4 (in-game lean)",
+   "description": "combo 2: reverse (backhand) rising arc, two-handed grip"
+  },
+  {
+   "pose": "swing_3",
+   "cell": 4,
+   "rect": [
+    256,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_attack3_right_4 (in-game lean)",
+   "description": "combo 3: overhead-to-low slam, both fists together on the haft, blade skims the ground"
+  },
+  {
+   "pose": "spin",
+   "cell": 5,
+   "rect": [
+    320,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_victory_right_3 (custom lean)",
+   "description": "charged: the raised fist whirls the scythe on its chain in a full circle overhead"
+  },
+  {
+   "pose": "windup",
+   "cell": 6,
+   "rect": [
+    384,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_attack1_right_1 (in-game lean)",
+   "description": "skill wind-up: haft drawn back in the rear fist, chain gathered in the lead fist"
+  },
+  {
+   "pose": "whip",
+   "cell": 7,
+   "rect": [
+    448,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_attack2_right_3 (in-game lean)",
+   "description": "skill: whip-out, the chain flies forward out of the lead fist (the scythe is far ahead, see the fx sheet)"
+  },
+  {
+   "pose": "pull",
+   "cell": 8,
+   "rect": [
+    512,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_parry_right_1 (custom lean)",
+   "description": "skill: drag, leaning back, the taut chain runs through both fists, slack loop below"
+  },
+  {
+   "pose": "recovery",
+   "cell": 9,
+   "rect": [
+    576,
+    0,
+    64,
+    64
+   ],
+   "anchor": [
+    32,
+    56
+   ],
+   "body_source": "hero2_attack1_right_6 (in-game lean)",
+   "description": "recovery: scythe lowered across the hips in both fists, blade trailing behind"
+  }
+ ],
+ "colours": {
+  "haft": "h stone_4 with t teal_1 ferrules, j stone_6 pommel ring",
+  "blade": "u teal_2 body, t teal_1 spine, 1 cream cutting edge (concave side), p water_6 tip",
+  "chain": "alternating links: j/1 face-on (2 px across) and u/t edge-on (1 px), ink outline 0",
+  "effects": "1 cream, p water_6, 7 grass_6 glints, u teal_2, t teal_1, k water_1 deep blue-black shadow"
+ },
+ "request": "Chain Scythe: wide sweeping arcs, charged full-circle spin on the chain; right-click Reaper's Coil whips the chain out, hooks the golem, drags it to Totoy and staggers it. Damage, timing, cost, cooldown and stagger length are owner/core decisions."
+}

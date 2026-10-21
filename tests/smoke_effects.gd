@@ -61,7 +61,11 @@ func _controls() -> void:
 	Input.action_press("arena_attack")
 	var frame: InputFrame = Bindings.read_frame(Vector2(20, 30), Vector2(30, 20))
 	_expect(frame.attack_pressed, "attack intent missing")
-	_expect(frame.aim.is_equal_approx(Vector2(1,-1).normalized()), "mouse aim direction incorrect")
+	_expect(frame.aim == Vector2.ZERO, "standing still sends no aim (the mouse is ignored; the core keeps the facing)")
+	Input.action_press("arena_up")
+	frame = Bindings.read_frame(Vector2(20, 30), Vector2(30, 20))
+	_expect(frame.aim.is_equal_approx(Vector2.UP), "aim follows the heading, not the mouse")
+	Input.action_release("arena_up")
 	Input.action_release("arena_attack")
 
 func _step(frame: InputFrame) -> void:
@@ -73,6 +77,9 @@ func _step(frame: InputFrame) -> void:
 		arena._on_event(event)
 		if event.type == &"attack_hit" and int(event.data["attacker_id"]) == arena.snapshot.player.id:
 			seen[String(event.data["kind"])] = true
+			var heavy_sound: bool = event.data["kind"] == &"counter" or int(event.data.get("combo_index", 1)) == 3
+			_expect(arena.combat_audio.played.has("counter_hit" if heavy_sound else "armor_hit"), "confirmed hit audio missing")
+			_expect(Vector2(arena.hit_bursts.back()["contact"]).y < Vector2(event.data["position"]).y, "hit spark is still at feet")
 			if event.data["kind"] == &"counter":
 				_expect(int(arena.flashes[arena.snapshot.entities[0].id]) == 10, "counter flash duration")
 			_expect(not arena.particles.is_empty(), "hit has no spark")
@@ -159,7 +166,7 @@ func _new_patterns() -> void:
 						saw_rush = true
 			if attack == &"gold_combo" and impact_ids.size() == 1:
 				var pose: String = String(arena.selected_frames.get(2, ""))
-				saw_reraise = saw_reraise or pose.contains("gold_combo_windup")
+				saw_reraise = saw_reraise or pose.begins_with("golem2_slam_") and int(pose.get_slice("_", 2)) <= 3
 			# Rendering the same snapshot twice must not duplicate impacts or dust.
 			var particle_count: int = arena.particles.size()
 			var trail_count: int = arena.trails.size()
@@ -193,8 +200,9 @@ func _parry_visuals() -> void:
 				if event.type == &"parry_succeeded":
 					succeeded = true
 					_expect(event.data["quality"] == (&"perfect" if lead == 2 else &"early"), "fixture parry quality")
+					_expect(arena.combat_audio.played.has("perfect_parry" if lead == 2 else "deflect"), "parry quality audio missing")
 					_expect(arena.parry_impacts.size() == 1, "parry impact missing")
-					_expect(arena.selected_frames[arena.snapshot.player.id] == "totoy_parry_right_3", "successful parry must show painted spark")
+					_expect(arena.selected_frames[arena.snapshot.player.id] == "hero2_parry_right_6", "successful parry must show painted spark")
 					_expect(arena.screen_flash_until > arena.snapshot.tick and arena.shake_left > 0, "parry flash or shake missing")
 					counts.append(arena.particles.size())
 					var impact: Dictionary = arena.parry_impacts[0]

@@ -1,31 +1,31 @@
 extends "res://tests/test_case.gd"
 ## The attacks added after the first playtest: red stomp (ring), gold combo (two slams), red charge (line).
 
-const FAR: Vector2 = Vector2(64.0, 88.0)
+const FAR: Vector2 = Tuning.PLAYER_START
 
 
 func test_stomp_ring_safe_inside_and_outside_hurts_in_the_band() -> void:
-	# Boss at (240, 88). Inner radius 44, outer 100. The player radius is 6.
+	# Boss at BOSS_START. Inner radius 44, outer 100. The player radius is 6.
 	var inside: GameCore = GameCore.new()
-	var hit_tick: int = begin_attack(inside, BossState.ATTACK_STOMP, Vector2(240.0 - 30.0, 88.0))
-	inside.player.position = Vector2(240.0 - 30.0, 88.0)
+	var hit_tick: int = begin_attack(inside, BossState.ATTACK_STOMP, Tuning.BOSS_START + Vector2(-30.0, 0.0))
+	inside.player.position = Tuning.BOSS_START + Vector2(-30.0, 0.0)
 	run_to_tick(inside, inside.boss.telegraphs[0].end_tick + 1)
 	assert_eq(inside.player.hp, Tuning.PLAYER_MAX_HP, "standing next to the boss is safe")
 
 	var band: GameCore = GameCore.new()
-	hit_tick = begin_attack(band, BossState.ATTACK_STOMP, Vector2(240.0 - 70.0, 88.0))
+	hit_tick = begin_attack(band, BossState.ATTACK_STOMP, Tuning.BOSS_START + Vector2(-70.0, 0.0))
 	run_to_tick(band, hit_tick)
 	assert_eq(band.player.hp, Tuning.PLAYER_MAX_HP - Tuning.STOMP_DAMAGE, "standing in the ring is hit")
 
 	var outside: GameCore = GameCore.new()
-	begin_attack(outside, BossState.ATTACK_STOMP, Vector2(240.0 - 140.0, 88.0))
+	begin_attack(outside, BossState.ATTACK_STOMP, Tuning.BOSS_START + Vector2(-140.0, 0.0))
 	run_to_tick(outside, outside.boss.telegraphs[0].end_tick + 1)
 	assert_eq(outside.player.hp, Tuning.PLAYER_MAX_HP, "standing outside the ring is safe")
 
 
 func test_stomp_can_be_dashed_through() -> void:
 	var core: GameCore = GameCore.new()
-	var hit_tick: int = begin_attack(core, BossState.ATTACK_STOMP, Vector2(240.0 - 70.0, 88.0))
+	var hit_tick: int = begin_attack(core, BossState.ATTACK_STOMP, Tuning.BOSS_START + Vector2(-70.0, 0.0))
 	run_to_tick(core, hit_tick - 3)
 	core.step(input(Vector2.LEFT, true))
 	run_to_tick(core, core.boss.telegraphs[0].end_tick + 1)
@@ -36,7 +36,7 @@ func test_ring_warning_matches_the_real_hit_area() -> void:
 	var mismatches: int = 0
 	for gx: int in range(0, 14):
 		var core: GameCore = GameCore.new()
-		var pos: Vector2 = Vector2(240.0 - 26.0 - gx * 8.0, 88.0)
+		var pos: Vector2 = Tuning.BOSS_START + Vector2(-26.0 - gx * 8.0, 0.0)
 		var hit_tick: int = begin_attack(core, BossState.ATTACK_STOMP, pos)
 		var telegraph: Telegraph = core.boss.telegraphs[0]
 		run_to_tick(core, hit_tick)
@@ -89,7 +89,7 @@ func test_perfect_parry_on_the_first_combo_slam_breaks_the_boss_and_cancels_the_
 
 func test_charge_moves_the_boss_along_the_locked_line() -> void:
 	var core: GameCore = GameCore.new()
-	core.player.position = Vector2(150.0, 88.0)
+	core.player.position = Tuning.BOSS_START + Vector2(-90.0, 0.0)
 	core.boss.next_attack_override = BossState.ATTACK_CHARGE
 	core.boss.cooldown = 1
 	core.step(input())
@@ -105,7 +105,7 @@ func test_charge_moves_the_boss_along_the_locked_line() -> void:
 
 func test_charge_hits_a_player_on_the_line_and_misses_one_beside_it() -> void:
 	var hit_core: GameCore = GameCore.new()
-	hit_core.player.position = Vector2(170.0, 88.0)
+	hit_core.player.position = Tuning.BOSS_START + Vector2(-70.0, 0.0)
 	hit_core.boss.next_attack_override = BossState.ATTACK_CHARGE
 	hit_core.boss.cooldown = 1
 	hit_core.step(input())
@@ -113,11 +113,11 @@ func test_charge_hits_a_player_on_the_line_and_misses_one_beside_it() -> void:
 	assert_true(hit_core.player.hp < Tuning.PLAYER_MAX_HP, "standing on the charge line is hit")
 
 	var miss_core: GameCore = GameCore.new()
-	miss_core.player.position = Vector2(170.0, 88.0)
+	miss_core.player.position = Tuning.BOSS_START + Vector2(-70.0, 0.0)
 	miss_core.boss.next_attack_override = BossState.ATTACK_CHARGE
 	miss_core.boss.cooldown = 1
 	miss_core.step(input())
-	miss_core.player.position = Vector2(170.0, 88.0 + 45.0)  # well outside the 28 px wide line
+	miss_core.player.position = Tuning.BOSS_START + Vector2(-70.0, 45.0)  # well outside the 28 px wide line
 	run_to_tick(miss_core, miss_core.boss.telegraphs[0].end_tick + 2)
 	assert_eq(miss_core.player.hp, Tuning.PLAYER_MAX_HP, "stepping aside avoids the charge")
 

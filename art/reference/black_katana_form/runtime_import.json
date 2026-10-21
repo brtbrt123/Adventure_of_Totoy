@@ -1,0 +1,266 @@
+{
+  "source_alpha": 224,
+  "output_alpha": 128,
+  "palette": "0eklvh",
+  "resample": "BOX",
+  "aura_columns": 362,
+  "aura_rows": [
+    [
+      0,
+      380
+    ],
+    [
+      400,
+      706
+    ]
+  ],
+  "slash_cuts": [
+    0,
+    368,
+    753,
+    1163,
+    1525,
+    1861,
+    2172
+  ],
+  "frames": [
+    {
+      "name": "fx_black_aura_back_1",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.125,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_aura_front_1",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.1,
+      "front_clip_above_feet": 17
+    },
+    {
+      "name": "fx_black_aura_back_2",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.125,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_aura_front_2",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.1,
+      "front_clip_above_feet": 17
+    },
+    {
+      "name": "fx_black_aura_back_3",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.125,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_aura_front_3",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.1,
+      "front_clip_above_feet": 17
+    },
+    {
+      "name": "fx_black_aura_back_4",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.125,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_aura_front_4",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.1,
+      "front_clip_above_feet": 17
+    },
+    {
+      "name": "fx_black_aura_back_5",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.125,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_aura_front_5",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.1,
+      "front_clip_above_feet": 17
+    },
+    {
+      "name": "fx_black_aura_back_6",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.125,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_aura_front_6",
+      "canvas": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ],
+      "scale": 0.1,
+      "front_clip_above_feet": 17
+    },
+    {
+      "name": "fx_black_slash_1",
+      "canvas": [
+        80,
+        80
+      ],
+      "anchor": [
+        40,
+        40
+      ],
+      "scale": 1.0,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_slash_2",
+      "canvas": [
+        80,
+        80
+      ],
+      "anchor": [
+        40,
+        40
+      ],
+      "scale": 1.0,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_slash_3",
+      "canvas": [
+        80,
+        80
+      ],
+      "anchor": [
+        40,
+        40
+      ],
+      "scale": 1.0,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_slash_4",
+      "canvas": [
+        80,
+        80
+      ],
+      "anchor": [
+        40,
+        40
+      ],
+      "scale": 1.0,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_slash_5",
+      "canvas": [
+        80,
+        80
+      ],
+      "anchor": [
+        40,
+        40
+      ],
+      "scale": 1.0,
+      "front_clip_above_feet": null
+    },
+    {
+      "name": "fx_black_slash_6",
+      "canvas": [
+        80,
+        80
+      ],
+      "anchor": [
+        40,
+        40
+      ],
+      "scale": 1.0,
+      "front_clip_above_feet": null
+    }
+  ],
+  "status": "Imported into gameplay as18 new frames; original concepts retained",
+  "slash_pre_export_scale": 0.12,
+  "slash_alignment": "Opaque bounds centred directly on(40,40), once only; no feet-baseline placement or second crop",
+  "slash_output_alpha_threshold": 128
+}

@@ -16,6 +16,7 @@ var attack: StringName = &""
 var kind: StringName = KIND_RED
 var shape: StringName = SHAPE_CIRCLE
 var center: Vector2 = Vector2.ZERO
+var muzzle: Vector2 = Vector2.ZERO  # where the attack leaves the boss: the chest core for red_shards (== center), else the boss position
 var direction: Vector2 = Vector2.RIGHT
 var size: float = 0.0
 var inner_size: float = 0.0  # rings only

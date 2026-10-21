@@ -1,0 +1,53 @@
+{
+  "source": "art\\reference\\skill_medallions_v1.png",
+  "columns": 4,
+  "alpha_threshold": 128,
+  "resample": "BOX",
+  "palette": "nearest RGB Totoy 36",
+  "frames": [
+    {
+      "name": "ui_aspect_breaking_edge_1",
+      "cell": 0,
+      "crop": [
+        31,
+        92,
+        542,
+        605
+      ],
+      "size": 24
+    },
+    {
+      "name": "ui_aspect_gale_cut_1",
+      "cell": 1,
+      "crop": [
+        28,
+        92,
+        539,
+        605
+      ],
+      "size": 24
+    },
+    {
+      "name": "ui_aspect_moon_cleave_1",
+      "cell": 2,
+      "crop": [
+        2,
+        92,
+        514,
+        605
+      ],
+      "size": 24
+    },
+    {
+      "name": "ui_weapon_sword_1",
+      "cell": 3,
+      "crop": [
+        1,
+        92,
+        512,
+        605
+      ],
+      "size": 48
+    }
+  ]
+}

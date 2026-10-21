@@ -1,0 +1,661 @@
+{
+  "generator": "tools/art/make_dual_dagger_art.py (procedural, Pillow only, deterministic seeds)",
+  "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+  "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+  "status": "Reference effects; not imported into gameplay",
+  "layout": "Rows 1-4: 8 directions x 4 phases of a 64x64 lightning cut, anchor (32,32) = the point the cut passes through (the target). Each row holds two directions (4 frames each). Then 6 hit sparks (32x32, anchor 16,16) and 4 chain-lightning segments (32x16, enter at (0,8), leave at (31,8); rotate/stretch between two points).",
+  "direction_convention": "direction_deg: travel direction of the cut, 0 = east (right), 90 = south (down, screen y), clockwise",
+  "timing_suggestion": "lead/peak/follow/fragments at about 33/50/50/66 ms; hit spark 6 frames at about 40 ms",
+  "frames": [
+    {
+      "name": "fx_lightning_slash_e_1",
+      "rect": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 0,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_e_2",
+      "rect": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 0,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_e_3",
+      "rect": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 0,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_e_4",
+      "rect": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 0,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_slash_se_1",
+      "rect": [
+        256,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 45,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_se_2",
+      "rect": [
+        320,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 45,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_se_3",
+      "rect": [
+        384,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 45,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_se_4",
+      "rect": [
+        448,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 45,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_slash_s_1",
+      "rect": [
+        0,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 90,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_s_2",
+      "rect": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 90,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_s_3",
+      "rect": [
+        128,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 90,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_s_4",
+      "rect": [
+        192,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 90,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_slash_sw_1",
+      "rect": [
+        256,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 135,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_sw_2",
+      "rect": [
+        320,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 135,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_sw_3",
+      "rect": [
+        384,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 135,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_sw_4",
+      "rect": [
+        448,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 135,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_slash_w_1",
+      "rect": [
+        0,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 180,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_w_2",
+      "rect": [
+        64,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 180,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_w_3",
+      "rect": [
+        128,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 180,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_w_4",
+      "rect": [
+        192,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 180,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_slash_nw_1",
+      "rect": [
+        256,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 225,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_nw_2",
+      "rect": [
+        320,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 225,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_nw_3",
+      "rect": [
+        384,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 225,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_nw_4",
+      "rect": [
+        448,
+        128,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 225,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_slash_n_1",
+      "rect": [
+        0,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 270,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_n_2",
+      "rect": [
+        64,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 270,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_n_3",
+      "rect": [
+        128,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 270,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_n_4",
+      "rect": [
+        192,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 270,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_slash_ne_1",
+      "rect": [
+        256,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 315,
+      "phase": "lead"
+    },
+    {
+      "name": "fx_lightning_slash_ne_2",
+      "rect": [
+        320,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 315,
+      "phase": "peak"
+    },
+    {
+      "name": "fx_lightning_slash_ne_3",
+      "rect": [
+        384,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 315,
+      "phase": "follow"
+    },
+    {
+      "name": "fx_lightning_slash_ne_4",
+      "rect": [
+        448,
+        192,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ],
+      "direction_deg": 315,
+      "phase": "fragments"
+    },
+    {
+      "name": "fx_lightning_hit_1",
+      "rect": [
+        0,
+        256,
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        16
+      ]
+    },
+    {
+      "name": "fx_lightning_hit_2",
+      "rect": [
+        32,
+        256,
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        16
+      ]
+    },
+    {
+      "name": "fx_lightning_hit_3",
+      "rect": [
+        64,
+        256,
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        16
+      ]
+    },
+    {
+      "name": "fx_lightning_hit_4",
+      "rect": [
+        96,
+        256,
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        16
+      ]
+    },
+    {
+      "name": "fx_lightning_hit_5",
+      "rect": [
+        128,
+        256,
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        16
+      ]
+    },
+    {
+      "name": "fx_lightning_hit_6",
+      "rect": [
+        160,
+        256,
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        16
+      ]
+    },
+    {
+      "name": "fx_lightning_chain_1",
+      "rect": [
+        0,
+        288,
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        8
+      ],
+      "ends": [
+        [
+          0,
+          8
+        ],
+        [
+          31,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "fx_lightning_chain_2",
+      "rect": [
+        32,
+        288,
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        8
+      ],
+      "ends": [
+        [
+          0,
+          8
+        ],
+        [
+          31,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "fx_lightning_chain_3",
+      "rect": [
+        64,
+        288,
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        8
+      ],
+      "ends": [
+        [
+          0,
+          8
+        ],
+        [
+          31,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "fx_lightning_chain_4",
+      "rect": [
+        96,
+        288,
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        8
+      ],
+      "ends": [
+        [
+          0,
+          8
+        ],
+        [
+          31,
+          8
+        ]
+      ]
+    }
+  ]
+}

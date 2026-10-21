@@ -3,6 +3,7 @@ extends SceneTree
 const Arena := preload("res://presentation/arena/arena.gd")
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const GameEvent := preload("res://core/game_event.gd")
+const Tuning := preload("res://core/tuning.gd")
 var failures: Array[String] = []
 var saw_dash: bool = false
 var saw_parry: bool = false
@@ -26,7 +27,11 @@ func _run() -> void:
 	root.add_child(arena)
 	_expect(Engine.physics_ticks_per_second == 60, "physics must run at 60 Hz")
 	_expect(arena.frames.has("mossbound_colossus_idle"), "boss atlas is stale: run validate/build/preview")
-	_expect(arena.floor_regions.size() == 220, "floor must contain 20x11 tiles")
+	_expect(arena.ground_texture.get_size() == Vector2(Tuning.ARENA_SIZE), "floor must cover the whole 800x480 arena (50x30 tiles)")
+	_expect(Tuning.ARENA_SIZE == Vector2(800, 480), "the ruins arena is 800x480")
+	# the camera keeps the 320x180 screen inside the arena
+	_expect(arena.camera != null and arena.camera.is_current(), "the arena camera is active")
+	_expect(Rect2(Vector2.ZERO, Tuning.ARENA_SIZE).encloses(Rect2(arena.view_origin, arena.VIEW_SIZE)), "the view stays inside the arena")
 	# Re-registration must not accumulate duplicate bindings.
 	var before: int = InputMap.action_get_events("arena_attack").size()
 	Bindings.register()

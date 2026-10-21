@@ -1,0 +1,646 @@
+{
+ "generator": "tools/art/make_aspect_lantern_phantom_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "aspect": "Spirit Lantern (suggested display name: SPIRIT LANTERN; HUD/menu subtitle idea: 'LIGHT THAT MENDS')",
+ "request": "Totoy sets a spirit lantern down at his feet; for about 5 s it glows and pulses; while Totoy stands in its light each pulse heals a little and gives Edge. v2: the light pool covers the gameplay radius of about 44 px.",
+ "groups": {
+  "fx_lantern_place_<1..4>": "32x32, anchor (16,29) = the lantern's ground point. 1 dropping in (unlit, speed lines; the lantern is 6 px up), 2 lands: ignition flash and dust burst, 3 dust spreads, sparks, small flame, 4 dust thins, flame up. Then loop idle.",
+  "fx_lantern_idle_<1..6>": "32x32, anchor (16,29). Burning loop: the teal-white flame flickers (height and lean), lilac tip on 2 and 5, motes rise off the cap. About 110 ms per frame.",
+  "fx_lantern_pulse_<1..4>": "32x32, anchor (16,29). One pulse: 1 flare, 2 burst (white glass, 8 rays), 3 rays out and breaking, 4 settle. Play on each core pulse, then back to idle.",
+  "fx_lantern_fade_<1..6>": "32x32, anchor (16,29). Extinguish: 1-3 the flame shrinks and cools with a lilac smoke wisp, 4 unlit, 5 the lantern dissolves (dither) into motes, 6 last motes. The lantern is gone after 6.",
+  "fx_lantern_pool_open_<1..3>": "96x48, anchor (48,24) = the same ground point as the lantern. Ground decal, draw UNDER every character. The pool opens from the lantern with a bright edge (with place 2-4).",
+  "fx_lantern_pool_idle_<1..4>": "96x48, anchor (48,24). Dithered teal floor glow (rx 44, ry 20: an 88x40 px ellipse, the gameplay radius of about 44 px with the floor squash) with a dashed rim that drifts; loop about 140 ms per frame.",
+  "fx_lantern_pool_pulse_<1..5>": "96x48, anchor (48,24). The pulse ring: 1 flash at the lantern, 2-4 a bright ring (2 px edge on 2-3) sweeps out, 5 it breaks on the rim. Starts with fx_lantern_pulse_1.",
+  "fx_lantern_motes_<1..6>": "32x40, anchor (16,38) = Totoy's feet. Heal motes: plays over Totoy on a pulse while he stands in the light: teal ring at the feet, plus-sparkles and wisps rise and fade. Draw over the hero.",
+  "fx_lantern_spark_<1..6>": "32x32, anchor (16,16) = Totoy's chest/weapon hand (about feet + (2,-15)). Edge sparks: cream sparks with lilac tails (the HUD Edge colour) stream in and pop. Start it 1-2 frames after fx_lantern_motes_1."
+ },
+ "pool_radius_px": {
+  "rx": 44.0,
+  "ry": 20.0
+ },
+ "draw_order": [
+  "fx_lantern_pool_* (floor decal)",
+  "hero / boss / lantern sorted by their ground y",
+  "fx_lantern_motes_*, fx_lantern_spark_* (over the hero)"
+ ],
+ "frames": [
+  {
+   "name": "fx_lantern_place_1",
+   "rect": [
+    0,
+    0,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_lantern_place_2",
+   "rect": [
+    32,
+    0,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_lantern_place_3",
+   "rect": [
+    64,
+    0,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_lantern_place_4",
+   "rect": [
+    96,
+    0,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_lantern_idle_1",
+   "rect": [
+    0,
+    32,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_lantern_idle_2",
+   "rect": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_lantern_idle_3",
+   "rect": [
+    64,
+    32,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_lantern_idle_4",
+   "rect": [
+    96,
+    32,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_lantern_idle_5",
+   "rect": [
+    128,
+    32,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_lantern_idle_6",
+   "rect": [
+    160,
+    32,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_lantern_pulse_1",
+   "rect": [
+    0,
+    64,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 50
+  },
+  {
+   "name": "fx_lantern_pulse_2",
+   "rect": [
+    32,
+    64,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_lantern_pulse_3",
+   "rect": [
+    64,
+    64,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_lantern_pulse_4",
+   "rect": [
+    96,
+    64,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_lantern_fade_1",
+   "rect": [
+    0,
+    96,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_lantern_fade_2",
+   "rect": [
+    32,
+    96,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_lantern_fade_3",
+   "rect": [
+    64,
+    96,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_lantern_fade_4",
+   "rect": [
+    96,
+    96,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_lantern_fade_5",
+   "rect": [
+    128,
+    96,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_lantern_fade_6",
+   "rect": [
+    160,
+    96,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_lantern_pool_open_1",
+   "rect": [
+    0,
+    128,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 50
+  },
+  {
+   "name": "fx_lantern_pool_open_2",
+   "rect": [
+    96,
+    128,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 50
+  },
+  {
+   "name": "fx_lantern_pool_open_3",
+   "rect": [
+    192,
+    128,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 50
+  },
+  {
+   "name": "fx_lantern_pool_idle_1",
+   "rect": [
+    0,
+    176,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_lantern_pool_idle_2",
+   "rect": [
+    96,
+    176,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_lantern_pool_idle_3",
+   "rect": [
+    192,
+    176,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_lantern_pool_idle_4",
+   "rect": [
+    288,
+    176,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_lantern_pool_pulse_1",
+   "rect": [
+    0,
+    224,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_pool_pulse_2",
+   "rect": [
+    96,
+    224,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_pool_pulse_3",
+   "rect": [
+    192,
+    224,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_pool_pulse_4",
+   "rect": [
+    288,
+    224,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_pool_pulse_5",
+   "rect": [
+    384,
+    224,
+    96,
+    48
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_motes_1",
+   "rect": [
+    0,
+    272,
+    32,
+    40
+   ],
+   "anchor": [
+    16,
+    38
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_lantern_motes_2",
+   "rect": [
+    32,
+    272,
+    32,
+    40
+   ],
+   "anchor": [
+    16,
+    38
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_lantern_motes_3",
+   "rect": [
+    64,
+    272,
+    32,
+    40
+   ],
+   "anchor": [
+    16,
+    38
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_lantern_motes_4",
+   "rect": [
+    96,
+    272,
+    32,
+    40
+   ],
+   "anchor": [
+    16,
+    38
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_lantern_motes_5",
+   "rect": [
+    128,
+    272,
+    32,
+    40
+   ],
+   "anchor": [
+    16,
+    38
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_lantern_motes_6",
+   "rect": [
+    160,
+    272,
+    32,
+    40
+   ],
+   "anchor": [
+    16,
+    38
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_lantern_spark_1",
+   "rect": [
+    0,
+    312,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_spark_2",
+   "rect": [
+    32,
+    312,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_spark_3",
+   "rect": [
+    64,
+    312,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_spark_4",
+   "rect": [
+    96,
+    312,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_spark_5",
+   "rect": [
+    128,
+    312,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 55
+  },
+  {
+   "name": "fx_lantern_spark_6",
+   "rect": [
+    160,
+    312,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "ms": 55
+  }
+ ]
+}

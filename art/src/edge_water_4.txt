@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Transition.png (Gemini), cell 12
+44445445glmlllll
+5545444bmlllllll
+4455554bllllmlll
+4455434gllllllll
+4444334bmlllllll
+44544444glmlllml
+33444444bmllllll
+44444455glllllll
+33444443mlllmlll
+3444454bllllllll
+44445544glllllll
+55544334amllllll
+45443334bmllllll
+44544445bllmmlll
+54434544glllllll
+55434555bmllllll

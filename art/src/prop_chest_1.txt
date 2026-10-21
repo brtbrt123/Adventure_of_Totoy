@@ -1,0 +1,19 @@
+# kind: sprite
+# anchor: 8,15
+# plaza chest (tools/art/make_plaza_props.py)
+................
+................
+................
+.....888888.....
+...88dccccc88...
+..8iddcccccbh8..
+.8diddcccccbhb8.
+.8diddcccccbhb8.
+.888888ji888888.
+.8ciccbjfbb9h98.
+.8ciccbfibb9h98.
+.8ciccbbbbb9h98.
+.8ciccbbbbb9h98.
+.89i99999999h98.
+.88888888888888.
+................

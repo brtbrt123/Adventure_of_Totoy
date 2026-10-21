@@ -1,0 +1,190 @@
+{
+ "generator": "tools/art/export_lightning_cutin.py (Pillow only, fixed seeds)",
+ "canvas": [
+  800,
+  450
+ ],
+ "palette": "Totoy 36, hard alpha; no gold x,y or red z,A",
+ "pose_scale": 12,
+ "aura_scale": 8,
+ "fx_scale": 4,
+ "poses": {
+  "crouch": {
+   "w": 636,
+   "h": 480,
+   "pad": 84,
+   "inner_w": 468,
+   "inner_h": 312,
+   "feet_x": 0.462,
+   "source": "concept_v1.png cell (5,0)"
+  },
+  "ready": {
+   "w": 528,
+   "h": 516,
+   "pad": 84,
+   "inner_w": 360,
+   "inner_h": 348,
+   "feet_x": 0.333,
+   "source": "concept_v1.png cell (1,0)"
+  },
+  "burst": {
+   "w": 432,
+   "h": 624,
+   "pad": 84,
+   "inner_w": 264,
+   "inner_h": 456,
+   "feet_x": 0.455,
+   "source": "concept_v1.png cell (7,0)"
+  }
+ },
+ "aura": {
+  "cell_w": 384,
+  "cell_h": 448,
+  "frames": [
+   {
+    "x": 0,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 384,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 768,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1152,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1536,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1920,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 0,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 384,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 768,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1152,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1536,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1920,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   }
+  ],
+  "anchor": "bottom centre"
+ },
+ "bolts": [
+  "lightning_bolt_1.png",
+  "lightning_bolt_2.png",
+  "lightning_bolt_3.png",
+  "lightning_bolt_4.png"
+ ],
+ "flashes": [
+  "lightning_flash_1.png",
+  "lightning_flash_2.png",
+  "lightning_flash_3.png"
+ ],
+ "timing_s": {
+  "note": "suggested, preview seconds at 30 fps; the game may scale them like black_form SPEED",
+  "flash_pop": [
+   0.0,
+   0.167
+  ],
+  "banner_in": [
+   0.03,
+   0.17
+  ],
+  "beats": [
+   [
+    "crouch",
+    0.1,
+    0.37
+   ],
+   [
+    "ready",
+    0.37,
+    0.6
+   ],
+   [
+    "burst",
+    0.6,
+    1.1
+   ]
+  ],
+  "cuts": [
+   0.37,
+   0.6
+  ],
+  "bolt_on_burst": [
+   [
+    1,
+    0.033
+   ],
+   [
+    2,
+    0.067
+   ],
+   [
+    3,
+    0.067
+   ],
+   [
+    4,
+    0.067
+   ],
+   [
+    "3/4 flicker",
+    "until exit"
+   ]
+  ],
+  "title_slam": 0.66,
+  "exit": [
+   0.88,
+   1.04
+  ],
+  "end": 1.04
+ }
+}

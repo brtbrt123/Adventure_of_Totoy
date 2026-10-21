@@ -65,10 +65,14 @@ func test_dash_is_short() -> void:
 
 func test_player_stays_in_arena() -> void:
 	var core: GameCore = GameCore.new()
-	run(core, 200, input(Vector2.LEFT))
+	core.player.position = Vector2(-50.0, -50.0)
+	core.step(input())
 	assert_near(core.player.position.x, Tuning.ARENA_MARGIN, 0.001, "left wall")
-	run(core, 200, input(Vector2.UP))
 	assert_near(core.player.position.y, Tuning.ARENA_MARGIN, 0.001, "top wall")
+	core.player.position = Tuning.ARENA_SIZE + Vector2(50.0, 50.0)
+	core.step(input())
+	assert_near(core.player.position.x, Tuning.ARENA_SIZE.x - Tuning.ARENA_MARGIN, 0.001, "right wall")
+	assert_near(core.player.position.y, Tuning.ARENA_SIZE.y - Tuning.ARENA_MARGIN, 0.001, "bottom wall")
 
 
 func test_boss_is_solid() -> void:

@@ -1,0 +1,41 @@
+# Gemini presentation migration
+
+Branch: `agent/art/gemini-import`. No core, tool, source art, or generated atlas changes. Old frames remain available. This handoff is here because this task restricts edits to presentation and tests (plus explicitly requested arena screenshots); docs/STATUS.md was left unchanged.
+
+## Mapping and cadence
+
+All actors use sprites.json feet anchors; left-facing hero frames mirror around that anchor. Head anchors are measured from every golem2 frame using the existing silhouette measurement. Core hitboxes and exact warning geometry remain unchanged. The larger body is decorative and does not enlarge damage areas; arena_gemini_hitboxes.png exposes the existing radii for review.
+
+Hero: idle 4 at 12 ticks/frame; walk 6 at 5; dash 4 at 1 (the core dash lasts 6 ticks, final frame holds); parry 6 at 2, recovery holds frame 6. There is no combo index in EntitySnapshot, so attack1 frames 1–2 are windup (4 ticks/frame), 3–4 active (2), 5–6 recovery (5). Damage events play hurt 4 at 3; defeat holds hurt 4 because no hero death art exists. Victory plays 6 at 8 using result_ticks.
+
+Golem: idle 4 at 16; walk 6 at 5 is supported although the current core has no walk state. gold_slam and gold_combo use slam; red_sweep uses sweep; red_stomp uses stomp; red_charge uses charge; red_shards uses beam. Windups select 1–3 from telegraph progress; frame 4 begins exactly at hit_tick, then 5–6 at 3 ticks/frame including recovery. Combo timing uses the preceding strike hold before re-raising, independently of telegraph array order. Posture break uses staggered 4 at 8; damage uses hurt 4 at 3; phase events use roar 6 at 5; death uses 8 at 6 from result_ticks. Reactions never override death, posture break, dash, or an active boss impact.
+
+Imported impact textures are clipped to the core circle/cone/ring geometry; stomp leaves its safe centre empty. Beam body repeats along the line, with start/end pieces. Exact capsule warning boundaries remain visible, including rounded end caps. Slam landing dust, charge dust, dash trails, hit/counter/parry and warning icons use imported art. The small supplemental particles, white damage silhouette and exact geometric warning boundaries remain. The existing geometry plans remain available for smoke assertions. Imported FX artwork has irregular opaque edges: the warning outline remains the authority for the full hit area.
+
+HUD: ui_profile at 156x60, portrait retained from totoy_portrait, live HP/Edge/dash meters fitted to its openings; ui_boss at 104x24 with live HP/posture and counter prompt. Imported edge/dash/parry icons and animated red/gold warning icons. Four anchored, collision-free edge props; selected sources contain no reserved combat colours.
+
+## Verification and review
+
+Installed Godot reports 4.7.2.stable.official.ed1daf0bf. `python tools/art/validate_art.py`: pass (369 sources, 371 built PNGs). `python harness/checks/run_tests.py --worktree . --timeout 45`: all suites pass, including Python, Godot import, core tests and smoke_animation, smoke_arena, smoke_boss_attacks, smoke_effects, smoke_golem, smoke_new_hero, smoke_profile and smoke_project.
+
+Windowed `tests/smoke_gemini_capture.gd`: pass. Review images in art/build/arena_gemini_*.png: hero walk, attack, parry; golem slam, staggered, death; HUD and debug hitboxes. These are labelled snapshot fixtures rendered through production presentation, not evidence of animation feel. No missing requested atlas frames were found. No judgement of art quality, readability in motion, animation feel or fun is possible here; the human approves those.
+
+Claude cross-review remains pending: three read-only CLI attempts (sandboxed, escalated, then a minimal no-plugin invocation) returned no review output and were interrupted. No pass/fail result was obtained. This does not constitute the required cross-review or human art approval. Nothing was merged.
+
+## Human feedback follow-up
+
+Profile footprint reduced from 156x60 to 125x48 with repositioned live meters and portrait. Laser body now uses an opaque imported cross-section normalized to the snapshot width, with continuous capsule backing; cap art overlays rather than replaces the body. Body padding cannot create gaps, and all four frames use the same lane geometry; afterglow fades after end_tick. Charge uses its own lane texture.
+
+The floor selects quiet imported grass variants and reflected versions by neighbouring edge cost. Shared border pixels match exactly; a two-colour tint in neighbouring Totoy grass colours reduces busy contrast. All work is done in presentation at startup; no art sources or generated atlases were edited. Tree and pillar are 2x larger and draw in foot-position order with actors. Static prop collision is not implemented because the core has no obstacle interface; see PROP_COLLISION_HANDOFF.md for proposed footprints and required core tests.
+
+Verification: art validator and the full harness runner pass, including smoke_feedback. Windowed smoke_feedback --capture passes, with arena_feedback_layout.png and horizontal/diagonal laser captures across all four frames. Screenshots still need human art approval. Automatic approval review rejected sending the private code/diffs to Claude for cross-review without explicit disclosure approval; no cross-review verdict is claimed.
+
+## Grass feedback: restore the imported style
+
+The human rejected the flat two-colour floor and visible chessboard motif. Removed the colour reduction, repeated four-tile selection and forced equal border pixels. The replacement uses all sixteen imported grass variants, preserving every copied pixel's original colour. Overlapping 16px patches use connected minimum-error cuts, with seeded choice among similar texture matches; their irregular joins do not expose the logical 16px grid. Only horizontal reflections are used, so grass blades keep their upright lighting. No source art, importer or core changes.
+
+The ground smoke check now requires opaque coverage and the source grass's four colours instead of enforcing identical pixels along straight tile boundaries. Updated windowed arena_feedback screenshots show the new ground with the existing HUD, props and laser fixtures. Human approval of the natural appearance remains pending. Claude cross-review remains pending under the previously documented disclosure approval restriction.
+
+## Combo core follow-up (42b6326)
+
+The earlier attack1-only mapping is superseded: presentation now selects attack1/2/3 from snapshot.player.combo_index, spreads each state's two frames across the corresponding per-swing timing array from tuning, and resets naturally on state or swing changes. Idle grace remains idle art. Swing-three confirmed hits use a heavier impact. Added original event-driven combat audio and torso/weapon contact sparks; see COMBAT_FEEL_HANDOFF.md for details, tests and the remaining core proposals for a deflect-driven duel. Core files are unchanged by this follow-up.

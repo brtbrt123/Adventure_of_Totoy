@@ -1,0 +1,1197 @@
+{
+ "generator": "tools/art/make_beacon_epilogue_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour)",
+ "status": "Reference art for the human's approval; NOT imported into art/src, not in art/build, not wired into the game",
+ "frame_naming": "<group>_<n>, n from 1; fireflies and petals are fx_firefly_<variant>_<n>, fx_petal_<variant>_<n>",
+ "world_placement": {
+  "beacon_base": [
+   400,
+   240
+  ],
+  "note": "fx_beacon, fx_beacon_ignite, fx_beacon_pool and fx_beacon_ripple are all placed with their anchor on the platform centre, world (400,240), over presentation/arena/arena_ground_restored.png"
+ },
+ "groups": {
+  "fx_beacon": "the beacon loop: pillar of cream/pale-teal light from the platform past the top of the screen; shimmering core, a brightening band climbs the core once per loop, 16 motes rise (15 px per frame), the base halo pulses (rx 13..17). Loop 1..8 at ~100 ms. Draw over characters standing behind it, under characters in front of the base (sort by the anchor y = 240) or simply above everything in the cutscene.",
+  "fx_beacon_ignite": "the start: 1 spark on the medallion, 2 it flares and a small ring opens, 3 a thin line shoots up a third of the way, 4 the line passes the top of the screen, 5 the column opens with a big flash on the platform (start fx_beacon_ripple and fx_beacon_pool here), 6 overshoot (wider and brighter), 7 settle, 8 = fx_beacon_1 plus one fading ring; then loop fx_beacon. Plays once.",
+  "fx_beacon_pool": "floor glow around the base: dithered ellipse rx 70 ry 31 (the same 0.45 floor squash as the other floor effects), cream at the centre to pale teal at the rim. Draw on the ground layer, under characters and under fx_beacon. Pulse loop 1..6 at ~140 ms (frame 1 brightest and widest, frame 4 dimmest).",
+  "fx_beacon_ripple": "a ring that spreads over the floor when the beacon lights: rx 12/28/46/64/82/98 px (ry = 0.45 rx), leading edge bright, trailing bands thin and fade, motes kicked up. Plays once from ignite 5, ~80 ms per frame, on the ground layer.",
+  "fx_firefly": "fireflies, variants a warm yellow-green, b pale cream, c pale teal: 1 nearly out, 2 half, 3 full 3x3 mote, 4 half. Loop with a random start frame per firefly (260/120/220/120 ms); move each one slowly along a wandering path (about 6-12 px/s, sine wobble). Scatter 10-20 over the plaza and the forest edge.",
+  "fx_petal": "drifting petals/leaves, variants a pale cream blossom, b small leaf, c mint-pale petal: 8 tumble frames (flat, turning, edge-on). Loop at ~110 ms while the petal drifts down and sideways (about 10-18 px/s down, sine sway of 6-10 px). Spawn above the top of the screen or from the forest edges."
+ },
+ "group_table": {
+  "fx_beacon": {
+   "frames": 8,
+   "size": [
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+   ]
+  },
+  "fx_beacon_ignite": {
+   "frames": 8,
+   "size": [
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": [
+    70,
+    70,
+    60,
+    60,
+    90,
+    100,
+    110,
+    100
+   ]
+  },
+  "fx_beacon_pool": {
+   "frames": 6,
+   "size": [
+    160,
+    80
+   ],
+   "anchor": [
+    80,
+    40
+   ],
+   "ms": [
+    140,
+    140,
+    140,
+    140,
+    140,
+    140
+   ],
+   "rx_px": 70.0,
+   "ry_px": 31.5
+  },
+  "fx_beacon_ripple": {
+   "frames": 6,
+   "size": [
+    208,
+    96
+   ],
+   "anchor": [
+    104,
+    48
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "rx_px": [
+    12,
+    28,
+    46,
+    64,
+    82,
+    98
+   ],
+   "ry_factor": 0.45
+  },
+  "fx_firefly_a": {
+   "frames": 4,
+   "size": [
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": [
+    260,
+    120,
+    220,
+    120
+   ]
+  },
+  "fx_firefly_b": {
+   "frames": 4,
+   "size": [
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": [
+    260,
+    120,
+    220,
+    120
+   ]
+  },
+  "fx_firefly_c": {
+   "frames": 4,
+   "size": [
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": [
+    260,
+    120,
+    220,
+    120
+   ]
+  },
+  "fx_petal_a": {
+   "frames": 8,
+   "size": [
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": [
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110
+   ]
+  },
+  "fx_petal_b": {
+   "frames": 8,
+   "size": [
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": [
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110
+   ]
+  },
+  "fx_petal_c": {
+   "frames": 8,
+   "size": [
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": [
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110
+   ]
+  }
+ },
+ "suggested_timeline": [
+  "0 ms: the restored ground, fireflies blinking, a few petals drifting",
+  "ignite 1..8 (70,70,60,60,90,100,110,100 ms = 660 ms) at (400,240)",
+  "at ignite 5: ripple 1..6 (80 ms each) and the pool from frame 4 (dim) fading into its loop",
+  "after ignite 8: fx_beacon loop at ~100 ms, the pool loop at ~140 ms, fireflies and petals keep going"
+ ],
+ "frames": [
+  {
+   "name": "fx_beacon_1",
+   "group": "fx_beacon",
+   "rect": [
+    0,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_2",
+   "group": "fx_beacon",
+   "rect": [
+    66,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_3",
+   "group": "fx_beacon",
+   "rect": [
+    132,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_4",
+   "group": "fx_beacon",
+   "rect": [
+    198,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_5",
+   "group": "fx_beacon",
+   "rect": [
+    264,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_6",
+   "group": "fx_beacon",
+   "rect": [
+    330,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_7",
+   "group": "fx_beacon",
+   "rect": [
+    396,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_8",
+   "group": "fx_beacon",
+   "rect": [
+    462,
+    0,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_ignite_1",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    0,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_beacon_ignite_2",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    66,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 70
+  },
+  {
+   "name": "fx_beacon_ignite_3",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    132,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_beacon_ignite_4",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    198,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 60
+  },
+  {
+   "name": "fx_beacon_ignite_5",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    264,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 90
+  },
+  {
+   "name": "fx_beacon_ignite_6",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    330,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_ignite_7",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    396,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_beacon_ignite_8",
+   "group": "fx_beacon_ignite",
+   "rect": [
+    462,
+    242,
+    64,
+    240
+   ],
+   "anchor": [
+    32,
+    232
+   ],
+   "ms": 100
+  },
+  {
+   "name": "fx_beacon_pool_1",
+   "group": "fx_beacon_pool",
+   "rect": [
+    0,
+    484,
+    160,
+    80
+   ],
+   "anchor": [
+    80,
+    40
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_beacon_pool_2",
+   "group": "fx_beacon_pool",
+   "rect": [
+    162,
+    484,
+    160,
+    80
+   ],
+   "anchor": [
+    80,
+    40
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_beacon_pool_3",
+   "group": "fx_beacon_pool",
+   "rect": [
+    324,
+    484,
+    160,
+    80
+   ],
+   "anchor": [
+    80,
+    40
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_beacon_pool_4",
+   "group": "fx_beacon_pool",
+   "rect": [
+    486,
+    484,
+    160,
+    80
+   ],
+   "anchor": [
+    80,
+    40
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_beacon_pool_5",
+   "group": "fx_beacon_pool",
+   "rect": [
+    648,
+    484,
+    160,
+    80
+   ],
+   "anchor": [
+    80,
+    40
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_beacon_pool_6",
+   "group": "fx_beacon_pool",
+   "rect": [
+    810,
+    484,
+    160,
+    80
+   ],
+   "anchor": [
+    80,
+    40
+   ],
+   "ms": 140
+  },
+  {
+   "name": "fx_beacon_ripple_1",
+   "group": "fx_beacon_ripple",
+   "rect": [
+    0,
+    566,
+    208,
+    96
+   ],
+   "anchor": [
+    104,
+    48
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_beacon_ripple_2",
+   "group": "fx_beacon_ripple",
+   "rect": [
+    210,
+    566,
+    208,
+    96
+   ],
+   "anchor": [
+    104,
+    48
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_beacon_ripple_3",
+   "group": "fx_beacon_ripple",
+   "rect": [
+    420,
+    566,
+    208,
+    96
+   ],
+   "anchor": [
+    104,
+    48
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_beacon_ripple_4",
+   "group": "fx_beacon_ripple",
+   "rect": [
+    630,
+    566,
+    208,
+    96
+   ],
+   "anchor": [
+    104,
+    48
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_beacon_ripple_5",
+   "group": "fx_beacon_ripple",
+   "rect": [
+    0,
+    664,
+    208,
+    96
+   ],
+   "anchor": [
+    104,
+    48
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_beacon_ripple_6",
+   "group": "fx_beacon_ripple",
+   "rect": [
+    210,
+    664,
+    208,
+    96
+   ],
+   "anchor": [
+    104,
+    48
+   ],
+   "ms": 80
+  },
+  {
+   "name": "fx_firefly_a_1",
+   "group": "fx_firefly_a",
+   "rect": [
+    0,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 260
+  },
+  {
+   "name": "fx_firefly_a_2",
+   "group": "fx_firefly_a",
+   "rect": [
+    10,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_firefly_a_3",
+   "group": "fx_firefly_a",
+   "rect": [
+    20,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 220
+  },
+  {
+   "name": "fx_firefly_a_4",
+   "group": "fx_firefly_a",
+   "rect": [
+    30,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_firefly_b_1",
+   "group": "fx_firefly_b",
+   "rect": [
+    40,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 260
+  },
+  {
+   "name": "fx_firefly_b_2",
+   "group": "fx_firefly_b",
+   "rect": [
+    50,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_firefly_b_3",
+   "group": "fx_firefly_b",
+   "rect": [
+    60,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 220
+  },
+  {
+   "name": "fx_firefly_b_4",
+   "group": "fx_firefly_b",
+   "rect": [
+    70,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_firefly_c_1",
+   "group": "fx_firefly_c",
+   "rect": [
+    80,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 260
+  },
+  {
+   "name": "fx_firefly_c_2",
+   "group": "fx_firefly_c",
+   "rect": [
+    90,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_firefly_c_3",
+   "group": "fx_firefly_c",
+   "rect": [
+    100,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 220
+  },
+  {
+   "name": "fx_firefly_c_4",
+   "group": "fx_firefly_c",
+   "rect": [
+    110,
+    762,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 120
+  },
+  {
+   "name": "fx_petal_a_1",
+   "group": "fx_petal_a",
+   "rect": [
+    0,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_a_2",
+   "group": "fx_petal_a",
+   "rect": [
+    10,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_a_3",
+   "group": "fx_petal_a",
+   "rect": [
+    20,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_a_4",
+   "group": "fx_petal_a",
+   "rect": [
+    30,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_a_5",
+   "group": "fx_petal_a",
+   "rect": [
+    40,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_a_6",
+   "group": "fx_petal_a",
+   "rect": [
+    50,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_a_7",
+   "group": "fx_petal_a",
+   "rect": [
+    60,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_a_8",
+   "group": "fx_petal_a",
+   "rect": [
+    70,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_1",
+   "group": "fx_petal_b",
+   "rect": [
+    80,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_2",
+   "group": "fx_petal_b",
+   "rect": [
+    90,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_3",
+   "group": "fx_petal_b",
+   "rect": [
+    100,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_4",
+   "group": "fx_petal_b",
+   "rect": [
+    110,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_5",
+   "group": "fx_petal_b",
+   "rect": [
+    120,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_6",
+   "group": "fx_petal_b",
+   "rect": [
+    130,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_7",
+   "group": "fx_petal_b",
+   "rect": [
+    140,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_b_8",
+   "group": "fx_petal_b",
+   "rect": [
+    150,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_1",
+   "group": "fx_petal_c",
+   "rect": [
+    160,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_2",
+   "group": "fx_petal_c",
+   "rect": [
+    170,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_3",
+   "group": "fx_petal_c",
+   "rect": [
+    180,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_4",
+   "group": "fx_petal_c",
+   "rect": [
+    190,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_5",
+   "group": "fx_petal_c",
+   "rect": [
+    200,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_6",
+   "group": "fx_petal_c",
+   "rect": [
+    210,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_7",
+   "group": "fx_petal_c",
+   "rect": [
+    220,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  },
+  {
+   "name": "fx_petal_c_8",
+   "group": "fx_petal_c",
+   "rect": [
+    230,
+    772,
+    8,
+    8
+   ],
+   "anchor": [
+    4,
+    4
+   ],
+   "ms": 110
+  }
+ ]
+}

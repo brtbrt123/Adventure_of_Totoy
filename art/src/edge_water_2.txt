@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Transition.png (Gemini), cell 10
+llllllf454434434
+llllllmb54445433
+llllllmg45443344
+llllllll55444444
+lllllllla4444444
+llllllllmb554444
+lllmllllmb454455
+llllmmllf4455555
+llllllllb5545455
+llllllla44443444
+lllllllg44434454
+lllmmmll34444444
+llllllllf4455444
+lllllllla4443443
+mmlllllmb5444443
+llllllmf55544433

@@ -1,0 +1,14 @@
+{
+  "status": "Installed in presentation: six new frames per skill and Z/X/C release cues, respectively",
+  "layout": "Six frames per sheet; anticipation, build, release, follow-through, breakup, remnants",
+  "skills": {
+    "breaking_edge_sheet.png": "Gold crossing retaliation cuts and metallic fragments",
+    "gale_cut_sheet.png": "Long straight cutting lane with transverse cut marks and speed ribbons",
+    "moon_cleave_sheet.png": "Large travelling crescent aura with trailing blades"
+  },
+  "sha256": {
+    "breaking_edge_sheet.png": "a37ac72f09eaa3f5071e0bb920f34e8e485839c49a0002c51b553abf3816540f",
+    "gale_cut_sheet.png": "de5ae207441b2c42a18a1fab7274f2268a6257eed8e4feb7d3c106420e053464",
+    "moon_cleave_sheet.png": "0a782bd0b918fb20b57e6e6e8a145642d700a48d109098b7329225d45e9ca5e6"
+  }
+}

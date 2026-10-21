@@ -1,0 +1,93 @@
+{
+ "generator": "tools/art/make_aspect_lantern_phantom_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "style": "Ring copied from the existing ui_aspect_gale_cut_1 (24px), like the dagger and scythe icons; new interior drawn here. No 48px versions: the existing Aspect icons are 24px only (character menu slots draw the 24px icon).",
+ "frames": [
+  {
+   "name": "ui_aspect_spirit_lantern_1",
+   "rect": [
+    0,
+    0,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "Aspect slot / HUD skill icon"
+  },
+  {
+   "name": "ui_aspect_phantom_cut_1",
+   "rect": [
+    24,
+    0,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "Aspect slot / HUD skill icon"
+  },
+  {
+   "name": "ui_aspect_spirit_lantern_lit_1",
+   "rect": [
+    48,
+    0,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the lantern burns (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_spirit_lantern_lit_2",
+   "rect": [
+    72,
+    0,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the lantern burns (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_spirit_lantern_lit_3",
+   "rect": [
+    96,
+    0,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the lantern burns (loop about 120 ms)"
+  },
+  {
+   "name": "ui_aspect_spirit_lantern_lit_4",
+   "rect": [
+    120,
+    0,
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "use": "optional: HUD icon while the lantern burns (loop about 120 ms)"
+  }
+ ]
+}

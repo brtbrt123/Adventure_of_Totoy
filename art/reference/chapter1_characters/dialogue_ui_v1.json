@@ -1,0 +1,123 @@
+{
+ "version": 1,
+ "theme": {
+  "accent": "v",
+  "bevel_hi": "f",
+  "bevel_lo": "8",
+  "gem": "1",
+  "plate": "k"
+ },
+ "theme_note": "the 'menu' theme of presentation/arena/ui_panel.gd (lilac accent, cream gems)",
+ "layout_320x180": {
+  "portrait_frame": [
+   8,
+   100
+  ],
+  "box": [
+   80,
+   116
+  ],
+  "nameplate": [
+   88,
+   106
+  ],
+  "text": [
+   90,
+   128
+  ],
+  "line_step": 12,
+  "next": [
+   298,
+   160
+  ],
+  "choice": [
+   94,
+   0
+  ]
+ },
+ "image": "dialogue_ui_v1.png",
+ "frames": {
+  "ui_dialogue_box": {
+   "x": 0,
+   "y": 0,
+   "w": 232,
+   "h": 56,
+   "nine_slice": [
+    8,
+    8,
+    8,
+    8
+   ],
+   "note": "stretch the middle; corners hold the gems"
+  },
+  "ui_dialogue_nameplate": {
+   "x": 0,
+   "y": 64,
+   "w": 72,
+   "h": 16,
+   "nine_slice": [
+    6,
+    6,
+    6,
+    6
+   ],
+   "note": "stretch horizontally to fit the name"
+  },
+  "ui_dialogue_portrait_frame": {
+   "x": 240,
+   "y": 0,
+   "w": 72,
+   "h": 72,
+   "window": [
+    4,
+    4,
+    64,
+    64
+   ],
+   "note": "64x64 portrait goes into the window"
+  },
+  "ui_dialogue_next_1": {
+   "x": 80,
+   "y": 64,
+   "w": 8,
+   "h": 8
+  },
+  "ui_dialogue_next_2": {
+   "x": 88,
+   "y": 64,
+   "w": 8,
+   "h": 8
+  },
+  "ui_dialogue_next_3": {
+   "x": 96,
+   "y": 64,
+   "w": 8,
+   "h": 8
+  },
+  "ui_dialogue_choice": {
+   "x": 112,
+   "y": 64,
+   "w": 8,
+   "h": 8
+  },
+  "ui_dialogue_choice_bar": {
+   "x": 128,
+   "y": 64,
+   "w": 64,
+   "h": 8,
+   "nine_slice": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "note": "tile/stretch horizontally behind the selected choice"
+  }
+ },
+ "next_ticks": [
+  18,
+  10,
+  10
+ ],
+ "text": "Pixelify Sans size 9 (body, mixed case), Cinzel 900 size 9 (name), drawn at window resolution (decision 0004)"
+}

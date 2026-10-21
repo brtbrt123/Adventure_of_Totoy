@@ -1,0 +1,19 @@
+{
+  "status": "Generated concept and animated preview only; not installed in gameplay",
+  "tool": "Built-in image_gen",
+  "reference": "concept_v1.png",
+  "source": "sword_trail_v1.png",
+  "sha256": "7a3a3ff420fd923e7ae5487a98fa262f347d1c6682a73935f0d6cdf20046baf1",
+  "prompt_summary": "Six sequential isolated black katana sweep trails opening right: streak, growing hook, peak crescent, follow-through, fragments, remnants. Black ribbons with charcoal/slate contours and sparse pale leading edge. No character, projectile, glow or scenery.",
+  "preview_cuts": [
+    0,
+    368,
+    753,
+    1163,
+    1525,
+    1861,
+    2172
+  ],
+  "preview_processing": "Source alpha224, BOX scale0.12, output alpha128, palette0eklvh. Opaque bounds centered for concept viewing. Attack1 frames1..6 shown at90/90/110/90/80/100ms, not final core timing.",
+  "remaining": "Some source frame margins overlap; isolate and align effect origins before runtime import. Runtime sword trail must follow buff snapshot plus core attack phase and direction, and must not become a free projectile."
+}

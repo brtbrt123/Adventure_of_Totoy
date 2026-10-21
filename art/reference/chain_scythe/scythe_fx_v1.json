@@ -1,0 +1,1002 @@
+{
+ "generator": "tools/art/make_chain_scythe_art.py (procedural, Pillow only, deterministic seeds)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+ "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "groups": {
+  "fx_scythe_arc_<swing>_<1..4>": "96x64, anchor (40,56) = the hero's feet. Swing 1 wide horizontal sweep (from behind, around the front, out to the right), 2 reverse rising arc (front-low over the top to the back), 3 overhead-to-low slam. Phases lead/peak/follow/fragments, about 33/50/50/66 ms. Draw over the hero.",
+  "fx_scythe_spin_back_/front_<1..4>": "96x64, anchor (48,56) = the hero's feet. The charged full-circle ring split into the half behind the hero (draw first) and the half in front (draw last); same phase numbers belong together. Loop 2 (peak) while the spin lasts, then 3, 4.",
+  "fx_chain_whip_<1..6>": "128x32, anchor (0,16) = the throwing hand; the target hook point is (120,16). 1-4 the chain unreels with a wave and the scythe tumbling at its tip, 5 full reach with the blade turning to hook, 6 snapped taut. For other distances build it from fx_chain_link_* + fx_chain_scythe_fly_*.",
+  "fx_chain_scythe_fly_<1..8>": "32x32, anchor (16,16) = the pommel ring where the chain attaches; 8 rotations, 45 deg apart, clockwise (1 = blade pointing up).",
+  "fx_chain_link_<1..4>": "32x8, from (0,4) to (31,4); 1/2 taut (two link phases: alternate for a shimmer, both tile end to end, period 4 px), 3 slight wave, 4 spectral (glowing rim, during the skill). Rotate between two points.",
+  "fx_chain_hook_<1..5>": "32x32, anchor (16,16) = the hook point on the target: bite, clink flash, ring, sparks, motes (about 40 ms each).",
+  "fx_chain_pull_<1..4>": "64x48, anchor (12,44) = the dragged golem's feet; the golem moves toward -x (toward Totoy facing right), streaks trail to +x. Mirror for the other side.",
+  "fx_chain_dust_<1..4>": "64x16, anchor (8,14) = the golem's leading foot on the ground; puffs trail to +x.",
+  "fx_scythe_scuff_<1..4>": "32x16 ground decal, anchor (16,8); 1 fresh .. 4 nearly gone. Lay end to end along the drag path, older ones further back.",
+  "fx_scythe_stagger_<1..6>": "32x32, anchor (16,16) = the golem's chest when it arrives: pinch, star, ring, broken ring, sparse stars, motes (about 45 ms each).",
+  "fx_scythe_dizzy_<1..4>": "32x16 loop, anchor (16,12) = just above the staggered golem's head; about 90 ms per frame while the stagger lasts."
+ },
+ "frames": [
+  {
+   "name": "fx_scythe_arc_1_1",
+   "rect": [
+    0,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 1,
+   "phase": "lead"
+  },
+  {
+   "name": "fx_scythe_arc_1_2",
+   "rect": [
+    96,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 1,
+   "phase": "peak"
+  },
+  {
+   "name": "fx_scythe_arc_1_3",
+   "rect": [
+    192,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 1,
+   "phase": "follow"
+  },
+  {
+   "name": "fx_scythe_arc_1_4",
+   "rect": [
+    288,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 1,
+   "phase": "fragments"
+  },
+  {
+   "name": "fx_scythe_arc_2_1",
+   "rect": [
+    384,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 2,
+   "phase": "lead"
+  },
+  {
+   "name": "fx_scythe_arc_2_2",
+   "rect": [
+    480,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 2,
+   "phase": "peak"
+  },
+  {
+   "name": "fx_scythe_arc_2_3",
+   "rect": [
+    576,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 2,
+   "phase": "follow"
+  },
+  {
+   "name": "fx_scythe_arc_2_4",
+   "rect": [
+    672,
+    0,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 2,
+   "phase": "fragments"
+  },
+  {
+   "name": "fx_scythe_arc_3_1",
+   "rect": [
+    0,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 3,
+   "phase": "lead"
+  },
+  {
+   "name": "fx_scythe_arc_3_2",
+   "rect": [
+    96,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 3,
+   "phase": "peak"
+  },
+  {
+   "name": "fx_scythe_arc_3_3",
+   "rect": [
+    192,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 3,
+   "phase": "follow"
+  },
+  {
+   "name": "fx_scythe_arc_3_4",
+   "rect": [
+    288,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "swing": 3,
+   "phase": "fragments"
+  },
+  {
+   "name": "fx_scythe_spin_back_1",
+   "rect": [
+    384,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "lead",
+   "layer": "behind the hero"
+  },
+  {
+   "name": "fx_scythe_spin_back_2",
+   "rect": [
+    480,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "peak",
+   "layer": "behind the hero"
+  },
+  {
+   "name": "fx_scythe_spin_back_3",
+   "rect": [
+    576,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "follow",
+   "layer": "behind the hero"
+  },
+  {
+   "name": "fx_scythe_spin_back_4",
+   "rect": [
+    672,
+    64,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "fragments",
+   "layer": "behind the hero"
+  },
+  {
+   "name": "fx_scythe_spin_front_1",
+   "rect": [
+    0,
+    128,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "lead",
+   "layer": "in front of the hero"
+  },
+  {
+   "name": "fx_scythe_spin_front_2",
+   "rect": [
+    96,
+    128,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "peak",
+   "layer": "in front of the hero"
+  },
+  {
+   "name": "fx_scythe_spin_front_3",
+   "rect": [
+    192,
+    128,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "follow",
+   "layer": "in front of the hero"
+  },
+  {
+   "name": "fx_scythe_spin_front_4",
+   "rect": [
+    288,
+    128,
+    96,
+    64
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "phase": "fragments",
+   "layer": "in front of the hero"
+  },
+  {
+   "name": "fx_chain_whip_1",
+   "rect": [
+    0,
+    192,
+    128,
+    32
+   ],
+   "anchor": [
+    0,
+    16
+   ],
+   "hand": [
+    0,
+    16
+   ],
+   "target": [
+    120,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_whip_2",
+   "rect": [
+    128,
+    192,
+    128,
+    32
+   ],
+   "anchor": [
+    0,
+    16
+   ],
+   "hand": [
+    0,
+    16
+   ],
+   "target": [
+    120,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_whip_3",
+   "rect": [
+    256,
+    192,
+    128,
+    32
+   ],
+   "anchor": [
+    0,
+    16
+   ],
+   "hand": [
+    0,
+    16
+   ],
+   "target": [
+    120,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_whip_4",
+   "rect": [
+    384,
+    192,
+    128,
+    32
+   ],
+   "anchor": [
+    0,
+    16
+   ],
+   "hand": [
+    0,
+    16
+   ],
+   "target": [
+    120,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_whip_5",
+   "rect": [
+    512,
+    192,
+    128,
+    32
+   ],
+   "anchor": [
+    0,
+    16
+   ],
+   "hand": [
+    0,
+    16
+   ],
+   "target": [
+    120,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_whip_6",
+   "rect": [
+    640,
+    192,
+    128,
+    32
+   ],
+   "anchor": [
+    0,
+    16
+   ],
+   "hand": [
+    0,
+    16
+   ],
+   "target": [
+    120,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_scythe_fly_1",
+   "rect": [
+    0,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 0
+  },
+  {
+   "name": "fx_chain_scythe_fly_2",
+   "rect": [
+    32,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 45
+  },
+  {
+   "name": "fx_chain_scythe_fly_3",
+   "rect": [
+    64,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 90
+  },
+  {
+   "name": "fx_chain_scythe_fly_4",
+   "rect": [
+    96,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 135
+  },
+  {
+   "name": "fx_chain_scythe_fly_5",
+   "rect": [
+    128,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 180
+  },
+  {
+   "name": "fx_chain_scythe_fly_6",
+   "rect": [
+    160,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 225
+  },
+  {
+   "name": "fx_chain_scythe_fly_7",
+   "rect": [
+    192,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 270
+  },
+  {
+   "name": "fx_chain_scythe_fly_8",
+   "rect": [
+    224,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "rotation_deg": 315
+  },
+  {
+   "name": "fx_chain_hook_1",
+   "rect": [
+    256,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_hook_2",
+   "rect": [
+    288,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_hook_3",
+   "rect": [
+    320,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_hook_4",
+   "rect": [
+    352,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_hook_5",
+   "rect": [
+    384,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_scythe_stagger_1",
+   "rect": [
+    416,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_scythe_stagger_2",
+   "rect": [
+    448,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_scythe_stagger_3",
+   "rect": [
+    480,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_scythe_stagger_4",
+   "rect": [
+    512,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_scythe_stagger_5",
+   "rect": [
+    544,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_scythe_stagger_6",
+   "rect": [
+    576,
+    224,
+    32,
+    32
+   ],
+   "anchor": [
+    16,
+    16
+   ]
+  },
+  {
+   "name": "fx_chain_link_1",
+   "rect": [
+    0,
+    256,
+    32,
+    8
+   ],
+   "anchor": [
+    0,
+    4
+   ],
+   "ends": [
+    [
+     0,
+     4
+    ],
+    [
+     31,
+     4
+    ]
+   ]
+  },
+  {
+   "name": "fx_chain_link_2",
+   "rect": [
+    32,
+    256,
+    32,
+    8
+   ],
+   "anchor": [
+    0,
+    4
+   ],
+   "ends": [
+    [
+     0,
+     4
+    ],
+    [
+     31,
+     4
+    ]
+   ]
+  },
+  {
+   "name": "fx_chain_link_3",
+   "rect": [
+    64,
+    256,
+    32,
+    8
+   ],
+   "anchor": [
+    0,
+    4
+   ],
+   "ends": [
+    [
+     0,
+     4
+    ],
+    [
+     31,
+     4
+    ]
+   ]
+  },
+  {
+   "name": "fx_chain_link_4",
+   "rect": [
+    96,
+    256,
+    32,
+    8
+   ],
+   "anchor": [
+    0,
+    4
+   ],
+   "ends": [
+    [
+     0,
+     4
+    ],
+    [
+     31,
+     4
+    ]
+   ]
+  },
+  {
+   "name": "fx_scythe_dizzy_1",
+   "rect": [
+    128,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    12
+   ]
+  },
+  {
+   "name": "fx_scythe_dizzy_2",
+   "rect": [
+    160,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    12
+   ]
+  },
+  {
+   "name": "fx_scythe_dizzy_3",
+   "rect": [
+    192,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    12
+   ]
+  },
+  {
+   "name": "fx_scythe_dizzy_4",
+   "rect": [
+    224,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    12
+   ]
+  },
+  {
+   "name": "fx_scythe_scuff_1",
+   "rect": [
+    256,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    8
+   ]
+  },
+  {
+   "name": "fx_scythe_scuff_2",
+   "rect": [
+    288,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    8
+   ]
+  },
+  {
+   "name": "fx_scythe_scuff_3",
+   "rect": [
+    320,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    8
+   ]
+  },
+  {
+   "name": "fx_scythe_scuff_4",
+   "rect": [
+    352,
+    256,
+    32,
+    16
+   ],
+   "anchor": [
+    16,
+    8
+   ]
+  },
+  {
+   "name": "fx_chain_pull_1",
+   "rect": [
+    0,
+    272,
+    64,
+    48
+   ],
+   "anchor": [
+    12,
+    44
+   ]
+  },
+  {
+   "name": "fx_chain_pull_2",
+   "rect": [
+    64,
+    272,
+    64,
+    48
+   ],
+   "anchor": [
+    12,
+    44
+   ]
+  },
+  {
+   "name": "fx_chain_pull_3",
+   "rect": [
+    128,
+    272,
+    64,
+    48
+   ],
+   "anchor": [
+    12,
+    44
+   ]
+  },
+  {
+   "name": "fx_chain_pull_4",
+   "rect": [
+    192,
+    272,
+    64,
+    48
+   ],
+   "anchor": [
+    12,
+    44
+   ]
+  },
+  {
+   "name": "fx_chain_dust_1",
+   "rect": [
+    256,
+    272,
+    64,
+    16
+   ],
+   "anchor": [
+    8,
+    14
+   ]
+  },
+  {
+   "name": "fx_chain_dust_2",
+   "rect": [
+    320,
+    272,
+    64,
+    16
+   ],
+   "anchor": [
+    8,
+    14
+   ]
+  },
+  {
+   "name": "fx_chain_dust_3",
+   "rect": [
+    384,
+    272,
+    64,
+    16
+   ],
+   "anchor": [
+    8,
+    14
+   ]
+  },
+  {
+   "name": "fx_chain_dust_4",
+   "rect": [
+    448,
+    272,
+    64,
+    16
+   ],
+   "anchor": [
+    8,
+    14
+   ]
+  }
+ ]
+}

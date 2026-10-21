@@ -3,6 +3,8 @@ extends RefCounted
 const Snapshots := preload("res://core/snapshots.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+static var beam_strips: Dictionary = {}
+static var sweep_radii: Dictionary = {}
 const AFTERGLOW_TICKS: int = 10
 
 static func pixel_points(points: PackedVector2Array) -> PackedVector2Array:
@@ -37,8 +39,8 @@ static func red(t: Snapshots.TelegraphSnapshot, tick: int, colors: Dictionary) -
 	var live: bool = tick <= t.end_tick
 	var fade: float = 1.0 if live else 1.0 - float(tick - t.end_tick) / AFTERGLOW_TICKS
 	var flicker: float = 0.90 + 0.05 * float(posmod(tick + t.id, 3))
-	var bright: Color = colors["z"]
-	var dark: Color = colors["A"]
+	var bright: Color = colors["x"] if t.kind == &"gold" else colors["z"]
+	var dark: Color = colors["y"] if t.kind == &"gold" else colors["A"]
 	var cream: Color = colors["1"]
 	if t.attack == &"red_shards" and t.shape == &"line":
 		var end: Vector2 = t.center + t.direction * t.size
@@ -120,3 +122,173 @@ static func hit_impact(at: Vector2, age: int, counter: bool, colors: Dictionary)
 	if age == 0:
 		disc(plan, at, 2.0, colors["p"])
 	return plan
+
+## Sweep/charge/beam use cosmetic anchors; floor impacts retain their core geometry,
+## including the stomp safe centre. No render plan mutates a gameplay snapshot.
+static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapshot, tick: int, frames: Dictionary, sprites: Texture2D, effect_origin: Vector2) -> void:
+	if tell.attack == &"red_sweep" and tell.shape == &"cone":
+		var sweep: Dictionary = sweep_plan(tell, tick, frames, sprites)
+		if not sweep.is_empty():
+			canvas.draw_polygon(sweep["polygon"], PackedColorArray([Color.WHITE]), sweep["uv"], sprites)
+		return
+	var age: int = tick - tell.hit_tick
+	var pose: String = {&"gold_slam": "slam", &"gold_combo": "slam", &"red_sweep": "sweep", &"red_stomp": "stomp", &"red_charge": "charge", &"red_shards": "beam_body"}.get(tell.attack, "slam")
+	var count: int = 4 if pose == "beam_body" else 6
+	var key: String = "fx_%s_%d" % [pose, mini(count - 1, age / 2) + 1]
+	if not frames.has(key):
+		return
+	var frame: Dictionary = frames[key]
+	if tell.shape == &"line":
+		if pose == "beam_body":
+			draw_beam(canvas, tell, tick, frames, sprites, effect_origin)
+		else:
+			var charge: Dictionary = charge_plan(tell, tick, effect_origin, frames, sprites.get_size())
+			if not charge.is_empty():
+				canvas.draw_polygon(charge["polygon"], PackedColorArray([Color.WHITE]), charge["uv"], sprites)
+		return
+	if tell.shape == &"ring":
+		for i: int in range(96):
+			var a: Vector2 = Vector2.from_angle(TAU * i / 96.0)
+			var b: Vector2 = Vector2.from_angle(TAU * (i + 1) / 96.0)
+			_effect_polygon(canvas, sprites, PackedVector2Array([tell.center + a * tell.inner_size, tell.center + a * tell.size, tell.center + b * tell.size, tell.center + b * tell.inner_size]), tell, frame)
+	else:
+		var boundary: PackedVector2Array = TelegraphView.outline(tell)
+		_effect_polygon(canvas, sprites, boundary.slice(0, boundary.size() - 1), tell, frame)
+
+## Native-size dust follows the observed body, never a stretched future lane.
+static func charge_plan(tell: Snapshots.TelegraphSnapshot, tick: int, position: Vector2, frames: Dictionary, atlas_size: Vector2) -> Dictionary:
+	if tick < tell.hit_tick or tick > tell.end_tick:
+		return {}
+	var key: String = "fx_charge_%d" % (posmod((tick - tell.hit_tick) / 2, 6) + 1)
+	var f: Dictionary = frames[key]
+	var at: Vector2 = position - tell.direction * 14.0 + Vector2(0, 2)
+	var pixels: PackedVector2Array = PackedVector2Array([Vector2.ZERO, Vector2(f["w"] - 1, 0), Vector2(f["w"] - 1, f["h"] - 1), Vector2(0, f["h"] - 1)])
+	var polygon: PackedVector2Array = PackedVector2Array()
+	var uv: PackedVector2Array = PackedVector2Array()
+	for pixel: Vector2 in pixels:
+		polygon.append((at + (pixel - Vector2(f["ax"], f["ay"])).rotated(tell.direction.angle())).round())
+		uv.append((Vector2(f["x"], f["y"]) + pixel) / atlas_size)
+	return {"key": key, "origin": at, "body_position": position, "polygon": polygon, "uv": uv}
+
+## One scale for the entire imported sequence preserves its natural growth/breakup.
+static func sweep_reference_radius(frames: Dictionary, sprites: Texture2D) -> float:
+	var identity: int = sprites.get_instance_id()
+	if sweep_radii.has(identity):
+		return float(sweep_radii[identity])
+	var image: Image = sprites.get_image()
+	var radius: float = 1.0
+	for index: int in range(1, 7):
+		var frame: Dictionary = frames["fx_sweep_%d" % index]
+		var anchor: Vector2 = Vector2(frame["ax"], frame["ay"])
+		for y: int in range(frame["h"]):
+			for x: int in range(frame["w"]):
+				if image.get_pixel(frame["x"] + x, frame["y"] + y).a > 0.0:
+					radius = maxf(radius, Vector2(x, y).distance_to(anchor))
+	sweep_radii[identity] = radius
+	return radius
+
+## Full cosmetic arc, deliberately unclipped by the warning cone. Core still owns hits.
+static func sweep_plan(tell: Snapshots.TelegraphSnapshot, tick: int, frames: Dictionary, sprites: Texture2D) -> Dictionary:
+	var age: int = tick - tell.hit_tick
+	if age < 0 or age >= 10:
+		return {}
+	# Anticipation is already painted by the boss; the full cut lands on hit_tick.
+	var key: String = "fx_sweep_%d" % mini(6, 3 + age / 2)
+	var f: Dictionary = frames[key]
+	var scale_px: float = tell.size / sweep_reference_radius(frames, sprites)
+	var pixels: PackedVector2Array = PackedVector2Array([Vector2.ZERO, Vector2(f["w"] - 1, 0), Vector2(f["w"] - 1, f["h"] - 1), Vector2(0, f["h"] - 1)])
+	var polygon: PackedVector2Array = PackedVector2Array()
+	var uv: PackedVector2Array = PackedVector2Array()
+	for pixel: Vector2 in pixels:
+		polygon.append((tell.center + (pixel - Vector2(f["ax"], f["ay"])).rotated(tell.direction.angle() + PI) * scale_px).round())
+		uv.append((Vector2(f["x"], f["y"]) + pixel) / sprites.get_size())
+	return {"key": key, "polygon": polygon, "uv": uv, "scale": scale_px, "origin": tell.center}
+
+## Imported sweep arcs face left; their effect origin is not necessarily the cell centre.
+## Every UV stays inside this frame so adjacent atlas sprites can never leak into a hit.
+static func effect_uvs(polygon: PackedVector2Array, tell: Snapshots.TelegraphSnapshot, frame: Dictionary, atlas_size: Vector2) -> PackedVector2Array:
+	var uv: PackedVector2Array = PackedVector2Array()
+	var radius: float = maxf(1.0, tell.size)
+	var anchor: Vector2 = Vector2(frame["ax"], frame["ay"])
+	var last: Vector2 = Vector2(frame["w"] - 1, frame["h"] - 1)
+	var sweep_radius: float = anchor.x
+	if tell.shape == &"cone":
+		var side: float = maxf(0.001, sin(minf(PI * 0.5, tell.half_angle)))
+		sweep_radius = maxf(1.0, minf(anchor.x, minf(anchor.y, last.y - anchor.y) / side))
+	for point: Vector2 in polygon:
+		var local: Vector2 = point - tell.center
+		var pixel: Vector2
+		if tell.shape == &"cone":
+			local = local.rotated(-tell.direction.angle())
+			# Rotate left-facing art onto the forward half of the hit cone.
+			pixel = anchor - local * sweep_radius / radius
+		else:
+			pixel = anchor + local / (radius * 2.0) * Vector2(frame["w"], frame["h"])
+		pixel = pixel.clamp(Vector2.ZERO, last)
+		uv.append((Vector2(frame["x"], frame["y"]) + pixel) / atlas_size)
+	return uv
+
+static func _effect_polygon(canvas: Node2D, sprites: Texture2D, polygon: PackedVector2Array, tell: Snapshots.TelegraphSnapshot, frame: Dictionary) -> void:
+	canvas.draw_polygon(polygon, PackedColorArray([Color.WHITE]), effect_uvs(polygon, tell, frame, sprites.get_size()), sprites)
+
+## Use one opaque cross-section of the imported body: padded cells and changing
+## start/end shapes can no longer punch gaps into the damaging lane.
+static func beam_strip(sprites: Texture2D, frame: Dictionary) -> Rect2:
+	var cache_key: String = "%d:%d:%d" % [sprites.get_instance_id(), frame["x"], frame["y"]]
+	if beam_strips.has(cache_key):
+		return beam_strips[cache_key]
+	var image: Image = sprites.get_image()
+	var x: int = int(frame["x"]) + int(frame["w"]) / 2
+	var top: int = int(frame["y"])
+	var bottom: int = top + int(frame["h"]) - 1
+	while top < bottom and image.get_pixel(x, top).a == 0.0:
+		top += 1
+	while bottom > top and image.get_pixel(x, bottom).a == 0.0:
+		bottom -= 1
+	var strip: Rect2 = Rect2(x, top, 1, bottom - top + 1)
+	beam_strips[cache_key] = strip
+	return strip
+
+static func beam_body_polygon(tell: Snapshots.TelegraphSnapshot) -> PackedVector2Array:
+	var side: Vector2 = tell.direction.orthogonal() * tell.width * 0.5
+	var end: Vector2 = tell.center + tell.direction * tell.size
+	return PackedVector2Array([tell.center - side, end - side, end + side, tell.center + side])
+
+static func beam_visual_tell(tell: Snapshots.TelegraphSnapshot, muzzle: Vector2) -> Snapshots.TelegraphSnapshot:
+	var visual: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
+	var end: Vector2 = tell.center + tell.direction * tell.size
+	visual.shape = tell.shape
+	visual.center = muzzle
+	visual.direction = (end - muzzle).normalized()
+	visual.size = muzzle.distance_to(end)
+	visual.width = tell.width
+	return visual
+
+static func draw_beam(canvas: Node2D, tell: Snapshots.TelegraphSnapshot, tick: int, frames: Dictionary, sprites: Texture2D, muzzle: Vector2) -> void:
+	var visual: Snapshots.TelegraphSnapshot = beam_visual_tell(tell, muzzle)
+	var age: int = maxi(0, tick - tell.hit_tick)
+	var index: int = 1 + (age / 2) % 4
+	var fade: float = 1.0 if tick <= tell.end_tick else clampf(1.0 - float(tick - tell.end_tick) / AFTERGLOW_TICKS, 0.0, 1.0)
+	var tint: Color = Color(1, 1, 1, fade)
+	var outline: PackedVector2Array = TelegraphView.outline(visual)
+	canvas.draw_colored_polygon(outline.slice(0, outline.size() - 1), Color(Color("#e0463f"), fade))
+	var region: Rect2 = beam_strip(sprites, frames["fx_beam_body_%d" % index])
+	var uv: PackedVector2Array = PackedVector2Array([region.position, region.position + Vector2(region.size.x, 0), region.end, region.position + Vector2(0, region.size.y)])
+	for i: int in range(uv.size()):
+		uv[i] /= sprites.get_size()
+	canvas.draw_polygon(beam_body_polygon(visual), PackedColorArray([tint]), uv, sprites)
+	# Cosmetic caps follow the measured chest muzzle and reported floor endpoint.
+	# The gameplay capsule remains untouched by this separate visual geometry.
+	for part: String in ["start", "end"]:
+		var frame: Dictionary = frames["fx_beam_%s_%d" % [part, index]]
+		var origin: Vector2 = visual.center if part == "start" else visual.center + visual.direction * visual.size
+		var polygon: PackedVector2Array = PackedVector2Array()
+		var cap_uv: PackedVector2Array = PackedVector2Array()
+		var extent: float = maxf(float(frame["w"]), float(frame["h"]))
+		for i: int in range(48):
+			var unit: Vector2 = Vector2.from_angle(TAU * i / 48.0)
+			polygon.append(origin + unit.rotated(visual.direction.angle()) * tell.width * 0.5)
+			var pixel: Vector2 = Vector2(frame["ax"], frame["ay"]) + unit * extent * 0.5
+			pixel = pixel.clamp(Vector2.ZERO, Vector2(frame["w"] - 1, frame["h"] - 1))
+			cap_uv.append((Vector2(frame["x"], frame["y"]) + pixel) / sprites.get_size())
+		canvas.draw_polygon(polygon, PackedColorArray([tint]), cap_uv, sprites)

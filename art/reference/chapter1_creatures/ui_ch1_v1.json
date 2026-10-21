@@ -1,0 +1,102 @@
+{
+ "generator": "tools/art/make_chapter1_creatures_art.py (procedural, Pillow only, deterministic)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A anywhere",
+ "scale": "1x game pixels (previews are nearest-neighbour copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "facing": "right; mirror around the anchor for left",
+ "ticks": "60 ticks per second; ticks_per_frame are suggestions only (state lengths are core decisions)",
+ "notes": {
+  "ui_enemy_bar_frame_1": "32x8 frame, anchor bottom-centre (place ~4 px above the head). HP track x3-28 y2-3, posture x6-25 y5",
+  "ui_enemy_bar_hp_1": "HP fill: crop to width; grass_6 with a cream top line (as the boss bar)",
+  "ui_enemy_bar_hp_ghost_1": "recent-damage trail (stone_6), drawn under the HP fill",
+  "ui_enemy_bar_posture_1": "posture fill (lilac, as the boss bar)",
+  "ui_enemy_bar_posture_broken_1": "posture fill while broken (water_6, as the boss bar)",
+  "ui_aggro_mark_small_1": "8x8 '!' mark, anchor bottom",
+  "ui_aggro_mark_1": "16x16 '!' pop: 1 pop, 2 overshoot, 3 settle, 4 glint; ~4 ticks each, then hold 3",
+  "ui_aggro_mark_2": "16x16 '!' pop: 1 pop, 2 overshoot, 3 settle, 4 glint; ~4 ticks each, then hold 3",
+  "ui_aggro_mark_3": "16x16 '!' pop: 1 pop, 2 overshoot, 3 settle, 4 glint; ~4 ticks each, then hold 3",
+  "ui_aggro_mark_4": "16x16 '!' pop: 1 pop, 2 overshoot, 3 settle, 4 glint; ~4 ticks each, then hold 3"
+ },
+ "frames": {
+  "ui_enemy_bar_frame_1": {
+   "x": 0,
+   "y": 0,
+   "w": 32,
+   "h": 8,
+   "ax": 16,
+   "ay": 8
+  },
+  "ui_enemy_bar_hp_1": {
+   "x": 0,
+   "y": 8,
+   "w": 32,
+   "h": 8,
+   "ax": 16,
+   "ay": 8
+  },
+  "ui_enemy_bar_hp_ghost_1": {
+   "x": 0,
+   "y": 16,
+   "w": 32,
+   "h": 8,
+   "ax": 16,
+   "ay": 8
+  },
+  "ui_enemy_bar_posture_1": {
+   "x": 0,
+   "y": 24,
+   "w": 32,
+   "h": 8,
+   "ax": 16,
+   "ay": 8
+  },
+  "ui_enemy_bar_posture_broken_1": {
+   "x": 0,
+   "y": 32,
+   "w": 32,
+   "h": 8,
+   "ax": 16,
+   "ay": 8
+  },
+  "ui_aggro_mark_small_1": {
+   "x": 0,
+   "y": 40,
+   "w": 8,
+   "h": 8,
+   "ax": 4,
+   "ay": 7
+  },
+  "ui_aggro_mark_1": {
+   "x": 0,
+   "y": 48,
+   "w": 16,
+   "h": 16,
+   "ax": 8,
+   "ay": 15
+  },
+  "ui_aggro_mark_2": {
+   "x": 0,
+   "y": 64,
+   "w": 16,
+   "h": 16,
+   "ax": 8,
+   "ay": 15
+  },
+  "ui_aggro_mark_3": {
+   "x": 0,
+   "y": 80,
+   "w": 16,
+   "h": 16,
+   "ax": 8,
+   "ay": 15
+  },
+  "ui_aggro_mark_4": {
+   "x": 0,
+   "y": 96,
+   "w": 16,
+   "h": 16,
+   "ax": 8,
+   "ay": 15
+  }
+ }
+}

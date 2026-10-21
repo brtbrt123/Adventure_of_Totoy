@@ -18,6 +18,7 @@ func _expect(ok: bool, message: String) -> void:
 
 func _observe() -> void:
 	arena.snapshot = arena.core.snapshot()
+	arena._update_camera(true)
 	arena.prepare_visuals()
 	arena._update_hud()
 	arena.queue_redraw()
@@ -35,15 +36,30 @@ func _save(name_key: String) -> void:
 	_expect(image.save_png("res://art/build/" + name_key + ".png") == OK, "capture failed: " + name_key)
 
 func _catalog() -> void:
+	var icons: Array[String] = ["ui_aspect_breaking_edge_1", "ui_aspect_gale_cut_1", "ui_aspect_moon_cleave_1", "ui_weapon_frame_1"]
+	_expect(arena.frames.has(arena.hud.weapon_icon_key), "equipped blade icon missing")
+	if arena.frames.has(arena.hud.weapon_icon_key):
+		_expect(int(arena.frames[arena.hud.weapon_icon_key]["w"]) == 32, "blade glyph must use native 32px size")
+	var sockets: Array[Rect2] = arena.hud.aspect_rects()
+	sockets.append(arena.hud.weapon_rect())
+	for slot: int in range(4):
+		_expect(arena.frames.has(icons[slot]), "medallion absent: " + icons[slot])
+		if arena.frames.has(icons[slot]):
+			var icon: Dictionary = arena.frames[icons[slot]]
+			_expect(Vector2(icon["w"], icon["h"]) == sockets[slot].size, "medallion must use native pixel size")
+		_expect(Rect2(0, 0, 320, 180).encloses(sockets[slot]), "socket clipped by viewport")
+		for other: int in range(slot):
+			_expect(sockets[slot].get_center().distance_to(sockets[other].get_center()) >= (sockets[slot].size.x + sockets[other].size.x) * 0.5, "overlapping medallion frames")
+	_expect(sockets[3].size == sockets[0].size * 2, "weapon icon must be larger than Aspects")
 	_expect(arena.frames.has("totoy_portrait"), "portrait absent from atlas")
-	_expect(arena.frames.has("hud_profile_frame"), "profile frame absent from atlas")
+	_expect(arena.frames.has("ui_profile"), "profile frame absent from atlas")
 	_expect(not arena.hud.profile_frame.is_empty(), "HUD frame not connected")
 	arena.hud.prepare_portrait()
 	_expect(arena.hud.portrait_mask != null, "circular portrait missing")
 	var distinct: Dictionary = {}
 	var source: Image = arena.sprites.get_image()
 	for name_key: String in arena.frames:
-		if not name_key.begins_with("mossbound_colossus_"):
+		if not name_key.begins_with("golem2_"):
 			continue
 		_expect(arena.head_anchors.has(name_key), "uncached boss frame: " + name_key)
 		var frame: Dictionary = arena.frames[name_key]
@@ -54,10 +70,10 @@ func _catalog() -> void:
 		var left: Vector2 = HeadAnchors.world(Vector2(160, 100), frame, head, true)
 		_expect(is_equal_approx(left.x + right.x, 319.0) and left.y == right.y, "mirror anchor mismatch: " + name_key)
 	_expect(distinct.size() >= 2, "head anchor is constant across boss frames")
-	var idle: Vector2 = arena.head_anchors["mossbound_colossus_idle_1"]
-	var charge: Vector2 = arena.head_anchors["mossbound_colossus_red_charge_strike_1"]
+	var idle: Vector2 = arena.head_anchors["golem2_idle_1"]
+	var charge: Vector2 = arena.head_anchors["golem2_charge_4"]
 	_expect(not idle.is_equal_approx(charge), "charge lean must move head")
-	_expect(Vector2(arena.head_anchors["mossbound_colossus_gold_slam_windup_3"]).y >= 4, "raised fist mistaken for head")
+	_expect(Vector2(arena.head_anchors["golem2_slam_3"]).y >= 4, "raised fist mistaken for head")
 	for at: Vector2 in [Vector2.ZERO, Vector2(320, 0), Vector2(0, 180), Vector2(320, 180)]:
 		for counter: bool in [false, true]:
 			_expect(Rect2(1, 1, 318, 165).encloses(arena.hud.boss_panel(at, counter).grow(1)), "panel/highlight left screen")
@@ -79,14 +95,16 @@ func _catalog() -> void:
 func _fight(attack: StringName, left: bool) -> void:
 	arena._restart()
 	arena.core.boss.phase = 2
-	arena.core.boss.position = Vector2(210 if left else 120, 110)
-	arena.core.player.position = Vector2(140 if left else 190, 110)
+	# in the open middle of the plaza (no props in the way)
+	arena.core.boss.position = Vector2(450 if left else 360, 240)
+	arena.core.player.position = Vector2(380 if left else 430, 240)
 	arena.core.boss.next_attack_override = attack
 	arena.core.boss.cooldown = 1
 	_observe()
 	var seen: Dictionary = {}
 	var mirror_seen: bool = false
 	var unmirror_seen: bool = false
+	var charge_mirrored: Array[bool] = []
 	var saved: bool = false
 	for i: int in range(120):
 		_step()
@@ -96,16 +114,23 @@ func _fight(attack: StringName, left: bool) -> void:
 		var mirrored: bool = ArenaAnimation.boss_mirrored(boss, arena.snapshot, arena.last_attacks.get(boss.id, {}))
 		mirror_seen = mirror_seen or mirrored
 		unmirror_seen = unmirror_seen or not mirrored
-		var target: Vector2 = HeadAnchors.world(boss.position, arena.frames[name_key], arena.head_anchors[name_key], mirrored)
+		var tell: Snapshots.TelegraphSnapshot = ArenaAnimation.attack_tell(boss.id, arena.snapshot)
+		if tell != null and tell.attack == &"red_charge":
+			charge_mirrored.append(mirrored)
+		# the HUD is in screen space: the head's world position minus the camera's top-left corner
+		var target: Vector2 = HeadAnchors.world(boss.position, arena.frames[name_key], arena.head_anchors[name_key], mirrored) - arena.view_origin
 		_expect(arena.hud.head_position.distance_to(target) < 20.0, "panel trails head too far: %s tick %d head %s target %s" % [attack, arena.snapshot.tick, arena.hud.head_position, target])
 		_expect(arena.hud.head_tick == arena.snapshot.tick, "head not updated for fight frame")
-		if capture and attack == &"gold_slam" and not saved and name_key.ends_with("windup_3"):
+		if capture and attack == &"gold_slam" and not saved and name_key == "golem2_slam_3":
 			await _save("arena_bossbar2")
 			saved = true
 		await process_frame
 	_expect(seen.size() >= 4, "too few boss frames exercised")
 	if attack == &"red_charge":
-		_expect(mirror_seen if left else unmirror_seen, "fight mirror direction not exercised")
+		# The charge source art faces LEFT: a leftward charge is native, a rightward one is mirrored.
+		_expect(not charge_mirrored.is_empty(), "no charge frames exercised")
+		for was_mirrored: bool in charge_mirrored:
+			_expect(was_mirrored == (not left), "charge mirror direction wrong for a %s charge" % ("left" if left else "right"))
 
 func _run() -> void:
 	capture = OS.get_cmdline_user_args().has("--capture")

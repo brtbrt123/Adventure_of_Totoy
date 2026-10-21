@@ -1,0 +1,153 @@
+{
+ "note": "88x88 portraits converted from the supplied paintings; draw at scale 0.5 (44 game px) in the socket window.",
+ "size": 88,
+ "display_scale": 0.5,
+ "background": "transparent; the socket window is filled with ink (0)",
+ "supplied": [
+  "portrait_mira_neutral",
+  "portrait_totoy_neutral",
+  "portrait_tovan_neutral",
+  "portrait_edda_neutral",
+  "portrait_elder_neutral",
+  "portrait_child_neutral",
+  "portrait_worker_neutral",
+  "portrait_edda_staff"
+ ],
+ "derived": [
+  "portrait_mira_happy",
+  "portrait_mira_worried",
+  "portrait_mira_serious",
+  "portrait_totoy_happy",
+  "portrait_totoy_worried",
+  "portrait_totoy_serious",
+  "portrait_tovan_happy",
+  "portrait_tovan_worried",
+  "portrait_tovan_serious",
+  "portrait_edda_happy",
+  "portrait_edda_worried",
+  "portrait_edda_serious"
+ ],
+ "image": "portraits_v2.png",
+ "frames": {
+  "portrait_mira_neutral": {
+   "x": 1,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_mira_happy": {
+   "x": 91,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_mira_worried": {
+   "x": 181,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_mira_serious": {
+   "x": 271,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_totoy_neutral": {
+   "x": 361,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_totoy_happy": {
+   "x": 451,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_totoy_worried": {
+   "x": 541,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_totoy_serious": {
+   "x": 631,
+   "y": 1,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_tovan_neutral": {
+   "x": 1,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_tovan_happy": {
+   "x": 91,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_tovan_worried": {
+   "x": 181,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_tovan_serious": {
+   "x": 271,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_edda_neutral": {
+   "x": 361,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_edda_happy": {
+   "x": 451,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_edda_worried": {
+   "x": 541,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_edda_serious": {
+   "x": 631,
+   "y": 91,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_elder_neutral": {
+   "x": 1,
+   "y": 181,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_child_neutral": {
+   "x": 91,
+   "y": 181,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_worker_neutral": {
+   "x": 181,
+   "y": 181,
+   "w": 88,
+   "h": 88
+  },
+  "portrait_edda_staff": {
+   "x": 271,
+   "y": 181,
+   "w": 88,
+   "h": 88
+  }
+ }
+}

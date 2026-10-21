@@ -1,0 +1,350 @@
+{
+  "source_alpha_threshold": 240,
+  "output_alpha_threshold": 128,
+  "resample": "BOX",
+  "alignment": "opaque bounds centered, fixed scale per skill",
+  "frames": [
+    {
+      "name": "fx_aspect2_breaking_edge_1",
+      "source_x": [
+        0,
+        335
+      ],
+      "opaque_bbox": [
+        54,
+        227,
+        275,
+        494
+      ],
+      "scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette": "01xyj"
+    },
+    {
+      "name": "fx_aspect2_breaking_edge_2",
+      "source_x": [
+        335,
+        690
+      ],
+      "opaque_bbox": [
+        37,
+        207,
+        309,
+        504
+      ],
+      "scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette": "01xyj"
+    },
+    {
+      "name": "fx_aspect2_breaking_edge_3",
+      "source_x": [
+        690,
+        1105
+      ],
+      "opaque_bbox": [
+        7,
+        178,
+        395,
+        551
+      ],
+      "scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette": "01xyj"
+    },
+    {
+      "name": "fx_aspect2_breaking_edge_4",
+      "source_x": [
+        1105,
+        1490
+      ],
+      "opaque_bbox": [
+        39,
+        190,
+        362,
+        517
+      ],
+      "scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette": "01xyj"
+    },
+    {
+      "name": "fx_aspect2_breaking_edge_5",
+      "source_x": [
+        1490,
+        1850
+      ],
+      "opaque_bbox": [
+        41,
+        233,
+        302,
+        505
+      ],
+      "scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette": "01xyj"
+    },
+    {
+      "name": "fx_aspect2_breaking_edge_6",
+      "source_x": [
+        1850,
+        2172
+      ],
+      "opaque_bbox": [
+        81,
+        239,
+        254,
+        484
+      ],
+      "scale": 0.13,
+      "canvas": [
+        64,
+        64
+      ],
+      "palette": "01xyj"
+    },
+    {
+      "name": "fx_aspect2_gale_cut_1",
+      "source_x": [
+        0,
+        270
+      ],
+      "opaque_bbox": [
+        59,
+        355,
+        248,
+        407
+      ],
+      "scale": 0.2,
+      "canvas": [
+        112,
+        40
+      ],
+      "palette": "01klmnop"
+    },
+    {
+      "name": "fx_aspect2_gale_cut_2",
+      "source_x": [
+        270,
+        550
+      ],
+      "opaque_bbox": [
+        30,
+        325,
+        257,
+        438
+      ],
+      "scale": 0.2,
+      "canvas": [
+        112,
+        40
+      ],
+      "palette": "01klmnop"
+    },
+    {
+      "name": "fx_aspect2_gale_cut_3",
+      "source_x": [
+        550,
+        1040
+      ],
+      "opaque_bbox": [
+        27,
+        303,
+        475,
+        460
+      ],
+      "scale": 0.2,
+      "canvas": [
+        112,
+        40
+      ],
+      "palette": "01klmnop"
+    },
+    {
+      "name": "fx_aspect2_gale_cut_4",
+      "source_x": [
+        1040,
+        1400
+      ],
+      "opaque_bbox": [
+        23,
+        310,
+        345,
+        445
+      ],
+      "scale": 0.2,
+      "canvas": [
+        112,
+        40
+      ],
+      "palette": "01klmnop"
+    },
+    {
+      "name": "fx_aspect2_gale_cut_5",
+      "source_x": [
+        1400,
+        1760
+      ],
+      "opaque_bbox": [
+        34,
+        325,
+        326,
+        437
+      ],
+      "scale": 0.2,
+      "canvas": [
+        112,
+        40
+      ],
+      "palette": "01klmnop"
+    },
+    {
+      "name": "fx_aspect2_gale_cut_6",
+      "source_x": [
+        1760,
+        2048
+      ],
+      "opaque_bbox": [
+        17,
+        349,
+        232,
+        408
+      ],
+      "scale": 0.2,
+      "canvas": [
+        112,
+        40
+      ],
+      "palette": "01klmnop"
+    },
+    {
+      "name": "fx_aspect2_moon_cleave_1",
+      "source_x": [
+        0,
+        280
+      ],
+      "opaque_bbox": [
+        57,
+        268,
+        248,
+        473
+      ],
+      "scale": 0.15,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette": "01klnopv"
+    },
+    {
+      "name": "fx_aspect2_moon_cleave_2",
+      "source_x": [
+        280,
+        620
+      ],
+      "opaque_bbox": [
+        43,
+        240,
+        314,
+        511
+      ],
+      "scale": 0.15,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette": "01klnopv"
+    },
+    {
+      "name": "fx_aspect2_moon_cleave_3",
+      "source_x": [
+        620,
+        1110
+      ],
+      "opaque_bbox": [
+        21,
+        146,
+        466,
+        606
+      ],
+      "scale": 0.15,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette": "01klnopv"
+    },
+    {
+      "name": "fx_aspect2_moon_cleave_4",
+      "source_x": [
+        1110,
+        1510
+      ],
+      "opaque_bbox": [
+        29,
+        167,
+        378,
+        597
+      ],
+      "scale": 0.15,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette": "01klnopv"
+    },
+    {
+      "name": "fx_aspect2_moon_cleave_5",
+      "source_x": [
+        1510,
+        1830
+      ],
+      "opaque_bbox": [
+        12,
+        201,
+        274,
+        552
+      ],
+      "scale": 0.15,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette": "01klnopv"
+    },
+    {
+      "name": "fx_aspect2_moon_cleave_6",
+      "source_x": [
+        1830,
+        2048
+      ],
+      "opaque_bbox": [
+        4,
+        255,
+        191,
+        526
+      ],
+      "scale": 0.15,
+      "canvas": [
+        80,
+        80
+      ],
+      "palette": "01klnopv"
+    }
+  ]
+}

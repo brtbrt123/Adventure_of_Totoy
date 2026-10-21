@@ -1,0 +1,277 @@
+{
+  "generator": "tools/art/make_dual_dagger_art.py (procedural, Pillow only, deterministic seeds)",
+  "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A",
+  "scale": "1x game pixels (nearest-neighbour; preview sheets are scaled copies)",
+  "status": "Concept for human approval; not imported into gameplay",
+  "reference": "art/src/hero2_* frames (katana removed) for identity; Black Katana form layout as the convention",
+  "layout": "8 columns x 2 rows of 64x64 cells. Row 1: Totoy armed with the twin daggers. Row 2: the same poses in lightning form.",
+  "poses": [
+    {
+      "pose": "ready_1",
+      "source_frame": "hero2_idle_right_1",
+      "description": "idle / ready, reverse-grip daggers low"
+    },
+    {
+      "pose": "ready_2",
+      "source_frame": "hero2_parry_right_1",
+      "description": "battle ready, lead dagger forward"
+    },
+    {
+      "pose": "slash_1",
+      "source_frame": "hero2_attack1_right_4",
+      "description": "combo 1: lead-hand horizontal cut"
+    },
+    {
+      "pose": "slash_2",
+      "source_frame": "hero2_attack2_right_4",
+      "description": "combo 2: rear-hand rising cut"
+    },
+    {
+      "pose": "slash_3",
+      "source_frame": "hero2_attack3_right_4",
+      "description": "combo 3: low twin sweep"
+    },
+    {
+      "pose": "charge",
+      "source_frame": "hero2_attack1_right_1",
+      "description": "lightning form: crouch / charge"
+    },
+    {
+      "pose": "blink",
+      "source_frame": "hero2_dash_right_3",
+      "description": "lightning form: blink-dash"
+    },
+    {
+      "pose": "burst",
+      "source_frame": "hero2_victory_right_3",
+      "description": "lightning form: burst"
+    }
+  ],
+  "frames": [
+    {
+      "name": "concept_ready_1",
+      "cell": 0,
+      "rect": [
+        0,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_ready_2",
+      "cell": 1,
+      "rect": [
+        64,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_slash_1",
+      "cell": 2,
+      "rect": [
+        128,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_slash_2",
+      "cell": 3,
+      "rect": [
+        192,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_slash_3",
+      "cell": 4,
+      "rect": [
+        256,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_charge",
+      "cell": 5,
+      "rect": [
+        320,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_blink",
+      "cell": 6,
+      "rect": [
+        384,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_burst",
+      "cell": 7,
+      "rect": [
+        448,
+        0,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_ready_1",
+      "cell": 8,
+      "rect": [
+        0,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_ready_2",
+      "cell": 9,
+      "rect": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_slash_1",
+      "cell": 10,
+      "rect": [
+        128,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_slash_2",
+      "cell": 11,
+      "rect": [
+        192,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_slash_3",
+      "cell": 12,
+      "rect": [
+        256,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_charge",
+      "cell": 13,
+      "rect": [
+        320,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_blink",
+      "cell": 14,
+      "rect": [
+        384,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    },
+    {
+      "name": "concept_lightning_burst",
+      "cell": 15,
+      "rect": [
+        448,
+        64,
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        56
+      ]
+    }
+  ],
+  "request": "Dual Dagger weapon; right-click active: Totoy turns into lightning and slashes the enemy from every direction. Damage, timing, cost, cooldown and hit count are owner/core decisions."
+}

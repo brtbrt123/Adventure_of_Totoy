@@ -1,0 +1,420 @@
+{
+ "generator": "tools/art/make_chapter1_creatures_art.py (procedural, Pillow only, deterministic)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A anywhere",
+ "scale": "1x game pixels (previews are nearest-neighbour copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "facing": "right; mirror around the anchor for left",
+ "ticks": "60 ticks per second; ticks_per_frame are suggestions only (state lengths are core decisions)",
+ "groups": {
+  "fx_ch1_leaf_puff": {
+   "frames": 5,
+   "cell": [
+    24,
+    24
+   ],
+   "anchor": [
+    12,
+    16
+   ],
+   "ticks_per_frame": 4,
+   "note": "Mossling hit/death: leaves and moss burst out and flutter down"
+  },
+  "fx_ch1_boar_dust": {
+   "frames": 4,
+   "cell": [
+    32,
+    16
+   ],
+   "anchor": [
+    28,
+    14
+   ],
+   "ticks_per_frame": 4,
+   "note": "dust trail behind the charging boar's hind feet (trails to -x); spawn one every ~6 ticks, each plays 1-4"
+  },
+  "fx_ch1_boar_crash": {
+   "frames": 5,
+   "cell": [
+    40,
+    32
+   ],
+   "anchor": [
+    20,
+    30
+   ],
+   "ticks_per_frame": 4,
+   "note": "boar hits an obstacle: impact star (cream), splinters, pebbles, dust. Anchor = snout on the ground line"
+  },
+  "fx_ch1_moth_trail": {
+   "frames": 4,
+   "cell": [
+    32,
+    8
+   ],
+   "anchor": [
+    24,
+    4
+   ],
+   "ticks_per_frame": 3,
+   "note": "glowmoth shot trail, drawn behind the orb; loop 1-4"
+  },
+  "fx_ch1_moth_shadow": {
+   "frames": 1,
+   "cell": [
+    16,
+    8
+   ],
+   "anchor": [
+    8,
+    4
+   ],
+   "ticks_per_frame": 1,
+   "note": "optional ground shadow under the hovering glowmoth (grass_1)"
+  },
+  "fx_ch1_root_spike": {
+   "frames": 6,
+   "cell": [
+    24,
+    40
+   ],
+   "anchor": [
+    12,
+    36
+   ],
+   "ticks_per_frame": 5,
+   "note": "Stag phase 2: crack, burst, spike, hold (thorns flare), crumble, rubble. The red warning is drawn by presentation"
+  },
+  "fx_ch1_stag_slam_rubble": {
+   "frames": 5,
+   "cell": [
+    48,
+    24
+   ],
+   "anchor": [
+    24,
+    22
+   ],
+   "ticks_per_frame": 4,
+   "note": "antler-slam impact: shock line, rubble, dust"
+  },
+  "fx_ch1_purify_sparkle": {
+   "frames": 8,
+   "cell": [
+    48,
+    48
+   ],
+   "anchor": [
+    24,
+    40
+   ],
+   "ticks_per_frame": 6,
+   "note": "purification ring and rising motes after the Stag's defeat"
+  }
+ },
+ "frames": {
+  "fx_ch1_leaf_puff_1": {
+   "x": 0,
+   "y": 0,
+   "w": 24,
+   "h": 24,
+   "ax": 12,
+   "ay": 16
+  },
+  "fx_ch1_leaf_puff_2": {
+   "x": 24,
+   "y": 0,
+   "w": 24,
+   "h": 24,
+   "ax": 12,
+   "ay": 16
+  },
+  "fx_ch1_leaf_puff_3": {
+   "x": 48,
+   "y": 0,
+   "w": 24,
+   "h": 24,
+   "ax": 12,
+   "ay": 16
+  },
+  "fx_ch1_leaf_puff_4": {
+   "x": 72,
+   "y": 0,
+   "w": 24,
+   "h": 24,
+   "ax": 12,
+   "ay": 16
+  },
+  "fx_ch1_leaf_puff_5": {
+   "x": 96,
+   "y": 0,
+   "w": 24,
+   "h": 24,
+   "ax": 12,
+   "ay": 16
+  },
+  "fx_ch1_boar_dust_1": {
+   "x": 0,
+   "y": 24,
+   "w": 32,
+   "h": 16,
+   "ax": 28,
+   "ay": 14
+  },
+  "fx_ch1_boar_dust_2": {
+   "x": 32,
+   "y": 24,
+   "w": 32,
+   "h": 16,
+   "ax": 28,
+   "ay": 14
+  },
+  "fx_ch1_boar_dust_3": {
+   "x": 64,
+   "y": 24,
+   "w": 32,
+   "h": 16,
+   "ax": 28,
+   "ay": 14
+  },
+  "fx_ch1_boar_dust_4": {
+   "x": 96,
+   "y": 24,
+   "w": 32,
+   "h": 16,
+   "ax": 28,
+   "ay": 14
+  },
+  "fx_ch1_boar_crash_1": {
+   "x": 0,
+   "y": 40,
+   "w": 40,
+   "h": 32,
+   "ax": 20,
+   "ay": 30
+  },
+  "fx_ch1_boar_crash_2": {
+   "x": 40,
+   "y": 40,
+   "w": 40,
+   "h": 32,
+   "ax": 20,
+   "ay": 30
+  },
+  "fx_ch1_boar_crash_3": {
+   "x": 80,
+   "y": 40,
+   "w": 40,
+   "h": 32,
+   "ax": 20,
+   "ay": 30
+  },
+  "fx_ch1_boar_crash_4": {
+   "x": 120,
+   "y": 40,
+   "w": 40,
+   "h": 32,
+   "ax": 20,
+   "ay": 30
+  },
+  "fx_ch1_boar_crash_5": {
+   "x": 160,
+   "y": 40,
+   "w": 40,
+   "h": 32,
+   "ax": 20,
+   "ay": 30
+  },
+  "fx_ch1_moth_trail_1": {
+   "x": 0,
+   "y": 72,
+   "w": 32,
+   "h": 8,
+   "ax": 24,
+   "ay": 4
+  },
+  "fx_ch1_moth_trail_2": {
+   "x": 32,
+   "y": 72,
+   "w": 32,
+   "h": 8,
+   "ax": 24,
+   "ay": 4
+  },
+  "fx_ch1_moth_trail_3": {
+   "x": 64,
+   "y": 72,
+   "w": 32,
+   "h": 8,
+   "ax": 24,
+   "ay": 4
+  },
+  "fx_ch1_moth_trail_4": {
+   "x": 96,
+   "y": 72,
+   "w": 32,
+   "h": 8,
+   "ax": 24,
+   "ay": 4
+  },
+  "fx_ch1_moth_shadow_1": {
+   "x": 0,
+   "y": 80,
+   "w": 16,
+   "h": 8,
+   "ax": 8,
+   "ay": 4
+  },
+  "fx_ch1_root_spike_1": {
+   "x": 0,
+   "y": 88,
+   "w": 24,
+   "h": 40,
+   "ax": 12,
+   "ay": 36
+  },
+  "fx_ch1_root_spike_2": {
+   "x": 24,
+   "y": 88,
+   "w": 24,
+   "h": 40,
+   "ax": 12,
+   "ay": 36
+  },
+  "fx_ch1_root_spike_3": {
+   "x": 48,
+   "y": 88,
+   "w": 24,
+   "h": 40,
+   "ax": 12,
+   "ay": 36
+  },
+  "fx_ch1_root_spike_4": {
+   "x": 72,
+   "y": 88,
+   "w": 24,
+   "h": 40,
+   "ax": 12,
+   "ay": 36
+  },
+  "fx_ch1_root_spike_5": {
+   "x": 96,
+   "y": 88,
+   "w": 24,
+   "h": 40,
+   "ax": 12,
+   "ay": 36
+  },
+  "fx_ch1_root_spike_6": {
+   "x": 120,
+   "y": 88,
+   "w": 24,
+   "h": 40,
+   "ax": 12,
+   "ay": 36
+  },
+  "fx_ch1_stag_slam_rubble_1": {
+   "x": 0,
+   "y": 128,
+   "w": 48,
+   "h": 24,
+   "ax": 24,
+   "ay": 22
+  },
+  "fx_ch1_stag_slam_rubble_2": {
+   "x": 48,
+   "y": 128,
+   "w": 48,
+   "h": 24,
+   "ax": 24,
+   "ay": 22
+  },
+  "fx_ch1_stag_slam_rubble_3": {
+   "x": 96,
+   "y": 128,
+   "w": 48,
+   "h": 24,
+   "ax": 24,
+   "ay": 22
+  },
+  "fx_ch1_stag_slam_rubble_4": {
+   "x": 144,
+   "y": 128,
+   "w": 48,
+   "h": 24,
+   "ax": 24,
+   "ay": 22
+  },
+  "fx_ch1_stag_slam_rubble_5": {
+   "x": 192,
+   "y": 128,
+   "w": 48,
+   "h": 24,
+   "ax": 24,
+   "ay": 22
+  },
+  "fx_ch1_purify_sparkle_1": {
+   "x": 0,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  },
+  "fx_ch1_purify_sparkle_2": {
+   "x": 48,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  },
+  "fx_ch1_purify_sparkle_3": {
+   "x": 96,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  },
+  "fx_ch1_purify_sparkle_4": {
+   "x": 144,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  },
+  "fx_ch1_purify_sparkle_5": {
+   "x": 192,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  },
+  "fx_ch1_purify_sparkle_6": {
+   "x": 240,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  },
+  "fx_ch1_purify_sparkle_7": {
+   "x": 288,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  },
+  "fx_ch1_purify_sparkle_8": {
+   "x": 336,
+   "y": 152,
+   "w": 48,
+   "h": 48,
+   "ax": 24,
+   "ay": 40
+  }
+ }
+}

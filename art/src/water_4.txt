@@ -1,18 +1,18 @@
 # kind: tile
-# seamless: true
-mmnnmmmmmmmmmmmm
-mooommmmmmmmmmmm
-mmmmmmmmmmmmmmmm
-mmmmmmmmmmmmmmmm
-mmnnmmmmmmmmmmmm
-mmmmmmmmmmmmmmmm
-mmmmmmmmmmmmmmmm
-mmmmmmmnnmmmmmmm
-mmllmmnonmmmmmmm
-mmmmnnmmmmmmmmmm
-mmmmmmnnnmmmmmmm
-mmmmmmmmmmmmmnmm
-mmmmmmmmmmmmmmmm
-mmmmmmmmmmmmmmmm
-mmmmmmmmmmmmmmmm
-mmmmmmmmmmmmmmno
+# imported from Water.png (Gemini), cell 4
+llllllllllllllll
+lllllllllllmllll
+llllllllllllmlll
+llllllllllllllll
+llllllllllllllll
+llllllllmmmlllll
+llllllllllllllll
+llllllllllllllll
+llmmllllllllllll
+mmmlllllllllllmm
+lllkllllllmmllll
+llllmmllllllllll
+llllllllllllllll
+lllllllllllmmlll
+llllllllllllllll
+lllmmlllllllllll

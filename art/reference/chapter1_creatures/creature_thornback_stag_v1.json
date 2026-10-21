@@ -1,0 +1,577 @@
+{
+ "generator": "tools/art/make_chapter1_creatures_art.py (procedural, Pillow only, deterministic)",
+ "palette": "Totoy 36, hard alpha; no reserved gold x,y or red z,A anywhere",
+ "scale": "1x game pixels (previews are nearest-neighbour copies)",
+ "status": "Reference art for the human's approval; not imported into art/src, not wired into the game",
+ "facing": "right; mirror around the anchor for left",
+ "ticks": "60 ticks per second; ticks_per_frame are suggestions only (state lengths are core decisions)",
+ "creature": "Thornback Stag",
+ "id": "thornback_stag",
+ "cell": {
+  "w": 96,
+  "h": 64,
+  "anchor": [
+   36,
+   62
+  ]
+ },
+ "states": {
+  "idle": {
+   "frames": 4,
+   "ticks_per_frame": 14,
+   "loop": true,
+   "names": "creature_thornback_stag_idle_1..4",
+   "note": "breathing; the antler fragment pulses"
+  },
+  "walk": {
+   "frames": 6,
+   "ticks_per_frame": 6,
+   "loop": true,
+   "names": "creature_thornback_stag_walk_1..6",
+   "note": "stately walk"
+  },
+  "slam_raise": {
+   "frames": 4,
+   "ticks_per_frame": "telegraph",
+   "loop": false,
+   "names": "creature_thornback_stag_slam_raise_1..4",
+   "note": "GOLD antler-slam windup: rears up, antlers back. Telegraph-driven, hold 4"
+  },
+  "slam_strike": {
+   "frames": 3,
+   "ticks_per_frame": 4,
+   "loop": false,
+   "names": "creature_thornback_stag_slam_strike_1..3",
+   "note": "drives the antlers into the ground (draw fx_ch1_stag_slam_rubble at the antler tips from frame 2)"
+  },
+  "slam_recover": {
+   "frames": 4,
+   "ticks_per_frame": 8,
+   "loop": false,
+   "names": "creature_thornback_stag_slam_recover_1..4",
+   "note": "pulls the antlers free, stands"
+  },
+  "charge_tell": {
+   "frames": 5,
+   "ticks_per_frame": "telegraph",
+   "loop": false,
+   "names": "creature_thornback_stag_charge_tell_1..5",
+   "note": "RED charge tell: head lowered, paws, antlers glow teal at the rim. Telegraph-driven over 5 frames, hold 5"
+  },
+  "charge_run": {
+   "frames": 4,
+   "ticks_per_frame": 3,
+   "loop": true,
+   "names": "creature_thornback_stag_charge_run_1..4",
+   "note": "gallop loop, antlers forward and glowing"
+  },
+  "charge_crash": {
+   "frames": 3,
+   "ticks_per_frame": 10,
+   "loop": false,
+   "names": "creature_thornback_stag_charge_crash_1..3",
+   "note": "1 = impact, 2-3 dazed (loop 2-3 while stunned)"
+  },
+  "phase2_roar": {
+   "frames": 6,
+   "ticks_per_frame": 8,
+   "loop": false,
+   "names": "creature_thornback_stag_phase2_roar_1..6",
+   "note": "phase-two transition: rears, roars, roots burst from the ground around it; spawn fx_ch1_root_spike where the core puts its spikes"
+  },
+  "hurt": {
+   "frames": 3,
+   "ticks_per_frame": 4,
+   "loop": false,
+   "names": "creature_thornback_stag_hurt_1..3",
+   "note": "flash + recoil"
+  },
+  "stagger": {
+   "frames": 4,
+   "ticks_per_frame": 10,
+   "loop": true,
+   "names": "creature_thornback_stag_stagger_1..4",
+   "note": "posture broken: head low, legs splayed, dizzy motes circle; loop"
+  },
+  "death": {
+   "frames": 8,
+   "ticks_per_frame": 9,
+   "loop": false,
+   "names": "creature_thornback_stag_death_1..8",
+   "note": "defeat (not a kill): stumbles, kneels, lies down; lilac corruption motes leave the body; eyes close. Then play fx_ch1_purify_sparkle and switch to freed"
+  },
+  "freed": {
+   "frames": 4,
+   "ticks_per_frame": 14,
+   "loop": true,
+   "names": "creature_thornback_stag_freed_1..4",
+   "note": "purified: calm eye, flowers in the moss, the front antler and fragment glow a soft pale beacon colour, no lilac veins"
+  }
+ },
+ "frames": {
+  "creature_thornback_stag_idle_1": {
+   "x": 0,
+   "y": 0,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_idle_2": {
+   "x": 96,
+   "y": 0,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_idle_3": {
+   "x": 192,
+   "y": 0,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_idle_4": {
+   "x": 288,
+   "y": 0,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_walk_1": {
+   "x": 0,
+   "y": 64,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_walk_2": {
+   "x": 96,
+   "y": 64,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_walk_3": {
+   "x": 192,
+   "y": 64,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_walk_4": {
+   "x": 288,
+   "y": 64,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_walk_5": {
+   "x": 384,
+   "y": 64,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_walk_6": {
+   "x": 480,
+   "y": 64,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_raise_1": {
+   "x": 0,
+   "y": 128,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_raise_2": {
+   "x": 96,
+   "y": 128,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_raise_3": {
+   "x": 192,
+   "y": 128,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_raise_4": {
+   "x": 288,
+   "y": 128,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_strike_1": {
+   "x": 0,
+   "y": 192,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_strike_2": {
+   "x": 96,
+   "y": 192,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_strike_3": {
+   "x": 192,
+   "y": 192,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_recover_1": {
+   "x": 0,
+   "y": 256,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_recover_2": {
+   "x": 96,
+   "y": 256,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_recover_3": {
+   "x": 192,
+   "y": 256,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_slam_recover_4": {
+   "x": 288,
+   "y": 256,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_tell_1": {
+   "x": 0,
+   "y": 320,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_tell_2": {
+   "x": 96,
+   "y": 320,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_tell_3": {
+   "x": 192,
+   "y": 320,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_tell_4": {
+   "x": 288,
+   "y": 320,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_tell_5": {
+   "x": 384,
+   "y": 320,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_run_1": {
+   "x": 0,
+   "y": 384,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_run_2": {
+   "x": 96,
+   "y": 384,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_run_3": {
+   "x": 192,
+   "y": 384,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_run_4": {
+   "x": 288,
+   "y": 384,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_crash_1": {
+   "x": 0,
+   "y": 448,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_crash_2": {
+   "x": 96,
+   "y": 448,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_charge_crash_3": {
+   "x": 192,
+   "y": 448,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_phase2_roar_1": {
+   "x": 0,
+   "y": 512,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_phase2_roar_2": {
+   "x": 96,
+   "y": 512,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_phase2_roar_3": {
+   "x": 192,
+   "y": 512,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_phase2_roar_4": {
+   "x": 288,
+   "y": 512,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_phase2_roar_5": {
+   "x": 384,
+   "y": 512,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_phase2_roar_6": {
+   "x": 480,
+   "y": 512,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_hurt_1": {
+   "x": 0,
+   "y": 576,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_hurt_2": {
+   "x": 96,
+   "y": 576,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_hurt_3": {
+   "x": 192,
+   "y": 576,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_stagger_1": {
+   "x": 0,
+   "y": 640,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_stagger_2": {
+   "x": 96,
+   "y": 640,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_stagger_3": {
+   "x": 192,
+   "y": 640,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_stagger_4": {
+   "x": 288,
+   "y": 640,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_1": {
+   "x": 0,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_2": {
+   "x": 96,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_3": {
+   "x": 192,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_4": {
+   "x": 288,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_5": {
+   "x": 384,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_6": {
+   "x": 480,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_7": {
+   "x": 576,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_death_8": {
+   "x": 672,
+   "y": 704,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_freed_1": {
+   "x": 0,
+   "y": 768,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_freed_2": {
+   "x": 96,
+   "y": 768,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_freed_3": {
+   "x": 192,
+   "y": 768,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  },
+  "creature_thornback_stag_freed_4": {
+   "x": 288,
+   "y": 768,
+   "w": 96,
+   "h": 64,
+   "ax": 36,
+   "ay": 62
+  }
+ }
+}

@@ -115,14 +115,14 @@ def shrink(image: Image.Image, mask: Image.Image, scale: float) -> tuple[Image.I
     return Image.merge("RGB", small_pre), small_a
 
 
-def to_grid(small_pre: Image.Image, small_a: Image.Image, quant: Quantizer, palette: artlib.Palette) -> list[list[str]]:
+def to_grid(small_pre: Image.Image, small_a: Image.Image, quant: Quantizer, palette: artlib.Palette, threshold: int = 120) -> list[list[str]]:
     w, h = small_a.size
     pp, ap = small_pre.load(), small_a.load()
     grid = [[palette.transparent] * w for _ in range(h)]
     for y in range(h):
         for x in range(w):
             a = ap[x, y]
-            if a < 120:
+            if a < threshold:
                 continue
             r, g, b = pp[x, y]
             k = 255.0 / a

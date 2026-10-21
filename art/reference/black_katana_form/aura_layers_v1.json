@@ -1,0 +1,10 @@
+{
+  "status": "Animated concept preview; not wired to gameplay",
+  "tool": "Built-in image_gen",
+  "reference": "concept_v1.png",
+  "source": "aura_layers_v1.png",
+  "source_sha256": "b1176ec6831f161cb01d3bf9bfa9d50e4ed790e3fe01f987c1bf4026099855d2",
+  "layout": "Six columns: time steps. Top row behind hero, bottom row in front. Row crops 0..380 and400..706. Each column362px.",
+  "preview": "6 frames at100ms, independent aura layers over existing walk/dash/attack1/parry sprites. Hard-alpha224 before BOX downsampling, output threshold128, palette0eklv. Preview only, not final animation timing.",
+  "runtime_requirement": "Core supplies active buff and equipped weapon state plus buff timing/events. Presentation maintains aura loop across state changes, trails follow movement and black sword sweeps follow core attack phases. No automatic buff or gameplay rules inferred from inputs."
+}

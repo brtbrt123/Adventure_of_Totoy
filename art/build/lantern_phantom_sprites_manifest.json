@@ -1,0 +1,11631 @@
+{
+ "generator": "tools/art/import_lantern_phantom_sprites.py",
+ "art": "tools/art/make_aspect_lantern_phantom_art.py (v2); reference and review files: art/reference/aspects_lantern_phantom/README.md",
+ "note": "Sprite groups: name -> frame count (frames are <name>_1..N), sizes, anchors per frame and their meaning, suggested ms per frame. Anchors are the point that goes on the given world position; mirror around the anchor for a left-facing hero.",
+ "glow_naming": "fx_phantom_glow_<hero frame name>_<phase 1..6>: the buff glow over that exact hero frame (hero2_*, totoy_dagger_*, totoy_scythe_*: idle, walk, dash, parry, hurt, attack<s> 1-6). Phase = (ticks since the buff started / about 5 ticks at 60 Hz) % 6 + 1 (about 80 ms), independent of the hero frame. Draw it on top of the hero frame with the same position and mirroring, by its own anchor (it is cropped). Missing name (victory, coil poses, lightning set): draw nothing.",
+ "weapons": {
+  "katana": {
+   "hero_set": "hero2",
+   "swings": 3
+  },
+  "dagger": {
+   "hero_set": "totoy_dagger",
+   "swings": 4
+  },
+  "scythe": {
+   "hero_set": "totoy_scythe",
+   "swings": 3
+  }
+ },
+ "ghost_offset_px": 8,
+ "pool_radius_px": {
+  "rx": 44.0,
+  "ry": 20.0
+ },
+ "counts": {
+  "fx_lantern": 44,
+  "fx_phantom_glow": 792,
+  "fx_phantom_other": 98,
+  "ui_aspect": 6,
+  "total": 940
+ },
+ "sprites": {
+  "fx_lantern_fade": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    90,
+    90,
+    100,
+    120,
+    90,
+    90
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "lantern's ground point (16,29)"
+  },
+  "fx_lantern_idle": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    110,
+    110,
+    110,
+    110,
+    110,
+    110
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "lantern's ground point (16,29)"
+  },
+  "fx_lantern_motes": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     38
+    ],
+    [
+     16,
+     38
+    ],
+    [
+     16,
+     38
+    ],
+    [
+     16,
+     38
+    ],
+    [
+     16,
+     38
+    ],
+    [
+     16,
+     38
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ]
+   ],
+   "ms": [
+    70,
+    70,
+    70,
+    70,
+    70,
+    70
+   ],
+   "anchor": [
+    16,
+    38
+   ],
+   "size": [
+    32,
+    40
+   ],
+   "anchor_meaning": "Totoy's feet (16,38); heal motes, draw over the hero on a pulse while he stands in the light"
+  },
+  "fx_lantern_place": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    60,
+    60,
+    70,
+    80
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "lantern's ground point (16,29)"
+  },
+  "fx_lantern_pool_idle": {
+   "frames": 4,
+   "anchors": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ]
+   ],
+   "ms": [
+    140,
+    140,
+    140,
+    140
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "size": [
+    96,
+    48
+   ],
+   "anchor_meaning": "lantern's ground point = pool centre (48,24); floor decal, draw under every character; ellipse rx 44 / ry 20"
+  },
+  "fx_lantern_pool_open": {
+   "frames": 3,
+   "anchors": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ]
+   ],
+   "ms": [
+    50,
+    50,
+    50
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "size": [
+    96,
+    48
+   ],
+   "anchor_meaning": "lantern's ground point = pool centre (48,24); floor decal, draw under every character; ellipse rx 44 / ry 20"
+  },
+  "fx_lantern_pool_pulse": {
+   "frames": 5,
+   "anchors": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ],
+    [
+     96,
+     48
+    ]
+   ],
+   "ms": [
+    55,
+    55,
+    55,
+    55,
+    55
+   ],
+   "anchor": [
+    48,
+    24
+   ],
+   "size": [
+    96,
+    48
+   ],
+   "anchor_meaning": "lantern's ground point = pool centre (48,24); floor decal, draw under every character; ellipse rx 44 / ry 20"
+  },
+  "fx_lantern_pulse": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ],
+    [
+     16,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    50,
+    60,
+    60,
+    80
+   ],
+   "anchor": [
+    16,
+    29
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "lantern's ground point (16,29)"
+  },
+  "fx_lantern_spark": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    55,
+    55,
+    55,
+    55,
+    55,
+    55
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "Totoy's chest / weapon hand (16,16), about feet + (2,-15); Edge sparks, start 1-2 frames after motes 1"
+  },
+  "fx_phantom_arc_dagger_1": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 1,
+   "anchor": [
+    16,
+    44
+   ],
+   "size": [
+    64,
+    48
+   ],
+   "anchor_meaning": "the phantom's feet (16,44); draw over the ghost"
+  },
+  "fx_phantom_arc_dagger_2": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 2,
+   "anchor": [
+    16,
+    44
+   ],
+   "size": [
+    64,
+    48
+   ],
+   "anchor_meaning": "the phantom's feet (16,44); draw over the ghost"
+  },
+  "fx_phantom_arc_dagger_3": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 3,
+   "anchor": [
+    16,
+    44
+   ],
+   "size": [
+    64,
+    48
+   ],
+   "anchor_meaning": "the phantom's feet (16,44); draw over the ghost"
+  },
+  "fx_phantom_arc_dagger_4": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ],
+    [
+     16,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 4,
+   "anchor": [
+    16,
+    44
+   ],
+   "size": [
+    64,
+    48
+   ],
+   "anchor_meaning": "the phantom's feet (16,44); draw over the ghost"
+  },
+  "fx_phantom_arc_katana_1": {
+   "frames": 4,
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 1,
+   "anchor": [
+    40,
+    56
+   ],
+   "size": [
+    96,
+    64
+   ],
+   "anchor_meaning": "the phantom's feet (40,56); draw over the ghost"
+  },
+  "fx_phantom_arc_katana_2": {
+   "frames": 4,
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 2,
+   "anchor": [
+    40,
+    56
+   ],
+   "size": [
+    96,
+    64
+   ],
+   "anchor_meaning": "the phantom's feet (40,56); draw over the ghost"
+  },
+  "fx_phantom_arc_katana_3": {
+   "frames": 4,
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 3,
+   "anchor": [
+    40,
+    56
+   ],
+   "size": [
+    96,
+    64
+   ],
+   "anchor_meaning": "the phantom's feet (40,56); draw over the ghost"
+  },
+  "fx_phantom_arc_scythe_1": {
+   "frames": 4,
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 1,
+   "anchor": [
+    40,
+    56
+   ],
+   "size": [
+    96,
+    64
+   ],
+   "anchor_meaning": "the phantom's feet (40,56); same canvas as fx_scythe_arc_*; draw over the ghost"
+  },
+  "fx_phantom_arc_scythe_2": {
+   "frames": 4,
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 2,
+   "anchor": [
+    40,
+    56
+   ],
+   "size": [
+    96,
+    64
+   ],
+   "anchor_meaning": "the phantom's feet (40,56); same canvas as fx_scythe_arc_*; draw over the ghost"
+  },
+  "fx_phantom_arc_scythe_3": {
+   "frames": 4,
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "ms": [
+    35,
+    55,
+    55,
+    70
+   ],
+   "swing": 3,
+   "anchor": [
+    40,
+    56
+   ],
+   "size": [
+    96,
+    64
+   ],
+   "anchor_meaning": "the phantom's feet (40,56); same canvas as fx_scythe_arc_*; draw over the ghost"
+  },
+  "fx_phantom_end": {
+   "frames": 4,
+   "anchors": [
+    [
+     24,
+     44
+    ],
+    [
+     24,
+     44
+    ],
+    [
+     24,
+     44
+    ],
+    [
+     24,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ]
+   ],
+   "ms": [
+    70,
+    70,
+    80,
+    90
+   ],
+   "anchor": [
+    24,
+    44
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor_meaning": "Totoy's feet (24,44); buff end fade, over the hero"
+  },
+  "fx_phantom_ghost_dagger_1": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     24,
+     33
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     32
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     48,
+     40
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "totoy_dagger_attack1_right_3",
+    "totoy_dagger_attack1_right_4",
+    "totoy_dagger_attack1_right_4",
+    "totoy_dagger_attack1_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_dagger_2": {
+   "frames": 4,
+   "anchors": [
+    [
+     12,
+     32
+    ],
+    [
+     15,
+     44
+    ],
+    [
+     15,
+     44
+    ],
+    [
+     12,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     40
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "totoy_dagger_attack2_right_3",
+    "totoy_dagger_attack2_right_4",
+    "totoy_dagger_attack2_right_4",
+    "totoy_dagger_attack2_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_dagger_3": {
+   "frames": 4,
+   "anchors": [
+    [
+     20,
+     27
+    ],
+    [
+     27,
+     25
+    ],
+    [
+     27,
+     25
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "totoy_dagger_attack3_right_3",
+    "totoy_dagger_attack3_right_4",
+    "totoy_dagger_attack3_right_4",
+    "totoy_dagger_attack3_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_dagger_4": {
+   "frames": 4,
+   "anchors": [
+    [
+     20,
+     27
+    ],
+    [
+     27,
+     25
+    ],
+    [
+     27,
+     25
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "totoy_dagger_attack4_right_3",
+    "totoy_dagger_attack4_right_4",
+    "totoy_dagger_attack4_right_4",
+    "totoy_dagger_attack4_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_katana_1": {
+   "frames": 4,
+   "anchors": [
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     24,
+     33
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     32
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     48,
+     40
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "hero2_attack1_right_3",
+    "hero2_attack1_right_4",
+    "hero2_attack1_right_4",
+    "hero2_attack1_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_katana_2": {
+   "frames": 4,
+   "anchors": [
+    [
+     12,
+     32
+    ],
+    [
+     15,
+     36
+    ],
+    [
+     15,
+     36
+    ],
+    [
+     12,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "hero2_attack2_right_3",
+    "hero2_attack2_right_4",
+    "hero2_attack2_right_4",
+    "hero2_attack2_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_katana_3": {
+   "frames": 4,
+   "anchors": [
+    [
+     20,
+     27
+    ],
+    [
+     27,
+     25
+    ],
+    [
+     27,
+     25
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "hero2_attack3_right_3",
+    "hero2_attack3_right_4",
+    "hero2_attack3_right_4",
+    "hero2_attack3_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_scythe_1": {
+   "frames": 4,
+   "anchors": [
+    [
+     24,
+     27
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     33
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     32
+    ],
+    [
+     64,
+     40
+    ],
+    [
+     64,
+     40
+    ],
+    [
+     56,
+     40
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "totoy_scythe_attack1_right_3",
+    "totoy_scythe_attack1_right_4",
+    "totoy_scythe_attack1_right_4",
+    "totoy_scythe_attack1_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_scythe_2": {
+   "frames": 4,
+   "anchors": [
+    [
+     20,
+     32
+    ],
+    [
+     15,
+     44
+    ],
+    [
+     15,
+     44
+    ],
+    [
+     18,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     40
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "totoy_scythe_attack2_right_3",
+    "totoy_scythe_attack2_right_4",
+    "totoy_scythe_attack2_right_4",
+    "totoy_scythe_attack2_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_ghost_scythe_3": {
+   "frames": 4,
+   "anchors": [
+    [
+     20,
+     27
+    ],
+    [
+     27,
+     33
+    ],
+    [
+     27,
+     33
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     56,
+     32
+    ]
+   ],
+   "ms": [
+    40,
+    60,
+    60,
+    70
+   ],
+   "sources": [
+    "totoy_scythe_attack3_right_3",
+    "totoy_scythe_attack3_right_4",
+    "totoy_scythe_attack3_right_4",
+    "totoy_scythe_attack3_right_5"
+   ],
+   "anchor_meaning": "the phantom's feet = Totoy's feet + ghost_offset_px along his facing; same canvas/anchor as the source attack frame"
+  },
+  "fx_phantom_glow_hero2_attack1_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     15,
+     27
+    ],
+    [
+     15,
+     27
+    ],
+    [
+     15,
+     27
+    ],
+    [
+     15,
+     27
+    ],
+    [
+     15,
+     27
+    ],
+    [
+     15,
+     27
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack1_right_1",
+   "anchor": [
+    15,
+    27
+   ],
+   "size": [
+    16,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack1_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     17,
+     28
+    ],
+    [
+     17,
+     28
+    ],
+    [
+     17,
+     28
+    ],
+    [
+     17,
+     28
+    ],
+    [
+     17,
+     28
+    ],
+    [
+     17,
+     28
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack1_right_2",
+   "anchor": [
+    17,
+    28
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack1_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     23
+    ],
+    [
+     0,
+     23
+    ],
+    [
+     0,
+     23
+    ],
+    [
+     0,
+     23
+    ],
+    [
+     0,
+     23
+    ],
+    [
+     0,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack1_right_3",
+   "anchor": [
+    0,
+    23
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack1_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack1_right_4",
+   "anchor": [
+    0,
+    25
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack1_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack1_right_5",
+   "anchor": [
+    21,
+    26
+   ],
+   "size": [
+    40,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack1_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     25
+    ],
+    [
+     4,
+     25
+    ],
+    [
+     4,
+     25
+    ],
+    [
+     4,
+     25
+    ],
+    [
+     4,
+     25
+    ],
+    [
+     4,
+     25
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack1_right_6",
+   "anchor": [
+    4,
+    25
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack2_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     17,
+     15
+    ],
+    [
+     17,
+     15
+    ],
+    [
+     17,
+     15
+    ],
+    [
+     17,
+     15
+    ],
+    [
+     17,
+     15
+    ],
+    [
+     17,
+     15
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack2_right_1",
+   "anchor": [
+    17,
+    15
+   ],
+   "size": [
+    24,
+    16
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack2_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     17,
+     20
+    ],
+    [
+     17,
+     20
+    ],
+    [
+     17,
+     20
+    ],
+    [
+     17,
+     20
+    ],
+    [
+     17,
+     20
+    ],
+    [
+     17,
+     20
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack2_right_2",
+   "anchor": [
+    17,
+    20
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack2_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     32
+    ],
+    [
+     4,
+     32
+    ],
+    [
+     4,
+     32
+    ],
+    [
+     4,
+     32
+    ],
+    [
+     4,
+     32
+    ],
+    [
+     4,
+     32
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack2_right_3",
+   "anchor": [
+    4,
+    32
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack2_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     36
+    ],
+    [
+     0,
+     36
+    ],
+    [
+     0,
+     36
+    ],
+    [
+     0,
+     36
+    ],
+    [
+     0,
+     36
+    ],
+    [
+     0,
+     36
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack2_right_4",
+   "anchor": [
+    0,
+    36
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack2_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     29
+    ],
+    [
+     0,
+     29
+    ],
+    [
+     0,
+     29
+    ],
+    [
+     0,
+     29
+    ],
+    [
+     0,
+     29
+    ],
+    [
+     0,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack2_right_5",
+   "anchor": [
+    0,
+    29
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack2_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     2,
+     23
+    ],
+    [
+     2,
+     23
+    ],
+    [
+     2,
+     23
+    ],
+    [
+     2,
+     23
+    ],
+    [
+     2,
+     23
+    ],
+    [
+     2,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack2_right_6",
+   "anchor": [
+    2,
+    23
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack3_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     7,
+     36
+    ],
+    [
+     7,
+     36
+    ],
+    [
+     7,
+     36
+    ],
+    [
+     7,
+     36
+    ],
+    [
+     7,
+     36
+    ],
+    [
+     7,
+     36
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack3_right_1",
+   "anchor": [
+    7,
+    36
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack3_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     1,
+     34
+    ],
+    [
+     1,
+     34
+    ],
+    [
+     1,
+     34
+    ],
+    [
+     1,
+     34
+    ],
+    [
+     1,
+     34
+    ],
+    [
+     1,
+     34
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack3_right_2",
+   "anchor": [
+    1,
+    34
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack3_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack3_right_3",
+   "anchor": [
+    4,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack3_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     3,
+     11
+    ],
+    [
+     3,
+     11
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack3_right_4",
+   "anchor": [
+    3,
+    11
+   ],
+   "size": [
+    24,
+    16
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack3_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ],
+    [
+     24,
+     16
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack3_right_5",
+   "anchor": [
+    0,
+    12
+   ],
+   "size": [
+    24,
+    16
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_attack3_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_attack3_right_6",
+   "anchor": [
+    3,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_dash_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ],
+    [
+     21,
+     26
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_dash_right_1",
+   "anchor": [
+    21,
+    26
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_dash_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     21
+    ],
+    [
+     16,
+     21
+    ],
+    [
+     16,
+     21
+    ],
+    [
+     16,
+     21
+    ],
+    [
+     16,
+     21
+    ],
+    [
+     16,
+     21
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_dash_right_2",
+   "anchor": [
+    16,
+    21
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_dash_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     19,
+     22
+    ],
+    [
+     19,
+     22
+    ],
+    [
+     19,
+     22
+    ],
+    [
+     19,
+     22
+    ],
+    [
+     19,
+     22
+    ],
+    [
+     19,
+     22
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_dash_right_3",
+   "anchor": [
+    19,
+    22
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_dash_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     38,
+     21
+    ],
+    [
+     38,
+     21
+    ],
+    [
+     38,
+     21
+    ],
+    [
+     38,
+     21
+    ],
+    [
+     38,
+     21
+    ],
+    [
+     38,
+     21
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_dash_right_4",
+   "anchor": [
+    38,
+    21
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_hurt_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     35
+    ],
+    [
+     4,
+     35
+    ],
+    [
+     4,
+     35
+    ],
+    [
+     4,
+     35
+    ],
+    [
+     4,
+     35
+    ],
+    [
+     4,
+     35
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_hurt_right_1",
+   "anchor": [
+    4,
+    35
+   ],
+   "size": [
+    24,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_hurt_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     5,
+     23
+    ],
+    [
+     5,
+     23
+    ],
+    [
+     5,
+     23
+    ],
+    [
+     5,
+     23
+    ],
+    [
+     5,
+     23
+    ],
+    [
+     5,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_hurt_right_2",
+   "anchor": [
+    5,
+    23
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_hurt_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     29
+    ],
+    [
+     3,
+     29
+    ],
+    [
+     3,
+     29
+    ],
+    [
+     3,
+     29
+    ],
+    [
+     3,
+     29
+    ],
+    [
+     3,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_hurt_right_3",
+   "anchor": [
+    3,
+    29
+   ],
+   "size": [
+    16,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_hurt_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     27
+    ],
+    [
+     3,
+     27
+    ],
+    [
+     3,
+     27
+    ],
+    [
+     3,
+     27
+    ],
+    [
+     3,
+     27
+    ],
+    [
+     3,
+     27
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_hurt_right_4",
+   "anchor": [
+    3,
+    27
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_idle_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_idle_right_1",
+   "anchor": [
+    4,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_idle_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     35
+    ],
+    [
+     3,
+     35
+    ],
+    [
+     3,
+     35
+    ],
+    [
+     3,
+     35
+    ],
+    [
+     3,
+     35
+    ],
+    [
+     3,
+     35
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_idle_right_2",
+   "anchor": [
+    3,
+    35
+   ],
+   "size": [
+    24,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_idle_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_idle_right_3",
+   "anchor": [
+    3,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_idle_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ],
+    [
+     3,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_idle_right_4",
+   "anchor": [
+    3,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_parry_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_parry_right_1",
+   "anchor": [
+    0,
+    31
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_parry_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_parry_right_2",
+   "anchor": [
+    0,
+    32
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_parry_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ],
+    [
+     0,
+     32
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_parry_right_3",
+   "anchor": [
+    0,
+    32
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_parry_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_parry_right_4",
+   "anchor": [
+    0,
+    31
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_parry_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     24,
+     35
+    ],
+    [
+     24,
+     35
+    ],
+    [
+     24,
+     35
+    ],
+    [
+     24,
+     35
+    ],
+    [
+     24,
+     35
+    ],
+    [
+     24,
+     35
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_parry_right_5",
+   "anchor": [
+    24,
+    35
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_parry_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     20
+    ],
+    [
+     3,
+     20
+    ],
+    [
+     3,
+     20
+    ],
+    [
+     3,
+     20
+    ],
+    [
+     3,
+     20
+    ],
+    [
+     3,
+     20
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_parry_right_6",
+   "anchor": [
+    3,
+    20
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_walk_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     1,
+     18
+    ],
+    [
+     1,
+     18
+    ],
+    [
+     1,
+     18
+    ],
+    [
+     1,
+     18
+    ],
+    [
+     1,
+     18
+    ],
+    [
+     1,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_walk_right_1",
+   "anchor": [
+    1,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_walk_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     17
+    ],
+    [
+     4,
+     17
+    ],
+    [
+     4,
+     17
+    ],
+    [
+     4,
+     17
+    ],
+    [
+     4,
+     17
+    ],
+    [
+     4,
+     17
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_walk_right_2",
+   "anchor": [
+    4,
+    17
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_walk_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_walk_right_3",
+   "anchor": [
+    3,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_walk_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ],
+    [
+     3,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_walk_right_4",
+   "anchor": [
+    3,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_walk_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     18
+    ],
+    [
+     4,
+     18
+    ],
+    [
+     4,
+     18
+    ],
+    [
+     4,
+     18
+    ],
+    [
+     4,
+     18
+    ],
+    [
+     4,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_walk_right_5",
+   "anchor": [
+    4,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_hero2_walk_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     2,
+     19
+    ],
+    [
+     2,
+     19
+    ],
+    [
+     2,
+     19
+    ],
+    [
+     2,
+     19
+    ],
+    [
+     2,
+     19
+    ],
+    [
+     2,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "hero2_walk_right_6",
+   "anchor": [
+    2,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack1_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack1_right_1",
+   "anchor": [
+    18,
+    21
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack1_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     13,
+     28
+    ],
+    [
+     13,
+     28
+    ],
+    [
+     13,
+     28
+    ],
+    [
+     13,
+     28
+    ],
+    [
+     13,
+     28
+    ],
+    [
+     13,
+     28
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack1_right_2",
+   "anchor": [
+    13,
+    28
+   ],
+   "size": [
+    40,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack1_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     21
+    ],
+    [
+     0,
+     21
+    ],
+    [
+     0,
+     21
+    ],
+    [
+     0,
+     21
+    ],
+    [
+     0,
+     21
+    ],
+    [
+     0,
+     21
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack1_right_3",
+   "anchor": [
+    0,
+    21
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack1_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     25
+    ],
+    [
+     16,
+     25
+    ],
+    [
+     16,
+     25
+    ],
+    [
+     16,
+     25
+    ],
+    [
+     16,
+     25
+    ],
+    [
+     16,
+     25
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack1_right_4",
+   "anchor": [
+    16,
+    25
+   ],
+   "size": [
+    48,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack1_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     6,
+     23
+    ],
+    [
+     6,
+     23
+    ],
+    [
+     6,
+     23
+    ],
+    [
+     6,
+     23
+    ],
+    [
+     6,
+     23
+    ],
+    [
+     6,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack1_right_5",
+   "anchor": [
+    6,
+    23
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack1_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack1_right_6",
+   "anchor": [
+    12,
+    18
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack2_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack2_right_1",
+   "anchor": [
+    8,
+    15
+   ],
+   "size": [
+    32,
+    16
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack2_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack2_right_2",
+   "anchor": [
+    12,
+    20
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack2_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     31
+    ],
+    [
+     4,
+     31
+    ],
+    [
+     4,
+     31
+    ],
+    [
+     4,
+     31
+    ],
+    [
+     4,
+     31
+    ],
+    [
+     4,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack2_right_3",
+   "anchor": [
+    4,
+    31
+   ],
+   "size": [
+    40,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack2_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     7,
+     44
+    ],
+    [
+     7,
+     44
+    ],
+    [
+     7,
+     44
+    ],
+    [
+     7,
+     44
+    ],
+    [
+     7,
+     44
+    ],
+    [
+     7,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     48
+    ],
+    [
+     24,
+     48
+    ],
+    [
+     24,
+     48
+    ],
+    [
+     24,
+     48
+    ],
+    [
+     24,
+     48
+    ],
+    [
+     24,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack2_right_4",
+   "anchor": [
+    7,
+    44
+   ],
+   "size": [
+    24,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack2_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack2_right_5",
+   "anchor": [
+    4,
+    23
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack2_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     9,
+     23
+    ],
+    [
+     9,
+     23
+    ],
+    [
+     9,
+     23
+    ],
+    [
+     9,
+     23
+    ],
+    [
+     9,
+     23
+    ],
+    [
+     9,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack2_right_6",
+   "anchor": [
+    9,
+    23
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack3_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     1,
+     36
+    ],
+    [
+     1,
+     36
+    ],
+    [
+     1,
+     36
+    ],
+    [
+     1,
+     36
+    ],
+    [
+     1,
+     36
+    ],
+    [
+     1,
+     36
+    ]
+   ],
+   "frame_sizes": [
+    [
+     8,
+     40
+    ],
+    [
+     8,
+     40
+    ],
+    [
+     8,
+     40
+    ],
+    [
+     8,
+     40
+    ],
+    [
+     8,
+     40
+    ],
+    [
+     8,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack3_right_1",
+   "anchor": [
+    1,
+    36
+   ],
+   "size": [
+    8,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack3_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     34
+    ],
+    [
+     0,
+     34
+    ],
+    [
+     0,
+     34
+    ],
+    [
+     0,
+     34
+    ],
+    [
+     0,
+     34
+    ],
+    [
+     0,
+     34
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack3_right_2",
+   "anchor": [
+    0,
+    34
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack3_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ],
+    [
+     4,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack3_right_3",
+   "anchor": [
+    4,
+    23
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack3_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ],
+    [
+     0,
+     12
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack3_right_4",
+   "anchor": [
+    0,
+    12
+   ],
+   "size": [
+    16,
+    16
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack3_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack3_right_5",
+   "anchor": [
+    0,
+    16
+   ],
+   "size": [
+    16,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack3_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack3_right_6",
+   "anchor": [
+    10,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack4_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     30
+    ],
+    [
+     0,
+     30
+    ],
+    [
+     0,
+     30
+    ],
+    [
+     0,
+     30
+    ],
+    [
+     0,
+     30
+    ],
+    [
+     0,
+     30
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack4_right_1",
+   "anchor": [
+    0,
+    30
+   ],
+   "size": [
+    16,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack4_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     3,
+     38
+    ],
+    [
+     3,
+     38
+    ],
+    [
+     3,
+     38
+    ],
+    [
+     3,
+     38
+    ],
+    [
+     3,
+     38
+    ],
+    [
+     3,
+     38
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack4_right_2",
+   "anchor": [
+    3,
+    38
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack4_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ],
+    [
+     4,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack4_right_3",
+   "anchor": [
+    4,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack4_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     19
+    ],
+    [
+     0,
+     19
+    ],
+    [
+     0,
+     19
+    ],
+    [
+     0,
+     19
+    ],
+    [
+     0,
+     19
+    ],
+    [
+     0,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack4_right_4",
+   "anchor": [
+    0,
+    19
+   ],
+   "size": [
+    16,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack4_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     16,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack4_right_5",
+   "anchor": [
+    0,
+    16
+   ],
+   "size": [
+    16,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_attack4_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ],
+    [
+     12,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_attack4_right_6",
+   "anchor": [
+    12,
+    18
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_dash_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     13,
+     21
+    ],
+    [
+     13,
+     21
+    ],
+    [
+     13,
+     21
+    ],
+    [
+     13,
+     21
+    ],
+    [
+     13,
+     21
+    ],
+    [
+     13,
+     21
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_dash_right_1",
+   "anchor": [
+    13,
+    21
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_dash_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     25
+    ],
+    [
+     10,
+     25
+    ],
+    [
+     10,
+     25
+    ],
+    [
+     10,
+     25
+    ],
+    [
+     10,
+     25
+    ],
+    [
+     10,
+     25
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_dash_right_2",
+   "anchor": [
+    10,
+    25
+   ],
+   "size": [
+    48,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_dash_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     7,
+     22
+    ],
+    [
+     7,
+     22
+    ],
+    [
+     7,
+     22
+    ],
+    [
+     7,
+     22
+    ],
+    [
+     7,
+     22
+    ],
+    [
+     7,
+     22
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_dash_right_3",
+   "anchor": [
+    7,
+    22
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_dash_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     32,
+     29
+    ],
+    [
+     32,
+     29
+    ],
+    [
+     32,
+     29
+    ],
+    [
+     32,
+     29
+    ],
+    [
+     32,
+     29
+    ],
+    [
+     32,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_dash_right_4",
+   "anchor": [
+    32,
+    29
+   ],
+   "size": [
+    48,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_hurt_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_hurt_right_1",
+   "anchor": [
+    10,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_hurt_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     13,
+     31
+    ],
+    [
+     13,
+     31
+    ],
+    [
+     13,
+     31
+    ],
+    [
+     13,
+     31
+    ],
+    [
+     13,
+     31
+    ],
+    [
+     13,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_hurt_right_2",
+   "anchor": [
+    13,
+    31
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_hurt_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     17,
+     31
+    ],
+    [
+     17,
+     31
+    ],
+    [
+     17,
+     31
+    ],
+    [
+     17,
+     31
+    ],
+    [
+     17,
+     31
+    ],
+    [
+     17,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_hurt_right_3",
+   "anchor": [
+    17,
+    31
+   ],
+   "size": [
+    40,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_hurt_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     35
+    ],
+    [
+     10,
+     35
+    ],
+    [
+     10,
+     35
+    ],
+    [
+     10,
+     35
+    ],
+    [
+     10,
+     35
+    ],
+    [
+     10,
+     35
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ],
+    [
+     24,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_hurt_right_4",
+   "anchor": [
+    10,
+    35
+   ],
+   "size": [
+    24,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_idle_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_idle_right_1",
+   "anchor": [
+    10,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_idle_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_idle_right_2",
+   "anchor": [
+    9,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_idle_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ],
+    [
+     9,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_idle_right_3",
+   "anchor": [
+    9,
+    19
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_idle_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     9,
+     27
+    ],
+    [
+     9,
+     27
+    ],
+    [
+     9,
+     27
+    ],
+    [
+     9,
+     27
+    ],
+    [
+     9,
+     27
+    ],
+    [
+     9,
+     27
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_idle_right_4",
+   "anchor": [
+    9,
+    27
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_parry_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_parry_right_1",
+   "anchor": [
+    0,
+    31
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_parry_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     0,
+     25
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_parry_right_2",
+   "anchor": [
+    0,
+    25
+   ],
+   "size": [
+    16,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_parry_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     26
+    ],
+    [
+     0,
+     26
+    ],
+    [
+     0,
+     26
+    ],
+    [
+     0,
+     26
+    ],
+    [
+     0,
+     26
+    ],
+    [
+     0,
+     26
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ],
+    [
+     16,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_parry_right_3",
+   "anchor": [
+    0,
+    26
+   ],
+   "size": [
+    16,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_parry_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ],
+    [
+     0,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ],
+    [
+     24,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_parry_right_4",
+   "anchor": [
+    0,
+    31
+   ],
+   "size": [
+    24,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_parry_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     35
+    ],
+    [
+     0,
+     35
+    ],
+    [
+     0,
+     35
+    ],
+    [
+     0,
+     35
+    ],
+    [
+     0,
+     35
+    ],
+    [
+     0,
+     35
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ],
+    [
+     16,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_parry_right_5",
+   "anchor": [
+    0,
+    35
+   ],
+   "size": [
+    16,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_parry_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     11,
+     18
+    ],
+    [
+     11,
+     18
+    ],
+    [
+     11,
+     18
+    ],
+    [
+     11,
+     18
+    ],
+    [
+     11,
+     18
+    ],
+    [
+     11,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_parry_right_6",
+   "anchor": [
+    11,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_walk_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ],
+    [
+     10,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_walk_right_1",
+   "anchor": [
+    10,
+    19
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_walk_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     12,
+     17
+    ],
+    [
+     12,
+     17
+    ],
+    [
+     12,
+     17
+    ],
+    [
+     12,
+     17
+    ],
+    [
+     12,
+     17
+    ],
+    [
+     12,
+     17
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_walk_right_2",
+   "anchor": [
+    12,
+    17
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_walk_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     11,
+     19
+    ],
+    [
+     11,
+     19
+    ],
+    [
+     11,
+     19
+    ],
+    [
+     11,
+     19
+    ],
+    [
+     11,
+     19
+    ],
+    [
+     11,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_walk_right_3",
+   "anchor": [
+    11,
+    19
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_walk_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ],
+    [
+     12,
+     20
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_walk_right_4",
+   "anchor": [
+    12,
+    20
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_walk_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_walk_right_5",
+   "anchor": [
+    10,
+    18
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_dagger_walk_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ],
+    [
+     10,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_dagger_walk_right_6",
+   "anchor": [
+    10,
+    18
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack1_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     19
+    ],
+    [
+     18,
+     19
+    ],
+    [
+     18,
+     19
+    ],
+    [
+     18,
+     19
+    ],
+    [
+     18,
+     19
+    ],
+    [
+     18,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack1_right_1",
+   "anchor": [
+    18,
+    19
+   ],
+   "size": [
+    56,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack1_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     21,
+     28
+    ],
+    [
+     21,
+     28
+    ],
+    [
+     21,
+     28
+    ],
+    [
+     21,
+     28
+    ],
+    [
+     21,
+     28
+    ],
+    [
+     21,
+     28
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack1_right_2",
+   "anchor": [
+    21,
+    28
+   ],
+   "size": [
+    56,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack1_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     21,
+     19
+    ],
+    [
+     21,
+     19
+    ],
+    [
+     21,
+     19
+    ],
+    [
+     21,
+     19
+    ],
+    [
+     21,
+     19
+    ],
+    [
+     21,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ],
+    [
+     56,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack1_right_3",
+   "anchor": [
+    21,
+    19
+   ],
+   "size": [
+    56,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack1_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     32,
+     26
+    ],
+    [
+     32,
+     26
+    ],
+    [
+     32,
+     26
+    ],
+    [
+     32,
+     26
+    ],
+    [
+     32,
+     26
+    ],
+    [
+     32,
+     26
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     32
+    ],
+    [
+     64,
+     32
+    ],
+    [
+     64,
+     32
+    ],
+    [
+     64,
+     32
+    ],
+    [
+     64,
+     32
+    ],
+    [
+     64,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack1_right_4",
+   "anchor": [
+    32,
+    26
+   ],
+   "size": [
+    64,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack1_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     25,
+     23
+    ],
+    [
+     25,
+     23
+    ],
+    [
+     25,
+     23
+    ],
+    [
+     25,
+     23
+    ],
+    [
+     25,
+     23
+    ],
+    [
+     25,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack1_right_5",
+   "anchor": [
+    25,
+    23
+   ],
+   "size": [
+    48,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack1_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     20,
+     18
+    ],
+    [
+     20,
+     18
+    ],
+    [
+     20,
+     18
+    ],
+    [
+     20,
+     18
+    ],
+    [
+     20,
+     18
+    ],
+    [
+     20,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack1_right_6",
+   "anchor": [
+    20,
+    18
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack2_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     22
+    ],
+    [
+     18,
+     22
+    ],
+    [
+     18,
+     22
+    ],
+    [
+     18,
+     22
+    ],
+    [
+     18,
+     22
+    ],
+    [
+     18,
+     22
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack2_right_1",
+   "anchor": [
+    18,
+    22
+   ],
+   "size": [
+    48,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack2_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     28
+    ],
+    [
+     18,
+     28
+    ],
+    [
+     18,
+     28
+    ],
+    [
+     18,
+     28
+    ],
+    [
+     18,
+     28
+    ],
+    [
+     18,
+     28
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack2_right_2",
+   "anchor": [
+    18,
+    28
+   ],
+   "size": [
+    48,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack2_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     20,
+     31
+    ],
+    [
+     20,
+     31
+    ],
+    [
+     20,
+     31
+    ],
+    [
+     20,
+     31
+    ],
+    [
+     20,
+     31
+    ],
+    [
+     20,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack2_right_3",
+   "anchor": [
+    20,
+    31
+   ],
+   "size": [
+    56,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack2_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     9,
+     44
+    ],
+    [
+     9,
+     44
+    ],
+    [
+     9,
+     44
+    ],
+    [
+     9,
+     44
+    ],
+    [
+     9,
+     44
+    ],
+    [
+     9,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack2_right_4",
+   "anchor": [
+    9,
+    44
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack2_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ],
+    [
+     18,
+     21
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack2_right_5",
+   "anchor": [
+    18,
+    21
+   ],
+   "size": [
+    48,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack2_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     20
+    ],
+    [
+     18,
+     20
+    ],
+    [
+     18,
+     20
+    ],
+    [
+     18,
+     20
+    ],
+    [
+     18,
+     20
+    ],
+    [
+     18,
+     20
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack2_right_6",
+   "anchor": [
+    18,
+    20
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack3_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     44
+    ],
+    [
+     18,
+     44
+    ],
+    [
+     18,
+     44
+    ],
+    [
+     18,
+     44
+    ],
+    [
+     18,
+     44
+    ],
+    [
+     18,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack3_right_1",
+   "anchor": [
+    18,
+    44
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack3_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     8,
+     34
+    ],
+    [
+     8,
+     34
+    ],
+    [
+     8,
+     34
+    ],
+    [
+     8,
+     34
+    ],
+    [
+     8,
+     34
+    ],
+    [
+     8,
+     34
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack3_right_2",
+   "anchor": [
+    8,
+    34
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack3_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     27
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack3_right_3",
+   "anchor": [
+    16,
+    27
+   ],
+   "size": [
+    40,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack3_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     23,
+     33
+    ],
+    [
+     23,
+     33
+    ],
+    [
+     23,
+     33
+    ],
+    [
+     23,
+     33
+    ],
+    [
+     23,
+     33
+    ],
+    [
+     23,
+     33
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack3_right_4",
+   "anchor": [
+    23,
+    33
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack3_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     25,
+     20
+    ],
+    [
+     25,
+     20
+    ],
+    [
+     25,
+     20
+    ],
+    [
+     25,
+     20
+    ],
+    [
+     25,
+     20
+    ],
+    [
+     25,
+     20
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack3_right_5",
+   "anchor": [
+    25,
+    20
+   ],
+   "size": [
+    48,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_attack3_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     19,
+     19
+    ],
+    [
+     19,
+     19
+    ],
+    [
+     19,
+     19
+    ],
+    [
+     19,
+     19
+    ],
+    [
+     19,
+     19
+    ],
+    [
+     19,
+     19
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ],
+    [
+     40,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_attack3_right_6",
+   "anchor": [
+    19,
+    19
+   ],
+   "size": [
+    40,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_dash_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     28,
+     23
+    ],
+    [
+     28,
+     23
+    ],
+    [
+     28,
+     23
+    ],
+    [
+     28,
+     23
+    ],
+    [
+     28,
+     23
+    ],
+    [
+     28,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_dash_right_1",
+   "anchor": [
+    28,
+    23
+   ],
+   "size": [
+    32,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_dash_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     20,
+     25
+    ],
+    [
+     20,
+     25
+    ],
+    [
+     20,
+     25
+    ],
+    [
+     20,
+     25
+    ],
+    [
+     20,
+     25
+    ],
+    [
+     20,
+     25
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_dash_right_2",
+   "anchor": [
+    20,
+    25
+   ],
+   "size": [
+    48,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_dash_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     22,
+     24
+    ],
+    [
+     22,
+     24
+    ],
+    [
+     22,
+     24
+    ],
+    [
+     22,
+     24
+    ],
+    [
+     22,
+     24
+    ],
+    [
+     22,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_dash_right_3",
+   "anchor": [
+    22,
+    24
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_dash_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     44,
+     23
+    ],
+    [
+     44,
+     23
+    ],
+    [
+     44,
+     23
+    ],
+    [
+     44,
+     23
+    ],
+    [
+     44,
+     23
+    ],
+    [
+     44,
+     23
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ],
+    [
+     48,
+     24
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_dash_right_4",
+   "anchor": [
+    44,
+    23
+   ],
+   "size": [
+    48,
+    24
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_hurt_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_hurt_right_1",
+   "anchor": [
+    19,
+    43
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_hurt_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     13,
+     47
+    ],
+    [
+     13,
+     47
+    ],
+    [
+     13,
+     47
+    ],
+    [
+     13,
+     47
+    ],
+    [
+     13,
+     47
+    ],
+    [
+     13,
+     47
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_hurt_right_2",
+   "anchor": [
+    13,
+    47
+   ],
+   "size": [
+    32,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_hurt_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     11,
+     48
+    ],
+    [
+     11,
+     48
+    ],
+    [
+     11,
+     48
+    ],
+    [
+     11,
+     48
+    ],
+    [
+     11,
+     48
+    ],
+    [
+     11,
+     48
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     56
+    ],
+    [
+     32,
+     56
+    ],
+    [
+     32,
+     56
+    ],
+    [
+     32,
+     56
+    ],
+    [
+     32,
+     56
+    ],
+    [
+     32,
+     56
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_hurt_right_3",
+   "anchor": [
+    11,
+    48
+   ],
+   "size": [
+    32,
+    56
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_hurt_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_hurt_right_4",
+   "anchor": [
+    18,
+    43
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_idle_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ],
+    [
+     19,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_idle_right_1",
+   "anchor": [
+    19,
+    43
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_idle_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_idle_right_2",
+   "anchor": [
+    18,
+    43
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_idle_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     17,
+     43
+    ],
+    [
+     17,
+     43
+    ],
+    [
+     17,
+     43
+    ],
+    [
+     17,
+     43
+    ],
+    [
+     17,
+     43
+    ],
+    [
+     17,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_idle_right_3",
+   "anchor": [
+    17,
+    43
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_idle_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     18,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_idle_right_4",
+   "anchor": [
+    18,
+    43
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_parry_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     7,
+     39
+    ],
+    [
+     7,
+     39
+    ],
+    [
+     7,
+     39
+    ],
+    [
+     7,
+     39
+    ],
+    [
+     7,
+     39
+    ],
+    [
+     7,
+     39
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_parry_right_1",
+   "anchor": [
+    7,
+    39
+   ],
+   "size": [
+    32,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_parry_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_parry_right_2",
+   "anchor": [
+    13,
+    39
+   ],
+   "size": [
+    32,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_parry_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ],
+    [
+     13,
+     39
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_parry_right_3",
+   "anchor": [
+    13,
+    39
+   ],
+   "size": [
+    32,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_parry_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     0,
+     39
+    ],
+    [
+     0,
+     39
+    ],
+    [
+     0,
+     39
+    ],
+    [
+     0,
+     39
+    ],
+    [
+     0,
+     39
+    ],
+    [
+     0,
+     39
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_parry_right_4",
+   "anchor": [
+    0,
+    39
+   ],
+   "size": [
+    32,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_parry_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     16,
+     43
+    ],
+    [
+     16,
+     43
+    ],
+    [
+     16,
+     43
+    ],
+    [
+     16,
+     43
+    ],
+    [
+     16,
+     43
+    ],
+    [
+     16,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_parry_right_5",
+   "anchor": [
+    16,
+    43
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_parry_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     17,
+     40
+    ],
+    [
+     17,
+     40
+    ],
+    [
+     17,
+     40
+    ],
+    [
+     17,
+     40
+    ],
+    [
+     17,
+     40
+    ],
+    [
+     17,
+     40
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_parry_right_6",
+   "anchor": [
+    17,
+    40
+   ],
+   "size": [
+    40,
+    48
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_walk_right_1": {
+   "frames": 6,
+   "anchors": [
+    [
+     17,
+     29
+    ],
+    [
+     17,
+     29
+    ],
+    [
+     17,
+     29
+    ],
+    [
+     17,
+     29
+    ],
+    [
+     17,
+     29
+    ],
+    [
+     17,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_walk_right_1",
+   "anchor": [
+    17,
+    29
+   ],
+   "size": [
+    40,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_walk_right_2": {
+   "frames": 6,
+   "anchors": [
+    [
+     20,
+     33
+    ],
+    [
+     20,
+     33
+    ],
+    [
+     20,
+     33
+    ],
+    [
+     20,
+     33
+    ],
+    [
+     20,
+     33
+    ],
+    [
+     20,
+     33
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_walk_right_2",
+   "anchor": [
+    20,
+    33
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_walk_right_3": {
+   "frames": 6,
+   "anchors": [
+    [
+     19,
+     34
+    ],
+    [
+     19,
+     34
+    ],
+    [
+     19,
+     34
+    ],
+    [
+     19,
+     34
+    ],
+    [
+     19,
+     34
+    ],
+    [
+     19,
+     34
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_walk_right_3",
+   "anchor": [
+    19,
+    34
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_walk_right_4": {
+   "frames": 6,
+   "anchors": [
+    [
+     19,
+     29
+    ],
+    [
+     19,
+     29
+    ],
+    [
+     19,
+     29
+    ],
+    [
+     19,
+     29
+    ],
+    [
+     19,
+     29
+    ],
+    [
+     19,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     40,
+     32
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_walk_right_4",
+   "anchor": [
+    19,
+    29
+   ],
+   "size": [
+    40,
+    32
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_walk_right_5": {
+   "frames": 6,
+   "anchors": [
+    [
+     20,
+     34
+    ],
+    [
+     20,
+     34
+    ],
+    [
+     20,
+     34
+    ],
+    [
+     20,
+     34
+    ],
+    [
+     20,
+     34
+    ],
+    [
+     20,
+     34
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_walk_right_5",
+   "anchor": [
+    20,
+    34
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_glow_totoy_scythe_walk_right_6": {
+   "frames": 6,
+   "anchors": [
+    [
+     18,
+     34
+    ],
+    [
+     18,
+     34
+    ],
+    [
+     18,
+     34
+    ],
+    [
+     18,
+     34
+    ],
+    [
+     18,
+     34
+    ],
+    [
+     18,
+     34
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "ms": [
+    80,
+    80,
+    80,
+    80,
+    80,
+    80
+   ],
+   "hero_frame": "totoy_scythe_walk_right_6",
+   "anchor": [
+    18,
+    34
+   ],
+   "size": [
+    40,
+    40
+   ],
+   "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame at the hero's feet, mirrored with him"
+  },
+  "fx_phantom_marker": {
+   "frames": 4,
+   "anchors": [
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ],
+    [
+     8,
+     15
+    ]
+   ],
+   "frame_sizes": [
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ]
+   ],
+   "ms": [
+    120,
+    120,
+    120,
+    120
+   ],
+   "anchor": [
+    8,
+    15
+   ],
+   "size": [
+    16,
+    16
+   ],
+   "anchor_meaning": "bottom centre (8,15); 3 px above Totoy's head while the buff runs"
+  },
+  "fx_phantom_spark": {
+   "frames": 5,
+   "anchors": [
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "ms": [
+    35,
+    50,
+    50,
+    55,
+    70
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "anchor_meaning": "where the echo hits (16,16); start on arc phase 2"
+  },
+  "fx_phantom_start": {
+   "frames": 5,
+   "anchors": [
+    [
+     24,
+     44
+    ],
+    [
+     24,
+     44
+    ],
+    [
+     24,
+     44
+    ],
+    [
+     24,
+     44
+    ],
+    [
+     24,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     48
+    ]
+   ],
+   "ms": [
+    50,
+    60,
+    60,
+    70,
+    80
+   ],
+   "anchor": [
+    24,
+    44
+   ],
+   "size": [
+    48,
+    48
+   ],
+   "anchor_meaning": "Totoy's feet (24,44); buff start burst, over the hero"
+  },
+  "ui_aspect_phantom_cut": {
+   "frames": 1,
+   "anchors": [
+    [
+     12,
+     12
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ]
+   ],
+   "use": "Aspect slot / HUD skill icon",
+   "anchor": [
+    12,
+    12
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "icon centre (12,12)"
+  },
+  "ui_aspect_spirit_lantern": {
+   "frames": 1,
+   "anchors": [
+    [
+     12,
+     12
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ]
+   ],
+   "use": "Aspect slot / HUD skill icon",
+   "anchor": [
+    12,
+    12
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "icon centre (12,12)"
+  },
+  "ui_aspect_spirit_lantern_lit": {
+   "frames": 4,
+   "anchors": [
+    [
+     12,
+     12
+    ],
+    [
+     12,
+     12
+    ],
+    [
+     12,
+     12
+    ],
+    [
+     12,
+     12
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     24,
+     24
+    ]
+   ],
+   "use": "optional: HUD icon while the lantern burns (loop about 120 ms)",
+   "anchor": [
+    12,
+    12
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "anchor_meaning": "icon centre (12,12)"
+  }
+ }
+}

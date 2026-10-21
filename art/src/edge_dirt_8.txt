@@ -1,0 +1,18 @@
+# kind: tile
+# imported from Transition.png (Gemini), cell 8
+aaaaqqaaaqaaqqaa
+qqqqqqqaaqaqqqaa
+qqqqqqqqqaqaqqqq
+qqqqqqqqqbaaqqaa
+aaaqqqqqaaaqaqqq
+4b3aqqqqaqbaaaaq
+5553aqqqqaqaqqqq
+5445baaaqaaaqqqa
+44443aaqqqqaqqqa
+44545baaqqaaaaqq
+44434444aqqqaaqa
+44434445baqaaaaa
+45444444bqaaaaqa
+45443344aaqqqqqq
+544444444aaqqaqa
+5434445549aaaaaa

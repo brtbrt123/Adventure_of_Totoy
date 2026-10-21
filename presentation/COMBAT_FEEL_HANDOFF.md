@@ -1,0 +1,42 @@
+# Sword combo presentation and combat feedback
+
+Built against core commit 42b6326 and docs/architecture.md, Sword combo (player). No core edits.
+
+## Implemented
+
+- Every attack phase reads combo_index 1-3 and chooses hero2_attack1/2/3. Phase frames 1-2, 3-4 and 5-6 are spread over that swing's current-state duration from SWING_WINDUP_TICKS, SWING_ACTIVE_TICKS and SWING_RECOVERY_TICKS. No timing numbers are duplicated in presentation. Frame selection is stateless: changes in state or combo index take effect immediately; idle grace never selects attack art.
+- Swing-three confirmed hits get a larger spark, slightly longer shake and heavier sound. Counter hits retain their own event-based effect. Successful parry has distinct early/perfect cues and different spark intensity. Brief contact flashes stay local.
+- Contact points are visual offsets from the authoritative event position to the body/weapon, instead of painting sparks under the target's feet. Stored event origins, hit decisions, telegraphs and actor world positions remain unchanged.
+- Ten event cues from CC0 recordings by StarNinjas, artisticdude and Kenney cover swings, armored hits, finisher/counter hits, early/perfect deflects, posture breaks, player damage, dash and red/gold warnings. No audio from commercial games. Credits, original source recordings, hashes and mixing edits are in presentation/audio/. Three armor-hit and two swing variants alternate. Eight playback voices; same-tick shard warnings deduplicate. Headless runs verify routing but skip audible playback. Restart stops all sounds and clears deduplication.
+
+## Core follow-up for the requested deflect-driven duel
+
+The current perfect parry instantly fills boss posture and clears its attack. Normal attacks add little posture; the existing boss spends long periods winding up and recovering. Presentation feedback alone cannot change that exchange.
+
+Propose to the human before changing game design: timed sequences of gold strikes that can be deflected individually; posture pressure accumulated across attacks and deflects rather than an automatic break on every perfect parry; clear retaliation after a blocked player combo; short defined defensive-cancel windows and input buffers; posture recovery that responds to recent pressure and/or health; a distinct payoff when posture finally breaks. Preserve red dodge-only attacks and exact snapshot warning/hit geometry. Any simulation hit-stop must come from core with documented input-buffer behaviour; presentation must not freeze the simulation independently or hide dangerous ticks behind a frozen render.
+
+This follows the attack/deflect/posture emphasis described in the publisher's [Sekiro mechanics guide](https://support.activision.com/sekiro/articles/sekiro-shadows-die-twice-game-mechanics), adapted to Totoy's gold/red rules. These are proposals, not implemented game rules or a claim that the game now feels like Sekiro.
+
+## Verification and human review
+
+smoke_combo_presentation checks every phase boundary of every swing from tuning, real buffered recovery-to-windup chains, all three confirmed hits and the heavier finisher cue, idle grace, early/perfect parry audio and a real counter. smoke_animation exercises all 18 attack frames during real core lifetimes. smoke_effects verifies hit-contact placement and event-to-audio routing. `python harness/checks/run_tests.py --worktree .` passed: Python tests, Godot import, core tests and every smoke suite. Art validator and PCM asset checks also passed.
+
+Windowed --capture saves arena_combo_hit_1/2/3, early_deflect, perfect_parry and counter screenshots. Human listening, timing/feel and fun still require playtesting. Cross-review by Claude is still pending under the earlier disclosure-approval restriction; do not claim it passed. Nothing is merged.
+
+## Recorded audio replacement
+
+The human rejected the procedural cues. All active sound files now derive from downloaded CC0 recordings; no oscillator synthesis remains in this set. Original selected recordings and creator credits are retained. See presentation/audio/README.md and sources.json for the per-cue layers and processing. preview.wav gives a short listening comparison; perceived quality and fit remain the human's decision. No core changes.
+
+Recorded-set validation: Godot import, windowed combo/parry playback fixture and `python harness/checks/run_tests.py --worktree .` all pass. All 14 processed WAVs have bounded peaks and faded endpoints; the 18 retained source recordings match their saved SHA-256 hashes. Human listening approval and the previously blocked Claude cross-review remain pending.
+
+## Golem audio and music follow-up
+
+Added distinct slam, stomp, sweep, charge and beam cues across all six boss patterns, driven by live snapshot hit_tick rather than player damage events. Parry now layers a recorded ringing metal strike. Added MintoDog's CC0 Heavy Boss Battle 1 as a 108-second looping background track with fade-in/result fade-out and brief ducking beneath clashes/heavy impacts. Retry clears playback and starts music again. No core edits.
+
+smoke_boss_audio verifies a missed slam still sounds once, an interrupted slam stays silent, repeated snapshots do not duplicate sounds, and music starts/ducks/stops/resets. smoke_boss_attacks now checks the sound count for every boss pattern, including two combo impacts and one cue for three shard lines. battle_mix_preview.wav is an offline listening preview, not captured gameplay. Human listening approval and prior Claude cross-review remain pending.
+
+Validation: `python harness/checks/run_tests.py --worktree .` passed Python tests, Godot import, core tests and all smoke suites (including boss audio). Windowed game playback starts/exits cleanly after explicitly releasing the music stream at shutdown. All processed PCM peaks are bounded; all 26 retained source hashes and the music hash match. Musical fit, perceived impact and seamlessness across a full 108-second loop still need human listening/playtesting.
+
+## Harder boss / gold sweep follow-up
+
+At the human's request, tuned core boss pressure and converted sweep to gold parryable kind (legacy red_sweep key retained). See docs/architecture.md for values; perfect parry still instantly breaks posture, but the counter opening is now 60 ticks. Both early/perfect sweep parries and retained red beam danger are covered by core tests. Sweep warning, procedural impact and imported red effect pixels now show gold; generated art is untouched. Laser audio now uses rushing air/stone instead of a sword clash. Windowed six-pattern smoke passed and saved arena_sweep.png for human approval. Cross-review and difficulty/audio-feel playtest remain pending.

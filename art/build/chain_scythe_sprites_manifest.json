@@ -1,0 +1,2385 @@
+{
+ "generator": "tools/art/import_chain_scythe_sprites.py",
+ "note": "Sprite groups: name -> frame count (frames are <name>_1..N), canvas size, anchor per frame and its meaning. Hero frames (totoy_scythe_*) are right-facing; mirror around the anchor for left. Their numbering is exactly hero2_*'s, so the katana frame hero2_<state>_right_<n> becomes totoy_scythe_<state>_right_<n>. 'hands' and 'chain_origin' are relative to the anchor (feet) in game pixels, x right, y down; 'chain_origin' is where the runtime chain (fx_chain_link_* / fx_chain_whip_*) leaves the fist on the Reaper's Coil whip and pull frames. Reference and approval: art/reference/chain_scythe/README.md.",
+ "sprites": {
+  "fx_chain_dust": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    64,
+    16
+   ],
+   "anchors": [
+    [
+     8,
+     14
+    ],
+    [
+     8,
+     14
+    ],
+    [
+     8,
+     14
+    ],
+    [
+     8,
+     14
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     16
+    ],
+    [
+     64,
+     16
+    ],
+    [
+     64,
+     16
+    ],
+    [
+     64,
+     16
+    ]
+   ],
+   "anchor": [
+    8,
+    14
+   ],
+   "anchor_meaning": "target's leading foot on the ground (8,14); puffs trail to +x"
+  },
+  "fx_chain_hook": {
+   "group": "fx_chain_scythe",
+   "frames": 5,
+   "size": [
+    32,
+    32
+   ],
+   "anchors": [
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "anchor_meaning": "hook point on the target (centre)"
+  },
+  "fx_chain_land": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    32,
+    24
+   ],
+   "anchors": [
+    [
+     16,
+     18
+    ],
+    [
+     16,
+     18
+    ],
+    [
+     16,
+     18
+    ],
+    [
+     16,
+     18
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     32,
+     24
+    ]
+   ],
+   "anchor": [
+    16,
+    18
+   ],
+   "anchor_meaning": "landing point on the ground (16,18) when the hook misses"
+  },
+  "fx_chain_link": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    32,
+    8
+   ],
+   "anchors": [
+    [
+     0,
+     4
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     0,
+     4
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     8
+    ],
+    [
+     32,
+     8
+    ],
+    [
+     32,
+     8
+    ],
+    [
+     32,
+     8
+    ]
+   ],
+   "anchor": [
+    0,
+    4
+   ],
+   "anchor_meaning": "segment start (0,4); it ends at (31,4): rotate/stretch between two points, tile end to end"
+  },
+  "fx_chain_pull": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    64,
+    48
+   ],
+   "anchors": [
+    [
+     12,
+     44
+    ],
+    [
+     12,
+     44
+    ],
+    [
+     12,
+     44
+    ],
+    [
+     12,
+     44
+    ]
+   ],
+   "frame_sizes": [
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ],
+    [
+     64,
+     48
+    ]
+   ],
+   "anchor": [
+    12,
+    44
+   ],
+   "anchor_meaning": "dragged target's feet (12,44); it moves toward -x, streaks trail to +x (mirror for the other side)"
+  },
+  "fx_chain_scuff": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    32,
+    16
+   ],
+   "anchors": [
+    [
+     16,
+     8
+    ],
+    [
+     16,
+     8
+    ],
+    [
+     16,
+     8
+    ],
+    [
+     16,
+     8
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ]
+   ],
+   "anchor": [
+    16,
+    8
+   ],
+   "anchor_meaning": "decal centre on the ground"
+  },
+  "fx_chain_stagger": {
+   "group": "fx_chain_scythe",
+   "frames": 6,
+   "size": [
+    32,
+    32
+   ],
+   "anchors": [
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "anchor_meaning": "target's chest (centre)"
+  },
+  "fx_chain_stars": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    32,
+    16
+   ],
+   "anchors": [
+    [
+     16,
+     12
+    ],
+    [
+     16,
+     12
+    ],
+    [
+     16,
+     12
+    ],
+    [
+     16,
+     12
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ],
+    [
+     32,
+     16
+    ]
+   ],
+   "anchor": [
+    16,
+    12
+   ],
+   "anchor_meaning": "just above the staggered target's head (16,12)"
+  },
+  "fx_chain_whip": {
+   "group": "fx_chain_scythe",
+   "frames": 6,
+   "size": [
+    128,
+    32
+   ],
+   "anchors": [
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     0,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     128,
+     32
+    ],
+    [
+     128,
+     32
+    ],
+    [
+     128,
+     32
+    ],
+    [
+     128,
+     32
+    ],
+    [
+     128,
+     32
+    ],
+    [
+     128,
+     32
+    ]
+   ],
+   "anchor": [
+    0,
+    16
+   ],
+   "anchor_meaning": "throwing hand (0,16); the hook point is (120,16)"
+  },
+  "fx_scythe_arc_1": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    96,
+    64
+   ],
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "anchor_meaning": "hero's feet (40,56); draw over the hero"
+  },
+  "fx_scythe_arc_2": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    96,
+    64
+   ],
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "anchor_meaning": "hero's feet (40,56); draw over the hero"
+  },
+  "fx_scythe_arc_3": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    96,
+    64
+   ],
+   "anchors": [
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ],
+    [
+     40,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "anchor": [
+    40,
+    56
+   ],
+   "anchor_meaning": "hero's feet (40,56); draw over the hero"
+  },
+  "fx_scythe_flying": {
+   "group": "fx_chain_scythe",
+   "frames": 8,
+   "size": [
+    32,
+    32
+   ],
+   "anchors": [
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ],
+    [
+     16,
+     16
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     32
+    ]
+   ],
+   "anchor": [
+    16,
+    16
+   ],
+   "anchor_meaning": "pommel ring where the chain attaches (cell centre); rotation (n-1)*45 deg clockwise, 1 = head up"
+  },
+  "fx_scythe_spin_back": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    96,
+    64
+   ],
+   "anchors": [
+    [
+     48,
+     56
+    ],
+    [
+     48,
+     56
+    ],
+    [
+     48,
+     56
+    ],
+    [
+     48,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "anchor_meaning": "hero's feet (48,56); back half before the hero, front half after"
+  },
+  "fx_scythe_spin_front": {
+   "group": "fx_chain_scythe",
+   "frames": 4,
+   "size": [
+    96,
+    64
+   ],
+   "anchors": [
+    [
+     48,
+     56
+    ],
+    [
+     48,
+     56
+    ],
+    [
+     48,
+     56
+    ],
+    [
+     48,
+     56
+    ]
+   ],
+   "frame_sizes": [
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ],
+    [
+     96,
+     64
+    ]
+   ],
+   "anchor": [
+    48,
+    56
+   ],
+   "anchor_meaning": "hero's feet (48,56); back half before the hero, front half after"
+  },
+  "totoy_scythe_attack1_right": {
+   "group": "hero_scythe",
+   "frames": 6,
+   "size": [
+    56,
+    32
+   ],
+   "anchors": [
+    [
+     18,
+     27
+    ],
+    [
+     21,
+     28
+    ],
+    [
+     24,
+     27
+    ],
+    [
+     32,
+     32
+    ],
+    [
+     32,
+     33
+    ],
+    [
+     20,
+     33
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     64,
+     32
+    ],
+    [
+     64,
+     40
+    ],
+    [
+     56,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_attack1_right_1",
+    "hero2_attack1_right_2",
+    "hero2_attack1_right_3",
+    "hero2_attack1_right_4",
+    "hero2_attack1_right_5",
+    "hero2_attack1_right_6"
+   ],
+   "hands": [
+    [
+     [
+      -3,
+      -14
+     ],
+     [
+      14,
+      -11
+     ]
+    ],
+    [
+     [
+      -1,
+      -17
+     ],
+     [
+      15,
+      -12
+     ]
+    ],
+    [
+     [
+      6,
+      -12
+     ],
+     [
+      19,
+      -13
+     ]
+    ],
+    [
+     [
+      -1,
+      -14
+     ],
+     [
+      21,
+      -17
+     ]
+    ],
+    [
+     [
+      -2,
+      -12
+     ],
+     [
+      9,
+      -12
+     ]
+    ],
+    [
+     [
+      -5,
+      -12
+     ],
+     [
+      8,
+      -13
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_attack2_right": {
+   "group": "hero_scythe",
+   "frames": 6,
+   "size": [
+    48,
+    32
+   ],
+   "anchors": [
+    [
+     18,
+     25
+    ],
+    [
+     18,
+     28
+    ],
+    [
+     20,
+     32
+    ],
+    [
+     15,
+     44
+    ],
+    [
+     18,
+     29
+    ],
+    [
+     18,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     56,
+     40
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_attack2_right_1",
+    "hero2_attack2_right_2",
+    "hero2_attack2_right_3",
+    "hero2_attack2_right_4",
+    "hero2_attack2_right_5",
+    "hero2_attack2_right_6"
+   ],
+   "hands": [
+    [
+     [
+      -1,
+      -8
+     ],
+     [
+      15,
+      -8
+     ]
+    ],
+    [
+     [
+      -4,
+      -10
+     ],
+     [
+      14,
+      -11
+     ]
+    ],
+    [
+     [
+      20,
+      -18
+     ],
+     [
+      4,
+      -16
+     ]
+    ],
+    [
+     [
+      4,
+      -28
+     ],
+     [
+      10,
+      -15
+     ]
+    ],
+    [
+     [
+      8,
+      -12
+     ],
+     [
+      1,
+      -13
+     ]
+    ],
+    [
+     [
+      -4,
+      -12
+     ],
+     [
+      8,
+      -12
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_attack3_right": {
+   "group": "hero_scythe",
+   "frames": 6,
+   "size": [
+    40,
+    48
+   ],
+   "anchors": [
+    [
+     18,
+     44
+    ],
+    [
+     8,
+     34
+    ],
+    [
+     20,
+     27
+    ],
+    [
+     27,
+     33
+    ],
+    [
+     32,
+     24
+    ],
+    [
+     19,
+     32
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_attack3_right_1",
+    "hero2_attack3_right_2",
+    "hero2_attack3_right_3",
+    "hero2_attack3_right_4",
+    "hero2_attack3_right_5",
+    "hero2_attack3_right_6"
+   ],
+   "hands": [
+    [
+     [
+      7,
+      -27
+     ],
+     [
+      6,
+      -26
+     ]
+    ],
+    [
+     [
+      14,
+      -26
+     ],
+     [
+      13,
+      -25
+     ]
+    ],
+    [
+     [
+      5,
+      -8
+     ],
+     [
+      3,
+      -10
+     ]
+    ],
+    [
+     [
+      2,
+      -6
+     ],
+     [
+      0,
+      -7
+     ]
+    ],
+    [
+     [
+      4,
+      -5
+     ],
+     [
+      2,
+      -8
+     ]
+    ],
+    [
+     [
+      -5,
+      -12
+     ],
+     [
+      7,
+      -13
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_coil_pull": {
+   "group": "hero_scythe_coil",
+   "frames": 3,
+   "size": [
+    40,
+    40
+   ],
+   "anchors": [
+    [
+     17,
+     31
+    ],
+    [
+     19,
+     39
+    ],
+    [
+     11,
+     31
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_parry_right_1 (custom lean)",
+    "hero2_parry_right_1 (custom lean)",
+    "hero2_parry_right_1 (custom lean)"
+   ],
+   "hands": [
+    [
+     [
+      10,
+      -14
+     ],
+     [
+      9,
+      -12
+     ]
+    ],
+    [
+     [
+      9,
+      -14
+     ],
+     [
+      8,
+      -13
+     ]
+    ],
+    [
+     [
+      11,
+      -15
+     ],
+     [
+      10,
+      -13
+     ]
+    ]
+   ],
+   "chain_origin": [
+    [
+     10,
+     -14
+    ],
+    [
+     9,
+     -14
+    ],
+    [
+     11,
+     -15
+    ]
+   ],
+   "body_source": "hero2_parry_right_1 (custom lean)",
+   "anchor_meaning": "feet (same world point as the hero2 frame in body_sources); chain_origin = the fist the runtime chain leaves from"
+  },
+  "totoy_scythe_coil_recover": {
+   "group": "hero_scythe_coil",
+   "frames": 2,
+   "size": [
+    56,
+    40
+   ],
+   "anchors": [
+    [
+     32,
+     33
+    ],
+    [
+     20,
+     33
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_attack1_right_5",
+    "hero2_attack1_right_6"
+   ],
+   "hands": [
+    [
+     [
+      -2,
+      -12
+     ],
+     [
+      9,
+      -12
+     ]
+    ],
+    [
+     [
+      -5,
+      -12
+     ],
+     [
+      8,
+      -13
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the hero2 frame in body_sources); chain_origin = the fist the runtime chain leaves from"
+  },
+  "totoy_scythe_coil_spin": {
+   "group": "hero_scythe_coil",
+   "frames": 8,
+   "size": [
+    56,
+    40
+   ],
+   "anchors": [
+    [
+     11,
+     38
+    ],
+    [
+     11,
+     38
+    ],
+    [
+     11,
+     38
+    ],
+    [
+     35,
+     38
+    ],
+    [
+     43,
+     38
+    ],
+    [
+     27,
+     38
+    ],
+    [
+     11,
+     38
+    ],
+    [
+     11,
+     38
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     40
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     56,
+     48
+    ],
+    [
+     64,
+     40
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     48,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_victory_right_3 (custom lean)",
+    "hero2_victory_right_3 (custom lean)",
+    "hero2_victory_right_3 (custom lean)",
+    "hero2_victory_right_3 (custom lean)",
+    "hero2_victory_right_3 (custom lean)",
+    "hero2_victory_right_3 (custom lean)",
+    "hero2_victory_right_3 (custom lean)",
+    "hero2_victory_right_3 (custom lean)"
+   ],
+   "hands": [
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -28
+     ],
+     [
+      7,
+      -13
+     ]
+    ]
+   ],
+   "body_source": "hero2_victory_right_3 (custom lean)",
+   "anchor_meaning": "feet (same world point as hero2_victory_right_3); the scythe circles the hero on its chain"
+  },
+  "totoy_scythe_coil_whip": {
+   "group": "hero_scythe_coil",
+   "frames": 3,
+   "size": [
+    48,
+    40
+   ],
+   "anchors": [
+    [
+     12,
+     32
+    ],
+    [
+     16,
+     27
+    ],
+    [
+     16,
+     32
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     40
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     48,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_attack2_right_3",
+    "hero2_attack1_right_3",
+    "hero2_attack1_right_4"
+   ],
+   "hands": [
+    [
+     [
+      20,
+      -18
+     ],
+     [
+      4,
+      -16
+     ]
+    ],
+    [
+     [
+      6,
+      -12
+     ],
+     [
+      19,
+      -13
+     ]
+    ],
+    [
+     [
+      -1,
+      -14
+     ],
+     [
+      21,
+      -17
+     ]
+    ]
+   ],
+   "chain_origin": [
+    [
+     20,
+     -18
+    ],
+    [
+     19,
+     -13
+    ],
+    [
+     21,
+     -17
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the hero2 frame in body_sources); chain_origin = the fist the runtime chain leaves from"
+  },
+  "totoy_scythe_coil_windup": {
+   "group": "hero_scythe_coil",
+   "frames": 2,
+   "size": [
+    48,
+    32
+   ],
+   "anchors": [
+    [
+     26,
+     27
+    ],
+    [
+     29,
+     28
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     32
+    ],
+    [
+     48,
+     32
+    ]
+   ],
+   "body_sources": [
+    "hero2_attack1_right_1",
+    "hero2_attack1_right_2"
+   ],
+   "hands": [
+    [
+     [
+      -3,
+      -14
+     ],
+     [
+      14,
+      -11
+     ]
+    ],
+    [
+     [
+      -1,
+      -17
+     ],
+     [
+      15,
+      -12
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the hero2 frame in body_sources); chain_origin = the fist the runtime chain leaves from"
+  },
+  "totoy_scythe_dash_right": {
+   "group": "hero_scythe",
+   "frames": 4,
+   "size": [
+    56,
+    32
+   ],
+   "anchors": [
+    [
+     32,
+     26
+    ],
+    [
+     26,
+     25
+    ],
+    [
+     22,
+     24
+    ],
+    [
+     48,
+     29
+    ]
+   ],
+   "frame_sizes": [
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     56,
+     32
+    ],
+    [
+     64,
+     32
+    ]
+   ],
+   "body_sources": [
+    "hero2_dash_right_1",
+    "hero2_dash_right_2",
+    "hero2_dash_right_3",
+    "hero2_dash_right_4"
+   ],
+   "hands": [
+    [
+     [
+      -5,
+      -13
+     ],
+     [
+      17,
+      -11
+     ]
+    ],
+    [
+     [
+      3,
+      -15
+     ],
+     [
+      27,
+      -11
+     ]
+    ],
+    [
+     [
+      1,
+      -14
+     ],
+     [
+      23,
+      -10
+     ]
+    ],
+    [
+     [
+      -22,
+      -10
+     ],
+     [
+      5,
+      -16
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_hurt_right": {
+   "group": "hero_scythe",
+   "frames": 4,
+   "size": [
+    40,
+    48
+   ],
+   "anchors": [
+    [
+     19,
+     43
+    ],
+    [
+     13,
+     47
+    ],
+    [
+     11,
+     48
+    ],
+    [
+     18,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     56
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "body_sources": [
+    "hero2_hurt_right_1",
+    "hero2_hurt_right_2",
+    "hero2_hurt_right_3",
+    "hero2_hurt_right_4"
+   ],
+   "hands": [
+    [
+     [
+      -6,
+      -13
+     ],
+     [
+      5,
+      -13
+     ]
+    ],
+    [
+     [
+      -7,
+      -9
+     ],
+     [
+      8,
+      -20
+     ]
+    ],
+    [
+     [
+      -5,
+      -13
+     ],
+     [
+      15,
+      -25
+     ]
+    ],
+    [
+     [
+      -6,
+      -13
+     ],
+     [
+      6,
+      -13
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_idle_right": {
+   "group": "hero_scythe",
+   "frames": 4,
+   "size": [
+    40,
+    48
+   ],
+   "anchors": [
+    [
+     19,
+     43
+    ],
+    [
+     18,
+     43
+    ],
+    [
+     17,
+     43
+    ],
+    [
+     18,
+     43
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "body_sources": [
+    "hero2_idle_right_1",
+    "hero2_idle_right_2",
+    "hero2_idle_right_3",
+    "hero2_idle_right_4"
+   ],
+   "hands": [
+    [
+     [
+      -6,
+      -13
+     ],
+     [
+      5,
+      -13
+     ]
+    ],
+    [
+     [
+      -5,
+      -13
+     ],
+     [
+      6,
+      -13
+     ]
+    ],
+    [
+     [
+      -4,
+      -13
+     ],
+     [
+      7,
+      -14
+     ]
+    ],
+    [
+     [
+      -5,
+      -13
+     ],
+     [
+      6,
+      -13
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_parry_right": {
+   "group": "hero_scythe",
+   "frames": 6,
+   "size": [
+    40,
+    40
+   ],
+   "anchors": [
+    [
+     11,
+     39
+    ],
+    [
+     20,
+     40
+    ],
+    [
+     19,
+     40
+    ],
+    [
+     12,
+     39
+    ],
+    [
+     24,
+     43
+    ],
+    [
+     17,
+     40
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     40,
+     48
+    ],
+    [
+     48,
+     40
+    ],
+    [
+     48,
+     48
+    ],
+    [
+     40,
+     48
+    ]
+   ],
+   "body_sources": [
+    "hero2_parry_right_1",
+    "hero2_parry_right_2",
+    "hero2_parry_right_3",
+    "hero2_parry_right_4",
+    "hero2_parry_right_5",
+    "hero2_parry_right_6"
+   ],
+   "hands": [
+    [
+     [
+      10,
+      -15
+     ],
+     [
+      9,
+      -14
+     ]
+    ],
+    [
+     [
+      4,
+      -17
+     ],
+     [
+      3,
+      -16
+     ]
+    ],
+    [
+     [
+      4,
+      -18
+     ],
+     [
+      3,
+      -17
+     ]
+    ],
+    [
+     [
+      13,
+      -21
+     ],
+     [
+      12,
+      -20
+     ]
+    ],
+    [
+     [
+      2,
+      -19
+     ],
+     [
+      1,
+      -18
+     ]
+    ],
+    [
+     [
+      -6,
+      -12
+     ],
+     [
+      7,
+      -12
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_victory_right": {
+   "group": "hero_scythe",
+   "frames": 6,
+   "size": [
+    32,
+    40
+   ],
+   "anchors": [
+    [
+     8,
+     38
+    ],
+    [
+     6,
+     38
+    ],
+    [
+     11,
+     46
+    ],
+    [
+     10,
+     45
+    ],
+    [
+     13,
+     47
+    ],
+    [
+     14,
+     47
+    ]
+   ],
+   "frame_sizes": [
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     40
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ],
+    [
+     32,
+     48
+    ]
+   ],
+   "body_sources": [
+    "hero2_victory_right_1",
+    "hero2_victory_right_2",
+    "hero2_victory_right_3",
+    "hero2_victory_right_4",
+    "hero2_victory_right_5",
+    "hero2_victory_right_6"
+   ],
+   "hands": [
+    [
+     [
+      -4,
+      -15
+     ],
+     [
+      2,
+      -14
+     ]
+    ],
+    [
+     [
+      0,
+      -13
+     ],
+     [
+      5,
+      -14
+     ]
+    ],
+    [
+     [
+      -4,
+      -29
+     ],
+     [
+      6,
+      -14
+     ]
+    ],
+    [
+     [
+      -1,
+      -15
+     ],
+     [
+      7,
+      -13
+     ]
+    ],
+    [
+     [
+      -2,
+      -17
+     ],
+     [
+      5,
+      -15
+     ]
+    ],
+    [
+     [
+      -3,
+      -18
+     ],
+     [
+      4,
+      -15
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "totoy_scythe_walk_right": {
+   "group": "hero_scythe",
+   "frames": 6,
+   "size": [
+    40,
+    40
+   ],
+   "anchors": [
+    [
+     17,
+     34
+    ],
+    [
+     20,
+     33
+    ],
+    [
+     19,
+     34
+    ],
+    [
+     19,
+     34
+    ],
+    [
+     20,
+     34
+    ],
+    [
+     18,
+     34
+    ]
+   ],
+   "frame_sizes": [
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ],
+    [
+     40,
+     40
+    ]
+   ],
+   "body_sources": [
+    "hero2_walk_right_1",
+    "hero2_walk_right_2",
+    "hero2_walk_right_3",
+    "hero2_walk_right_4",
+    "hero2_walk_right_5",
+    "hero2_walk_right_6"
+   ],
+   "hands": [
+    [
+     [
+      -5,
+      -12
+     ],
+     [
+      9,
+      -13
+     ]
+    ],
+    [
+     [
+      -6,
+      -12
+     ],
+     [
+      8,
+      -12
+     ]
+    ],
+    [
+     [
+      -4,
+      -12
+     ],
+     [
+      10,
+      -13
+     ]
+    ],
+    [
+     [
+      -7,
+      -12
+     ],
+     [
+      7,
+      -14
+     ]
+    ],
+    [
+     [
+      -5,
+      -12
+     ],
+     [
+      8,
+      -14
+     ]
+    ],
+    [
+     [
+      -3,
+      -13
+     ],
+     [
+      10,
+      -13
+     ]
+    ]
+   ],
+   "anchor_meaning": "feet (same world point as the matching hero2_* frame; place by anchor, mirror around it for left)"
+  },
+  "ui_aspect_reapers_coil": {
+   "group": "ui",
+   "frames": 1,
+   "size": [
+    24,
+    24
+   ],
+   "anchors": [
+    [
+     12,
+     12
+    ]
+   ],
+   "frame_sizes": [
+    [
+     24,
+     24
+    ]
+   ],
+   "anchor": [
+    12,
+    12
+   ],
+   "anchor_meaning": "icon centre"
+  },
+  "ui_weapon_chain_scythe": {
+   "group": "ui",
+   "frames": 1,
+   "size": [
+    48,
+    48
+   ],
+   "anchors": [
+    [
+     24,
+     24
+    ]
+   ],
+   "frame_sizes": [
+    [
+     48,
+     48
+    ]
+   ],
+   "anchor": [
+    24,
+    24
+   ],
+   "anchor_meaning": "icon centre"
+  }
+ }
+}

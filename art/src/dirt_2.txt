@@ -1,18 +1,18 @@
 # kind: tile
-# seamless: true
-bbbbbcccbbbbbbbb
-bbbbbccccabccbbb
-bbbbcccccccacbbb
-bbbcccccccbbbbbb
-babbcccccccbbbbb
-cddbbaacbbbbbbbb
-bbbbbbabbbbbbbbb
-bbbbbbbbbbbbaabb
-bbbbbbcccccbbabb
-bbbbbcccccacbbbb
-bbbbcccccccaabbb
-bbbbbcccccccc9bb
-bbbbbbbccccccbbb
-cbbbbbbbbccccccc
-dbbbbccbccccccba
-bbbbbadbbbbccbbb
+# imported from Dirt.png (Gemini), cell 2
+aababaaaaabaaa9a
+aqqqaaaabaqaaaaa
+aabqqqabqqqqqaaa
+aaqqqqqqqqqqbqqa
+aaaqqqqqqqqqqqba
+aaaqqccccqqqqqaa
+aqqqqcccqqqqqqa9
+qqqqqccqqqqqaaaa
+bqaqqcqqqqqqqaaa
+aaaqqqqqqqqaaqqa
+aaaqqqqqqaqqqqaa
+aaqqqqqaaaaqqqaa
+aqqqqqqaaaaaqaaa
+aqabqbqaaaaaabba
+aabbqaabaaaaaqqa
+aaaaabaaaa9aabaa
