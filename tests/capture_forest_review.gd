@@ -3,7 +3,8 @@ extends SceneTree
 ## of the converted paintings and the layouts (no scene manager exists yet, so this does NOT use the arena scene or
 ## any game code: it draws the ground texture under a Camera2D clamped to the world, like the arena camera, the hero
 ## frame hero2_idle_right_1 from art/build/sprites.png and the chapter 1 creatures from the reference sheets in
-## art/reference/chapter1_creatures/ at the layouts' spawn points):
+## art/reference/chapter1_creatures/ at the layouts' spawn points). The scenes are at their game scales (forest 0.6 =
+## 480x288, glade 0.7 = 560x336; core/forest_layout.gd / core/glade_layout.gd SCALE); characters keep their pixel size.
 ##   godot --path . --script res://tests/capture_forest_review.gd
 ## Every actor stands on the arena's ground shadow (presentation/arena/arena.gd _draw_actor: an opaque ink (palette 0)
 ## ellipse, x radius r, y radius 0.3 r, 2 px below the feet; r = 10 for the hero, here scaled per creature) and its
@@ -11,26 +12,16 @@ extends SceneTree
 ## without losing readability. The real scene renderer should do the same: that shadow plus one ambient tint constant
 ## per scene.
 ## Saves into docs/previews/:
-##   forest_full_v1.png, glade_full_v1.png   the whole 800x480 scene at 2x, stitched from 9 real camera views, with the
-##                                           hero at the entry point and the creatures (the Stag in the glade)
+##   forest_full_v1.png, glade_full_v1.png   the whole scene at 2x, stitched from 9 real camera views, with the hero at
+##                                           the entry point and the creatures (the Stag in the glade)
 ##   forest_view_<name>.png, glade_view_<name>.png   1x camera views (320x180) with the hero standing somewhere
 ## Run tools/art/compare_forest_target.py afterwards for forest_vs_target.png and glade_vs_target.png.
-## Scale options (the human's review, 2026-10-22: the hero looks tiny next to the painted trees and stones):
-##   godot --path . --script res://tests/capture_forest_review.gd -- --scales
-## renders, for every scale in SCALES (1.0 = the approved files, the others the *_sNNN.png options made by
-## tools/art/make_forest_ground_from_reference.py --scale S, with the layouts' *_scaled points; characters keep their
-## pixel size), <scene>_sNNN_full.png (2x stitch) and the comparison crops <scene>_sNNN_crop_<name>.png (1x camera
-## views: forest sign / pedestals, glade ring) into docs/previews/scale_options/; tools/art/make_forest_scale_sheet.py
-## turns them into docs/previews/forest_scale_options.png and glade_scale_options.png.
+## (The scale options the human chose from, docs/previews/forest_scale_options.png and glade_scale_options.png, were
+## rendered by an earlier version of this script; that mode and its files were removed after the choice.)
 const ForestLayout := preload("res://core/forest_layout.gd")
 const GladeLayout := preload("res://core/glade_layout.gd")
 const OUT_DIR: String = "res://docs/previews/"
 const VIEW: Vector2 = Vector2(320.0, 180.0)
-const SCALES: Array[float] = [1.0, 0.7, 0.6, 0.5]
-const SCALE_DIR: String = "res://docs/previews/scale_options/"
-## The comparison crops at 1.0: [name, where the hero stands, where the camera looks] (both scaled with the scene).
-const FOREST_CROPS: Array = [["sign", Vector2(262, 210), Vector2(250, 222)], ["pedestals", Vector2(630, 302), Vector2(580, 252)]]
-const GLADE_CROPS: Array = [["ring", Vector2(262, 270), Vector2(415, 262)]]
 const CREATURES: String = "res://art/reference/chapter1_creatures/"
 ## kind -> [sheet base name, frame name]
 const FRAMES: Dictionary = {
@@ -40,19 +31,19 @@ const FRAMES: Dictionary = {
 	"thornback_stag": ["creature_thornback_stag_v1", "creature_thornback_stag_idle_1"],
 }
 const HERO_FRAME: String = "hero2_idle_right_1"
-## [name, where the hero stands]
-const FOREST_VIEWS: Array = [
-	["entrance", Vector2(60, 268)], ["first_clearing", Vector2(200, 262)], ["second_clearing", Vector2(440, 330)],
+## [name, where the hero stands] measured at 1.0 (the layouts' *_1X coordinates), scaled with the scene.
+const FOREST_VIEWS_1X: Array = [
+	["entrance", Vector2(60, 268)], ["first_clearing", Vector2(262, 210)], ["second_clearing", Vector2(470, 300)],
 	["lantern_gate", Vector2(596, 212)], ["dead_end_chest", Vector2(724, 326)], ["north_exit", Vector2(646, 40)],
+]
+const GLADE_VIEWS_1X: Array = [
+	["entrance", Vector2(60, 440)], ["ring", Vector2(262, 270)], ["spring", Vector2(445, 300)],
+	["arch", Vector2(630, 150)],
 ]
 ## Shadow x radius per actor (the arena: hero 10, boss 20) and the per-scene ambient multiply.
 const SHADOW_RADIUS: Dictionary = {"hero": 10.0, "mossling": 7.0, "thornback_boar": 14.0, "glowmoth": 5.0, "thornback_stag": 18.0}
 const AMBIENT: Dictionary = {"forest": Color(0.9, 0.94, 0.88), "glade": Color(0.88, 0.95, 0.94)}
 const INK: Color = Color("#1c1824")
-const GLADE_VIEWS: Array = [
-	["entrance", Vector2(60, 440)], ["ring", Vector2(300, 330)], ["spring", Vector2(445, 300)],
-	["arch", Vector2(615, 190)],
-]
 
 var world_size: Vector2 = Vector2(800.0, 480.0)
 var camera: Camera2D
@@ -68,40 +59,22 @@ func _init() -> void:
 func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR))
 	var ok: bool = true
-	if OS.get_cmdline_user_args().has("--scales"):
-		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(SCALE_DIR))
-		for sc: float in SCALES:
-			var tag: String = "" if is_equal_approx(sc, 1.0) else "_s%03d" % roundi(sc * 100.0)
-			var stem: String = "_s%03d" % roundi(sc * 100.0)
-			world_size = ForestLayout.size_scaled(sc)
-			ok = await _scene("forest", "res://presentation/forest/forest_route_ground%s.png" % tag, _forest_actors(sc),
-				ForestLayout.point_scaled(ForestLayout.ENTRY_POINT, sc), _crops(FOREST_CROPS, sc), SCALE_DIR + "forest" + stem) and ok
-			ok = await _scene("glade", "res://presentation/forest/stag_glade_ground%s.png" % tag, _glade_actors(sc),
-				GladeLayout.point_scaled(GladeLayout.PLAYER_START, sc), _crops(GLADE_CROPS, sc), SCALE_DIR + "glade" + stem) and ok
-		print("FOREST SCALES captured" if ok else "FOREST SCALES failed")
-		quit(0 if ok else 1)
-		return
 	# (the north_exit view puts the hero on the exit path behind the gate; the painting always shows the gate closed)
-	ok = await _scene("forest", "res://presentation/forest/forest_route_ground.png", _forest_actors(1.0), ForestLayout.ENTRY_POINT, FOREST_VIEWS, "") and ok
-	ok = await _scene("glade", "res://presentation/forest/stag_glade_ground.png", _glade_actors(1.0), GladeLayout.PLAYER_START, GLADE_VIEWS, "") and ok
+	world_size = ForestLayout.SIZE
+	ok = await _scene("forest", "res://presentation/forest/forest_route_ground.png", ForestLayout.spawns_scaled(ForestLayout.SCALE),
+		ForestLayout.ENTRY_POINT, _views(FOREST_VIEWS_1X, ForestLayout.SCALE), "") and ok
+	world_size = GladeLayout.SIZE
+	ok = await _scene("glade", "res://presentation/forest/stag_glade_ground.png", [["thornback_stag", GladeLayout.STAG_START]],
+		GladeLayout.PLAYER_START, _views(GLADE_VIEWS_1X, GladeLayout.SCALE), "") and ok
 	print("FOREST REVIEW captured" if ok else "FOREST REVIEW failed")
 	quit(0 if ok else 1)
 
 
-## [kind, position] for every creature in the scene.
-func _forest_actors(sc: float) -> Array:
-	return ForestLayout.spawns_scaled(sc)
-
-
-func _glade_actors(sc: float) -> Array:
-	return [["thornback_stag", GladeLayout.point_scaled(GladeLayout.STAG_START, sc)]]
-
-
-## The comparison crops at `sc`: [name, hero position, camera centre].
-func _crops(rows: Array, sc: float) -> Array:
+## The views at `sc`: [name, hero position].
+func _views(rows: Array, sc: float) -> Array:
 	var out: Array = []
 	for row: Array in rows:
-		out.append([row[0], ((row[1] as Vector2) * sc).round(), ((row[2] as Vector2) * sc).round()])
+		out.append([row[0], ((row[1] as Vector2) * sc).round()])
 	return out
 
 

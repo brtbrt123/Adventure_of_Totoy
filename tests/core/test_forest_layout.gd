@@ -1,5 +1,6 @@
 extends "res://tests/test_case.gd"
-## The forest route's layout (core/forest_layout.gd): valid colliders, free and reachable points, the exit (behind the
+## The forest route's layout at its game scale (core/forest_layout.gd, SCALE 0.6; other scales:
+## test_forest_layout_scaled.gd): valid colliders, free and reachable points, the exit (behind the
 ## root gate) is out of reach until the lantern puzzle opens the gate, the east trail is a sealed dead end with the
 ## chest, determinism.
 
@@ -44,7 +45,7 @@ func test_the_gate_is_a_separate_door() -> void:
 	for o: Obstacle in closed:
 		if ForestLayout.is_gate(o):
 			gate += 1
-	assert_eq(gate, ForestLayout.GATE_COLLIDERS.size(), "every gate collider is tagged by its feet")
+	assert_eq(gate, ForestLayout.GATE_COLLIDERS_1X.size(), "every gate collider is tagged by its feet")
 	assert_eq(closed.size() - open.size(), gate, "opening the gate removes exactly its colliders")
 	for o: Obstacle in open:
 		assert_false(ForestLayout.is_gate(o), "no gate collider when open")
@@ -71,7 +72,7 @@ func test_every_point_is_inside_the_world_and_free() -> void:
 func test_the_triggers_sit_on_their_edges() -> void:
 	assert_eq(ForestLayout.ENTRY_RECT.position.x, 0.0, "the entry trigger is on the left edge")
 	assert_eq(ForestLayout.EXIT_RECT.position.y, 0.0, "the exit is where the path behind the gate leaves the top edge")
-	assert_true(ForestLayout.EXIT_RECT.position.x > 560.0, "the exit is behind the root gate at the top right")
+	assert_true(ForestLayout.EXIT_RECT.position.x > 560.0 * ForestLayout.SCALE, "the exit is behind the root gate at the top right")
 	assert_true(ForestLayout.EXIT_RECT.has_point(ForestLayout.EXIT_POINT), "the exit point is inside its trigger")
 	assert_false(ForestLayout.ENTRY_RECT.has_point(ForestLayout.ENTRY_POINT), "arriving does not stand in the trigger back")
 
@@ -86,12 +87,12 @@ func test_spawn_points_do_not_overlap() -> void:
 			var gap: float = ForestLayout.SPAWN_RADIUS[rows[i][0]] + ForestLayout.SPAWN_RADIUS[rows[j][0]] + 8.0
 			assert_true(a.distance_to(b) >= gap, "spawns %d and %d keep apart" % [i, j])
 		var at: Vector2 = Vector2(rows[i][1], rows[i][2])
-		assert_true(at.distance_to(ForestLayout.ENTRY_POINT) > 100.0, "spawn %d is not on the entrance" % i)
+		assert_true(at.distance_to(ForestLayout.ENTRY_POINT) > 100.0 * ForestLayout.SCALE, "spawn %d is not on the entrance" % i)
 		# the Mosslings wait in the first clearing, the Boars and Glowmoths in the second
 		if rows[i][0] == "mossling":
-			assert_true(at.x < 300.0, "mossling %d is in the first clearing" % i)
+			assert_true(at.x < 300.0 * ForestLayout.SCALE, "mossling %d is in the first clearing" % i)
 		else:
-			assert_true(at.x >= 300.0, "%s %d is in the second clearing" % [rows[i][0], i])
+			assert_true(at.x >= 300.0 * ForestLayout.SCALE, "%s %d is in the second clearing" % [rows[i][0], i])
 
 
 func test_with_the_gate_closed_everything_but_the_exit_is_reachable() -> void:
@@ -115,21 +116,21 @@ func test_the_right_edge_is_sealed() -> void:
 	var grid: LayoutFlood = _flood(ForestLayout.build_with_gate(true))
 	var far: float = 0.0
 	for p: Vector2 in grid.reached_points():
-		if p.y > 150.0:  # below the exit path behind the gate
+		if p.y > 150.0 * ForestLayout.SCALE:  # below the exit path behind the gate
 			far = maxf(far, p.x)
-	assert_true(far < 770.0, "the dead-end trail stops short of the right edge (farthest x %.0f)" % far)
+	assert_true(far < 770.0 * ForestLayout.SCALE, "the dead-end trail stops short of the right edge (farthest x %.0f)" % far)
 
 
 func test_the_walkable_ground_stays_inside_the_outline() -> void:
 	# nothing leaks into the painted forest: every reachable spot (gate open, so the north path counts) is inside the
 	# outline or within a few px of it (the gaps between edge circles are smaller than the hero)
 	var grid: LayoutFlood = _flood(ForestLayout.build_with_gate(true))
-	var outline: PackedVector2Array = PackedVector2Array(ForestLayout.OUTLINE)
+	var outline: PackedVector2Array = PackedVector2Array(ForestLayout.outline_scaled())
 	var outside: int = 0
 	for p: Vector2 in grid.reached_points():
 		if Geometry2D.is_point_in_polygon(p, outline):
 			continue
-		if SceneBounds.fit_radius(ForestLayout.OUTLINE, p, 100.0) > 6.0:
+		if SceneBounds.fit_radius(ForestLayout.outline_scaled(), p, 100.0) > 6.0:
 			outside += 1
 	assert_eq(outside, 0, "reachable spots more than 6 px outside the outline")
-	assert_true(grid.reached_points().size() > 3000, "the walkable ground is large (%d samples)" % grid.reached_points().size())
+	assert_true(grid.reached_points().size() > 3000.0 * ForestLayout.SCALE * ForestLayout.SCALE, "the walkable ground is large (%d samples)" % grid.reached_points().size())

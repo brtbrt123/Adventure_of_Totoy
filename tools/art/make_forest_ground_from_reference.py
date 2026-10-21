@@ -36,14 +36,13 @@ Functional edits (painting coordinates of the untrimmed source; see FOREST_EDITS
   and the chest are left as painted.
 - glade: the bottom-left entrance trail and the root arch are already clear in the painting; nothing is painted.
 
-Writes presentation/forest/forest_route_ground.png and presentation/forest/stag_glade_ground.png (800x480, opaque,
-palette colours only). Deterministic: the only randomness is a hash of (SEED, x, y) for the ragged trail fringe.
---scale S (default 1.0, the approved 800x480 files) converts the paintings at round(800*S) x round(480*S) with the same
-pipeline and edits, so trees, stones and props shrink relative to the characters (who keep their pixel size; the human's
-review on 2026-10-22: at 1.0 the hero looks tiny, as in the village, which moved to 0.7). Any other scale writes
-presentation/forest/<name>_sNNN.png (forest_route_ground_s060.png ...) beside the game's files; the matching colliders
-are core/forest_layout.gd / core/glade_layout.gd build_scaled(S). Options compared on docs/previews/forest_scale_options.png
-and glade_scale_options.png.
+Scale: each scene is converted at round(800*S) x round(480*S); the paintings are drawn bigger than the characters, so the
+props shrink while the characters keep their pixel size. The human chose (2026-10-22, after comparing 1.0 / 0.7 / 0.6 /
+0.5 on docs/previews/forest_scale_options.png and glade_scale_options.png) the forest at 0.6 and the glade at 0.7
+(core/forest_layout.gd / core/glade_layout.gd SCALE). Writes presentation/forest/forest_route_ground.png (480x288) and
+presentation/forest/stag_glade_ground.png (560x336), opaque, palette colours only. --scale S converts at another scale
+and writes presentation/forest/<name>_sNNN.png instead (e.g. --scale 1.0 -> _s100, the first 800x480 version); the
+matching colliders are build_scaled(S). Deterministic: the only randomness is a hash of (SEED, x, y) for the trail fringe.
 Run from the project root:
   python tools/art/make_forest_ground_from_reference.py --scene forest|glade|all [--scale S] [--preview DIR]
 """
@@ -64,8 +63,6 @@ from import_reference import srgb_to_lab  # noqa: E402
 ROOT = artlib.ROOT
 OUT_DIR = ROOT / "presentation" / "forest"
 W, H = 800, 480
-# the approved scale of the files the game loads (1.0 = 800x480); --scale writes options beside them (see the docstring)
-DEFAULT_SCALE = 1.0
 SEED = 20261021
 LIGHTNESS_WEIGHT = 2.0
 # the village's hue guards (extra cost, Lab distance squared, for leaving the pixel's hue family)
@@ -104,6 +101,8 @@ class Scene:
     edits: Callable[[Image.Image, "Scene"], Image.Image] | None = None
     contrast: float = 1.08
     color: float = 0.94
+    # the game's scale of this scene (the human's choice; core/<scene>_layout.gd SCALE)
+    scale: float = 1.0
     extra: dict = field(default_factory=dict)
 
     def local(self, x: float, y: float) -> Point:
@@ -260,6 +259,7 @@ SCENES: dict[str, Scene] = {
         # 2 grey columns at the left, 3 at the right, no rows (measured)
         (2, 0, 832, 481),
         forest_edits,
+        scale=0.6,
     ),
     "glade": Scene(
         "glade",
@@ -268,6 +268,7 @@ SCENES: dict[str, Scene] = {
         # 1 grey column at the left, 3 at the right, 5 rows at the top (measured)
         (1, 5, 832, 489),
         None,
+        scale=0.7,
     ),
 }
 
@@ -399,23 +400,24 @@ def to_image(grid: list[list[str]]) -> Image.Image:
     return out
 
 
-def size_for(scale: float = DEFAULT_SCALE) -> tuple[int, int]:
+def size_for(scale: float) -> tuple[int, int]:
     """The scene size in px at `scale` (1.0 = 800x480, the approved size; 0.7 = 560x336, 0.6 = 480x288, 0.5 = 400x240)."""
     return round(W * scale), round(H * scale)
 
 
 def out_for(scene: Scene, scale: float) -> Path:
     """The game's file at the default scale; presentation/forest/<name>_sNNN.png for any other scale (an option)."""
-    if abs(scale - DEFAULT_SCALE) < 1e-9:
+    if abs(scale - scene.scale) < 1e-9:
         return scene.out
     return scene.out.with_name(f"{scene.out.stem}_s{round(scale * 100):03d}.png")
 
 
-def build(scene: Scene, scale: float = DEFAULT_SCALE) -> Image.Image:
+def build(scene: Scene, scale: float | None = None) -> Image.Image:
+    scale = scene.scale if scale is None else scale
     return to_image(cleanup(snap_image(prepare(scene, size_for(scale)))))
 
 
-def check(img: Image.Image, scale: float = DEFAULT_SCALE) -> list[str]:
+def check(img: Image.Image, scale: float) -> list[str]:
     allowed = {rgb for sym, rgb in palette.by_symbol.items() if sym not in palette.reserved}
     problems: list[str] = []
     if img.size != size_for(scale):
@@ -428,7 +430,8 @@ def check(img: Image.Image, scale: float = DEFAULT_SCALE) -> list[str]:
     return problems
 
 
-def run(scene: Scene, preview: Path | None, scale: float = DEFAULT_SCALE) -> int:
+def run(scene: Scene, preview: Path | None, scale: float | None = None) -> int:
+    scale = scene.scale if scale is None else scale
     if not scene.source.exists():
         print("missing", scene.source)
         return 1
@@ -453,11 +456,12 @@ def run(scene: Scene, preview: Path | None, scale: float = DEFAULT_SCALE) -> int
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--scene", choices=["forest", "glade", "all"], default="all")
-    parser.add_argument("--scale", type=float, default=DEFAULT_SCALE,
-                        help="scene scale relative to 800x480 (default 1.0, the approved files; others write *_sNNN.png)")
+    parser.add_argument("--scale", type=float, default=None,
+                        help="scale relative to 800x480 (default: the scene's game scale, forest 0.6, glade 0.7, writing the "
+                             "game's files; any other scale writes *_sNNN.png)")
     parser.add_argument("--preview", help="also write a 2x preview, the edited painting and the prepared (unsnapped) image")
     args = parser.parse_args()
-    if not 0.25 <= args.scale <= 2.0:
+    if args.scale is not None and not 0.25 <= args.scale <= 2.0:
         print("--scale must be between 0.25 and 2.0")
         return 1
     names = ["forest", "glade"] if args.scene == "all" else [args.scene]
