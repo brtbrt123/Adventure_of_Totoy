@@ -12,8 +12,12 @@ func _init() -> void:
 	var failed: int = 0
 	var files: PackedStringArray = DirAccess.get_files_at(TEST_DIR)
 	files.sort()
+	# optional: TOTOY_TEST_FILTER=glade runs only the files whose name contains "glade" (quick local runs)
+	var only: String = OS.get_environment("TOTOY_TEST_FILTER")
 	for file_name: String in files:
 		if not (file_name.begins_with("test_") and file_name.ends_with(".gd")):
+			continue
+		if only != "" and not file_name.contains(only):
 			continue
 		var script: GDScript = load(TEST_DIR + "/" + file_name) as GDScript
 		if script == null:

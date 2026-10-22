@@ -64,8 +64,9 @@ const SOLIDS_1X: Array = [
 	["signpost", 248, 182, 7.0],
 	["lantern post", 296, 190, 5.0],
 	["mossy stone", 333, 200, 16.0],
-	["lantern pedestal", 512, 236, 10.0],
-	["lantern pedestal", 636, 274, 10.0],
+	# the lantern pedestals: two circles along each square base (the whole painted width is solid)
+	["lantern pedestal", 503, 238, 10.0], ["lantern pedestal", 522, 238, 10.0],
+	["lantern pedestal", 627, 277, 10.0], ["lantern pedestal", 645, 277, 10.0],
 	["chest", 688, 376, 14.0],
 	["mossy rock", 741, 290, 15.0],
 	# the undergrowth and roots where the dead-end trail stops (beyond the edge chain, so the end reads solid too)
@@ -76,8 +77,9 @@ const SOLIDS_1X: Array = [
 ## The root gate: a row of circles along its base, closing the path north. Every gate collider has feet GATE_FEET_1X * scale.
 const GATE_FEET_1X: Vector2 = Vector2(628, 190)
 const GATE_FEET: Vector2 = Vector2(377, 114)
-const GATE_COLLIDERS_1X: Array = [[585, 182, 10.0], [600, 182, 10.0], [615, 182, 10.0], [630, 182, 10.0],
-	[645, 182, 10.0], [660, 182, 10.0], [675, 182, 10.0]]  # x, y, radius
+## The row sits on the painted gate's base (y about 104 at 0.6), so the hero stops right in front of the roots.
+const GATE_COLLIDERS_1X: Array = [[585, 175, 10.0], [600, 175, 10.0], [615, 175, 10.0], [630, 175, 10.0],
+	[645, 175, 10.0], [660, 175, 10.0], [675, 175, 10.0]]  # x, y, radius
 
 ## The left edge: entering from (and leaving to) the village. The player appears at ENTRY_POINT.
 const ENTRY_RECT_1X: Rect2 = Rect2(0, 240, 12, 58)

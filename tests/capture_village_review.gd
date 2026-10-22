@@ -4,11 +4,10 @@ extends SceneTree
 ## ground, the people at their stand points (core/village_layout.gd) and the hero at the gate, and looks through a
 ## 320x180 camera clamped to the village, the same crop rule as the arena camera. The village is the 0.7 conversion
 ## (571x336, VillageLayout.SCALE).
-## Every person stands on a ground shadow drawn exactly like the arena's actor shadow (presentation/arena/arena.gd
-## _draw_actor: an opaque ink (palette 0) 32-point ellipse, x radius r, y radius 0.3 r, 2 px below the feet; the hero's r
-## is 10), with r scaled by the person's height against the hero's 34 px, and every person is modulated by AMBIENT, a
-## slight warm-evening darkening, so the bright sprites sit in the dusk painting. The real village scene should do the
-## same: the arena shadow plus a per-scene ambient tint constant.
+## Every person stands on the shared soft ground shadow (presentation/common/actor_shadow.gd, the game's: translucent
+## ink, hard-pixel rows with a dithered ring; the hero's radius is 10), with the radius scaled by the person's height
+## against the hero's 34 px, and every person is modulated by AMBIENT, a slight warm-evening darkening, so the bright
+## sprites sit in the dusk painting (the real village scene does the same).
 ##   godot --path . --script res://tests/capture_village_review.gd      (the regular, windowed exe)
 ## Saves into docs/previews/:
 ##   village_full_v1.png       the whole 571x336 village at 2x, stitched from 9 camera views, people and hero standing
@@ -25,9 +24,9 @@ const HERO: String = "res://art/build/sprites/hero2_idle_right_1.png"
 const HERO_ANCHOR: Vector2 = Vector2(12, 35)  # art/build/sprites.json ax/ay of hero2_idle_right_1
 const HERO_HEIGHT: float = 34.0
 const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
-## The arena's hero shadow radius (presentation/arena/arena.gd _draw_actor) and its ink colour (palette 0).
+## The hero's shadow radius (presentation/common/actor_shadow.gd draws it).
 const SHADOW_RADIUS: float = 10.0
-const SHADOW_COLOUR: Color = Color("#1c1824")
+const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 ## The village's evening ambient: a few percent darker and warmer on the people (multiply), not on the ground.
 const AMBIENT: Color = Color(0.93, 0.89, 0.84)
 ## [stand point id, frame, face left] (the chest gets no shadow and no tint: it is an object, like the painted props)
@@ -50,7 +49,7 @@ const VIEWS: Array = [
 
 var camera: Camera2D
 var hero: Sprite2D
-var hero_shadow: Polygon2D
+var hero_shadow: Node2D
 
 
 func _init() -> void:
@@ -139,14 +138,10 @@ func _sprite(texture: Texture2D, feet: Vector2, anchor: Vector2, face_left: bool
 	return s
 
 
-## The arena's actor shadow (presentation/arena/arena.gd _draw_actor) at `feet` with x radius `radius`.
-func _shadow(feet: Vector2, radius: float) -> Polygon2D:
-	var points: PackedVector2Array = PackedVector2Array()
-	for i: int in range(32):
-		points.append(Vector2(cos(TAU * i / 32.0) * radius, sin(TAU * i / 32.0) * radius * 0.3 + 2))
-	var shadow: Polygon2D = Polygon2D.new()
-	shadow.polygon = points
-	shadow.color = SHADOW_COLOUR
+## The game's actor shadow (presentation/common/actor_shadow.gd) at `feet` with radius `radius`.
+func _shadow(feet: Vector2, radius: float) -> Node2D:
+	var shadow: Node2D = Node2D.new()
+	shadow.draw.connect(func() -> void: ActorShadow.draw(shadow, Vector2.ZERO, radius, ActorShadow.strength_for(&"village")))
 	shadow.position = feet.round()
 	return shadow
 

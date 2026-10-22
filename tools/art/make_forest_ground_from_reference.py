@@ -34,7 +34,12 @@ Functional edits (painting coordinates of the untrimmed source; see FOREST_EDITS
   narrows to a point and darkens into the undergrowth well before the right edge (it does not lead off-screen). The two pedestals are made UNLIT (their warm windows become dark stone): the
   lantern puzzle lights them at runtime, so the painting must show the unlit state. The left entrance, the root gate
   and the chest are left as painted.
-- glade: the bottom-left entrance trail and the root arch are already clear in the painting; nothing is painted.
+- glade: the bottom-left entrance trail and the root arch are already clear in the painting. A DELIBERATE CHANGE from
+  the painting (the human's decision, 2026-10-22): the spring (water, rim stones, pebbles), the three lying slabs and
+  the round rock are painted over with the clearing's own grass (grass_over: the light of the grass around each hole
+  plus the high-pass detail of a clean grass sample from inside the ring, a dithered edge), so the ring keeps only its
+  five standing rune stones (protected, with the thorn ferns beside them) and the Stag has the middle to fight in. The
+  pale glow on the grass west of the spring stays as a flat haze.
 
 Scale: each scene is converted at round(800*S) x round(480*S); the paintings are drawn bigger than the characters, so the
 props shrink while the characters keep their pixel size. The human chose (2026-10-22, after comparing 1.0 / 0.7 / 0.6 /
@@ -251,6 +256,171 @@ def forest_edits(img: Image.Image, scene: Scene) -> Image.Image:
     return unlight(img, scene, FOREST_PEDESTAL_WINDOWS)
 
 
+def _in_polygon(x: float, y: float, poly: list[Point]) -> bool:
+    inside = False
+    j = len(poly) - 1
+    for i in range(len(poly)):
+        xi, yi = poly[i]
+        xj, yj = poly[j]
+        if (yi > y) != (yj > y) and x < (xj - xi) * (y - yi) / (yj - yi) + xi:
+            inside = not inside
+        j = i
+    return inside
+
+
+def grass_over(img: Image.Image, scene: Scene, spec: dict) -> Image.Image:
+    """Paint props over with the painting's own grass (a seamless clone, at the painting's resolution).
+
+    The mask is the union of spec['ellipses'] (cx, cy, rx, ry) and spec['polygons'], minus spec['protect'] boxes (props
+    that stay), all in source coordinates. Every masked pixel becomes
+        low(p) + texture(p)
+    where low(p) is the inverse-distance average of the grass just outside the mask (only grass-green boundary pixels,
+    so the stones that stay do not bleed in: the fill takes the light of the grass around it, no seam), and texture(p)
+    is the high-pass detail (the pixel minus its 7x7 box mean) of the clean grass samples spec['samples'], laid in
+    random spec['block'] px blocks (tufts and blobs of the painted grass, no repeating tile; the detail averages to zero
+    so the block edges do not show). Boundary pixels darker than spec['dark_cut'] x the median are ignored. The edge `feather` px dither between the fill and the
+    painting by hashed noise. Deterministic.
+    """
+    out = img.copy()
+    src = img.load()
+    dst = out.load()
+    w, h = img.size
+    ellipses = [(*scene.local(e[0], e[1]), e[2], e[3]) for e in spec.get("ellipses", [])]
+    polygons = [[scene.local(x, y) for x, y in poly] for poly in spec.get("polygons", [])]
+    protect = []
+    for b in spec.get("protect", []):
+        x0, y0 = scene.local(b[0], b[1])
+        x1, y1 = scene.local(b[2], b[3])
+        protect.append((x0, y0, x1, y1))
+
+    def masked(x: int, y: int) -> bool:
+        if any(b[0] <= x < b[2] and b[1] <= y < b[3] for b in protect):
+            return False
+        return any(_inside_ellipse(x, y, e) for e in ellipses) or any(_in_polygon(x, y, p) for p in polygons)
+
+    bx0 = int(min([e[0] - e[2] for e in ellipses] + [min(p[0] for p in poly) for poly in polygons])) - 2
+    bx1 = int(max([e[0] + e[2] for e in ellipses] + [max(p[0] for p in poly) for poly in polygons])) + 2
+    by0 = int(min([e[1] - e[3] for e in ellipses] + [min(p[1] for p in poly) for poly in polygons])) - 2
+    by1 = int(max([e[1] + e[3] for e in ellipses] + [max(p[1] for p in poly) for poly in polygons])) + 2
+    mask: set[tuple[int, int]] = set()
+    for y in range(max(0, by0), min(h, by1)):
+        for x in range(max(0, bx0), min(w, bx1)):
+            if masked(x, y):
+                mask.add((x, y))
+    # the grass just outside the mask (every 2nd boundary pixel), the light the fill takes
+    boundary: list[tuple[int, int, tuple[int, int, int]]] = []
+    for (x, y) in sorted(mask):
+        for dx, dy in ((2, 0), (-2, 0), (0, 2), (0, -2)):
+            q = (x + dx, y + dy)
+            if q in mask or not (0 <= q[0] < w and 0 <= q[1] < h):
+                continue
+            r, g, b = src[q]
+            if g > r and g > b + 35 and (q[0] + q[1]) % 2 == 0:  # grass, not the stones or the spring's mint glow
+                boundary.append((q[0], q[1], (r, g, b)))
+    boundary = sorted(set(boundary))[::2]
+    # drop the dark boundary pixels (the ink and shadows at the foot of the stones that stay): they would smear in
+    lums = sorted(c[0] + c[1] + c[2] for (_, _, c) in boundary)
+    floor = lums[len(lums) // 2] * spec["dark_cut"]
+    boundary = [q for q in boundary if q[2][0] + q[2][1] + q[2][2] >= floor]
+
+    # the high-pass detail of the clean grass samples (pixel minus its 7x7 box mean), per sample region
+    def high_pass(box: tuple[int, int, int, int]) -> list[list[tuple[float, float, float]]]:
+        x0, y0 = scene.local(box[0], box[1])
+        x1, y1 = scene.local(box[2], box[3])
+        x0, y0, x1, y1 = int(x0), int(y0), int(x1), int(y1)
+        rows = []
+        for y in range(y0, y1):
+            row = []
+            for x in range(x0, x1):
+                acc = [0.0, 0.0, 0.0]
+                n = 0
+                for yy in range(max(y0, y - 3), min(y1, y + 4)):
+                    for xx in range(max(x0, x - 3), min(x1, x + 4)):
+                        c = src[xx, yy]
+                        acc[0] += c[0]
+                        acc[1] += c[1]
+                        acc[2] += c[2]
+                        n += 1
+                c = src[x, y]
+                row.append((c[0] - acc[0] / n, c[1] - acc[1] / n, c[2] - acc[2] / n))
+            rows.append(row)
+        return rows
+
+    samples = [high_pass(box) for box in spec["samples"]]
+    block = spec["block"]
+
+    def texture(x: int, y: int) -> tuple[float, float, float]:
+        """Random blocks (quilting) of the samples' detail: block (x // block, y // block) picks a sample and an offset."""
+        bx, by = x // block, y // block
+        pick = samples[int(_hash01(bx, by, 31) * len(samples)) % len(samples)]
+        sh, sw = len(pick), len(pick[0])
+        ox = int(_hash01(bx, by, 32) * (sw - block))
+        oy = int(_hash01(bx, by, 33) * (sh - block))
+        return pick[oy + y % block][ox + x % block]
+
+    feather = spec["feather"]
+    for (x, y) in sorted(mask):
+        # the distance to the mask's edge (up to `feather`), for the dithered edge
+        edge = feather
+        for d in range(1, feather):
+            if any((x + ex * d, y + ey * d) not in mask for ex, ey in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                edge = d
+                break
+        if edge < feather and _hash01(x, y, 21) > edge / feather:
+            continue
+        wsum = 0.0
+        low = [0.0, 0.0, 0.0]
+        for (qx, qy, c) in boundary:
+            d2 = (qx - x) ** 2 + (qy - y) ** 2
+            wt = 1.0 / (d2 * (d2 ** 0.5) + 1.0)
+            wsum += wt
+            low[0] += c[0] * wt
+            low[1] += c[1] * wt
+            low[2] += c[2] * wt
+        t = texture(x, y)
+        k = spec["detail"]
+        r, g, b = (low[i] / wsum + t[i] * k for i in range(3))
+        # grass, never the spring's teal (the snap would turn a blue-green fill into water)
+        b = min(b, g - spec["min_yellow"], r + 10.0)
+        r = max(r, g - 32.0)
+        dst[x, y] = tuple(max(0, min(255, int(round(v)))) for v in (r, g, b))
+    return out
+
+
+# Glade (the human's decision, 2026-10-22): the spring (water, rim stones, pebbles), the three lying slabs and the round
+# rock are painted over with the clearing's grass, so the ring keeps only its five standing stones and the Stag has the
+# middle to fight in. Source coordinates (the untrimmed painting). The five stones and the thorn ferns beside the back
+# and the right stone are protected; the pale glow on the grass west of the spring stays (a faint magical haze, flat).
+GLADE_CLEAR = {
+    "ellipses": [
+        (474.0, 248.0, 63.0, 37.0),   # the spring, its rim stones and pebbles
+        (391.0, 213.0, 35.0, 21.0),   # the top slab
+        (464.0, 325.0, 43.0, 25.0),   # the bottom slab
+        (490.0, 342.0, 11.0, 8.0),    # the small stone under it
+        (553.0, 315.0, 15.0, 13.0),   # the round rock
+        (412.0, 267.0, 8.0, 6.0),     # pebbles at the spring's west rim
+        (468.0, 286.0, 56.0, 10.0),   # the pebbles along its south rim
+        (402.0, 268.0, 30.0, 24.0),   # the spring's mint glow on the grass west of it (it snaps to water teal)
+    ],
+    "polygons": [
+        [(487.0, 318.0), (539.0, 257.0), (570.0, 266.0), (570.0, 298.0), (524.0, 344.0), (490.0, 342.0)],  # right slab
+    ],
+    "protect": [(432, 156, 471, 226), (521, 182, 563, 262), (471, 184, 506, 212), (556, 212, 594, 268),
+                (378, 284, 418, 352)],
+    # clean grass inside the ring, west of the spring (the glow haze with its yellow tufts)
+    "samples": [(345, 242, 398, 280), (200, 232, 255, 300)],
+    "block": 9,
+    "dark_cut": 0.8,
+    "min_yellow": 55.0,
+    "feather": 4,
+    "detail": 1.0,
+}
+
+
+def glade_edits(img: Image.Image, scene: Scene) -> Image.Image:
+    return grass_over(img, scene, GLADE_CLEAR)
+
+
 SCENES: dict[str, Scene] = {
     "forest": Scene(
         "forest",
@@ -267,7 +437,7 @@ SCENES: dict[str, Scene] = {
         OUT_DIR / "stag_glade_ground.png",
         # 1 grey column at the left, 3 at the right, 5 rows at the top (measured)
         (1, 5, 832, 489),
-        None,
+        glade_edits,
         scale=0.7,
     ),
 }

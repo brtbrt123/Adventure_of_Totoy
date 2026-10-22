@@ -8,7 +8,7 @@ static func register() -> void:
 		"arena_up": [KEY_W, KEY_UP], "arena_down": [KEY_S, KEY_DOWN],
 		"arena_attack": [], "arena_weapon_active": [], "arena_parry": [KEY_SPACE],
 		"arena_dash": [KEY_SHIFT], "arena_restart": [KEY_R],
-		"arena_debug": [KEY_F1],
+		"arena_debug": [KEY_F1, KEY_H],
 		"menu_up": [KEY_W, KEY_UP], "menu_down": [KEY_S, KEY_DOWN],
 		"menu_accept": [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE], "menu_back": [KEY_ESCAPE],
 		"arena_skill_1": [KEY_Z], "arena_skill_2": [KEY_X], "arena_skill_3": [KEY_C],
@@ -18,8 +18,9 @@ static func register() -> void:
 		# exploration (presentation/explore/explore_scene.gd): E interacts; F2-F5 jump to a scene, F6 opens/closes the
 		# forest's root gate (debug keys for testing)
 		"explore_interact": [KEY_E],
-		"debug_scene_village": [KEY_F2], "debug_scene_forest": [KEY_F3], "debug_scene_glade": [KEY_F4],
-		"debug_scene_arena": [KEY_F5], "debug_toggle_gate": [KEY_F6],
+		# keyboards without F-keys: the number row 1-4 jump, G toggles the gate, H shows the debug overlay
+		"debug_scene_village": [KEY_F2, KEY_1], "debug_scene_forest": [KEY_F3, KEY_2], "debug_scene_glade": [KEY_F4, KEY_3],
+		"debug_scene_arena": [KEY_F5, KEY_4], "debug_toggle_gate": [KEY_F6, KEY_G],
 	}
 	# Q no longer swaps weapons in the arena (2026-10-21): weapons are equipped in the character menu's inventory.
 	if InputMap.has_action("arena_weapon_swap"):

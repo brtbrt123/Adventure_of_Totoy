@@ -90,6 +90,8 @@ func _every_scene_loads() -> void:
 		_expect(scene.fade_alpha() == 0.0, "the fade ends clear")
 		_expect(scene.hud.toast_text == SceneDefs.get_def(scene_id)["name"] and scene.hud.toast_alpha > 0.0, "%s shows its name toast" % scene_id)
 		for item: Dictionary in scene.drawables():
+			if item["kind"] == &"occluder":
+				continue  # the painted props drawn over actors behind them (smoke_depth_occluders.gd)
 			_expect(scene.frames.has(item["frame"]), "%s draws a missing frame %s" % [scene_id, item["frame"]])
 		_expect(Explore.AMBIENT.has(scene_id) and scene.ambient() == Explore.AMBIENT[scene_id], "%s has its ambient tint" % scene_id)
 		# camera: clamped at the four corners and the hero always on screen
@@ -136,7 +138,7 @@ func _village() -> void:
 		_expect(float(item["shadow"]) > 5.0 and float(item["shadow"]) <= 10.0, "%s has a ground shadow scaled by height" % item["id"])
 	var chest: bool = false
 	for item: Dictionary in scene.drawables():
-		chest = chest or item["frame"] == "obj_chest_closed_1"
+		chest = chest or item.get("frame", "") == "obj_chest_closed_1"
 	_expect(chest, "the village chest is drawn closed")
 	# the idle loop advances (4 frames over 60 ticks)
 	var seen: Dictionary = {}

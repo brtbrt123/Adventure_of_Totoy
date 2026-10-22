@@ -16,12 +16,13 @@ extends RefCounted
 ## spacing and the fight area scale; the hero's radius and STAG_RADIUS do not (characters keep their pixel size).
 ##
 ## The trail comes in at the bottom-left (ENTRY_RECT on the left edge); the round clearing holds the ring of standing
-## stones around the glowing spring; the root arch at the top right is the exit (EXIT_RECT, inside the arch).
-## Only TWO standing stones are solid (SOLIDS_1X: the "2" rune stone at the back and the rune stone at the right): at
-## 0.7 the Stag keeps its size while the ring shrinks, and with all five stones solid it could reach only 68.9 % of the
-## fight area (the rule is at least 80 %; three solid stones gave 78.8 %, two give 83.4 %). The other three tall stones
-## (WALKABLE_STONES_1X), the lying slabs, the flagstones, the spring (shallow, decor) and the bones are walkable, so the
-## middle stays open for the fight and no charge gets trapped in the ring.
+## stones; the root arch at the top right is the exit (EXIT_RECT, inside the arch).
+## The human's decisions (2026-10-22): everything that stands up is SOLID ("why can I walk in this stone and water"),
+## and the spring, the three lying slabs and the round rock were REMOVED from the ground art (a deliberate change from
+## the painting: tools/art/make_forest_ground_from_reference.py paints them over with grass) so the Stag keeps the
+## middle of the ring. Solid inside the ring: the five standing stones only (two small circles along each painted base,
+## SOLIDS_1X); presentation draws their tops over actors standing behind them (presentation/common/depth_occluders.json).
+## The flagstones, the bones and SPRING (the ring's middle, where the spring was: decor, walkable) stay walkable.
 const Obstacle := preload("res://core/obstacle.gd")
 const SceneBounds := preload("res://core/scene_bounds.gd")
 
@@ -50,24 +51,28 @@ const OUTLINE_1X: Array[Vector2] = [
 const BOUNDARY_RADIUS_1X: float = 36.0
 const BOUNDARY_SPACING_1X: float = 24.0
 
-## [what it is, centre x, centre y, radius] at 1.0: the two solid standing stones, a circle on the middle of each painted
-## base. Radius 7.2 at 1.0 = 5.04 at 0.7 (the smallest radius that still reads as the stone's base).
+## [what it is, centre x, centre y, radius] at 1.0: everything solid standing in the ring, the five standing stones, two
+## circles along each painted base (radius 7.2 at 1.0 = 5.04 at 0.7; the front rune stone is wider, 8.6).
 const SOLIDS_1X: Array = [
-	["rune stone", 432, 207, 7.2],
-	["rune stone", 518, 231, 7.2],
+	["rune stone (back, 2)", 424, 207, 7.2], ["rune stone (back, 2)", 436, 207, 7.2],
+	["rune stone (right)", 513, 233, 7.2], ["rune stone (right)", 524, 233, 7.2],
+	["rune stone (left)", 317, 233, 7.2], ["rune stone (left)", 329, 234, 7.2],
+	["standing stone", 300, 290, 7.2], ["standing stone", 310, 291, 7.2],
+	["rune stone (front)", 373, 330, 8.6], ["rune stone (front)", 391, 330, 8.6],
 ]
-## The tall stones that are NOT solid (for the record and for presentation, e.g. depth sorting later): [what, x, y].
-const WALKABLE_STONES_1X: Array = [["rune stone", 322, 233], ["standing stone", 305, 280], ["rune stone", 382, 328]]
+## The five tall standing stones (the "2" stone at the back, right, left, the plain standing stone, front): [what, x, y]
+## of the middle of each base at 1.0 (the depth occluders in presentation use the same bases).
+const STANDING_STONES_1X: Array = [["rune stone (back, 2)", 430, 208], ["rune stone (right)", 518, 236],
+	["rune stone (left)", 323, 236], ["standing stone", 305, 293], ["rune stone (front)", 382, 333]]
 
-## The spring in the ring: decor (walkable, shallow). Centre and radii of its painted ellipse.
-const SPRING_1X: Vector2 = Vector2(445, 252)
-const SPRING_RADII_1X: Vector2 = Vector2(62, 32)
-const SPRING: Vector2 = Vector2(312, 176)
+## Where the spring was (removed from the art on 2026-10-22): the ring's middle, decor and walkable.
+const SPRING_1X: Vector2 = Vector2(439, 250)
+const SPRING: Vector2 = Vector2(307, 175)
 ## The middle of the clearing (x 120..660, y 160..400 at 1.0) and the fight area around it (300x200 at 1.0, scaled with
-## the scene) that the Stag must be free to use (tests: at least 80 % of it; 83.4 % at SCALE with STAG_RADIUS 20).
-const CENTRE_1X: Vector2 = Vector2(390, 282)
+## the scene) that the Stag must be free to use (tests: at least 80 % of it with STAG_RADIUS 20).
+const CENTRE_1X: Vector2 = Vector2(390, 290)
 const FIGHT_AREA_1X: Rect2 = Rect2(240, 182, 300, 200)
-const CENTRE: Vector2 = Vector2(273, 197)
+const CENTRE: Vector2 = Vector2(273, 203)
 const FIGHT_AREA: Rect2 = Rect2(168, 127, 210, 140)
 
 ## The left edge at the bottom: entering from (and leaving to) the forest route. The player appears at ENTRY_POINT.
@@ -91,10 +96,10 @@ const STAG_RADIUS: float = 20.0
 
 ## [id, kind, feet x, feet y, stand x, stand y] at 1.0 and at SCALE.
 const INTERACTABLES_1X: Array = [
-	["spring", "decor", 445, 252, 445, 296],
+	["spring", "decor", 439, 250, 445, 296],
 ]
 const INTERACTABLES: Array = [
-	["spring", "decor", 312, 176, 312, 207],
+	["spring", "decor", 307, 175, 312, 207],
 ]
 ## The checkpoint at the glade entrance (docs/CHAPTER1_PLAN.md), at 1.0 and at SCALE.
 const CHECKPOINTS_1X: Array[Vector2] = [Vector2(60, 440)]

@@ -1,0 +1,466 @@
+{
+ "scene": "village",
+ "ground": "res://presentation/village/village_ground.png",
+ "texture": "res://presentation/common/occluders/village_occluders.png",
+ "occluders": [
+  {
+   "id": "gate_left_pillar",
+   "base_y": 192,
+   "rect": [
+    80,
+    104,
+    26,
+    92
+   ],
+   "atlas": [
+    0,
+    0
+   ],
+   "pixels": 2392,
+   "ground_share": 0.7266,
+   "hide_when": ""
+  },
+  {
+   "id": "gate_lintel",
+   "base_y": 185,
+   "rect": [
+    78,
+    76,
+    90,
+    52
+   ],
+   "atlas": [
+    27,
+    0
+   ],
+   "pixels": 2228,
+   "ground_share": 0.4331,
+   "hide_when": ""
+  },
+  {
+   "id": "gate_door_right_pillar",
+   "base_y": 174,
+   "rect": [
+    125,
+    84,
+    42,
+    93
+   ],
+   "atlas": [
+    118,
+    0
+   ],
+   "pixels": 3780,
+   "ground_share": 0.3902,
+   "hide_when": ""
+  },
+  {
+   "id": "middle_tree",
+   "base_y": 165,
+   "rect": [
+    190,
+    60,
+    43,
+    110
+   ],
+   "atlas": [
+    161,
+    0
+   ],
+   "pixels": 3346,
+   "ground_share": 0.5912,
+   "hide_when": ""
+  },
+  {
+   "id": "stump",
+   "base_y": 177,
+   "rect": [
+    226,
+    150,
+    22,
+    29
+   ],
+   "atlas": [
+    205,
+    0
+   ],
+   "pixels": 638,
+   "ground_share": 0.7006,
+   "hide_when": ""
+  },
+  {
+   "id": "forge",
+   "base_y": 104,
+   "rect": [
+    268,
+    32,
+    54,
+    74
+   ],
+   "atlas": [
+    228,
+    0
+   ],
+   "pixels": 3996,
+   "ground_share": 0.3056,
+   "hide_when": ""
+  },
+  {
+   "id": "anvil",
+   "base_y": 120,
+   "rect": [
+    293,
+    100,
+    27,
+    21
+   ],
+   "atlas": [
+    283,
+    0
+   ],
+   "pixels": 567,
+   "ground_share": 0.4356,
+   "hide_when": ""
+  },
+  {
+   "id": "tool_bench",
+   "base_y": 128,
+   "rect": [
+    236,
+    98,
+    36,
+    32
+   ],
+   "atlas": [
+    311,
+    0
+   ],
+   "pixels": 1152,
+   "ground_share": 0.8108,
+   "hide_when": ""
+  },
+  {
+   "id": "training_dummy",
+   "base_y": 152,
+   "rect": [
+    315,
+    115,
+    26,
+    38
+   ],
+   "atlas": [
+    348,
+    0
+   ],
+   "pixels": 502,
+   "ground_share": 0.6833,
+   "hide_when": ""
+  },
+  {
+   "id": "barrel_smithy",
+   "base_y": 143,
+   "rect": [
+    355,
+    110,
+    27,
+    35
+   ],
+   "atlas": [
+    375,
+    0
+   ],
+   "pixels": 945,
+   "ground_share": 0.5661,
+   "hide_when": ""
+  },
+  {
+   "id": "shelf",
+   "base_y": 147,
+   "rect": [
+    385,
+    95,
+    29,
+    54
+   ],
+   "atlas": [
+    403,
+    0
+   ],
+   "pixels": 1566,
+   "ground_share": 0.5581,
+   "hide_when": ""
+  },
+  {
+   "id": "house_front",
+   "base_y": 150,
+   "rect": [
+    383,
+    30,
+    99,
+    121
+   ],
+   "atlas": [
+    0,
+    111
+   ],
+   "pixels": 10243,
+   "ground_share": 0.5752,
+   "hide_when": ""
+  },
+  {
+   "id": "house_side",
+   "base_y": 144,
+   "rect": [
+    482,
+    40,
+    40,
+    106
+   ],
+   "atlas": [
+    100,
+    111
+   ],
+   "pixels": 4240,
+   "ground_share": 0.713,
+   "hide_when": ""
+  },
+  {
+   "id": "east_tree",
+   "base_y": 172,
+   "rect": [
+    534,
+    86,
+    37,
+    92
+   ],
+   "atlas": [
+    141,
+    111
+   ],
+   "pixels": 2381,
+   "ground_share": 0.5884,
+   "hide_when": ""
+  },
+  {
+   "id": "slab_house_left",
+   "base_y": 189,
+   "rect": [
+    450,
+    166,
+    49,
+    26
+   ],
+   "atlas": [
+    179,
+    111
+   ],
+   "pixels": 1274,
+   "ground_share": 0.4608,
+   "hide_when": ""
+  },
+  {
+   "id": "slab_house_right",
+   "base_y": 180,
+   "rect": [
+    498,
+    157,
+    42,
+    25
+   ],
+   "atlas": [
+    229,
+    111
+   ],
+   "pixels": 1050,
+   "ground_share": 0.7886,
+   "hide_when": ""
+  },
+  {
+   "id": "barrel_west_1",
+   "base_y": 232,
+   "rect": [
+    78,
+    206,
+    24,
+    28
+   ],
+   "atlas": [
+    272,
+    111
+   ],
+   "pixels": 672,
+   "ground_share": 0.5193,
+   "hide_when": ""
+  },
+  {
+   "id": "barrel_west_2",
+   "base_y": 247,
+   "rect": [
+    60,
+    220,
+    25,
+    29
+   ],
+   "atlas": [
+    297,
+    111
+   ],
+   "pixels": 725,
+   "ground_share": 0.5131,
+   "hide_when": ""
+  },
+  {
+   "id": "tilted_slab_west",
+   "base_y": 245,
+   "rect": [
+    111,
+    214,
+    36,
+    35
+   ],
+   "atlas": [
+    323,
+    111
+   ],
+   "pixels": 1260,
+   "ground_share": 0.5032,
+   "hide_when": ""
+  },
+  {
+   "id": "rubble_red",
+   "base_y": 263,
+   "rect": [
+    83,
+    243,
+    25,
+    23
+   ],
+   "atlas": [
+    360,
+    111
+   ],
+   "pixels": 575,
+   "ground_share": 0.4574,
+   "hide_when": ""
+  },
+  {
+   "id": "shrine",
+   "base_y": 307,
+   "rect": [
+    120,
+    251,
+    35,
+    60
+   ],
+   "atlas": [
+    386,
+    111
+   ],
+   "pixels": 2100,
+   "ground_share": 0.4895,
+   "hide_when": ""
+  },
+  {
+   "id": "lamp_post",
+   "base_y": 305,
+   "rect": [
+    194,
+    238,
+    32,
+    68
+   ],
+   "atlas": [
+    422,
+    111
+   ],
+   "pixels": 920,
+   "ground_share": 0.3826,
+   "hide_when": ""
+  },
+  {
+   "id": "lamp_lantern",
+   "base_y": 305,
+   "rect": [
+    213,
+    258,
+    16,
+    27
+   ],
+   "atlas": [
+    455,
+    111
+   ],
+   "pixels": 411,
+   "ground_share": 0.7616,
+   "hide_when": ""
+  },
+  {
+   "id": "pile_back_rock",
+   "base_y": 290,
+   "rect": [
+    314,
+    238,
+    32,
+    54
+   ],
+   "atlas": [
+    472,
+    111
+   ],
+   "pixels": 1728,
+   "ground_share": 0.6169,
+   "hide_when": ""
+  },
+  {
+   "id": "pile_barrels_crate",
+   "base_y": 316,
+   "rect": [
+    338,
+    250,
+    60,
+    70
+   ],
+   "atlas": [
+    0,
+    233
+   ],
+   "pixels": 4200,
+   "ground_share": 0.3726,
+   "hide_when": ""
+  },
+  {
+   "id": "pile_rocks_right",
+   "base_y": 304,
+   "rect": [
+    396,
+    256,
+    38,
+    51
+   ],
+   "atlas": [
+    61,
+    233
+   ],
+   "pixels": 1938,
+   "ground_share": 0.7141,
+   "hide_when": ""
+  },
+  {
+   "id": "stone_pillar_east",
+   "base_y": 290,
+   "rect": [
+    494,
+    234,
+    29,
+    60
+   ],
+   "atlas": [
+    100,
+    233
+   ],
+   "pixels": 1740,
+   "ground_share": 0.5966,
+   "hide_when": ""
+  }
+ ]
+}

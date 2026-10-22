@@ -1,0 +1,245 @@
+{
+ "scene": "arena",
+ "ground": "res://presentation/arena/arena_ground.png",
+ "texture": "res://presentation/common/occluders/arena_occluders.png",
+ "occluders": [
+  {
+   "id": "statue",
+   "base_y": 95,
+   "rect": [
+    376,
+    14,
+    39,
+    83
+   ],
+   "atlas": [
+    0,
+    0
+   ],
+   "pixels": 2094,
+   "ground_share": 0.0287,
+   "hide_when": ""
+  },
+  {
+   "id": "pillar_nw",
+   "base_y": 106,
+   "rect": [
+    124,
+    71,
+    18,
+    37
+   ],
+   "atlas": [
+    40,
+    0
+   ],
+   "pixels": 214,
+   "ground_share": 0.0047,
+   "hide_when": ""
+  },
+  {
+   "id": "pillar_ne_top",
+   "base_y": 104,
+   "rect": [
+    660,
+    82,
+    18,
+    25
+   ],
+   "atlas": [
+    59,
+    0
+   ],
+   "pixels": 203,
+   "ground_share": 0.0049,
+   "hide_when": ""
+  },
+  {
+   "id": "pillar_ne",
+   "base_y": 157,
+   "rect": [
+    664,
+    128,
+    19,
+    31
+   ],
+   "atlas": [
+    78,
+    0
+   ],
+   "pixels": 408,
+   "ground_share": 0.0049,
+   "hide_when": ""
+  },
+  {
+   "id": "rubble_sw",
+   "base_y": 378,
+   "rect": [
+    115,
+    346,
+    95,
+    36
+   ],
+   "atlas": [
+    98,
+    0
+   ],
+   "pixels": 1510,
+   "ground_share": 0.0934,
+   "hide_when": ""
+  },
+  {
+   "id": "rubble_se",
+   "base_y": 374,
+   "rect": [
+    608,
+    345,
+    44,
+    32
+   ],
+   "atlas": [
+    194,
+    0
+   ],
+   "pixels": 725,
+   "ground_share": 0.0524,
+   "hide_when": ""
+  },
+  {
+   "id": "slab_se",
+   "base_y": 361,
+   "rect": [
+    652,
+    330,
+    31,
+    34
+   ],
+   "atlas": [
+    239,
+    0
+   ],
+   "pixels": 583,
+   "ground_share": 0.0086,
+   "hide_when": ""
+  },
+  {
+   "id": "pillar_sw",
+   "base_y": 404,
+   "rect": [
+    121,
+    375,
+    12,
+    25
+   ],
+   "atlas": [
+    271,
+    0
+   ],
+   "pixels": 116,
+   "ground_share": 0.0,
+   "hide_when": ""
+  },
+  {
+   "id": "pillar_s_left",
+   "base_y": 408,
+   "rect": [
+    252,
+    373,
+    17,
+    33
+   ],
+   "atlas": [
+    284,
+    0
+   ],
+   "pixels": 168,
+   "ground_share": 0.0119,
+   "hide_when": ""
+  },
+  {
+   "id": "pillar_s_right",
+   "base_y": 405,
+   "rect": [
+    530,
+    372,
+    18,
+    36
+   ],
+   "atlas": [
+    302,
+    0
+   ],
+   "pixels": 266,
+   "ground_share": 0.0,
+   "hide_when": ""
+  },
+  {
+   "id": "pillar_se",
+   "base_y": 397,
+   "rect": [
+    662,
+    364,
+    14,
+    36
+   ],
+   "atlas": [
+    321,
+    0
+   ],
+   "pixels": 227,
+   "ground_share": 0.0,
+   "hide_when": ""
+  },
+  {
+   "id": "altar",
+   "base_y": 407,
+   "rect": [
+    352,
+    381,
+    82,
+    30
+   ],
+   "atlas": [
+    336,
+    0
+   ],
+   "pixels": 749,
+   "ground_share": 0.0013,
+   "hide_when": ""
+  },
+  {
+   "id": "wall_sw",
+   "base_y": 408,
+   "rect": [
+    150,
+    380,
+    93,
+    32
+   ],
+   "atlas": [
+    0,
+    84
+   ],
+   "pixels": 844,
+   "ground_share": 0.0095,
+   "hide_when": ""
+  },
+  {
+   "id": "wall_se",
+   "base_y": 408,
+   "rect": [
+    556,
+    380,
+    96,
+    32
+   ],
+   "atlas": [
+    94,
+    84
+   ],
+   "pixels": 1301,
+   "ground_share": 0.0231,
+   "hide_when": ""
+  }
+ ]
+}

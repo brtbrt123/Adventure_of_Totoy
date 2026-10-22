@@ -2,9 +2,11 @@ extends Node2D
 ## Exploration mode (chapter 1): draws any scene of core/scene_defs.gd from an ExploreCore snapshot and sends it the
 ## player's intents. The core decides movement, collisions, exits, checkpoints and interactions; this node draws the
 ## painted ground, the y-sorted actors (hero with the katana frames, NPCs with idle loops facing the hero when near,
-## the village chest) on the arena's ground shadow with a per-scene ambient tint, a 320x180 camera clamped to the
-## scene, the HUD-lite (scene toast, interact hint), the 0.3 s fade between scenes, the "..." speech bubble on E, the
-## character menu (TAB) and the debug keys (F1 colliders, F2-F5 jump, F6 forest gate).
+## the village chest) on the shared soft ground shadow (presentation/common/actor_shadow.gd) with a per-scene ambient
+## tint, the painted tall props drawn again over actors standing behind them (depth occluders,
+## presentation/common/depth_occluders.gd), a 320x180 camera clamped to the scene, the HUD-lite (scene toast, interact
+## hint), the 0.3 s fade between scenes, the "..." speech bubble on E, the character menu (TAB) and the debug keys
+## (F1/H colliders, F2-F5 or 1-4 jump, F6/G forest gate).
 ##
 ## Start: Engine meta START_META (set by the title screen) = {scene, entry, checkpoint, gate_open}; without it the
 ## village arrival. Progress (scene, checkpoint, gate) is saved only when started from the title (Engine meta
@@ -23,6 +25,8 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CharacterMenu := preload("res://presentation/arena/character_menu.gd")
 const ExploreHud := preload("res://presentation/explore/explore_hud.gd")
+const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
+const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
@@ -43,7 +47,7 @@ const AMBIENT: Dictionary = {
 	&"glade": Color(0.88, 0.95, 0.94),
 	&"arena": Color(1, 1, 1),
 }
-## The arena's actor shadow: an opaque ink ellipse, x radius r, y radius 0.3 r, 2 px below the feet (arena.gd _draw_actor).
+## The actor shadow's radius for the hero (presentation/common/actor_shadow.gd draws it, the same as in the arena).
 const HERO_SHADOW_RADIUS: float = 10.0
 const HERO_HEIGHT: float = 34.0
 ## NPC sprite heights (art/reference/chapter1_characters_v2/README.md); the shadow radius scales with height / hero.
@@ -270,12 +274,12 @@ func fade_alpha() -> float:
 	return 0.0
 
 
-## Debug jump (F2-F5): to the scene's default entry, with the fade.
+## Debug jump (F2-F5 or 1-4): to the scene's default entry, with the fade.
 func jump_to(scene: StringName) -> void:
 	begin_transition(scene, &"")
 
 
-## Debug (F6), later the lantern puzzle: opens or closes the forest's root gate (saved with the progress).
+## Debug (F6 or G), later the lantern puzzle: opens or closes the forest's root gate (saved with the progress).
 func toggle_gate() -> void:
 	gate_open = not gate_open
 	core.set_gate_open(gate_open)
@@ -400,7 +404,9 @@ func ambient() -> Color:
 	return AMBIENT.get(snapshot.scene_id, Color.WHITE) if snapshot != null else Color.WHITE
 
 
-## Everything drawn in the world this tick, y-sorted by feet: [{kind: hero|npc|object, at, frame, left, shadow, tint}].
+## Everything drawn in the world this tick, y-sorted by feet: [{kind: hero|npc|object, at, frame, left, shadow, tint}]
+## and the depth occluders of the props in view ({kind: occluder, at: (x, base_y - bias), occluder}): an occluder sorts
+## after (in front of) every actor whose feet are north of its base.
 func drawables() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	var tint: Color = ambient()
@@ -412,6 +418,7 @@ func drawables() -> Array[Dictionary]:
 			if object["kind"] == &"chest":  # the village chest is not painted (the forest's is, in its nook)
 				out.append({"kind": &"object", "id": object["id"], "at": object["position"], "frame": "obj_chest_closed_1", "left": false, "shadow": 0.0, "tint": Color.WHITE})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
+	out.append_array(DepthOccluders.drawables(snapshot.scene_id, {&"gate_open": snapshot.gate_open}, Rect2(view_origin, VIEW_SIZE).grow(8.0)))
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
 	return out
 
@@ -435,13 +442,13 @@ func _draw() -> void:
 
 
 func _draw_item(item: Dictionary) -> void:
+	if item["kind"] == &"occluder":
+		DepthOccluders.draw(self, snapshot.scene_id, item)
+		return
 	var at: Vector2 = Vector2(item["at"]).round()
 	var radius: float = float(item["shadow"])
 	if radius > 0.0:
-		var shadow: PackedVector2Array = PackedVector2Array()
-		for i: int in range(32):
-			shadow.append(at + Vector2(cos(TAU * i / 32.0) * radius, sin(TAU * i / 32.0) * radius * 0.3 + 2))
-		draw_colored_polygon(shadow, colors["0"])
+		ActorShadow.draw(self, at, radius, ActorShadow.strength_for(snapshot.scene_id))
 	var key: String = item["frame"]
 	if not frames.has(key):
 		if not missing_frames.has(key):
@@ -478,7 +485,7 @@ func _draw_bubble(tip: Vector2) -> void:
 		draw_rect(Rect2(t + Vector2(-5 + k * 4, -7), Vector2(2, 2)), colors["0"])
 
 
-## F1: colliders (circles), exits (rectangles), checkpoints, entries, the hero's body and the interact range.
+## F1 / H: colliders (circles), exits (rectangles), checkpoints, entries, the hero's body and the interact range.
 func _draw_debug() -> void:
 	for o: Dictionary in snapshot.obstacles:
 		draw_circle(o["center"], float(o["radius"]), colors["p"], false, 1.0)
@@ -506,7 +513,7 @@ func _update_hud() -> void:
 	hud.fade_alpha = fade_alpha()
 	hud.debug_lines = []
 	if debug_enabled:
-		hud.debug_lines = ["SCENE %s  TICK %d" % [String(snapshot.scene_id).to_upper(), snapshot.tick], "HERO %d,%d %s" % [int(snapshot.hero.position.x), int(snapshot.hero.position.y), String(snapshot.hero.state).to_upper()], "CHECKPOINT %s" % String(snapshot.last_checkpoint).to_upper(), "GATE %s (F6)" % ("OPEN" if snapshot.gate_open else "CLOSED")]
+		hud.debug_lines = ["SCENE %s  TICK %d" % [String(snapshot.scene_id).to_upper(), snapshot.tick], "HERO %d,%d %s" % [int(snapshot.hero.position.x), int(snapshot.hero.position.y), String(snapshot.hero.state).to_upper()], "CHECKPOINT %s" % String(snapshot.last_checkpoint).to_upper(), "GATE %s (F6/G)" % ("OPEN" if snapshot.gate_open else "CLOSED")]
 	hud.queue_redraw()
 	character_menu.snapshot = loadout_core.snapshot()
 	character_menu.colors = colors

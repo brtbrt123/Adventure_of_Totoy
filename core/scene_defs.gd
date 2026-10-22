@@ -11,7 +11,7 @@ extends RefCounted
 ##   arena                 no exits (the fight's victory screen returns to the title)
 ##
 ## The forest's root gate is solid until the lantern puzzle opens it (a later step); `gate_open` (a scene state flag,
-## saved in SaveProfile.gate_open, toggled by the debug key F6) builds the forest with build_with_gate(true).
+## saved in SaveProfile.gate_open, toggled by the debug key F6 or G) builds the forest with build_with_gate(true).
 const Tuning := preload("res://core/tuning.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const SceneBounds := preload("res://core/scene_bounds.gd")
@@ -64,7 +64,7 @@ static func get_def(scene_id: StringName) -> Dictionary:
 				],
 				"objects": [
 					{"id": &"chest", "kind": &"chest", "position": points[&"chest"], "stand": points[&"chest"] + Vector2(0, 14)},
-					{"id": &"edda_door", "kind": &"door", "position": points[&"edda_door"], "stand": points[&"edda_door"]},
+					{"id": &"edda_door", "kind": &"door", "position": VillageLayout.EDDA_DOOR, "stand": points[&"edda_door"]},
 					{"id": &"training_dummy", "kind": &"dummy", "position": VillageLayout.TRAINING_DUMMY, "stand": VillageLayout.TRAINING_DUMMY + Vector2(0, 14)},
 				],
 			}

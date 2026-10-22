@@ -6,8 +6,8 @@ extends SceneTree
 ## art/reference/chapter1_creatures/ at the layouts' spawn points). The scenes are at their game scales (forest 0.6 =
 ## 480x288, glade 0.7 = 560x336; core/forest_layout.gd / core/glade_layout.gd SCALE); characters keep their pixel size.
 ##   godot --path . --script res://tests/capture_forest_review.gd
-## Every actor stands on the arena's ground shadow (presentation/arena/arena.gd _draw_actor: an opaque ink (palette 0)
-## ellipse, x radius r, y radius 0.3 r, 2 px below the feet; r = 10 for the hero, here scaled per creature) and its
+## Every actor stands on the game's shared soft ground shadow (presentation/common/actor_shadow.gd: translucent ink,
+## hard-pixel rows with a dithered ring; radius 10 for the hero, here scaled per creature) and its
 ## sprite is multiplied by the scene's AMBIENT tint (a few percent toward the canopy light) so it sits in the painting
 ## without losing readability. The real scene renderer should do the same: that shadow plus one ambient tint constant
 ## per scene.
@@ -40,7 +40,8 @@ const GLADE_VIEWS_1X: Array = [
 	["entrance", Vector2(60, 440)], ["ring", Vector2(262, 270)], ["spring", Vector2(445, 300)],
 	["arch", Vector2(630, 150)],
 ]
-## Shadow x radius per actor (the arena: hero 10, boss 20) and the per-scene ambient multiply.
+## Shadow radius per actor (the arena: hero 10, boss 20) and the per-scene ambient multiply.
+const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const SHADOW_RADIUS: Dictionary = {"hero": 10.0, "mossling": 7.0, "thornback_boar": 14.0, "glowmoth": 5.0, "thornback_stag": 18.0}
 const AMBIENT: Dictionary = {"forest": Color(0.9, 0.94, 0.88), "glade": Color(0.88, 0.95, 0.94)}
 const INK: Color = Color("#1c1824")
@@ -167,14 +168,10 @@ func _framed(sheet: Texture2D, frame: Dictionary, shadow: float, tint: Color) ->
 	s.offset = -Vector2(frame["ax"], frame["ay"])
 	s.modulate = tint
 	var holder: Node2D = Node2D.new()
-	# the arena's actor shadow: an opaque ink ellipse under the feet, drawn before the sprite
-	var points: PackedVector2Array = PackedVector2Array()
-	for i: int in range(32):
-		points.append(Vector2(cos(TAU * i / 32.0) * shadow, sin(TAU * i / 32.0) * shadow * 0.3 + 2))
-	var ellipse: Polygon2D = Polygon2D.new()
-	ellipse.polygon = points
-	ellipse.color = INK
-	holder.add_child(ellipse)
+	# the game's actor shadow (presentation/common/actor_shadow.gd), drawn before the sprite
+	var ground_shadow: Node2D = Node2D.new()
+	ground_shadow.draw.connect(func() -> void: ActorShadow.draw(ground_shadow, Vector2.ZERO, shadow, ActorShadow.ALPHA))
+	holder.add_child(ground_shadow)
 	holder.add_child(s)
 	return holder
 

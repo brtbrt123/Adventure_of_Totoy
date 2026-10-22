@@ -31,6 +31,12 @@ const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
 const ArenaDecor := preload("res://presentation/arena/arena_decor.gd")
+## The shared soft ground shadow under the actors and the painted props drawn over actors behind them (2026-10-22).
+const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
+const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
+const OCCLUDER_SCENE: StringName = &"arena"
+## The ground is drawn at this modulate; the occluders (cut from it) must match.
+const GROUND_MODULATE: Color = Color(0.92, 0.92, 0.92)
 const GROUND_PATH: String = "res://presentation/arena/arena_ground.png"
 const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
 ## Non-solid decoration (the solid props come from the core's snapshot).
@@ -811,7 +817,7 @@ func _draw() -> void:
 		offset = Vector2(1 if shake_left % 2 == 0 else -1, 1 if shake_left % 3 == 0 else -1)
 	draw_set_transform(offset)
 	draw_rect(Rect2(-2, -2, Tuning.ARENA_SIZE.x + 4.0, Tuning.ARENA_SIZE.y + 4.0), colors["2"])
-	draw_texture(ground_texture, Vector2.ZERO, Color(0.92, 0.92, 0.92))
+	draw_texture(ground_texture, Vector2.ZERO, GROUND_MODULATE)
 	for trace: Dictionary in skill_trails:
 		CombatEffects.draw_plan(self, SkillEffects.trail(trace["from"], trace["to"], snapshot.tick + snapshot.result_ticks - int(trace["tick"]), colors))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
@@ -843,10 +849,14 @@ func _draw() -> void:
 	drawables.append_array(echo_drawables())
 	for actor: Snapshots.EntitySnapshot in actors:
 		drawables.append({"actor": actor, "at": actor.position})
+	# the painted pillars, statue, altar, trees, ... over actors standing behind them (sort key: their base line)
+	drawables.append_array(DepthOccluders.drawables(OCCLUDER_SCENE, {}, view))
 	drawables.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
 	for item: Dictionary in drawables:
 		if item.has("actor"):
 			_draw_actor(item["actor"])
+		elif item.has("occluder"):
+			DepthOccluders.draw(self, OCCLUDER_SCENE, item, GROUND_MODULATE)
 		else:
 			_draw_imported(item["name"], item["at"], item["scale"])
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
@@ -1070,11 +1080,8 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	var chosen: String = String(selected_frames.get(actor.id, ""))
 	var at: Vector2 = actor.position.round()
 	var radius: float = 10.0 if actor.visual_id == &"totoy" else 20.0
-	var shadow: PackedVector2Array = PackedVector2Array()
-	for i: int in range(32):
-		shadow.append(at + Vector2(cos(TAU * i / 32.0) * radius, sin(TAU * i / 32.0) * radius * 0.3 + 2))
 	if not silhouette_only:
-		draw_colored_polygon(shadow, colors["0"])
+		ActorShadow.draw(self, at, radius, ActorShadow.strength_for(OCCLUDER_SCENE))
 	if not frames.has(chosen):
 		draw_rect(Rect2(at - Vector2(radius, radius * 2), Vector2(radius * 2, radius * 2)), colors["g"])
 		return
