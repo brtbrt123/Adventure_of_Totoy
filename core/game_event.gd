@@ -45,6 +45,11 @@ const DAMAGE_TAKEN: StringName = &"damage_taken"
 const ENTITY_DIED: StringName = &"entity_died"
 const BOSS_PHASE_CHANGED: StringName = &"boss_phase_changed"
 const GAME_RESULT: StringName = &"game_result"
+# exploration (core/explore_core.gd)
+const SCENE_EXIT: StringName = &"scene_exit"
+const CHECKPOINT: StringName = &"checkpoint"
+const INTERACT: StringName = &"interact"
+const GATE_CHANGED: StringName = &"gate_changed"
 
 var type: StringName = &""
 var tick: int = 0

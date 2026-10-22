@@ -49,7 +49,7 @@ One `InputFrame` per tick:
 | `weapon_equip` | `StringName` | equip exactly this weapon this tick (`black_katana`, `dual_dagger`, `chain_scythe`), empty = none; sent by the character menu's inventory (see "Weapon equip"). Replaced the Q cycle `weapon_swap_pressed` on 2026-10-21 |
 | `skill_pressed` | `int` | skill slot 1, 2 or 3 pressed this tick, else 0: triggers the aspect **equipped in that slot** (default Z = 1 Breaking Edge, X = 2 Gale Cut, C = 3 Moon Cleave; see "Aspects, Spirit Lantern, Phantom Cut"; the key mapping is presentation's job) |
 | `aspect_equip` / `aspect_equip_slot` | `StringName` / `int` | equip aspect `aspect_equip` (an `Aspects.ALL` id) into slot `aspect_equip_slot` (1-3) this tick; empty = none. Sent by the character menu (see "Aspects") |
-| `interact_pressed` | `bool` | talk, open, checkpoint (unused so far) |
+| `interact_pressed` | `bool` | talk, open (exploration only, `core/explore_core.gd`; the fight ignores it) |
 
 ## Channel 2: read-only snapshot (core to presentation): `core/snapshots.gd`
 
@@ -336,7 +336,41 @@ Each event is a `GameEvent` with `type: StringName`, `tick: int` and `data: Dict
 | `boss_phase_changed` | `entity_id`, `phase` |
 | `game_result` | `result` |
 
-Planned, not yet implemented: `aspect_dropped`, `artifact_dropped`, `quest_updated`, `dialogue_requested`, `entity_spawned`.
+Exploration events (`scene_exit`, `checkpoint`, `interact`, `gate_changed`) are listed in "Scenes and exploration mode". Planned, not yet implemented: `aspect_dropped`, `artifact_dropped`, `quest_updated`, `dialogue_requested`, `entity_spawned`.
+
+## Scenes and exploration mode (chapter 1, 2026-10-22)
+
+The non-combat scenes run on their own small core, `core/explore_core.gd`; the Colossus fight stays `GameCore` in `presentation/arena/arena.tscn`. Core: Claude Code; presentation built by Claude Code under the temporary override.
+
+**Scene graph (`core/scene_defs.gd`, static data):** ids `village`, `forest`, `glade`, `arena`. `SceneDefs.get_def(id)` gives `name`, `size`, `margin`, `entries` (id -> spawn point), `default_entry`, `exits` (`id`, `rect`, `target_scene`, `target_entry`), `checkpoints` (`id`, `position`), `npcs` (`id`, `visual`, `position`, `face_left`), `objects` (`id`, `kind`, `position`, `stand`); `build_obstacles(id, gate_open)` the colliders (the layout's, plus a radius-5 circle on every NPC and radius 6 on the village chest; the forest with `build_with_gate(gate_open)`); `checkpoint(scene, id)`, `scene_of_checkpoint(id)`.
+
+| From | Exit | To (entry) |
+|---|---|---|
+| village | `to_forest` (east road, right edge) | forest `village_side` |
+| forest | `to_village` (left edge) | village `return` |
+| forest | `to_glade` (north, behind the root gate: solid while `gate_open` is false) | glade `entrance` |
+| glade | `to_forest` (bottom-left trail) | forest `north` (388,28, below the north exit) |
+| glade | `to_arena` (root arch) | arena `start` (the fight) |
+
+Checkpoints: `village_gate` (the arrival spot), `forest_entrance`, `forest_puzzle`, `glade_entrance`, `ruins_gate` (arena, recorded when the fight is entered). New game: village `arrival`.
+
+**ExploreCore interface:**
+```gdscript
+const ExploreCore := preload("res://core/explore_core.gd")
+var core: ExploreCore = ExploreCore.new(&"village", &"arrival", gate_open)   # or ExploreCore.at_checkpoint(scene, checkpoint_id, gate_open)
+core.step(frame)                  # InputFrame: move, dash_pressed, interact_pressed (everything else is ignored)
+var snap := core.snapshot()       # ExploreCore.ExploreSnapshot
+for e in core.last_events: pass
+core.set_gate_open(true)          # debug key / later the lantern puzzle; emits gate_changed with the next step
+```
+- **Hero:** the fight's `Player` fed only `move` and `dash_pressed`: the same speed (`PLAYER_SPEED`), dash (`DASH_SPEED`, `DASH_TICKS`, `DASH_COOLDOWN_TICKS`, `dash_started`/`dash_ready` events) and facing rules; states `idle`, `walk`, `dash` only. Movement goes through `core/collision.gd` (`move_resolved`, then `clamp_point` into `[margin, size - margin]`); `GameCore` uses the same helper (extracted 2026-10-22, results identical, `tests/core/test_collision.gd`).
+- **Each tick after moving:** a checkpoint whose point is within `CHECKPOINT_RADIUS` (12) and is not the last recorded one is recorded (`checkpoint`); an exit rectangle the hero's body touches fires `scene_exit` once per entry (an exit the hero was placed inside fires only after he left it), after which the hero gets no more input (`exiting`); NPCs within `NPC_FACE_RANGE` (56) face the hero, others their default; the interact target is the nearest NPC (`kind` `npc`) or non-decor object whose feet or stand point is within `INTERACT_RANGE` (24); `interact_pressed` in idle/walk with a target emits `interact`.
+- **Events:** `scene_exit` (`scene`, `exit_id`, `target_scene`, `target_entry`), `checkpoint` (`scene`, `checkpoint_id`, `position`), `interact` (`scene`, `target_id`, `kind`, `position`), `gate_changed` (`scene`, `gate_open`), plus the Player's `dash_started` / `dash_ready`.
+- **Snapshot (`ExploreSnapshot`):** `tick`, `scene_id`, `scene_name`, `size`, `hero` (an `EntitySnapshot`: `state`, `state_ticks`, `position`, `facing`, `weapon_id`, `move_speed_mult`, ...), `dash_cooldown_ticks`, `npcs` (`id`, `visual`, `position`, `facing_left`, `near`), `objects`, `interact_target` / `interact_kind` / `interact_position`, `gate_open`, `last_checkpoint`, `exiting`, `exit_target_scene` / `exit_target_entry`, and for debug drawing `obstacles` (`center`, `radius`), `exits`, `checkpoints`, `entries`.
+
+**Save fields (`SaveProfile`, optional, `VERSION` 1):** `scene_id` (empty = nothing to continue), `checkpoint_id` (a checkpoint of that scene, else dropped), `gate_open`; `record_scene(scene, checkpoint)`, `has_progress()`, `reset_progress()`. Presentation saves on entering a scene, on every `checkpoint` and on the gate key, only when started from the title (`totoy_persist`).
+
+**Presentation (`presentation/explore/explore_scene.gd`, `explore_hud.gd`):** the title's NEW GAME / CONTINUE set Engine meta `totoy_explore_start` ({scene, entry, checkpoint, gate_open}) and open `explore_scene.tscn`; CONTINUE with `arena` opens the fight; BOSS FIGHT opens the arena directly. The scene draws the ground painting (`GROUNDS`), a 320x180 camera locked to the rounded hero and clamped to the scene, y-sorted actors on the arena's ground shadow (ink ellipse, radius 10 for the hero, NPCs 10 x height / 34) multiplied by `AMBIENT` (village `(0.93, 0.89, 0.84)`, forest `(0.9, 0.94, 0.88)`, glade `(0.88, 0.95, 0.94)`), the katana frames `hero2_*` for idle/walk/dash (`ArenaAnimation` helpers, mirrored left), NPC idle loops `npc_<name>_idle_right_1..4` at the manifest ticks (24/14/14/8), the village chest `obj_chest_closed_1`; HUD-lite: scene-name toast, hint above the target, `...` bubble on an NPC `interact` (no dialogue yet), the fade (18 ticks out, scene change, 18 in; the world does not step during it). TAB opens the character menu over a loadout `GameCore` that is stepped only for equip requests (the choice is saved and the fight starts with it). Debug: F1 overlay, F2-F5 jump (fade, default entry; F5 = the fight), F6 gate. ESC goes to the title. Gaps for later steps: dialogue, chest opening, the lantern puzzle and the gate's look, depth sorting against tall painted props, enemies.
 
 ## Tuning
 

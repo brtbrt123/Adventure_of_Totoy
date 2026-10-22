@@ -1,5 +1,6 @@
 extends "res://presentation/arena/hud.gd"
-## Title screen: START, CONTROLS, CREDITS, QUIT. (The saved record is kept and can be shown with record_text(),
+## Title screen: NEW GAME (chapter 1 from the village), CONTINUE (the saved scene and checkpoint), BOSS FIGHT (the
+## Colossus arena directly, for testing), CONTROLS, CREDITS, QUIT. (The saved record is kept and can be shown with record_text(),
 ## but the menu no longer displays it.) Presentation only: it reads
 ## the save profile through the core's save store and starts the arena; it holds no game rules. It reuses the
 ## HUD's 3x5 bitmap lettering and draws on the 320x180 canvas.
@@ -7,12 +8,15 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const SaveStore := preload("res://core/save_store.gd")
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
+const EXPLORE_SCENE: String = "res://presentation/explore/explore_scene.tscn"
+## Read by presentation/explore/explore_scene.gd: where the chapter starts ({scene, entry, checkpoint, gate_open}).
+const EXPLORE_START_META: StringName = &"totoy_explore_start"
 ## While this meta is set on the Engine, the arena saves progress (smoke tests that load the arena directly do
 ## not set it and never touch the player's save).
 const PERSIST_META: StringName = &"totoy_persist"
 
 const MENU_TOP: int = 103  # y of the first menu line, in game pixels
-const MENU_STEP: int = 14
+const MENU_STEP: int = 12
 const MENU_SIZE: int = 13  # menu item font size (Cinzel capitals)
 const PAGE_SIZE: int = 10  # body text on the controls and credits pages
 const FALLBACK_TITLE_SIZE: int = 15  # the plain-lettering title used when the logo image is missing
@@ -30,23 +34,23 @@ const LOGO_PATH: String = "res://presentation/menu/title_logo.png"
 const LOGO_WIDTH: float = 190.0  # game pixels (the logo is 1800 px wide, drawn smooth)
 var logo_sprite: Sprite2D
 var logo_pixel: bool = false
-const ITEMS: Array[String] = ["START", "CONTROLS", "CREDITS", "QUIT"]
+const ITEMS: Array[String] = ["NEW GAME", "CONTINUE", "BOSS FIGHT", "CONTROLS", "CREDITS", "QUIT"]
 const SCREEN_TITLE: StringName = &"title"
 const SCREEN_CONTROLS: StringName = &"controls"
 const SCREEN_CREDITS: StringName = &"credits"
 
 const CONTROL_LINES: Array[String] = [
 	"WASD:MOVE",
-	"LEFT CLICK:ATTACK (3 HIT COMBO)",
+	"LEFT CLICK:ATTACK (COMBO)",
 	"RIGHT CLICK:WEAPON ACTIVE",
 	"SHIFT:DASH",
 	"SPACE:PARRY GOLD ATTACKS",
-	"Z:BREAKING EDGE AFTER A PARRY",
-	"X:GALE CUT",
-	"C:MOON CLEAVE",
-	"TAB:CHARACTER MENU",
-	"R:RESTART  (F1 DEBUG)",
-	"ESC:BACK",
+	"Z X C:ASPECTS IN SLOTS 1-3",
+	"E:INTERACT / TALK",
+	"TAB:MENU (WEAPONS, ASPECTS)",
+	"R:RESTART THE FIGHT",
+	"F1:DEBUG  F2-F6:TEST KEYS",
+	"ESC:BACK / TITLE",
 ]
 const CONTROL_FOOTER: Array[String] = [
 	"GOLD ATTACKS CAN BE PARRIED.",
@@ -196,7 +200,11 @@ func activate() -> void:
 		back()
 		return
 	match ITEMS[index]:
-		"START":
+		"NEW GAME":
+			new_game()
+		"CONTINUE":
+			continue_game()
+		"BOSS FIGHT":
 			start_game()
 		"CONTROLS":
 			screen = SCREEN_CONTROLS
@@ -213,12 +221,46 @@ func back() -> void:
 		queue_redraw()
 
 
+## BOSS FIGHT: the Colossus arena directly (for testing; the fight saves its record as before).
 func start_game() -> void:
 	if started:
 		return
 	started = true
 	Engine.set_meta(PERSIST_META, true)
 	change_scene.call(ARENA_SCENE)
+
+
+## NEW GAME: chapter 1 from the village arrival. The chapter progress in the save is cleared (the fight record and the
+## loadout stay).
+func new_game() -> void:
+	if started:
+		return
+	started = true
+	Engine.set_meta(PERSIST_META, true)
+	if profile == null:
+		profile = SaveStore.load_profile()
+	profile.reset_progress()
+	SaveStore.save(profile)
+	Engine.set_meta(EXPLORE_START_META, {"scene": &"village", "entry": &"arrival", "checkpoint": &"", "gate_open": false})
+	change_scene.call(EXPLORE_SCENE)
+
+
+## True when the save has a chapter game to resume.
+func can_continue() -> bool:
+	return profile != null and profile.has_progress()
+
+
+## CONTINUE: the saved scene at its last checkpoint (the arena: the Colossus fight). Nothing without progress.
+func continue_game() -> void:
+	if started or not can_continue():
+		return
+	started = true
+	Engine.set_meta(PERSIST_META, true)
+	if profile.scene_id == &"arena":
+		change_scene.call(ARENA_SCENE)
+		return
+	Engine.set_meta(EXPLORE_START_META, {"scene": profile.scene_id, "entry": &"", "checkpoint": profile.checkpoint_id, "gate_open": profile.gate_open})
+	change_scene.call(EXPLORE_SCENE)
 
 
 ## The menu line under a canvas point, or -1.
@@ -303,7 +345,10 @@ func _draw_title(canvas: Object) -> void:
 			canvas.draw_rect(Rect2(96, y - 3, 128, MENU_STEP - 1), colors["k"])
 			canvas.draw_rect(Rect2(96, y - 3 + MENU_STEP - 2, 128, 1), colors["1"])
 			canvas.outlined(Vector2(100, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
-		canvas.centered(160, y, ITEMS[i], colors["1"] if selected else colors["p"], colors["0"], 1, face, MENU_SIZE)
+		var tone: Color = colors["1"] if selected else colors["p"]
+		if ITEMS[i] == "CONTINUE" and not can_continue():
+			tone = colors["h"]  # nothing saved to continue
+		canvas.centered(160, y, ITEMS[i], tone, colors["0"], 1, face, MENU_SIZE)
 	var note: String = String(profile.load_note) if profile != null else ""
 	if note != "":
 		canvas.centered(160, 175, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)

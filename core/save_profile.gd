@@ -3,8 +3,9 @@ extends RefCounted
 ## (see save_store.gd) and nothing that touches a running fight. Reading is forgiving: anything unreadable or
 ## from a newer version gives a fresh profile and says why in `load_note`.
 
-const VERSION: int = 1  # equipped_aspects (2026-10-21) is an optional field: older version-1 saves load with the defaults
+const VERSION: int = 1  # equipped_aspects (2026-10-21) and scene_id / checkpoint_id / gate_open (2026-10-22) are optional fields: older version-1 saves load with the defaults
 const Aspects := preload("res://core/aspects.gd")
+const SceneDefs := preload("res://core/scene_defs.gd")
 const RESULT_VICTORY: StringName = &"victory"
 const RESULT_DEFEAT: StringName = &"defeat"
 
@@ -17,6 +18,12 @@ var last_result: StringName = &""
 var weapon_id: StringName = &"black_katana"
 ## The aspects in skill slots 1-3 (three different Aspects.ALL ids). GameCore.apply_profile() starts a fight with them.
 var equipped_aspects: Array[StringName] = Aspects.DEFAULT_EQUIPPED.duplicate()
+## Chapter progress (exploration, 2026-10-22): the scene the player was last in (empty = no game started, CONTINUE
+## has nothing to resume), the last checkpoint reached there (a SceneDefs checkpoint id of that scene, or empty) and
+## whether the forest's root gate is open.
+var scene_id: StringName = &""
+var checkpoint_id: StringName = &""
+var gate_open: bool = false
 ## Why this profile is a fresh one instead of a loaded one ("" when it was loaded or never saved before).
 var load_note: String = ""
 
@@ -38,6 +45,24 @@ func record_result(result: StringName, ticks: int) -> bool:
 	return false
 
 
+## Records where the player is: the scene and its last checkpoint (empty = none reached there yet).
+func record_scene(scene: StringName, checkpoint: StringName = &"") -> void:
+	scene_id = scene if SceneDefs.is_known(scene) else &""
+	checkpoint_id = checkpoint if scene_id != &"" and not SceneDefs.checkpoint(scene_id, checkpoint).is_empty() else &""
+
+
+## True when there is a chapter game to CONTINUE.
+func has_progress() -> bool:
+	return scene_id != &""
+
+
+## A new game: the chapter progress is cleared (the record and the loadout stay).
+func reset_progress() -> void:
+	scene_id = &""
+	checkpoint_id = &""
+	gate_open = false
+
+
 func to_dict() -> Dictionary:
 	return {
 		"version": VERSION,
@@ -48,6 +73,9 @@ func to_dict() -> Dictionary:
 		"last_result": String(last_result),
 		"weapon_id": String(weapon_id),
 		"equipped_aspects": equipped_aspects.map(func(aspect: StringName) -> String: return String(aspect)),
+		"scene_id": String(scene_id),
+		"checkpoint_id": String(checkpoint_id),
+		"gate_open": gate_open,
 	}
 
 
@@ -77,6 +105,11 @@ static func from_dict(data: Dictionary) -> Object:
 		profile.equipped_aspects.clear()
 		for value: Variant in aspects:
 			profile.equipped_aspects.append(StringName(value))
+	var scene: Variant = data.get("scene_id", "")
+	var checkpoint: Variant = data.get("checkpoint_id", "")
+	profile.record_scene(StringName(scene) if scene is String else &"", StringName(checkpoint) if checkpoint is String else &"")
+	var gate: Variant = data.get("gate_open", false)
+	profile.gate_open = gate if gate is bool else false
 	return profile
 
 

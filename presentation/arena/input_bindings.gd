@@ -15,6 +15,11 @@ static func register() -> void:
 		# the character menu (presentation/arena/character_menu.gd): TAB opens and closes it, Q/E switch its tabs
 		"menu_toggle": [KEY_TAB], "menu_tab_prev": [KEY_Q], "menu_tab_next": [KEY_E],
 		"menu_left": [KEY_A, KEY_LEFT], "menu_right": [KEY_D, KEY_RIGHT],
+		# exploration (presentation/explore/explore_scene.gd): E interacts; F2-F5 jump to a scene, F6 opens/closes the
+		# forest's root gate (debug keys for testing)
+		"explore_interact": [KEY_E],
+		"debug_scene_village": [KEY_F2], "debug_scene_forest": [KEY_F3], "debug_scene_glade": [KEY_F4],
+		"debug_scene_arena": [KEY_F5], "debug_toggle_gate": [KEY_F6],
 	}
 	# Q no longer swaps weapons in the arena (2026-10-21): weapons are equipped in the character menu's inventory.
 	if InputMap.has_action("arena_weapon_swap"):

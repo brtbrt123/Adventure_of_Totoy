@@ -17,6 +17,7 @@ const Weapons := preload("res://core/weapons.gd")
 const Aspects := preload("res://core/aspects.gd")
 const Lantern := preload("res://core/lantern.gd")
 const Echo := preload("res://core/echo.gd")
+const Collision := preload("res://core/collision.gd")
 
 const RESULT_PLAYING: StringName = &"playing"
 const RESULT_VICTORY: StringName = &"victory"
@@ -1012,51 +1013,22 @@ func _clamp_to_arena() -> void:
 ## that fits is searched on small rings around it (2 px steps, 16 directions), so nothing is left inside a prop.
 func arena_point(point: Vector2, radius: float) -> Vector2:
 	var low: Vector2 = Vector2(Tuning.ARENA_MARGIN, Tuning.ARENA_MARGIN)
-	var high: Vector2 = Tuning.ARENA_SIZE - low
-	var spot: Vector2 = push_out_of_obstacles(point.clamp(low, high), radius).clamp(low, high)
-	if _fits_props(spot, radius):
-		return spot
-	for ring: int in range(1, 17):
-		for k: int in 16:
-			var candidate: Vector2 = spot + Vector2.RIGHT.rotated(float(k) * TAU / 16.0) * (2.0 * ring)
-			candidate = push_out_of_obstacles(candidate.clamp(low, high), radius).clamp(low, high)
-			if _fits_props(candidate, radius):
-				return candidate
-	return spot
+	return Collision.clamp_point(obstacles, point, radius, low, Tuning.ARENA_SIZE - low)
 
 
 func _fits_props(point: Vector2, radius: float) -> bool:
-	for obstacle: Obstacle in obstacles:
-		if point.distance_to(obstacle.center) < obstacle.radius + radius - 0.001:
-			return false
-	return true
+	return Collision.fits(obstacles, point, radius)
 
 
 ## Moves a circle of `radius` from `before` towards `after` in steps of at most OBSTACLE_SWEEP_STEP pixels, pushing
 ## it out of every solid prop after each step: it slides along them and cannot tunnel, however fast it moves.
 func move_resolved(before: Vector2, after: Vector2, radius: float) -> Vector2:
-	var delta: Vector2 = after - before
-	var steps: int = maxi(1, ceili(delta.length() / Tuning.OBSTACLE_SWEEP_STEP))
-	var step_delta: Vector2 = delta / steps
-	var current: Vector2 = before
-	for i: int in steps:
-		current = push_out_of_obstacles(current + step_delta, radius)
-	return current
+	return Collision.move_resolved(obstacles, before, after, radius)
 
 
 ## The nearest position at which a circle of `radius` at `point` touches no solid prop.
 func push_out_of_obstacles(point: Vector2, radius: float) -> Vector2:
-	var current: Vector2 = point
-	for pass_index: int in 2:  # a second pass settles a circle squeezed between two props
-		for obstacle: Obstacle in obstacles:
-			var offset: Vector2 = current - obstacle.center
-			var reach: float = obstacle.radius + radius
-			var dist_sq: float = offset.length_squared()
-			if dist_sq < reach * reach:
-				var dist: float = sqrt(dist_sq)
-				var dir: Vector2 = offset / dist if dist > 0.0001 else Vector2.DOWN
-				current = obstacle.center + dir * reach
-	return current
+	return Collision.push_out(obstacles, point, radius)
 
 
 ## Gale Cut passes through the boss only while the dash itself runs (skill_active). Skill attacks are

@@ -156,3 +156,56 @@ func test_the_environment_variable_redirects_the_default_path() -> void:
 	assert_eq(SaveStore.default_path(), "user://redirected_test_save.json")
 	OS.set_environment(SaveStore.PATH_ENV, "")
 	assert_eq(SaveStore.default_path(), SaveStore.DEFAULT_PATH)
+
+
+func test_chapter_progress_round_trips() -> void:
+	var p: SaveProfile = SaveProfile.new()
+	assert_false(p.has_progress(), "a new profile has nothing to continue")
+	p.record_scene(&"forest", &"forest_puzzle")
+	p.gate_open = true
+	var back: SaveProfile = SaveProfile.from_json(p.to_json()) as SaveProfile
+	assert_eq(back.scene_id, &"forest")
+	assert_eq(back.checkpoint_id, &"forest_puzzle")
+	assert_true(back.gate_open)
+	assert_true(back.has_progress())
+	assert_eq(back.to_json(), p.to_json(), "stable output")
+	back.reset_progress()
+	assert_false(back.has_progress() or back.gate_open or back.checkpoint_id != &"", "a new game clears the chapter progress")
+
+
+func test_old_saves_without_chapter_fields_still_load() -> void:
+	var text: String = "{\"version\": 1, \"runs_started\": 3, \"victories\": 1, \"weapon_id\": \"dual_dagger\", \"equipped_aspects\": [\"sprint\", \"gale_cut\", \"moon_cleave\"]}"
+	var p: SaveProfile = SaveProfile.from_json(text) as SaveProfile
+	assert_eq(p.load_note, "", "a pre-chapter save is still a readable save")
+	assert_eq(p.runs_started, 3)
+	assert_eq(p.weapon_id, &"dual_dagger")
+	assert_eq(p.scene_id, &"", "no scene: CONTINUE has nothing to resume")
+	assert_eq(p.checkpoint_id, &"")
+	assert_false(p.gate_open)
+	assert_eq(int(JSON.parse_string(p.to_json())["version"]), 1, "the version is unchanged (optional fields)")
+
+
+func test_bad_chapter_fields_are_cleaned() -> void:
+	var cases: Array = [
+		["{\"version\": 1, \"scene_id\": \"moon\", \"checkpoint_id\": \"village_gate\", \"gate_open\": \"yes\"}", &"", &"", false],
+		["{\"version\": 1, \"scene_id\": \"village\", \"checkpoint_id\": \"forest_puzzle\", \"gate_open\": 1}", &"village", &"", false],
+		["{\"version\": 1, \"scene_id\": 5, \"checkpoint_id\": null}", &"", &"", false],
+		["{\"version\": 1, \"scene_id\": \"glade\", \"checkpoint_id\": \"glade_entrance\", \"gate_open\": true}", &"glade", &"glade_entrance", true],
+	]
+	for c: Array in cases:
+		var p: SaveProfile = SaveProfile.from_json(c[0]) as SaveProfile
+		assert_eq(p.load_note, "", c[0])
+		assert_eq(p.scene_id, c[1], c[0])
+		assert_eq(p.checkpoint_id, c[2], c[0] + " (a checkpoint of another scene is dropped)")
+		assert_eq(p.gate_open, c[3], c[0])
+
+
+func test_the_store_keeps_the_chapter_progress() -> void:
+	_clean()
+	var p: SaveProfile = SaveProfile.new()
+	p.record_scene(&"glade", &"glade_entrance")
+	assert_eq(SaveStore.save(p, PATH), OK)
+	var back: SaveProfile = SaveStore.load_profile(PATH)
+	assert_eq(back.scene_id, &"glade")
+	assert_eq(back.checkpoint_id, &"glade_entrance")
+	_clean()

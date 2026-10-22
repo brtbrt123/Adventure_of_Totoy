@@ -97,8 +97,8 @@ same rules where possible; several enemies on screen; drops (herb heals).
 
 | # | System | Layer | Notes |
 |---|---|---|---|
-| 1 | Scene manager, transitions, checkpoints, save of chapter state | core + presentation | Save format extends `SaveProfile` (version bump) |
-| 2 | Player exploration mode: walking in non-combat scenes, interact key (E), no boss | core + presentation | The arena fight stays as is |
+| 1 | Scene manager, transitions, checkpoints, save of chapter state | core + presentation | **Done 2026-10-22** (with the walking of step 2): `core/scene_defs.gd`, `core/explore_core.gd`, `SaveProfile.scene_id/checkpoint_id/gate_open` (optional fields, no version bump needed) |
+| 2 | Player exploration mode: walking in non-combat scenes, interact key (E), no boss | core + presentation | **Walking done 2026-10-22** (`presentation/explore/`): E emits `interact` and shows a `...` bubble; dialogue is step 3 |
 | 3 | Dialogue system and NPCs | presentation (+ tiny core state for flags) | Data-driven dialogue files in `data/` |
 | 4 | Generic enemies and AI (Mossling, Boar, Glowmoth) | core + art | Telegraph, hit, posture, drops |
 | 5 | Level scenes S1-S4 (tilemaps, props, colliders, doors, lantern puzzle) | art + presentation | Same ground pipeline as the arena (paintings converted to the Totoy palette, colliders overlaid) |
