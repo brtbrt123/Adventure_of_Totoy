@@ -4,6 +4,7 @@ const SceneDefs := preload("res://core/scene_defs.gd")
 const PropScene := preload("res://core/prop_scene.gd")
 const Collision := preload("res://core/collision.gd")
 const Obstacle := preload("res://core/obstacle.gd")
+const Bot := preload("res://tests/explore_bot.gd")
 var failures: Array[String] = []
 
 
@@ -49,11 +50,14 @@ func _init() -> void:
 	expect(not antler.is_empty() and bool(antler["solid"]) and antler["feet"].x > 430.0, "Antlers are solid at the side of the clearing")
 	var glade_obstacles: Array[Obstacle] = SceneDefs.build_obstacles(&"glade_layered")
 	expect(not Collision.fits(glade_obstacles, Vector2(458, 165), 6.0), "Upper antler branches block feet too")
-	for x: float in [400.0, 508.0]:
-		var at: Vector2 = Vector2(x, 120)
-		for tick: int in 100:
-			at = Collision.move_resolved(glade_obstacles, at, at + Vector2.UP * 1.5, 6.0)
-		expect(at.y > 60.0, "Arch-side rock blocks a direct bypass at x=%s" % x)
+	# Temporarily plug only the arch opening: an exit path would expose a side bypass.
+	var sealed: Array[Obstacle] = glade_obstacles.duplicate()
+	var plug: Obstacle = Obstacle.new()
+	plug.center = Vector2(508, 58)
+	plug.radius = 9.0
+	sealed.append(plug)
+	var bot: Bot = Bot.new()
+	expect(not bot.plan(Vector2(560, 336), sealed, Vector2(24, 318), Vector2.ZERO, Rect2(488, 0, 56, 10)), "Vegetation and boundary prevent bypassing the arch opening")
 	if failures.is_empty():
 		print("PLAYTEST COLLISIONS OK: removed logs, rock/root footprints, solid side antlers, swept movement")
 		quit()

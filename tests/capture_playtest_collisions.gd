@@ -9,7 +9,11 @@ func _init() -> void:
 
 
 func run() -> void:
-	var output: String = OUT + ("alignment/" if "--alignment" in OS.get_cmdline_user_args() else "")
+	var output: String = OUT
+	if "--alignment" in OS.get_cmdline_user_args():
+		output += "alignment/"
+	elif "--narrow-final" in OS.get_cmdline_user_args():
+		output += "narrow_final/"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	if Engine.has_meta(Explore.PERSIST_META):
 		Engine.remove_meta(Explore.PERSIST_META)

@@ -26,3 +26,14 @@ The two side boulders now share y=88, at x=394 (mirrored) and x=506, outside the
 Alignment verification: actual windowed `capture_prop_mirror.gd` passed its mirrored-pixel/bounds comparison; versioned runtime/collider captures completed without script or shader errors. Focused glade tests (13/13), the side-bypass/footprint smoke and final import passed. Full background regression result follows below.
 
 **Alignment regression: PASS.** Full background Python/import/core/all-smoke regression completed with every suite exiting 0.
+
+
+## Owner's upper-right arch and narrow approach
+
+Moved the arch to feet (508,62), fully within the 560x336 world at the upper-right trail exit. Replaced the two added side boulders with the approved solid tall-bush sprite: left (444,62), right (536,80). Added a connected left vegetation bank at (412,78), (438,100) and (462,110). Its foliage covers the broad dirt edge and forms a narrow lane into the arch; ground art is unchanged. All bushes use shared solid prop footprints, not presentation collision rules.
+
+A temporary test-only plug in the arch opening makes the arena exit unreachable, proving there is no path around either side. Without the plug, both exit routes, walking and dashing through the arch, and 91% Stag fight-area coverage pass the layered-glade tests. The direct foot-approach check now only drives from valid scene positions: the arch's outer-right side lies beyond the world boundary after this move.
+
+Final runtime/collider images: `narrow_final/`; detail: `narrow_final/arch_preview.png`. Reproduce with `capture_playtest_collisions.gd -- --narrow-final`. The owner can judge foliage density and the visual width of the approach from these captures.
+
+**Upper-right approach verification: PASS.** Full background regression completed with every suite exiting 0. The final connected-bank placement also passed all 13 focused layered-glade core tests and the art/placement contract test. Runtime captures completed without script/shader errors.

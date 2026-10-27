@@ -64,7 +64,7 @@ func test_the_data_is_valid_and_every_type_is_classified() -> void:
 		used[String(p["type"])] = true
 	assert_eq(used.size(), glade_types - 1, "all retained glade types are placed; removed log stays available as an asset")
 	assert_false(used.has("glade_log"), "owner removed the entrance log")
-	assert_eq(PropScene.placements(_scene, _defs).size(), 21, "owner removed the entrance log and added two arch-side rocks: 21 props")
+	assert_eq(PropScene.placements(_scene, _defs).size(), 24, "owner removed the log and added the arch vegetation bank: 24 props")
 
 
 func test_placements_match_the_approved_arrangement_and_carry_shadows() -> void:
@@ -72,7 +72,7 @@ func test_placements_match_the_approved_arrangement_and_carry_shadows() -> void:
 	assert_eq(stone["feet"], Vector2(170, 140), "the approved place of stone 1")
 	assert_eq(stone["anchor"], Vector2(24, 54), "its anchor in the sprite")
 	assert_near(float(stone["shadow_radius"]), 14.4, 0.01, "the shadow radius is passed on for the renderer")
-	assert_eq(_placement("glade_arch")["feet"], Vector2(450, 82), "the arch stays where it was approved")
+	assert_eq(_placement("glade_arch")["feet"], Vector2(508, 62), "owner moved the arch to the upper-right exit")
 
 
 func test_the_renderer_takes_the_placements_as_they_are() -> void:
@@ -84,7 +84,7 @@ func test_the_renderer_takes_the_placements_as_they_are() -> void:
 		frames[type_id] = {"x": x, "y": 0, "w": int(def["w"]), "h": int(def["h"])}
 		x += int(def["w"])
 	var drawn: Array[Dictionary] = PropsLayer.drawables(PropScene.placements(_scene, _defs), frames)
-	assert_eq(drawn.size(), 21, "every placement becomes a drawable")
+	assert_eq(drawn.size(), 24, "every placement becomes a drawable")
 	for item: Dictionary in drawn:
 		var p: Dictionary = _placement(String(item["id"]))
 		assert_eq(item["at"], p["feet"], "%s is sorted by its feet" % item["id"])
@@ -204,6 +204,9 @@ func test_the_root_arch_keeps_its_gap_open_and_its_feet_solid() -> void:
 	# the feet stop him
 	for foot_x: float in [-30.0, 31.0]:
 		var p: Vector2 = arch + Vector2(foot_x, 24)
+		# The upper-right placement puts the outer approach beyond the scene boundary.
+		if not Collision.fits(obstacles, p, HERO):
+			continue
 		for i: int in 60:
 			p = Collision.move_resolved(obstacles, p, p + Vector2.UP, HERO)
 		assert_true(p.y > arch.y - 6.0, "the arch's foot at dx %.0f stops the hero from the south (y %.1f)" % [foot_x, p.y])

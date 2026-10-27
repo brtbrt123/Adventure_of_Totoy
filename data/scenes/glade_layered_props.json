@@ -318,8 +318,8 @@
   {
    "id": "glade_arch",
    "type": "glade_arch",
-   "x": 450,
-   "y": 82,
+   "x": 508,
+   "y": 62,
    "flip": false,
    "shadow_radius": 22
   },
@@ -364,20 +364,44 @@
    "shadow_radius": 10.2
   },
   {
-   "id": "arch_rocks_left",
-   "type": "glade_rock_2",
-   "x": 394,
-   "y": 88,
+   "id": "arch_bush_left",
+   "type": "glade_bush_1",
+   "x": 444,
+   "y": 62,
    "flip": true,
-   "shadow_radius": 10
+   "shadow_radius": 12.6
   },
   {
-   "id": "arch_rocks_right",
-   "type": "glade_rock_2",
-   "x": 506,
-   "y": 88,
+   "id": "arch_bush_right",
+   "type": "glade_bush_1",
+   "x": 536,
+   "y": 80,
    "flip": false,
-   "shadow_radius": 10
+   "shadow_radius": 12.6
+  },
+  {
+   "id": "arch_bush_bank_left",
+   "type": "glade_bush_1",
+   "x": 412,
+   "y": 78,
+   "flip": false,
+   "shadow_radius": 12.6
+  },
+  {
+   "id": "arch_bush_approach_left",
+   "type": "glade_bush_1",
+   "x": 462,
+   "y": 110,
+   "flip": true,
+   "shadow_radius": 12.6
+  },
+  {
+   "id": "arch_bush_bank_connector",
+   "type": "glade_bush_1",
+   "x": 438,
+   "y": 100,
+   "flip": false,
+   "shadow_radius": 12.6
   }
  ]
 }
