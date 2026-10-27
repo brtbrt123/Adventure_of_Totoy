@@ -4,7 +4,8 @@ extends RefCounted
 ##
 ## File: `npcs {npc id: [{when?: {flags: [...], not: [...]}, dialogue: id}]}` (the first entry whose `when` holds is played; no
 ## `when` always holds) and `dialogues {id: {speaker, portrait, set?: [flags], lines: [{text, speaker?, portrait?}]}}`.
-## A dialogue sets its `set` flags when it ends, finished or skipped.
+## A dialogue sets its `set` flags when it ends, finished or skipped. It may also `grants` [{reward_id, kind (weapon or item), item,
+## name, flag, quantity?}]: when it ends and the grant's `flag` is not yet set, ExploreCore sets it and emits `item_received`.
 
 const PATH: String = "res://data/dialogue/chapter1.json"
 ## Guides for the writer and the dialogue box (docs/CHAPTER1_PLAN.md: about 60 lines in the chapter).
@@ -84,6 +85,15 @@ static func flags_set_by(dialogue_def: Dictionary) -> Array[StringName]:
 	return out
 
 
+## The grants a dialogue makes when it ends (empty when none).
+static func grants_of(dialogue_def: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for grant: Variant in dialogue_def.get("grants", []):
+		if grant is Dictionary:
+			out.append(grant)
+	return out
+
+
 ## Every problem in the book (empty when fine). `npc_ids` are the NPCs that must be able to talk (each needs an entry
 ## without `when`, so it always has something to say).
 static func validate(book: Dictionary, npc_ids: Array[StringName]) -> Array[String]:
@@ -93,6 +103,14 @@ static func validate(book: Dictionary, npc_ids: Array[StringName]) -> Array[Stri
 	var total: int = 0
 	for id: String in dialogues:
 		var def: Dictionary = dialogues[id]
+		for grant: Dictionary in grants_of(def):
+			for key: String in ["reward_id", "kind", "item", "name", "flag"]:
+				if String(grant.get(key, "")).strip_edges() == "":
+					problems.append("dialogue %s has a grant without %s" % [id, key])
+			if not ["weapon", "item"].has(String(grant.get("kind", ""))):
+				problems.append("dialogue %s grant kind must be weapon or item" % id)
+			if int(grant.get("quantity", 1)) < 1:
+				problems.append("dialogue %s grant quantity must be at least 1" % id)
 		var lines: Array = def.get("lines", [])
 		if lines.is_empty():
 			problems.append("dialogue %s has no lines" % id)

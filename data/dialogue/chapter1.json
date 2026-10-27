@@ -52,8 +52,9 @@
   },
   "tovan_intro": {
    "speaker": "Tovan", "portrait": "tovan", "set": ["met_tovan"],
+   "grants": [{"reward_id": "first_sword", "kind": "weapon", "item": "black_katana", "name": "Black Katana", "flag": "received_first_sword", "quantity": 1}],
    "lines": [
-    {"text": "Hold it up to the light. That is a Black Katana, and it is yours. It was always yours."},
+    {"text": "Hold out your hands, Totoy. This is a Black Katana, and it is yours. It was always yours."},
     {"text": "Worn, but the edge is honest. Mind the weight. A blade like that rewards patience."},
     {"text": "Dash is your best friend out there. It carries you through trouble faster than a sword can."},
     {"text": "Remember the colours. Gold attacks can be parried. Red attacks, you dodge. No exceptions."},

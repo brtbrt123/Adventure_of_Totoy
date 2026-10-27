@@ -1,6 +1,6 @@
 extends RefCounted
 ## Tovan's practice post: the village's combat tutorial. A scene with a `dummy` object (the training post) gets one yard.
-## Once the hero has heard Tovan (flag `met_tovan`) and stands within YARD_RADIUS of the post, ExploreCore lets him attack
+## Once the hero owns his first sword (flag `received_first_sword`, Tovan's handover) and stands within YARD_RADIUS of the post, ExploreCore lets him attack
 ## and parry (the rest of exploration never does), and the post teaches four lessons in order of difficulty:
 ##   dash   start a dash in the yard
 ##   attack hit the post HITS_NEEDED times
@@ -18,7 +18,7 @@ const Telegraph := preload("res://core/telegraph.gd")
 const Weapons := preload("res://core/weapons.gd")
 const PlayerState := preload("res://core/player.gd")
 
-const WAKE_FLAG: StringName = &"met_tovan"
+const WAKE_FLAG: StringName = &"received_first_sword"
 const DONE_FLAG: StringName = &"training_done"
 const LESSONS: Array[StringName] = [&"dash", &"attack", &"parry", &"dodge"]
 ## The hero may fight within this distance of the post's feet.

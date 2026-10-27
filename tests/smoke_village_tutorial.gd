@@ -88,6 +88,7 @@ func run() -> void:
 		scene.advance(skip)
 		expect(scene.snapshot.dialogue.is_empty(), "skip immediate even during reveal")
 		scene.core.set_flag(&"met_tovan")
+		scene.core.set_flag(&"received_first_sword")  # the handover: only an armed hero fights in the yard
 		scene.advance(frame())
 		var stand: Vector2 = Vector2.ZERO
 		for object: Dictionary in scene.snapshot.objects:

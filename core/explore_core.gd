@@ -20,6 +20,8 @@ extends RefCounted
 ## A scene with a training post (a `dummy` object, the village) has a TrainingYard (core/training_yard.gd): once Tovan has been
 ## heard and the hero stands in the yard he may also attack and parry (`attack_pressed`, `attack_held`, `parry_pressed`, `aim`),
 ## the post teaches dash, attack, parry and dodge and sets the `lesson_*` flags. Everywhere else those inputs are ignored.
+## The hero starts unarmed: Tovan's first conversation hands him the Black Katana (flag `received_first_sword`, event `item_received`),
+## and only an armed hero fights in the yard (`ExploreSnapshot.armed`).
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -31,6 +33,9 @@ const SceneDefs := preload("res://core/scene_defs.gd")
 const DialogueBook := preload("res://core/dialogue_book.gd")
 const TrainingYard := preload("res://core/training_yard.gd")
 
+## The story flag that means the hero owns his first sword (Tovan's handover, DialogueBook grants). A save that has met Tovan
+## but has no such flag is an older save from before the handover existed: it is treated as armed (set_story_flags).
+const ARMED_FLAG: StringName = &"received_first_sword"
 ## The hero can interact with an NPC or object when his centre is this close to its feet or its stand point.
 const INTERACT_RANGE: float = 24.0
 ## A checkpoint is reached when the hero's centre is this close to its point.
@@ -61,6 +66,8 @@ class ExploreSnapshot:
 	var lit_switches: Array[StringName] = []
 	## The story flags set so far (what the save keeps).
 	var story_flags: Array[StringName] = []
+	## True once he owns his first sword (flag received_first_sword); before that the hero is unarmed and cannot fight.
+	var armed: bool = false
 	## The running conversation, {} when none: {npc_id, dialogue_id, index (0-based), count, speaker, portrait, text}.
 	var dialogue: Dictionary = {}
 	## The training post (a scene with a `dummy` object), {} elsewhere: see TrainingYard.view(). `telegraphs` is its current
@@ -166,6 +173,8 @@ func set_story_flags(flags: Array[StringName]) -> void:
 	for flag: StringName in flags:
 		if not story_flags.has(flag):
 			story_flags.append(flag)
+	if story_flags.has(&"met_tovan") and not story_flags.has(ARMED_FLAG):
+		story_flags.append(ARMED_FLAG)  # an older save: Tovan was met before the handover existed; do not trap the tutorial
 
 
 ## Sets a story flag (a new one emits `flag_set` with the next step). Returns true when it was new.
@@ -184,6 +193,10 @@ func _grant_flag(flag: StringName, events: Array[GameEvent]) -> bool:
 	story_flags.append(flag)
 	events.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
 	return true
+
+
+func is_armed() -> bool:
+	return story_flags.has(ARMED_FLAG)
 
 
 func has_flag(flag: StringName) -> bool:
@@ -248,8 +261,9 @@ func snapshot() -> ExploreSnapshot:
 	hero.max_hp = Tuning.PLAYER_MAX_HP
 	hero.invulnerable = player.is_invulnerable()
 	hero.weapon_id = player.weapon_id
-	hero.combo_index = 1
+	hero.combo_index = player.combo_index
 	hero.combo_max = player.combo_max()
+	hero.attack_speed_mult = player.swing_speed_mult if String(player.state).begins_with("attack_") else player.attack_speed_mult()
 	hero.move_speed_mult = player.move_speed_mult()
 	hero.equipped_aspects = player.equipped_aspects.duplicate()
 	snap.hero = hero
@@ -266,6 +280,7 @@ func snapshot() -> ExploreSnapshot:
 	snap.gate_open = gate_open
 	snap.lit_switches = lit_switches.duplicate()
 	snap.story_flags = story_flags.duplicate()
+	snap.armed = is_armed()
 	snap.dialogue = _dialogue_view()
 	if training != null:
 		snap.training = training.view(self)
@@ -315,6 +330,16 @@ func _end_talk(def_: Dictionary, skipped: bool, events: Array[GameEvent]) -> voi
 	events.append(GameEvent.new(GameEvent.DIALOGUE_ENDED, tick, {"scene": scene_id, "npc_id": finished["npc_id"], "dialogue_id": finished["dialogue_id"], "skipped": skipped, "flags_set": added}))
 	for flag: StringName in added:
 		events.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+	for grant: Dictionary in DialogueBook.grants_of(def_):
+		var flag: StringName = StringName(grant["flag"])
+		if story_flags.has(flag):
+			continue  # the grant is the flag: never twice, not after a reload, not when talking again
+		story_flags.append(flag)
+		events.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+		events.append(GameEvent.new(GameEvent.ITEM_RECEIVED, tick, {
+			"scene": scene_id, "reward_id": StringName(grant["reward_id"]), "kind": StringName(grant["kind"]), "item_id": StringName(grant["item"]),
+			"name": String(grant["name"]), "quantity": int(grant.get("quantity", 1)), "source": finished["npc_id"],
+		}))
 
 
 ## What the dialogue box shows now, {} when nobody is talking.

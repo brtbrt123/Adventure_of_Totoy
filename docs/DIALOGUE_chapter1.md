@@ -27,7 +27,7 @@ Generated from `data/dialogue/chapter1.json`, which is the real file the game re
 
 ### First visit (`tovan_intro`)
 
-- Hold it up to the light. That is a Black Katana, and it is yours. It was always yours.
+- Hold out your hands, Totoy. This is a Black Katana, and it is yours. It was always yours.
 - Worn, but the edge is honest. Mind the weight. A blade like that rewards patience.
 - Dash is your best friend out there. It carries you through trouble faster than a sword can.
 - Remember the colours. Gold attacks can be parried. Red attacks, you dodge. No exceptions.
