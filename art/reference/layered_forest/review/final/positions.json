@@ -1,0 +1,197 @@
+[
+	{
+		"entry": "village_side",
+		"feet": [
+			377.646942138672,
+			81.0761337280273
+		],
+		"label": "root_gate_closed_front",
+		"walked": true
+	},
+	{
+		"entry": "north",
+		"feet": [
+			378.357299804688,
+			46.7602005004883
+		],
+		"label": "root_gate_closed_north_entry_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			297.656951904297,
+			109.574333190918
+		],
+		"label": "pedestal_west_unlit_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			297.953521728516,
+			114.564308166504
+		],
+		"label": "pedestal_west_unlit_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			370.630432128906,
+			133.792709350586
+		],
+		"label": "pedestal_east_unlit_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			370.888092041016,
+			141.293411254883
+		],
+		"label": "pedestal_east_unlit_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			377.661956787109,
+			69.1881942749023
+		],
+		"label": "root_gate_lit_open_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			377.962707519531,
+			74.1781616210938
+		],
+		"label": "root_gate_lit_open_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			298.346405029297,
+			106.273124694824
+		],
+		"label": "pedestal_west_lit_open_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			298.0068359375,
+			114.259819030762
+		],
+		"label": "pedestal_west_lit_open_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			370.558837890625,
+			133.748107910156
+		],
+		"label": "pedestal_east_lit_open_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			370.877990722656,
+			141.267288208008
+		],
+		"label": "pedestal_east_lit_open_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			108.539810180664,
+			88.8652648925781
+		],
+		"label": "tree_left_lit_open_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			24.8359146118164,
+			97.0512466430664
+		],
+		"label": "tree_left_lit_open_front",
+		"walked": true
+	},
+	{
+		"capture": "unavailable",
+		"label": "tree_middle_lit_open_behind",
+		"reason": "tree_middle_lit_open_behind: upper boundary prevents walking behind this tree",
+		"walked": false
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			286.896697998047,
+			97.1016616821289
+		],
+		"label": "tree_middle_lit_open_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			103.217819213867,
+			81.3667678833008
+		],
+		"label": "tree_right_lit_open_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			103.291816711426,
+			86.9116897583008
+		],
+		"label": "tree_right_lit_open_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			28.9261913299561,
+			170.76286315918
+		],
+		"label": "log_west_lit_open_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			28.9063186645508,
+			178.390151977539
+		],
+		"label": "log_west_lit_open_front",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			414.954681396484,
+			138.292816162109
+		],
+		"label": "chest_lit_open_behind",
+		"walked": true
+	},
+	{
+		"entry": "village_side",
+		"feet": [
+			414.959899902344,
+			145.573608398438
+		],
+		"label": "chest_lit_open_front",
+		"walked": true
+	}
+]

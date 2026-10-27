@@ -9,6 +9,11 @@ uniform int lamp_count = 0;
 uniform vec4 lamps[16];
 uniform vec3 lamp_colour = vec3(1.0, 0.79, 0.52);
 uniform float emissive_pass_alpha = 0.99;
+uniform float prop_shadow_alpha = 0.30;
+uniform float actor_shadow_alpha = 0.20;
+uniform bool mixed_lights = false;
+uniform vec3 lamp_colours[16];
+uniform vec3 lamp_core_colours[16];
 uniform vec3 lamp_core_colour = vec3(1.05, 0.98, 0.88);
 varying vec2 world_position;
 varying vec4 draw_colour;
@@ -46,6 +51,9 @@ void fragment() {
 	float warm_pool = 0.0;
 	float warm_halo = 0.0;
 	float fixture_core = 0.0;
+	vec3 pool_rgb = vec3(0.0);
+	vec3 halo_rgb = vec3(0.0);
+	vec3 core_rgb = vec3(0.0);
 	for (int i = 0; i < 16; i++) {
 		if (i >= lamp_count) { break; }
 		vec4 lamp = lamps[i];
@@ -56,17 +64,20 @@ void fragment() {
 		float falloff = 1.0 - smoothstep(0.0, lamp.z, distance_to_light);
 		if (floor_pool) {
 			warm_pool += falloff * falloff * abs(lamp.w);
+			pool_rgb += lamp_colours[i] * falloff * falloff * abs(lamp.w);
 		} else {
 			warm_halo += falloff * falloff * lamp.w;
+			halo_rgb += lamp_colours[i] * falloff * falloff * lamp.w;
+			core_rgb += lamp_core_colours[i] * (1.0 - smoothstep(0.0, 7.0, distance_to_light)) * lamp.w;
 			fixture_core += (1.0 - smoothstep(0.0, 7.0, distance_to_light)) * lamp.w;
 		}
 	}
 	bool shadow_pass = max(draw_colour.r, max(draw_colour.g, draw_colour.b)) < 0.001
-		&& draw_colour.a > 0.0 && draw_colour.a < 0.5;
+		&& (abs(draw_colour.a - prop_shadow_alpha) < 0.0001 || abs(draw_colour.a - actor_shadow_alpha) < 0.0001);
 	if (abs(draw_colour.a - emissive_pass_alpha) < 0.0001) {
 		COLOR = vec4(texture(TEXTURE, UV).rgb * draw_colour.rgb, texture(TEXTURE, UV).a);
 	} else if (shadow_pass) {
-		float radius = draw_colour.a > 0.25 ? 2.0 : 0.65;
+		float radius = abs(draw_colour.a - prop_shadow_alpha) < 0.0001 ? 2.0 : 0.65;
 		vec2 step_uv = TEXTURE_PIXEL_SIZE * radius;
 		float mask = texture(TEXTURE, UV).a * 0.28;
 		mask += (texture(TEXTURE, UV + vec2(step_uv.x, 0)).a + texture(TEXTURE, UV - vec2(step_uv.x, 0)).a
@@ -80,11 +91,17 @@ void fragment() {
 		float exposure = mix(1.0, 0.48 + moonlight * 0.20 + shafts * 0.07 + above * 0.03, strength);
 		vec3 lit = base.rgb * exposure * mix(vec3(1.0), light_colour, strength);
 		float warmth = min(1.8, warm_pool * 0.95 + warm_halo * 0.75);
-		lit += base.rgb * lamp_colour * warmth * 0.65;
-		lit += lamp_colour * min(0.075, warm_halo * 0.035);
+		if (mixed_lights) {
+			lit += base.rgb * min(vec3(1.8), pool_rgb * 0.95 + halo_rgb * 0.75) * 0.65;
+			lit += min(vec3(0.075), halo_rgb * 0.035);
+		} else {
+			lit += base.rgb * lamp_colour * warmth * 0.65;
+			lit += lamp_colour * min(0.075, warm_halo * 0.035);
+		}
 		// The painted cream lamp/window/fire cores stay luminous at night.
 		float bright_paint = smoothstep(0.55, 0.88, max(base.r, max(base.g, base.b)));
-		lit = mix(lit, base.rgb * lamp_core_colour, clamp(fixture_core * bright_paint, 0.0, 0.9));
+		vec3 fixture_colour = mixed_lights ? core_rgb / max(fixture_core, 0.001) : lamp_core_colour;
+		lit = mix(lit, base.rgb * fixture_colour, clamp(fixture_core * bright_paint, 0.0, 0.9));
 		COLOR = vec4(clamp(lit, vec3(0.0), vec3(1.0)), base.a);
 	}
 }

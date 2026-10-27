@@ -13,7 +13,6 @@ class SeparateShadowLayerTests(unittest.TestCase):
     def test_all_props_have_independent_shadow_layers(self):
         manifest = json.loads((ROOT / 'art/reference/shadow_layers/manifest.json').read_text())
         defs = json.loads((ROOT / 'data/props/prop_defs.json').read_text())['props']
-        defs = {k: v for k, v in defs.items() if not k.startswith('forest_')}  # the forest types have no sprites or prop_art yet (docs/CODEX_TASK_forest_layered.md): drop this filter when Codex adds them
         frames = json.loads((ROOT / 'art/build/sprites.json').read_text())['frames']
         renderer = json.loads((ROOT / 'presentation/common/prop_art.json').read_text())['props']
         self.assertEqual(set(defs), set(manifest['props']))
@@ -41,7 +40,7 @@ class SeparateShadowLayerTests(unittest.TestCase):
                     self.assertLessEqual(y1, obj.height * abs(manifest['projection']['dy_per_height']) + 2)
                     self.assertGreaterEqual(x0, -obj.width - obj.height * abs(manifest['projection']['dx_per_height']) - 2)
                     self.assertLessEqual(x1, obj.width + obj.height * abs(manifest['projection']['dx_per_height']) + 2)
-        self.assertEqual(102, len(names))
+        self.assertEqual(2 * len(defs), len(names))
 
 
 if __name__ == '__main__':

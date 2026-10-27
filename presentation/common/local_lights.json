@@ -116,5 +116,213 @@
       "pool_radius": 48.0,
       "pool_energy": 0.7
     }
+  ],
+  "_painted_glade": [
+    {
+      "pixel": [
+        226,
+        148
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.25,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
+      "pool_pixel": [
+        226,
+        163
+      ]
+    },
+    {
+      "pixel": [
+        303,
+        133
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.25,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
+      "pool_pixel": [
+        303,
+        148
+      ]
+    },
+    {
+      "pixel": [
+        365,
+        155
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.25,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
+      "pool_pixel": [
+        365,
+        170
+      ]
+    },
+    {
+      "pixel": [
+        267,
+        215
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.25,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
+      "pool_pixel": [
+        267,
+        230
+      ]
+    }
+  ],
+  "forest_pedestal_lit": [
+    {
+      "pixel": [
+        10.3,
+        19.1
+      ],
+      "halo_radius": 30.0,
+      "energy": 1.1,
+      "pool_radius": 40.0,
+      "pool_energy": 0.55,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "forest_standing_stone": [
+    {
+      "pixel": [
+        27.8,
+        25.5
+      ],
+      "halo_radius": 30.0,
+      "energy": 1.1,
+      "pool_radius": 40.0,
+      "pool_energy": 0.55,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "forest_gate_closed": [
+    {
+      "pixel": [
+        34.3,
+        35.6
+      ],
+      "halo_radius": 25.0,
+      "energy": 0.65,
+      "pool_radius": 40.0,
+      "pool_energy": 0.25,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "pixel": [
+        90.9,
+        46.2
+      ],
+      "halo_radius": 25.0,
+      "energy": 0.65,
+      "pool_radius": 40.0,
+      "pool_energy": 0.25,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "forest_gate_open": [
+    {
+      "pixel": [
+        32.8,
+        33.1
+      ],
+      "halo_radius": 25.0,
+      "energy": 0.65,
+      "pool_radius": 40.0,
+      "pool_energy": 0.25,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "pixel": [
+        96.5,
+        43.2
+      ],
+      "halo_radius": 25.0,
+      "energy": 0.65,
+      "pool_radius": 40.0,
+      "pool_energy": 0.25,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "forest_lantern_post": [
+    {
+      "pixel": [
+        5.0,
+        25.0
+      ],
+      "halo_radius": 25.0,
+      "energy": 1.05,
+      "pool_radius": 40.0,
+      "pool_energy": 0.6,
+      "colour": [
+        1.0,
+        0.79,
+        0.52
+      ],
+      "core_colour": [
+        1.05,
+        0.98,
+        0.88
+      ]
+    }
   ]
 }

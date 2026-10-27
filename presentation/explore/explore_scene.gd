@@ -52,6 +52,7 @@ const AMBIENT: Dictionary = {
 	&"arena": Color(1, 1, 1),
 	&"village_layered": Color(0.93, 0.89, 0.84),
 	&"glade_layered": Color(0.88, 0.95, 0.94),
+	&"forest_layered": Color(0.9, 0.94, 0.88),
 }
 ## The actor shadow's radius for the hero (presentation/common/actor_shadow.gd draws it, the same as in the arena).
 const HERO_SHADOW_RADIUS: float = 10.0
@@ -70,7 +71,7 @@ const HINTS: Dictionary = {&"npc": "[E] TALK", &"chest": "[E] OPEN", &"sign": "[
 const HINT_OVERRIDES: Dictionary = {&"root_gate": "[E] LOOK"}
 ## The hint floats this far above an object's feet (people: their height + 8).
 const OBJECT_HINT_HEIGHT: float = 30.0
-const DEBUG_SCENES: Dictionary = {"debug_scene_village": &"village", "debug_scene_forest": &"forest", "debug_scene_glade": &"glade", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered"}
+const DEBUG_SCENES: Dictionary = {"debug_scene_village": &"village", "debug_scene_forest": &"forest", "debug_scene_glade": &"glade", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered"}
 
 var core: ExploreCore
 var snapshot: ExploreCore.ExploreSnapshot
@@ -174,10 +175,8 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	else:
 		core = ExploreCore.new(scene, entry, gate_open)
 	snapshot = core.snapshot()
-	prop_placements.clear()
-	if SceneDefs.LAYERED.has(scene):
-		prop_placements = PropScene.placements(SceneDefs.layered_data(scene), PropScene.load_defs())
-	_update_lighting()
+	gate_open = snapshot.gate_open
+	_refresh_props()
 	facing_left = snapshot.hero.facing.x < 0.0
 	previous_hero_position = snapshot.hero.position
 	bubbles.clear()
@@ -232,6 +231,7 @@ func _physics_process(_delta: float) -> void:
 func advance(intent: InputFrame) -> void:
 	core.step(intent)
 	snapshot = core.snapshot()
+	gate_open = snapshot.gate_open
 	for event: GameEvent in core.last_events:
 		_on_event(event)
 	if toast_ticks > 0:
@@ -252,6 +252,12 @@ func _on_event(event: GameEvent) -> void:
 			begin_transition(event.data["target_scene"], event.data["target_entry"])
 		GameEvent.CHECKPOINT:
 			_save_progress(core.scene_id, event.data["checkpoint_id"])
+		GameEvent.SWITCH_LIT:
+			_refresh_props()
+		GameEvent.GATE_CHANGED:
+			gate_open = snapshot.gate_open
+			_refresh_props()
+			_save_progress(core.scene_id, core.last_checkpoint)
 		GameEvent.INTERACT:
 			if event.data["kind"] == &"npc":
 				bubbles[event.data["target_id"]] = BUBBLE_TICKS  # no dialogue yet (step 2): a placeholder "..."
@@ -307,6 +313,7 @@ func toggle_gate() -> void:
 	toast_message = "ROOT GATE OPEN" if gate_open else "ROOT GATE CLOSED"
 	toast_ticks = TOAST_TICKS
 	snapshot = core.snapshot()
+	_refresh_props()
 	_update_hud()
 	queue_redraw()
 
@@ -378,6 +385,7 @@ func _update_camera() -> void:
 	var half: Vector2 = VIEW_SIZE * 0.5
 	view_origin = (snapshot.hero.position.round() - half).clamp(Vector2.ZERO, (snapshot.size - VIEW_SIZE).max(Vector2.ZERO))
 	camera.position = view_origin + half
+	camera.force_update_scroll()
 
 
 func _choose_frames() -> void:
@@ -425,7 +433,7 @@ func ambient() -> Color:
 
 
 func _visible_world_rect() -> Rect2:
-	return Rect2(view_origin, VIEW_SIZE) if camera.enabled else Rect2(Vector2.ZERO, snapshot.size)
+	return get_canvas_transform().affine_inverse() * get_viewport_rect()
 
 
 ## Actors, props, cosmetic motes and painted foreground occluders sorted by base.
@@ -505,7 +513,7 @@ func _draw_actor_cast(item: Dictionary) -> void:
 		return
 	var frame: Dictionary = frames[item["frame"]]
 	draw_set_transform_matrix(EnvironmentLight.actor_transform(item["at"], frame, bool(item["left"])))
-	draw_texture_rect_region(sprites, Rect2(Vector2.ZERO, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(0, 0, 0, 0.20))
+	draw_texture_rect_region(sprites, Rect2(Vector2.ZERO, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(0, 0, 0, EnvironmentLight.ACTOR_SHADOW_ALPHA))
 	draw_set_transform_matrix(Transform2D.IDENTITY)
 
 
@@ -513,9 +521,18 @@ func shadow_strength() -> float:
 	var scene: StringName = snapshot.scene_id
 	if scene == &"village_layered":
 		scene = &"village"
+	elif scene == &"forest_layered":
+		scene = &"forest"
 	elif scene == &"glade_layered":
 		scene = &"glade"
 	return ActorShadow.strength_for(scene)
+
+
+func _refresh_props() -> void:
+	prop_placements.clear()
+	if SceneDefs.LAYERED.has(snapshot.scene_id):
+		prop_placements = PropScene.placements(SceneDefs.layered_data(snapshot.scene_id), PropScene.load_defs(), {"gate_open": snapshot.gate_open, "lit": snapshot.lit_switches})
+	_update_lighting()
 
 
 func _update_lighting() -> void:

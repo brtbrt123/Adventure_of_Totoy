@@ -1,6 +1,7 @@
 extends RefCounted
 ## Separate prop sprites. Call draw_shadows before the sorted actor/prop pass.
 ## Placements follow PropScene.placements; this renderer holds no collision rules.
+const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const GLADE_TINT: Color = Color(0.88, 0.95, 0.94)
 static var _art: Dictionary = {}
@@ -102,7 +103,7 @@ static func draw_shadow(canvas: CanvasItem, item: Dictionary, strength: float = 
 		var at: Vector2 = item.get("shadow_at", item["at"])
 		var cast_origin: Vector2 = (at - Vector2(cast_frame["ax"], cast_frame["ay"])).round()
 		# Black vertex colour tags this draw as the shader's separate shadow pass.
-		canvas.draw_texture_rect_region(atlas, Rect2(cast_origin, Vector2(cast_frame["w"], cast_frame["h"])), Rect2(cast_frame["x"], cast_frame["y"], cast_frame["w"], cast_frame["h"]), Color(0, 0, 0, 0.30))
+		canvas.draw_texture_rect_region(atlas, Rect2(cast_origin, Vector2(cast_frame["w"], cast_frame["h"])), Rect2(cast_frame["x"], cast_frame["y"], cast_frame["w"], cast_frame["h"]), Color(0, 0, 0, EnvironmentLight.PROP_SHADOW_ALPHA))
 	var plan: Dictionary = item.get("shadow_plan", {})
 	if plan.is_empty():
 		ActorShadow.draw(canvas, item.get("shadow_at", item["at"]), item["shadow_radius"], strength)

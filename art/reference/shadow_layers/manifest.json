@@ -2608,6 +2608,1281 @@
         }
       },
       "object_rgba_sha256": "7dc6cfe85d0031f7160b1a2d710f65bb97fbcc68353fe8286416e002ef0a1984"
+    },
+    "forest_sign": {
+      "object": "forest_sign",
+      "object_source": "art/reference/layered_forest/props/forest_sign.png",
+      "object_size": [
+        30,
+        45
+      ],
+      "object_anchor": [
+        15.5,
+        45
+      ],
+      "object_rgba_sha256": "c6cee9e99f1411bb5cbae37dd49e70d888bfd959b2b62fd8a45d27aa341c731e",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_sign_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            27,
+            12
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_sign_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            27,
+            12
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_pedestal": {
+      "object": "forest_pedestal",
+      "object_source": "art/reference/layered_forest/props/forest_pedestal.png",
+      "object_size": [
+        26,
+        49
+      ],
+      "object_anchor": [
+        13.0,
+        49
+      ],
+      "object_rgba_sha256": "093ede0802df9f0da741a49ef1329e2fce304c2e0dc9042b42c2ee05a1b99438",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_pedestal_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            17,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            23,
+            13
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_pedestal_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -11,
+            0,
+            23,
+            13
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_pedestal_lit": {
+      "object": "forest_pedestal_lit",
+      "object_source": "art/reference/layered_forest/props/forest_pedestal_lit.png",
+      "object_size": [
+        26,
+        49
+      ],
+      "object_anchor": [
+        13.0,
+        49
+      ],
+      "object_rgba_sha256": "36a191da19128c4b1f0cbf7ee2a51fa9aab6364494cb86440038c1ccb96345db",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_pedestal_lit_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            17,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            23,
+            13
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_pedestal_lit_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            15,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -11,
+            0,
+            22,
+            13
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_lantern_post": {
+      "object": "forest_lantern_post",
+      "object_source": "art/reference/layered_forest/props/forest_lantern_post.png",
+      "object_size": [
+        25,
+        54
+      ],
+      "object_anchor": [
+        14.5,
+        54
+      ],
+      "object_rgba_sha256": "cd075e9363e24d73421f774a5f6b76fd143f81410f6242e7fad7f21e44ce638c",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_lantern_post_1",
+          "size": [
+            40,
+            24
+          ],
+          "anchor": [
+            14,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -9,
+            0,
+            21,
+            15
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_lantern_post_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            13,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -9,
+            0,
+            28,
+            15
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_gate_closed": {
+      "object": "forest_gate_closed",
+      "object_source": "art/reference/layered_forest/props/forest_gate_closed.png",
+      "object_size": [
+        124,
+        87
+      ],
+      "object_anchor": [
+        61.0,
+        87
+      ],
+      "object_rgba_sha256": "a3a50592ec12e8c892a833479c81b9f740a28026d2eccf4f7a9d014bc1e40625",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_gate_closed_1",
+          "size": [
+            152,
+            32
+          ],
+          "anchor": [
+            63,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -59,
+            0,
+            84,
+            23
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_gate_closed_flipped_1",
+          "size": [
+            152,
+            32
+          ],
+          "anchor": [
+            64,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -59,
+            0,
+            77,
+            23
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_gate_open": {
+      "object": "forest_gate_open",
+      "object_source": "art/reference/layered_forest/props/forest_gate_open.png",
+      "object_size": [
+        124,
+        87
+      ],
+      "object_anchor": [
+        61.0,
+        87
+      ],
+      "object_rgba_sha256": "bcecae33ef098369a4ea3b99af7344ba43bf8ba7d1e5278cc735ff8d6c2cef2c",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_gate_open_1",
+          "size": [
+            152,
+            32
+          ],
+          "anchor": [
+            61,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -56,
+            0,
+            84,
+            23
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_gate_open_flipped_1",
+          "size": [
+            152,
+            32
+          ],
+          "anchor": [
+            67,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -63,
+            0,
+            77,
+            23
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_tree_middle": {
+      "object": "forest_tree_middle",
+      "object_source": "art/reference/layered_forest/props/forest_tree_middle.png",
+      "object_size": [
+        95,
+        113
+      ],
+      "object_anchor": [
+        55.5,
+        113
+      ],
+      "object_rgba_sha256": "5ac2d525ac95d488a024032bc2eb6562e5233d585776f77abcb967fd180277ec",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_tree_middle_1",
+          "size": [
+            120,
+            40
+          ],
+          "anchor": [
+            47,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -42,
+            0,
+            66,
+            29
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_tree_middle_flipped_1",
+          "size": [
+            128,
+            40
+          ],
+          "anchor": [
+            40,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -36,
+            0,
+            78,
+            29
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_standing_stone": {
+      "object": "forest_standing_stone",
+      "object_source": "art/reference/layered_forest/props/forest_standing_stone.png",
+      "object_size": [
+        49,
+        61
+      ],
+      "object_anchor": [
+        24.0,
+        61
+      ],
+      "object_rgba_sha256": "e6a4d5aa956bc3d5974f2bd44538a91ed3cef51f6700e43ad4a49016ef5d0b05",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_standing_stone_1",
+          "size": [
+            64,
+            32
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            31,
+            16
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_standing_stone_flipped_1",
+          "size": [
+            64,
+            32
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            33,
+            16
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_rock_root": {
+      "object": "forest_rock_root",
+      "object_source": "art/reference/layered_forest/props/forest_rock_root.png",
+      "object_size": [
+        57,
+        47
+      ],
+      "object_anchor": [
+        29.5,
+        47
+      ],
+      "object_rgba_sha256": "12992ab7ee640ec2f6f0938924e049985096bfcb8fda1cb0f14322950f4aab94",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_rock_root_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            32,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            34,
+            13
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_rock_root_flipped_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -25,
+            0,
+            35,
+            13
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_tree_left": {
+      "object": "forest_tree_left",
+      "object_source": "art/reference/layered_forest/props/forest_tree_left.png",
+      "object_size": [
+        113,
+        103
+      ],
+      "object_anchor": [
+        58.5,
+        103
+      ],
+      "object_rgba_sha256": "ef7439eb078d00cc7f2c2fb0b0e083c51eaf1f78843b5bf0f26b6c164229a14c",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_tree_left_1",
+          "size": [
+            128,
+            40
+          ],
+          "anchor": [
+            45,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -41,
+            0,
+            75,
+            27
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_tree_left_flipped_1",
+          "size": [
+            136,
+            40
+          ],
+          "anchor": [
+            48,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -44,
+            0,
+            78,
+            27
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_tree_right": {
+      "object": "forest_tree_right",
+      "object_source": "art/reference/layered_forest/props/forest_tree_right.png",
+      "object_size": [
+        128,
+        104
+      ],
+      "object_anchor": [
+        75.0,
+        104
+      ],
+      "object_rgba_sha256": "55633bfb70531230ab412245585fa2a18d0e8a9671918150c58345fcdf510537",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_tree_right_1",
+          "size": [
+            144,
+            40
+          ],
+          "anchor": [
+            64,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -59,
+            0,
+            71,
+            27
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_tree_right_flipped_1",
+          "size": [
+            152,
+            40
+          ],
+          "anchor": [
+            47,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -43,
+            0,
+            93,
+            27
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_log_1": {
+      "object": "forest_log_1",
+      "object_source": "art/reference/layered_forest/props/forest_log_1.png",
+      "object_size": [
+        83,
+        42
+      ],
+      "object_anchor": [
+        54.0,
+        42
+      ],
+      "object_rgba_sha256": "499bfb58f3726cffe755b7190f782c5790e7211c640de6397487ae32915a44a4",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_log_1_1",
+          "size": [
+            96,
+            24
+          ],
+          "anchor": [
+            52,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -47,
+            0,
+            37,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_log_1_flipped_1",
+          "size": [
+            104,
+            24
+          ],
+          "anchor": [
+            30,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -26,
+            0,
+            64,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_log_2": {
+      "object": "forest_log_2",
+      "object_source": "art/reference/layered_forest/props/forest_log_2.png",
+      "object_size": [
+        70,
+        40
+      ],
+      "object_anchor": [
+        36.5,
+        40
+      ],
+      "object_rgba_sha256": "efe3efaedca9562ecddd024de2c526cdb5810fddaf7da718b43910c1f7e4a891",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_log_2_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            38,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -34,
+            0,
+            40,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_log_2_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            35,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -30,
+            0,
+            45,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_stump": {
+      "object": "forest_stump",
+      "object_source": "art/reference/layered_forest/props/forest_stump.png",
+      "object_size": [
+        70,
+        40
+      ],
+      "object_anchor": [
+        28.5,
+        40
+      ],
+      "object_rgba_sha256": "541e7fd2c668a42d3d5138500f5c1fb37c84e9b606d6963da2d7f2a043a082c1",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_stump_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            45,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_stump_flipped_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            44,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -40,
+            0,
+            32,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_chest": {
+      "object": "forest_chest",
+      "object_source": "art/reference/layered_forest/props/forest_chest.png",
+      "object_size": [
+        47,
+        32
+      ],
+      "object_anchor": [
+        26.0,
+        32
+      ],
+      "object_rgba_sha256": "8a718a89cd8533c52048039a66c4c5eb865a69e29726f69dc6937f61c735cbbb",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_chest_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            26,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_chest_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            33,
+            9
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_thorns_1": {
+      "object": "forest_thorns_1",
+      "object_source": "art/reference/layered_forest/props/forest_thorns_1.png",
+      "object_size": [
+        64,
+        44
+      ],
+      "object_anchor": [
+        32.5,
+        44
+      ],
+      "object_rgba_sha256": "2d05dd0a179d8492599b6976ad97f38aaf8ac64a52acaf5b484606874702d0ce",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_thorns_1_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            33,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -29,
+            0,
+            38,
+            12
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_thorns_1_flipped_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            33,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -29,
+            0,
+            40,
+            12
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_thorns_2": {
+      "object": "forest_thorns_2",
+      "object_source": "art/reference/layered_forest/props/forest_thorns_2.png",
+      "object_size": [
+        52,
+        38
+      ],
+      "object_anchor": [
+        27.0,
+        38
+      ],
+      "object_rgba_sha256": "79ed567124146dbd9608d021768b419d76f1c994a35df92e55d5c5be80530985",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_thorns_2_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            30,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_thorns_2_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            33,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_bush_1": {
+      "object": "forest_bush_1",
+      "object_source": "art/reference/layered_forest/props/forest_bush_1.png",
+      "object_size": [
+        54,
+        40
+      ],
+      "object_anchor": [
+        27.0,
+        40
+      ],
+      "object_rgba_sha256": "173049f5124ed0e00244fd5e7f7cde6d62bcec659c8a1d2d17c49661cec42be8",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_bush_1_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            34,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_bush_1_flipped_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -25,
+            0,
+            34,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_bush_2": {
+      "object": "forest_bush_2",
+      "object_source": "art/reference/layered_forest/props/forest_bush_2.png",
+      "object_size": [
+        52,
+        38
+      ],
+      "object_anchor": [
+        25.5,
+        38
+      ],
+      "object_rgba_sha256": "0dbba44724876f4f8f748972eb81a9db28d635311166d5684acad0df11196842",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_bush_2_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            32,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_bush_2_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            31,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_fern_1": {
+      "object": "forest_fern_1",
+      "object_source": "art/reference/layered_forest/props/forest_fern_1.png",
+      "object_size": [
+        61,
+        37
+      ],
+      "object_anchor": [
+        28.5,
+        37
+      ],
+      "object_rgba_sha256": "59988fb55371e72ab7c7ce1a4b6d4342d54942a1a2e91eccd8e8663d66b540d2",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_fern_1_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            32,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            38,
+            10
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_fern_1_flipped_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            33,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -29,
+            0,
+            36,
+            10
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_fern_small": {
+      "object": "forest_fern_small",
+      "object_source": "art/reference/layered_forest/props/forest_fern_small.png",
+      "object_size": [
+        38,
+        32
+      ],
+      "object_anchor": [
+        19.0,
+        32
+      ],
+      "object_rgba_sha256": "4b88ce6a86aa529b2eadc53a00183c5480ee01a253c42c850e8f17caa753bdcb",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_fern_small_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            24,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_fern_small_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -16,
+            0,
+            23,
+            9
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_fern_2": {
+      "object": "forest_fern_2",
+      "object_source": "art/reference/layered_forest/props/forest_fern_2.png",
+      "object_size": [
+        46,
+        38
+      ],
+      "object_anchor": [
+        22.0,
+        38
+      ],
+      "object_rgba_sha256": "03c160b91ba054cd9ad8d07ad93a245f49812744ba601a8774eb4a0cc2abc59a",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_fern_2_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            23,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -19,
+            0,
+            31,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_fern_2_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            33,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_flowers": {
+      "object": "forest_flowers",
+      "object_source": "art/reference/layered_forest/props/forest_flowers.png",
+      "object_size": [
+        54,
+        36
+      ],
+      "object_anchor": [
+        29.0,
+        36
+      ],
+      "object_rgba_sha256": "891ca25245518b061600de7285a570c77a2fc80d2fc5f1d7905aeedcb74ec3b8",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_flowers_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -26,
+            0,
+            29,
+            10
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_flowers_flipped_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            34,
+            10
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_rocks": {
+      "object": "forest_rocks",
+      "object_source": "art/reference/layered_forest/props/forest_rocks.png",
+      "object_size": [
+        43,
+        31
+      ],
+      "object_anchor": [
+        18.5,
+        31
+      ],
+      "object_rgba_sha256": "2704ec934e86ae906d3e7f735b0c771128439927a8b1241b5610b9980360647d",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_rocks_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -16,
+            0,
+            30,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_rocks_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            23,
+            9
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "forest_mushrooms": {
+      "object": "forest_mushrooms",
+      "object_source": "art/reference/layered_forest/props/forest_mushrooms.png",
+      "object_size": [
+        36,
+        27
+      ],
+      "object_anchor": [
+        18.5,
+        27
+      ],
+      "object_rgba_sha256": "5901c84f52507e12519e12c16cad0813fb0bc60087824dbe6ef3c2f1b203453c",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_forest_mushrooms_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            22,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_forest_mushrooms_flipped_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            22,
+            8
+          ],
+          "blur_padding": 4
+        }
+      }
     }
   }
 }
