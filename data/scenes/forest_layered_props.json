@@ -26,11 +26,11 @@
   ],
   [
    230,
-   78
+   70
   ],
   [
    300,
-   84
+   74
   ],
   [
    338,
@@ -268,7 +268,7 @@
    "id": "tree_middle",
    "type": "forest_tree_middle",
    "x": 252,
-   "y": 92,
+   "y": 108,
    "flip": false,
    "shadow_radius": 22
   },

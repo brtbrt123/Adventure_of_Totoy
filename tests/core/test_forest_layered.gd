@@ -313,3 +313,39 @@ func test_walking_is_deterministic() -> void:
 			trace.append(core.player.position)
 		traces.append(trace)
 	assert_eq(traces[0], traces[1], "the same inputs give the same walk")
+
+
+## The review capture "hero behind the middle tree" needs a pose the hero really reaches north of the tree's base while
+## the tree covers him. The tree first stood at feet y 92, 12 px from the upper boundary: only a pose beside the trunk
+## (281,90) was reachable and it showed the hero half behind leaf fringe. It stands at feet y 108 now (the trail starts
+## at y 125, so nothing changes for the route) and the outline's top edge near it moved up 8-10 px (vertices 230,78 ->
+## 230,70 and 300,84 -> 300,74: still the lit lawn, the dark undergrowth starts near y 55), which opens a pocket behind
+## the trunk. BEHIND_POSE is in that pocket; the test walks the hero there with the walking bot and the real collision
+## and measures how much of him the tree's pixels cover.
+const BEHIND_POSE: Vector2 = Vector2(248, 88)
+
+
+func test_the_middle_tree_has_a_reachable_behind_pose() -> void:
+	var tree: Dictionary = _placement(&"tree_middle")
+	var core: ExploreCore = ExploreCore.new(SCENE)
+	var bot: ExploreBot = ExploreBot.new()
+	assert_true(bot.plan(core.size, core.obstacles, core.player.position, BEHIND_POSE), "a path exists to the behind pose")
+	for i: int in 3000:
+		core.step(bot.next_input(core.player.position))
+		if bot.done():
+			break
+	assert_true(core.player.position.distance_to(BEHIND_POSE) < 3.0, "the hero walks there (at %s)" % str(core.player.position))
+	assert_true(core.player.position.y < (tree["feet"] as Vector2).y, "north of the tree's base: drawn behind it")
+	var def: Dictionary = _defs["props"]["forest_tree_middle"]
+	var image: Image = Image.load_from_file(ProjectSettings.globalize_path("res://data/props/cutouts_forest/" + String(def["image"])))
+	var origin: Vector2 = (tree["feet"] as Vector2) - (tree["anchor"] as Vector2)
+	var hit: int = 0
+	var total: int = 0
+	for y: int in range(int(core.player.position.y) - 34, int(core.player.position.y)):
+		for x: int in range(int(core.player.position.x) - 6, int(core.player.position.x) + 6):
+			total += 1
+			var sx: int = x - int(round(origin.x))
+			var sy: int = y - int(round(origin.y))
+			if sx >= 0 and sy >= 0 and sx < image.get_width() and sy < image.get_height() and image.get_pixel(sx, sy).a > 0.0:
+				hit += 1
+	assert_true(float(hit) / float(total) >= 0.9, "the tree covers at least 90 percent of the hero there (%.0f percent)" % (100.0 * hit / total))

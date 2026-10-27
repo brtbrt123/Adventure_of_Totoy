@@ -42,3 +42,7 @@ See the newest `docs/STATUS.md` entry. Short: `smoke_night_ambience.gd` uses `as
 
 - (Done 2026-10-27: approved.) The forest ground and prop sheet are approved production sources. The sheet's single signpost board (the prompt asked for two arrow boards) and the third fern slot that reads as a small bush are findings, not approved substitutions.
 - The gate is 124 px wide against a 50 px trail; it stands across the climb with its trunks on the grass beside it. Say if the gate should be narrower (that is a new generation, or a smaller scale for this prop).
+
+## Final capture for the middle tree (2026-10-27, after your f70ad0f)
+
+`tree_middle` now stands at feet (252,108) and the outline opened a pocket behind its trunk. Capture the hero **behind** it at feet **(248,88)**: `ExploreBot.plan(size, obstacles, hero position, Vector2(248, 88))` reaches it (`tests/core/test_forest_layered.gd::test_the_middle_tree_has_a_reachable_behind_pose` does exactly that); the tree covers 90 % or more of his body there. Remove the "upper boundary prevents walking behind this tree" exception in `tests/smoke_forest_layered.gd` and use this pose for `tree_middle`. Re-take the lit/open and closed variants of that one capture and the overview images (the tree moved 16 px south).
