@@ -1,5 +1,7 @@
 # HANDOFF: Adventure of Totoy (rewritten 2026-10-22 for the next session)
 
+> **Current owner direction (2026-10-27): start the next Codex session with [CODEX_NEXT_SESSION.md](CODEX_NEXT_SESSION.md). The owner wants to redo the glade arch/bush/path composition. The older next-session list below is historical; forest integration is already complete. Preserve the uncommitted CHAPTER1_PLAN.md edit.**
+
 Read this first, then `AGENTS.md` (the rules), then `docs/CHAPTER1_PLAN.md` (what we are building) and `docs/STATUS.md` (the detailed log, newest section first; entries labelled "NOT committed" may be older than the git history: trust `git log`).
 
 ## What this project is

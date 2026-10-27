@@ -1,5 +1,7 @@
 # Codex task: the layered forest route (2026-10-27)
 
+> **Historical task — implementation completed in f70ad0f, followed by playtest fixes through ba1cc3b. Do not re-run this as unfinished work. The owner now requests a fresh glade arch/bush/path redo; read [CODEX_NEXT_SESSION.md](CODEX_NEXT_SESSION.md). Current JSON and Git history supersede the old counts/coordinates below.**
+
 Claude finished the core/data side (see the newest `docs/STATUS.md` entry and `docs/architecture.md` "Layered scenes"). The owner APPROVED the forest ground and the prop sheet on 2026-10-27. Nothing here switches the chapter route.
 
 ## What exists
