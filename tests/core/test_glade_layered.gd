@@ -22,9 +22,9 @@ const DIRECTIONS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vect
 	Vector2(1, 1), Vector2(-1, 1), Vector2(1, -1), Vector2(-1, -1)]
 ## The deliberate classification (the extractor marks everything solid): walk-through decor vs solid.
 const SOLID_TYPES: Array[String] = ["glade_stone_1", "glade_stone_2", "glade_stone_3", "glade_stone_4", "glade_stone_5",
-	"glade_rock_1", "glade_rock_2", "glade_rock_3", "glade_rocks_small", "glade_tree", "glade_stump", "glade_log",
+	"glade_rock_1", "glade_rock_2", "glade_rock_3", "glade_rocks_small", "glade_tree", "glade_stump", "glade_log", "glade_antler",
 	"glade_thorns", "glade_bush_1", "glade_arch"]
-const DECOR_TYPES: Array[String] = ["glade_bush_2", "glade_fern_1", "glade_fern_2", "glade_antler", "glade_mushrooms"]
+const DECOR_TYPES: Array[String] = ["glade_bush_2", "glade_fern_1", "glade_fern_2", "glade_mushrooms"]
 
 var _scene: Dictionary = SceneDefs.layered_data(SCENE)
 var _defs: Dictionary = PropScene.load_defs()
@@ -62,8 +62,9 @@ func test_the_data_is_valid_and_every_type_is_classified() -> void:
 	var used: Dictionary = {}
 	for p: Dictionary in PropScene.placements(_scene, _defs):
 		used[String(p["type"])] = true
-	assert_eq(used.size(), glade_types, "every glade prop type is placed once or more")
-	assert_eq(PropScene.placements(_scene, _defs).size(), 20, "the approved arrangement: 20 props")
+	assert_eq(used.size(), glade_types - 1, "all retained glade types are placed; removed log stays available as an asset")
+	assert_false(used.has("glade_log"), "owner removed the entrance log")
+	assert_eq(PropScene.placements(_scene, _defs).size(), 21, "owner removed the entrance log and added two arch-side rocks: 21 props")
 
 
 func test_placements_match_the_approved_arrangement_and_carry_shadows() -> void:
@@ -83,7 +84,7 @@ func test_the_renderer_takes_the_placements_as_they_are() -> void:
 		frames[type_id] = {"x": x, "y": 0, "w": int(def["w"]), "h": int(def["h"])}
 		x += int(def["w"])
 	var drawn: Array[Dictionary] = PropsLayer.drawables(PropScene.placements(_scene, _defs), frames)
-	assert_eq(drawn.size(), 20, "every placement becomes a drawable")
+	assert_eq(drawn.size(), 21, "every placement becomes a drawable")
 	for item: Dictionary in drawn:
 		var p: Dictionary = _placement(String(item["id"]))
 		assert_eq(item["at"], p["feet"], "%s is sorted by its feet" % item["id"])

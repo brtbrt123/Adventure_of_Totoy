@@ -292,14 +292,6 @@
    "shadow_radius": 9.9
   },
   {
-   "id": "glade_log",
-   "type": "glade_log",
-   "x": 98,
-   "y": 310,
-   "flip": false,
-   "shadow_radius": 14.4
-  },
-  {
    "id": "glade_thorns",
    "type": "glade_thorns",
    "x": 490,
@@ -334,8 +326,8 @@
   {
    "id": "glade_antler",
    "type": "glade_antler",
-   "x": 135,
-   "y": 210,
+   "x": 488,
+   "y": 188,
    "flip": false,
    "shadow_radius": 2.7
   },
@@ -370,6 +362,22 @@
    "y": 50,
    "flip": false,
    "shadow_radius": 10.2
+  },
+  {
+   "id": "arch_rocks_left",
+   "type": "glade_rock_2",
+   "x": 405,
+   "y": 66,
+   "flip": true,
+   "shadow_radius": 10
+  },
+  {
+   "id": "arch_rocks_right",
+   "type": "glade_rock_2",
+   "x": 514,
+   "y": 88,
+   "flip": false,
+   "shadow_radius": 10
   }
  ]
 }

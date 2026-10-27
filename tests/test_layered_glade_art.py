@@ -18,8 +18,8 @@ class LayeredGladeArtTests(unittest.TestCase):
         frames = json.loads((ROOT / 'art/build/sprites.json').read_text())['frames']
         scene = json.loads((ROOT / 'data/scenes/glade_layered_props.json').read_text())
         self.assertEqual(20, len(defs))
-        self.assertEqual(set(defs), {p['type'] for p in scene['props']})
-        self.assertEqual(20, len({p['id'] for p in scene['props']}))
+        self.assertEqual(set(defs) - {'glade_log'}, {p['type'] for p in scene['props']})
+        self.assertEqual(21, len({p['id'] for p in scene['props']}))
         for name, info in defs.items():
             with self.subTest(prop=name):
                 with Image.open(base / 'props' / info['image']) as source:

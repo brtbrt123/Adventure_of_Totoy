@@ -164,17 +164,9 @@ func run() -> void:
 		expect(scene.snapshot.scene_id == Explore.DEBUG_SCENES[key], "Debug jump " + key)
 	expect(scene.ground_texture(&"glade_layered").get_size() == Vector2(560, 336), "Runtime glade ground")
 	expect((scene.material as ShaderMaterial).get_shader_parameter("lamp_count") == 10, "Five glade rune stones have their own teal glow")
-	# The diagonal log's left end must sort earlier than its right end.
-	var props: Array[Dictionary] = PropsLayer.drawables(scene.prop_placements, scene.frames)
-	var low: float = INF
-	var high: float = -INF
-	var strips: int = 0
-	for p: Dictionary in props:
-		if p["type"] == &"glade_log":
-			low = minf(low, p["at"].y)
-			high = maxf(high, p["at"].y)
-			strips += 1
-	expect(strips > 1 and high - low >= 10, "Log uses rising lower edge, not a single base row")
+	# Removed placements must vanish from rendering and collision together.
+	for p: Dictionary in scene.prop_placements:
+		expect(p["type"] != &"glade_log", "Owner removed the glade entrance log")
 	if "--capture" in OS.get_cmdline_user_args():
 		var file: FileAccess = FileAccess.open(OUT + "capture_positions.json", FileAccess.WRITE)
 		file.store_string(JSON.stringify(captures, "\t") + "\n")

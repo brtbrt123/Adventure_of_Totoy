@@ -284,6 +284,26 @@
      15,
      -5,
      7
+    ],
+    [
+     -25,
+     -7,
+     4
+    ],
+    [
+     24,
+     -7,
+     4
+    ],
+    [
+     -9,
+     -9,
+     4
+    ],
+    [
+     6,
+     -9,
+     4
     ]
    ],
    "image": "forest_tree_middle.png",
@@ -294,7 +314,7 @@
     700
    ],
    "locked": true,
-   "note": "trunk and root flare"
+   "note": "Trunk base and exposed ground roots; canopy remains walk-behind."
   },
   "forest_standing_stone": {
    "w": 49,
@@ -407,6 +427,26 @@
      24,
      -5,
      7
+    ],
+    [
+     -34,
+     -8,
+     2
+    ],
+    [
+     30,
+     -8,
+     5
+    ],
+    [
+     -10,
+     -10,
+     4
+    ],
+    [
+     7,
+     -10,
+     4
     ]
    ],
    "image": "forest_tree_left.png",
@@ -417,7 +457,7 @@
     694
    ],
    "locked": true,
-   "note": "trunk and root flare"
+   "note": "Trunk base and exposed ground roots; canopy remains walk-behind."
   },
   "forest_tree_right": {
    "w": 128,
@@ -463,6 +503,26 @@
      33,
      -5,
      7
+    ],
+    [
+     -44,
+     -7,
+     4
+    ],
+    [
+     39,
+     -9,
+     4
+    ],
+    [
+     -14,
+     -10,
+     4
+    ],
+    [
+     10,
+     -10,
+     4
     ]
    ],
    "image": "forest_tree_right.png",
@@ -473,7 +533,7 @@
     699
    ],
    "locked": true,
-   "note": "wide trunk and root flare"
+   "note": "Trunk base and exposed ground roots; canopy remains walk-behind."
   },
   "forest_log_1": {
    "w": 83,
@@ -862,19 +922,24 @@
    "solid": true,
    "colliders": [
     [
-     -8,
-     -3,
+     -9,
+     -6,
      6
     ],
     [
-     0,
-     -3,
+     1,
+     -5,
      6
     ],
     [
-     8,
-     -3,
+     12,
+     -9,
      6
+    ],
+    [
+     1,
+     -17,
+     8
     ]
    ],
    "image": "forest_rocks.png",
@@ -885,7 +950,7 @@
     999
    ],
    "locked": true,
-   "note": "small rock pile"
+   "note": "Rock-pile footprint covers the central and side rocks, not only the bottom row."
   },
   "forest_mushrooms": {
    "w": 36,
@@ -2190,10 +2255,25 @@
      28,
      -7,
      7
+    ],
+    [
+     -28,
+     -7,
+     4
+    ],
+    [
+     0,
+     -10,
+     4
+    ],
+    [
+     21,
+     -11,
+     4
     ]
    ],
    "locked": true,
-   "note": "trunk and root flare"
+   "note": "Trunk base and exposed ground roots; canopy remains walk-behind."
   },
   "glade_stump": {
    "image": "glade_stump.png",
@@ -2402,11 +2482,42 @@
     34,
     28
    ],
-   "base_width": 9,
-   "solid": false,
-   "colliders": [],
+   "base_width": 34,
+   "solid": true,
+   "colliders": [
+    [
+     -25,
+     -13,
+     5
+    ],
+    [
+     -16,
+     -9,
+     5
+    ],
+    [
+     -7,
+     -5,
+     5
+    ],
+    [
+     -30,
+     -23,
+     3
+    ],
+    [
+     -18,
+     -21,
+     3
+    ],
+    [
+     -9,
+     -15,
+     3
+    ]
+   ],
    "locked": true,
-   "note": "antler shed on the ground: decor"
+   "note": "Solid shed antlers moved to the clearing edge; bone footprint only."
   },
   "glade_rocks_small": {
    "image": "glade_rocks_small.png",

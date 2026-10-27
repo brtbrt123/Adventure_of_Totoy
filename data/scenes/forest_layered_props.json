@@ -343,14 +343,6 @@
    "shadow_radius": 13
   },
   {
-   "id": "log_south",
-   "type": "forest_log_2",
-   "x": 232,
-   "y": 196,
-   "flip": true,
-   "shadow_radius": 14
-  },
-  {
    "id": "stump",
    "type": "forest_stump",
    "x": 150,

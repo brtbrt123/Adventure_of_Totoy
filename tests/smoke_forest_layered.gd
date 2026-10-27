@@ -139,7 +139,7 @@ func run() -> void:
 	root.add_child(scene)
 	await process_frame
 	finish_fade()
-	expect(scene.prop_placements.size() == 28, "All forest placements")
+	expect(scene.prop_placements.size() == 27, "All forest placements")
 	expect(scene.ground_texture(&"forest_layered").get_size() == Vector2(480, 288), "Runtime ground")
 	expect(scene.material is ShaderMaterial, "Forest night lighting")
 	expect(placement(&"root_gate")["type"] == &"forest_gate_closed", "Initially closed sprite")
