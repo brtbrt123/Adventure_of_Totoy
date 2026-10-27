@@ -47,3 +47,6 @@ docs/.obsidian/
 
 # Graphify output (regenerate with: python -m graphify update .)
 graphify-out/
+
+# spare sound candidates (listening folder, not part of the game)
+data/audio_candidates/
