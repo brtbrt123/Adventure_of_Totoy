@@ -50,6 +50,12 @@ const SCENE_EXIT: StringName = &"scene_exit"
 const CHECKPOINT: StringName = &"checkpoint"
 const INTERACT: StringName = &"interact"
 const GATE_CHANGED: StringName = &"gate_changed"
+## Conversations (core/dialogue_book.gd): data {scene, npc_id, dialogue_id}; `dialogue_advanced` adds index (the line now shown);
+## `dialogue_ended` adds skipped and flags_set; `flag_set` is {flag, flags (all set flags)}.
+const DIALOGUE_STARTED: StringName = &"dialogue_started"
+const DIALOGUE_ADVANCED: StringName = &"dialogue_advanced"
+const DIALOGUE_ENDED: StringName = &"dialogue_ended"
+const FLAG_SET: StringName = &"flag_set"
 ## A lantern switch was lit: data {scene, switch_id, lit (every lit switch id), all_lit}.
 const SWITCH_LIT: StringName = &"switch_lit"
 

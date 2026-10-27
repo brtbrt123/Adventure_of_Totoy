@@ -1,0 +1,97 @@
+{
+ "note": "PLACEHOLDER LINES (Claude, 2026-10-27): the owner rewrites the text. Structure: npcs[npc id] = conditions in order, the first whose `when` holds is played (a last entry without `when` is the fallback). `when` = {flags: [all must be set], not: [none may be set]}. A dialogue sets its `set` flags when it ends (finished or skipped). A line may override `speaker` and `portrait`.",
+ "npcs": {
+  "mira": [
+   {"when": {"flags": ["met_edda"]}, "dialogue": "mira_after_edda"},
+   {"when": {"flags": ["met_mira"]}, "dialogue": "mira_again"},
+   {"dialogue": "mira_intro"}
+  ],
+  "tovan": [
+   {"when": {"flags": ["met_tovan"]}, "dialogue": "tovan_again"},
+   {"dialogue": "tovan_intro"}
+  ],
+  "edda": [
+   {"when": {"flags": ["met_edda"]}, "dialogue": "edda_again"},
+   {"dialogue": "edda_intro"}
+  ],
+  "elder": [{"dialogue": "elder_talk"}],
+  "child": [{"dialogue": "child_talk"}],
+  "worker": [{"dialogue": "worker_talk"}]
+ },
+ "dialogues": {
+  "mira_intro": {
+   "speaker": "Mira", "portrait": "mira", "set": ["met_mira"],
+   "lines": [
+    {"text": "Totoy? Is that the beacon key? Let me see it."},
+    {"text": "Broken, but it still hums. Five beacons are dark, and one glows weakly."},
+    {"text": "The forest beacon is the nearest. Talk to Tovan and Edda first, then follow the east road."}
+   ]
+  },
+  "mira_again": {
+   "speaker": "Mira", "portrait": "mira",
+   "lines": [
+    {"text": "The east road leads to the forest. Take your time, but do not wait too long."},
+    {"text": "I will mark the map when you come back."}
+   ]
+  },
+  "mira_after_edda": {
+   "speaker": "Mira", "portrait": "mira",
+   "lines": [
+    {"text": "Edda sent you after the Thornback Stag? She trusts you."},
+    {"text": "Light both lanterns to open the root gate. The glade lies beyond it."}
+   ]
+  },
+  "tovan_intro": {
+   "speaker": "Tovan", "portrait": "tovan", "set": ["met_tovan"],
+   "lines": [
+    {"text": "A Black Katana. Worn, but it keeps its edge."},
+    {"text": "Dash with Space. Practice on the post by the forge before you meet anything real."},
+    {"text": "Gold attacks can be parried. Red ones you dodge. Remember that."}
+   ]
+  },
+  "tovan_again": {
+   "speaker": "Tovan", "portrait": "tovan",
+   "lines": [
+    {"text": "Swing at the post until the dash feels like breathing."},
+    {"text": "Come back with something strange and I will tell you what it is."}
+   ]
+  },
+  "edda_intro": {
+   "speaker": "Edda", "portrait": "edda", "set": ["met_edda"],
+   "lines": [
+    {"text": "So the key came home. Sit, Totoy. I have something to teach you."},
+    {"text": "A monster's power is a fragment. You can bind it without destroying what remains of it."},
+    {"text": "Open the character menu with Tab and equip an Aspect."},
+    {"text": "The Thornback Stag in the forest is calm enough to bind. Find it."}
+   ]
+  },
+  "edda_again": {
+   "speaker": "Edda", "portrait": "edda",
+   "lines": [
+    {"text": "The Stag guards the glade past the root gate. Be gentle with it if you can."},
+    {"text": "Tab opens the character menu. Check your Aspects before you go."}
+   ]
+  },
+  "elder_talk": {
+   "speaker": "Elder", "portrait": "elder",
+   "lines": [
+    {"text": "The Night of Returning Lights was never quiet before. Now it is."},
+    {"text": "The shrine remembers every song. Maybe you will remember too."}
+   ]
+  },
+  "child_talk": {
+   "speaker": "Child", "portrait": "child",
+   "lines": [
+    {"text": "Are you the one with the broken key?"},
+    {"text": "I saw a light in the forest last night. It was not a lantern."}
+   ]
+  },
+  "worker_talk": {
+   "speaker": "Worker", "portrait": "worker",
+   "lines": [
+    {"text": "These crates are for the beacon hill. If the beacon ever lights again."},
+    {"text": "Mind the east road. Mosslings have been creeping out of the forest."}
+   ]
+  }
+ }
+}

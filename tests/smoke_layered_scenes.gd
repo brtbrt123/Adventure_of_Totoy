@@ -141,6 +141,9 @@ func run() -> void:
 	input.interact_pressed = true
 	scene.advance(input)
 	expect(scene.bubbles.has(&"mira"), "E talks to Mira through core interaction")
+	var skip: InputFrame = InputFrame.new()
+	skip.skip_pressed = true  # the conversation stops the hero until it ends
+	scene.advance(skip)
 	for object: Dictionary in scene.snapshot.objects:
 		expect(walk_to(object["stand"]), "Walk to interaction " + String(object["id"]))
 		scene.advance(InputFrame.new())

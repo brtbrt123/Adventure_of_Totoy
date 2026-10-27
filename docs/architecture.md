@@ -49,7 +49,8 @@ One `InputFrame` per tick:
 | `weapon_equip` | `StringName` | equip exactly this weapon this tick (`black_katana`, `dual_dagger`, `chain_scythe`), empty = none; sent by the character menu's inventory (see "Weapon equip"). Replaced the Q cycle `weapon_swap_pressed` on 2026-10-21 |
 | `skill_pressed` | `int` | skill slot 1, 2 or 3 pressed this tick, else 0: triggers the aspect **equipped in that slot** (default Z = 1 Breaking Edge, X = 2 Gale Cut, C = 3 Moon Cleave; see "Aspects, Spirit Lantern, Phantom Cut"; the key mapping is presentation's job) |
 | `aspect_equip` / `aspect_equip_slot` | `StringName` / `int` | equip aspect `aspect_equip` (an `Aspects.ALL` id) into slot `aspect_equip_slot` (1-3) this tick; empty = none. Sent by the character menu (see "Aspects") |
-| `interact_pressed` | `bool` | talk, open (exploration only, `core/explore_core.gd`; the fight ignores it) |
+| `interact_pressed` | `bool` | talk, open (exploration only, `core/explore_core.gd`; the fight ignores it); while a dialogue runs it shows the next line |
+| `skip_pressed` | `bool` | ends a running dialogue (exploration only; ignored when nobody talks) |
 
 ## Channel 2: read-only snapshot (core to presentation): `core/snapshots.gd`
 
@@ -336,7 +337,7 @@ Each event is a `GameEvent` with `type: StringName`, `tick: int` and `data: Dict
 | `boss_phase_changed` | `entity_id`, `phase` |
 | `game_result` | `result` |
 
-Exploration events (`scene_exit`, `checkpoint`, `interact`, `gate_changed`) are listed in "Scenes and exploration mode". Planned, not yet implemented: `aspect_dropped`, `artifact_dropped`, `quest_updated`, `dialogue_requested`, `entity_spawned`.
+Exploration events (`scene_exit`, `checkpoint`, `interact`, `gate_changed`) are listed in "Scenes and exploration mode". Dialogue events (`dialogue_started`, `dialogue_advanced`, `dialogue_ended`, `flag_set`) are listed under "Dialogue and story flags". Planned, not yet implemented: `aspect_dropped`, `artifact_dropped`, `quest_updated`, `entity_spawned`.
 
 ## Scenes and exploration mode (chapter 1, 2026-10-22)
 
@@ -403,12 +404,23 @@ Every gameplay number lives in `core/tuning.gd` (parry window, dash i-frames, bo
 
 `core/` owns save/load. Saves are plain data (JSON or `Resource`) of core state only; no presentation state.
 
+## Dialogue and story flags (2026-10-27)
+
+Core side of chapter 1's NPC conversations: `core/dialogue_book.gd` (static lookups), `data/dialogue/chapter1.json` (the text; the lines in it are PLACEHOLDERS, the owner rewrites them), the conversation state in `ExploreCore`, `story_flags` in `SaveProfile`. Presentation draws the box and portrait from the snapshot; it holds no dialogue rules.
+
+- **Data:** `npcs {npc id: [{when?: {flags: [...], not: [...]}, dialogue: id}, ...]}`: the first entry whose `when` holds is played (all `flags` set, no `not` flag set); the last entry has no `when` (validated). `dialogues {id: {speaker, portrait, set?: [flags], lines: [{text, speaker?, portrait?}]}}`. `DialogueBook.validate(book, npc ids)` checks every NPC of every scene has a conversation, every referenced dialogue exists, no empty lines, every line has a speaker, at most `MAX_TEXT_LENGTH` (110) characters per line and `MAX_LINES_TOTAL` (60) lines in the book. Flag names: 1-40 characters of a-z, 0-9, _.
+- **Flow:** `interact_pressed` on an NPC target (idle or walk) emits `interact` as before and then `dialogue_started`; the hero stops (move and dash ignored, idle) and the world's other rules keep running. While talking, `interact_pressed` shows the next line (`dialogue_advanced`, `index`), after the last line it ends; `skip_pressed` ends it at once. Ending, finished or skipped, emits `dialogue_ended` {scene, npc_id, dialogue_id, skipped, flags_set} and one `flag_set` per NEW flag; a flag is set once. The press that ends a conversation never starts another. Objects and scenes without NPCs are unchanged.
+- **Snapshot:** `ExploreSnapshot.dialogue` = `{npc_id, dialogue_id, index (0-based), count, speaker, portrait, text}`, empty when nobody talks; `story_flags` = every flag set. The typewriter effect, portraits, the box and the key mapping (E / Enter = `interact_pressed`, a skip key = `skip_pressed`) are presentation's. A press while the text is still typing should finish the typing in presentation and only send `interact_pressed` once the line is complete.
+- **Core API:** `ExploreCore.set_story_flags(flags)` (restore a save, no events), `set_flag(flag)` (a story event such as the Stag binding sets one; emits `flag_set` with the next step), `has_flag`, `is_talking`.
+- **Save:** `SaveProfile.story_flags` (an optional list in the JSON, version stays 1; unreadable entries are dropped, duplicates removed, at most 64); `reset_progress()` (a new game) clears it. Presentation saves on `flag_set` and passes `profile.story_flags` to `set_story_flags` when it builds the core of a scene.
+- **Flags in the placeholder book:** `met_mira`, `met_tovan`, `met_edda` (Mira's follow-up changes once Edda has been heard).
+
 ## Open questions (to resolve with playtesting and the next slice)
 
 - Do telegraph shapes need richer geometry (moving projectiles, sweeps over time, multi-segment beams)?
 - Interpolation: does presentation smooth between ticks, or draw each tick as-is at 60 Hz?
 - How generous should the parry window feel (design question): `PARRY_ACTIVE_TICKS` 14, `PARRY_PERFECT_TICKS` 6 are first guesses.
-- Dialogue and quest data format (owned by core, authored by the human).
+- Quest data format (owned by core, authored by the human). The dialogue format is decided: see "Dialogue and story flags".
 - Bow and staff need per-weapon intents (`attack_held` for draw, placed sigils); not designed yet.
 
 

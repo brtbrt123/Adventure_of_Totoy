@@ -1,5 +1,9 @@
 # STATUS (handoff note)
 
+## Chapter 1 dialogue: core side done (2026-10-27, Claude)
+
+Cross-review of Codex 8aa02ad (glade arch and clear approach): PASS, plus a permanent radius-6 test that only the arch gap leads to the arena exit (`b078e84`). Then the dialogue core: `core/dialogue_book.gd`, `data/dialogue/chapter1.json` (PLACEHOLDER lines for Mira, Tovan, Edda, elder, child, worker: 22 lines of the 60 budget; the owner rewrites them), the conversation state in `ExploreCore` (interact on an NPC starts it, the hero stops, interact = next line, `skip_pressed` ends it, flags set on the end), new events `dialogue_started` / `dialogue_advanced` / `dialogue_ended` / `flag_set`, `InputFrame.skip_pressed`, `ExploreSnapshot.dialogue` and `story_flags`, `SaveProfile.story_flags`. Contract: `docs/architecture.md` "Dialogue and story flags". Tests: `tests/core/test_dialogue.gd` (16). Task for Codex: `docs/CODEX_TASK_dialogue.md` (box, portraits, typewriter, key mapping, save on `flag_set`, pass the flags into every core). The painted and the layered village both talk (same NPC ids). Not judged: how the lines read, the pacing, the box's look.
+
 ## Glade arch: clean approach APPROVED (2026-10-27, Codex)
 
 Owner approved the runtime candidate: "yes thats good". Owner supplied a sketch: arch aligned to the dirt trail, a solid bush on each side preventing side access, clear approach. Moved arch feet to (492,62), left bush to (440,62), right bush to (540,62); removed bank-left, bank-connector and approach-left bushes (21 placements). Ground pixels and approved assets/lighting unchanged. Runtime/collider captures: `art/reference/layered_forest/review/playtest_fixes/clean_approach_v1/`, including `arch_preview.png`. Added capture flag `--clean-approach`; updated placement counts and made the sealed-opening smoke fixture follow the arch position.

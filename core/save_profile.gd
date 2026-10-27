@@ -6,6 +6,7 @@ extends RefCounted
 const VERSION: int = 1  # equipped_aspects (2026-10-21) and scene_id / checkpoint_id / gate_open (2026-10-22) are optional fields: older version-1 saves load with the defaults
 const Aspects := preload("res://core/aspects.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
+const MAX_FLAGS: int = 64
 const RESULT_VICTORY: StringName = &"victory"
 const RESULT_DEFEAT: StringName = &"defeat"
 
@@ -24,6 +25,8 @@ var equipped_aspects: Array[StringName] = Aspects.DEFAULT_EQUIPPED.duplicate()
 var scene_id: StringName = &""
 var checkpoint_id: StringName = &""
 var gate_open: bool = false
+## The story flags set by conversations (ExploreCore.story_flags), e.g. met_mira. Optional in the file: older saves have none.
+var story_flags: Array[StringName] = []
 ## Why this profile is a fresh one instead of a loaded one ("" when it was loaded or never saved before).
 var load_note: String = ""
 
@@ -61,6 +64,7 @@ func reset_progress() -> void:
 	scene_id = &""
 	checkpoint_id = &""
 	gate_open = false
+	story_flags.clear()
 
 
 func to_dict() -> Dictionary:
@@ -76,6 +80,7 @@ func to_dict() -> Dictionary:
 		"scene_id": String(scene_id),
 		"checkpoint_id": String(checkpoint_id),
 		"gate_open": gate_open,
+		"story_flags": story_flags.map(func(flag: StringName) -> String: return String(flag)),
 	}
 
 
@@ -110,6 +115,11 @@ static func from_dict(data: Dictionary) -> Object:
 	profile.record_scene(StringName(scene) if scene is String else &"", StringName(checkpoint) if checkpoint is String else &"")
 	var gate: Variant = data.get("gate_open", false)
 	profile.gate_open = gate if gate is bool else false
+	var flags: Variant = data.get("story_flags", [])
+	if flags is Array:
+		for flag: Variant in flags:
+			if flag is String and _is_flag(flag) and profile.story_flags.size() < MAX_FLAGS and not profile.story_flags.has(StringName(flag)):
+				profile.story_flags.append(StringName(flag))
 	return profile
 
 
@@ -129,3 +139,14 @@ static func _count(value: Variant) -> int:
 	if value is float and is_finite(value):
 		return maxi(0, int(value))
 	return 0
+
+
+## A story flag name: 1-40 characters of a-z, 0-9 and _.
+static func _is_flag(text: String) -> bool:
+	if text.is_empty() or text.length() > 40:
+		return false
+	for i: int in text.length():
+		var c: String = text[i]
+		if not ((c >= "a" and c <= "z") or (c >= "0" and c <= "9") or c == "_"):
+			return false
+	return true

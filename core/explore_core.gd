@@ -13,7 +13,9 @@ extends RefCounted
 ## exits (the hero's body touching an exit rectangle emits `scene_exit` once; the hero then stops: presentation fades
 ## and builds the target scene's core at `target_entry`; an exit the hero spawned inside is ignored until he has left
 ## it), the interact target (the nearest NPC or object within INTERACT_RANGE) and, on `interact_pressed` in idle or
-## walk, an `interact` event naming it (no action yet: dialogue is step 2). NPCs turn toward the hero when he is near.
+## walk, an `interact` event naming it. On an NPC it also starts that NPC's conversation (core/dialogue_book.gd, chosen by the
+## story flags): the hero stops, `interact_pressed` shows the next line, `skip_pressed` ends it, and a finished or skipped
+## conversation sets its flags (`flag_set`). NPCs turn toward the hero when he is near.
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -22,6 +24,7 @@ const PlayerState := preload("res://core/player.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const Collision := preload("res://core/collision.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
+const DialogueBook := preload("res://core/dialogue_book.gd")
 
 ## The hero can interact with an NPC or object when his centre is this close to its feet or its stand point.
 const INTERACT_RANGE: float = 24.0
@@ -51,6 +54,10 @@ class ExploreSnapshot:
 	var gate_open: bool = false
 	## The lantern switches that are lit (a scene with a `puzzle`; empty elsewhere). The pedestal sprites follow this.
 	var lit_switches: Array[StringName] = []
+	## The story flags set so far (what the save keeps).
+	var story_flags: Array[StringName] = []
+	## The running conversation, {} when none: {npc_id, dialogue_id, index (0-based), count, speaker, portrait, text}.
+	var dialogue: Dictionary = {}
 	var last_checkpoint: StringName = &""
 	## True from the tick an exit fired: the hero no longer moves; presentation changes scene.
 	var exiting: bool = false
@@ -71,6 +78,8 @@ var size: Vector2 = Vector2.ZERO
 var margin: float = Tuning.PLAYER_RADIUS
 var gate_open: bool = false
 var lit_switches: Array[StringName] = []  # the lantern switches lit so far (the scene's `puzzle`, if any)
+var story_flags: Array[StringName] = []
+var book: Dictionary = DialogueBook.default_book()
 var player: PlayerState = PlayerState.new()
 var obstacles: Array[Obstacle] = []
 var last_events: Array[GameEvent] = []
@@ -80,6 +89,7 @@ var exit_fired: Dictionary = {}  # exit id -> true once fired (never twice per e
 var pending_exit: Dictionary = {}
 var interact_target: Dictionary = {}
 var npc_facing_left: Dictionary = {}  # npc id -> bool
+var _talk: Dictionary = {}  # the running conversation: {npc_id, dialogue_id, index}; {} when none
 var _armed: Dictionary = {}  # exit id -> true once the hero has been outside it
 var _queued: Array[GameEvent] = []  # events raised between steps (gate changes), emitted with the next step
 
@@ -139,6 +149,31 @@ func set_gate_open(open: bool) -> void:
 	_queued.append(GameEvent.new(GameEvent.GATE_CHANGED, tick, {"scene": scene_id, "gate_open": gate_open}))
 
 
+## Replaces the story flags (CONTINUE from a save). No events.
+func set_story_flags(flags: Array[StringName]) -> void:
+	story_flags.clear()
+	for flag: StringName in flags:
+		if not story_flags.has(flag):
+			story_flags.append(flag)
+
+
+## Sets a story flag (a new one emits `flag_set` with the next step). Returns true when it was new.
+func set_flag(flag: StringName) -> bool:
+	if story_flags.has(flag):
+		return false
+	story_flags.append(flag)
+	_queued.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+	return true
+
+
+func has_flag(flag: StringName) -> bool:
+	return story_flags.has(flag)
+
+
+func is_talking() -> bool:
+	return not _talk.is_empty()
+
+
 func step(input: InputFrame) -> void:
 	tick += 1
 	var events: Array[GameEvent] = []
@@ -147,7 +182,8 @@ func step(input: InputFrame) -> void:
 		events.append(queued)
 	_queued.clear()
 	var frame: InputFrame = InputFrame.new()
-	if not exiting:
+	var talking: bool = is_talking()
+	if not exiting and not talking:
 		frame.move = input.move
 		frame.dash_pressed = input.dash_pressed
 	var before: Vector2 = player.position
@@ -158,9 +194,13 @@ func step(input: InputFrame) -> void:
 		_check_exits(events)
 	_update_npcs()
 	interact_target = _find_interact_target()
-	if input.interact_pressed and not exiting and not interact_target.is_empty() and (player.state == PlayerState.STATE_IDLE or player.state == PlayerState.STATE_WALK):
+	if talking:
+		_talk_input(input, events)
+	elif input.interact_pressed and not exiting and not interact_target.is_empty() and (player.state == PlayerState.STATE_IDLE or player.state == PlayerState.STATE_WALK):
 		events.append(GameEvent.new(GameEvent.INTERACT, tick, {"scene": scene_id, "target_id": interact_target["id"], "kind": interact_target["kind"], "position": interact_target["position"]}))
 		_use_switch(interact_target["id"], events)
+		if interact_target["kind"] == &"npc":
+			_start_talk(interact_target["id"], events)
 	last_events = events
 
 
@@ -198,6 +238,8 @@ func snapshot() -> ExploreSnapshot:
 		snap.interact_position = interact_target["position"]
 	snap.gate_open = gate_open
 	snap.lit_switches = lit_switches.duplicate()
+	snap.story_flags = story_flags.duplicate()
+	snap.dialogue = _dialogue_view()
 	snap.last_checkpoint = last_checkpoint
 	snap.exiting = exiting
 	snap.exit_target_scene = pending_exit.get("target_scene", &"")
@@ -208,6 +250,50 @@ func snapshot() -> ExploreSnapshot:
 	snap.checkpoints = def.get("checkpoints", []).duplicate(true)
 	snap.entries = def.get("entries", {}).duplicate()
 	return snap
+
+
+## Starts the NPC's conversation for the flags set so far (nothing when it has none).
+func _start_talk(npc_id: StringName, events: Array[GameEvent]) -> void:
+	var id: StringName = DialogueBook.pick(book, npc_id, story_flags)
+	if id == &"" or DialogueBook.dialogue(book, id).is_empty() or DialogueBook.line(DialogueBook.dialogue(book, id), 0).is_empty():
+		return
+	_talk = {"npc_id": npc_id, "dialogue_id": id, "index": 0}
+	events.append(GameEvent.new(GameEvent.DIALOGUE_STARTED, tick, {"scene": scene_id, "npc_id": npc_id, "dialogue_id": id}))
+
+
+## While talking: skip ends the conversation, interact shows the next line (and ends it after the last).
+func _talk_input(input: InputFrame, events: Array[GameEvent]) -> void:
+	var def_: Dictionary = DialogueBook.dialogue(book, _talk["dialogue_id"])
+	if input.skip_pressed:
+		_end_talk(def_, true, events)
+	elif input.interact_pressed:
+		_talk["index"] = int(_talk["index"]) + 1
+		if int(_talk["index"]) >= (def_["lines"] as Array).size():
+			_end_talk(def_, false, events)
+		else:
+			events.append(GameEvent.new(GameEvent.DIALOGUE_ADVANCED, tick, {"scene": scene_id, "npc_id": _talk["npc_id"], "dialogue_id": _talk["dialogue_id"], "index": _talk["index"]}))
+
+
+func _end_talk(def_: Dictionary, skipped: bool, events: Array[GameEvent]) -> void:
+	var finished: Dictionary = _talk
+	_talk = {}
+	var added: Array[StringName] = []
+	for flag: StringName in DialogueBook.flags_set_by(def_):
+		if not story_flags.has(flag):
+			story_flags.append(flag)
+			added.append(flag)
+	events.append(GameEvent.new(GameEvent.DIALOGUE_ENDED, tick, {"scene": scene_id, "npc_id": finished["npc_id"], "dialogue_id": finished["dialogue_id"], "skipped": skipped, "flags_set": added}))
+	for flag: StringName in added:
+		events.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+
+
+## What the dialogue box shows now, {} when nobody is talking.
+func _dialogue_view() -> Dictionary:
+	if _talk.is_empty():
+		return {}
+	var def_: Dictionary = DialogueBook.dialogue(book, _talk["dialogue_id"])
+	var row: Dictionary = DialogueBook.line(def_, int(_talk["index"]))
+	return {"npc_id": _talk["npc_id"], "dialogue_id": _talk["dialogue_id"], "index": int(_talk["index"]), "count": (def_["lines"] as Array).size(), "speaker": row["speaker"], "portrait": row["portrait"], "text": row["text"]}
 
 
 ## The switch ids of the scene's lantern puzzle (empty: the scene has none).
