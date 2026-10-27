@@ -1,5 +1,26 @@
 # STATUS (handoff note)
 
+## Review of Codex's layered village/glade rendering and night look (2026-10-27, Claude Code)
+
+Reviewed f225d05 (layered rendering, fitted gate path, contact shadows) and 0c4ffde (separate cast masks, soft moonlit night, warm fixtures). The human chose the SOFT night look: keep it. Canonical capture `art/reference/shadow_layers/night_selected_on.png`. Debug: 5/F7 village_layered, 6/F8 glade_layered, 7/F9 lighting toggle.
+
+**Verdict: PASS** (no blocking finding). Done on my side: both shared `ground` strings now point at the runtime grounds (`village_layered` -> `res://presentation/village/village_layered_ground.png`, 571x336; `glade_layered` -> `res://presentation/forest/glade_layered_ground.png`, 560x336); new `tests/core/test_layered_progress.gd` (6 tests: grounds are in presentation/ and the scene's size, save round trip for both scenes, a foreign checkpoint is dropped, CONTINUE places the hero on the checkpoint without re-announcing it, reaching a checkpoint emits and records it once, every exit leads to a real scene and entry); `tests/run_tests.gd` now FAILS when a test script has a parse error (before, it printed the error and exited 0 with "0 test(s)"). The normal chapter routes are NOT switched.
+
+**Geometry contract (checked by script against `art/reference/*/props/*.png` and `art/build/sprites.png`):** all 31 village cut-outs equal their `trim` region of the atlas pixel for pixel, trim is left/bottom aligned and equals the defs size, and every header anchor is within 0.5 px (x) and exact (y, after the top padding) of the shared anchor. The 20 glade frames hold the cut-out at (0,0) with exact anchors (padding right and bottom, drawn untrimmed, harmless). Placements and sizes unchanged.
+
+**Findings (all for Codex, none blocking):**
+1. [low] `presentation/explore/explore_scene.gd:42-47` still has `GROUNDS` entries for the two layered scenes and the comment "while Claude updates the shared scene files": delete both entries; `ground_texture` already falls back to the shared data.
+2. [low] `presentation/common/overhead_light.gdshader:62-65` finds its shadow pass by vertex colour (black, alpha under 0.5) and picks the blur radius from alpha > 0.25; the values live in `props_layer.gd:105` (0.30) and `explore_scene.gd` `_draw_actor_cast` (0.20). Works, but a rename or alpha change breaks it silently: give each pass a named constant shared by both files (or a uniform).
+3. [low] `presentation/common/environment_light.gd:28-30` drops lights beyond 16 without a warning (the village uses 10). Add a `push_warning` or a test.
+4. [low] `presentation/common/props_layer.gd:28` branches on `frame.has("ax")` for tool-only contract tests: a production path shaped by test fixtures. Prefer a flag or fixture frames that carry `ax`.
+5. [low] The debug jumps save the layered scene as the CONTINUE point (same as the painted debug jumps), so CONTINUE after a 5/F7 jump opens the layered village while its east exit leads to the painted forest. Fine for now; decide when the human switches the routes.
+6. [info] The smoke test covers the village completely (walks, interactions, exit, jumps) but only loads the glade: no glade interaction/exit walk through the explore scene (core tests cover it).
+7. [info] The shader's value noise uses `fract(sin(...))`, which can differ between GPUs: visual only.
+
+**Cannot judge:** whether the night look, the shadow softness and the lamp glow look good, whether the gold/red combat cues stay readable on the dark ground (none exist in exploration yet), collision feel and hero-behind-prop feel in play (the walking captures exist; the human decides). Performance was not measured.
+
+**Verification:** `python harness/checks/run_tests.py --worktree .` (background): Python tests, import, core tests and all 27 smoke suites passed, including `smoke_layered_scenes`, `smoke_props_layer`, `smoke_depth_occluders`, `smoke_explore_scenes`. Remaining work: Codex fixes 1-4, the human's play test and decision to switch the chapter routes, then the forest redo (waiting for the human's images, needs the root gate open/closed state in the scene format).
+
 ## Layered village source images generated (2026-10-27, Codex, art APPROVED)
 
 The human asked Codex to generate Lanternfen assets matching the game, using `docs/LAYERED_VILLAGE_FOREST.md`. Built-in ImageGen used both `art/reference/lanternfen_village_target.png` and the approved `art/reference/layered_pilot/review/glade_full.png` as style references. Original ground-only image and two prop sheets saved in `art/reference/layered_village/` as `village_ground_only.png`, `village_props_a.png`, `village_props_b.png`. Sheet B's closed-lid barrel was corrected; v1 preserved. Prompt/provenance and extraction caveats in that folder's README and generation.json. No gameplay wiring or palette conversion yet; scale, exact Totoy36, hard alpha and fringe need extraction-stage checks. Forge includes adjacent bench/anvil: avoid duplicate placement. The human approved the ground and both selected prop sheets on 2026-10-27. Claude extraction/shared data comes next, followed by Codex palette/scale/edge checks and presentation review. No runtime regression for inactive source references. No core/tools/harness changes.
