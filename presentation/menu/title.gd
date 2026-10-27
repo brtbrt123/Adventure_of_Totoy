@@ -10,6 +10,7 @@ const SaveStore := preload("res://core/save_store.gd")
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const EXPLORE_SCENE: String = "res://presentation/explore/explore_scene.tscn"
 ## Read by presentation/explore/explore_scene.gd: where the chapter starts ({scene, entry, checkpoint, gate_open}).
+const SceneDefs := preload("res://core/scene_defs.gd")
 const EXPLORE_START_META: StringName = &"totoy_explore_start"
 ## While this meta is set on the Engine, the arena saves progress (smoke tests that load the arena directly do
 ## not set it and never touch the player's save).
@@ -241,7 +242,7 @@ func new_game() -> void:
 		profile = SaveStore.load_profile()
 	profile.reset_progress()
 	SaveStore.save(profile)
-	Engine.set_meta(EXPLORE_START_META, {"scene": &"village", "entry": &"arrival", "checkpoint": &"", "gate_open": false})
+	Engine.set_meta(EXPLORE_START_META, {"scene": SceneDefs.START_SCENE, "entry": SceneDefs.START_ENTRY, "checkpoint": &"", "gate_open": false})
 	change_scene.call(EXPLORE_SCENE)
 
 

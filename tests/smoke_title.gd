@@ -96,7 +96,7 @@ func _title_screen() -> void:
 	title.activate()
 	_expect(changed_to == [Title.EXPLORE_SCENE], "NEW GAME opens the exploration scene: %s" % str(changed_to))
 	var start: Dictionary = Engine.get_meta(Title.EXPLORE_START_META, {})
-	_expect(start.get("scene", &"") == &"village" and start.get("entry", &"") == &"arrival" and not bool(start.get("gate_open", true)), "NEW GAME starts at the village arrival: %s" % str(start))
+	_expect(start.get("scene", &"") == &"village_layered" and start.get("entry", &"") == &"arrival" and not bool(start.get("gate_open", true)), "NEW GAME starts at the village arrival: %s" % str(start))
 	var after_new: SaveProfile = SaveStore.load_profile(SAVE_PATH)
 	_expect(after_new.victories == 4 and not after_new.has_progress() and not after_new.gate_open, "NEW GAME clears the chapter progress and keeps the record")
 	# CONTINUE: the saved scene and checkpoint
@@ -108,7 +108,7 @@ func _title_screen() -> void:
 	title.index = 1
 	title.activate()
 	start = Engine.get_meta(Title.EXPLORE_START_META, {})
-	_expect(changed_to == [Title.EXPLORE_SCENE] and start.get("scene", &"") == &"glade" and start.get("checkpoint", &"") == &"glade_entrance" and bool(start.get("gate_open", false)), "CONTINUE resumes the glade checkpoint with the gate flag: %s" % str(start))
+	_expect(changed_to == [Title.EXPLORE_SCENE] and start.get("scene", &"") == &"glade_layered" and start.get("checkpoint", &"") == &"glade_layered_entrance" and bool(start.get("gate_open", false)), "CONTINUE resumes the glade checkpoint with the gate flag: %s" % str(start))
 	seeded.record_scene(&"arena", &"ruins_gate")
 	SaveStore.save(seeded, SAVE_PATH)
 	title.profile = SaveStore.load_profile(SAVE_PATH)
