@@ -1,6 +1,6 @@
 # Codex task: the layered forest route (2026-10-27)
 
-Claude finished the core/data side (see the newest `docs/STATUS.md` entry and `docs/architecture.md` "Layered scenes"). The sources are **waiting for the owner's approval**; start the art work after the owner says the forest ground and the prop sheet are approved. Nothing here switches the chapter route.
+Claude finished the core/data side (see the newest `docs/STATUS.md` entry and `docs/architecture.md` "Layered scenes"). The owner APPROVED the forest ground and the prop sheet on 2026-10-27. Nothing here switches the chapter route.
 
 ## What exists
 
@@ -40,5 +40,5 @@ See the newest `docs/STATUS.md` entry. Short: `smoke_night_ambience.gd` uses `as
 
 ## Open items for the owner (not Codex)
 
-- Approve or reject the forest ground and prop sheet as production sources. The sheet's single signpost board (the prompt asked for two arrow boards) and the third fern slot that reads as a small bush are findings, not approved substitutions.
+- (Done 2026-10-27: approved.) The forest ground and prop sheet are approved production sources. The sheet's single signpost board (the prompt asked for two arrow boards) and the third fern slot that reads as a small bush are findings, not approved substitutions.
 - The gate is 124 px wide against a 50 px trail; it stands across the climb with its trunks on the grass beside it. Say if the gate should be narrower (that is a new generation, or a smaller scale for this prop).
