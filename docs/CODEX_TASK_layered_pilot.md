@@ -31,3 +31,7 @@ It writes `art/reference/layered_pilot/props/<id>.png` (cut-outs at world scale,
 ## Acceptance (the human judges)
 
 Looks as good as the painted glade or better; walking behind stones/roots/trunks is correct everywhere; no floor pixels over the hero; colliders line up with the visible bases; adding or moving a prop is a one-line data change.
+
+## Round 2 (2026-10-27): integrate the approved glade into the game
+
+Claude's data and core side is done (`docs/architecture.md` "Layered scenes", `docs/STATUS.md` newest entry, including the review of your art with three findings). Your tasks: fix the three findings (log sort order, `explore_scene.gd` support for `glade_layered`, move the ground to `presentation/forest/` and drop `glade_props.json`); draw the scene with `props_layer.gd` from `PropScene.placements(SceneDefs.layered_data(&"glade_layered"), PropScene.load_defs())`; add a debug jump key; add a smoke test. Do not edit `core/`, `data/` or the colliders: tell Claude what to change. The forest exit keeps leading to the painted glade until the human approves the look in play.

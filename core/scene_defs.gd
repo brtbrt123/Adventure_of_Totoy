@@ -10,6 +10,11 @@ extends RefCounted
 ##   glade                 root arch                           -> arena   "start"      (the Colossus fight)
 ##   arena                 no exits (the fight's victory screen returns to the title)
 ##
+## glade_layered (the Stag glade as a layered scene: one floor painting + separate prop sprites, data/scenes/glade_layered_props.json
+## read through core/prop_scene.gd) is a FIFTH scene, not in IDS, until the human switches the game over from the painted
+## glade: forest -> glade stays the painted one. It has the same two exits (forest "north", arena "start"); its own entry
+## is "entrance" and its own checkpoint "glade_layered_entrance". SceneDefs.LAYERED lists such scenes.
+##
 ## The forest's root gate is solid until the lantern puzzle opens it (a later step); `gate_open` (a scene state flag,
 ## saved in SaveProfile.gate_open, toggled by the debug key F6 or G) builds the forest with build_with_gate(true).
 const Tuning := preload("res://core/tuning.gd")
@@ -19,12 +24,17 @@ const VillageLayout := preload("res://core/village_layout.gd")
 const ForestLayout := preload("res://core/forest_layout.gd")
 const GladeLayout := preload("res://core/glade_layout.gd")
 const ArenaLayout := preload("res://core/arena_layout.gd")
+const PropScene := preload("res://core/prop_scene.gd")
 
 const VILLAGE: StringName = &"village"
 const FOREST: StringName = &"forest"
 const GLADE: StringName = &"glade"
 const ARENA: StringName = &"arena"
 const IDS: Array[StringName] = [VILLAGE, FOREST, GLADE, ARENA]
+## The layered scenes (floor + prop sprites, built from data/scenes/<id>_props.json).
+const GLADE_LAYERED: StringName = &"glade_layered"
+const LAYERED: Array[StringName] = [GLADE_LAYERED]
+const LAYERED_PATHS: Dictionary = {GLADE_LAYERED: "res://data/scenes/glade_layered_props.json"}
 
 ## Where a new game starts.
 const START_SCENE: StringName = VILLAGE
@@ -43,6 +53,8 @@ const FOREST_NORTH_ENTRY: Vector2 = Vector2(388.0, 28.0)
 ## default_entry, exits [{id, rect, target_scene, target_entry}], checkpoints [{id, position}],
 ## npcs [{id, visual, position, face_left (the way they face when the hero is far)}], objects [{id, kind, position, stand}] (interactables that are not people).
 static func get_def(scene_id: StringName) -> Dictionary:
+	if scene_id in LAYERED:
+		return PropScene.scene_def(layered_data(scene_id), scene_id, Tuning.PLAYER_RADIUS)
 	match scene_id:
 		VILLAGE:
 			var points: Dictionary = VillageLayout.STAND_POINTS
@@ -114,13 +126,22 @@ static func get_def(scene_id: StringName) -> Dictionary:
 
 
 static func is_known(scene_id: StringName) -> bool:
-	return scene_id in IDS
+	return scene_id in IDS or scene_id in LAYERED
+
+
+## The scene file of a layered scene (data/scenes/<id>_props.json), empty for any other id.
+static func layered_data(scene_id: StringName) -> Dictionary:
+	if not LAYERED_PATHS.has(scene_id):
+		return {}
+	return PropScene.load_scene(LAYERED_PATHS[scene_id])
 
 
 ## The solid colliders of a scene: the layout's colliders (the forest with its root gate closed unless `gate_open`),
 ## plus a small circle on every NPC and on the village chest (drawn as sprites, not painted).
 static func build_obstacles(scene_id: StringName, gate_open: bool = false) -> Array[Obstacle]:
 	var list: Array[Obstacle] = []
+	if scene_id in LAYERED:
+		return PropScene.build(layered_data(scene_id), PropScene.load_defs())
 	match scene_id:
 		VILLAGE:
 			list = VillageLayout.build()
@@ -148,7 +169,7 @@ static func checkpoint(scene_id: StringName, checkpoint_id: StringName) -> Dicti
 
 ## The scene whose checkpoint list contains `checkpoint_id`, or empty.
 static func scene_of_checkpoint(checkpoint_id: StringName) -> StringName:
-	for scene_id: StringName in IDS:
+	for scene_id: StringName in IDS + LAYERED:
 		if not checkpoint(scene_id, checkpoint_id).is_empty():
 			return scene_id
 	return &""

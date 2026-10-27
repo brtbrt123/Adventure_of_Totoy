@@ -11,7 +11,12 @@ extends RefCounted
 ##   scene FILE  data/scenes/<scene>_props.json  (hand-edited; adding or moving a prop is one line)
 ##     {"version": 1, "scene": "glade", "size": [w, h], "outline": [[x, y], ...] (the walkable ground, clockwise, game
 ##      pixels; edges on the world border are the openings), "boundary_radius", "boundary_spacing",
-##      "props": [{"id": "stone_back", "type": "<type>", "x", "y" (where the anchor stands in the world), "flip"?}]}
+##      "props": [{"id": "stone_back", "type": "<type>", "x", "y" (where the anchor stands in the world), "flip"?,
+##                 "shadow_radius"? (presentation's ground shadow, passed through)}],
+##      and, for a scene the player walks through (SceneDefs.get_def / ExploreCore): "name", "ground" (the floor
+##      painting, a res:// path), "entries": {id: [x, y]}, "default_entry", "exits": [{id, rect [x, y, w, h],
+##      target_scene, target_entry}], "checkpoints": [{id, position}], and for the Stag fight room "stag_start",
+##      "stag_radius", "fight_area" [x, y, w, h]}
 ##
 ## No sprites are loaded here (the core stays headless): sizes and colliders are numbers in the files.
 const Obstacle := preload("res://core/obstacle.gd")
@@ -37,16 +42,16 @@ static func load_scene(path: String) -> Dictionary:
 
 
 ## The scene's prop placements with their def folded in, in file order:
-## [{id, type, feet (Vector2), flip, size (Vector2), anchor (Vector2), image, solid}]. Presentation draws the sprite
-## `image` with its anchor on `feet`, mirrored when `flip`, sorted by feet.y.
-static func placements(scene: Dictionary, defs: Dictionary) -> Array:
-	var out: Array = []
+## [{id, type, feet (Vector2), flip, size (Vector2), anchor (Vector2), image, solid, shadow_radius?}]. Presentation
+## draws the sprite `image` with its anchor on `feet`, mirrored when `flip`, sorted by feet.y.
+static func placements(scene: Dictionary, defs: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
 	var types: Dictionary = defs.get("props", {})
 	for row: Variant in scene.get("props", []):
 		var p: Dictionary = row
 		var def: Dictionary = types.get(p.get("type", ""), {})
 		var anchor: Array = def.get("anchor", [0, 0])
-		out.append({
+		var entry: Dictionary = {
 			"id": StringName(str(p.get("id", ""))),
 			"type": StringName(str(p.get("type", ""))),
 			"feet": Vector2(float(p.get("x", 0)), float(p.get("y", 0))),
@@ -55,7 +60,10 @@ static func placements(scene: Dictionary, defs: Dictionary) -> Array:
 			"anchor": Vector2(float(anchor[0]), float(anchor[1])),
 			"image": str(def.get("image", "")),
 			"solid": bool(def.get("solid", false)),
-		})
+		}
+		if p.has("shadow_radius"):
+			entry["shadow_radius"] = float(p["shadow_radius"])
+		out.append(entry)
 	return out
 
 
@@ -82,6 +90,43 @@ static func outline(scene: Dictionary) -> Array[Vector2]:
 		var pair: Array = v
 		out.append(Vector2(float(pair[0]), float(pair[1])))
 	return out
+
+
+static func _vec(v: Variant) -> Vector2:
+	var pair: Array = v
+	return Vector2(float(pair[0]), float(pair[1]))
+
+
+static func _rect(v: Variant) -> Rect2:
+	var r: Array = v
+	return Rect2(float(r[0]), float(r[1]), float(r[2]), float(r[3]))
+
+
+## The scene as SceneDefs.get_def() describes a walkable scene (id, name, size, margin, entries, default_entry, exits,
+## checkpoints, npcs, objects), so ExploreCore can run it. `id` is the scene id the game uses for it.
+static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dictionary:
+	var entries: Dictionary = {}
+	for key: Variant in scene.get("entries", {}):
+		entries[StringName(str(key))] = _vec(scene["entries"][key])
+	var exits: Array = []
+	for row: Variant in scene.get("exits", []):
+		var e: Dictionary = row
+		exits.append({"id": StringName(str(e["id"])), "rect": _rect(e["rect"]), "target_scene": StringName(str(e["target_scene"])),
+			"target_entry": StringName(str(e["target_entry"]))})
+	var checkpoints: Array = []
+	for row: Variant in scene.get("checkpoints", []):
+		var c: Dictionary = row
+		checkpoints.append({"id": StringName(str(c["id"])), "position": _vec(c["position"])})
+	return {"id": id, "name": str(scene.get("name", "")), "size": size(scene), "margin": margin, "entries": entries,
+		"default_entry": StringName(str(scene.get("default_entry", ""))), "exits": exits, "checkpoints": checkpoints,
+		"npcs": [], "objects": []}
+
+
+## The Stag fight room: {start (Vector2), radius, area (Rect2)}; empty when the scene has none.
+static func fight_room(scene: Dictionary) -> Dictionary:
+	if not scene.has("stag_start"):
+		return {}
+	return {"start": _vec(scene["stag_start"]), "radius": float(scene.get("stag_radius", 20.0)), "area": _rect(scene["fight_area"])}
 
 
 static func size(scene: Dictionary) -> Vector2:

@@ -1,0 +1,375 @@
+{
+ "version": 1,
+ "scene": "glade_layered",
+ "name": "STAG GLADE",
+ "size": [
+  560,
+  336
+ ],
+ "ground": "res://art/reference/layered_pilot/glade_ground_totoy36.png",
+ "outline": [
+  [
+   0,
+   296
+  ],
+  [
+   22,
+   290
+  ],
+  [
+   40,
+   270
+  ],
+  [
+   26,
+   258
+  ],
+  [
+   16,
+   244
+  ],
+  [
+   18,
+   222
+  ],
+  [
+   22,
+   190
+  ],
+  [
+   26,
+   150
+  ],
+  [
+   30,
+   110
+  ],
+  [
+   56,
+   80
+  ],
+  [
+   96,
+   56
+  ],
+  [
+   150,
+   40
+  ],
+  [
+   220,
+   28
+  ],
+  [
+   300,
+   24
+  ],
+  [
+   380,
+   24
+  ],
+  [
+   420,
+   40
+  ],
+  [
+   440,
+   44
+  ],
+  [
+   462,
+   22
+  ],
+  [
+   480,
+   0
+  ],
+  [
+   548,
+   0
+  ],
+  [
+   536,
+   40
+  ],
+  [
+   526,
+   90
+  ],
+  [
+   528,
+   150
+  ],
+  [
+   524,
+   200
+  ],
+  [
+   520,
+   250
+  ],
+  [
+   500,
+   290
+  ],
+  [
+   470,
+   318
+  ],
+  [
+   440,
+   332
+  ],
+  [
+   410,
+   332
+  ],
+  [
+   380,
+   326
+  ],
+  [
+   330,
+   326
+  ],
+  [
+   260,
+   324
+  ],
+  [
+   200,
+   322
+  ],
+  [
+   150,
+   326
+  ],
+  [
+   110,
+   332
+  ],
+  [
+   60,
+   326
+  ],
+  [
+   0,
+   336
+  ]
+ ],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "entries": {
+  "entrance": [
+   24,
+   318
+  ]
+ },
+ "default_entry": "entrance",
+ "exits": [
+  {
+   "id": "to_forest",
+   "rect": [
+    0,
+    306,
+    8,
+    30
+   ],
+   "target_scene": "forest",
+   "target_entry": "north"
+  },
+  {
+   "id": "to_arena",
+   "rect": [
+    488,
+    0,
+    56,
+    10
+   ],
+   "target_scene": "arena",
+   "target_entry": "start"
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "glade_layered_entrance",
+   "position": [
+    42,
+    312
+   ]
+  }
+ ],
+ "stag_start": [
+  420,
+  165
+ ],
+ "stag_radius": 20,
+ "fight_area": [
+  168,
+  127,
+  210,
+  140
+ ],
+ "props": [
+  {
+   "id": "glade_stone_1",
+   "type": "glade_stone_1",
+   "x": 170,
+   "y": 140,
+   "flip": false,
+   "shadow_radius": 14.4
+  },
+  {
+   "id": "glade_stone_2",
+   "type": "glade_stone_2",
+   "x": 255,
+   "y": 95,
+   "flip": false,
+   "shadow_radius": 13.5
+  },
+  {
+   "id": "glade_stone_3",
+   "type": "glade_stone_3",
+   "x": 360,
+   "y": 125,
+   "flip": false,
+   "shadow_radius": 12.3
+  },
+  {
+   "id": "glade_stone_4",
+   "type": "glade_stone_4",
+   "x": 390,
+   "y": 245,
+   "flip": false,
+   "shadow_radius": 14.1
+  },
+  {
+   "id": "glade_stone_5",
+   "type": "glade_stone_5",
+   "x": 185,
+   "y": 265,
+   "flip": false,
+   "shadow_radius": 12.9
+  },
+  {
+   "id": "glade_rock_1",
+   "type": "glade_rock_1",
+   "x": 110,
+   "y": 175,
+   "flip": false,
+   "shadow_radius": 6.0
+  },
+  {
+   "id": "glade_rock_2",
+   "type": "glade_rock_2",
+   "x": 455,
+   "y": 225,
+   "flip": false,
+   "shadow_radius": 12.6
+  },
+  {
+   "id": "glade_rock_3",
+   "type": "glade_rock_3",
+   "x": 420,
+   "y": 280,
+   "flip": false,
+   "shadow_radius": 3.6
+  },
+  {
+   "id": "glade_tree",
+   "type": "glade_tree",
+   "x": 72,
+   "y": 135,
+   "flip": false,
+   "shadow_radius": 22
+  },
+  {
+   "id": "glade_stump",
+   "type": "glade_stump",
+   "x": 92,
+   "y": 245,
+   "flip": false,
+   "shadow_radius": 9.9
+  },
+  {
+   "id": "glade_log",
+   "type": "glade_log",
+   "x": 98,
+   "y": 310,
+   "flip": false,
+   "shadow_radius": 14.4
+  },
+  {
+   "id": "glade_thorns",
+   "type": "glade_thorns",
+   "x": 490,
+   "y": 290,
+   "flip": false,
+   "shadow_radius": 18.0
+  },
+  {
+   "id": "glade_bush_1",
+   "type": "glade_bush_1",
+   "x": 490,
+   "y": 155,
+   "flip": false,
+   "shadow_radius": 12.6
+  },
+  {
+   "id": "glade_fern_1",
+   "type": "glade_fern_1",
+   "x": 330,
+   "y": 318,
+   "flip": false,
+   "shadow_radius": 16.5
+  },
+  {
+   "id": "glade_arch",
+   "type": "glade_arch",
+   "x": 450,
+   "y": 82,
+   "flip": false,
+   "shadow_radius": 22
+  },
+  {
+   "id": "glade_antler",
+   "type": "glade_antler",
+   "x": 135,
+   "y": 210,
+   "flip": false,
+   "shadow_radius": 2.7
+  },
+  {
+   "id": "glade_rocks_small",
+   "type": "glade_rocks_small",
+   "x": 265,
+   "y": 300,
+   "flip": false,
+   "shadow_radius": 12.6
+  },
+  {
+   "id": "glade_mushrooms",
+   "type": "glade_mushrooms",
+   "x": 420,
+   "y": 325,
+   "flip": false,
+   "shadow_radius": 10.5
+  },
+  {
+   "id": "glade_fern_2",
+   "type": "glade_fern_2",
+   "x": 28,
+   "y": 245,
+   "flip": false,
+   "shadow_radius": 16.2
+  },
+  {
+   "id": "glade_bush_2",
+   "type": "glade_bush_2",
+   "x": 305,
+   "y": 50,
+   "flip": false,
+   "shadow_radius": 10.2
+  }
+ ]
+}
