@@ -1,0 +1,10 @@
+{
+ "version": 1,
+ "props": {
+  "pillar": {"image": "pillar.png", "w": 24, "h": 48, "anchor": [12, 48], "base_width": 20, "solid": true,
+             "colliders": [[-5, -2, 5], [5, -2, 5]]},
+  "lopsided": {"image": "lopsided.png", "w": 40, "h": 30, "anchor": [20, 30], "base_width": 36, "solid": true,
+               "colliders": [[-12, -3, 6]]},
+  "bone": {"image": "bone.png", "w": 20, "h": 8, "anchor": [10, 8], "base_width": 20, "solid": false, "colliders": []}
+ }
+}

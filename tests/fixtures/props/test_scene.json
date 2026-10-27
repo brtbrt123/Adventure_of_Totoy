@@ -1,0 +1,13 @@
+{
+ "version": 1,
+ "scene": "fixture",
+ "size": [200, 140],
+ "outline": [[20, 20], [180, 20], [180, 120], [20, 120]],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "props": [
+  {"id": "pillar_a", "type": "pillar", "x": 100, "y": 70},
+  {"id": "lop_flipped", "type": "lopsided", "x": 150, "y": 100, "flip": true},
+  {"id": "bone_a", "type": "bone", "x": 60, "y": 100}
+ ]
+}

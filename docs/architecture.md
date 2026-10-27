@@ -378,6 +378,16 @@ core.set_gate_open(true)          # debug key / later the lantern puzzle; emits 
 
 **Colliders after the playtest (core, 2026-10-22).** Everything that stands up is solid at its base: the glade's five standing stones (the spring and the slabs were then removed from the art, 2026-10-22); Edda's door (`VillageLayout.EDDA_DOOR`, no doorway notch; the knock spot `STAND_POINTS[&"edda_door"]` is in front), the village gate's door leaf; the forest's lantern pedestals (full width) and the root gate (its row on the painted base). Audit: `tests/core/test_prop_solidity.gd`. The glade's radius-20 Stag reaches 63.1 % of the fight area (`docs/STATUS.md`).
 
+### Layered scenes: separate props (pilot, 2026-10-27)
+
+A layered scene has a painted floor and props as separate sprites, so depth order and collision come from each prop's base line (docs/LAYERED_SCENE_PILOT.md). Core and presentation read the same two JSON files; the core loads no sprites. Code: `core/prop_scene.gd`; extractor: `tools/art/extract_props.py`.
+
+- **Prop defs** `data/props/prop_defs.json` (made by the extractor from the magenta prop sheet): `props.<type>` = `{image, w, h, anchor [ax, ay], base_width, solid, colliders [[dx, dy, r], ...]}`. The anchor is the middle of the base in sprite pixels (from the top left); colliders are circles relative to the anchor, dy <= 0 (centres sit a little above the base line). Flat things (lower than 14 px) are decor: `solid` false, no colliders. An entry with `"locked": true` is hand-tuned and survives a re-run of the extractor.
+- **Scene file** `data/scenes/<scene>_props.json`: `size`, `outline` (the walkable ground, clockwise, game pixels; edges on the world border are the openings), `boundary_radius`, `boundary_spacing`, `props[] = {id, type, x, y, flip?}` where x, y is where the prop's anchor stands in the world. Adding or moving a prop is one line.
+- **Core API** (`PropScene`): `load_defs()`, `load_scene(path)`, `placements(scene, defs)` (what to draw: id, type, feet, flip, size, anchor, image, solid), `prop_colliders`, `build(scene, defs)` (edge chain along the outline + every solid prop's circles, `visual_id` empty), `validate(scene, defs)` (empty when fine).
+- **Presentation** draws each placement's `image` with its anchor on `feet` (mirrored when `flip`), y-sorted with the actors by `feet.y`: an actor whose feet are north of `feet.y` is drawn behind the prop. No occluder cut-outs. Sprites live in `art/src` (Codex converts the extractor's PNGs); the sprite name is the type id.
+- **Not wired yet:** no scene uses it until the human's images exist; `SceneDefs` will get a `glade_layered` entry that builds its obstacles with `PropScene.build`.
+
 ## Tuning
 
 Every gameplay number lives in `core/tuning.gd` (parry window, dash i-frames, boss timings, damage). The human tunes feel there after playtesting; tests read the same constants, so they follow the tuning.
