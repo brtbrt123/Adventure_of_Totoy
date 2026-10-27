@@ -9,7 +9,8 @@ func _init() -> void:
 
 
 func run() -> void:
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
+	var output: String = OUT + ("alignment/" if "--alignment" in OS.get_cmdline_user_args() else "")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	if Engine.has_meta(Explore.PERSIST_META):
 		Engine.remove_meta(Explore.PERSIST_META)
 	for id: StringName in [&"forest_layered", &"glade_layered"]:
@@ -30,7 +31,7 @@ func run() -> void:
 			scene.queue_redraw()
 			await process_frame
 			await RenderingServer.frame_post_draw
-			var path: String = OUT + String(id) + ("_colliders" if debug else "") + ".png"
+			var path: String = output + String(id) + ("_colliders" if debug else "") + ".png"
 			if root.get_texture().get_image().save_png(path) != OK:
 				printerr("FAIL capture " + path)
 				quit(1)

@@ -121,6 +121,7 @@ static func draw_shadow(canvas: CanvasItem, item: Dictionary, strength: float = 
 static func draw(canvas: CanvasItem, item: Dictionary, atlas: Texture2D, tint: Color = GLADE_TINT) -> void:
 	var rect: Rect2 = item["rect"]
 	if item["flip"]:
-		rect.position.x += rect.size.x
+		# Godot flips the texture for a negative width, keeping the draw origin.
+		# Advancing the origin as well shifts the sprite away from its collider.
 		rect.size.x = -rect.size.x
 	canvas.draw_texture_rect_region(atlas, rect, item["src"], tint)

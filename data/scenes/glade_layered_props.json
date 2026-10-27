@@ -366,15 +366,15 @@
   {
    "id": "arch_rocks_left",
    "type": "glade_rock_2",
-   "x": 405,
-   "y": 66,
+   "x": 394,
+   "y": 88,
    "flip": true,
    "shadow_radius": 10
   },
   {
    "id": "arch_rocks_right",
    "type": "glade_rock_2",
-   "x": 514,
+   "x": 506,
    "y": 88,
    "flip": false,
    "shadow_radius": 10
