@@ -105,6 +105,16 @@ class ExtractPropsTest(unittest.TestCase):
         self.assertEqual(again["props"]["stone"]["colliders"], [[0, 0, 9.0]])
         self.assertNotEqual(again["props"]["bush"]["colliders"], [[0, 0, 9.0]])
 
+    def test_merge_keeps_other_sheets_and_prefix_names_the_rest(self) -> None:
+        self.run_tool(names=["stone", "bush", "bone"])
+        again = extract_props.extract(self.sheet, self.dir / "out2", self.dir / "defs.json", None, 560.0, 60, self.palette,
+                                      merge=True, prefix="village")
+        self.assertEqual(list(again["props"])[:3], ["village_01", "village_02", "village_03"])
+        for name in ("stone", "bush", "bone"):
+            self.assertIn(name, again["props"], "the first sheet's props survive --merge")
+        plain = extract_props.extract(self.sheet, self.dir / "out3", self.dir / "defs3.json", None, 560.0, 60, self.palette)
+        self.assertEqual(list(plain["props"]), ["prop_01", "prop_02", "prop_03"], "the default prefix")
+
     def test_deterministic(self) -> None:
         self.run_tool(out="a", defs="a.json", names=["stone", "bush", "bone"])
         self.run_tool(out="b", defs="b.json", names=["stone", "bush", "bone"])

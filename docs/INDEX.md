@@ -17,6 +17,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 ## Work in progress
 - [[LAYERED_SCENE_PILOT]]: floor painting plus separate props; prompts for the images
 - [[CODEX_TASK_layered_pilot]]: Codex's side of the pilot
+- [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, who does what)
 
 ## Art references
 - [[ART_PROMPTS_GEMINI]], [[GEMINI_PROMPT_PACK]]

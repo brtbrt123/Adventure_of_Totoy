@@ -12,7 +12,10 @@ Output:
                                  scenes"): per prop id the size, the anchor (base middle, in sprite pixels), the base
                                  width and the colliders [dx, dy, r] relative to the anchor. Core reads it for the
                                  colliders; presentation reads it for the sprite placement. No sprites in core.
-An existing entry with "locked": true is kept as it is (hand-tuned colliders survive a re-run).
+An existing entry with "locked": true is kept as it is (hand-tuned colliders survive a re-run). With --merge every
+existing entry of the defs file is kept (several sheets, several scenes share data/props/prop_defs.json: the glade's
+props are not lost when the village sheet is extracted); without it the file holds only this sheet's props and the
+locked ones. --prefix puts a scene's name in front of the default ids (village_01, ...).
 
 Run (project root):  python tools/art/extract_props.py --sheet art/reference/layered_pilot/glade_props_sheet.png
                          [--names a,b,c] [--out DIR] [--defs FILE] [--world-width 560]
@@ -223,7 +226,7 @@ def base_info(img: Image.Image) -> dict:
 # --- the whole sheet ---
 
 def extract(sheet_path: Path, out_dir: Path, defs_path: Path, names: list[str] | None = None, world_width: float = 560.0,
-            tol: int = 60, palette: artlib.Palette | None = None) -> dict:
+            tol: int = 60, palette: artlib.Palette | None = None, merge: bool = False, prefix: str = "prop") -> dict:
     palette = palette or artlib.load_palette()
     sheet = Image.open(sheet_path).convert("RGB")
     scale = world_width / sheet.size[0]
@@ -242,7 +245,7 @@ def extract(sheet_path: Path, out_dir: Path, defs_path: Path, names: list[str] |
         if img is None:
             continue
         index += 1
-        name = names[index - 1] if names and index <= len(names) else f"prop_{index:02d}"
+        name = names[index - 1] if names and index <= len(names) else f"{prefix}_{index:02d}"
         info = base_info(img)
         if old.get(name, {}).get("locked"):
             info = old[name]
@@ -251,7 +254,7 @@ def extract(sheet_path: Path, out_dir: Path, defs_path: Path, names: list[str] |
         images[name] = img
         img.save(out_dir / f"{name}.png")
     for name, entry in old.items():
-        if entry.get("locked") and name not in props:
+        if (merge or entry.get("locked")) and name not in props:
             props[name] = entry
     data = {"version": VERSION, "sheet": sheet_path.name, "scale": round(scale, 5), "props": props}
     defs_path.parent.mkdir(parents=True, exist_ok=True)
@@ -292,13 +295,15 @@ def main() -> int:
     parser.add_argument("--defs", type=Path, default=DEFAULT_DEFS)
     parser.add_argument("--names", default="", help="comma separated ids in reading order (top to bottom, left to right)")
     parser.add_argument("--world-width", type=float, default=560.0, help="the scene's width the sheet width maps to")
+    parser.add_argument("--merge", action="store_true", help="keep every existing entry of the defs file (another sheet or scene)")
+    parser.add_argument("--prefix", default="prop", help="default id prefix for unnamed props (e.g. village)")
     parser.add_argument("--tol", type=int, default=60, help="colour distance from #FF00FF counted as background")
     args = parser.parse_args()
     if not args.sheet.exists():
         print(f"missing sheet: {args.sheet}", file=sys.stderr)
         return 1
     names = [n for n in args.names.split(",") if n] or None
-    data = extract(args.sheet, args.out, args.defs, names, args.world_width, args.tol)
+    data = extract(args.sheet, args.out, args.defs, names, args.world_width, args.tol, merge=args.merge, prefix=args.prefix)
     for name, info in data["props"].items():
         print(f"{name:14s} {info['w']:3d}x{info['h']:3d}  anchor {info['anchor']}  base {info['base_width']:3d}  "
               f"{'solid x%d' % len(info['colliders']) if info['solid'] else 'decor'}")
