@@ -104,11 +104,11 @@ func _every_scene_loads() -> void:
 			_expect(o == o.round(), "whole-pixel camera")
 			var on_screen: Vector2 = scene.snapshot.hero.position - o
 			_expect(on_screen.x >= 0.0 and on_screen.y >= 0.0 and on_screen.x <= 320.0 and on_screen.y <= 180.0, "%s hero on screen" % scene_id)
-		# walking animates the katana set
+		# walking follows the core armed/unarmed state
 		scene.core.place_at(SceneDefs.get_def(scene_id)["entries"][SceneDefs.get_def(scene_id)["default_entry"]])
 		for i: int in 12:
 			_step(scene, Vector2.DOWN)
-		_expect(scene.hero_frame.begins_with("hero2_"), "the hero uses the katana frames: %s" % scene.hero_frame)
+		_expect(scene.hero_frame.begins_with("hero2_" if scene.snapshot.armed else "totoy_unarmed_"), "the hero follows the armed snapshot: %s" % scene.hero_frame)
 		_expect(scene.missing_frames.is_empty(), "%s: no missing frames %s" % [scene_id, str(scene.missing_frames.keys())])
 		scene.queue_free()
 		await process_frame

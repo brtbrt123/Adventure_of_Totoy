@@ -461,18 +461,25 @@ func _choose_frames() -> void:
 	if absf(hero.facing.x) > 0.3:
 		facing_left = hero.facing.x < 0.0
 	previous_hero_position = hero.position
-	hero_frame = hero_frame_for(hero)
+	hero_frame = hero_frame_for(hero, snapshot.armed)
 	# Core returns to idle on success; hold the same brief contact pose as the arena.
 	for effect: Dictionary in practice_effects:
-		if effect["type"] == GameEvent.PARRY_SUCCEEDED and snapshot.tick - int(effect["tick"]) < 3 and hero.state in [&"idle", &"walk", &"parry"]:
+		if snapshot.armed and effect["type"] == GameEvent.PARRY_SUCCEEDED and snapshot.tick - int(effect["tick"]) < 3 and hero.state in [&"idle", &"walk", &"parry"]:
 			hero_frame = ArenaAnimation.hero_frame(ArenaAnimation.SET_KATANA, "parry", 6)
 	for i: int in snapshot.npcs.size():
 		var npc: Dictionary = snapshot.npcs[i]
 		npc_frames[npc["id"]] = npc_frame_for(npc, snapshot.tick + i * 13)
 
 
-## The katana hero frame (hero2_*) for idle, walk and dash, timed like the fight (animation.gd).
-static func hero_frame_for(hero: Snapshots.EntitySnapshot) -> String:
+## Appearance follows the core's armed snapshot; combat animation tables stay unchanged.
+const UNARMED_FRAMES: Dictionary = {"idle": [6, 12, true], "walk": [6, 5, true], "dash": [6, 1, false]}
+
+
+static func hero_frame_for(hero: Snapshots.EntitySnapshot, armed: bool = true) -> String:
+	if not armed:
+		var state: String = String(hero.state) if UNARMED_FRAMES.has(String(hero.state)) else "idle"
+		var ticks: int = ArenaAnimation.walk_ticks(hero.state_ticks, hero.move_speed_mult) if state == "walk" else hero.state_ticks
+		return ArenaAnimation.hero_frame("totoy_unarmed", state, ArenaAnimation.frame_index(UNARMED_FRAMES[state], ticks))
 	var view: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
 	return ArenaAnimation.choose(hero, view, {})
 

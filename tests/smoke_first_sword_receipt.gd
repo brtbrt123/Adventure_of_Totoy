@@ -57,8 +57,29 @@ func run() -> void:
 			Store.delete(SAVE)
 			var scene: Explore = spawn(id)
 			expect(not scene.snapshot.armed and scene.reward_popup.pending.is_empty(), "fresh village unarmed without a receipt")
+			expect(scene.hero_frame.begins_with("totoy_unarmed_idle_"), "fresh arrival draws no sword")
+			for state: StringName in [&"idle", &"walk", &"dash"]:
+				var seen: Dictionary = {}
+				for tick: int in 72:
+					var hero: Explore.Snapshots.EntitySnapshot = Explore.Snapshots.EntitySnapshot.new()
+					hero.state = state
+					hero.state_ticks = tick
+					var key: String = Explore.hero_frame_for(hero, false)
+					expect(scene.frames.has(key) and key.begins_with("totoy_unarmed_"), "unarmed animation frame exists")
+					seen[key] = true
+				expect(seen.size() == 6, "six unarmed frames per state")
+			var move: Intent = Intent.new()
+			move.move = Vector2.RIGHT
+			scene.advance(move)
+			expect(scene.hero_frame.begins_with("totoy_unarmed_walk_"), "unarmed walking uses approved set")
+			move.dash_pressed = true
+			scene.advance(move)
+			expect(scene.hero_frame.begins_with("totoy_unarmed_dash_"), "unarmed dashing uses approved set")
+			for i: int in 40:
+				scene.advance(Intent.new())
 			talk(scene, skipped)
 			expect(scene.snapshot.armed and Store.load_profile().story_flags.has(&"received_first_sword"), "handover saved")
+			expect(scene.hero_frame.begins_with("hero2_"), "handover immediately selects armed poses")
 			expect(scene.reward_popup.pending.size() == 1, "one handover receipt, finished or skipped")
 			if not scene.reward_popup.pending.is_empty():
 				expect(scene.reward_popup.pending[0]["icon"] == "ui_weapon_totoy_blade_1" and scene.reward_popup.pending[0]["quantity"] == 1, "weapon icon and quantity from event")
@@ -73,7 +94,7 @@ func run() -> void:
 			scene.queue_free()
 			await process_frame
 			var resumed: Explore = spawn(id)
-			expect(resumed.snapshot.armed and resumed.reward_popup.pending.is_empty(), "reload armed without another receipt")
+			expect(resumed.snapshot.armed and resumed.reward_popup.pending.is_empty() and resumed.hero_frame.begins_with("hero2_"), "reload armed without another receipt")
 			resumed.queue_free()
 			await process_frame
 		# Legacy save migration arms silently, without replaying the award.

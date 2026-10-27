@@ -14,8 +14,12 @@ Codex stays in presentation/art under the owner's batch instructions. The owner 
 
 ## Codex follow-up after core migration
 
-Remove obsolete painted ground paths/rendering branches and the retired depth-occluder assets and fixtures after their references are gone. Update title/debug controls and capture the official route. Do not remove `presentation/common/depth_occluders.gd` wholesale: the arena still uses it. Do not install unarmed hero art without the owner's separate art approval; that was explicitly excluded from this batch.
+Remove obsolete painted ground paths/rendering branches and the retired depth-occluder assets and fixtures after their references are gone. Update title/debug controls and capture the official route. Do not remove `presentation/common/depth_occluders.gd` wholesale: the arena still uses it. Unarmed art was excluded from the original batch; the owner subsequently approved it and it is now installed (see the later approval section below).
 
 ## Current batch state
 
-The painted-yard consistency repair was already completed before this new decision, keeping the current routes coherent while migration is pending. It does not commit us to maintaining painted maps afterward. Layered training feet are380,180; core/shared data already agree. First-sword receipt hook and owner audio are implemented in both scene variants. Fresh debug village visits currently retain the core's unarmed flag state; they do not fabricate a weapon reward. Until art approval, the display still uses the armed hero set as documented in the batch exclusions.
+The painted-yard consistency repair was already completed before this new decision, keeping the current routes coherent while migration is pending. It does not commit us to maintaining painted maps afterward. Layered training feet are380,180; core/shared data already agree. First-sword receipt hook and owner audio are implemented in both scene variants. Fresh debug village visits currently retain the core's unarmed flag state; they do not fabricate a weapon reward. At the original batch handoff the display still used the armed set; the later approved unarmed installation below supersedes that historical limitation.
+
+## Later owner approval: unarmed hero installed
+
+The owner subsequently approved the unarmed sheet on 2026-10-27. Its18frames are now installed in art/src and selected by snapshot.armed in exploration. Fresh arrivals draw idle/walk/dash without the sword; the actual Tovan grant immediately selects armed poses, and reloaded/legacy armed saves keep them. The prior batch exclusion/review-only note is historical. No new core grant/state logic was added. Installation evidence/captures: `art/reference/hero_unarmed_v1/INSTALLATION.md` and `runtime/`.
