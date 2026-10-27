@@ -1,0 +1,873 @@
+{
+  "version": 1,
+  "props": {
+    "village_dummy": {
+      "source_size": [
+        28,
+        38
+      ],
+      "padded_size": [
+        32,
+        40
+      ],
+      "padding": [
+        0,
+        2,
+        4,
+        0
+      ],
+      "shared_anchor": [
+        13.5,
+        38
+      ],
+      "padded_anchor": [
+        13.5,
+        40
+      ],
+      "header_anchor": [
+        14,
+        40
+      ]
+    },
+    "village_shelf": {
+      "source_size": [
+        33,
+        34
+      ],
+      "padded_size": [
+        40,
+        40
+      ],
+      "padding": [
+        0,
+        6,
+        7,
+        0
+      ],
+      "shared_anchor": [
+        15.5,
+        34
+      ],
+      "padded_anchor": [
+        15.5,
+        40
+      ],
+      "header_anchor": [
+        16,
+        40
+      ]
+    },
+    "village_barrel_a": {
+      "source_size": [
+        23,
+        28
+      ],
+      "padded_size": [
+        24,
+        32
+      ],
+      "padding": [
+        0,
+        4,
+        1,
+        0
+      ],
+      "shared_anchor": [
+        11.5,
+        28
+      ],
+      "padded_anchor": [
+        11.5,
+        32
+      ],
+      "header_anchor": [
+        12,
+        32
+      ]
+    },
+    "village_barrel_b": {
+      "source_size": [
+        23,
+        28
+      ],
+      "padded_size": [
+        24,
+        32
+      ],
+      "padding": [
+        0,
+        4,
+        1,
+        0
+      ],
+      "shared_anchor": [
+        11.5,
+        28
+      ],
+      "padded_anchor": [
+        11.5,
+        32
+      ],
+      "header_anchor": [
+        12,
+        32
+      ]
+    },
+    "village_barrel_c": {
+      "source_size": [
+        24,
+        27
+      ],
+      "padded_size": [
+        24,
+        32
+      ],
+      "padding": [
+        0,
+        5,
+        0,
+        0
+      ],
+      "shared_anchor": [
+        12.5,
+        27
+      ],
+      "padded_anchor": [
+        12.5,
+        32
+      ],
+      "header_anchor": [
+        13,
+        32
+      ]
+    },
+    "village_barrel_tipped": {
+      "source_size": [
+        35,
+        28
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        4,
+        5,
+        0
+      ],
+      "shared_anchor": [
+        11.5,
+        28
+      ],
+      "padded_anchor": [
+        11.5,
+        32
+      ],
+      "header_anchor": [
+        12,
+        32
+      ]
+    },
+    "village_crate_a": {
+      "source_size": [
+        31,
+        31
+      ],
+      "padded_size": [
+        32,
+        32
+      ],
+      "padding": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "shared_anchor": [
+        13.5,
+        31
+      ],
+      "padded_anchor": [
+        13.5,
+        32
+      ],
+      "header_anchor": [
+        14,
+        32
+      ]
+    },
+    "village_crate_b": {
+      "source_size": [
+        30,
+        31
+      ],
+      "padded_size": [
+        32,
+        32
+      ],
+      "padding": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "shared_anchor": [
+        13.0,
+        31
+      ],
+      "padded_anchor": [
+        13.0,
+        32
+      ],
+      "header_anchor": [
+        13,
+        32
+      ]
+    },
+    "village_pile": {
+      "source_size": [
+        49,
+        32
+      ],
+      "padded_size": [
+        56,
+        32
+      ],
+      "padding": [
+        0,
+        0,
+        7,
+        0
+      ],
+      "shared_anchor": [
+        26.0,
+        32
+      ],
+      "padded_anchor": [
+        26.0,
+        32
+      ],
+      "header_anchor": [
+        26,
+        32
+      ]
+    },
+    "village_rocks": {
+      "source_size": [
+        42,
+        30
+      ],
+      "padded_size": [
+        48,
+        32
+      ],
+      "padding": [
+        0,
+        2,
+        6,
+        0
+      ],
+      "shared_anchor": [
+        23.0,
+        30
+      ],
+      "padded_anchor": [
+        23.0,
+        32
+      ],
+      "header_anchor": [
+        23,
+        32
+      ]
+    },
+    "village_stump": {
+      "source_size": [
+        39,
+        28
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        4,
+        1,
+        0
+      ],
+      "shared_anchor": [
+        21.5,
+        28
+      ],
+      "padded_anchor": [
+        21.5,
+        32
+      ],
+      "header_anchor": [
+        22,
+        32
+      ]
+    },
+    "village_slab": {
+      "source_size": [
+        40,
+        25
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        7,
+        0,
+        0
+      ],
+      "shared_anchor": [
+        27.5,
+        25
+      ],
+      "padded_anchor": [
+        27.5,
+        32
+      ],
+      "header_anchor": [
+        28,
+        32
+      ]
+    },
+    "village_slab_tilted": {
+      "source_size": [
+        35,
+        28
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        4,
+        5,
+        0
+      ],
+      "shared_anchor": [
+        20.5,
+        28
+      ],
+      "padded_anchor": [
+        20.5,
+        32
+      ],
+      "header_anchor": [
+        21,
+        32
+      ]
+    },
+    "village_rubble": {
+      "source_size": [
+        40,
+        21
+      ],
+      "padded_size": [
+        40,
+        24
+      ],
+      "padding": [
+        0,
+        3,
+        0,
+        0
+      ],
+      "shared_anchor": [
+        23.0,
+        21
+      ],
+      "padded_anchor": [
+        23.0,
+        24
+      ],
+      "header_anchor": [
+        23,
+        24
+      ]
+    },
+    "village_chest": {
+      "source_size": [
+        33,
+        28
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        4,
+        7,
+        0
+      ],
+      "shared_anchor": [
+        18.0,
+        28
+      ],
+      "padded_anchor": [
+        18.0,
+        32
+      ],
+      "header_anchor": [
+        18,
+        32
+      ]
+    },
+    "village_bush_1": {
+      "source_size": [
+        36,
+        30
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        2,
+        4,
+        0
+      ],
+      "shared_anchor": [
+        16.5,
+        30
+      ],
+      "padded_anchor": [
+        16.5,
+        32
+      ],
+      "header_anchor": [
+        17,
+        32
+      ]
+    },
+    "village_bush_2": {
+      "source_size": [
+        39,
+        30
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        2,
+        1,
+        0
+      ],
+      "shared_anchor": [
+        19.0,
+        30
+      ],
+      "padded_anchor": [
+        19.0,
+        32
+      ],
+      "header_anchor": [
+        19,
+        32
+      ]
+    },
+    "village_fern_1": {
+      "source_size": [
+        46,
+        31
+      ],
+      "padded_size": [
+        48,
+        32
+      ],
+      "padding": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "shared_anchor": [
+        22.5,
+        31
+      ],
+      "padded_anchor": [
+        22.5,
+        32
+      ],
+      "header_anchor": [
+        23,
+        32
+      ]
+    },
+    "village_fern_2": {
+      "source_size": [
+        39,
+        25
+      ],
+      "padded_size": [
+        40,
+        32
+      ],
+      "padding": [
+        0,
+        7,
+        1,
+        0
+      ],
+      "shared_anchor": [
+        16.5,
+        25
+      ],
+      "padded_anchor": [
+        16.5,
+        32
+      ],
+      "header_anchor": [
+        17,
+        32
+      ]
+    },
+    "village_mushrooms": {
+      "source_size": [
+        30,
+        23
+      ],
+      "padded_size": [
+        32,
+        24
+      ],
+      "padding": [
+        0,
+        1,
+        2,
+        0
+      ],
+      "shared_anchor": [
+        15.0,
+        23
+      ],
+      "padded_anchor": [
+        15.0,
+        24
+      ],
+      "header_anchor": [
+        15,
+        24
+      ]
+    },
+    "village_bucket": {
+      "source_size": [
+        20,
+        26
+      ],
+      "padded_size": [
+        24,
+        32
+      ],
+      "padding": [
+        0,
+        6,
+        4,
+        0
+      ],
+      "shared_anchor": [
+        10.0,
+        26
+      ],
+      "padded_anchor": [
+        10.0,
+        32
+      ],
+      "header_anchor": [
+        10,
+        32
+      ]
+    },
+    "village_rope": {
+      "source_size": [
+        33,
+        19
+      ],
+      "padded_size": [
+        40,
+        24
+      ],
+      "padding": [
+        0,
+        5,
+        7,
+        0
+      ],
+      "shared_anchor": [
+        19.0,
+        19
+      ],
+      "padded_anchor": [
+        19.0,
+        24
+      ],
+      "header_anchor": [
+        19,
+        24
+      ]
+    },
+    "village_mushrooms_small": {
+      "source_size": [
+        25,
+        21
+      ],
+      "padded_size": [
+        32,
+        24
+      ],
+      "padding": [
+        0,
+        3,
+        7,
+        0
+      ],
+      "shared_anchor": [
+        11.0,
+        21
+      ],
+      "padded_anchor": [
+        11.0,
+        24
+      ],
+      "header_anchor": [
+        11,
+        24
+      ]
+    },
+    "village_gate": {
+      "source_size": [
+        99,
+        99
+      ],
+      "padded_size": [
+        104,
+        104
+      ],
+      "padding": [
+        0,
+        5,
+        5,
+        0
+      ],
+      "shared_anchor": [
+        15.5,
+        99
+      ],
+      "padded_anchor": [
+        15.5,
+        104
+      ],
+      "header_anchor": [
+        16,
+        104
+      ]
+    },
+    "village_cottage": {
+      "source_size": [
+        125,
+        109
+      ],
+      "padded_size": [
+        128,
+        112
+      ],
+      "padding": [
+        0,
+        3,
+        3,
+        0
+      ],
+      "shared_anchor": [
+        63.5,
+        109
+      ],
+      "padded_anchor": [
+        63.5,
+        112
+      ],
+      "header_anchor": [
+        64,
+        112
+      ]
+    },
+    "village_east_tree": {
+      "source_size": [
+        112,
+        125
+      ],
+      "padded_size": [
+        112,
+        128
+      ],
+      "padding": [
+        0,
+        3,
+        0,
+        0
+      ],
+      "shared_anchor": [
+        55.0,
+        125
+      ],
+      "padded_anchor": [
+        55.0,
+        128
+      ],
+      "header_anchor": [
+        55,
+        128
+      ]
+    },
+    "village_forge": {
+      "source_size": [
+        87,
+        87
+      ],
+      "padded_size": [
+        88,
+        88
+      ],
+      "padding": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "shared_anchor": [
+        35.0,
+        87
+      ],
+      "padded_anchor": [
+        35.0,
+        88
+      ],
+      "header_anchor": [
+        35,
+        88
+      ]
+    },
+    "village_big_tree": {
+      "source_size": [
+        126,
+        116
+      ],
+      "padded_size": [
+        128,
+        120
+      ],
+      "padding": [
+        0,
+        4,
+        2,
+        0
+      ],
+      "shared_anchor": [
+        58.0,
+        116
+      ],
+      "padded_anchor": [
+        58.0,
+        120
+      ],
+      "header_anchor": [
+        58,
+        120
+      ]
+    },
+    "village_shrine": {
+      "source_size": [
+        60,
+        86
+      ],
+      "padded_size": [
+        64,
+        88
+      ],
+      "padding": [
+        0,
+        2,
+        4,
+        0
+      ],
+      "shared_anchor": [
+        31.0,
+        86
+      ],
+      "padded_anchor": [
+        31.0,
+        88
+      ],
+      "header_anchor": [
+        31,
+        88
+      ]
+    },
+    "village_standing_stone": {
+      "source_size": [
+        49,
+        72
+      ],
+      "padded_size": [
+        56,
+        72
+      ],
+      "padding": [
+        0,
+        0,
+        7,
+        0
+      ],
+      "shared_anchor": [
+        24.5,
+        72
+      ],
+      "padded_anchor": [
+        24.5,
+        72
+      ],
+      "header_anchor": [
+        25,
+        72
+      ]
+    },
+    "village_lamp_post": {
+      "source_size": [
+        40,
+        84
+      ],
+      "padded_size": [
+        40,
+        88
+      ],
+      "padding": [
+        0,
+        4,
+        0,
+        0
+      ],
+      "shared_anchor": [
+        7.5,
+        84
+      ],
+      "padded_anchor": [
+        7.5,
+        88
+      ],
+      "header_anchor": [
+        8,
+        88
+      ]
+    }
+  }
+}

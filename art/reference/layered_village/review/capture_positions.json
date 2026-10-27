@@ -1,0 +1,82 @@
+[
+	{
+		"feet": [
+			49.1568870544434,
+			108.832420349121
+		],
+		"label": "gate_behind",
+		"walked": true
+	},
+	{
+		"feet": [
+			49.3326187133789,
+			146.681747436523
+		],
+		"label": "gate_front",
+		"walked": true
+	},
+	{
+		"feet": [
+			303.401336669922,
+			70.1927337646484
+		],
+		"label": "forge_behind",
+		"walked": true
+	},
+	{
+		"feet": [
+			304.175354003906,
+			119.380935668945
+		],
+		"label": "forge_front",
+		"walked": true
+	},
+	{
+		"feet": [
+			447.155120849609,
+			91.155143737793
+		],
+		"label": "cottage_behind",
+		"walked": true
+	},
+	{
+		"feet": [
+			434.574066162109,
+			130.635971069336
+		],
+		"label": "cottage_front",
+		"walked": true
+	},
+	{
+		"feet": [
+			190.412933349609,
+			94.9326400756836
+		],
+		"label": "big_tree_behind",
+		"walked": true
+	},
+	{
+		"feet": [
+			189.468017578125,
+			134.185440063477
+		],
+		"label": "big_tree_front",
+		"walked": true
+	},
+	{
+		"feet": [
+			529.814697265625,
+			129.009994506836
+		],
+		"label": "east_tree_behind",
+		"walked": true
+	},
+	{
+		"feet": [
+			528.282836914063,
+			169.757141113281
+		],
+		"label": "east_tree_front",
+		"walked": true
+	}
+]

@@ -157,10 +157,10 @@ func "))
 			_expect(not r.has_point(Vector2(px) + Vector2(0.5, 0.5)), "ring pixel %s is not under a core row" % str(px))
 	var small: Dictionary = ActorShadow.plan(Vector2(100, 50), 6.0)
 	_expect(Array(small["core"]).size() <= core.size(), "a smaller radius gives a smaller shadow")
-	_expect(ActorShadow.ALPHA >= 0.3 and ActorShadow.ALPHA <= 0.5, "translucent ink, never a black hole (alpha %.2f)" % ActorShadow.ALPHA)
+	_expect(ActorShadow.ALPHA >= 0.15 and ActorShadow.ALPHA <= 0.3, "subtle grounded actor shadow (alpha %.2f)" % ActorShadow.ALPHA)
 	for scene_id: StringName in SceneDefs.IDS:
 		var s: float = ActorShadow.strength_for(scene_id)
-		_expect(s >= 0.3 and s <= 0.5, "%s shadow strength %.2f" % [scene_id, s])
+		_expect(s >= 0.15 and s <= 0.3, "%s shadow strength %.2f" % [scene_id, s])
 	for path: String in ["res://presentation/explore/explore_scene.gd", "res://presentation/arena/arena.gd"]:
 		var src: String = FileAccess.get_file_as_string(path)
 		_expect(src.contains("ActorShadow.draw(") and not src.contains("draw_colored_polygon(shadow"), "%s draws the shared shadow, not the ink ellipse" % path)

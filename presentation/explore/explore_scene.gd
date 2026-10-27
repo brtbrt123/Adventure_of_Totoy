@@ -27,6 +27,8 @@ const CharacterMenu := preload("res://presentation/arena/character_menu.gd")
 const ExploreHud := preload("res://presentation/explore/explore_hud.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
+const PropScene := preload("res://core/prop_scene.gd")
+const PropsLayer := preload("res://presentation/common/props_layer.gd")
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
@@ -39,6 +41,9 @@ const GROUNDS: Dictionary = {
 	&"forest": "res://presentation/forest/forest_route_ground.png",
 	&"glade": "res://presentation/forest/stag_glade_ground.png",
 	&"arena": "res://presentation/arena/arena_ground.png",
+	# Runtime copies while Claude updates the shared scene files' ground strings.
+	&"village_layered": "res://presentation/village/village_layered_ground.png",
+	&"glade_layered": "res://presentation/forest/glade_layered_ground.png",
 }
 ## Per-scene ambient multiplied onto the actors (not the ground) so the sprites sit in the dusk paintings.
 const AMBIENT: Dictionary = {
@@ -46,6 +51,8 @@ const AMBIENT: Dictionary = {
 	&"forest": Color(0.9, 0.94, 0.88),
 	&"glade": Color(0.88, 0.95, 0.94),
 	&"arena": Color(1, 1, 1),
+	&"village_layered": Color(0.93, 0.89, 0.84),
+	&"glade_layered": Color(0.88, 0.95, 0.94),
 }
 ## The actor shadow's radius for the hero (presentation/common/actor_shadow.gd draws it, the same as in the arena).
 const HERO_SHADOW_RADIUS: float = 10.0
@@ -64,7 +71,7 @@ const HINTS: Dictionary = {&"npc": "[E] TALK", &"chest": "[E] OPEN", &"sign": "[
 const HINT_OVERRIDES: Dictionary = {&"root_gate": "[E] LOOK"}
 ## The hint floats this far above an object's feet (people: their height + 8).
 const OBJECT_HINT_HEIGHT: float = 30.0
-const DEBUG_SCENES: Dictionary = {"debug_scene_village": &"village", "debug_scene_forest": &"forest", "debug_scene_glade": &"glade", "debug_scene_arena": &"arena"}
+const DEBUG_SCENES: Dictionary = {"debug_scene_village": &"village", "debug_scene_forest": &"forest", "debug_scene_glade": &"glade", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered"}
 
 var core: ExploreCore
 var snapshot: ExploreCore.ExploreSnapshot
@@ -72,6 +79,7 @@ var colors: Dictionary = {}
 var frames: Dictionary = {}
 var sprites: Texture2D
 var grounds: Dictionary = {}
+var prop_placements: Array[Dictionary] = []
 var npc_idle_ticks: Dictionary = {}
 var camera: Camera2D
 var view_origin: Vector2 = Vector2.ZERO
@@ -145,8 +153,12 @@ func _read_json(path: String) -> Dictionary:
 
 
 func ground_texture(scene: StringName) -> Texture2D:
-	if not grounds.has(scene) and GROUNDS.has(scene):
-		grounds[scene] = load(GROUNDS[scene]) as Texture2D
+	if not grounds.has(scene):
+		var path: String = String(GROUNDS.get(scene, ""))
+		if path == "" and SceneDefs.LAYERED.has(scene):
+			path = String(SceneDefs.layered_data(scene).get("ground", ""))
+		if path != "":
+			grounds[scene] = load(path) as Texture2D
 	return grounds.get(scene, null)
 
 
@@ -162,6 +174,9 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	else:
 		core = ExploreCore.new(scene, entry, gate_open)
 	snapshot = core.snapshot()
+	prop_placements.clear()
+	if SceneDefs.LAYERED.has(scene):
+		prop_placements = PropScene.placements(SceneDefs.layered_data(scene), PropScene.load_defs())
 	facing_left = snapshot.hero.facing.x < 0.0
 	previous_hero_position = snapshot.hero.position
 	bubbles.clear()
@@ -418,6 +433,8 @@ func drawables() -> Array[Dictionary]:
 			if object["kind"] == &"chest":  # the village chest is not painted (the forest's is, in its nook)
 				out.append({"kind": &"object", "id": object["id"], "at": object["position"], "frame": "obj_chest_closed_1", "left": false, "shadow": 0.0, "tint": Color.WHITE})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
+	if SceneDefs.LAYERED.has(snapshot.scene_id):
+		return PropsLayer.sorted_with_actors(PropsLayer.drawables(prop_placements, frames, Rect2(view_origin, VIEW_SIZE).grow(8)), out)
 	out.append_array(DepthOccluders.drawables(snapshot.scene_id, {&"gate_open": snapshot.gate_open}, Rect2(view_origin, VIEW_SIZE).grow(8.0)))
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
 	return out
@@ -430,11 +447,19 @@ func _draw() -> void:
 	var ground: Texture2D = ground_texture(snapshot.scene_id)
 	if ground != null:
 		draw_texture(ground, Vector2.ZERO)
-	for item: Dictionary in drawables():
+	var items: Array[Dictionary] = drawables()
+	if SceneDefs.LAYERED.has(snapshot.scene_id):
+		# All shadows lie on the floor, never on a lower-sorted prop or actor.
+		for item: Dictionary in items:
+			if item["kind"] == &"prop":
+				PropsLayer.draw_shadow(self, item, shadow_strength())
+			else:
+				ActorShadow.draw(self, item["at"], item["shadow"], shadow_strength())
+	for item: Dictionary in items:
 		_draw_item(item)
 	if snapshot.hero.state == &"dash":
 		_draw_imported("fx_dash_%d" % (mini(5, snapshot.hero.state_ticks / 2) + 1), snapshot.hero.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
-	for item: Dictionary in drawables():
+	for item: Dictionary in items:
 		if item["kind"] == &"npc" and bubbles.has(item["id"]):
 			_draw_bubble(Vector2(item["at"]) - Vector2(0, float(item["height"]) + 6.0))
 	if debug_enabled:
@@ -442,12 +467,15 @@ func _draw() -> void:
 
 
 func _draw_item(item: Dictionary) -> void:
+	if item["kind"] == &"prop":
+		PropsLayer.draw(self, item, sprites, ambient())
+		return
 	if item["kind"] == &"occluder":
 		DepthOccluders.draw(self, snapshot.scene_id, item)
 		return
 	var at: Vector2 = Vector2(item["at"]).round()
 	var radius: float = float(item["shadow"])
-	if radius > 0.0:
+	if radius > 0.0 and not SceneDefs.LAYERED.has(snapshot.scene_id):
 		ActorShadow.draw(self, at, radius, ActorShadow.strength_for(snapshot.scene_id))
 	var key: String = item["frame"]
 	if not frames.has(key):
@@ -458,6 +486,15 @@ func _draw_item(item: Dictionary) -> void:
 		return
 	var frame: Dictionary = frames[key]
 	draw_texture_rect_region(sprites, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
+
+
+func shadow_strength() -> float:
+	var scene: StringName = snapshot.scene_id
+	if scene == &"village_layered":
+		scene = &"village"
+	elif scene == &"glade_layered":
+		scene = &"glade"
+	return ActorShadow.strength_for(scene)
 
 
 func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE) -> void:

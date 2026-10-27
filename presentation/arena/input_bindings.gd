@@ -21,6 +21,8 @@ static func register() -> void:
 		# keyboards without F-keys: the number row 1-4 jump, G toggles the gate, H shows the debug overlay
 		"debug_scene_village": [KEY_F2, KEY_1], "debug_scene_forest": [KEY_F3, KEY_2], "debug_scene_glade": [KEY_F4, KEY_3],
 		"debug_scene_arena": [KEY_F5, KEY_4], "debug_toggle_gate": [KEY_F6, KEY_G],
+		"debug_scene_village_layered": [KEY_F7, KEY_5],
+		"debug_scene_glade_layered": [KEY_F8, KEY_6],
 	}
 	# Q no longer swaps weapons in the arena (2026-10-21): weapons are equipped in the character menu's inventory.
 	if InputMap.has_action("arena_weapon_swap"):

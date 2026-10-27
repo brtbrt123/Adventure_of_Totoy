@@ -1,6 +1,6 @@
 extends RefCounted
 ## The ground shadow under every actor (hero, NPCs, the boss), shared by the exploration scenes
-## (presentation/explore/explore_scene.gd) and the arena (presentation/arena/arena.gd). It replaces the opaque ink
+## (presentation/explore/explore_scene.gd) and the arena (presentation/arena/arena.gd). Revised 2026-10-27: smaller, lighter contact shadow close to the feet. It replaces the opaque ink
 ## ellipse (2026-10-22, the human: "fix the shadow on the character to match our game"): the painted scenes darken the
 ## ground softly under their objects, so the shadow is translucent ink, never a black hole, and stays hard-pixel:
 ## - a pixel-aligned ellipse of whole-pixel row spans (no smooth edges), x radius `radius` * SIZE, y radius
@@ -11,14 +11,14 @@ extends RefCounted
 ## Draw it before the actor's sprite. Pure drawing on any CanvasItem; nothing here changes game state.
 
 ## Opacity of the shadow's core (ink over the ground).
-const ALPHA: float = 0.4
+const ALPHA: float = 0.25
 ## The shadow is a little smaller than the old ellipse (radius 10 for the hero).
-const SIZE: float = 0.9
-const Y_RATIO: float = 0.3
-const OFFSET_Y: int = 2
+const SIZE: float = 0.65
+const Y_RATIO: float = 0.25
+const OFFSET_Y: int = 1
 const INK: Color = Color(0.110, 0.094, 0.141)  # palette "0" (ink, #1c1824)
 ## Per-scene strength (the dark forest floor needs a little more to read, the bright village dirt a little less).
-const STRENGTH: Dictionary = {&"village": 0.38, &"forest": 0.42, &"glade": 0.4, &"arena": 0.4}
+const STRENGTH: Dictionary = {&"village": 0.22, &"forest": 0.25, &"glade": 0.23, &"arena": 0.25}
 
 
 ## The shadow's pixels for feet at `feet` (rounded) and `radius`: {"core": [Rect2 row spans], "ring": [Vector2i pixels]}.
