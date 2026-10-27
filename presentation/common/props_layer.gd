@@ -26,6 +26,9 @@ static func drawables(placements: Array[Dictionary], frames: Dictionary, view: R
 		var source: Rect2 = Rect2(frame["x"], frame["y"], size.x, size.y)
 		# Tool-only contract tests supply unpadded frames without atlas anchors.
 		var metadata: Dictionary = art_metadata().get(name, {}) if frame.has("ax") else {}
+		var cast_names: Dictionary = metadata.get("cast_shadow", {})
+		var cast_name: String = String(cast_names.get("flipped" if bool(placement.get("flip", false)) else "normal", ""))
+		var cast_frame: Dictionary = frames.get(cast_name, {})
 		if metadata.has("trim"):
 			var trim: Array = metadata["trim"]
 			source.position += Vector2(trim[0], trim[1])
@@ -38,14 +41,18 @@ static func drawables(placements: Array[Dictionary], frames: Dictionary, view: R
 		if frame.has("ax"):
 			origin = origin.round()  # shared half-pixel anchors snap to the world pixel grid
 		var rect: Rect2 = Rect2(origin, size)
-		if not view.intersects(rect):
+		var visible_rect: Rect2 = rect
+		if not cast_frame.is_empty():
+			var cast_origin: Vector2 = (feet - Vector2(cast_frame["ax"], cast_frame["ay"])).round()
+			visible_rect = visible_rect.merge(Rect2(cast_origin, Vector2(cast_frame["w"], cast_frame["h"])))
+		if not view.intersects(visible_rect):
 			continue
 		var base_size: Vector2 = placement.get("size", size)
 		var shadow_radius: float = float(placement.get("shadow_radius", minf(22.0, base_size.x * 0.2)))
 		var item: Dictionary = {"kind": &"prop", "id": placement["id"], "at": feet,
 			"rect": rect, "src": source, "type": placement["type"],
 			"flip": flip, "shadow_at": feet, "shadow_origin": origin,
-			"shadow_plan": metadata.get("contact_shadow", {}), "shadow_radius": shadow_radius}
+			"shadow_plan": metadata.get("contact_shadow", {}), "cast_frame": cast_frame, "shadow_radius": shadow_radius}
 		if metadata.has("sort_strips"):
 			var first: bool = true
 			for strip: Array in metadata["sort_strips"]:
@@ -79,16 +86,23 @@ static func sorted_with_actors(props: Array[Dictionary], actors: Array[Dictionar
 	return items
 
 
-static func draw_shadows(canvas: CanvasItem, props: Array[Dictionary], strength: float = 0.4) -> void:
+static func draw_shadows(canvas: CanvasItem, props: Array[Dictionary], strength: float = 0.4, atlas: Texture2D = null) -> void:
 	for item: Dictionary in props:
-		draw_shadow(canvas, item, strength)
+		draw_shadow(canvas, item, strength, atlas)
 
 
 ## Short contact shadows follow each visible base, including separated gate feet.
 ## Source-space rows never join across a doorway. Only the first log strip casts.
-static func draw_shadow(canvas: CanvasItem, item: Dictionary, strength: float = 0.25) -> void:
+static func draw_shadow(canvas: CanvasItem, item: Dictionary, strength: float = 0.25, atlas: Texture2D = null) -> void:
 	if float(item["shadow_radius"]) <= 0.0:
 		return
+	var cast_frame: Dictionary = item.get("cast_frame", {})
+	if atlas != null and not cast_frame.is_empty():
+		# Mirrored objects have their own mask: key light still comes from upper-left.
+		var at: Vector2 = item.get("shadow_at", item["at"])
+		var cast_origin: Vector2 = (at - Vector2(cast_frame["ax"], cast_frame["ay"])).round()
+		# Black vertex colour tags this draw as the shader's separate shadow pass.
+		canvas.draw_texture_rect_region(atlas, Rect2(cast_origin, Vector2(cast_frame["w"], cast_frame["h"])), Rect2(cast_frame["x"], cast_frame["y"], cast_frame["w"], cast_frame["h"]), Color(0, 0, 0, 0.30))
 	var plan: Dictionary = item.get("shadow_plan", {})
 	if plan.is_empty():
 		ActorShadow.draw(canvas, item.get("shadow_at", item["at"]), item["shadow_radius"], strength)

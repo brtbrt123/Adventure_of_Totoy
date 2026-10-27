@@ -23,6 +23,7 @@ static func register() -> void:
 		"debug_scene_arena": [KEY_F5, KEY_4], "debug_toggle_gate": [KEY_F6, KEY_G],
 		"debug_scene_village_layered": [KEY_F7, KEY_5],
 		"debug_scene_glade_layered": [KEY_F8, KEY_6],
+		"debug_lighting_toggle": [KEY_F9, KEY_7],
 	}
 	# Q no longer swaps weapons in the arena (2026-10-21): weapons are equipped in the character menu's inventory.
 	if InputMap.has_action("arena_weapon_swap"):

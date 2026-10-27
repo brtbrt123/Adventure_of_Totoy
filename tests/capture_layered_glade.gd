@@ -21,7 +21,7 @@ class ReviewCanvas extends Node2D:
 			if only_id == "" or p["id"] == only_id:
 				selected.append(p)
 		var props: Array[Dictionary] = PropsLayer.drawables(selected, frames)
-		PropsLayer.draw_shadows(self, props)
+		PropsLayer.draw_shadows(self, props, 0.23, atlas)
 		ActorShadow.draw(self, hero, 10)
 		var actors: Array[Dictionary] = [{"id": "hero", "kind": &"actor", "at": hero}]
 		for item: Dictionary in PropsLayer.sorted_with_actors(props, actors):

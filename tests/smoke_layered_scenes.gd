@@ -7,7 +7,8 @@ const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const ExploreBot := preload("res://tests/explore_bot.gd")
 const Collision := preload("res://core/collision.gd")
-const OUT: String = "res://art/reference/layered_village/review/path_v2/"
+const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
+const OUT: String = "res://art/reference/layered_village/review/night_selected/"
 var failures: Array[String] = []
 var captures: Array[Dictionary] = []
 var scene: Explore
@@ -96,6 +97,30 @@ func run() -> void:
 	expect(scene.ground_texture(&"village_layered").get_size() == Vector2(571, 336), "Converted village ground")
 	expect(scene.prop_placements.size() == 34, "All shared placements")
 	expect(scene.snapshot.npcs.size() == 6, "Six NPCs")
+	expect(scene.material is ShaderMaterial, "Overhead lighting material active")
+	var light_material: ShaderMaterial = scene.material as ShaderMaterial
+	expect(is_equal_approx(light_material.get_shader_parameter("shaft_slope"), EnvironmentLight.SHADOW_PROJECTION.x / EnvironmentLight.SHADOW_PROJECTION.y), "Light direction matches separate shadows")
+	var moon_colour: Vector3 = light_material.get_shader_parameter("light_colour")
+	expect(moon_colour.z > moon_colour.x + 0.2, "Night key light is cool moonlight")
+	expect(light_material.get_shader_parameter("lamp_count") == 10, "Five visible fixtures plus their floor pools")
+	var lamp_plan: Dictionary = EnvironmentLight.lamp_plan(scene.prop_placements)
+	var lamp_points: PackedVector4Array = lamp_plan["points"]
+	var found_post: bool = false
+	for lamp: Vector4 in lamp_points:
+		if Vector2(lamp.x, lamp.y).distance_to(Vector2(255, 217)) < 1.0 and lamp.w > 0:
+			found_post = true
+	expect(found_post, "Warm glow is attached to the actual hanging lamp")
+	var actor_frame: Dictionary = {"w": 32, "h": 40, "ax": 12, "ay": 36}
+	for flipped: bool in [false, true]:
+		var projected: Transform2D = EnvironmentLight.actor_transform(Vector2(100, 80), actor_frame, flipped)
+		expect((projected * Vector2(12, 36)).is_equal_approx(Vector2(100, 80)), "Actor shadow stays attached to feet in both facings")
+		var head: Vector2 = projected * Vector2(12, 0)
+		expect(head.x > 100 and head.y > 80, "Actor shadow falls down/right regardless of facing")
+	scene.lighting_enabled = false
+	scene._update_lighting()
+	expect(scene.material == null, "Lighting toggle permits direct comparison")
+	scene.lighting_enabled = true
+	scene._update_lighting()
 	var seen: Dictionary = {}
 	for item: Dictionary in scene.drawables():
 		if item["kind"] == &"object":
@@ -105,6 +130,9 @@ func run() -> void:
 	# All frames exist even when off camera.
 	for p: Dictionary in scene.prop_placements:
 		expect(scene.frames.has(String(p["type"])), "Frame " + String(p["type"]))
+	for p: Dictionary in scene.drawables():
+		if p["kind"] == &"prop":
+			expect(not Dictionary(p["cast_frame"]).is_empty(), "Separate shadow asset " + String(p["id"]))
 	for id: StringName in [&"gate", &"forge", &"cottage", &"big_tree", &"east_tree"]:
 		await review_side(id, true)
 		await review_side(id, false)
@@ -135,6 +163,7 @@ func run() -> void:
 		finish_fade()
 		expect(scene.snapshot.scene_id == Explore.DEBUG_SCENES[key], "Debug jump " + key)
 	expect(scene.ground_texture(&"glade_layered").get_size() == Vector2(560, 336), "Runtime glade ground")
+	expect((scene.material as ShaderMaterial).get_shader_parameter("lamp_count") == 0, "Village lamps do not leak into glade")
 	# The diagonal log's left end must sort earlier than its right end.
 	var props: Array[Dictionary] = PropsLayer.drawables(scene.prop_placements, scene.frames)
 	var low: float = INF

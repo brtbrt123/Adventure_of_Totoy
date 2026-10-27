@@ -1,0 +1,2613 @@
+{
+  "version": 1,
+  "projection": {
+    "direction": "selected soft moonlight from upper-left; casts down-right",
+    "dx_per_height": 0.3,
+    "dy_per_height": 0.25,
+    "preview_opacity": 0.16,
+    "rasterization": "filled projected pixel quadrilaterals; common ground plane, no per-column baseline jumps"
+  },
+  "props": {
+    "village_dummy": {
+      "object": "village_dummy",
+      "object_source": "art\\reference\\layered_village\\props\\village_dummy.png",
+      "object_size": [
+        28,
+        38
+      ],
+      "object_anchor": [
+        13.5,
+        38
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_dummy_1",
+          "size": [
+            40,
+            24
+          ],
+          "anchor": [
+            11,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -7,
+            0,
+            24,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_dummy_flipped_1",
+          "size": [
+            40,
+            24
+          ],
+          "anchor": [
+            12,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -8,
+            0,
+            23,
+            11
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "969d50f94d6e2cbb1f704dfdd0851a9870a0e207e6a2dcb25035023f5aec4f96"
+    },
+    "village_shelf": {
+      "object": "village_shelf",
+      "object_source": "art\\reference\\layered_village\\props\\village_shelf.png",
+      "object_size": [
+        33,
+        34
+      ],
+      "object_anchor": [
+        15.5,
+        34
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_shelf_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            27,
+            10
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_shelf_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            26,
+            10
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "f5dd969684da0f2567886751308cf18f3f7383d372a378bf376b307d93cc62d4"
+    },
+    "village_barrel_a": {
+      "object": "village_barrel_a",
+      "object_source": "art\\reference\\layered_village\\props\\village_barrel_a.png",
+      "object_size": [
+        23,
+        28
+      ],
+      "object_anchor": [
+        11.5,
+        28
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_barrel_a_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            14,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -10,
+            0,
+            19,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_barrel_a_flipped_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            13,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -9,
+            0,
+            19,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "3d7075f7578633e6eca037abe57bfdf7d051c0ecaa3480b2cc582bfdcf488c00"
+    },
+    "village_barrel_b": {
+      "object": "village_barrel_b",
+      "object_source": "art\\reference\\layered_village\\props\\village_barrel_b.png",
+      "object_size": [
+        23,
+        28
+      ],
+      "object_anchor": [
+        11.5,
+        28
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_barrel_b_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            13,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -9,
+            0,
+            19,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_barrel_b_flipped_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            14,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -10,
+            0,
+            19,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "e47e99ca0654af89be59b78adcc4d174554839ddb515c7e577633dd05d50a4c2"
+    },
+    "village_barrel_c": {
+      "object": "village_barrel_c",
+      "object_source": "art\\reference\\layered_village\\props\\village_barrel_c.png",
+      "object_size": [
+        24,
+        27
+      ],
+      "object_anchor": [
+        12.5,
+        27
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_barrel_c_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            15,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -11,
+            0,
+            19,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_barrel_c_flipped_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            14,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -10,
+            0,
+            20,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "33d6942063f027fc5ac4a30a9bda17d989a65307a513a27dd65081436f3bbdb4"
+    },
+    "village_barrel_tipped": {
+      "object": "village_barrel_tipped",
+      "object_source": "art\\reference\\layered_village\\props\\village_barrel_tipped.png",
+      "object_size": [
+        35,
+        28
+      ],
+      "object_anchor": [
+        11.5,
+        28
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_barrel_tipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            14,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -10,
+            0,
+            31,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_barrel_tipped_flipped_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            16,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "068fa53037b06aa870a8cc42dfec2c80c1b2baaeb2f4b24d49e0a977c6405e96"
+    },
+    "village_crate_a": {
+      "object": "village_crate_a",
+      "object_source": "art\\reference\\layered_village\\props\\village_crate_a.png",
+      "object_size": [
+        31,
+        31
+      ],
+      "object_anchor": [
+        13.5,
+        31
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_crate_a_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            27,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_crate_a_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            20,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -16,
+            0,
+            22,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "a96c37e2ec11d7916b7fbe301cb6931b6fd58535a64ec733442ed47a5318b256"
+    },
+    "village_crate_b": {
+      "object": "village_crate_b",
+      "object_source": "art\\reference\\layered_village\\props\\village_crate_b.png",
+      "object_size": [
+        30,
+        31
+      ],
+      "object_anchor": [
+        13.0,
+        31
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_crate_b_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            27,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_crate_b_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            19,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -15,
+            0,
+            22,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "a138ed5db8fe36a0eaed463606d17aec75b84a51be23476ae3d6607f2815b57b"
+    },
+    "village_pile": {
+      "object": "village_pile",
+      "object_source": "art\\reference\\layered_village\\props\\village_pile.png",
+      "object_size": [
+        49,
+        32
+      ],
+      "object_anchor": [
+        26.0,
+        32
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_pile_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            28,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_pile_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            33,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "4d9f604780c03d2c60adab8f58823eec445be2e6a3001575995f4aa0ad8a7358"
+    },
+    "village_rocks": {
+      "object": "village_rocks",
+      "object_source": "art\\reference\\layered_village\\props\\village_rocks.png",
+      "object_size": [
+        42,
+        30
+      ],
+      "object_anchor": [
+        23.0,
+        30
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_rocks_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            26,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_rocks_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            27,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "45bc63b67e9b3c605eee5559845186474106525020e261cd16879ee1ba36424b"
+    },
+    "village_stump": {
+      "object": "village_stump",
+      "object_source": "art\\reference\\layered_village\\props\\village_stump.png",
+      "object_size": [
+        39,
+        28
+      ],
+      "object_anchor": [
+        21.5,
+        28
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_stump_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            22,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_stump_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            27,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "72fa84b3a24f44900e185b4024ae8468389e905e088b5bacf7a8e0b939e36e50"
+    },
+    "village_slab": {
+      "object": "village_slab",
+      "object_source": "art\\reference\\layered_village\\props\\village_slab.png",
+      "object_size": [
+        40,
+        25
+      ],
+      "object_anchor": [
+        27.5,
+        25
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_slab_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -25,
+            0,
+            18,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_slab_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            15,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -11,
+            0,
+            34,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "6c4e660257ca2fb51e1c64035d7b4db75cca5b91ee464a0093eb5114459ef660"
+    },
+    "village_slab_tilted": {
+      "object": "village_slab_tilted",
+      "object_source": "art\\reference\\layered_village\\props\\village_slab_tilted.png",
+      "object_size": [
+        35,
+        28
+      ],
+      "object_anchor": [
+        20.5,
+        28
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_slab_tilted_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            19,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_slab_tilted_flipped_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            17,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -13,
+            0,
+            27,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "8f4a728359a30776efd390d07b8d9acdc9a0358bd3d1e710ea3e9073a089e410"
+    },
+    "village_rubble": {
+      "object": "village_rubble",
+      "object_source": "art\\reference\\layered_village\\props\\village_rubble.png",
+      "object_size": [
+        40,
+        21
+      ],
+      "object_anchor": [
+        23.0,
+        21
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_rubble_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            21,
+            7
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_rubble_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            20,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -16,
+            0,
+            28,
+            7
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "2d97de32f616e0ba44db05c1200c14cb7579ae6ee53f5e934f861e589c9e629a"
+    },
+    "village_chest": {
+      "object": "village_chest",
+      "object_source": "art\\reference\\layered_village\\props\\village_chest.png",
+      "object_size": [
+        33,
+        28
+      ],
+      "object_anchor": [
+        18.0,
+        28
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_chest_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            23,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_chest_flipped_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            25,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "c3b8c86e3cc40a323cb0182f90fbe14018786390efc3e893c657b8406086a3bb"
+    },
+    "village_bush_1": {
+      "object": "village_bush_1",
+      "object_source": "art\\reference\\layered_village\\props\\village_bush_1.png",
+      "object_size": [
+        36,
+        30
+      ],
+      "object_anchor": [
+        16.5,
+        30
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_bush_1_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            19,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -15,
+            0,
+            25,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_bush_1_flipped_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            22,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "309f93124a79f2fde2a364a472265ec5735793cf6f170e9098068372375a952b"
+    },
+    "village_bush_2": {
+      "object": "village_bush_2",
+      "object_source": "art\\reference\\layered_village\\props\\village_bush_2.png",
+      "object_size": [
+        39,
+        30
+      ],
+      "object_anchor": [
+        19.0,
+        30
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_bush_2_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            26,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_bush_2_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            22,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -18,
+            0,
+            25,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "4322e198b775813e89c5e8bf36867284aa56a3b30fd6c4ad8fe047520f18d199"
+    },
+    "village_fern_1": {
+      "object": "village_fern_1",
+      "object_source": "art\\reference\\layered_village\\props\\village_fern_1.png",
+      "object_size": [
+        46,
+        31
+      ],
+      "object_anchor": [
+        22.5,
+        31
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_fern_1_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            23,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -19,
+            0,
+            29,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_fern_1_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            29,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "f89940cd1061c2e62b4dcd1a56149f29844be20408df7d962318ccec5a0524b8"
+    },
+    "village_fern_2": {
+      "object": "village_fern_2",
+      "object_source": "art\\reference\\layered_village\\props\\village_fern_2.png",
+      "object_size": [
+        39,
+        25
+      ],
+      "object_anchor": [
+        16.5,
+        25
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_fern_2_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            17,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -13,
+            0,
+            28,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_fern_2_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            23,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "5b0419b697bbb2aa2f3bcf268355356c8f7a8652efd08b6a2216917957902f61"
+    },
+    "village_mushrooms": {
+      "object": "village_mushrooms",
+      "object_source": "art\\reference\\layered_village\\props\\village_mushrooms.png",
+      "object_size": [
+        30,
+        23
+      ],
+      "object_anchor": [
+        15.0,
+        23
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_mushrooms_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            19,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -15,
+            0,
+            19,
+            7
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_mushrooms_flipped_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            20,
+            7
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "0e27b32f943b67f3da77b7aab5f880b7a948b6273d7a841b60d4365f789189c4"
+    },
+    "village_bucket": {
+      "object": "village_bucket",
+      "object_source": "art\\reference\\layered_village\\props\\village_bucket.png",
+      "object_size": [
+        20,
+        26
+      ],
+      "object_anchor": [
+        10.0,
+        26
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_bucket_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            12,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -8,
+            0,
+            18,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_bucket_flipped_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            12,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -8,
+            0,
+            18,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "723496665562dd685d0c4792af42f83fa0a5becbc2611c012066ecb127c9c991"
+    },
+    "village_rope": {
+      "object": "village_rope",
+      "object_source": "art\\reference\\layered_village\\props\\village_rope.png",
+      "object_size": [
+        33,
+        19
+      ],
+      "object_anchor": [
+        19.0,
+        19
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_rope_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            17,
+            6
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_rope_flipped_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            23,
+            6
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "fe14155018943946dfc0885829dd99aaa529093b6a3aedd53b30e0fb55ca1e5e"
+    },
+    "village_mushrooms_small": {
+      "object": "village_mushrooms_small",
+      "object_source": "art\\reference\\layered_village\\props\\village_mushrooms_small.png",
+      "object_size": [
+        25,
+        21
+      ],
+      "object_anchor": [
+        11.0,
+        21
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_mushrooms_small_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            13,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -9,
+            0,
+            18,
+            7
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_mushrooms_small_flipped_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            16,
+            7
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "c798ddf6b4d7eee93a137eca47da91886801f225082933f3d7aa1bd43ba2305b"
+    },
+    "village_gate": {
+      "object": "village_gate",
+      "object_source": "art\\reference\\layered_village\\props\\village_gate.png",
+      "object_size": [
+        99,
+        99
+      ],
+      "object_anchor": [
+        15.5,
+        99
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_gate_1",
+          "size": [
+            136,
+            40
+          ],
+          "anchor": [
+            17,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -13,
+            0,
+            113,
+            26
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_gate_flipped_1",
+          "size": [
+            128,
+            40
+          ],
+          "anchor": [
+            80,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -76,
+            0,
+            40,
+            26
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "c0e5c0fbcd50d48293fbb6b656ba526673d4a778fdb34f65bf030d1ffc5267e4"
+    },
+    "village_cottage": {
+      "object": "village_cottage",
+      "object_source": "art\\reference\\layered_village\\props\\village_cottage.png",
+      "object_size": [
+        125,
+        109
+      ],
+      "object_anchor": [
+        63.5,
+        109
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_cottage_1",
+          "size": [
+            144,
+            40
+          ],
+          "anchor": [
+            56,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -52,
+            0,
+            80,
+            29
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_cottage_flipped_1",
+          "size": [
+            144,
+            40
+          ],
+          "anchor": [
+            55,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -51,
+            0,
+            81,
+            29
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "8660832765cfde28f6f4332aeb9e6059a6f6a676281b4a42f4b5e4f0a4d85977"
+    },
+    "village_east_tree": {
+      "object": "village_east_tree",
+      "object_source": "art\\reference\\layered_village\\props\\village_east_tree.png",
+      "object_size": [
+        112,
+        125
+      ],
+      "object_anchor": [
+        55.0,
+        125
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_east_tree_1",
+          "size": [
+            128,
+            48
+          ],
+          "anchor": [
+            35,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -31,
+            0,
+            85,
+            33
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_east_tree_flipped_1",
+          "size": [
+            136,
+            48
+          ],
+          "anchor": [
+            42,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -38,
+            0,
+            84,
+            33
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "8d52923468970f8c04056b163e3c7d3d50183e74c501d960cf1bed1277017a6a"
+    },
+    "village_forge": {
+      "object": "village_forge",
+      "object_source": "art\\reference\\layered_village\\props\\village_forge.png",
+      "object_size": [
+        87,
+        87
+      ],
+      "object_anchor": [
+        35.0,
+        87
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_forge_1",
+          "size": [
+            112,
+            32
+          ],
+          "anchor": [
+            36,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -32,
+            0,
+            71,
+            23
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_forge_flipped_1",
+          "size": [
+            104,
+            32
+          ],
+          "anchor": [
+            49,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -45,
+            0,
+            44,
+            23
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "94ed8f7415b927a1d1629b81869c1197accfe0edc600fa21ac536c5a8adb05e3"
+    },
+    "village_big_tree": {
+      "object": "village_big_tree",
+      "object_source": "art\\reference\\layered_village\\props\\village_big_tree.png",
+      "object_size": [
+        126,
+        116
+      ],
+      "object_anchor": [
+        58.0,
+        116
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_big_tree_1",
+          "size": [
+            144,
+            40
+          ],
+          "anchor": [
+            45,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -41,
+            0,
+            89,
+            30
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_big_tree_flipped_1",
+          "size": [
+            144,
+            40
+          ],
+          "anchor": [
+            54,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -50,
+            0,
+            82,
+            30
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "a39d9006bd992253ca4409bf41d3ce29df2d30b86b0401644f9337219d28dd15"
+    },
+    "village_shrine": {
+      "object": "village_shrine",
+      "object_source": "art\\reference\\layered_village\\props\\village_shrine.png",
+      "object_size": [
+        60,
+        86
+      ],
+      "object_anchor": [
+        31.0,
+        86
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_shrine_1",
+          "size": [
+            80,
+            32
+          ],
+          "anchor": [
+            33,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -29,
+            0,
+            37,
+            23
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_shrine_flipped_1",
+          "size": [
+            80,
+            32
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            41,
+            23
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "88a241e26ad1be89c59704c57c54ebc3891e360eaf4d1e421709b15d0db7e885"
+    },
+    "village_standing_stone": {
+      "object": "village_standing_stone",
+      "object_source": "art\\reference\\layered_village\\props\\village_standing_stone.png",
+      "object_size": [
+        49,
+        72
+      ],
+      "object_anchor": [
+        24.5,
+        72
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_standing_stone_1",
+          "size": [
+            64,
+            32
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            32,
+            19
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_standing_stone_flipped_1",
+          "size": [
+            64,
+            32
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            31,
+            19
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "db16697c67a951b6d6769c0fd577a6e21e6052f8975ae84569638481f915d5bf"
+    },
+    "village_lamp_post": {
+      "object": "village_lamp_post",
+      "object_source": "art\\reference\\layered_village\\props\\village_lamp_post.png",
+      "object_size": [
+        40,
+        84
+      ],
+      "object_anchor": [
+        7.5,
+        84
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_lamp_post_1",
+          "size": [
+            72,
+            32
+          ],
+          "anchor": [
+            9,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -5,
+            0,
+            54,
+            22
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_lamp_post_flipped_1",
+          "size": [
+            64,
+            32
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            32,
+            22
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "f45ce56db40d689a4c390fab17c25c4276b6040ba659451c2a15fc05aba71746"
+    },
+    "glade_stone_1": {
+      "object": "glade_stone_1",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_stone_1.png",
+      "object_size": [
+        50,
+        54
+      ],
+      "object_anchor": [
+        24,
+        54
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_stone_1_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            30,
+            15
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_stone_1_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            30,
+            15
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "d6eea854641411a48c5cc63d07381c401de3e5016a3a0a1503fe1c9e5141cd2f"
+    },
+    "glade_stone_2": {
+      "object": "glade_stone_2",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_stone_2.png",
+      "object_size": [
+        50,
+        57
+      ],
+      "object_anchor": [
+        24,
+        57
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_stone_2_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            31,
+            16
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_stone_2_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            30,
+            16
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "7837f28367ee4dd67229b37cca2d8184addab9048ebd6698e70749b036a33dd1"
+    },
+    "glade_stone_3": {
+      "object": "glade_stone_3",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_stone_3.png",
+      "object_size": [
+        43,
+        50
+      ],
+      "object_anchor": [
+        22,
+        50
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_stone_3_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            28,
+            14
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_stone_3_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            23,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -19,
+            0,
+            26,
+            14
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "9f9e3257c006a49b9ecfba8beadad299fe63ced7dfa43875b2a5737a40f8ab69"
+    },
+    "glade_stone_4": {
+      "object": "glade_stone_4",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_stone_4.png",
+      "object_size": [
+        49,
+        53
+      ],
+      "object_anchor": [
+        26,
+        53
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_stone_4_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            30,
+            15
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_stone_4_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            31,
+            15
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "2f84657020ee48047d8e1c9d06498cbf654658b704a1c962d62326cdbd7c1a0a"
+    },
+    "glade_stone_5": {
+      "object": "glade_stone_5",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_stone_5.png",
+      "object_size": [
+        47,
+        54
+      ],
+      "object_anchor": [
+        24,
+        54
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_stone_5_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            32,
+            15
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_stone_5_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            28,
+            15
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "61e2ccea7a36fdf7dbd61324a8a5fcd437fec6937341f05988c9c067200793fa"
+    },
+    "glade_rock_1": {
+      "object": "glade_rock_1",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_rock_1.png",
+      "object_size": [
+        43,
+        26
+      ],
+      "object_anchor": [
+        16,
+        26
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_rock_1_1",
+          "size": [
+            64,
+            16
+          ],
+          "anchor": [
+            19,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -15,
+            0,
+            35,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_rock_1_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            21,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "232e124d88f1d709bcd2d11569325918a5aef2c1a243100d4e0241a4c9dc695e"
+    },
+    "glade_rock_2": {
+      "object": "glade_rock_2",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_rock_2.png",
+      "object_size": [
+        46,
+        31
+      ],
+      "object_anchor": [
+        22,
+        31
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_rock_2_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            29,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_rock_2_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            26,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "7db4b92d6ee0139b0967569eb9af47fd0c9ea55d121e33ed5d74ca0eb468b814"
+    },
+    "glade_rock_3": {
+      "object": "glade_rock_3",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_rock_3.png",
+      "object_size": [
+        39,
+        26
+      ],
+      "object_anchor": [
+        23,
+        26
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_rock_3_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            21,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_rock_3_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            29,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "c67e1afff5cda35ad210e7d1defdb9b555f572d4fd750f8b4faf864f2fa07b24"
+    },
+    "glade_tree": {
+      "object": "glade_tree",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_tree.png",
+      "object_size": [
+        93,
+        84
+      ],
+      "object_anchor": [
+        44,
+        84
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_tree_1",
+          "size": [
+            120,
+            32
+          ],
+          "anchor": [
+            43,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -39,
+            0,
+            70,
+            22
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_tree_flipped_1",
+          "size": [
+            120,
+            32
+          ],
+          "anchor": [
+            47,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -43,
+            0,
+            65,
+            22
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "2d0c76d31cbb60a120633d12f440ffcc04eb62020b58beba13572faccb28727c"
+    },
+    "glade_stump": {
+      "object": "glade_stump",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_stump.png",
+      "object_size": [
+        64,
+        40
+      ],
+      "object_anchor": [
+        30,
+        40
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_stump_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            38,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_stump_flipped_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            37,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -33,
+            0,
+            35,
+            11
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "5c1abb90e74518b3b1dabfc29639a6e6b1ab9cd2f0f28781aaaf9d12840eaf3f"
+    },
+    "glade_log": {
+      "object": "glade_log",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_log.png",
+      "object_size": [
+        85,
+        49
+      ],
+      "object_anchor": [
+        59,
+        49
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_log_1",
+          "size": [
+            96,
+            24
+          ],
+          "anchor": [
+            58,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -54,
+            0,
+            33,
+            14
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_log_flipped_1",
+          "size": [
+            104,
+            24
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            70,
+            14
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "97e0deb0ae639ae1d136b263b313fc1831b194dbc278050dbd4bc1999442a204"
+    },
+    "glade_thorns": {
+      "object": "glade_thorns",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_thorns.png",
+      "object_size": [
+        70,
+        51
+      ],
+      "object_anchor": [
+        36,
+        51
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_thorns_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            35,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -31,
+            0,
+            43,
+            14
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_thorns_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            34,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -30,
+            0,
+            44,
+            14
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "4dbd52b30006cfd1f4bf5907adc68712b2fa4ee4fdd449b19bfc135ae6356de9"
+    },
+    "glade_bush_1": {
+      "object": "glade_bush_1",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_bush_1.png",
+      "object_size": [
+        52,
+        40
+      ],
+      "object_anchor": [
+        26,
+        40
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_bush_1_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -25,
+            0,
+            33,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_bush_1_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            33,
+            11
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "8ddeb4cd4e09fa2450b6dd9008eab6f41f8b1d22029e6e21df005078272eb130"
+    },
+    "glade_fern_1": {
+      "object": "glade_fern_1",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_fern_1.png",
+      "object_size": [
+        56,
+        38
+      ],
+      "object_anchor": [
+        28,
+        38
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_fern_1_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            37,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_fern_1_flipped_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            37,
+            11
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "4f119485f0f546e3d6162b104c1960747ce0a4cc59c28230140da8f4860cb802"
+    },
+    "glade_arch": {
+      "object": "glade_arch",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_arch.png",
+      "object_size": [
+        95,
+        62
+      ],
+      "object_anchor": [
+        48,
+        62
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_arch_1",
+          "size": [
+            112,
+            32
+          ],
+          "anchor": [
+            51,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -47,
+            0,
+            56,
+            17
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_arch_flipped_1",
+          "size": [
+            112,
+            32
+          ],
+          "anchor": [
+            50,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -46,
+            0,
+            55,
+            17
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "415c509a5df55e47f1c07d419db36fe6d9aef9c2b0e877a0d403a84105cfc59f"
+    },
+    "glade_antler": {
+      "object": "glade_antler",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_antler.png",
+      "object_size": [
+        39,
+        28
+      ],
+      "object_anchor": [
+        34,
+        28
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_antler_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            32,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -28,
+            0,
+            8,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_antler_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            9,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -5,
+            0,
+            43,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "cd4136d9e0843ddff77668555496330d22c0b0cc097bce87fdb5209c6d0840b9"
+    },
+    "glade_rocks_small": {
+      "object": "glade_rocks_small",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_rocks_small.png",
+      "object_size": [
+        47,
+        24
+      ],
+      "object_anchor": [
+        25,
+        24
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_rocks_small_1",
+          "size": [
+            64,
+            16
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            26,
+            7
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_rocks_small_flipped_1",
+          "size": [
+            64,
+            16
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            29,
+            7
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "c1e40fc8ec62f7a5ef4d595565e4c0fd1582e9bd561e9940d4ef3e9178457275"
+    },
+    "glade_mushrooms": {
+      "object": "glade_mushrooms",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_mushrooms.png",
+      "object_size": [
+        39,
+        27
+      ],
+      "object_anchor": [
+        20,
+        27
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_mushrooms_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            22,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -18,
+            0,
+            25,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_mushrooms_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            21,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            24,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "e2c7680cdc3f89d20d3ca626208ab79c390e6b05bb39b13b29169c68f4ec43fb"
+    },
+    "glade_fern_2": {
+      "object": "glade_fern_2",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_fern_2.png",
+      "object_size": [
+        54,
+        30
+      ],
+      "object_anchor": [
+        27,
+        30
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_fern_2_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            31,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_fern_2_flipped_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            34,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "f75fa4afb040050af3e6c770c17b93922080c30e230fd9fbadd911f6bdc5abb7"
+    },
+    "glade_bush_2": {
+      "object": "glade_bush_2",
+      "object_source": "art\\reference\\layered_pilot\\props\\glade_bush_2.png",
+      "object_size": [
+        50,
+        26
+      ],
+      "object_anchor": [
+        28,
+        26
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_glade_bush_2_1",
+          "size": [
+            64,
+            16
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            27,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_glade_bush_2_flipped_1",
+          "size": [
+            64,
+            16
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            32,
+            8
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "7dc6cfe85d0031f7160b1a2d710f65bb97fbcc68353fe8286416e002ef0a1984"
+    }
+  }
+}

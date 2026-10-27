@@ -29,6 +29,7 @@ const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
 const PropScene := preload("res://core/prop_scene.gd")
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
+const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
@@ -80,6 +81,7 @@ var frames: Dictionary = {}
 var sprites: Texture2D
 var grounds: Dictionary = {}
 var prop_placements: Array[Dictionary] = []
+var lighting_enabled: bool = true
 var npc_idle_ticks: Dictionary = {}
 var camera: Camera2D
 var view_origin: Vector2 = Vector2.ZERO
@@ -177,6 +179,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	prop_placements.clear()
 	if SceneDefs.LAYERED.has(scene):
 		prop_placements = PropScene.placements(SceneDefs.layered_data(scene), PropScene.load_defs())
+	_update_lighting()
 	facing_left = snapshot.hero.facing.x < 0.0
 	previous_hero_position = snapshot.hero.position
 	bubbles.clear()
@@ -209,6 +212,10 @@ func _physics_process(_delta: float) -> void:
 		return
 	if Input.is_action_just_pressed("arena_debug"):
 		debug_enabled = not debug_enabled
+	if Input.is_action_just_pressed("debug_lighting_toggle"):
+		lighting_enabled = not lighting_enabled
+		_update_lighting()
+		queue_redraw()
 	for action: String in DEBUG_SCENES:
 		if Input.is_action_just_pressed(action):
 			jump_to(DEBUG_SCENES[action])
@@ -452,8 +459,9 @@ func _draw() -> void:
 		# All shadows lie on the floor, never on a lower-sorted prop or actor.
 		for item: Dictionary in items:
 			if item["kind"] == &"prop":
-				PropsLayer.draw_shadow(self, item, shadow_strength())
+				PropsLayer.draw_shadow(self, item, shadow_strength(), sprites)
 			else:
+				_draw_actor_cast(item)
 				ActorShadow.draw(self, item["at"], item["shadow"], shadow_strength())
 	for item: Dictionary in items:
 		_draw_item(item)
@@ -488,6 +496,15 @@ func _draw_item(item: Dictionary) -> void:
 	draw_texture_rect_region(sprites, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
 
 
+func _draw_actor_cast(item: Dictionary) -> void:
+	if not frames.has(item["frame"]):
+		return
+	var frame: Dictionary = frames[item["frame"]]
+	draw_set_transform_matrix(EnvironmentLight.actor_transform(item["at"], frame, bool(item["left"])))
+	draw_texture_rect_region(sprites, Rect2(Vector2.ZERO, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(0, 0, 0, 0.20))
+	draw_set_transform_matrix(Transform2D.IDENTITY)
+
+
 func shadow_strength() -> float:
 	var scene: StringName = snapshot.scene_id
 	if scene == &"village_layered":
@@ -495,6 +512,10 @@ func shadow_strength() -> float:
 	elif scene == &"glade_layered":
 		scene = &"glade"
 	return ActorShadow.strength_for(scene)
+
+
+func _update_lighting() -> void:
+	material = EnvironmentLight.make_material(snapshot.scene_id, snapshot.size, prop_placements) if lighting_enabled and SceneDefs.LAYERED.has(snapshot.scene_id) else null
 
 
 func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE) -> void:

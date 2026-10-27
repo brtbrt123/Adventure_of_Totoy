@@ -1,0 +1,9 @@
+{
+  "village_lamp_post": [{"pixel": [30.5, 39.0], "halo_radius": 28.0, "energy": 1.15, "pool_radius": 45.0, "pool_energy": 0.80}],
+  "village_east_tree": [{"pixel": [89.0, 84.5], "halo_radius": 25.0, "energy": 1.00, "pool_radius": 42.0, "pool_energy": 0.70}],
+  "village_forge": [{"pixel": [33.0, 55.0], "halo_radius": 30.0, "energy": 1.35, "pool_radius": 50.0, "pool_energy": 1.00}],
+  "village_cottage": [
+    {"pixel": [42.0, 44.0], "halo_radius": 24.0, "energy": 1.05, "pool_radius": 37.0, "pool_energy": 0.45},
+    {"pixel": [96.0, 74.0], "halo_radius": 27.0, "energy": 1.15, "pool_radius": 44.0, "pool_energy": 0.70}
+  ]
+}
