@@ -7,6 +7,9 @@ const ExploreCore := preload("res://core/explore_core.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
 const TrainingYard := preload("res://core/training_yard.gd")
 
+const Collision := preload("res://core/collision.gd")
+const Obstacle := preload("res://core/obstacle.gd")
+const ExploreBot := preload("res://tests/explore_bot.gd")
 const SCENES: Array[StringName] = [SceneDefs.VILLAGE, SceneDefs.VILLAGE_LAYERED]
 
 
@@ -252,3 +255,76 @@ func test_a_talk_still_freezes_the_hero_in_the_yard() -> void:
 		core.step(_frame(Vector2.ZERO, true))
 		assert_eq(core.player.position, at)
 		assert_eq(core.snapshot().hero.state, &"idle", "no swing while talking")
+
+
+# --- the post moved to open ground south of the forge (2026-10-27) ---
+
+const OLD_POST: Dictionary = {&"village": Vector2(328, 148), &"village_layered": Vector2(345, 118)}
+const NEW_POST: Dictionary = {&"village": Vector2(390, 212), &"village_layered": Vector2(380, 180)}
+
+
+func _object(scene: StringName) -> Dictionary:
+	for object: Dictionary in SceneDefs.get_def(scene)["objects"]:
+		if object["kind"] == &"dummy":
+			return object
+	return {}
+
+
+func test_the_post_stands_on_the_new_spot_in_both_villages() -> void:
+	for scene: StringName in SCENES:
+		var object: Dictionary = _object(scene)
+		assert_eq(object["position"], NEW_POST[scene], "%s: the post's feet" % scene)
+		assert_eq(object["stand"], NEW_POST[scene] + Vector2(0, 14 if scene == SceneDefs.VILLAGE else 16), "%s: the use spot in front" % scene)
+		var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(scene)
+		assert_false(Collision.fits(obstacles, NEW_POST[scene], 6.0), "%s: the post is solid where it stands" % scene)
+		assert_true(Collision.fits(obstacles, OLD_POST[scene], 6.0), "%s: nothing invisible is left at the old spot" % scene)
+		assert_true(Collision.fits(obstacles, object["stand"], 6.0), "%s: the hero can stand in front of it" % scene)
+
+
+func test_the_new_yard_is_roomy_and_reachable() -> void:
+	for scene: StringName in SCENES:
+		var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(scene)
+		var post: Vector2 = NEW_POST[scene]
+		var free: int = 0
+		for i: int in 32:
+			var at: Vector2 = post + Vector2.RIGHT.rotated(TAU * i / 32.0) * 44.0
+			if Collision.fits(obstacles, at, 6.0):
+				free += 1
+		assert_eq(free, 32, "%s: all 32 samples on a 44 px ring round the post are free" % scene)
+		# the hero walks there from the arrival and on to the east exit
+		var core: ExploreCore = ExploreCore.new(scene)
+		var bot: ExploreBot = ExploreBot.new()
+		assert_true(bot.plan(core.size, core.obstacles, core.player.position, _object(scene)["stand"]), "%s: a route to the post's stand point" % scene)
+		var exit_rect: Rect2 = Rect2()
+		for exit: Dictionary in core.def["exits"]:
+			exit_rect = exit["rect"]
+		assert_true(ExploreBot.new().plan(core.size, core.obstacles, _object(scene)["stand"], Vector2.ZERO, exit_rect), "%s: and from the post to the forest exit" % scene)
+
+
+func test_the_whole_yard_can_be_fought_in_without_blocking_the_roads() -> void:
+	for scene: StringName in SCENES:
+		var core: ExploreCore = ExploreCore.new(scene)
+		var post: Vector2 = NEW_POST[scene]
+		# every cell of the yard disc that is free is reachable from the stand point (no sealed pockets)
+		var start: Vector2i = Vector2i(_object(scene)["stand"])
+		var seen: Dictionary = {start: true}
+		var queue: Array[Vector2i] = [start]
+		var head: int = 0
+		var free_cells: int = 0
+		var step: int = 4
+		for x: int in range(-100, 101, step):
+			for y: int in range(-100, 101, step):
+				var c: Vector2 = post + Vector2(x, y)
+				if c.distance_to(post) <= TrainingYard.YARD_RADIUS and Collision.fits(core.obstacles, c, 6.0):
+					free_cells += 1
+		while head < queue.size():
+			var cell: Vector2i = queue[head]
+			head += 1
+			for d: Vector2i in [Vector2i(step, 0), Vector2i(-step, 0), Vector2i(0, step), Vector2i(0, -step)]:
+				var n: Vector2i = cell + d
+				if seen.has(n) or Vector2(n).distance_to(post) > TrainingYard.YARD_RADIUS or not Collision.fits(core.obstacles, Vector2(n), 6.0):
+					continue
+				seen[n] = true
+				queue.append(n)
+		assert_true(float(seen.size()) / float(free_cells) >= 0.95, "%s: %d of %d free yard cells reachable" % [scene, seen.size(), free_cells])
+		print("yard %s: %d free cells of the disc, %.0f %% reachable" % [scene, free_cells, 100.0 * seen.size() / free_cells])

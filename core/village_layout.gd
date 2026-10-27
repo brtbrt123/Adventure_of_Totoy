@@ -55,8 +55,10 @@ const STAND_POINTS: Dictionary = {
 	&"chest": Vector2(112.0, 246.0),  # on the west lawn between the stone slab and the rubble
 }
 
-## The painted training post in the forge yard (its feet; it is solid, see SOLIDS_1X): Totoy tests the sword on it.
-const TRAINING_DUMMY: Vector2 = Vector2(328.0, 148.0)
+## The training post (its feet; it is solid, see SOLIDS_1X): Totoy tests the sword on it. Moved on 2026-10-27 from the forge yard (328,148)
+## to the open ground south of the forge (the owner found the old spot cramped): the painted ground must have its old post erased and
+## the post drawn here as an object (docs/CODEX_TASK_training_yard_move.md).
+const TRAINING_DUMMY: Vector2 = Vector2(390.0, 212.0)
 ## Edda's house door (its threshold, the interaction's feet): solid since the human's playtest (2026-10-22, "why can I
 ## walk ... on the door"); the hero knocks from STAND_POINTS[&"edda_door"] in front of it.
 const EDDA_DOOR: Vector2 = Vector2(435.0, 150.0)
@@ -78,7 +80,7 @@ const STAND_POINTS_1X: Dictionary = {
 	&"villager_worker": Vector2(482.0, 336.0),
 	&"chest": Vector2(160.0, 352.0),
 }
-const TRAINING_DUMMY_1X: Vector2 = Vector2(468.0, 212.0)
+const TRAINING_DUMMY_1X: Vector2 = Vector2(557.0, 303.0)
 const EDDA_DOOR_1X: Vector2 = Vector2(621.0, 214.0)
 
 ## The walkable clearing's outline, clockwise (screen coordinates): the circles go on the outer side of each edge.
@@ -113,7 +115,7 @@ const SOLIDS_1X: Array = [
 	["forge", 414, 140, 12.0], ["forge", 438, 140, 12.0], ["forge", 426, 120, 14.0],
 	["anvil", 434, 166, 8.0],
 	["workbench", 478, 140, 9.0], ["workbench", 498, 140, 9.0], ["workbench", 516, 138, 8.0],
-	["training dummy", 468, 209, 5.0],
+	["training dummy", 557, 300, 5.0],
 	["barrel", 526, 186, 12.0],
 	["shelf", 574, 202, 11.0], ["shelf", 586, 205, 9.0],
 	# Edda's house: the front wall right of the doorway and the side wall (the roof and body sit behind the boundary)

@@ -26,7 +26,7 @@ const FOOTPRINTS: Array = [
 	[&"village", "gate door leaf", Rect2(131, 166, 13, 8)],
 	[&"village", "gate pillar (left)", Rect2(92, 182, 14, 8)],
 	[&"village", "gate pillar (right)", Rect2(149, 164, 12, 8)],
-	[&"village", "training post", Rect2(325, 141, 6, 7)],
+	[&"village", "training post", Rect2(387, 205, 6, 7)],
 	[&"village", "shrine", Rect2(136, 282, 14, 12)],
 	[&"village", "lamp post", Rect2(198, 299, 4, 4)],
 	# the forest route: the closed root gate across the path, both lantern pedestals, the signpost, the mossy stone

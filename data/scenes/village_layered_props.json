@@ -229,12 +229,12 @@
    "id": "training_dummy",
    "kind": "dummy",
    "position": [
-    345,
-    118
+    380,
+    180
    ],
    "stand": [
-    345,
-    134
+    380,
+    196
    ]
   }
  ],
@@ -290,8 +290,8 @@
   {
    "id": "dummy",
    "type": "village_dummy",
-   "x": 345,
-   "y": 118,
+   "x": 380,
+   "y": 180,
    "flip": false,
    "shadow_radius": 6
   },

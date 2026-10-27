@@ -204,8 +204,45 @@ def to_image(grid: list[list[str]]) -> Image.Image:
     return out
 
 
-def build(scale: float = DEFAULT_SCALE) -> Image.Image:
-    return to_image(cleanup(snap_image(prepare(Image.open(SOURCE), size_for(scale)))))
+# The painted training post of the first layout (feet 468,212 on the 816x480 painting): its body, arms and ground shadow
+# fit this rectangle (x0, y0, x1, y1 at scale 1.0). The post moved on 2026-10-27 (core/village_layout.gd TRAINING_DUMMY),
+# so the opt-in --erase-old-dummy replaces these pixels with the dirt around them.
+OLD_DUMMY_1X = (446, 161, 493, 226)
+ERASE_SEED = 20261027
+# the three dirt browns of the forge yard (the base, the pinker patches and the darker mottling)
+YARD_DIRT_RGB = {(118, 95, 71), (143, 95, 76), (98, 69, 61)}
+
+
+def erase_old_dummy(grid: list[list[str]], scale: float) -> list[list[str]]:
+    """Fills OLD_DUMMY_1X (scaled) with forge-yard dirt: 2x2 blocks that take the dirt symbols (the three dirt browns of the
+    yard, never the shadow, grass or anvil next to it) of the pixels within 4 px outside the rectangle, nearer ones likelier.
+    A fixed seed keeps the speckle natural and the result identical every run."""
+    import random
+
+    rng = random.Random(ERASE_SEED)
+    x0, y0, x1, y1 = (round(v * scale) for v in OLD_DUMMY_1X)
+    dirt = {sym for sym, rgb in palette.by_symbol.items() if rgb in YARD_DIRT_RGB}
+    out = [row[:] for row in grid]
+    for by in range(y0, y1, 2):
+        for bx in range(x0, x1, 2):
+            picks: list[tuple[str, float]] = []
+            for k in range(1, 5):
+                for sym, d in ((grid[by][x0 - k], bx - (x0 - k)), (grid[by][x1 + k - 1], (x1 + k - 1) - bx),
+                               (grid[y0 - k][bx], by - (y0 - k)), (grid[y1 + k - 1][bx], (y1 + k - 1) - by)):
+                    if sym in dirt:
+                        picks.append((sym, 1.0 / max(d, 1) ** 2))
+            sym = rng.choices([c for c, _w in picks], weights=[w for _c, w in picks])[0] if picks else "m"
+            for y in range(by, min(by + 2, y1)):
+                for x in range(bx, min(bx + 2, x1)):
+                    out[y][x] = sym
+    return out
+
+
+def build(scale: float = DEFAULT_SCALE, erase_dummy: bool = False) -> Image.Image:
+    grid = cleanup(snap_image(prepare(Image.open(SOURCE), size_for(scale))))
+    if erase_dummy:
+        grid = erase_old_dummy(grid, scale)
+    return to_image(grid)
 
 
 def check(img: Image.Image, scale: float = DEFAULT_SCALE) -> list[str]:
@@ -228,6 +265,8 @@ def main() -> int:
                         "village_ground_sNNN.png next to it otherwise)")
     parser.add_argument("--scale", type=float, default=DEFAULT_SCALE,
                         help="village scale relative to 816x480 (default 0.7 = 571x336)")
+    parser.add_argument("--erase-old-dummy", action="store_true",
+                        help="paint the old training post out of the ground (it moved, see OLD_DUMMY_1X); the default output stays reproducible without it")
     args = parser.parse_args()
     if not SOURCE.exists():
         print("missing", SOURCE)
@@ -235,7 +274,7 @@ def main() -> int:
     if not 0.25 <= args.scale <= 2.0:
         print("--scale must be between 0.25 and 2.0")
         return 1
-    out = build(args.scale)
+    out = build(args.scale, args.erase_old_dummy)
     problems = check(out, args.scale)
     if problems:
         for p in problems:
