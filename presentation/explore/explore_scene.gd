@@ -307,7 +307,7 @@ func _on_event(event: GameEvent) -> void:
 			if event.data["kind"] == &"npc" and snapshot.dialogue.is_empty():
 				bubbles[event.data["target_id"]] = BUBBLE_TICKS
 		GameEvent.ITEM_RECEIVED:
-			var icons: Dictionary = {&"black_katana": "ui_weapon_sword_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
+			var icons: Dictionary = {&"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
 			show_reward({"kind": event.data["kind"], "name": event.data["name"], "quantity": event.data["quantity"], "icon": icons.get(StringName(event.data["item_id"]), "")})
 		GameEvent.FLAG_SET, GameEvent.DIALOGUE_ENDED:
 			_save_progress(core.scene_id, core.last_checkpoint)

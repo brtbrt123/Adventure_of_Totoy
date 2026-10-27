@@ -61,7 +61,7 @@ func run() -> void:
 			expect(scene.snapshot.armed and Store.load_profile().story_flags.has(&"received_first_sword"), "handover saved")
 			expect(scene.reward_popup.pending.size() == 1, "one handover receipt, finished or skipped")
 			if not scene.reward_popup.pending.is_empty():
-				expect(scene.reward_popup.pending[0]["icon"] == "ui_weapon_sword_1" and scene.reward_popup.pending[0]["quantity"] == 1, "weapon icon and quantity from event")
+				expect(scene.reward_popup.pending[0]["icon"] == "ui_weapon_totoy_blade_1" and scene.reward_popup.pending[0]["quantity"] == 1, "weapon icon and quantity from event")
 			scene.reward_popup.advance(0)
 			expect(scene.reward_popup.receipt.get("name", "") == "Black Katana", "receipt displayed")
 			scene.reward_popup.advance(4)
