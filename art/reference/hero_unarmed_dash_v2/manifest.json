@@ -1,0 +1,38 @@
+{
+  "status": "approved_installed",
+  "generator": "built-in imagegen",
+  "reference": "art/reference/hero_unarmed_v1/unarmed_sheet_raw.png",
+  "request": "Replace running-cycle dash with a single push-off, streamlined forward glide, planted braking and recovery; same character/outfit, empty hands, no weapon.",
+  "scale": 0.08,
+  "hip_roots_source_x": [
+    260,
+    728,
+    1205,
+    319,
+    760,
+    1286
+  ],
+  "ground_source_y": [
+    477,
+    477,
+    477,
+    944,
+    944,
+    944
+  ],
+  "alpha_threshold_source": 248,
+  "alpha_threshold_scaled": 128,
+  "palette": "Totoy36 excluding reserved combat colors",
+  "canvas": [
+    56,
+    40
+  ],
+  "anchor": [
+    28,
+    35
+  ],
+  "runtime_timing": "unchanged; six active ticks. GIF deliberately slowed for pose review.",
+  "unchanged": "Idle/walk/armed frames and all gameplay; replaces only the six unarmed dash frames.",
+  "approved": "2026-10-27",
+  "approval": "yes i approved"
+}

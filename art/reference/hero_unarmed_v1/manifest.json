@@ -24,5 +24,6 @@
   "palette_contact": "unarmed_contact_6x.png",
   "motion_preview": "unarmed_motion_preview.gif (100ms per frame, review timing only)",
   "approved": "2026-10-27",
-  "approval": "yes i approved to the unamed hero sheet"
+  "approval": "yes i approved to the unamed hero sheet",
+  "dash_revision": "Six dash poses superseded by approved hero_unarmed_dash_v2 (56x40,anchor28,35). Idle/walk remain v1 (40x40,anchor20,35)."
 }

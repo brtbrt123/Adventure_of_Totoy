@@ -67,6 +67,9 @@ func run() -> void:
 					var key: String = Explore.hero_frame_for(hero, false)
 					expect(scene.frames.has(key) and key.begins_with("totoy_unarmed_"), "unarmed animation frame exists")
 					seen[key] = true
+					if state == &"dash":
+						var art: Dictionary = scene.frames[key]
+						expect(int(art["w"]) == 56 and int(art["h"]) == 40 and int(art["ax"]) == 28 and int(art["ay"]) == 35, "revised dash retains its fixed root/ground anchor")
 				expect(seen.size() == 6, "six unarmed frames per state")
 			var move: Intent = Intent.new()
 			move.move = Vector2.RIGHT

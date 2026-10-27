@@ -1,0 +1,5 @@
+# Approved unarmed dash v2 — 2026-10-27
+
+Owner approved the revised push-off / streamlined glide / recovery poses and slow motion preview. Replaced only art/src/totoy_unarmed_dash_right_1..6.txt with normalized v2 review grids. Frame canvas56x40 and anchor28,35 preserve stable hip/ground alignment, while v1 idle/walk stay40x40 and anchor20,35. Existing per-frame anchored drawing supports the differing widths. No idle/walk/armed source or gameplay timing change: dash still follows the six core ticks.
+
+Art validate/build/preview and Godot editor import passed. Expanded first-sword receipt smoke (all six anchors) and animation smoke passed. Windowed runtime capture verified all six poses in order and the return to idle. Full harness passed Python suites, Godot import, core tests and every smoke suite; log art/build/arena_dash_v2_full_regression.log (ignored). The source GIF is deliberately slowed; runtime motion/feel remains for human playtest. Architecture edit and chapter plan are preserved. No core/data/tools edits.
