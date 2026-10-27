@@ -10,9 +10,12 @@ extends RefCounted
 ##   glade                 root arch                           -> arena   "start"      (the Colossus fight)
 ##   arena                 no exits (the fight's victory screen returns to the title)
 ##
-## glade_layered and village_layered (the Stag glade and Lanternfen as layered scenes: one floor painting + separate prop
-## sprites, data/scenes/<id>_props.json read through core/prop_scene.gd) are extra scenes, not in IDS, until the human
-## switches the game over from the painted ones: forest -> glade and forest -> village stay the painted ones.
+## village_layered, forest_layered and glade_layered (Lanternfen, the forest route and the Stag glade as layered scenes: one
+## floor painting + separate prop sprites, data/scenes/<id>_props.json read through core/prop_scene.gd) are the OFFICIAL
+## chapter maps since 2026-10-27 (the owner's decision): a new game starts in village_layered and the layered exits lead
+## to each other (village_layered -> forest_layered -> glade_layered -> arena and back). The painted village, forest and
+## glade stay in IDS and as debug jumps until they are retired; `migrate_legacy` maps a saved painted scene or checkpoint
+## to its layered twin (SaveProfile.from_dict applies it), so a painted id never has to be resumed.
 ## glade_layered has the same two exits (forest "north", arena "start"), entry "entrance", checkpoint
 ## "glade_layered_entrance". village_layered has the east exit (forest "village_side"), entries "arrival" (inside the
 ## rune gate) and "return" (from the forest), checkpoint "village_layered_gate", the six NPCs and the chest / door /
@@ -46,7 +49,7 @@ const LAYERED_PATHS: Dictionary = {
 }
 
 ## Where a new game starts.
-const START_SCENE: StringName = VILLAGE
+const START_SCENE: StringName = VILLAGE_LAYERED
 const START_ENTRY: StringName = &"arrival"
 
 ## Body radius of an NPC and of the village chest as solid circles (people stand still; the hero walks round them).
@@ -132,6 +135,29 @@ static func get_def(scene_id: StringName) -> Dictionary:
 				"npcs": [], "objects": [],
 			}
 	return {}
+
+
+## The layered twin of each painted scene, and of each painted checkpoint (ids of saves written before the migration).
+const LEGACY_SCENES: Dictionary = {VILLAGE: VILLAGE_LAYERED, FOREST: FOREST_LAYERED, GLADE: GLADE_LAYERED}
+const LEGACY_CHECKPOINTS: Dictionary = {
+	&"village_gate": &"village_layered_gate",
+	&"forest_entrance": &"forest_layered_entrance",
+	&"forest_puzzle": &"forest_layered_puzzle",
+	&"glade_entrance": &"glade_layered_entrance",
+}
+
+
+## A saved scene and checkpoint moved to the layered maps: a painted scene becomes its layered twin and a painted
+## checkpoint its layered one (never the painted coordinates); any other id (layered, arena, unknown) is returned unchanged.
+## A painted checkpoint that does not belong to the saved scene is dropped (the scene's default entry is used).
+static func migrate_legacy(scene_id: StringName, checkpoint_id: StringName) -> Dictionary:
+	if not LEGACY_SCENES.has(scene_id):
+		return {"scene": scene_id, "checkpoint": checkpoint_id}
+	var twin: StringName = LEGACY_SCENES[scene_id]
+	var moved: StringName = LEGACY_CHECKPOINTS.get(checkpoint_id, &"")
+	if moved == &"" or checkpoint(twin, moved).is_empty():
+		moved = &""
+	return {"scene": twin, "checkpoint": moved}
 
 
 static func is_known(scene_id: StringName) -> bool:

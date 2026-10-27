@@ -161,11 +161,11 @@ func test_the_environment_variable_redirects_the_default_path() -> void:
 func test_chapter_progress_round_trips() -> void:
 	var p: SaveProfile = SaveProfile.new()
 	assert_false(p.has_progress(), "a new profile has nothing to continue")
-	p.record_scene(&"forest", &"forest_puzzle")
+	p.record_scene(&"forest_layered", &"forest_layered_puzzle")
 	p.gate_open = true
 	var back: SaveProfile = SaveProfile.from_json(p.to_json()) as SaveProfile
-	assert_eq(back.scene_id, &"forest")
-	assert_eq(back.checkpoint_id, &"forest_puzzle")
+	assert_eq(back.scene_id, &"forest_layered")
+	assert_eq(back.checkpoint_id, &"forest_layered_puzzle")
 	assert_true(back.gate_open)
 	assert_true(back.has_progress())
 	assert_eq(back.to_json(), p.to_json(), "stable output")
@@ -188,9 +188,10 @@ func test_old_saves_without_chapter_fields_still_load() -> void:
 func test_bad_chapter_fields_are_cleaned() -> void:
 	var cases: Array = [
 		["{\"version\": 1, \"scene_id\": \"moon\", \"checkpoint_id\": \"village_gate\", \"gate_open\": \"yes\"}", &"", &"", false],
-		["{\"version\": 1, \"scene_id\": \"village\", \"checkpoint_id\": \"forest_puzzle\", \"gate_open\": 1}", &"village", &"", false],
+		["{\"version\": 1, \"scene_id\": \"village_layered\", \"checkpoint_id\": \"forest_layered_puzzle\", \"gate_open\": 1}", &"village_layered", &"", false],
+		["{\"version\": 1, \"scene_id\": \"village\", \"checkpoint_id\": \"forest_puzzle\", \"gate_open\": 1}", &"village_layered", &"", false],
 		["{\"version\": 1, \"scene_id\": 5, \"checkpoint_id\": null}", &"", &"", false],
-		["{\"version\": 1, \"scene_id\": \"glade\", \"checkpoint_id\": \"glade_entrance\", \"gate_open\": true}", &"glade", &"glade_entrance", true],
+		["{\"version\": 1, \"scene_id\": \"glade_layered\", \"checkpoint_id\": \"glade_layered_entrance\", \"gate_open\": true}", &"glade_layered", &"glade_layered_entrance", true],
 	]
 	for c: Array in cases:
 		var p: SaveProfile = SaveProfile.from_json(c[0]) as SaveProfile
@@ -203,9 +204,9 @@ func test_bad_chapter_fields_are_cleaned() -> void:
 func test_the_store_keeps_the_chapter_progress() -> void:
 	_clean()
 	var p: SaveProfile = SaveProfile.new()
-	p.record_scene(&"glade", &"glade_entrance")
+	p.record_scene(&"glade_layered", &"glade_layered_entrance")
 	assert_eq(SaveStore.save(p, PATH), OK)
 	var back: SaveProfile = SaveStore.load_profile(PATH)
-	assert_eq(back.scene_id, &"glade")
-	assert_eq(back.checkpoint_id, &"glade_entrance")
+	assert_eq(back.scene_id, &"glade_layered")
+	assert_eq(back.checkpoint_id, &"glade_layered_entrance")
 	_clean()

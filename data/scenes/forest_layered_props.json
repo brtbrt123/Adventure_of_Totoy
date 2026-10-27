@@ -147,7 +147,7 @@
     7,
     40
    ],
-   "target_scene": "village",
+   "target_scene": "village_layered",
    "target_entry": "return"
   },
   {
@@ -158,7 +158,7 @@
     44,
     9
    ],
-   "target_scene": "glade",
+   "target_scene": "glade_layered",
    "target_entry": "entrance"
   }
  ],

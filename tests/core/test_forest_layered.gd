@@ -79,7 +79,7 @@ func test_the_data_is_valid_and_every_type_is_classified() -> void:
 	for type_id: String in DECOR_TYPES:
 		assert_false(bool(_defs["props"][type_id]["solid"]), "%s is walk-through decor" % type_id)
 	assert_eq(SceneDefs.get_def(SCENE)["size"], Vector2(480, 288), "the forest's size")
-	assert_true(SceneDefs.is_known(SCENE) and not (SCENE in SceneDefs.IDS), "known, but not in the painted chapter's IDS")
+	assert_true(SceneDefs.is_known(SCENE) and not (SCENE in SceneDefs.IDS), "known, but not in the painted IDS (the painted forest is the retired twin)")
 
 
 func test_the_two_states_stand_in_one_place() -> void:
@@ -144,7 +144,7 @@ func test_the_scene_def_has_the_puzzle_and_the_route() -> void:
 	var targets: Array = []
 	for e: Dictionary in def["exits"]:
 		targets.append("%s>%s/%s" % [e["id"], e["target_scene"], e["target_entry"]])
-	assert_eq(targets, ["to_village>village/return", "to_glade>glade/entrance"], "the same exits as the painted forest")
+	assert_eq(targets, ["to_village>village_layered/return", "to_glade>glade_layered/entrance"], "the same exits as the painted forest, to the layered neighbours")
 	assert_eq(SceneDefs.scene_of_checkpoint(&"forest_layered_puzzle"), SCENE, "the checkpoints belong to the scene")
 	assert_false(SceneDefs.get_def(SceneDefs.FOREST).has("puzzle"), "the painted forest has no puzzle: its pedestals do nothing")
 

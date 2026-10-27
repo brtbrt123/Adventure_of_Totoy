@@ -112,7 +112,8 @@ static func from_dict(data: Dictionary) -> Object:
 			profile.equipped_aspects.append(StringName(value))
 	var scene: Variant = data.get("scene_id", "")
 	var checkpoint: Variant = data.get("checkpoint_id", "")
-	profile.record_scene(StringName(scene) if scene is String else &"", StringName(checkpoint) if checkpoint is String else &"")
+	var moved: Dictionary = SceneDefs.migrate_legacy(StringName(scene) if scene is String else &"", StringName(checkpoint) if checkpoint is String else &"")  # a save from the painted maps resumes on the layered ones
+	profile.record_scene(moved["scene"], moved["checkpoint"])
 	var gate: Variant = data.get("gate_open", false)
 	profile.gate_open = gate if gate is bool else false
 	var flags: Variant = data.get("story_flags", [])

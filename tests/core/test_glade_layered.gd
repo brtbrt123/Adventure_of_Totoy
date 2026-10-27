@@ -115,7 +115,7 @@ func test_scene_def_and_obstacles() -> void:
 	assert_eq(def["size"], Vector2(560, 336), "the ground's size")
 	assert_true(def["entries"].has(def["default_entry"]), "default entry exists")
 	assert_true(SceneDefs.is_known(SCENE), "known to the scene table")
-	assert_false(SCENE in SceneDefs.IDS, "not in the painted chapter's IDS (the switch is the human's)")
+	assert_false(SCENE in SceneDefs.IDS, "not in the painted IDS (the painted glade is the retired twin)")
 	var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(SCENE)
 	assert_true(obstacles.size() > 60, "edge chain and prop circles (%d)" % obstacles.size())
 	var ids: Dictionary = {}
