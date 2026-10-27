@@ -51,6 +51,10 @@ func _catalog() -> void:
 		for other: int in range(slot):
 			_expect(sockets[slot].get_center().distance_to(sockets[other].get_center()) >= (sockets[slot].size.x + sockets[other].size.x) * 0.5, "overlapping medallion frames")
 	_expect(sockets[3].size == sockets[0].size * 2, "weapon icon must be larger than Aspects")
+	_expect(sockets[3].position.x < 54, "weapon stays left of the bottom meters")
+	for slot: int in range(3):
+		_expect(sockets[slot].position.y == 147 and sockets[slot].position.x >= 174, "Aspects align beside bottom meters")
+
 	_expect(arena.frames.has("totoy_portrait"), "portrait absent from atlas")
 	_expect(arena.frames.has("ui_profile"), "profile frame absent from atlas")
 	_expect(not arena.hud.profile_frame.is_empty(), "HUD frame not connected")

@@ -25,7 +25,7 @@ const MEDALLIONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: DAGGER_MEDALLION, Tun
 ## Active slot icons by weapon (the katana's buff has none: its box only).
 const FORM_ICONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: LIGHTNING_FORM_ICON, Tuning.WEAPON_CHAIN_SCYTHE: REAPER_COIL_ICON}
 static func form_icon_rect() -> Rect2:
-	return Rect2(154, 151, 24, 24)
+	return Rect2(58, 115, 24, 24)
 var counter_max: int = 1
 ## Tests and captures: draw this Aspect socket's (0-2) hover tooltip as if the mouse were on it; -1 = off.
 var hint_slot_override: int = -1
@@ -311,22 +311,30 @@ func _draw_result() -> void:
 
 ## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
-	prepare_portrait()
-	# Quiet teal metalwork ties the persistent HUD to the approved reward cards.
-	UiPanel.draw_panel(self, Rect2(7, 7, 112, 35), &"info", colors, false)
-	# Leave the portrait aperture open: its smooth sprite renders behind this node.
-	draw_circle(PORTRAIT_CENTER, 15.0, colors["t"])
-	draw_circle(PORTRAIT_CENTER, 14.0, colors["0"])
 	if portrait_sprite != null:
-		portrait_sprite.show_behind_parent = false
-	lettering(Vector2(44, 11), "TOTOY", colors["1"], 1, menu_font(), 7)
+		portrait_sprite.hide()
+	# Bottom-left combat strip, following the owner's sketch. No portrait.
+	UiPanel.draw_panel(self, Rect2(54, 140, 112, 37), &"info", colors, false)
 	var hp: String = "%d / %d" % [h.player_hp, h.player_max_hp]
-	lettering(Vector2(113 - text_width(hp, 1, stat_font(), 7), 11), hp, colors["u"], 1, stat_font(), 7)
-	bar(Vector2(44, 21), 69, h.player_hp, h.player_max_hp, colors["t"], 5, float(health_ghosts.get("player", h.player_hp)))
-	ui("ui_icon_edge_1", Rect2(42, 28, 6, 6))
-	bar(Vector2(50, 30), 63, h.edge, h.edge_max, colors["v"], 2)
-	ui("ui_icon_dash_1", Rect2(42, 34, 6, 6))
-	bar(Vector2(50, 36), 63, dash_fraction(h), 1.0, colors["n"], 2)
+	lettering(Vector2(60, 145), "HEALTH", colors["u"], 1, null, 7)
+	lettering(Vector2(159 - text_width(hp, 1, stat_font(), 7), 145), hp, colors["1"], 1, stat_font(), 7)
+	bar(Vector2(60, 153), 100, h.player_hp, h.player_max_hp, colors["t"], 5, float(health_ghosts.get("player", h.player_hp)))
+	ui("ui_icon_edge_1", Rect2(58, 160, 6, 6))
+	bar(Vector2(67, 162), 86, h.edge, h.edge_max, colors["v"], 3)
+	ui("ui_icon_dash_1", Rect2(58, 168, 6, 6))
+	bar(Vector2(67, 170), 70, dash_fraction(h), 1.0, colors["n"], 2)
+	_draw_status_icons(h)
+
+## Only active states exposed by the core appear here; no invented debuff rules.
+func _draw_status_icons(h: Snapshots.HudSnapshot) -> void:
+	var index: int = 0
+	for row: Dictionary in skill_rows(h, snapshot.tick):
+		if not bool(row["running"]):
+			continue
+		var rect: Rect2 = Rect2(88 + index * 22, 119, 18, 18)
+		UiPanel.draw_panel(self, rect.grow(1), &"info", colors, false)
+		ui(row["icon"], rect)
+		index += 1
 
 func ui(key: String, rect: Rect2) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
@@ -410,13 +418,13 @@ static func skill_rows(h: Snapshots.HudSnapshot, tick: int = 0) -> Array[Diction
 	return rows
 
 
-## The owner's layout: three small Aspect sockets climbing around a larger weapon socket.
+## The owner's layout: three small Aspect sockets beside the bottom health strip.
 ## Native sprite sizes keep the new HUD at integer scale.
 static func aspect_rects() -> Array[Rect2]:
-	return [Rect2(241, 147, 24, 24), Rect2(253, 116, 24, 24), Rect2(284, 100, 24, 24)]
+	return [Rect2(174, 147, 24, 24), Rect2(206, 147, 24, 24), Rect2(238, 147, 24, 24)]
 
 static func weapon_rect() -> Rect2:
-	return Rect2(269, 130, 48, 48)
+	return Rect2(4, 130, 48, 48)
 
 ## The cooldown ring's fill (1 = just used) of a skill row.
 static func cooldown_fraction(row: Dictionary) -> float:
@@ -484,7 +492,7 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 		for slot: int in range(3):
 			if not bool(rows[slot]["needs_retaliation"]):
 				continue
-			outlined(Vector2(216, 91), "%s %s READY" % [rows[slot]["key"], rows[slot]["name"]], colors["x"], colors["0"], 1, stat_font())
+			outlined(Vector2(174, 136), "%s %s READY" % [rows[slot]["key"], rows[slot]["name"]], colors["x"], colors["0"], 1, stat_font())
 			var ring: PackedVector2Array = PackedVector2Array()
 			for point: int in range(33):
 				ring.append((sockets[slot].get_center() + Vector2.from_angle(TAU * point / 32.0) * 12.0).round())
@@ -495,7 +503,7 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 ## The skill hover tooltip in the shared frame (info theme): the key in a badge, the slotted Aspect's name, a divider,
 ## its Edge cost, its icon on the right. No cooldown text (the icon's ring shows it).
 static func aspect_hint_rect() -> Rect2:
-	return Rect2(156, 60, 160, 34)
+	return Rect2(150, 100, 160, 34)
 
 func _draw_aspect_hint(row: Dictionary) -> void:
 	var rect: Rect2 = aspect_hint_rect()
