@@ -15,8 +15,10 @@ extends RefCounted
 ##                 "shadow_radius"? (presentation's ground shadow, passed through)}],
 ##      and, for a scene the player walks through (SceneDefs.get_def / ExploreCore): "name", "ground" (the floor
 ##      painting, a res:// path), "entries": {id: [x, y]}, "default_entry", "exits": [{id, rect [x, y, w, h],
-##      target_scene, target_entry}], "checkpoints": [{id, position}], and for the Stag fight room "stag_start",
-##      "stag_radius", "fight_area" [x, y, w, h]}
+##      target_scene, target_entry}], "checkpoints": [{id, position}], "npcs": [{id, visual, position (where the person
+##      stands), face_left}], "objects": [{id, kind (chest, door, dummy, ...), position (its feet), stand (where the hero
+##      uses it from, in front)}] (the props that are interactable stay ordinary props; the object row says how to use
+##      them), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
 ##
 ## No sprites are loaded here (the core stays headless): sizes and colliders are numbers in the files.
 const Obstacle := preload("res://core/obstacle.gd")
@@ -117,9 +119,19 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 	for row: Variant in scene.get("checkpoints", []):
 		var c: Dictionary = row
 		checkpoints.append({"id": StringName(str(c["id"])), "position": _vec(c["position"])})
+	var npcs: Array = []
+	for row: Variant in scene.get("npcs", []):
+		var n: Dictionary = row
+		npcs.append({"id": StringName(str(n["id"])), "visual": StringName(str(n["visual"])), "position": _vec(n["position"]),
+			"face_left": bool(n.get("face_left", false))})
+	var objects: Array = []
+	for row: Variant in scene.get("objects", []):
+		var o: Dictionary = row
+		objects.append({"id": StringName(str(o["id"])), "kind": StringName(str(o["kind"])), "position": _vec(o["position"]),
+			"stand": _vec(o["stand"])})
 	return {"id": id, "name": str(scene.get("name", "")), "size": size(scene), "margin": margin, "entries": entries,
 		"default_entry": StringName(str(scene.get("default_entry", ""))), "exits": exits, "checkpoints": checkpoints,
-		"npcs": [], "objects": []}
+		"npcs": npcs, "objects": objects}
 
 
 ## The Stag fight room: {start (Vector2), radius, area (Rect2)}; empty when the scene has none.
@@ -174,6 +186,21 @@ static func validate(scene: Dictionary, defs: Dictionary) -> PackedStringArray:
 				errors.append("type %s: collider needs [dx, dy <= 0, r > 0]" % type_id)
 		if bool(def.get("solid", false)) and def.get("colliders", []).is_empty():
 			errors.append("type %s: solid without colliders" % type_id)
+	var people: Dictionary = {}
+	for row: Variant in scene.get("npcs", []):
+		var n: Dictionary = row
+		var who: String = str(n.get("id", ""))
+		var at: Vector2 = _vec(n.get("position", [-1, -1]))
+		if who.is_empty() or people.has(who) or at.x < 0.0 or at.y < 0.0 or at.x > world.x or at.y > world.y:
+			errors.append("npc '%s' is empty, duplicated or outside the world" % who)
+		people[who] = true
+	var things: Dictionary = {}
+	for row: Variant in scene.get("objects", []):
+		var o: Dictionary = row
+		var what: String = str(o.get("id", ""))
+		if what.is_empty() or things.has(what) or not o.has("stand") or not o.has("position"):
+			errors.append("object '%s' is empty, duplicated or lacks position/stand" % what)
+		things[what] = true
 	var seen: Dictionary = {}
 	for row: Variant in scene.get("props", []):
 		var p: Dictionary = row

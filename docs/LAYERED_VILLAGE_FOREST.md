@@ -2,7 +2,7 @@
 
 The Stag glade proved the layered method (floor painting + separate prop sprites: depth order and collision come from each prop, see `docs/LAYERED_SCENE_PILOT.md`, `docs/architecture.md` "Layered scenes"). The human decided to redo the **village (Lanternfen)** and the **forest route** the same way, because their flat paintings cannot be fixed completely: the occluder cut-outs hold floor pixels and some colliders do not match the art.
 
-Order: **village first** (worst case), then the forest. Each scene is one chat with the image generator so the style stays consistent; give it the painted target as a style reference (`art/reference/lanternfen_village_target.png`, `art/reference/forest_route_target.png`) AND the glade's approved result (`art/reference/layered_pilot/glade_full.png` in `review/`) so the new scenes match the glade.
+**Status 2026-10-27:** the village sources are approved, extracted and in the core (`village_layered`, see `docs/STATUS.md` newest entry); the forest is next. Order: **village first** (worst case), then the forest. Each scene is one chat with the image generator so the style stays consistent; give it the painted target as a style reference (`art/reference/lanternfen_village_target.png`, `art/reference/forest_route_target.png`) AND the glade's approved result (`art/reference/layered_pilot/glade_full.png` in `review/`) so the new scenes match the glade.
 
 ## Who does what
 

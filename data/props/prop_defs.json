@@ -1,8 +1,1036 @@
 {
  "version": 1,
- "sheet": "glade_props_sheet.png",
- "scale": 0.24707,
+ "sheet": "village_props_b.png",
+ "scale": 0.19584,
  "props": {
+  "village_dummy": {
+   "w": 28,
+   "h": 38,
+   "anchor": [
+    13.5,
+    38
+   ],
+   "base_width": 7,
+   "solid": true,
+   "colliders": [
+    [
+     0,
+     -3,
+     4
+    ]
+   ],
+   "image": "village_dummy.png",
+   "src_bbox": [
+    747,
+    22,
+    891,
+    215
+   ],
+   "locked": true,
+   "note": "training dummy post: one small circle at its foot"
+  },
+  "village_shelf": {
+   "w": 33,
+   "h": 34,
+   "anchor": [
+    15.5,
+    34
+   ],
+   "base_width": 29,
+   "solid": true,
+   "colliders": [
+    [
+     -9,
+     -5,
+     6
+    ],
+    [
+     0,
+     -5,
+     6
+    ],
+    [
+     9,
+     -5,
+     6
+    ]
+   ],
+   "image": "village_shelf.png",
+   "src_bbox": [
+    1061,
+    39,
+    1232,
+    215
+   ],
+   "locked": true,
+   "note": "wooden shelf"
+  },
+  "village_barrel_a": {
+   "w": 23,
+   "h": 28,
+   "anchor": [
+    11.5,
+    28
+   ],
+   "base_width": 19,
+   "solid": true,
+   "colliders": [
+    [
+     0,
+     -5,
+     8
+    ]
+   ],
+   "image": "village_barrel_a.png",
+   "src_bbox": [
+    1394,
+    55,
+    1511,
+    200
+   ],
+   "locked": true,
+   "note": "barrel"
+  },
+  "village_barrel_b": {
+   "w": 23,
+   "h": 28,
+   "anchor": [
+    11.5,
+    28
+   ],
+   "base_width": 19,
+   "solid": true,
+   "colliders": [
+    [
+     0,
+     -5,
+     8
+    ]
+   ],
+   "image": "village_barrel_b.png",
+   "src_bbox": [
+    130,
+    252,
+    248,
+    396
+   ],
+   "locked": true,
+   "note": "barrel"
+  },
+  "village_barrel_c": {
+   "w": 24,
+   "h": 27,
+   "anchor": [
+    12.5,
+    27
+   ],
+   "base_width": 21,
+   "solid": true,
+   "colliders": [
+    [
+     0,
+     -5,
+     8
+    ]
+   ],
+   "image": "village_barrel_c.png",
+   "src_bbox": [
+    436,
+    257,
+    560,
+    396
+   ],
+   "locked": true,
+   "note": "barrel"
+  },
+  "village_barrel_tipped": {
+   "w": 35,
+   "h": 28,
+   "anchor": [
+    11.5,
+    28
+   ],
+   "base_width": 7,
+   "solid": true,
+   "colliders": [
+    [
+     6,
+     -9,
+     6.5
+    ],
+    [
+     16,
+     -9,
+     6.5
+    ]
+   ],
+   "image": "village_barrel_tipped.png",
+   "src_bbox": [
+    714,
+    262,
+    894,
+    406
+   ],
+   "locked": true,
+   "note": "tipped barrel (the anchor sits on the spilled grain; the body is at dx 0..22)"
+  },
+  "village_crate_a": {
+   "w": 31,
+   "h": 31,
+   "anchor": [
+    13.5,
+    31
+   ],
+   "base_width": 23,
+   "solid": true,
+   "colliders": [
+    [
+     -6,
+     -5,
+     6
+    ],
+    [
+     6,
+     -5,
+     6
+    ]
+   ],
+   "image": "village_crate_a.png",
+   "src_bbox": [
+    1047,
+    246,
+    1204,
+    404
+   ],
+   "locked": true,
+   "note": "crate"
+  },
+  "village_crate_b": {
+   "w": 30,
+   "h": 31,
+   "anchor": [
+    13.0,
+    31
+   ],
+   "base_width": 26,
+   "solid": true,
+   "colliders": [
+    [
+     -6,
+     -5,
+     6
+    ],
+    [
+     6,
+     -5,
+     6
+    ]
+   ],
+   "image": "village_crate_b.png",
+   "src_bbox": [
+    1371,
+    251,
+    1526,
+    408
+   ],
+   "locked": true,
+   "note": "crate"
+  },
+  "village_pile": {
+   "w": 49,
+   "h": 32,
+   "anchor": [
+    26.0,
+    32
+   ],
+   "base_width": 46,
+   "solid": true,
+   "colliders": [
+    [
+     -18,
+     -6,
+     7
+    ],
+    [
+     -6,
+     -6,
+     7
+    ],
+    [
+     6,
+     -6,
+     7
+    ],
+    [
+     18,
+     -6,
+     7
+    ]
+   ],
+   "image": "village_pile.png",
+   "src_bbox": [
+    72,
+    427,
+    322,
+    590
+   ],
+   "locked": true,
+   "note": "barrels and crates"
+  },
+  "village_rocks": {
+   "w": 42,
+   "h": 30,
+   "anchor": [
+    23.0,
+    30
+   ],
+   "base_width": 28,
+   "solid": true,
+   "colliders": [
+    [
+     -10,
+     -6,
+     6.5
+    ],
+    [
+     0,
+     -6,
+     6.5
+    ],
+    [
+     10,
+     -6,
+     6.5
+    ]
+   ],
+   "image": "village_rocks.png",
+   "src_bbox": [
+    398,
+    430,
+    615,
+    584
+   ],
+   "locked": true,
+   "note": "mossy rock pile"
+  },
+  "village_stump": {
+   "w": 39,
+   "h": 28,
+   "anchor": [
+    21.5,
+    28
+   ],
+   "base_width": 35,
+   "solid": true,
+   "colliders": [
+    [
+     -7,
+     -6,
+     6.5
+    ],
+    [
+     0,
+     -6,
+     6.5
+    ],
+    [
+     8,
+     -6,
+     6.5
+    ]
+   ],
+   "image": "village_stump.png",
+   "src_bbox": [
+    723,
+    444,
+    924,
+    587
+   ],
+   "locked": true,
+   "note": "stump"
+  },
+  "village_slab": {
+   "w": 40,
+   "h": 25,
+   "anchor": [
+    27.5,
+    25
+   ],
+   "base_width": 19,
+   "solid": true,
+   "colliders": [
+    [
+     -24,
+     -11,
+     6
+    ],
+    [
+     -14,
+     -9,
+     6
+    ],
+    [
+     -4,
+     -7,
+     6
+    ],
+    [
+     6,
+     -5,
+     6
+    ]
+   ],
+   "image": "village_slab.png",
+   "src_bbox": [
+    1031,
+    455,
+    1235,
+    585
+   ],
+   "locked": true,
+   "note": "lying slab, lower edge rises to the left"
+  },
+  "village_slab_tilted": {
+   "w": 35,
+   "h": 28,
+   "anchor": [
+    20.5,
+    28
+   ],
+   "base_width": 13,
+   "solid": true,
+   "colliders": [
+    [
+     -14,
+     -9,
+     6
+    ],
+    [
+     -4,
+     -6,
+     6
+    ],
+    [
+     6,
+     -5,
+     6
+    ],
+    [
+     14,
+     -6,
+     5
+    ]
+   ],
+   "image": "village_slab_tilted.png",
+   "src_bbox": [
+    1370,
+    444,
+    1549,
+    587
+   ],
+   "locked": true,
+   "note": "tilted slab"
+  },
+  "village_rubble": {
+   "w": 40,
+   "h": 21,
+   "anchor": [
+    23.0,
+    21
+   ],
+   "base_width": 28,
+   "solid": true,
+   "colliders": [
+    [
+     -14,
+     -5,
+     6
+    ],
+    [
+     -3,
+     -5,
+     6
+    ],
+    [
+     8,
+     -5,
+     6
+    ]
+   ],
+   "image": "village_rubble.png",
+   "src_bbox": [
+    83,
+    638,
+    287,
+    743
+   ],
+   "locked": true,
+   "note": "grey rubble pile"
+  },
+  "village_chest": {
+   "w": 33,
+   "h": 28,
+   "anchor": [
+    18.0,
+    28
+   ],
+   "base_width": 20,
+   "solid": true,
+   "colliders": [
+    [
+     -6,
+     -5,
+     6
+    ],
+    [
+     6,
+     -5,
+     6
+    ]
+   ],
+   "image": "village_chest.png",
+   "src_bbox": [
+    427,
+    624,
+    596,
+    769
+   ],
+   "locked": true,
+   "note": "closed chest (interactable, used from in front)"
+  },
+  "village_bush_1": {
+   "w": 36,
+   "h": 30,
+   "anchor": [
+    16.5,
+    30
+   ],
+   "base_width": 27,
+   "solid": false,
+   "colliders": [],
+   "image": "village_bush_1.png",
+   "src_bbox": [
+    735,
+    611,
+    917,
+    765
+   ],
+   "locked": true,
+   "note": "low bush: decor (walk through)"
+  },
+  "village_bush_2": {
+   "w": 39,
+   "h": 30,
+   "anchor": [
+    19.0,
+    30
+   ],
+   "base_width": 34,
+   "solid": false,
+   "colliders": [],
+   "image": "village_bush_2.png",
+   "src_bbox": [
+    1038,
+    614,
+    1238,
+    770
+   ],
+   "locked": true,
+   "note": "low bush: decor"
+  },
+  "village_fern_1": {
+   "w": 46,
+   "h": 31,
+   "anchor": [
+    22.5,
+    31
+   ],
+   "base_width": 33,
+   "solid": false,
+   "colliders": [],
+   "image": "village_fern_1.png",
+   "src_bbox": [
+    1344,
+    610,
+    1577,
+    769
+   ],
+   "locked": true,
+   "note": "fern: decor"
+  },
+  "village_fern_2": {
+   "w": 39,
+   "h": 25,
+   "anchor": [
+    16.5,
+    25
+   ],
+   "base_width": 27,
+   "solid": false,
+   "colliders": [],
+   "image": "village_fern_2.png",
+   "src_bbox": [
+    82,
+    805,
+    283,
+    931
+   ],
+   "locked": true,
+   "note": "fern: decor"
+  },
+  "village_mushrooms": {
+   "w": 30,
+   "h": 23,
+   "anchor": [
+    15.0,
+    23
+   ],
+   "base_width": 22,
+   "solid": false,
+   "colliders": [],
+   "image": "village_mushrooms.png",
+   "src_bbox": [
+    435,
+    798,
+    589,
+    916
+   ],
+   "locked": true,
+   "note": "mushrooms: decor"
+  },
+  "village_bucket": {
+   "w": 20,
+   "h": 26,
+   "anchor": [
+    10.0,
+    26
+   ],
+   "base_width": 16,
+   "solid": false,
+   "colliders": [],
+   "image": "village_bucket.png",
+   "src_bbox": [
+    769,
+    794,
+    870,
+    927
+   ],
+   "locked": true,
+   "note": "bucket: decor"
+  },
+  "village_rope": {
+   "w": 33,
+   "h": 19,
+   "anchor": [
+    19.0,
+    19
+   ],
+   "base_width": 28,
+   "solid": false,
+   "colliders": [],
+   "image": "village_rope.png",
+   "src_bbox": [
+    1056,
+    818,
+    1224,
+    918
+   ],
+   "locked": true,
+   "note": "coiled rope: decor"
+  },
+  "village_mushrooms_small": {
+   "w": 25,
+   "h": 21,
+   "anchor": [
+    11.0,
+    21
+   ],
+   "base_width": 18,
+   "solid": false,
+   "colliders": [],
+   "image": "village_mushrooms_small.png",
+   "src_bbox": [
+    1401,
+    810,
+    1529,
+    917
+   ],
+   "locked": true,
+   "note": "mushrooms: decor"
+  },
+  "village_gate": {
+   "w": 99,
+   "h": 99,
+   "anchor": [
+    15.5,
+    99
+   ],
+   "base_width": 29,
+   "solid": true,
+   "colliders": [
+    [
+     -8,
+     -4,
+     6
+    ],
+    [
+     7,
+     -4,
+     6
+    ],
+    [
+     46,
+     -16,
+     6
+    ],
+    [
+     58,
+     -16,
+     6
+    ],
+    [
+     70,
+     -16,
+     6
+    ]
+   ],
+   "image": "village_gate.png",
+   "src_bbox": [
+    25,
+    105,
+    404,
+    485
+   ],
+   "locked": true,
+   "note": "rune gate: the left pillar and the door leaf + right pillar are separate; the ~27 px passage between stays open (the hero walks north-south through it)"
+  },
+  "village_cottage": {
+   "w": 125,
+   "h": 109,
+   "anchor": [
+    63.5,
+    109
+   ],
+   "base_width": 79,
+   "solid": true,
+   "colliders": [
+    [
+     -46,
+     -12,
+     5.5
+    ],
+    [
+     -35,
+     -11,
+     5.5
+    ],
+    [
+     -24,
+     -10,
+     5.5
+    ],
+    [
+     -13,
+     -8,
+     5.5
+    ],
+    [
+     -2,
+     -6,
+     5.5
+    ],
+    [
+     9,
+     -4,
+     5.5
+    ],
+    [
+     20,
+     -5,
+     5.5
+    ],
+    [
+     30,
+     -8,
+     5.5
+    ],
+    [
+     40,
+     -11,
+     5.5
+    ],
+    [
+     50,
+     -15,
+     5.5
+    ]
+   ],
+   "image": "village_cottage.png",
+   "src_bbox": [
+    425,
+    75,
+    907,
+    495
+   ],
+   "locked": true,
+   "note": "cottage: both wall bases (the front corner is at dx +12); the door (left wall, dx -35..-5) is solid, used from in front"
+  },
+  "village_east_tree": {
+   "w": 112,
+   "h": 125,
+   "anchor": [
+    55.0,
+    125
+   ],
+   "base_width": 64,
+   "solid": true,
+   "colliders": [
+    [
+     -22,
+     -6,
+     7
+    ],
+    [
+     -11,
+     -5,
+     7
+    ],
+    [
+     0,
+     -4,
+     7
+    ],
+    [
+     11,
+     -5,
+     7
+    ],
+    [
+     22,
+     -6,
+     7
+    ]
+   ],
+   "image": "village_east_tree.png",
+   "src_bbox": [
+    1184,
+    27,
+    1616,
+    506
+   ],
+   "locked": true,
+   "note": "trunk and root flare (hanging lantern)"
+  },
+  "village_forge": {
+   "w": 87,
+   "h": 87,
+   "anchor": [
+    35.0,
+    87
+   ],
+   "base_width": 32,
+   "solid": true,
+   "colliders": [
+    [
+     -29,
+     -12,
+     6
+    ],
+    [
+     -18,
+     -12,
+     6
+    ],
+    [
+     -8,
+     -10,
+     6
+    ],
+    [
+     3,
+     -4,
+     5
+    ],
+    [
+     12,
+     -4,
+     4.5
+    ],
+    [
+     22,
+     -17,
+     4.5
+    ],
+    [
+     32,
+     -15,
+     4.5
+    ],
+    [
+     42,
+     -14,
+     4.5
+    ]
+   ],
+   "image": "village_forge.png",
+   "src_bbox": [
+    902,
+    165,
+    1236,
+    499
+   ],
+   "locked": true,
+   "note": "forge with its anvil stump (dx 0..14) and the bench legs (dx 17..49): the anvil and bench are in the sprite, never place them again"
+  },
+  "village_big_tree": {
+   "w": 126,
+   "h": 116,
+   "anchor": [
+    58.0,
+    116
+   ],
+   "base_width": 84,
+   "solid": true,
+   "colliders": [
+    [
+     -28,
+     -6,
+     7
+    ],
+    [
+     -14,
+     -5,
+     7
+    ],
+    [
+     0,
+     -4,
+     7
+    ],
+    [
+     14,
+     -5,
+     7
+    ],
+    [
+     28,
+     -6,
+     7
+    ]
+   ],
+   "image": "village_big_tree.png",
+   "src_bbox": [
+    33,
+    485,
+    516,
+    932
+   ],
+   "locked": true,
+   "note": "trunk and root flare"
+  },
+  "village_shrine": {
+   "w": 60,
+   "h": 86,
+   "anchor": [
+    31.0,
+    86
+   ],
+   "base_width": 56,
+   "solid": true,
+   "colliders": [
+    [
+     -18,
+     -6,
+     6.5
+    ],
+    [
+     -6,
+     -6,
+     6.5
+    ],
+    [
+     6,
+     -6,
+     6.5
+    ],
+    [
+     18,
+     -6,
+     6.5
+    ]
+   ],
+   "image": "village_shrine.png",
+   "src_bbox": [
+    615,
+    582,
+    847,
+    913
+   ],
+   "locked": true,
+   "note": "shrine plinth"
+  },
+  "village_standing_stone": {
+   "w": 49,
+   "h": 72,
+   "anchor": [
+    24.5,
+    72
+   ],
+   "base_width": 49,
+   "solid": true,
+   "colliders": [
+    [
+     -11,
+     -6,
+     6.5
+    ],
+    [
+     0,
+     -6,
+     6.5
+    ],
+    [
+     11,
+     -6,
+     6.5
+    ]
+   ],
+   "image": "village_standing_stone.png",
+   "src_bbox": [
+    1006,
+    630,
+    1195,
+    908
+   ],
+   "locked": true,
+   "note": "rune stone and its mossy foot"
+  },
+  "village_lamp_post": {
+   "w": 40,
+   "h": 84,
+   "anchor": [
+    7.5,
+    84
+   ],
+   "base_width": 9,
+   "solid": true,
+   "colliders": [
+    [
+     0,
+     -3,
+     3.5
+    ]
+   ],
+   "image": "village_lamp_post.png",
+   "src_bbox": [
+    1372,
+    582,
+    1525,
+    907
+   ],
+   "locked": true,
+   "note": "thin post: one small circle at its foot"
+  },
   "glade_stone_1": {
    "image": "glade_stone_1.png",
    "w": 50,

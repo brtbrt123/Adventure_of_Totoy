@@ -1,4 +1,5 @@
-"""Review image and reach numbers for the layered Stag glade (data/scenes/glade_layered_props.json + data/props/prop_defs.json).
+"""Review image and reach numbers for a layered scene (data/scenes/<scene>_props.json + data/props/prop_defs.json):
+the Stag glade (default) or the village (--scene village_layered).
 
 Draws the approved ground, every prop sprite at its place (y-sorted), the walkable outline (cyan), the prop colliders
 (orange, solid props) and the openings; tints what a body of STAG radius can reach (green) and prints the shares of the
@@ -6,7 +7,7 @@ fight area a radius-20 Stag and the hero (radius 6) reach, and whether entrance 
 It is an approximation of the core's collision (outline inset by the body radius, circles); the real rule is checked by
 tests/core/test_glade_layered.gd. Output: docs/previews/glade_layered_overlay.png (3x).
 
-Run: python tools/art/preview_layered_glade.py [--out FILE] [--no-reach]
+Run: python tools/art/preview_layered_glade.py [--scene glade_layered|village_layered] [--out FILE] [--no-reach]
 """
 from __future__ import annotations
 
@@ -21,14 +22,22 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[2]
 SCENE = ROOT / "data" / "scenes" / "glade_layered_props.json"
 DEFS = ROOT / "data" / "props" / "prop_defs.json"
-PROPS_DIR = ROOT / "art" / "reference" / "layered_pilot" / "props"
+PROPS_DIRS = [ROOT / "art" / "reference" / "layered_pilot" / "props", ROOT / "art" / "reference" / "layered_village" / "props"]
 ZOOM = 3
 HERO = 6.0
 STEP = 2.0
 
 
-def load() -> tuple[dict, dict]:
-    return json.loads(SCENE.read_text(encoding="utf-8")), json.loads(DEFS.read_text(encoding="utf-8"))
+def load(scene_id: str = "glade_layered") -> tuple[dict, dict]:
+    path = ROOT / "data" / "scenes" / f"{scene_id}_props.json"
+    return json.loads(path.read_text(encoding="utf-8")), json.loads(DEFS.read_text(encoding="utf-8"))
+
+
+def prop_image(name: str) -> Path:
+    for d in PROPS_DIRS:
+        if (d / name).exists():
+            return d / name
+    raise FileNotFoundError(name)
 
 
 def circles(scene: dict, defs: dict) -> list[tuple[float, float, float]]:
@@ -148,13 +157,37 @@ def render(scene: dict, defs: dict, out: Path, reach: bool) -> dict:
     board.paste(ground.resize((w, h), Image.NEAREST))
     for p in sorted(scene["props"], key=lambda q: q["y"]):
         d = defs["props"][p["type"]]
-        img = Image.open(PROPS_DIR / d["image"]).convert("RGBA")
+        img = Image.open(prop_image(d["image"])).convert("RGBA")
         if p.get("flip"):
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
         ax = (img.size[0] - d["anchor"][0]) if p.get("flip") else d["anchor"][0]
         board.alpha_composite(img, (round(p["x"] - ax), round(p["y"] - d["anchor"][1])))
     stats = {}
-    if reach:
+    if reach and "stag_start" not in scene:
+        g_hero, cols, rows = free_grid(scene, defs, HERO)
+        hero_seen = flood(g_hero, cols, rows, scene["entries"][scene["default_entry"]])
+        tint = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        tp = tint.load()
+        for j in range(rows):
+            for i in range(cols):
+                if hero_seen[j][i]:
+                    for dy in range(int(STEP)):
+                        for dx in range(int(STEP)):
+                            tp[int(i * STEP) + dx, int(j * STEP) + dy] = (0, 255, 120, 50)
+        board.alpha_composite(tint)
+        def ok(pt):
+            return hero_seen[min(rows - 1, int(pt[1] / STEP))][min(cols - 1, int(pt[0] / STEP))]
+        stats["entries_reached"] = {k: bool(ok(v)) for k, v in scene["entries"].items()}
+        stats["checkpoints_reached"] = {c["id"]: bool(ok(c["position"])) for c in scene.get("checkpoints", [])}
+        stats["npc_stands_reached"] = {n["id"]: bool(ok(n["position"])) for n in scene.get("npcs", [])}
+        stats["interact_stands_reached"] = {o["id"]: bool(ok(o["stand"])) for o in scene.get("objects", [])}
+        stats["exits_reached"] = {}
+        for e in scene["exits"]:
+            r = e["rect"]
+            x = min(max(r[0] + r[2] / 2, HERO + 1), w - HERO - 1)
+            y = min(max(r[1] + r[3] / 2, HERO + 1), h - HERO - 1)
+            stats["exits_reached"][e["id"]] = bool(ok((x, y)))
+    elif reach:
         stag_r = scene["stag_radius"]
         g_stag, cols, rows = free_grid(scene, defs, stag_r)
         seen = flood(g_stag, cols, rows, scene["stag_start"])
@@ -181,15 +214,28 @@ def render(scene: dict, defs: dict, out: Path, reach: bool) -> dict:
     d.line(poly + [poly[0]], fill=(0, 255, 255, 255), width=2)
     for cx, cy, r in circles(scene, defs):
         d.ellipse([(cx - r) * z, (cy - r) * z, (cx + r) * z, (cy + r) * z], outline=(255, 160, 0, 255))
-    fa = scene["fight_area"]
-    d.rectangle([fa[0] * z, fa[1] * z, (fa[0] + fa[2]) * z, (fa[1] + fa[3]) * z], outline=(255, 255, 255, 255))
+    if "fight_area" in scene:
+        fa = scene["fight_area"]
+        d.rectangle([fa[0] * z, fa[1] * z, (fa[0] + fa[2]) * z, (fa[1] + fa[3]) * z], outline=(255, 255, 255, 255))
+    for n in scene.get("npcs", []):
+        px, py = n["position"]
+        d.ellipse([px * z - 5, py * z - 5, px * z + 5, py * z + 5], outline=(255, 255, 255, 255), width=2)
+        d.text((px * z + 7, py * z - 6), n["id"], fill=(255, 255, 255, 255))
+    for o in scene.get("objects", []):
+        sx, sy = o["stand"]
+        d.rectangle([sx * z - 4, sy * z - 4, sx * z + 4, sy * z + 4], outline=(120, 200, 255, 255), width=2)
+        d.text((sx * z + 7, sy * z - 6), o["id"], fill=(120, 200, 255, 255))
+    for c in scene.get("checkpoints", []):
+        cx, cy = c["position"]
+        d.polygon([(cx * z, cy * z - 6), (cx * z + 6, cy * z), (cx * z, cy * z + 6), (cx * z - 6, cy * z)], outline=(255, 255, 0, 255))
     for e in scene["exits"]:
         r = e["rect"]
         d.rectangle([r[0] * z, r[1] * z, (r[0] + r[2]) * z, (r[1] + r[3]) * z], outline=(255, 0, 255, 255), width=2)
     for name, pt in scene["entries"].items():
         d.ellipse([pt[0] * z - 4, pt[1] * z - 4, pt[0] * z + 4, pt[1] * z + 4], fill=(255, 255, 0, 255))
-    sp = scene["stag_start"]
-    d.ellipse([(sp[0] - scene["stag_radius"]) * z, (sp[1] - scene["stag_radius"]) * z, (sp[0] + scene["stag_radius"]) * z, (sp[1] + scene["stag_radius"]) * z], outline=(255, 80, 80, 255), width=2)
+    if "stag_start" in scene:
+        sp = scene["stag_start"]
+        d.ellipse([(sp[0] - scene["stag_radius"]) * z, (sp[1] - scene["stag_radius"]) * z, (sp[0] + scene["stag_radius"]) * z, (sp[1] + scene["stag_radius"]) * z], outline=(255, 80, 80, 255), width=2)
     out.parent.mkdir(parents=True, exist_ok=True)
     big.convert("RGB").save(out)
     return stats
@@ -197,13 +243,15 @@ def render(scene: dict, defs: dict, out: Path, reach: bool) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", type=Path, default=ROOT / "docs" / "previews" / "glade_layered_overlay.png")
+    ap.add_argument("--scene", default="glade_layered")
+    ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--no-reach", action="store_true")
     args = ap.parse_args()
-    scene, defs = load()
-    stats = render(scene, defs, args.out, not args.no_reach)
+    scene, defs = load(args.scene)
+    out = args.out or ROOT / "docs" / "previews" / f"{args.scene.replace('_layered', '')}_layered_overlay.png"
+    stats = render(scene, defs, out, not args.no_reach)
     print(json.dumps(stats, indent=1))
-    print(args.out)
+    print(out)
     return 0
 
 

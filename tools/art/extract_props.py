@@ -226,7 +226,8 @@ def base_info(img: Image.Image) -> dict:
 # --- the whole sheet ---
 
 def extract(sheet_path: Path, out_dir: Path, defs_path: Path, names: list[str] | None = None, world_width: float = 560.0,
-            tol: int = 60, palette: artlib.Palette | None = None, merge: bool = False, prefix: str = "prop") -> dict:
+            tol: int = 60, palette: artlib.Palette | None = None, merge: bool = False, prefix: str = "prop",
+            contact: str = "props_contact.png") -> dict:
     palette = palette or artlib.load_palette()
     sheet = Image.open(sheet_path).convert("RGB")
     scale = world_width / sheet.size[0]
@@ -246,10 +247,16 @@ def extract(sheet_path: Path, out_dir: Path, defs_path: Path, names: list[str] |
             continue
         index += 1
         name = names[index - 1] if names and index <= len(names) else f"{prefix}_{index:02d}"
+        if name == "-":
+            continue  # a prop on the sheet that is not wanted (a duplicate of something drawn in another prop)
         info = base_info(img)
         if old.get(name, {}).get("locked"):
             info = old[name]
         info["image"] = f"{name}.png"
+        if "src_bbox" not in info:
+            xs = [q[0] for q in part]
+            ys = [q[1] for q in part]
+            info["src_bbox"] = [min(xs), min(ys), max(xs) + 1, max(ys) + 1]  # in sheet pixels (provenance, for naming)
         props[name] = info
         images[name] = img
         img.save(out_dir / f"{name}.png")
@@ -259,7 +266,7 @@ def extract(sheet_path: Path, out_dir: Path, defs_path: Path, names: list[str] |
     data = {"version": VERSION, "sheet": sheet_path.name, "scale": round(scale, 5), "props": props}
     defs_path.parent.mkdir(parents=True, exist_ok=True)
     defs_path.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
-    contact_sheet(images, props, out_dir / "props_contact.png")
+    contact_sheet(images, props, out_dir / contact)
     return data
 
 
@@ -293,20 +300,21 @@ def main() -> int:
     parser.add_argument("--sheet", type=Path, required=True)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--defs", type=Path, default=DEFAULT_DEFS)
-    parser.add_argument("--names", default="", help="comma separated ids in reading order (top to bottom, left to right)")
+    parser.add_argument("--names", default="", help="comma separated ids in reading order (top to bottom, left to right); '-' skips that prop")
     parser.add_argument("--world-width", type=float, default=560.0, help="the scene's width the sheet width maps to")
     parser.add_argument("--merge", action="store_true", help="keep every existing entry of the defs file (another sheet or scene)")
     parser.add_argument("--prefix", default="prop", help="default id prefix for unnamed props (e.g. village)")
+    parser.add_argument("--contact", default="props_contact.png", help="file name of the contact sheet in --out")
     parser.add_argument("--tol", type=int, default=60, help="colour distance from #FF00FF counted as background")
     args = parser.parse_args()
     if not args.sheet.exists():
         print(f"missing sheet: {args.sheet}", file=sys.stderr)
         return 1
     names = [n for n in args.names.split(",") if n] or None
-    data = extract(args.sheet, args.out, args.defs, names, args.world_width, args.tol, merge=args.merge, prefix=args.prefix)
+    data = extract(args.sheet, args.out, args.defs, names, args.world_width, args.tol, merge=args.merge, prefix=args.prefix, contact=args.contact)
     for name, info in data["props"].items():
         print(f"{name:14s} {info['w']:3d}x{info['h']:3d}  anchor {info['anchor']}  base {info['base_width']:3d}  "
-              f"{'solid x%d' % len(info['colliders']) if info['solid'] else 'decor'}")
+              f"{'solid x%d' % len(info['colliders']) if info['solid'] else 'decor':8s} sheet {info.get('src_bbox')}")
     print(f"{len(data['props'])} props -> {args.defs}")
     return 0
 

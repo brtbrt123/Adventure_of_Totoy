@@ -10,10 +10,13 @@ extends RefCounted
 ##   glade                 root arch                           -> arena   "start"      (the Colossus fight)
 ##   arena                 no exits (the fight's victory screen returns to the title)
 ##
-## glade_layered (the Stag glade as a layered scene: one floor painting + separate prop sprites, data/scenes/glade_layered_props.json
-## read through core/prop_scene.gd) is a FIFTH scene, not in IDS, until the human switches the game over from the painted
-## glade: forest -> glade stays the painted one. It has the same two exits (forest "north", arena "start"); its own entry
-## is "entrance" and its own checkpoint "glade_layered_entrance". SceneDefs.LAYERED lists such scenes.
+## glade_layered and village_layered (the Stag glade and Lanternfen as layered scenes: one floor painting + separate prop
+## sprites, data/scenes/<id>_props.json read through core/prop_scene.gd) are extra scenes, not in IDS, until the human
+## switches the game over from the painted ones: forest -> glade and forest -> village stay the painted ones.
+## glade_layered has the same two exits (forest "north", arena "start"), entry "entrance", checkpoint
+## "glade_layered_entrance". village_layered has the east exit (forest "village_side"), entries "arrival" (inside the
+## rune gate) and "return" (from the forest), checkpoint "village_layered_gate", the six NPCs and the chest / door /
+## dummy interaction spots of the painted village. SceneDefs.LAYERED lists such scenes.
 ##
 ## The forest's root gate is solid until the lantern puzzle opens it (a later step); `gate_open` (a scene state flag,
 ## saved in SaveProfile.gate_open, toggled by the debug key F6 or G) builds the forest with build_with_gate(true).
@@ -33,8 +36,12 @@ const ARENA: StringName = &"arena"
 const IDS: Array[StringName] = [VILLAGE, FOREST, GLADE, ARENA]
 ## The layered scenes (floor + prop sprites, built from data/scenes/<id>_props.json).
 const GLADE_LAYERED: StringName = &"glade_layered"
-const LAYERED: Array[StringName] = [GLADE_LAYERED]
-const LAYERED_PATHS: Dictionary = {GLADE_LAYERED: "res://data/scenes/glade_layered_props.json"}
+const VILLAGE_LAYERED: StringName = &"village_layered"
+const LAYERED: Array[StringName] = [GLADE_LAYERED, VILLAGE_LAYERED]
+const LAYERED_PATHS: Dictionary = {
+	GLADE_LAYERED: "res://data/scenes/glade_layered_props.json",
+	VILLAGE_LAYERED: "res://data/scenes/village_layered_props.json",
+}
 
 ## Where a new game starts.
 const START_SCENE: StringName = VILLAGE
@@ -141,7 +148,10 @@ static func layered_data(scene_id: StringName) -> Dictionary:
 static func build_obstacles(scene_id: StringName, gate_open: bool = false) -> Array[Obstacle]:
 	var list: Array[Obstacle] = []
 	if scene_id in LAYERED:
-		return PropScene.build(layered_data(scene_id), PropScene.load_defs())
+		list = PropScene.build(layered_data(scene_id), PropScene.load_defs())
+		for npc: Dictionary in get_def(scene_id)["npcs"]:
+			SceneBounds.add(list, npc["position"], NPC_RADIUS, npc["position"])
+		return list
 	match scene_id:
 		VILLAGE:
 			list = VillageLayout.build()

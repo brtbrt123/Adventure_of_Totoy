@@ -47,17 +47,22 @@ func _placement(id: String) -> Dictionary:
 func test_the_data_is_valid_and_every_type_is_classified() -> void:
 	assert_eq(PropScene.validate(_scene, _defs).size(), 0, "no problems: %s" % str(PropScene.validate(_scene, _defs)))
 	var types: Dictionary = _defs["props"]
-	assert_eq(types.size(), SOLID_TYPES.size() + DECOR_TYPES.size(), "20 prop types, each classified in this test")
+	var glade_types: int = 0
+	for t: String in types:
+		if t.begins_with("glade_"):
+			glade_types += 1
+	assert_eq(glade_types, SOLID_TYPES.size() + DECOR_TYPES.size(), "20 glade prop types, each classified in this test (village types share the file)")
 	for t: String in SOLID_TYPES:
 		assert_true(bool(types[t]["solid"]) and types[t]["colliders"].size() >= 2, "%s is solid with colliders" % t)
 	for t: String in DECOR_TYPES:
 		assert_true(not bool(types[t]["solid"]) and types[t]["colliders"].is_empty(), "%s is decor" % t)
 	for t: String in types:
-		assert_true(bool(types[t].get("locked", false)), "%s is hand-tuned and locked (the extractor must not overwrite it)" % t)
+		if t.begins_with("glade_"):
+			assert_true(bool(types[t].get("locked", false)), "%s is hand-tuned and locked (the extractor must not overwrite it)" % t)
 	var used: Dictionary = {}
 	for p: Dictionary in PropScene.placements(_scene, _defs):
 		used[String(p["type"])] = true
-	assert_eq(used.size(), types.size(), "every prop type is placed once or more")
+	assert_eq(used.size(), glade_types, "every glade prop type is placed once or more")
 	assert_eq(PropScene.placements(_scene, _defs).size(), 20, "the approved arrangement: 20 props")
 
 

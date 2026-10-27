@@ -1,0 +1,515 @@
+{
+ "version": 1,
+ "scene": "village_layered",
+ "name": "LANTERNFEN",
+ "size": [
+  571,
+  336
+ ],
+ "ground": "res://art/reference/layered_village/village_ground_only.png",
+ "outline": [
+  [
+   14,
+   100
+  ],
+  [
+   40,
+   50
+  ],
+  [
+   100,
+   34
+  ],
+  [
+   200,
+   26
+  ],
+  [
+   300,
+   22
+  ],
+  [
+   400,
+   24
+  ],
+  [
+   480,
+   34
+  ],
+  [
+   540,
+   56
+  ],
+  [
+   556,
+   90
+  ],
+  [
+   556,
+   120
+  ],
+  [
+   571,
+   147
+  ],
+  [
+   571,
+   195
+  ],
+  [
+   556,
+   205
+  ],
+  [
+   556,
+   250
+  ],
+  [
+   530,
+   290
+  ],
+  [
+   480,
+   314
+  ],
+  [
+   400,
+   326
+  ],
+  [
+   330,
+   330
+  ],
+  [
+   245,
+   330
+  ],
+  [
+   200,
+   326
+  ],
+  [
+   120,
+   320
+  ],
+  [
+   50,
+   300
+  ],
+  [
+   20,
+   260
+  ],
+  [
+   14,
+   200
+  ],
+  [
+   14,
+   140
+  ]
+ ],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "entries": {
+  "arrival": [
+   74,
+   146
+  ],
+  "return": [
+   546,
+   172
+  ]
+ },
+ "default_entry": "arrival",
+ "exits": [
+  {
+   "id": "to_forest",
+   "rect": [
+    565,
+    150,
+    6,
+    42
+   ],
+   "target_scene": "forest",
+   "target_entry": "village_side"
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "village_layered_gate",
+   "position": [
+    74,
+    146
+   ]
+  }
+ ],
+ "npcs": [
+  {
+   "id": "mira",
+   "visual": "npc_mira",
+   "position": [
+    104,
+    152
+   ],
+   "face_left": true
+  },
+  {
+   "id": "tovan",
+   "visual": "npc_tovan",
+   "position": [
+    316,
+    114
+   ],
+   "face_left": true
+  },
+  {
+   "id": "edda",
+   "visual": "npc_edda",
+   "position": [
+    448,
+    128
+   ],
+   "face_left": true
+  },
+  {
+   "id": "elder",
+   "visual": "npc_elder",
+   "position": [
+    134,
+    310
+   ],
+   "face_left": true
+  },
+  {
+   "id": "child",
+   "visual": "npc_child",
+   "position": [
+    262,
+    190
+   ],
+   "face_left": false
+  },
+  {
+   "id": "worker",
+   "visual": "npc_worker",
+   "position": [
+    332,
+    232
+   ],
+   "face_left": true
+  }
+ ],
+ "objects": [
+  {
+   "id": "chest",
+   "kind": "chest",
+   "position": [
+    52,
+    262
+   ],
+   "stand": [
+    52,
+    278
+   ]
+  },
+  {
+   "id": "edda_door",
+   "kind": "door",
+   "position": [
+    428,
+    106
+   ],
+   "stand": [
+    428,
+    124
+   ]
+  },
+  {
+   "id": "training_dummy",
+   "kind": "dummy",
+   "position": [
+    345,
+    118
+   ],
+   "stand": [
+    345,
+    134
+   ]
+  }
+ ],
+ "props": [
+  {
+   "id": "gate",
+   "type": "village_gate",
+   "x": 48,
+   "y": 128,
+   "flip": false,
+   "shadow_radius": 26
+  },
+  {
+   "id": "big_tree",
+   "type": "village_big_tree",
+   "x": 190,
+   "y": 116,
+   "flip": false,
+   "shadow_radius": 30
+  },
+  {
+   "id": "stump",
+   "type": "village_stump",
+   "x": 232,
+   "y": 132,
+   "flip": false,
+   "shadow_radius": 10
+  },
+  {
+   "id": "shelf",
+   "type": "village_shelf",
+   "x": 262,
+   "y": 96,
+   "flip": false,
+   "shadow_radius": 10
+  },
+  {
+   "id": "forge",
+   "type": "village_forge",
+   "x": 305,
+   "y": 100,
+   "flip": false,
+   "shadow_radius": 24
+  },
+  {
+   "id": "bucket",
+   "type": "village_bucket",
+   "x": 332,
+   "y": 106,
+   "flip": false,
+   "shadow_radius": 5
+  },
+  {
+   "id": "dummy",
+   "type": "village_dummy",
+   "x": 345,
+   "y": 118,
+   "flip": false,
+   "shadow_radius": 6
+  },
+  {
+   "id": "barrel_forge_1",
+   "type": "village_barrel_a",
+   "x": 372,
+   "y": 98,
+   "flip": false,
+   "shadow_radius": 8
+  },
+  {
+   "id": "barrel_forge_2",
+   "type": "village_barrel_b",
+   "x": 386,
+   "y": 104,
+   "flip": false,
+   "shadow_radius": 8
+  },
+  {
+   "id": "cottage",
+   "type": "village_cottage",
+   "x": 448,
+   "y": 112,
+   "flip": false,
+   "shadow_radius": 34
+  },
+  {
+   "id": "east_tree",
+   "type": "village_east_tree",
+   "x": 530,
+   "y": 150,
+   "flip": false,
+   "shadow_radius": 30
+  },
+  {
+   "id": "slab_house_1",
+   "type": "village_slab",
+   "x": 496,
+   "y": 152,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "lamp_post",
+   "type": "village_lamp_post",
+   "x": 232,
+   "y": 262,
+   "flip": false,
+   "shadow_radius": 5
+  },
+  {
+   "id": "standing_stone",
+   "type": "village_standing_stone",
+   "x": 520,
+   "y": 262,
+   "flip": false,
+   "shadow_radius": 14
+  },
+  {
+   "id": "shrine",
+   "type": "village_shrine",
+   "x": 104,
+   "y": 304,
+   "flip": false,
+   "shadow_radius": 16
+  },
+  {
+   "id": "barrel_west_1",
+   "type": "village_barrel_c",
+   "x": 40,
+   "y": 196,
+   "flip": false,
+   "shadow_radius": 8
+  },
+  {
+   "id": "barrel_west_2",
+   "type": "village_barrel_a",
+   "x": 58,
+   "y": 206,
+   "flip": false,
+   "shadow_radius": 8
+  },
+  {
+   "id": "rubble",
+   "type": "village_rubble",
+   "x": 160,
+   "y": 196,
+   "flip": false,
+   "shadow_radius": 10
+  },
+  {
+   "id": "slab_tilted",
+   "type": "village_slab_tilted",
+   "x": 160,
+   "y": 240,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "chest",
+   "type": "village_chest",
+   "x": 52,
+   "y": 262,
+   "flip": false,
+   "shadow_radius": 9
+  },
+  {
+   "id": "pile",
+   "type": "village_pile",
+   "x": 352,
+   "y": 262,
+   "flip": false,
+   "shadow_radius": 16
+  },
+  {
+   "id": "rocks",
+   "type": "village_rocks",
+   "x": 305,
+   "y": 248,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "crate_1",
+   "type": "village_crate_a",
+   "x": 392,
+   "y": 272,
+   "flip": false,
+   "shadow_radius": 9
+  },
+  {
+   "id": "crate_2",
+   "type": "village_crate_b",
+   "x": 408,
+   "y": 288,
+   "flip": true,
+   "shadow_radius": 9
+  },
+  {
+   "id": "barrel_tipped",
+   "type": "village_barrel_tipped",
+   "x": 330,
+   "y": 292,
+   "flip": false,
+   "shadow_radius": 10
+  },
+  {
+   "id": "rope",
+   "type": "village_rope",
+   "x": 322,
+   "y": 128,
+   "flip": false,
+   "shadow_radius": 8
+  },
+  {
+   "id": "bush_nw",
+   "type": "village_bush_1",
+   "x": 40,
+   "y": 70,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "fern_w",
+   "type": "village_fern_1",
+   "x": 28,
+   "y": 160,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "bush_sw",
+   "type": "village_bush_2",
+   "x": 70,
+   "y": 296,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "fern_s",
+   "type": "village_fern_2",
+   "x": 200,
+   "y": 300,
+   "flip": false,
+   "shadow_radius": 10
+  },
+  {
+   "id": "mushrooms_a",
+   "type": "village_mushrooms",
+   "x": 210,
+   "y": 236,
+   "flip": false,
+   "shadow_radius": 7
+  },
+  {
+   "id": "mushrooms_b",
+   "type": "village_mushrooms_small",
+   "x": 470,
+   "y": 190,
+   "flip": false,
+   "shadow_radius": 6
+  },
+  {
+   "id": "fern_se",
+   "type": "village_fern_1",
+   "x": 450,
+   "y": 300,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "bush_ne",
+   "type": "village_bush_2",
+   "x": 524,
+   "y": 80,
+   "flip": false,
+   "shadow_radius": 12
+  }
+ ]
+}
