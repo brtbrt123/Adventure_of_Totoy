@@ -41,3 +41,6 @@ docs/.trash/
 
 # Run logs written by agent check scripts
 art/build/*.log
+
+# Obsidian (docs/ is the vault; settings are machine-specific, see docs/HARNESS.md)
+docs/.obsidian/
