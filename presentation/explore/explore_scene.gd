@@ -32,6 +32,12 @@ const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
 
+const ConversationView := preload("res://presentation/explore/conversation_view.gd")
+const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
+const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
+var conversation: ConversationView
+var practice_effects: Array[Dictionary] = []
+
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const START_META: StringName = &"totoy_explore_start"
@@ -132,6 +138,8 @@ func _ready() -> void:
 	character_menu.equip_request = request_equip
 	character_menu.aspect_request = request_aspect_equip
 	$HUD.add_child(character_menu)
+	conversation = ConversationView.new()
+	$HUD.add_child(conversation)
 	var start: Dictionary = Engine.get_meta(START_META, {}) if Engine.has_meta(START_META) else {}
 	if Engine.has_meta(START_META):
 		Engine.remove_meta(START_META)
@@ -174,7 +182,11 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 		core = ExploreCore.at_checkpoint(scene, checkpoint, gate_open) as ExploreCore
 	else:
 		core = ExploreCore.new(scene, entry, gate_open)
+	core.set_story_flags(profile.story_flags)
 	snapshot = core.snapshot()
+	practice_effects.clear()
+	conversation.sync(snapshot.dialogue)
+	conversation.controls_open = scene in [SceneDefs.VILLAGE, SceneDefs.VILLAGE_LAYERED] and not snapshot.story_flags.has(&"seen_controls")
 	gate_open = snapshot.gate_open
 	_refresh_props()
 	facing_left = snapshot.hero.facing.x < 0.0
@@ -193,6 +205,8 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 func _save_progress(scene: StringName, checkpoint: StringName) -> void:
 	profile.record_scene(scene, checkpoint)
 	profile.gate_open = gate_open
+	if snapshot != null:
+		profile.story_flags = snapshot.story_flags.duplicate()
 	if persist:
 		SaveStore.save(profile)
 
@@ -204,6 +218,16 @@ func _physics_process(_delta: float) -> void:
 		return
 	if fade_phase != &"":
 		advance_fade()
+		return
+	if conversation.controls_open:
+		if Input.is_action_just_pressed("explore_interact") or Input.is_action_just_pressed("dialogue_next") or Input.is_action_just_pressed("menu_back"):
+			dismiss_controls()
+		return
+	if not snapshot.dialogue.is_empty():
+		var talk_frame: InputFrame = InputFrame.new()
+		talk_frame.interact_pressed = Input.is_action_just_pressed("explore_interact") or Input.is_action_just_pressed("dialogue_next")
+		talk_frame.skip_pressed = Input.is_action_just_pressed("dialogue_skip")
+		advance(talk_frame)
 		return
 	if Input.is_action_just_pressed("menu_toggle") and open_menu():
 		return
@@ -229,9 +253,16 @@ func _physics_process(_delta: float) -> void:
 
 ## One core step with `intent`, then everything drawn from it.
 func advance(intent: InputFrame) -> void:
+	if not snapshot.dialogue.is_empty() and intent.interact_pressed and not intent.skip_pressed and not conversation.complete():
+		conversation.finish_typing()
+		intent = InputFrame.new()
+		intent.interact_pressed = false
 	core.step(intent)
 	snapshot = core.snapshot()
 	gate_open = snapshot.gate_open
+	conversation.sync(snapshot.dialogue)
+	conversation.tick()
+	practice_effects = practice_effects.filter(func(effect: Dictionary) -> bool: return snapshot.tick - int(effect["tick"]) < 12)
 	for event: GameEvent in core.last_events:
 		_on_event(event)
 	if toast_ticks > 0:
@@ -259,8 +290,22 @@ func _on_event(event: GameEvent) -> void:
 			_refresh_props()
 			_save_progress(core.scene_id, core.last_checkpoint)
 		GameEvent.INTERACT:
-			if event.data["kind"] == &"npc":
-				bubbles[event.data["target_id"]] = BUBBLE_TICKS  # no dialogue yet (step 2): a placeholder "..."
+			if event.data["kind"] == &"npc" and snapshot.dialogue.is_empty():
+				bubbles[event.data["target_id"]] = BUBBLE_TICKS
+		GameEvent.FLAG_SET, GameEvent.DIALOGUE_ENDED:
+			_save_progress(core.scene_id, core.last_checkpoint)
+			if event.type == GameEvent.FLAG_SET:
+				var flag: String = String(event.data.get("flag", ""))
+				if flag == "training_done":
+					practice_message("TRAINING COMPLETE")
+				elif flag.begins_with("lesson_"):
+					practice_message(flag.trim_prefix("lesson_").to_upper() + " LEARNED")
+		GameEvent.TRAINING_POST_HIT, GameEvent.PARRY_SUCCEEDED:
+			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": event.data.get("quality", &"") == &"perfect"})
+		GameEvent.TRAINING_HERO_HIT:
+			practice_message("TRY AGAIN")
+		GameEvent.TRAINING_DODGED:
+			practice_message("DODGE LEARNED")
 
 
 ## Starts the fade out; at its end the target scene is entered and the fade comes back in.
@@ -325,7 +370,7 @@ func toast_text() -> String:
 
 
 func hint_text() -> String:
-	if snapshot == null or snapshot.interact_target == &"" or snapshot.exiting or bubbles.has(snapshot.interact_target):
+	if snapshot == null or not snapshot.dialogue.is_empty() or bool(snapshot.training.get("active", false)) or snapshot.interact_target == &"" or snapshot.exiting or bubbles.has(snapshot.interact_target):
 		return ""
 	return HINT_OVERRIDES.get(snapshot.interact_target, HINTS.get(snapshot.interact_kind, "[E] LOOK"))
 
@@ -344,7 +389,7 @@ func hint_anchor() -> Vector2:
 # --- the character menu (TAB): the loadout lives in a GameCore that is only stepped for equip requests ---
 
 func open_menu() -> bool:
-	if character_menu.is_open or fade_phase != &"":
+	if character_menu.is_open or fade_phase != &"" or not snapshot.dialogue.is_empty():
 		return false
 	character_menu.open()
 	_update_hud()
@@ -364,6 +409,10 @@ func request_aspect_equip(aspect: StringName, slot: int) -> void:
 	frame.aspect_equip = aspect
 	frame.aspect_equip_slot = slot
 	loadout_core.step(frame)
+	if slot >= 1 and slot <= loadout_core.snapshot().player.equipped_aspects.size() and loadout_core.snapshot().player.equipped_aspects[slot - 1] == aspect:
+		core.set_flag(&"lesson_aspect")
+		snapshot = core.snapshot()
+		_save_progress(core.scene_id, core.last_checkpoint)
 	_save_loadout()
 	_update_hud()
 
@@ -390,8 +439,7 @@ func _update_camera() -> void:
 
 func _choose_frames() -> void:
 	var hero: Snapshots.EntitySnapshot = snapshot.hero
-	var moved: bool = previous_hero_position != Vector2.INF and not hero.position.is_equal_approx(previous_hero_position)
-	if (moved or hero.state == &"dash") and absf(hero.facing.x) > 0.3:
+	if absf(hero.facing.x) > 0.3:
 		facing_left = hero.facing.x < 0.0
 	previous_hero_position = hero.position
 	hero_frame = hero_frame_for(hero)
@@ -402,13 +450,8 @@ func _choose_frames() -> void:
 
 ## The katana hero frame (hero2_*) for idle, walk and dash, timed like the fight (animation.gd).
 static func hero_frame_for(hero: Snapshots.EntitySnapshot) -> String:
-	var prefix: String = ArenaAnimation.SET_KATANA
-	match hero.state:
-		&"walk":
-			return ArenaAnimation.hero_frame(prefix, "walk", ArenaAnimation.frame_index(ArenaAnimation.PLAYER["walk"], ArenaAnimation.walk_ticks(hero.state_ticks, hero.move_speed_mult)))
-		&"dash":
-			return ArenaAnimation.hero_frame(prefix, "dash", ArenaAnimation.frame_index(ArenaAnimation.PLAYER["dash"], hero.state_ticks))
-	return ArenaAnimation.hero_frame(prefix, "idle", ArenaAnimation.frame_index(ArenaAnimation.PLAYER["idle"], hero.state_ticks))
+	var view: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
+	return ArenaAnimation.choose(hero, view, {})
 
 
 ## The NPC's idle loop frame (4 frames, the source ticks 24/14/14/8) at `tick`.
@@ -463,6 +506,8 @@ func _draw() -> void:
 	var ground: Texture2D = ground_texture(snapshot.scene_id)
 	if ground != null:
 		draw_texture(ground, Vector2.ZERO)
+	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
+		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
 	var items: Array[Dictionary] = drawables()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		# All shadows lie on the floor, never on a lower-sorted prop or actor.
@@ -479,6 +524,15 @@ func _draw() -> void:
 	for item: Dictionary in items:
 		if item["kind"] == &"npc" and bubbles.has(item["id"]):
 			_draw_bubble(Vector2(item["at"]) - Vector2(0, float(item["height"]) + 6.0))
+	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
+		if TelegraphView.warning_visible(tell, snapshot.tick):
+			TelegraphView.draw_marker(self, tell, colors["x"] if tell.kind == &"gold" else colors["z"], colors["0"])
+	for effect: Dictionary in practice_effects:
+		var age: int = snapshot.tick - int(effect["tick"])
+		var plan: Array[Dictionary] = CombatEffects.parry_impact(effect["at"], age, effect["perfect"], colors) if effect["type"] == GameEvent.PARRY_SUCCEEDED else CombatEffects.hit_impact(effect["at"], age, false, colors)
+		CombatEffects.draw_plan(self, plan)
+	if not snapshot.training.is_empty() and int(snapshot.training["since_hit"]) < 8:
+		draw_arc(snapshot.training["center"], 10.0 + float(snapshot.training["since_hit"]) * 0.5, 0, TAU, 24, colors["1"], 1.0)
 	if debug_enabled:
 		_draw_debug()
 
@@ -488,7 +542,14 @@ func _draw_item(item: Dictionary) -> void:
 		AmbientFireflies.draw(self, item)
 		return
 	if item["kind"] == &"prop":
-		PropsLayer.draw(self, item, sprites, ambient())
+		var drawn: Dictionary = item.duplicate()
+		if not snapshot.training.is_empty() and item["type"] == &"village_dummy" and int(snapshot.training["since_hit"]) < 8:
+			var offset: Vector2 = Vector2(1 if int(snapshot.training["since_hit"]) % 2 == 0 else -1, 0)
+			drawn["at"] = Vector2(item["at"]) + offset
+			var rect: Rect2 = item["rect"]
+			rect.position += offset
+			drawn["rect"] = rect
+		PropsLayer.draw(self, drawn, sprites, ambient())
 		return
 	if item["kind"] == &"occluder":
 		DepthOccluders.draw(self, snapshot.scene_id, item)
@@ -584,6 +645,10 @@ func _draw_debug() -> void:
 func _update_hud() -> void:
 	if hud == null or snapshot == null:
 		return
+	conversation.colors = colors
+	conversation.visible = not character_menu.is_open and fade_phase == &""
+	hud.training = snapshot.training if snapshot.dialogue.is_empty() and not conversation.controls_open and not character_menu.is_open else {}
+	hud.training_at = Vector2(snapshot.training.get("center", Vector2.INF)) - view_origin
 	hud.colors = colors
 	hud.toast_text = toast_text()
 	hud.toast_alpha = clampf(float(toast_ticks) / TOAST_FADE_TICKS, 0.0, 1.0)
@@ -599,3 +664,16 @@ func _update_hud() -> void:
 	character_menu.atlas = sprites
 	character_menu.frames = frames
 	character_menu.queue_redraw()
+
+
+func dismiss_controls() -> void:
+	conversation.controls_open = false
+	core.set_flag(&"seen_controls")
+	snapshot = core.snapshot()
+	_save_progress(core.scene_id, core.last_checkpoint)
+	_update_hud()
+
+
+func practice_message(message: String) -> void:
+	toast_message = message
+	toast_ticks = TOAST_TICKS

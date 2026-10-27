@@ -13,6 +13,19 @@ var hint_at: Vector2 = Vector2.INF
 ## 0 = clear, 1 = the screen is ink (the 0.3 s fade between scenes).
 var fade_alpha: float = 0.0
 var debug_lines: Array[String] = []
+var training: Dictionary = {}
+var training_at: Vector2 = Vector2.INF
+const Bindings := preload("res://presentation/arena/input_bindings.gd")
+
+
+func training_hint() -> String:
+	match String(training.get("hint", "")):
+		"dash": return "Dash: " + Bindings.action_label("arena_dash")
+		"attack": return "Attack 3 times: %s (%d/%d)" % [Bindings.action_label("arena_attack"), training.get("hits", 0), training.get("hits_needed", 3)]
+		"parry": return "Parry GOLD just before hit: " + Bindings.action_label("arena_parry")
+		"dodge": return "Dash through RED: " + Bindings.action_label("arena_dash")
+	return ""
+
 
 const TOAST_SIZE: int = 11
 const HINT_Y: float = 160.0
@@ -47,6 +60,20 @@ func _draw() -> void:
 		draw_rect(plate, Color(colors["0"], 0.78))
 		draw_rect(Rect2(plate.position, Vector2(plate.size.x, 1)), colors["v"])
 		outlined(plate.position + Vector2(5, 3), hint_text, colors["1"], colors["0"])
+	if bool(training.get("active", false)):
+		var hint: String = training_hint()
+		if not hint.is_empty():
+			var w: float = text_width(hint) + 12
+			var at: Vector2 = Vector2(clampf(training_at.x - w / 2, 3, 317 - w), clampf(training_at.y - 54, 24, 132)).floor()
+			draw_rect(Rect2(at, Vector2(w, 13)), colors["0"])
+			lettering(at + Vector2(6, 4), hint, colors["1"])
+		var lesson_checks: Dictionary = training.get("lessons", {})
+		var checks: String = ""
+		for lesson: String in ["dash", "attack", "parry", "dodge"]:
+			checks += ("[+] " if bool(lesson_checks.get(lesson, false)) else "[ ] ") + lesson + "  "
+		var width: float = text_width(checks) + 12
+		draw_rect(Rect2(160 - width / 2, 161, width, 14), colors["0"])
+		lettering(Vector2(166 - width / 2, 165), checks, colors["u"])
 	if not debug_lines.is_empty():
 		var y: float = 24.0
 		draw_rect(Rect2(3, y - 2, 170, debug_lines.size() * 8 + 4), Color(colors["0"], 0.7))

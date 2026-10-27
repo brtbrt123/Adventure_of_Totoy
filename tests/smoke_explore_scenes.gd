@@ -159,10 +159,13 @@ func _village() -> void:
 			mira_left = npc["facing_left"]
 	_expect(not mira_left, "Mira turns to the hero on her right")
 	_step(scene, Vector2.ZERO, true)
-	_expect(scene.bubbles.has(&"mira"), "E shows the placeholder bubble over Mira")
+	_expect(not scene.snapshot.dialogue.is_empty() and not scene.bubbles.has(&"mira"), "E opens Mira dialogue instead of a placeholder bubble")
 	for i: int in Explore.BUBBLE_TICKS + 2:
 		_step(scene)
 	_expect(not scene.bubbles.has(&"mira"), "the bubble goes away")
+	var skip: InputFrame = InputFrame.new()
+	skip.skip_pressed = true
+	scene.advance(skip)
 	scene.core.place_at(Vector2(300, 250))
 	_step(scene)
 	_expect(scene.hud.hint_text == "", "no hint far from everyone")

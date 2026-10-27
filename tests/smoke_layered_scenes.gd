@@ -140,7 +140,7 @@ func run() -> void:
 	var input: InputFrame = InputFrame.new()
 	input.interact_pressed = true
 	scene.advance(input)
-	expect(scene.bubbles.has(&"mira"), "E talks to Mira through core interaction")
+	expect(not scene.snapshot.dialogue.is_empty() and not scene.bubbles.has(&"mira"), "E opens Mira conversation through core interaction")
 	var skip: InputFrame = InputFrame.new()
 	skip.skip_pressed = true  # the conversation stops the hero until it ends
 	scene.advance(skip)
