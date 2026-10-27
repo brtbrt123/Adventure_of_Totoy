@@ -4,6 +4,8 @@
 
 > **Latest Codex work (2026-10-27): village tutorial + prerequisite dialogue presentation implemented; review captures in `art/reference/tutorial_review_v1/`. See newest STATUS for verification and the P2 core snapshot combo finding for Claude. Glade arch remains approved.**
 
+> **Village playtest follow-up:** owner chose Claude for core changes. See [CLAUDE_TASK_village_playtest_polish.md](CLAUDE_TASK_village_playtest_polish.md): proposed roomier yard, Tovan first-sword grant, unarmed state, real reward event, combo snapshot fix. Codex has live practice VFX/audio/music; receipt card and unarmed/yard assets are review/integration fixtures. Compact training cards are approved. See newest STATUS.**
+
 Read this first, then `AGENTS.md` (the rules), then `docs/CHAPTER1_PLAN.md` (what we are building) and `docs/STATUS.md` (the detailed log, newest section first; entries labelled "NOT committed" may be older than the git history: trust `git log`).
 
 ## What this project is

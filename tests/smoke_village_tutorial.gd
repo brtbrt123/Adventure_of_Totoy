@@ -116,13 +116,16 @@ func run() -> void:
 			scene.advance(frame(true))
 			expect(scene.snapshot.hero.state == &"attack_windup" and scene.hero_frame.contains("attack"), "attack uses combat animation")
 			var impact_seen: bool = false
+			var slash_seen: bool = false
 			for i: int in 90:
 				scene.advance(frame())
 				impact_seen = impact_seen or not scene.practice_effects.is_empty()
+				slash_seen = slash_seen or not scene.practice_view.slash_effect().is_empty()
 				if scene.snapshot.hero.state == &"idle":
 					break
 			expect(int(scene.snapshot.training["hits"]) == swing + 1, "post counts one hit per swing")
 			expect(impact_seen, "post hit reaction recorded")
+			expect(slash_seen, "imported slash accompanies the swing")
 			expect(scene.frames.has(scene.hero_frame), "combat pose exists")
 		if wait_warning(scene):
 			var tell: RefCounted = scene.snapshot.telegraphs[0]
@@ -153,6 +156,21 @@ func run() -> void:
 		expect(not scene.snapshot.story_flags.has(&"lesson_aspect"), "rejected aspect does not teach lesson")
 		scene.request_aspect_equip(&"gale_cut", 1)
 		expect(Store.load_profile().story_flags.has(&"lesson_aspect"), "aspect equip lesson saved")
+		expect(int(scene.practice_view.audio.played.get("swing", 0)) >= 3, "recorded sword swishes")
+		expect(int(scene.practice_view.audio.played.get("perfect_parry", 0)) + int(scene.practice_view.audio.played.get("deflect", 0)) >= 1, "recorded parry cue")
+		expect(scene.practice_view.audio.music_active and scene.practice_view.audio.music.stream.get_length() > 20.0, "village music loop configured")
+		# A confirmed receipt fixture exercises only presentation, not item-grant rules.
+		scene.show_reward({"kind": &"weapon", "name": "Black Katana", "icon": "ui_weapon_sword_1", "quantity": 1})
+		scene.reward_popup.advance(0.0)
+		expect(scene.reward_popup.receipt.get("name", "") == "Black Katana", "weapon receipt popup")
+		scene.show_reward({"kind": &"item", "name": "Healing Herb", "quantity": 2})
+		scene.reward_popup.blocked = true
+		var left: float = scene.reward_popup.seconds_left
+		scene.reward_popup.advance(10.0)
+		expect(scene.reward_popup.seconds_left == left and not scene.reward_popup.visible, "dialogue pauses reward popup")
+		scene.reward_popup.blocked = false
+		scene.reward_popup.advance(4.0)
+		expect(scene.reward_popup.receipt.get("quantity", 0) == 2, "item receipt queue and quantity")
 		scene.enter_scene(id)
 		expect(not scene.conversation.controls_open and scene.snapshot.story_flags.has(&"training_done"), "scene entry restores flags")
 		scene.queue_free()

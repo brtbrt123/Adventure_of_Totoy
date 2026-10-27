@@ -32,6 +32,10 @@ const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
 
+const RewardPopup := preload("res://presentation/explore/reward_popup.gd")
+var reward_popup: RewardPopup
+const PracticeView := preload("res://presentation/explore/practice_view.gd")
+var practice_view: PracticeView
 const ConversationView := preload("res://presentation/explore/conversation_view.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
@@ -117,6 +121,8 @@ var change_scene: Callable = func(path: String) -> void: get_tree().change_scene
 
 func _ready() -> void:
 	Bindings.register()
+	practice_view = PracticeView.new()
+	add_child(practice_view)
 	var palette: Dictionary = _read_json("res://art/palette.json")
 	for entry: Dictionary in palette.get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
@@ -140,6 +146,8 @@ func _ready() -> void:
 	$HUD.add_child(character_menu)
 	conversation = ConversationView.new()
 	$HUD.add_child(conversation)
+	reward_popup = RewardPopup.new()
+	$HUD.add_child(reward_popup)
 	var start: Dictionary = Engine.get_meta(START_META, {}) if Engine.has_meta(START_META) else {}
 	if Engine.has_meta(START_META):
 		Engine.remove_meta(START_META)
@@ -185,6 +193,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	core.set_story_flags(profile.story_flags)
 	snapshot = core.snapshot()
 	practice_effects.clear()
+	practice_view.enter_scene(scene)
 	conversation.sync(snapshot.dialogue)
 	conversation.controls_open = scene in [SceneDefs.VILLAGE, SceneDefs.VILLAGE_LAYERED] and not snapshot.story_flags.has(&"seen_controls")
 	gate_open = snapshot.gate_open
@@ -198,6 +207,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	transitions += 1
 	_save_progress(scene, core.last_checkpoint)
 	_choose_frames()
+	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	_update_camera()
 	queue_redraw()
 
@@ -272,6 +282,7 @@ func advance(intent: InputFrame) -> void:
 		if int(bubbles[id]) <= 0:
 			bubbles.erase(id)
 	_choose_frames()
+	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	_update_camera()
 	_update_hud()
 	queue_redraw()
@@ -443,6 +454,10 @@ func _choose_frames() -> void:
 		facing_left = hero.facing.x < 0.0
 	previous_hero_position = hero.position
 	hero_frame = hero_frame_for(hero)
+	# Core returns to idle on success; hold the same brief contact pose as the arena.
+	for effect: Dictionary in practice_effects:
+		if effect["type"] == GameEvent.PARRY_SUCCEEDED and snapshot.tick - int(effect["tick"]) < 3 and hero.state in [&"idle", &"walk", &"parry"]:
+			hero_frame = ArenaAnimation.hero_frame(ArenaAnimation.SET_KATANA, "parry", 6)
 	for i: int in snapshot.npcs.size():
 		var npc: Dictionary = snapshot.npcs[i]
 		npc_frames[npc["id"]] = npc_frame_for(npc, snapshot.tick + i * 13)
@@ -645,9 +660,14 @@ func _draw_debug() -> void:
 func _update_hud() -> void:
 	if hud == null or snapshot == null:
 		return
+	reward_popup.colors = colors
+	reward_popup.atlas = sprites
+	reward_popup.frames = frames
+	reward_popup.blocked = conversation.controls_open or not snapshot.dialogue.is_empty() or character_menu.is_open or fade_phase != &""
 	conversation.colors = colors
 	conversation.visible = not character_menu.is_open and fade_phase == &""
 	hud.training = snapshot.training if snapshot.dialogue.is_empty() and not conversation.controls_open and not character_menu.is_open else {}
+	hud.training_feedback = toast_message if toast_ticks > 0 else ""
 	hud.training_at = Vector2(snapshot.training.get("center", Vector2.INF)) - view_origin
 	hud.colors = colors
 	hud.toast_text = toast_text()
@@ -677,3 +697,8 @@ func dismiss_controls() -> void:
 func practice_message(message: String) -> void:
 	toast_message = message
 	toast_ticks = TOAST_TICKS
+
+
+## Hook for Claude's confirmed reward event; no inventory or grant logic lives here.
+func show_reward(receipt: Dictionary) -> void:
+	reward_popup.enqueue(receipt)

@@ -15,6 +15,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - The rules for agents live in `AGENTS.md` at the project root (not in the vault)
 
 ## Work in progress
+- [[CLAUDE_TASK_village_playtest_polish]]: roomier training yard, Tovan first sword/unarmed state and reward event; Codex presentation ready
 - [[LAYERED_SCENE_PILOT]]: floor painting plus separate props; prompts for the images
 - [[CODEX_TASK_layered_pilot]]: Codex's side of the pilot
 - [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, who does what)

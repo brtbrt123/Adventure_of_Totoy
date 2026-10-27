@@ -2,6 +2,7 @@ extends SceneTree
 const Explore := preload("res://presentation/explore/explore_scene.gd")
 const Intent := preload("res://core/input_frame.gd")
 const OUT: String = "res://art/reference/tutorial_review_v1/"
+var output: String = OUT
 var scene: Explore
 
 
@@ -14,13 +15,17 @@ func capture(name: String) -> void:
 	scene.queue_redraw()
 	await process_frame
 	await RenderingServer.frame_post_draw
-	if root.get_texture().get_image().save_png(OUT + name + ".png") != OK:
+	if root.get_texture().get_image().save_png(output + name + ".png") != OK:
 		printerr("FAIL saving " + name)
 		quit(1)
 
 
 func run() -> void:
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
+	if "--compact-v3" in OS.get_cmdline_user_args():
+		output = "res://art/reference/tutorial_cards_compact_v3/"
+	elif "--cards-v2" in OS.get_cmdline_user_args():
+		output = "res://art/reference/tutorial_cards_v2/"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	if Engine.has_meta(Explore.PERSIST_META):
 		Engine.remove_meta(Explore.PERSIST_META)
 	root.size = Vector2i(1280, 720)
@@ -65,6 +70,9 @@ func run() -> void:
 					var tell: RefCounted = scene.snapshot.telegraphs[0]
 					if tell.kind == kind and scene.snapshot.tick == tell.hit_tick - 10:
 						break
+			# Show the instruction after transient event feedback, for layout review.
+			scene.toast_message = ""
+			scene.toast_ticks = 0
 			await capture(String(id) + "_" + String(kind))
 		var attack: Intent = Intent.new()
 		attack.attack_pressed = true

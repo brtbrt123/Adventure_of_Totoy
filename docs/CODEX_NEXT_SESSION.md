@@ -2,6 +2,8 @@
 
 ## Latest owner instruction takes priority
 
+Newest playtest follow-up: compact cards are approved. Owner requested roomier training, stronger VFX/audio, village music, unarmed arrival and reward popups; confirmed Tovan grants first sword before training and explicitly chose Claude for core changes. Start with `docs/CLAUDE_TASK_village_playtest_polish.md` and newest STATUS. Live practice effects/sounds/music are implemented; receipt UI, unarmed sheet and yard relocation are prepared for review/core integration. Do not claim the dummy has moved in gameplay or that sword grants/popups/unarmed arrival are wired yet. No core edits by Codex.
+
 Latest implementation: the owner supplied Claude's tutorial task. Codex built the village tutorial presentation together with its dialogue prerequisite; see newest STATUS and `art/reference/tutorial_review_v1/README.md`. Full regression passes. Human UI/playtest approval and Claude cross-review are pending. Claude must address the P2 core snapshot finding: `core/explore_core.gd:251` always reports combo swing 1. Do not edit core as Codex. The glade approval below remains valid; this tutorial work does not switch chapter routes.
 
 The owner approved the clean glade arch/bush/path composition on 2026-10-27: **"yes thats good"**. Preserve this selected layout; the earlier redo request is fulfilled. Review captures: `art/reference/layered_forest/review/playtest_fixes/clean_approach_v1/arch_preview.png` and full runtime/collider images in the same folder. Arch feet (492,62), solid left bush (440,62), solid right bush (540,62); three approach/bank bushes removed. Ground pixels unchanged. Focused glade, no-side-bypass collision and art-contract checks pass; see newest STATUS for full regression and commit results.

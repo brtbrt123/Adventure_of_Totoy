@@ -24,3 +24,10 @@ Readability follow-up: Moon preparation now uses the recorded posture_break laye
 
 
 Dedicated skill release mixes (2026-10-17): skill_gale_release layers dash and the broad sweep whoosh; skill_moon_release layers beam rush, a slowed sword swing and a quiet resonant impact tail; skill_breaking_release layers a sharp swing and metallic clash. All derive from the already credited processed CC0 recordings. sources.json records gains/pitches and normalization. Each mono44100Hz/16-bit WAV peaks below0.86 with faded endpoints. Release cues play 2dB above the old mix and all three briefly duck music. Moon preparation is now only2dB below base instead of5dB. skill_release_preview.wav demonstrates X, C, Z in that order. Human listening approval remains necessary.
+
+
+## Village practice and Lanternfen Evening (2026-10-27)
+
+`presentation/explore/village_audio.gd` reuses the same credited recorded `swing`, `armor_hit`, `perfect_parry` and `deflect` cues during practice, plus subdued gold/red warnings. Whiffs swish only on the snapshot's active transition; confirmed training-post/parry events choose contact cues. No synthesized replacement of the approved combat recordings.
+
+`music/lanternfen_evening.wav` is an original 26.667-second instrumental loop at 72 BPM: sparse plucked mallet notes over warm sustained chords, no percussion. It was synthesized locally, with no third-party melody or downloaded audio; the score, instrumentation and rendering settings are recorded in `music/lanternfen_evening.score.json`. Stereo PCM, 32 kHz, 16 bit, peak 0.6 before runtime gain; circular voice tails/reflections for continuous looping. Runtime mix is -26 dB with short ducking to -32 dB on parries/strong cues. Only village scenes enable it; it fades away in the forest/glade. Human listening approval remains pending.

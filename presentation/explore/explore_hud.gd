@@ -14,6 +14,7 @@ var hint_at: Vector2 = Vector2.INF
 var fade_alpha: float = 0.0
 var debug_lines: Array[String] = []
 var training: Dictionary = {}
+var training_feedback: String = ""
 var training_at: Vector2 = Vector2.INF
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 
@@ -50,7 +51,7 @@ func hint_rect() -> Rect2:
 func _draw() -> void:
 	if colors.is_empty():
 		return
-	if toast_text != "" and toast_alpha > 0.0:
+	if toast_text != "" and toast_alpha > 0.0 and not bool(training.get("active", false)):
 		var rect: Rect2 = toast_rect()
 		draw_rect(rect, Color(colors["0"], 0.78 * toast_alpha))
 		draw_rect(Rect2(rect.position + Vector2(0, rect.size.y - 1), Vector2(rect.size.x, 1)), Color(colors["u"], toast_alpha))
@@ -61,19 +62,7 @@ func _draw() -> void:
 		draw_rect(Rect2(plate.position, Vector2(plate.size.x, 1)), colors["v"])
 		outlined(plate.position + Vector2(5, 3), hint_text, colors["1"], colors["0"])
 	if bool(training.get("active", false)):
-		var hint: String = training_hint()
-		if not hint.is_empty():
-			var w: float = text_width(hint) + 12
-			var at: Vector2 = Vector2(clampf(training_at.x - w / 2, 3, 317 - w), clampf(training_at.y - 54, 24, 132)).floor()
-			draw_rect(Rect2(at, Vector2(w, 13)), colors["0"])
-			lettering(at + Vector2(6, 4), hint, colors["1"])
-		var lesson_checks: Dictionary = training.get("lessons", {})
-		var checks: String = ""
-		for lesson: String in ["dash", "attack", "parry", "dodge"]:
-			checks += ("[+] " if bool(lesson_checks.get(lesson, false)) else "[ ] ") + lesson + "  "
-		var width: float = text_width(checks) + 12
-		draw_rect(Rect2(160 - width / 2, 161, width, 14), colors["0"])
-		lettering(Vector2(166 - width / 2, 165), checks, colors["u"])
+		_draw_training_cards()
 	if not debug_lines.is_empty():
 		var y: float = 24.0
 		draw_rect(Rect2(3, y - 2, 170, debug_lines.size() * 8 + 4), Color(colors["0"], 0.7))
@@ -82,3 +71,37 @@ func _draw() -> void:
 			y += 8
 	if fade_alpha > 0.0:
 		draw_rect(Rect2(-4, -4, 328, 188), Color(colors["0"], clampf(fade_alpha, 0.0, 1.0)))
+
+
+## Same teal frame, corner gems, title face and body font as the controls/dialogue cards.
+func _draw_training_cards() -> void:
+	var lesson: String = String(training.get("hint", ""))
+	var titles: Dictionary = {"dash": "Dash", "attack": "Attack", "parry": "Parry gold", "dodge": "Dodge red"}
+	var details: Dictionary = {"dash": "Dash once in the training yard.", "attack": "Hit the post: %d / %d" % [training.get("hits", 0), training.get("hits_needed", 3)], "parry": "Press just before the gold hit.", "dodge": "Dash through the red hit."}
+	var actions: Dictionary = {"dash": "arena_dash", "attack": "arena_attack", "parry": "arena_parry", "dodge": "arena_dash"}
+	var feedback: bool = not training_feedback.is_empty() and toast_alpha > 0.0
+	if titles.has(lesson) or (bool(training.get("done", false)) and feedback):
+		UiPanel.draw_panel(self, Rect2(6, 6, 184, 29), &"info", colors)
+		lettering(Vector2(14, 12), titles.get(lesson, "Training complete"), colors["u"], 1, menu_font(), 8)
+		lettering(Vector2(14, 25), training_feedback if feedback else String(details.get(lesson, "All four lessons learned.")), colors["1"], 1, ui_font(), 8)
+		var key: String = Bindings.action_label(actions[lesson]) if actions.has(lesson) else "Done"
+		var width: float = text_width(key, 1, ui_font(), 8) + 10
+		var badge: Rect2 = Rect2(182 - width, 10, width, 12)
+		draw_rect(badge, colors["8"])
+		UiPanel.outline(self, badge, colors["t"])
+		lettering(badge.position + Vector2(5, 3), key, colors["1"], 1, ui_font(), 8)
+	UiPanel.draw_panel(self, Rect2(180, 145, 134, 29), &"info", colors)
+	var checks: Dictionary = training.get("lessons", {})
+	var names: Array[String] = ["dash", "attack", "parry", "dodge"]
+	for i: int in names.size():
+		var name: String = names[i]
+		var done: bool = bool(checks.get(name, false))
+		var x: float = 188 + (i % 2) * 63
+		var y: float = 152 + (i / 2) * 11
+		var tone: Color = colors["u"] if done else (colors["1"] if name == lesson else colors["o"])
+		UiPanel.outline(self, Rect2(x, y, 5, 5), tone)
+		if done:
+			draw_polyline(PackedVector2Array([Vector2(x + 1, y + 2), Vector2(x + 2, y + 3), Vector2(x + 4, y)]), tone)
+		lettering(Vector2(x + 8, y), name, tone, 1, ui_font(), 8)
+		if name == lesson:
+			draw_rect(Rect2(x + 8, y + 7, 40, 1), colors["t"])
