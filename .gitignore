@@ -44,3 +44,6 @@ art/build/*.log
 
 # Obsidian (docs/ is the vault; settings are machine-specific, see docs/HARNESS.md)
 docs/.obsidian/
+
+# Graphify output (regenerate with: python -m graphify update .)
+graphify-out/
