@@ -324,5 +324,27 @@
         0.88
       ]
     }
+  ],
+  "woodland_lantern": [
+    {
+      "pixel": [
+        12,
+        22
+      ],
+      "halo_radius": 25.0,
+      "energy": 1.05,
+      "pool_radius": 40.0,
+      "pool_energy": 0.6,
+      "colour": [
+        1.0,
+        0.79,
+        0.52
+      ],
+      "core_colour": [
+        1.05,
+        0.98,
+        0.88
+      ]
+    }
   ]
 }

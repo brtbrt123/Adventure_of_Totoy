@@ -1,0 +1,330 @@
+{
+  "scale": 0.23,
+  "alpha_threshold": 244,
+  "ground_size": [
+    640,
+    400
+  ],
+  "props": {
+    "woodland_tree_broad": {
+      "crop": [
+        10,
+        12,
+        505,
+        475
+      ],
+      "alpha_crop": [
+        16,
+        9,
+        487,
+        453
+      ],
+      "size": [
+        108,
+        102
+      ],
+      "anchor": [
+        54,
+        102
+      ],
+      "padded": [
+        112,
+        104
+      ]
+    },
+    "woodland_tree_slender": {
+      "crop": [
+        510,
+        12,
+        805,
+        475
+      ],
+      "alpha_crop": [
+        8,
+        16,
+        278,
+        448
+      ],
+      "size": [
+        62,
+        99
+      ],
+      "anchor": [
+        31,
+        99
+      ],
+      "padded": [
+        64,
+        104
+      ]
+    },
+    "woodland_bush": {
+      "crop": [
+        840,
+        240,
+        1135,
+        470
+      ],
+      "alpha_crop": [
+        22,
+        25,
+        281,
+        205
+      ],
+      "size": [
+        60,
+        41
+      ],
+      "anchor": [
+        30,
+        41
+      ],
+      "padded": [
+        64,
+        48
+      ]
+    },
+    "woodland_brambles": {
+      "crop": [
+        1180,
+        200,
+        1530,
+        475
+      ],
+      "alpha_crop": [
+        24,
+        38,
+        319,
+        253
+      ],
+      "size": [
+        68,
+        49
+      ],
+      "anchor": [
+        34,
+        49
+      ],
+      "padded": [
+        72,
+        56
+      ]
+    },
+    "woodland_rocks": {
+      "crop": [
+        40,
+        515,
+        395,
+        735
+      ],
+      "alpha_crop": [
+        32,
+        26,
+        336,
+        197
+      ],
+      "size": [
+        70,
+        39
+      ],
+      "anchor": [
+        35,
+        39
+      ],
+      "padded": [
+        72,
+        40
+      ]
+    },
+    "woodland_log": {
+      "crop": [
+        440,
+        530,
+        780,
+        735
+      ],
+      "alpha_crop": [
+        17,
+        44,
+        321,
+        193
+      ],
+      "size": [
+        70,
+        34
+      ],
+      "anchor": [
+        35,
+        34
+      ],
+      "padded": [
+        72,
+        40
+      ]
+    },
+    "woodland_stump": {
+      "crop": [
+        820,
+        510,
+        1165,
+        740
+      ],
+      "alpha_crop": [
+        20,
+        18,
+        337,
+        220
+      ],
+      "size": [
+        73,
+        46
+      ],
+      "anchor": [
+        36,
+        46
+      ],
+      "padded": [
+        80,
+        48
+      ]
+    },
+    "woodland_lantern": {
+      "crop": [
+        1250,
+        465,
+        1440,
+        750
+      ],
+      "alpha_crop": [
+        57,
+        16,
+        189,
+        271
+      ],
+      "size": [
+        30,
+        59
+      ],
+      "anchor": [
+        15,
+        59
+      ],
+      "padded": [
+        32,
+        64
+      ]
+    },
+    "woodland_sign": {
+      "crop": [
+        60,
+        745,
+        315,
+        1020
+      ],
+      "alpha_crop": [
+        37,
+        11,
+        211,
+        253
+      ],
+      "size": [
+        40,
+        56
+      ],
+      "anchor": [
+        20,
+        56
+      ],
+      "padded": [
+        40,
+        56
+      ]
+    },
+    "woodland_fire_ring": {
+      "crop": [
+        430,
+        795,
+        760,
+        1015
+      ],
+      "alpha_crop": [
+        19,
+        38,
+        293,
+        186
+      ],
+      "size": [
+        63,
+        34
+      ],
+      "anchor": [
+        32,
+        34
+      ],
+      "padded": [
+        64,
+        40
+      ]
+    },
+    "woodland_bedroll": {
+      "crop": [
+        830,
+        835,
+        1150,
+        1000
+      ],
+      "alpha_crop": [
+        33,
+        30,
+        273,
+        147
+      ],
+      "size": [
+        55,
+        27
+      ],
+      "anchor": [
+        28,
+        27
+      ],
+      "padded": [
+        56,
+        32
+      ]
+    },
+    "woodland_supplies": {
+      "crop": [
+        1180,
+        770,
+        1536,
+        1024
+      ],
+      "alpha_crop": [
+        28,
+        39,
+        309,
+        222
+      ],
+      "size": [
+        65,
+        42
+      ],
+      "anchor": [
+        32,
+        42
+      ],
+      "padded": [
+        72,
+        48
+      ]
+    }
+  },
+  "approvals": {
+    "ground": "2026-10-27: yes i approved",
+    "props": "2026-10-27: aight thats good"
+  },
+  "source_sha256": {
+    "ground_raw.png": "14fb710e012eb22f152bd91f2e31309fcbf86a1913dab800df84eb2942ccf13a",
+    "props_raw.png": "65e2ec91fa61bec8004240209333168126098381216f42822338eaeb0d9551f2"
+  }
+}

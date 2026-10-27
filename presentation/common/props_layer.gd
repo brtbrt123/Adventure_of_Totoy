@@ -13,7 +13,7 @@ static func art_metadata() -> Dictionary:
 	return _art
 
 
-static func drawables(placements: Array[Dictionary], frames: Dictionary, view: Rect2 = Rect2(-10000, -10000, 20000, 20000)) -> Array[Dictionary]:
+static func drawables(placements: Array[Dictionary], frames: Dictionary, view: Rect2 = Rect2(-10000, -10000, 20000, 20000), art_overrides: Dictionary = {}) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for placement: Dictionary in placements:
 		var name: String = String(placement["type"])
@@ -26,7 +26,7 @@ static func drawables(placements: Array[Dictionary], frames: Dictionary, view: R
 		var size: Vector2 = Vector2(frame["w"], frame["h"])
 		var source: Rect2 = Rect2(frame["x"], frame["y"], size.x, size.y)
 		# Tool-only contract tests supply unpadded frames without atlas anchors.
-		var metadata: Dictionary = art_metadata().get(name, {}) if frame.has("ax") else {}
+		var metadata: Dictionary = art_overrides.get(name, art_metadata().get(name, {})) if frame.has("ax") else {}
 		var cast_names: Dictionary = metadata.get("cast_shadow", {})
 		var cast_name: String = String(cast_names.get("flipped" if bool(placement.get("flip", false)) else "normal", ""))
 		var cast_frame: Dictionary = frames.get(cast_name, {})

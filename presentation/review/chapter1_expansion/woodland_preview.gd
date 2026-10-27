@@ -4,32 +4,30 @@ const PropScene := preload("res://core/prop_scene.gd")
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
 var data: Dictionary = {}
-var tiles: Dictionary = {}
 var frames: Dictionary = {}
 var items: Array[Dictionary] = []
-var tile_atlas: Texture2D
 var atlas: Texture2D
+var ground_texture: Texture2D
 var annotations: bool = false
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	data = PropScene.read_json("res://presentation/review/chapter1_expansion/woodland_approach.json")
-	tiles = PropScene.read_json("res://art/build/tiles.json")["tiles"]
 	frames = PropScene.read_json("res://art/build/sprites.json")["frames"]
-	tile_atlas = load("res://art/build/tiles.png") as Texture2D
 	atlas = load("res://art/build/sprites.png") as Texture2D
-	var placements: Array[Dictionary] = PropScene.placements(data, PropScene.load_defs())
-	items = PropsLayer.drawables(placements, frames)
+	var definitions: Dictionary = PropScene.load_defs()
+	definitions["props"].merge(PropScene.read_json("res://art/reference/woodland_approach_v1/review_prop_defs.json")["props"])
+	ground_texture = load("res://presentation/forest/woodland_approach_ground.png") as Texture2D
+	var placements: Array[Dictionary] = PropScene.placements(data, definitions)
+	var review_art: Dictionary = PropScene.read_json("res://art/reference/woodland_approach_v1/review_prop_art.json")["props"]
+	items = PropsLayer.drawables(placements, frames, Rect2(0, 0, 640, 400), review_art)
 	material = EnvironmentLight.make_material(&"forest_layered", Vector2(640, 400), placements)
 	queue_redraw()
 
 func _draw() -> void:
 	if data.is_empty():
 		return
-	for y: int in range(25):
-		for x: int in range(40):
-			var tile: Dictionary = tiles[data["terrain"][y][x]]
-			draw_texture_rect_region(tile_atlas, Rect2(x * 16, y * 16, 16, 16), Rect2(tile["x"], tile["y"], 16, 16))
+	draw_texture(ground_texture, Vector2.ZERO)
 	PropsLayer.draw_shadows(self, items, 0.3, atlas)
 	var hero: Vector2 = Vector2(data["hero_marker"][0], data["hero_marker"][1])
 	var actors: Array[Dictionary] = [{"kind": &"actor", "id": "review_hero", "at": hero}]
