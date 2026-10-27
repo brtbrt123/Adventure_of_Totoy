@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "props": {
+    "woodland_tree_broad": {
+      "w": 108,
+      "h": 102,
+      "anchor": [
+        54,
+        102
+      ],
+      "image": "woodland_tree_broad.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_tree_slender": {
+      "w": 62,
+      "h": 99,
+      "anchor": [
+        31,
+        99
+      ],
+      "image": "woodland_tree_slender.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_bush": {
+      "w": 60,
+      "h": 41,
+      "anchor": [
+        30,
+        41
+      ],
+      "image": "woodland_bush.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_brambles": {
+      "w": 68,
+      "h": 49,
+      "anchor": [
+        34,
+        49
+      ],
+      "image": "woodland_brambles.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_rocks": {
+      "w": 70,
+      "h": 39,
+      "anchor": [
+        35,
+        39
+      ],
+      "image": "woodland_rocks.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_log": {
+      "w": 70,
+      "h": 34,
+      "anchor": [
+        35,
+        34
+      ],
+      "image": "woodland_log.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_stump": {
+      "w": 73,
+      "h": 46,
+      "anchor": [
+        36,
+        46
+      ],
+      "image": "woodland_stump.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_lantern": {
+      "w": 30,
+      "h": 59,
+      "anchor": [
+        15,
+        59
+      ],
+      "image": "woodland_lantern.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_sign": {
+      "w": 40,
+      "h": 56,
+      "anchor": [
+        20,
+        56
+      ],
+      "image": "woodland_sign.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_fire_ring": {
+      "w": 63,
+      "h": 34,
+      "anchor": [
+        32,
+        34
+      ],
+      "image": "woodland_fire_ring.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_bedroll": {
+      "w": 55,
+      "h": 27,
+      "anchor": [
+        28,
+        27
+      ],
+      "image": "woodland_bedroll.png",
+      "solid": false,
+      "colliders": []
+    },
+    "woodland_supplies": {
+      "w": 65,
+      "h": 42,
+      "anchor": [
+        32,
+        42
+      ],
+      "image": "woodland_supplies.png",
+      "solid": false,
+      "colliders": []
+    }
+  }
+}

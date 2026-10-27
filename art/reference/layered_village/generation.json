@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-27",
+  "generator": "built-in ImageGen",
+  "status": "source art APPROVED by the human on 2026-10-27; palette normalization, extraction and integration pending",
+  "style_references": [
+    "art/reference/lanternfen_village_target.png",
+    "art/reference/layered_pilot/review/glade_full.png"
+  ],
+  "prompt_source": "docs/LAYERED_VILLAGE_FOREST.md, Village sections 1\u20133",
+  "constraints": [
+    "571x336 eventual ground",
+    "3/4 top-down pixel art",
+    "olive/brown/grey material ramps and teal runes",
+    "cream/peach lights; reserve red/gold for combat",
+    "isolated props on pure magenta; no floor or external shadows"
+  ],
+  "files": {
+    "village_ground_only.png": {
+      "size": [
+        1634,
+        963
+      ]
+    },
+    "village_props_a.png": {
+      "size": [
+        1635,
+        962
+      ]
+    },
+    "village_props_b.png": {
+      "size": [
+        1634,
+        962
+      ]
+    }
+  },
+  "correction": "Sheet B row2 column2 changed to closed planked lid. Original preserved as village_props_b_v1.png.",
+  "gate_path_revision": {
+    "source": "village_ground_gate_path_v2.png",
+    "request": "Human chose narrowing the path around the gate instead of enlarging the gate. Keep existing gate/colliders.",
+    "tool": "built-in ImageGen edit using runtime ground and gate placement review as references",
+    "runtime": "res://presentation/village/village_layered_ground.png",
+    "conversion": "571x336 BOX reduction, nonreserved Totoy36 Lab snap"
+  }
+}

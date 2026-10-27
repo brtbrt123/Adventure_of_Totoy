@@ -113,5 +113,20 @@ Notes: `--headless --quit` alone fails with "no main scene defined" until the pr
 - Do not use flags that skip all permission checks. Do not put secrets (`.env`, keys) in files, commits or prompts.
 - Never delete branches or worktrees without asking.
 - Report honestly: what you ran, what passed, what you could not verify.
-- Future sessions start with no memory. Read `docs/STATUS.md` first; update it when you finish a piece of work.
-- The router, runner, checks and review loop exist (`harness/`, see `docs/HARNESS.md` and `docs/ROUTING.md`): `python harness/router.py run "<task>" --dry-run` shows the plan. Claude Code owns `harness/` and `tools/`. CI and Graphify are later stages; do not build them unless asked.
+- Future sessions start with no memory. Read `docs/INDEX.md` (the Obsidian vault home, links every note) and `docs/STATUS.md` first; update it when you finish a piece of work.
+- The router, runner, checks and review loop exist (`harness/`, see `docs/HARNESS.md` and `docs/ROUTING.md`): `python harness/router.py run "<task>" --dry-run` shows the plan. Claude Code owns `harness/` and `tools/`. CI is a later stage; do not build it unless asked. Graphify is installed for Claude Code and Codex (see the graphify section below).
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+
+Rules:
+- When graphify-out/graph.json exists, run `graphify query "<question>"` before your first grep, search or source-file read for a codebase question, and put this rule in every subagent prompt that explores code. Read raw files only for lines the graph or an earlier read already located. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
+- The graph does NOT cover GDScript (`core/`, `presentation/`, `tests/*.gd`, Graphify has no `.gd` parser) or art: use Grep/Read there; use the graph for `tools/`, `harness/` and the docs. `graphify-out/` is gitignored, so build your own copy once with `python -m graphify update .`. The `graphify` command is not on PATH on this machine: run `python -m graphify ...` (install: `pip install --user graphifyy`).

@@ -1,0 +1,296 @@
+{
+  "frames": [
+    "npc_child_idle_right_1",
+    "npc_child_idle_right_2",
+    "npc_child_idle_right_3",
+    "npc_child_idle_right_4",
+    "npc_child_walk_right_1",
+    "npc_child_walk_right_2",
+    "npc_child_walk_right_3",
+    "npc_child_walk_right_4",
+    "npc_child_walk_right_5",
+    "npc_child_walk_right_6",
+    "npc_edda_cane_right_1",
+    "npc_edda_idle_right_1",
+    "npc_edda_idle_right_2",
+    "npc_edda_idle_right_3",
+    "npc_edda_idle_right_4",
+    "npc_edda_talk_right_1",
+    "npc_edda_talk_right_2",
+    "npc_edda_talk_right_3",
+    "npc_edda_walk_right_1",
+    "npc_edda_walk_right_2",
+    "npc_edda_walk_right_3",
+    "npc_edda_walk_right_4",
+    "npc_edda_walk_right_5",
+    "npc_edda_walk_right_6",
+    "npc_elder_idle_right_1",
+    "npc_elder_idle_right_2",
+    "npc_elder_idle_right_3",
+    "npc_elder_idle_right_4",
+    "npc_elder_walk_right_1",
+    "npc_elder_walk_right_2",
+    "npc_elder_walk_right_3",
+    "npc_elder_walk_right_4",
+    "npc_elder_walk_right_5",
+    "npc_elder_walk_right_6",
+    "npc_mira_compass_right_1",
+    "npc_mira_idle_right_1",
+    "npc_mira_idle_right_2",
+    "npc_mira_idle_right_3",
+    "npc_mira_idle_right_4",
+    "npc_mira_talk_right_1",
+    "npc_mira_talk_right_2",
+    "npc_mira_talk_right_3",
+    "npc_mira_walk_right_1",
+    "npc_mira_walk_right_2",
+    "npc_mira_walk_right_3",
+    "npc_mira_walk_right_4",
+    "npc_mira_walk_right_5",
+    "npc_mira_walk_right_6",
+    "npc_tovan_anvil_right_1",
+    "npc_tovan_idle_right_1",
+    "npc_tovan_idle_right_2",
+    "npc_tovan_idle_right_3",
+    "npc_tovan_idle_right_4",
+    "npc_tovan_talk_right_1",
+    "npc_tovan_talk_right_2",
+    "npc_tovan_talk_right_3",
+    "npc_tovan_walk_right_1",
+    "npc_tovan_walk_right_2",
+    "npc_tovan_walk_right_3",
+    "npc_tovan_walk_right_4",
+    "npc_tovan_walk_right_5",
+    "npc_tovan_walk_right_6",
+    "npc_worker_idle_right_1",
+    "npc_worker_idle_right_2",
+    "npc_worker_idle_right_3",
+    "npc_worker_idle_right_4",
+    "npc_worker_walk_right_1",
+    "npc_worker_walk_right_2",
+    "npc_worker_walk_right_3",
+    "npc_worker_walk_right_4",
+    "npc_worker_walk_right_5",
+    "npc_worker_walk_right_6",
+    "obj_chest_closed_1",
+    "obj_chest_open_1",
+    "obj_dummy_1",
+    "obj_dummy_hit_1",
+    "obj_dummy_hit_2",
+    "obj_herbs_1",
+    "obj_lantern_1",
+    "obj_lantern_2",
+    "obj_lantern_3",
+    "obj_lantern_4",
+    "obj_lantern_post_1",
+    "obj_lantern_post_2",
+    "obj_lantern_post_3",
+    "obj_lantern_post_4"
+  ],
+  "note": "Chapter 1 NPCs and interactables in the game atlas (art/build/sprites.json). Names: npc_<name>_<state>_right_<n> (left = mirror around the anchor), obj_*_<n>. Ticks per frame at 60 per second.",
+  "objects": {
+    "obj_dummy_hit": {
+      "frames": 2,
+      "then": "obj_dummy_1",
+      "ticks": [
+        4,
+        4
+      ]
+    },
+    "obj_lantern": {
+      "frames": 4,
+      "ticks": [
+        12,
+        10,
+        12,
+        10
+      ]
+    },
+    "obj_lantern_post": {
+      "frames": 4,
+      "ticks": [
+        12,
+        10,
+        12,
+        10
+      ]
+    }
+  },
+  "source": "art/reference/chapter1_characters_v2/npc_sprites_v2.json",
+  "states": {
+    "child": {
+      "idle": {
+        "frames": 4,
+        "ticks": [
+          24,
+          14,
+          14,
+          8
+        ]
+      },
+      "walk": {
+        "frames": 6,
+        "ticks": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      }
+    },
+    "edda": {
+      "cane": {
+        "frames": 1,
+        "ticks": [
+          60
+        ]
+      },
+      "idle": {
+        "frames": 4,
+        "ticks": [
+          24,
+          14,
+          14,
+          8
+        ]
+      },
+      "talk": {
+        "frames": 3,
+        "ticks": [
+          10,
+          8,
+          10
+        ]
+      },
+      "walk": {
+        "frames": 6,
+        "ticks": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      }
+    },
+    "elder": {
+      "idle": {
+        "frames": 4,
+        "ticks": [
+          24,
+          14,
+          14,
+          8
+        ]
+      },
+      "walk": {
+        "frames": 6,
+        "ticks": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      }
+    },
+    "mira": {
+      "compass": {
+        "frames": 1,
+        "ticks": [
+          60
+        ]
+      },
+      "idle": {
+        "frames": 4,
+        "ticks": [
+          24,
+          14,
+          14,
+          8
+        ]
+      },
+      "talk": {
+        "frames": 3,
+        "ticks": [
+          10,
+          8,
+          10
+        ]
+      },
+      "walk": {
+        "frames": 6,
+        "ticks": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      }
+    },
+    "tovan": {
+      "anvil": {
+        "frames": 1,
+        "ticks": [
+          60
+        ]
+      },
+      "idle": {
+        "frames": 4,
+        "ticks": [
+          24,
+          14,
+          14,
+          8
+        ]
+      },
+      "talk": {
+        "frames": 3,
+        "ticks": [
+          10,
+          8,
+          10
+        ]
+      },
+      "walk": {
+        "frames": 6,
+        "ticks": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      }
+    },
+    "worker": {
+      "idle": {
+        "frames": 4,
+        "ticks": [
+          24,
+          14,
+          14,
+          8
+        ]
+      },
+      "walk": {
+        "frames": 6,
+        "ticks": [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      }
+    }
+  }
+}

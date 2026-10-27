@@ -52,43 +52,88 @@ func _title_screen() -> void:
 	var title: Title = (load("res://presentation/menu/title.tscn") as PackedScene).instantiate() as Title
 	root.add_child(title)
 	title.change_scene = func(path: String) -> void: changed_to.append(path)
-	_expect(title.screen == Title.SCREEN_TITLE and title.index == 0, "starts on the menu with START selected")
+	_expect(title.screen == Title.SCREEN_TITLE and title.index == 0, "starts on the menu with NEW GAME selected")
+	_expect(Array(Title.ITEMS) == ["NEW GAME", "CONTINUE", "BOSS FIGHT", "CONTROLS", "CREDITS", "QUIT"], "the menu items")
+	_expect(Title.MENU_TOP + (Title.ITEMS.size() - 1) * Title.MENU_STEP + Title.MENU_STEP <= 178, "the last menu line fits the screen")
 	title.move_selection(-1)
 	_expect(title.index == Title.ITEMS.size() - 1, "up from the first item wraps to the last")
 	title.move_selection(1)
 	_expect(title.index == 0, "down from the last wraps to the first")
 	_expect(title.item_at(Vector2(160, Title.MENU_TOP + 4)) == 0 and title.item_at(Vector2(160, Title.MENU_TOP + Title.MENU_STEP + 4)) == 1 and title.item_at(Vector2(10, 10)) == -1, "mouse hit boxes line up with the menu rows")
-	title.index = 1
+	title.index = 3
 	title.activate()
 	_expect(title.screen == Title.SCREEN_CONTROLS, "CONTROLS opens the controls page")
 	title.move_selection(1)
-	_expect(title.index == 1, "the menu does not move while a page is open")
+	_expect(title.index == 3, "the menu does not move while a page is open")
 	title.back()
 	_expect(title.screen == Title.SCREEN_TITLE, "back returns to the menu")
-	title.index = 2
+	title.index = 4
 	title.activate()
 	_expect(title.screen == Title.SCREEN_CREDITS, "CREDITS opens the credits page")
 	title.activate()
 	_expect(title.screen == Title.SCREEN_TITLE, "enter on a page goes back")
-	title.index = 0
+	# CONTINUE with nothing saved does nothing
+	title.index = 1
+	title.activate()
+	_expect(changed_to.is_empty() and not title.started, "CONTINUE without a saved chapter does nothing")
+	title.index = 2
 	title.activate()
 	title.activate()  # a second press must not start twice
-	_expect(changed_to == [Title.ARENA_SCENE], "START opens the arena exactly once: %s" % str(changed_to))
-	_expect(Engine.has_meta(Title.PERSIST_META), "START turns saving on")
+	_expect(changed_to == [Title.ARENA_SCENE], "BOSS FIGHT opens the arena exactly once: %s" % str(changed_to))
+	_expect(Engine.has_meta(Title.PERSIST_META), "BOSS FIGHT turns saving on")
 	Engine.remove_meta(Title.PERSIST_META)
+	# NEW GAME: the village, chapter progress cleared, the record kept
+	var seeded: SaveProfile = SaveProfile.new()
+	seeded.victories = 4
+	seeded.record_scene(&"forest", &"forest_puzzle")
+	seeded.gate_open = true
+	SaveStore.save(seeded, SAVE_PATH)
+	title.profile = SaveStore.load_profile(SAVE_PATH)
+	title.started = false
+	changed_to.clear()
+	_expect(title.can_continue(), "a saved chapter can be continued")
+	title.index = 0
+	title.activate()
+	_expect(changed_to == [Title.EXPLORE_SCENE], "NEW GAME opens the exploration scene: %s" % str(changed_to))
+	var start: Dictionary = Engine.get_meta(Title.EXPLORE_START_META, {})
+	_expect(start.get("scene", &"") == &"village_layered" and start.get("entry", &"") == &"arrival" and not bool(start.get("gate_open", true)), "NEW GAME starts at the village arrival: %s" % str(start))
+	var after_new: SaveProfile = SaveStore.load_profile(SAVE_PATH)
+	_expect(after_new.victories == 4 and not after_new.has_progress() and not after_new.gate_open, "NEW GAME clears the chapter progress and keeps the record")
+	# CONTINUE: the saved scene and checkpoint
+	seeded.record_scene(&"glade", &"glade_entrance")
+	SaveStore.save(seeded, SAVE_PATH)
+	title.profile = SaveStore.load_profile(SAVE_PATH)
+	title.started = false
+	changed_to.clear()
+	title.index = 1
+	title.activate()
+	start = Engine.get_meta(Title.EXPLORE_START_META, {})
+	_expect(changed_to == [Title.EXPLORE_SCENE] and start.get("scene", &"") == &"glade_layered" and start.get("checkpoint", &"") == &"glade_layered_entrance" and bool(start.get("gate_open", false)), "CONTINUE resumes the glade checkpoint with the gate flag: %s" % str(start))
+	seeded.record_scene(&"arena", &"ruins_gate")
+	SaveStore.save(seeded, SAVE_PATH)
+	title.profile = SaveStore.load_profile(SAVE_PATH)
+	title.started = false
+	changed_to.clear()
+	title.activate()
+	_expect(changed_to == [Title.ARENA_SCENE], "CONTINUE in the arena opens the fight")
+	Engine.remove_meta(Title.PERSIST_META)
+	if Engine.has_meta(Title.EXPLORE_START_META):
+		Engine.remove_meta(Title.EXPLORE_START_META)
+	SaveStore.delete(SAVE_PATH)
+	title.profile = SaveProfile.new()
 	# every character on every page and menu line exists in the UI font (nothing falls back to a missing-glyph box)
 	var strings: Array[String] = []
 	strings.append_array(Title.ITEMS)
 	strings.append_array(Title.CONTROL_LINES)
 	strings.append_array(Title.CONTROL_FOOTER)
 	strings.append_array(Title.CREDIT_LINES)
-	strings.append_array(["ADVENTURE OF TOTOY", "GOLD CAN BE PARRIED. RED MUST BE DODGED.", "VICTORIES 0  DEFEATS 0  BEST 1:00.0", "SAVE RESET: NOT VALID JSON", "ESC OR ENTER: BACK", "> START", "NEW BEST!", "ESC: TITLE", "R TO RESTART", "TIME 1:23.4"])
+	strings.append_array(["ADVENTURE OF TOTOY", "GOLD CAN BE PARRIED. RED MUST BE DODGED.", "VICTORIES 0  DEFEATS 0  BEST 1:00.0", "SAVE RESET: NOT VALID JSON", "ESC OR ENTER: BACK", "> NEW GAME", "LANTERNFEN", "FOREST ROUTE", "STAG GLADE", "COLOSSUS RUINS", "ROOT GATE OPEN", "ROOT GATE CLOSED", "NEW BEST!", "ESC: TITLE", "R TO RESTART", "TIME 1:23.4"])
 	for line: String in strings:
 		for character: String in line.to_upper():
 			_expect(Title.menu_font().has_char(character.unicode_at(0)), "the menu font has no glyph for '%s' in \"%s\"" % [character, line])
 	# the controls page covers every binding the game uses
 	var controls: String = " ".join(Title.CONTROL_LINES).to_upper()
-	for needle: String in ["WASD", "LEFT CLICK", "RIGHT CLICK", "SHIFT", "SPACE", "Z:", "X:", "C:", "R:", "ESC", "TAB"]:
+	for needle: String in ["WASD", "LEFT CLICK", "RIGHT CLICK", "SHIFT", "SPACE", "Z X C:", "E:INTERACT", "R:", "ESC", "TAB:", "F1"]:
 		_expect(controls.contains(needle), "controls page misses " + needle)
 	# the credits name every creator in the audio source list and licence notes
 	var credits: String = " ".join(Title.CREDIT_LINES).to_upper()

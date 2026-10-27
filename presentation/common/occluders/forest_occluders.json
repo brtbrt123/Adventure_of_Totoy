@@ -1,0 +1,160 @@
+{
+ "scene": "forest",
+ "ground": "res://presentation/forest/forest_route_ground.png",
+ "texture": "res://presentation/common/occluders/forest_occluders.png",
+ "occluders": [
+  {
+   "id": "root_gate_left",
+   "base_y": 106,
+   "rect": [
+    310,
+    28,
+    35,
+    82
+   ],
+   "atlas": [
+    0,
+    0
+   ],
+   "pixels": 2870,
+   "ground_share": 0.3798,
+   "hide_when": ""
+  },
+  {
+   "id": "root_gate_middle",
+   "base_y": 105,
+   "rect": [
+    345,
+    26,
+    54,
+    81
+   ],
+   "atlas": [
+    36,
+    0
+   ],
+   "pixels": 4374,
+   "ground_share": 0.5942,
+   "hide_when": "gate_open"
+  },
+  {
+   "id": "root_gate_right",
+   "base_y": 118,
+   "rect": [
+    399,
+    28,
+    34,
+    93
+   ],
+   "atlas": [
+    91,
+    0
+   ],
+   "pixels": 3162,
+   "ground_share": 0.4671,
+   "hide_when": ""
+  },
+  {
+   "id": "pedestal_west",
+   "base_y": 147,
+   "rect": [
+    295,
+    97,
+    25,
+    53
+   ],
+   "atlas": [
+    126,
+    0
+   ],
+   "pixels": 929,
+   "ground_share": 0.042,
+   "hide_when": ""
+  },
+  {
+   "id": "pedestal_east",
+   "base_y": 170,
+   "rect": [
+    369,
+    117,
+    25,
+    56
+   ],
+   "atlas": [
+    152,
+    0
+   ],
+   "pixels": 719,
+   "ground_share": 0.0139,
+   "hide_when": ""
+  },
+  {
+   "id": "signpost",
+   "base_y": 111,
+   "rect": [
+    133,
+    65,
+    31,
+    47
+   ],
+   "atlas": [
+    178,
+    0
+   ],
+   "pixels": 728,
+   "ground_share": 0.0165,
+   "hide_when": ""
+  },
+  {
+   "id": "lantern_post",
+   "base_y": 116,
+   "rect": [
+    168,
+    80,
+    16,
+    28
+   ],
+   "atlas": [
+    210,
+    0
+   ],
+   "pixels": 132,
+   "ground_share": 0.0076,
+   "hide_when": ""
+  },
+  {
+   "id": "mossy_stone",
+   "base_y": 124,
+   "rect": [
+    187,
+    82,
+    30,
+    45
+   ],
+   "atlas": [
+    227,
+    0
+   ],
+   "pixels": 1350,
+   "ground_share": 0.5615,
+   "hide_when": ""
+  },
+  {
+   "id": "mossy_rock_east",
+   "base_y": 184,
+   "rect": [
+    428,
+    150,
+    28,
+    37
+   ],
+   "atlas": [
+    258,
+    0
+   ],
+   "pixels": 406,
+   "ground_share": 0.0,
+   "hide_when": ""
+  }
+ ]
+}

@@ -8,13 +8,25 @@ static func register() -> void:
 		"arena_up": [KEY_W, KEY_UP], "arena_down": [KEY_S, KEY_DOWN],
 		"arena_attack": [], "arena_weapon_active": [], "arena_parry": [KEY_SPACE],
 		"arena_dash": [KEY_SHIFT], "arena_restart": [KEY_R],
-		"arena_debug": [KEY_F1],
+		"arena_debug": [KEY_F1, KEY_H],
 		"menu_up": [KEY_W, KEY_UP], "menu_down": [KEY_S, KEY_DOWN],
 		"menu_accept": [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE], "menu_back": [KEY_ESCAPE],
 		"arena_skill_1": [KEY_Z], "arena_skill_2": [KEY_X], "arena_skill_3": [KEY_C],
 		# the character menu (presentation/arena/character_menu.gd): TAB opens and closes it, Q/E switch its tabs
 		"menu_toggle": [KEY_TAB], "menu_tab_prev": [KEY_Q], "menu_tab_next": [KEY_E],
 		"menu_left": [KEY_A, KEY_LEFT], "menu_right": [KEY_D, KEY_RIGHT],
+		# exploration (presentation/explore/explore_scene.gd): E interacts; F2-F5 jump to a scene, F6 opens/closes the
+		# forest's root gate (debug keys for testing)
+		"explore_interact": [KEY_E],
+		"dialogue_next": [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE],
+		"dialogue_skip": [KEY_ESCAPE],
+		# keyboards without F-keys: the number row 1-4 jump, G toggles the gate, H shows the debug overlay
+		"debug_scene_village": [KEY_F2, KEY_1], "debug_scene_forest": [KEY_F3, KEY_2], "debug_scene_glade": [KEY_F4, KEY_3],
+		"debug_scene_arena": [KEY_F5, KEY_4], "debug_toggle_gate": [KEY_F6, KEY_G],
+		"debug_scene_village_layered": [KEY_F7, KEY_5],
+		"debug_scene_glade_layered": [KEY_F8, KEY_6],
+		"debug_lighting_toggle": [KEY_F9, KEY_7],
+		"debug_scene_forest_layered": [KEY_F10, KEY_8],
 	}
 	# Q no longer swaps weapons in the arena (2026-10-21): weapons are equipped in the character menu's inventory.
 	if InputMap.has_action("arena_weapon_swap"):
@@ -42,6 +54,8 @@ static func register() -> void:
 				click.button_index = MOUSE_BUTTON_RIGHT
 				InputMap.action_add_event(action, click)
 				_button(action, JOY_BUTTON_Y)
+			"dialogue_next": _button(action, JOY_BUTTON_A)
+			"dialogue_skip": _button(action, JOY_BUTTON_B)
 			"menu_up": _button(action, JOY_BUTTON_DPAD_UP)
 			"menu_down": _button(action, JOY_BUTTON_DPAD_DOWN)
 			"menu_accept": _button(action, JOY_BUTTON_A)
@@ -83,3 +97,14 @@ static func read_frame(_player_position: Vector2 = Vector2.ZERO, _mouse_position
 	frame.parry_pressed = Input.is_action_just_pressed("arena_parry")
 	frame.dash_pressed = Input.is_action_just_pressed("arena_dash")
 	return frame
+
+
+## Keyboard/mouse labels reflect the currently registered map, including later remaps.
+static func action_label(action: String) -> String:
+	for event: InputEvent in InputMap.action_get_events(action):
+		if event is InputEventKey:
+			var key: InputEventKey = event as InputEventKey
+			return OS.get_keycode_string(key.physical_keycode if key.physical_keycode != 0 else key.keycode)
+		if event is InputEventMouseButton:
+			return "Left click" if (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT else "Right click"
+	return "Unbound"

@@ -31,6 +31,12 @@ const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
 const ArenaDecor := preload("res://presentation/arena/arena_decor.gd")
+## The shared soft ground shadow under the actors and the painted props drawn over actors behind them (2026-10-22).
+const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
+const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
+const OCCLUDER_SCENE: StringName = &"arena"
+## The ground is drawn at this modulate; the occluders (cut from it) must match.
+const GROUND_MODULATE: Color = Color(0.92, 0.92, 0.92)
 const GROUND_PATH: String = "res://presentation/arena/arena_ground.png"
 const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
 ## Non-solid decoration (the solid props come from the core's snapshot).
@@ -508,6 +514,7 @@ func _age_effects() -> void:
 			trails.remove_at(index)
 
 func _on_event(event: GameEvent) -> void:
+	combat_audio.handle_event(event)
 	match event.type:
 		&"weapon_buff_started", &"weapon_buff_ended":
 			var identity: String = "%s:%d:%d" % [event.type, event.tick, int(event.data["entity_id"])]
@@ -668,7 +675,7 @@ func _on_lightning_blink(event: GameEvent) -> void:
 	_add_lightning_fx({"kind": "cut", "tick": tick + windup, "at": (target + LightningEffects.BOSS_BODY).round(), "direction": LightningEffects.cut_direction(side, to, target), "life": LightningEffects.sequence_length(LightningEffects.CUT_TICKS)})
 	shake_left = maxi(shake_left, 2)
 	_flash(tick, colors["p"], [0.14])
-	combat_audio.cue("dash", tick, 0.6)
+	combat_audio.cue("lightning_blink", tick, 0.6)
 
 ## Dual Dagger finisher: a bolt from the sky onto the boss (the event position), white flash, shake, scorch decal.
 ## The boss's own hit flash and hurt pose come from its damage_taken event as for any hit.
@@ -685,7 +692,7 @@ func _on_lightning_strike(event: GameEvent) -> void:
 	_flash(tick, colors["p"], strengths)
 	shake_left = maxi(shake_left, 8)
 	_burst(at + LightningEffects.BOSS_BODY, 18, colors["1"], 1.6)
-	combat_audio.cue("posture_break", tick)
+	combat_audio.cue("lightning_crack", tick)
 
 func _add_coil_fx(effect: Dictionary) -> void:
 	ScytheEffects.add(coil_fx, effect)
@@ -705,7 +712,7 @@ func _on_reaper_coil(event: GameEvent) -> void:
 	var tick: int = event.tick
 	match event.type:
 		&"reaper_coil_started":
-			combat_audio.cue("swing", tick, 1.0)
+			combat_audio.cue("chain_coil", tick, 1.0)
 		&"reaper_coil_hooked":
 			coil_hook_tick = tick
 			var bite: Vector2 = Vector2(event.data["to"]) + CHAIN_HEIGHT
@@ -781,7 +788,7 @@ func _on_aspect_event(event: GameEvent) -> void:
 			AspectEffects.add(aspect_fx, {"kind": "fade", "tick": tick, "at": at.round(), "scale": AspectEffects.pool_scale(Tuning.SPIRIT_LANTERN_RADIUS), "life": AspectEffects.sequence_length(AspectEffects.FADE_TICKS)})
 		&"phantom_cut_started":
 			AspectEffects.add(aspect_fx, {"kind": "phantom_start", "tick": tick, "life": AspectEffects.sequence_length(AspectEffects.START_TICKS)})
-			combat_audio.cue("weapon_buff_start", tick, 0.55)
+			combat_audio.cue("phantom_cut", tick, 0.55)
 		&"phantom_cut_ended":
 			AspectEffects.add(aspect_fx, {"kind": "phantom_end", "tick": tick, "life": AspectEffects.sequence_length(AspectEffects.END_TICKS)})
 			combat_audio.cue("weapon_buff_end", tick, 0.45)
@@ -811,7 +818,7 @@ func _draw() -> void:
 		offset = Vector2(1 if shake_left % 2 == 0 else -1, 1 if shake_left % 3 == 0 else -1)
 	draw_set_transform(offset)
 	draw_rect(Rect2(-2, -2, Tuning.ARENA_SIZE.x + 4.0, Tuning.ARENA_SIZE.y + 4.0), colors["2"])
-	draw_texture(ground_texture, Vector2.ZERO, Color(0.92, 0.92, 0.92))
+	draw_texture(ground_texture, Vector2.ZERO, GROUND_MODULATE)
 	for trace: Dictionary in skill_trails:
 		CombatEffects.draw_plan(self, SkillEffects.trail(trace["from"], trace["to"], snapshot.tick + snapshot.result_ticks - int(trace["tick"]), colors))
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
@@ -843,10 +850,14 @@ func _draw() -> void:
 	drawables.append_array(echo_drawables())
 	for actor: Snapshots.EntitySnapshot in actors:
 		drawables.append({"actor": actor, "at": actor.position})
+	# the painted pillars, statue, altar, trees, ... over actors standing behind them (sort key: their base line)
+	drawables.append_array(DepthOccluders.drawables(OCCLUDER_SCENE, {}, view))
 	drawables.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
 	for item: Dictionary in drawables:
 		if item.has("actor"):
 			_draw_actor(item["actor"])
+		elif item.has("occluder"):
+			DepthOccluders.draw(self, OCCLUDER_SCENE, item, GROUND_MODULATE)
 		else:
 			_draw_imported(item["name"], item["at"], item["scale"])
 	for t: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
@@ -1070,11 +1081,8 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	var chosen: String = String(selected_frames.get(actor.id, ""))
 	var at: Vector2 = actor.position.round()
 	var radius: float = 10.0 if actor.visual_id == &"totoy" else 20.0
-	var shadow: PackedVector2Array = PackedVector2Array()
-	for i: int in range(32):
-		shadow.append(at + Vector2(cos(TAU * i / 32.0) * radius, sin(TAU * i / 32.0) * radius * 0.3 + 2))
 	if not silhouette_only:
-		draw_colored_polygon(shadow, colors["0"])
+		ActorShadow.draw(self, at, radius, ActorShadow.strength_for(OCCLUDER_SCENE))
 	if not frames.has(chosen):
 		draw_rect(Rect2(at - Vector2(radius, radius * 2), Vector2(radius * 2, radius * 2)), colors["g"])
 		return
@@ -1707,7 +1715,7 @@ func _on_ward_echo_sprint(event: GameEvent) -> void:
 	match event.type:
 		&"sprint_started":
 			_add_wes_fx({"kind": "sprint_start", "tick": tick, "at": snapshot.player.position.round(), "left": facing_left, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.SPRINT_START_TICKS)})
-			combat_audio.cue("dash", tick, 0.5)
+			combat_audio.cue("sprint", tick, 0.5)
 		&"sprint_ended":
 			sprint_trail.clear()
 			if event.data.get("reason", &"expired") == &"expired":
@@ -1717,7 +1725,7 @@ func _on_ward_echo_sprint(event: GameEvent) -> void:
 			var at: Vector2 = Vector2(event.data["position"]).round()
 			_add_wes_fx({"kind": "echo_place", "tick": tick, "at": at, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.PLACE_TICKS)})
 			_add_wes_fx({"kind": "echo_dust", "tick": tick, "at": at, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.ECHO_DUST_TICKS)})
-			combat_audio.cue("deflect", tick, 0.45)
+			combat_audio.cue("echo_place", tick, 0.45)
 		&"echo_recall":
 			var from: Vector2 = Vector2(event.data["from"]).round()
 			var to: Vector2 = Vector2(event.data["to"]).round()
@@ -1735,7 +1743,7 @@ func _on_ward_echo_sprint(event: GameEvent) -> void:
 			previous_player_position = snapshot.player.position
 			shake_left = maxi(shake_left, 2)
 			_flash(tick, colors["p"], [0.10])
-			combat_audio.cue("dash", tick, 0.9)
+			combat_audio.cue("echo_recall", tick, 0.9)
 		&"echo_expired":
 			_add_wes_fx({"kind": "echo_vanish", "tick": tick, "at": Vector2(event.data["position"]).round(), "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.VANISH_TICKS)})
 		&"ward_raised":
@@ -1744,7 +1752,7 @@ func _on_ward_echo_sprint(event: GameEvent) -> void:
 				facing_left = facing.x < 0.0
 			ward_absorb_tick = -1000
 			_dust(snapshot.player.position)
-			combat_audio.cue("deflect", tick, 0.5)
+			combat_audio.cue("ward_raise", tick, 0.5)
 		&"ward_blocked":
 			ward_absorb_tick = tick
 			_add_wes_fx({"kind": "ward_block", "tick": tick, "left": facing_left, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.BLOCK_TICKS)})
@@ -1757,7 +1765,7 @@ func _on_ward_echo_sprint(event: GameEvent) -> void:
 			_add_wes_fx({"kind": "ward_cracks", "tick": tick, "at": at, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.CRACKS_TICKS)})
 			_burst(at - Vector2(0, 4), 10, colors["g"], 1.2)
 			shake_left = maxi(shake_left, 4)
-			combat_audio.cue("posture_break", tick, 0.6 if bool(event.data.get("hit", false)) else 0.4)
+			combat_audio.cue("ward_release", tick, 0.6 if bool(event.data.get("hit", false)) else 0.4)
 
 ## The echo anchors as y-sorted drawables ({"name", "at", "scale"} like the lantern): the anchor loop, the countdown
 ## for the last ticks; nothing during the placement burst.

@@ -1,0 +1,29 @@
+{
+  "status": "approved_installed",
+  "generator": "built-in imagegen",
+  "references": [
+    "art/reference/Hero_Idle.png",
+    "art/reference/Hero_Walk.png"
+  ],
+  "prompt": "Create a production animation sprite sheet for the SAME original pixel-art hero Totoy shown in reference images. Image 1 is identity/outfit/idle style reference, image 2 is walk reference. Change: he is UNARMED arriving in the village: absolutely NO sword, blade, hilt, sheath, belt weapon, or combat effects in any frame. Keep same spiky dark brown hair, dark headband, black sleeveless open vest, bare chest, dark cropped trousers, brown belt and brown boots, same face/proportions/pixel-art shading. Right-facing side view only. Natural empty hands, relaxed arms for idle, swinging arms for walking, forward lean empty hands for dash. Transparent background. One neatly aligned 3 ROW x 6 COLUMN grid, equal-size generous cells, no text, labels, shadows on floor, borders or UI. Row1 six idle breathing frames (subtle consistent breathing); Row2 six chronological walking frames (full gait, left and right step); Row3 six chronological dashing/running-lean frames. Consistent character height and baseline in every cell, no cropping, full body, large clear gaps. Pixel art with hard pixel edges and restrained earthy palette matching references; no gold/red magic. Preserve identity exactly; this is his pre-weapon exploration set, not a character redesign.",
+  "raw_sheet": "unarmed_sheet_raw.png",
+  "notes": [
+    "Approved normalized grids installed into art/src; six idle, walk and dash frames each.",
+    "Existing hero2_* grids unchanged.",
+    "Exploration selects these frames only when snapshot.armed is false.",
+    "Core owns the first-sword grant and persistence."
+  ],
+  "row_bounds": [
+    0,
+    334,
+    658,
+    941
+  ],
+  "normalization": "alpha thresholds 192 at source, 128 after common 34/316 resize; weighted nearest Totoy36 excluding reserved colors; 40x40 frames, anchor20,35",
+  "review_frames": 18,
+  "palette_contact": "unarmed_contact_6x.png",
+  "motion_preview": "unarmed_motion_preview.gif (100ms per frame, review timing only)",
+  "approved": "2026-10-27",
+  "approval": "yes i approved to the unamed hero sheet",
+  "dash_revision": "Six dash poses superseded by approved hero_unarmed_dash_v2 (56x40,anchor28,35). Idle/walk remain v1 (40x40,anchor20,35)."
+}

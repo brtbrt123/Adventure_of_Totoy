@@ -1,0 +1,474 @@
+{
+ "version": 1,
+ "scene": "forest_layered",
+ "name": "FOREST ROUTE",
+ "size": [
+  480,
+  288
+ ],
+ "ground": "res://presentation/forest/forest_layered_ground.png",
+ "outline": [
+  [
+   0,
+   92
+  ],
+  [
+   30,
+   78
+  ],
+  [
+   90,
+   72
+  ],
+  [
+   160,
+   72
+  ],
+  [
+   230,
+   70
+  ],
+  [
+   300,
+   74
+  ],
+  [
+   338,
+   88
+  ],
+  [
+   338,
+   52
+  ],
+  [
+   352,
+   38
+  ],
+  [
+   352,
+   0
+  ],
+  [
+   406,
+   0
+  ],
+  [
+   406,
+   38
+  ],
+  [
+   418,
+   52
+  ],
+  [
+   418,
+   90
+  ],
+  [
+   440,
+   72
+  ],
+  [
+   462,
+   86
+  ],
+  [
+   466,
+   128
+  ],
+  [
+   462,
+   160
+  ],
+  [
+   440,
+   172
+  ],
+  [
+   400,
+   176
+  ],
+  [
+   360,
+   184
+  ],
+  [
+   330,
+   200
+  ],
+  [
+   300,
+   216
+  ],
+  [
+   250,
+   226
+  ],
+  [
+   200,
+   226
+  ],
+  [
+   140,
+   220
+  ],
+  [
+   80,
+   212
+  ],
+  [
+   30,
+   196
+  ],
+  [
+   0,
+   168
+  ]
+ ],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "entries": {
+  "village_side": [
+   14,
+   121
+  ],
+  "north": [
+   380,
+   26
+  ]
+ },
+ "default_entry": "village_side",
+ "exits": [
+  {
+   "id": "to_village",
+   "rect": [
+    0,
+    100,
+    7,
+    40
+   ],
+   "target_scene": "village_layered",
+   "target_entry": "return"
+  },
+  {
+   "id": "to_glade",
+   "rect": [
+    358,
+    0,
+    44,
+    9
+   ],
+   "target_scene": "glade_layered",
+   "target_entry": "entrance"
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "forest_layered_entrance",
+   "position": [
+    24,
+    121
+   ]
+  },
+  {
+   "id": "forest_layered_puzzle",
+   "position": [
+    332,
+    148
+   ]
+  }
+ ],
+ "npcs": [],
+ "objects": [
+  {
+   "id": "signpost",
+   "kind": "sign",
+   "position": [
+    150,
+    102
+   ],
+   "stand": [
+    158,
+    116
+   ]
+  },
+  {
+   "id": "pedestal_west",
+   "kind": "lantern_switch",
+   "position": [
+    322,
+    112
+   ],
+   "stand": [
+    330,
+    126
+   ]
+  },
+  {
+   "id": "pedestal_east",
+   "kind": "lantern_switch",
+   "position": [
+    396,
+    138
+   ],
+   "stand": [
+    396,
+    152
+   ]
+  },
+  {
+   "id": "root_gate",
+   "kind": "door",
+   "position": [
+    378,
+    72
+   ],
+   "stand": [
+    378,
+    96
+   ]
+  },
+  {
+   "id": "chest",
+   "kind": "chest",
+   "position": [
+    440,
+    142
+   ],
+   "stand": [
+    440,
+    156
+   ]
+  }
+ ],
+ "puzzle": {
+  "switches": [
+   "pedestal_west",
+   "pedestal_east"
+  ]
+ },
+ "props": [
+  {
+   "id": "tree_left",
+   "type": "forest_tree_left",
+   "x": 60,
+   "y": 92,
+   "flip": false,
+   "shadow_radius": 26
+  },
+  {
+   "id": "tree_right",
+   "type": "forest_tree_right",
+   "x": 152,
+   "y": 84,
+   "flip": true,
+   "shadow_radius": 30
+  },
+  {
+   "id": "tree_middle",
+   "type": "forest_tree_middle",
+   "x": 252,
+   "y": 108,
+   "flip": false,
+   "shadow_radius": 22
+  },
+  {
+   "id": "root_gate",
+   "type": "forest_gate_closed",
+   "x": 378,
+   "y": 72,
+   "flip": false,
+   "shadow_radius": 28,
+   "when": "gate_open",
+   "on_type": "forest_gate_open"
+  },
+  {
+   "id": "pedestal_west",
+   "type": "forest_pedestal",
+   "x": 322,
+   "y": 112,
+   "flip": false,
+   "shadow_radius": 8,
+   "when": "lit:pedestal_west",
+   "on_type": "forest_pedestal_lit"
+  },
+  {
+   "id": "pedestal_east",
+   "type": "forest_pedestal",
+   "x": 396,
+   "y": 138,
+   "flip": false,
+   "shadow_radius": 8,
+   "when": "lit:pedestal_east",
+   "on_type": "forest_pedestal_lit"
+  },
+  {
+   "id": "signpost",
+   "type": "forest_sign",
+   "x": 150,
+   "y": 102,
+   "flip": false,
+   "shadow_radius": 7
+  },
+  {
+   "id": "lantern_post",
+   "type": "forest_lantern_post",
+   "x": 48,
+   "y": 100,
+   "flip": false,
+   "shadow_radius": 6
+  },
+  {
+   "id": "standing_stone",
+   "type": "forest_standing_stone",
+   "x": 214,
+   "y": 98,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "chest",
+   "type": "forest_chest",
+   "x": 440,
+   "y": 142,
+   "flip": false,
+   "shadow_radius": 9
+  },
+  {
+   "id": "log_west",
+   "type": "forest_log_1",
+   "x": 64,
+   "y": 176,
+   "flip": false,
+   "shadow_radius": 13
+  },
+  {
+   "id": "stump",
+   "type": "forest_stump",
+   "x": 150,
+   "y": 168,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rock_root",
+   "type": "forest_rock_root",
+   "x": 316,
+   "y": 186,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "thorns_south",
+   "type": "forest_thorns_1",
+   "x": 366,
+   "y": 178,
+   "flip": false,
+   "shadow_radius": 14
+  },
+  {
+   "id": "thorns_east",
+   "type": "forest_thorns_2",
+   "x": 454,
+   "y": 118,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "rocks_west",
+   "type": "forest_rocks",
+   "x": 100,
+   "y": 162,
+   "flip": false,
+   "shadow_radius": 8
+  },
+  {
+   "id": "bush_nw",
+   "type": "forest_bush_1",
+   "x": 22,
+   "y": 92,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "bush_sw",
+   "type": "forest_bush_2",
+   "x": 28,
+   "y": 156,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "bush_s",
+   "type": "forest_bush_2",
+   "x": 112,
+   "y": 192,
+   "flip": true,
+   "shadow_radius": 11
+  },
+  {
+   "id": "bush_ne",
+   "type": "forest_bush_1",
+   "x": 446,
+   "y": 98,
+   "flip": false,
+   "shadow_radius": 11
+  },
+  {
+   "id": "fern_a",
+   "type": "forest_fern_1",
+   "x": 182,
+   "y": 160,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "fern_b",
+   "type": "forest_fern_2",
+   "x": 302,
+   "y": 98,
+   "flip": false,
+   "shadow_radius": 9
+  },
+  {
+   "id": "fern_c",
+   "type": "forest_fern_small",
+   "x": 58,
+   "y": 150,
+   "flip": false,
+   "shadow_radius": 8
+  },
+  {
+   "id": "fern_d",
+   "type": "forest_fern_1",
+   "x": 416,
+   "y": 160,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "flowers_a",
+   "type": "forest_flowers",
+   "x": 190,
+   "y": 178,
+   "flip": false,
+   "shadow_radius": 9
+  },
+  {
+   "id": "flowers_b",
+   "type": "forest_flowers",
+   "x": 428,
+   "y": 104,
+   "flip": false,
+   "shadow_radius": 9
+  },
+  {
+   "id": "mushrooms",
+   "type": "forest_mushrooms",
+   "x": 286,
+   "y": 108,
+   "flip": false,
+   "shadow_radius": 7
+  }
+ ]
+}

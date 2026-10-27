@@ -45,6 +45,28 @@ const DAMAGE_TAKEN: StringName = &"damage_taken"
 const ENTITY_DIED: StringName = &"entity_died"
 const BOSS_PHASE_CHANGED: StringName = &"boss_phase_changed"
 const GAME_RESULT: StringName = &"game_result"
+# exploration (core/explore_core.gd)
+const SCENE_EXIT: StringName = &"scene_exit"
+const CHECKPOINT: StringName = &"checkpoint"
+const INTERACT: StringName = &"interact"
+const GATE_CHANGED: StringName = &"gate_changed"
+## Conversations (core/dialogue_book.gd): data {scene, npc_id, dialogue_id}; `dialogue_advanced` adds index (the line now shown);
+## `dialogue_ended` adds skipped and flags_set; `flag_set` is {flag, flags (all set flags)}.
+const DIALOGUE_STARTED: StringName = &"dialogue_started"
+const DIALOGUE_ADVANCED: StringName = &"dialogue_advanced"
+const DIALOGUE_ENDED: StringName = &"dialogue_ended"
+const FLAG_SET: StringName = &"flag_set"
+## The hero received something for good (a dialogue grant, core/dialogue_book.gd): data {scene, reward_id, kind (weapon or item),
+## item_id, name, quantity, source (the NPC)}. Emitted once, on the tick the flag that records the grant is first set, never when a
+## save is loaded and never again when he talks to the NPC again.
+const ITEM_RECEIVED: StringName = &"item_received"
+## The training post (core/training_yard.gd): `training_post_hit` {scene, object_id, hits, combo_index, position}; `training_hero_hit` {scene,
+## kind (gold or red), position} (a practice hit, no damage); `training_dodged` {scene, position}. A parry uses `parry_succeeded` (attacker_id 100).
+const TRAINING_POST_HIT: StringName = &"training_post_hit"
+const TRAINING_HERO_HIT: StringName = &"training_hero_hit"
+const TRAINING_DODGED: StringName = &"training_dodged"
+## A lantern switch was lit: data {scene, switch_id, lit (every lit switch id), all_lit}.
+const SWITCH_LIT: StringName = &"switch_lit"
 
 var type: StringName = &""
 var tick: int = 0

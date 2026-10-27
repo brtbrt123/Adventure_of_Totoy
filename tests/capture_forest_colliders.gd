@@ -1,7 +1,7 @@
 extends SceneTree
 ## Draws the colliders and points of the forest route (core/forest_layout.gd) and the Stag glade
-## (core/glade_layout.gd) over their converted ground paintings, 2x, for checking that every circle sits on its painted
-## prop and every point is in the open:
+## (core/glade_layout.gd) over their converted ground paintings at the game scales (forest 0.6, glade 0.7), shown 3x,
+## for checking that every circle sits on its painted prop and every point is in the open:
 ##   godot_console --headless --path . --script res://tests/capture_forest_colliders.gd
 ## Saves docs/previews/forest_colliders_overlay.png and docs/previews/glade_colliders_overlay.png.
 ## Colours: forest-edge circles blue, props orange, the root gate red; entry trigger green, exit trigger cyan (the
@@ -11,7 +11,7 @@ extends SceneTree
 const ForestLayout := preload("res://core/forest_layout.gd")
 const GladeLayout := preload("res://core/glade_layout.gd")
 const Obstacle := preload("res://core/obstacle.gd")
-const SCALE: int = 2
+const SCALE: int = 3
 const BLUE: Color = Color(0.3, 0.6, 1.0)
 const ORANGE: Color = Color(1.0, 0.55, 0.1)
 const RED: Color = Color(1.0, 0.2, 0.25)

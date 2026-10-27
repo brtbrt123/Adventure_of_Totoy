@@ -1,0 +1,13 @@
+# Generated or binary: never indexed (the graph is for code and notes)
+.godot/
+art/build/
+art/reference/
+art/src/
+docs/previews/
+presentation/**/occluders/
+harness/logs/
+graphify-out/
+*.png
+*.jpg
+*.import
+*.uid

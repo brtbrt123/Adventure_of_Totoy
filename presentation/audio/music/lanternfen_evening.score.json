@@ -1,0 +1,677 @@
+{
+  "title": "Lanternfen Evening",
+  "provenance": "Original synthesized composition created for Adventure of Totoy; no downloaded recordings or third-party melody.",
+  "bpm": 72,
+  "beats": 32,
+  "duration_seconds": 26.666666666666668,
+  "rate": 32000,
+  "voices": "Warm sine-based plucked mallet, quiet sustained chords, circular room reflections; no drums.",
+  "notes": [
+    {
+      "midi": 50,
+      "beat": 0.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 57,
+      "beat": 0.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 60,
+      "beat": 0.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 64,
+      "beat": 0.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 62,
+      "beat": 0.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 1.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 72,
+      "beat": 2.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 3.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 46,
+      "beat": 4.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 53,
+      "beat": 4.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 57,
+      "beat": 4.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 60,
+      "beat": 4.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 58,
+      "beat": 4.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 5.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 6.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 7.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 41,
+      "beat": 8.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 53,
+      "beat": 8.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 57,
+      "beat": 8.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 67,
+      "beat": 8.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 53,
+      "beat": 8.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 9.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 10.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 11.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 48,
+      "beat": 12.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 55,
+      "beat": 12.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 62,
+      "beat": 12.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 65,
+      "beat": 12.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 60,
+      "beat": 12.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 67,
+      "beat": 13.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 74,
+      "beat": 14.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 67,
+      "beat": 15.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 50,
+      "beat": 16.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 57,
+      "beat": 16.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 60,
+      "beat": 16.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 64,
+      "beat": 16.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 62,
+      "beat": 16.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 17.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 72,
+      "beat": 18.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 19.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 46,
+      "beat": 20.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 53,
+      "beat": 20.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 57,
+      "beat": 20.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 60,
+      "beat": 20.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 58,
+      "beat": 20.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 21.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 22.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 23.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 41,
+      "beat": 24.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 53,
+      "beat": 24.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 57,
+      "beat": 24.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 67,
+      "beat": 24.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 53,
+      "beat": 24.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 25.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 26.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 65,
+      "beat": 27.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 48,
+      "beat": 28.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.45,
+      "voice": "pad"
+    },
+    {
+      "midi": 55,
+      "beat": 28.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": -0.15000000000000002,
+      "voice": "pad"
+    },
+    {
+      "midi": 62,
+      "beat": 28.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.14999999999999997,
+      "voice": "pad"
+    },
+    {
+      "midi": 65,
+      "beat": 28.0,
+      "seconds": 3.9333333333333336,
+      "amplitude": 0.037,
+      "pan": 0.4499999999999999,
+      "voice": "pad"
+    },
+    {
+      "midi": 60,
+      "beat": 28.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 67,
+      "beat": 29.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 74,
+      "beat": 30.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": 0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 67,
+      "beat": 31.0,
+      "seconds": 2.4,
+      "amplitude": 0.035,
+      "pan": -0.3,
+      "voice": "pluck"
+    },
+    {
+      "midi": 74,
+      "beat": 0.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.0,
+      "voice": "pluck"
+    },
+    {
+      "midi": 77,
+      "beat": 1.5,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.14962424799060817,
+      "voice": "pluck"
+    },
+    {
+      "midi": 76,
+      "beat": 3.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.021168001208980082,
+      "voice": "pluck"
+    },
+    {
+      "midi": 72,
+      "beat": 4.5,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.14662951764976453,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 6.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.04191232472983888,
+      "voice": "pluck"
+    },
+    {
+      "midi": 72,
+      "beat": 8.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.14840373699350726,
+      "voice": "pluck"
+    },
+    {
+      "midi": 77,
+      "beat": 10.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.08160316663340546,
+      "voice": "pluck"
+    },
+    {
+      "midi": 79,
+      "beat": 11.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.14999853098260552,
+      "voice": "pluck"
+    },
+    {
+      "midi": 76,
+      "beat": 12.5,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.009948284602680102,
+      "voice": "pluck"
+    },
+    {
+      "midi": 74,
+      "beat": 14.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.14859110335423054,
+      "voice": "pluck"
+    },
+    {
+      "midi": 77,
+      "beat": 16.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.04318549749975979,
+      "voice": "pluck"
+    },
+    {
+      "midi": 81,
+      "beat": 18.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.11264808701575142,
+      "voice": "pluck"
+    },
+    {
+      "midi": 79,
+      "beat": 19.5,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.09083098045794015,
+      "voice": "pluck"
+    },
+    {
+      "midi": 77,
+      "beat": 21.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.12549834578040842,
+      "voice": "pluck"
+    },
+    {
+      "midi": 74,
+      "beat": 22.5,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.07307617686907643,
+      "voice": "pluck"
+    },
+    {
+      "midi": 76,
+      "beat": 24.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.13583675430099357,
+      "voice": "pluck"
+    },
+    {
+      "midi": 72,
+      "beat": 26.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.1143837675719404,
+      "voice": "pluck"
+    },
+    {
+      "midi": 69,
+      "beat": 28.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": 0.04063586824618035,
+      "voice": "pluck"
+    },
+    {
+      "midi": 72,
+      "beat": 30.0,
+      "seconds": 3.3,
+      "amplitude": 0.09,
+      "pan": -0.14820474361392927,
+      "voice": "pluck"
+    }
+  ],
+  "peak": 0.6,
+  "runtime_gain_db": -26
+}

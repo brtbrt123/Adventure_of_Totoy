@@ -21,7 +21,7 @@ extends RefCounted
 ## - the forest edge: BOUNDARY_1X is the outline of the walkable clearing (the crossroads, the forge yard, the grass by
 ##   the house, the west lawn with the shrine and the barrels, the gate opening and the east road out of the village). A
 ##   chain of circles sits outside every edge, so the forest, the canopy, the low stone wall and the house body cannot be
-##   entered. Where the outline turns inward (the gate opening, the house door) a full-size circle would bulge into the
+##   entered. Where the outline turns inward (the gate opening) a full-size circle would bulge into the
 ##   walkable side, so such circles shrink to fit (see boundary_circles()).
 ## - SOLIDS_1X: the things standing inside the clearing (gate pillars and doors, forge, anvil, workbenches, barrels, the
 ##   house walls, the shrine, tree trunks, stone slabs, rubble, the training dummy, the lamp post).
@@ -48,15 +48,20 @@ const STAND_POINTS: Dictionary = {
 	&"mira": Vector2(144.0, 206.0),  # by the gate, waiting for Totoy
 	&"tovan": Vector2(316.0, 129.0),  # at the anvil, in front of the forge
 	&"edda": Vector2(452.0, 165.0),  # beside her house door
-	&"edda_door": Vector2(435.0, 155.0),  # the house doorway (walkable; the door interaction point)
+	&"edda_door": Vector2(435.0, 164.0),  # in front of the house door (the door itself is solid: EDDA_DOOR)
 	&"villager_elder": Vector2(172.0, 286.0),  # by the stone shrine
 	&"villager_child": Vector2(253.0, 210.0),  # on the crossroads
 	&"villager_worker": Vector2(337.0, 235.0),  # beside the crates and barrels
 	&"chest": Vector2(112.0, 246.0),  # on the west lawn between the stone slab and the rubble
 }
 
-## The painted training post in the forge yard (its feet; it is solid, see SOLIDS_1X): Totoy tests the sword on it.
-const TRAINING_DUMMY: Vector2 = Vector2(328.0, 148.0)
+## The training post (its feet; it is solid, see SOLIDS_1X): Totoy tests the sword on it. Moved on 2026-10-27 from the forge yard (328,148)
+## to the open ground south of the forge (the owner found the old spot cramped): the painted ground must have its old post erased and
+## the post drawn here as an object (docs/CODEX_TASK_training_yard_move.md).
+const TRAINING_DUMMY: Vector2 = Vector2(390.0, 212.0)
+## Edda's house door (its threshold, the interaction's feet): solid since the human's playtest (2026-10-22, "why can I
+## walk ... on the door"); the hero knocks from STAND_POINTS[&"edda_door"] in front of it.
+const EDDA_DOOR: Vector2 = Vector2(435.0, 150.0)
 
 # --- the same at scale 1.0 (816x480), where everything was measured on the painting ---
 const VILLAGE_SIZE_1X: Vector2 = Vector2(816.0, 480.0)
@@ -69,22 +74,24 @@ const STAND_POINTS_1X: Dictionary = {
 	&"mira": Vector2(206.0, 294.0),
 	&"tovan": Vector2(452.0, 184.0),
 	&"edda": Vector2(646.0, 236.0),
-	&"edda_door": Vector2(621.0, 222.0),
+	&"edda_door": Vector2(621.0, 234.0),
 	&"villager_elder": Vector2(246.0, 408.0),
 	&"villager_child": Vector2(362.0, 300.0),
 	&"villager_worker": Vector2(482.0, 336.0),
 	&"chest": Vector2(160.0, 352.0),
 }
-const TRAINING_DUMMY_1X: Vector2 = Vector2(468.0, 212.0)
+const TRAINING_DUMMY_1X: Vector2 = Vector2(557.0, 303.0)
+const EDDA_DOOR_1X: Vector2 = Vector2(621.0, 214.0)
 
 ## The walkable clearing's outline, clockwise (screen coordinates): the circles go on the outer side of each edge.
-## It starts in the gate opening and runs along the gate wall, the middle tree, the forge yard, the house front (with the
-## doorway notch), the east tree, out of the map along the east road, back along the south bushes, round the south
-## path, the low stone wall at the south-west and up the west lawn.
+## It starts in the gate opening and runs along the gate wall, the middle tree, the forge yard, the house front (straight
+## past the door: the doorway notch was closed on 2026-10-22, the door is solid), the east tree, out of the map along the
+## east road, back along the south bushes, round the south path, the low stone wall at the south-west and up the west
+## lawn.
 const BOUNDARY_1X: Array[Vector2] = [
 	Vector2(150, 240), Vector2(186, 236), Vector2(204, 250), Vector2(232, 246), Vector2(262, 238), Vector2(286, 228),
 	Vector2(318, 212), Vector2(334, 188), Vector2(362, 162), Vector2(400, 156), Vector2(456, 152), Vector2(530, 152),
-	Vector2(548, 168), Vector2(556, 214), Vector2(600, 216), Vector2(602, 208), Vector2(642, 208), Vector2(644, 224),
+	Vector2(548, 168), Vector2(556, 214), Vector2(600, 218), Vector2(644, 224),
 	Vector2(700, 224), Vector2(748, 202), Vector2(768, 210), Vector2(806, 238), Vector2(806, 276), Vector2(828, 276),
 	Vector2(828, 350), Vector2(806, 352), Vector2(760, 364), Vector2(700, 406), Vector2(640, 410), Vector2(600, 414),
 	Vector2(590, 452), Vector2(440, 458), Vector2(440, 470), Vector2(330, 470), Vector2(330, 456), Vector2(160, 456),
@@ -99,7 +106,7 @@ const BOUNDARY_MIN_RADIUS: float = 3.0
 ## [what it is, centre x, centre y, radius]
 const SOLIDS_1X: Array = [
 	# the rune gate: the left pillar, the closed door leaf and the right pillar (the opening between them is the way in)
-	["gate pillar", 144, 266, 10.0], ["gate door", 197, 252, 9.0], ["gate pillar", 221, 246, 11.0],
+	["gate pillar", 144, 266, 10.0], ["gate door", 189, 252, 7.0], ["gate door", 203, 249, 7.0], ["gate pillar", 221, 246, 11.0],
 	# the middle tree with the lantern, the bench under it and the stump
 	["tree", 298, 214, 12.0], ["tree", 316, 214, 7.0],
 	["bench", 342, 173, 10.0],
@@ -108,7 +115,7 @@ const SOLIDS_1X: Array = [
 	["forge", 414, 140, 12.0], ["forge", 438, 140, 12.0], ["forge", 426, 120, 14.0],
 	["anvil", 434, 166, 8.0],
 	["workbench", 478, 140, 9.0], ["workbench", 498, 140, 9.0], ["workbench", 516, 138, 8.0],
-	["training dummy", 468, 209, 5.0],
+	["training dummy", 557, 300, 5.0],
 	["barrel", 526, 186, 12.0],
 	["shelf", 574, 202, 11.0], ["shelf", 586, 205, 9.0],
 	# Edda's house: the front wall right of the doorway and the side wall (the roof and body sit behind the boundary)
