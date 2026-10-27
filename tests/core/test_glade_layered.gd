@@ -64,7 +64,7 @@ func test_the_data_is_valid_and_every_type_is_classified() -> void:
 		used[String(p["type"])] = true
 	assert_eq(used.size(), glade_types - 1, "all retained glade types are placed; removed log stays available as an asset")
 	assert_false(used.has("glade_log"), "owner removed the entrance log")
-	assert_eq(PropScene.placements(_scene, _defs).size(), 24, "owner removed the log and added the arch vegetation bank: 24 props")
+	assert_eq(PropScene.placements(_scene, _defs).size(), 21, "owner removed the log and cleared the approach: 21 props")
 
 
 func test_placements_match_the_approved_arrangement_and_carry_shadows() -> void:
@@ -72,7 +72,7 @@ func test_placements_match_the_approved_arrangement_and_carry_shadows() -> void:
 	assert_eq(stone["feet"], Vector2(170, 140), "the approved place of stone 1")
 	assert_eq(stone["anchor"], Vector2(24, 54), "its anchor in the sprite")
 	assert_near(float(stone["shadow_radius"]), 14.4, 0.01, "the shadow radius is passed on for the renderer")
-	assert_eq(_placement("glade_arch")["feet"], Vector2(508, 62), "owner moved the arch to the upper-right exit")
+	assert_eq(_placement("glade_arch")["feet"], Vector2(492, 62), "owner moved the arch to the upper-right exit")
 
 
 func test_the_renderer_takes_the_placements_as_they_are() -> void:
@@ -84,7 +84,7 @@ func test_the_renderer_takes_the_placements_as_they_are() -> void:
 		frames[type_id] = {"x": x, "y": 0, "w": int(def["w"]), "h": int(def["h"])}
 		x += int(def["w"])
 	var drawn: Array[Dictionary] = PropsLayer.drawables(PropScene.placements(_scene, _defs), frames)
-	assert_eq(drawn.size(), 24, "every placement becomes a drawable")
+	assert_eq(drawn.size(), 21, "every placement becomes a drawable")
 	for item: Dictionary in drawn:
 		var p: Dictionary = _placement(String(item["id"]))
 		assert_eq(item["at"], p["feet"], "%s is sorted by its feet" % item["id"])

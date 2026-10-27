@@ -53,7 +53,11 @@ func _init() -> void:
 	# Temporarily plug only the arch opening: an exit path would expose a side bypass.
 	var sealed: Array[Obstacle] = glade_obstacles.duplicate()
 	var plug: Obstacle = Obstacle.new()
-	plug.center = Vector2(508, 58)
+	var arch_feet: Vector2 = Vector2.ZERO
+	for row: Dictionary in PropScene.placements(glade, defs):
+		if row["id"] == &"glade_arch":
+			arch_feet = row["feet"]
+	plug.center = arch_feet + Vector2(0, -4)
 	plug.radius = 9.0
 	sealed.append(plug)
 	var bot: Bot = Bot.new()

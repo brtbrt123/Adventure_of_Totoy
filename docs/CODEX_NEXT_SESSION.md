@@ -2,14 +2,12 @@
 
 ## Latest owner instruction takes priority
 
-The owner said: **"we will redo it ... switch to new session ... edit what needed the codex next session need to know."**
-
-The immediate discussion was the **Stag glade's upper-right root arch, surrounding bushes and narrow approach path**. The last visual iteration is NOT approved as the finished composition. Treat this as the next redo target, not an instruction to regenerate all approved art or revert the whole project. Wait for the owner's new composition instructions/reference before another layout iteration. Do not make more speculative bush/rock placements just because older tasks say to continue.
+The owner approved the clean glade arch/bush/path composition on 2026-10-27: **"yes thats good"**. Preserve this selected layout; the earlier redo request is fulfilled. Review captures: `art/reference/layered_forest/review/playtest_fixes/clean_approach_v1/arch_preview.png` and full runtime/collider images in the same folder. Arch feet (492,62), solid left bush (440,62), solid right bush (540,62); three approach/bank bushes removed. Ground pixels unchanged. Focused glade, no-side-bypass collision and art-contract checks pass; see newest STATUS for full regression and commit results.
 
 ## Read and preserve
 
 1. Read `AGENTS.md`, this note, the newest `docs/STATUS.md`, and `docs/architecture.md` (Layered scenes). Ignore Graphify: the owner explicitly requested normal search.
-2. Check `git status` and `git log`. At this handoff, branch is `agent/game/chapter1-dev`, code HEAD is **ba1cc3b**, pushed to origin, never merged to main.
+2. Check `git status` and `git log`. At this handoff, branch is `agent/game/chapter1-dev`, previous handoff HEAD was **ddb80a5**; the approved clean approach is committed after it (check Git log), never merged to main.
 3. **Preserve `docs/CHAPTER1_PLAN.md`: it has an ongoing, unrelated uncommitted edit.** Do not stage, overwrite or revert it.
 4. Earlier `docs/HANDOFF.md` "Next session" and `docs/CODEX_TASK_forest_layered.md` describe old work. Forest import/rendering is already complete; do not redo those tasks by default. Shared JSON and Git history supersede stale coordinates/counts in old docs.
 
@@ -31,23 +29,20 @@ The immediate discussion was the **Stag glade's upper-right root arch, surroundi
 - Normal chapter routes still use the painted scenes. Layered maps are debug/review alternatives; no route switch was authorized.
 - Debug: **5/F7 village_layered; 6/F8 glade_layered; 8/F10 forest_layered; 7/F9 lighting; G/F6 gate; H colliders.** Re-enter a scene to load changed JSON.
 
-## Current glade composition — subject to redo
+## Current glade composition — approved 2026-10-27
 
-Authoritative file: `data/scenes/glade_layered_props.json` (24 placements).
+Authoritative file: `data/scenes/glade_layered_props.json` (21 placements).
 
 | Placement | Current feet | Type / purpose |
 |---|---|---|
-| `glade_arch` | (508,62) | `glade_arch`, upper-right trail exit; full art fits near top/right world edges |
-| `arch_bush_left` | (444,62) | solid `glade_bush_1`, mirrored |
-| `arch_bush_right` | (536,80) | solid `glade_bush_1`, foliage extends into edge jungle |
-| `arch_bush_bank_left` | (412,78) | solid left vegetation bank |
-| `arch_bush_bank_connector` | (438,100) | connects the bank |
-| `arch_bush_approach_left` | (462,110) | foliage narrows approach toward arch |
+| `glade_arch` | (492,62) | `glade_arch`, upper-right trail exit; full art fits near top/right world edges |
+| `arch_bush_left` | (440,62) | solid `glade_bush_1`, mirrored |
+| `arch_bush_right` | (540,62) | solid `glade_bush_1`, foliage extends into edge jungle |
 | `glade_antler` | (488,188) | moved to east side; now solid, six circles cover bones and branches |
 
-- Arena exit remains `[488,0,56,10]`; the glade scene is 560x336. The latest narrowing is done by foliage covering the broad dirt edge; **the ground PNG has not been repainted/narrowed**. Do not tell the owner the floor pixels were changed.
+- Arena exit remains `[488,0,56,10]`; the glade scene is 560x336. The approach bank was removed and the arch aligned to the existing dirt; **the ground PNG has not been repainted/narrowed**. Do not tell the owner the floor pixels were changed.
 - The two added arch-side boulders were replaced by bushes in the latest commit; old rock-alignment images are historical, not the current layout.
-- Latest preview: `art/reference/layered_forest/review/playtest_fixes/narrow_final/arch_preview.png`. Full runtime and collider images are in the same folder. These show the last attempted composition, not approval.
+- Latest approved preview: `art/reference/layered_forest/review/playtest_fixes/clean_approach_v1/arch_preview.png`. Full runtime and collider images are in the same folder. The owner approved this composition.
 - Earlier progress: owner asked arch as far upper-right as possible, then bush beside its left side, then denser left bushes and a path matching the arch. After viewing iterations, they requested this new-session redo. Do not assume every interim coordinate is a fixed design decision.
 
 ## Fixes to preserve unless the owner changes them
@@ -74,6 +69,6 @@ Authoritative file: `data/scenes/glade_layered_props.json` (24 placements).
 
 Claude's review noted the debug gate toggle saves once directly and again on the queued gate event; harmless double write. Firefly region lookup needs an empty/missing-region guard (all configured scenes currently have regions). Generic behind-prop review poses may have little actual sprite overlap; prefer measured cover and explicit reachable poses. Do not let these distract from the owner's fresh composition request.
 
-## Suggested first response next session
+## Next session
 
-Summarize the current arch/bush/path layout and acknowledge it is to be redone. Ask the owner for the desired new composition/reference if they have not supplied it, then make one coherent reviewable layout. Preserve approved lighting/art and unrelated collision fixes, unless the new instructions explicitly change them.
+The composition is approved; do not restart the redo. Check Git and newest STATUS, preserve the chapter-plan edit and wait for the owner's next task. Claude cross-review remains pending; human visual approval does not replace technical cross-review.

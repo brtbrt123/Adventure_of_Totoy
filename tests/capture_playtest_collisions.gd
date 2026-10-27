@@ -10,7 +10,9 @@ func _init() -> void:
 
 func run() -> void:
 	var output: String = OUT
-	if "--alignment" in OS.get_cmdline_user_args():
+	if "--clean-approach" in OS.get_cmdline_user_args():
+		output += "clean_approach_v1/"
+	elif "--alignment" in OS.get_cmdline_user_args():
 		output += "alignment/"
 	elif "--narrow-final" in OS.get_cmdline_user_args():
 		output += "narrow_final/"

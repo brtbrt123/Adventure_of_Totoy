@@ -1,5 +1,11 @@
 # STATUS (handoff note)
 
+## Glade arch: clean approach APPROVED (2026-10-27, Codex)
+
+Owner approved the runtime candidate: "yes thats good". Owner supplied a sketch: arch aligned to the dirt trail, a solid bush on each side preventing side access, clear approach. Moved arch feet to (492,62), left bush to (440,62), right bush to (540,62); removed bank-left, bank-connector and approach-left bushes (21 placements). Ground pixels and approved assets/lighting unchanged. Runtime/collider captures: `art/reference/layered_forest/review/playtest_fixes/clean_approach_v1/`, including `arch_preview.png`. Added capture flag `--clean-approach`; updated placement counts and made the sealed-opening smoke fixture follow the arch position.
+
+Verified Godot 4.7.2; all 13 focused glade tests pass (walking/dashing through opening, both exits, solid approaches, Stag reach 91%); collision smoke passes including no side bypass with the opening temporarily sealed; Python glade art contract and windowed captures pass. Known certificate-store warning persists. Full harness regression passed (Python suites, Godot import, all core tests and every headless smoke suite), log `art/build/arch_clean_approach_regression.log` (ignored). Claude cross-review pending. Human judges composition/game feel. Preserve unrelated `docs/CHAPTER1_PLAN.md` edit. No merge.
+
 ## Next Codex session: owner requests a fresh glade arch/path redo (2026-10-27)
 
 Read **docs/CODEX_NEXT_SESSION.md** before acting on older tasks. The owner requested a new session and a redo following the latest upper-right arch/left-bush/narrow-approach iterations. The current visual composition is not approved as finished; scope is the immediate glade arch/bush/path discussion, not an automatic regeneration/revert of the entire project. Await the owner's fresh composition instructions/reference before more speculative layout edits.
