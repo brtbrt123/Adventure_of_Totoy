@@ -50,7 +50,7 @@ func run() -> void:
 	expect(not audio.hum_active and audio.played.is_empty(), "retry clears audio and hum")
 	var village: VillageAudio = VillageAudio.new()
 	root.add_child(village)
-	for id: StringName in [&"forest", &"forest_layered", &"glade", &"glade_layered"]:
+	for id: StringName in [&"forest_layered", &"glade_layered"]:
 		village.set_scene(id)
 		expect(village.ambience_active and not village.music_active, "ambience only outside village")
 	village.set_scene(&"village_layered")

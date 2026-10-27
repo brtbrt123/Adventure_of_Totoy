@@ -156,9 +156,9 @@ func run() -> void:
 		scene.advance(bot.next_input(scene.snapshot.hero.position))
 		if scene.fade_phase != &"":
 			break
-	expect(scene.pending_scene == &"forest", "East exit requests forest")
+	expect(scene.pending_scene == &"forest_layered", "East exit requests forest")
 	finish_fade()
-	expect(scene.snapshot.scene_id == &"forest", "East exit loads forest")
+	expect(scene.snapshot.scene_id == &"forest_layered", "East exit loads forest")
 	# New debug bindings use the existing fade path.
 	for key: String in ["debug_scene_village_layered", "debug_scene_glade_layered"]:
 		expect(InputMap.has_action(key), "Debug binding " + key)

@@ -52,7 +52,7 @@ func run() -> void:
 	var previous: String = OS.get_environment(Store.PATH_ENV)
 	OS.set_environment(Store.PATH_ENV, SAVE)
 	Engine.set_meta(Explore.PERSIST_META, true)
-	for id: StringName in [&"village", &"village_layered"]:
+	for id: StringName in [&"village_layered"]:
 		for skipped: bool in [false, true]:
 			Store.delete(SAVE)
 			var scene: Explore = spawn(id)
@@ -91,7 +91,7 @@ func run() -> void:
 			scene.reward_popup.advance(4)
 			talk(scene, false)
 			expect(scene.reward_popup.pending.is_empty(), "second conversation gives no receipt")
-			scene.enter_scene(&"forest")
+			scene.enter_scene(&"forest_layered")
 			scene.enter_scene(id)
 			expect(scene.reward_popup.pending.is_empty(), "scene change gives no receipt")
 			scene.queue_free()

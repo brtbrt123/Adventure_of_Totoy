@@ -58,7 +58,7 @@ func run() -> void:
 	var old_path: String = OS.get_environment(Store.PATH_ENV)
 	OS.set_environment(Store.PATH_ENV, SAVE)
 	Engine.set_meta(Explore.PERSIST_META, true)
-	for id: StringName in [&"village", &"village_layered"]:
+	for id: StringName in [&"village_layered"]:
 		Store.delete(SAVE)
 		var scene: Explore = spawn(id)
 		expect(scene.conversation.controls_open, "%s: first visit controls" % id)

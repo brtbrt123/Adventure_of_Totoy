@@ -1,17 +1,7 @@
 extends Node2D
-## Exploration mode (chapter 1): draws any scene of core/scene_defs.gd from an ExploreCore snapshot and sends it the
-## player's intents. The core decides movement, collisions, exits, checkpoints and interactions; this node draws the
-## painted ground, the y-sorted actors (hero with the katana frames, NPCs with idle loops facing the hero when near,
-## the village chest) on the shared soft ground shadow (presentation/common/actor_shadow.gd) with a per-scene ambient
-## tint, the painted tall props drawn again over actors standing behind them (depth occluders,
-## presentation/common/depth_occluders.gd), a 320x180 camera clamped to the scene, the HUD-lite (scene toast, interact
-## hint), the 0.3 s fade between scenes, the "..." speech bubble on E, the character menu (TAB) and the debug keys
-## (F1/H colliders, F2-F5 or 1-4 jump, F6/G forest gate).
-##
-## Start: Engine meta START_META (set by the title screen) = {scene, entry, checkpoint, gate_open}; without it the
-## village arrival. Progress (scene, checkpoint, gate) is saved only when started from the title (Engine meta
-## totoy_persist), through core/save_store.gd. Entering the arena (the glade's root arch or F5) loads the Colossus
-## fight (presentation/arena/arena.tscn).
+## Chapter 1 layered-ground/prop renderer. Core owns movement, collisions, transitions and rewards.
+## F2/1 village, F3/2 forest, F4/3 glade, F5/4 arena; F7/5, F8/6 and F10/8 remain layered aliases.
+## The arena uses its own renderer. Save migration stays in core/SaveProfile.
 const ExploreCore := preload("res://core/explore_core.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
 const InputFrame := preload("res://core/input_frame.gd")
@@ -26,7 +16,6 @@ const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CharacterMenu := preload("res://presentation/arena/character_menu.gd")
 const ExploreHud := preload("res://presentation/explore/explore_hud.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
-const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
 const PropScene := preload("res://core/prop_scene.gd")
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
@@ -49,16 +38,10 @@ const PERSIST_META: StringName = &"totoy_persist"
 const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
 
 const GROUNDS: Dictionary = {
-	&"village": "res://presentation/village/village_ground.png",
-	&"forest": "res://presentation/forest/forest_route_ground.png",
-	&"glade": "res://presentation/forest/stag_glade_ground.png",
 	&"arena": "res://presentation/arena/arena_ground.png",
 }
 ## Per-scene ambient multiplied onto the actors (not the ground) so the sprites sit in the dusk paintings.
 const AMBIENT: Dictionary = {
-	&"village": Color(0.93, 0.89, 0.84),
-	&"forest": Color(0.9, 0.94, 0.88),
-	&"glade": Color(0.88, 0.95, 0.94),
 	&"arena": Color(1, 1, 1),
 	&"village_layered": Color(0.93, 0.89, 0.84),
 	&"glade_layered": Color(0.88, 0.95, 0.94),
@@ -81,7 +64,7 @@ const HINTS: Dictionary = {&"npc": "[E] TALK", &"chest": "[E] OPEN", &"sign": "[
 const HINT_OVERRIDES: Dictionary = {&"root_gate": "[E] LOOK"}
 ## The hint floats this far above an object's feet (people: their height + 8).
 const OBJECT_HINT_HEIGHT: float = 30.0
-const DEBUG_SCENES: Dictionary = {"debug_scene_village": &"village", "debug_scene_forest": &"forest", "debug_scene_glade": &"glade", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered"}
+const DEBUG_SCENES: Dictionary = {"debug_scene_village": &"village_layered", "debug_scene_forest": &"forest_layered", "debug_scene_glade": &"glade_layered", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered"}
 
 var core: ExploreCore
 var snapshot: ExploreCore.ExploreSnapshot
@@ -154,7 +137,7 @@ func _ready() -> void:
 		Engine.remove_meta(START_META)
 	gate_open = bool(start.get("gate_open", profile.gate_open if persist else false))
 	var scene: StringName = StringName(start.get("scene", SceneDefs.START_SCENE))
-	if not SceneDefs.is_known(scene) or scene == SceneDefs.ARENA:
+	if not SceneDefs.LAYERED.has(scene):
 		scene = SceneDefs.START_SCENE
 	enter_scene(scene, StringName(start.get("entry", &"")), StringName(start.get("checkpoint", &"")))
 	fade_phase = &"in"
@@ -196,7 +179,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	practice_effects.clear()
 	practice_view.enter_scene(scene)
 	conversation.sync(snapshot.dialogue)
-	conversation.controls_open = scene in [SceneDefs.VILLAGE, SceneDefs.VILLAGE_LAYERED] and not snapshot.story_flags.has(&"seen_controls")
+	conversation.controls_open = scene == SceneDefs.VILLAGE_LAYERED and not snapshot.story_flags.has(&"seen_controls")
 	gate_open = snapshot.gate_open
 	_refresh_props()
 	facing_left = snapshot.hero.facing.x < 0.0
@@ -516,24 +499,12 @@ func drawables() -> Array[Dictionary]:
 	for npc: Dictionary in snapshot.npcs:
 		var height: float = float(NPC_HEIGHTS.get(npc["visual"], 30.0))
 		out.append({"kind": &"npc", "id": npc["id"], "at": npc["position"], "frame": String(npc_frames.get(npc["id"], "")), "left": bool(npc["facing_left"]), "shadow": HERO_SHADOW_RADIUS * height / HERO_HEIGHT, "tint": tint, "height": height})
-	if snapshot.scene_id == SceneDefs.VILLAGE:
-		for object: Dictionary in snapshot.objects:
-			if object["kind"] == &"chest":  # the village chest is not painted (the forest's is, in its nook)
-				out.append({"kind": &"object", "id": object["id"], "at": object["position"], "frame": "obj_chest_closed_1", "left": false, "shadow": 0.0, "tint": Color.WHITE})
-	if snapshot.scene_id == SceneDefs.VILLAGE:
-		for object: Dictionary in snapshot.objects:
-			if object["kind"] == &"dummy":
-				var age: int = int(snapshot.training.get("since_hit", 1000))
-				var key: String = "obj_dummy_hit_%d" % (1 + mini(1, age / 4)) if age >= 0 and age < 8 else "obj_dummy_1"
-				var offset: Vector2 = Vector2(1 if age % 2 == 0 else -1, 0) if age >= 0 and age < 8 else Vector2.ZERO
-				out.append({"kind": &"object", "id": object["id"], "at": Vector2(object["position"]) + offset, "frame": key, "left": false, "shadow": 6.0, "tint": tint})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		return PropsLayer.sorted_with_actors(PropsLayer.drawables(prop_placements, frames, _visible_world_rect().grow(8)), out)
-	out.append_array(DepthOccluders.drawables(snapshot.scene_id, {&"gate_open": snapshot.gate_open}, _visible_world_rect().grow(8.0)))
-	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
 	return out
+
 
 
 func _draw() -> void:
@@ -588,9 +559,6 @@ func _draw_item(item: Dictionary) -> void:
 			drawn["rect"] = rect
 		PropsLayer.draw(self, drawn, sprites, ambient())
 		return
-	if item["kind"] == &"occluder":
-		DepthOccluders.draw(self, snapshot.scene_id, item)
-		return
 	var at: Vector2 = Vector2(item["at"]).round()
 	var radius: float = float(item["shadow"])
 	if radius > 0.0 and not SceneDefs.LAYERED.has(snapshot.scene_id):
@@ -616,14 +584,8 @@ func _draw_actor_cast(item: Dictionary) -> void:
 
 
 func shadow_strength() -> float:
-	var scene: StringName = snapshot.scene_id
-	if scene == &"village_layered":
-		scene = &"village"
-	elif scene == &"forest_layered":
-		scene = &"forest"
-	elif scene == &"glade_layered":
-		scene = &"glade"
-	return ActorShadow.strength_for(scene)
+	return ActorShadow.strength_for(snapshot.scene_id)
+
 
 
 func _refresh_props() -> void:

@@ -1,0 +1,1400 @@
+{
+  "_doc": "Hand-authored depth occluders per scene (ground pixel coordinates at the game scale). tools/art/make_depth_occluders.py cuts them out of the ground into presentation/common/occluders/; presentation/common/depth_occluders.gd draws them over actors whose feet are north of base_y. See the tool's docstring for the fields. Each occluder is refined automatically (floor pixels around the prop dropped, see the tool) unless \"refine\": false: the dark village and the brown root gate / arch / mossy stone share the floor colours, so their hand polygons are used as drawn.",
+  "scenes": {
+    "glade": {
+      "ground": "presentation/forest/stag_glade_ground.png",
+      "trim_symbols": "34567",
+      "occluders": [
+        {
+          "id": "rune_stone_back",
+          "base_y": 147,
+          "poly": [
+            [
+              290,
+              114
+            ],
+            [
+              295,
+              108
+            ],
+            [
+              309,
+              108
+            ],
+            [
+              314,
+              114
+            ],
+            [
+              314,
+              149
+            ],
+            [
+              290,
+              149
+            ]
+          ]
+        },
+        {
+          "id": "rune_stone_right",
+          "base_y": 167,
+          "poly": [
+            [
+              351,
+              130
+            ],
+            [
+              356,
+              124
+            ],
+            [
+              370,
+              124
+            ],
+            [
+              375,
+              130
+            ],
+            [
+              375,
+              169
+            ],
+            [
+              351,
+              169
+            ]
+          ]
+        },
+        {
+          "id": "rune_stone_left",
+          "base_y": 168,
+          "poly": [
+            [
+              213,
+              140
+            ],
+            [
+              222,
+              130
+            ],
+            [
+              233,
+              130
+            ],
+            [
+              238,
+              138
+            ],
+            [
+              238,
+              170
+            ],
+            [
+              213,
+              170
+            ]
+          ]
+        },
+        {
+          "id": "standing_stone",
+          "base_y": 207,
+          "poly": [
+            [
+              202,
+              168
+            ],
+            [
+              207,
+              161
+            ],
+            [
+              219,
+              161
+            ],
+            [
+              225,
+              168
+            ],
+            [
+              225,
+              210
+            ],
+            [
+              202,
+              210
+            ]
+          ]
+        },
+        {
+          "id": "rune_stone_front",
+          "base_y": 236,
+          "poly": [
+            [
+              253,
+              200
+            ],
+            [
+              259,
+              192
+            ],
+            [
+              276,
+              192
+            ],
+            [
+              281,
+              200
+            ],
+            [
+              281,
+              239
+            ],
+            [
+              253,
+              239
+            ]
+          ]
+        },
+        {
+          "id": "root_arch",
+          "base_y": 110,
+          "poly": [
+            [
+              397,
+              34
+            ],
+            [
+              472,
+              34
+            ],
+            [
+              474,
+              112
+            ],
+            [
+              447,
+              112
+            ],
+            [
+              447,
+              62
+            ],
+            [
+              432,
+              56
+            ],
+            [
+              420,
+              60
+            ],
+            [
+              420,
+              112
+            ],
+            [
+              397,
+              112
+            ]
+          ],
+          "refine": false
+        }
+      ]
+    },
+    "village": {
+      "ground": "presentation/village/village_ground.png",
+      "trim_symbols": "234567abcq9",
+      "occluders": [
+        {
+          "id": "gate_left_pillar",
+          "base_y": 192,
+          "poly": [
+            [
+              80,
+              104
+            ],
+            [
+              106,
+              104
+            ],
+            [
+              106,
+              196
+            ],
+            [
+              80,
+              196
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "gate_lintel",
+          "base_y": 185,
+          "poly": [
+            [
+              78,
+              112
+            ],
+            [
+              160,
+              76
+            ],
+            [
+              168,
+              80
+            ],
+            [
+              168,
+              98
+            ],
+            [
+              104,
+              128
+            ],
+            [
+              78,
+              128
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "gate_door_right_pillar",
+          "base_y": 174,
+          "poly": [
+            [
+              125,
+              96
+            ],
+            [
+              146,
+              84
+            ],
+            [
+              167,
+              84
+            ],
+            [
+              167,
+              177
+            ],
+            [
+              125,
+              177
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "middle_tree",
+          "base_y": 165,
+          "poly": [
+            [
+              190,
+              60
+            ],
+            [
+              218,
+              60
+            ],
+            [
+              218,
+              100
+            ],
+            [
+              233,
+              100
+            ],
+            [
+              233,
+              121
+            ],
+            [
+              218,
+              121
+            ],
+            [
+              216,
+              170
+            ],
+            [
+              190,
+              170
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "stump",
+          "base_y": 177,
+          "poly": [
+            [
+              226,
+              150
+            ],
+            [
+              248,
+              150
+            ],
+            [
+              248,
+              179
+            ],
+            [
+              226,
+              179
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "forge",
+          "base_y": 104,
+          "poly": [
+            [
+              268,
+              32
+            ],
+            [
+              322,
+              32
+            ],
+            [
+              322,
+              106
+            ],
+            [
+              268,
+              106
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "anvil",
+          "base_y": 120,
+          "poly": [
+            [
+              293,
+              100
+            ],
+            [
+              320,
+              100
+            ],
+            [
+              320,
+              121
+            ],
+            [
+              293,
+              121
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "tool_bench",
+          "base_y": 128,
+          "poly": [
+            [
+              236,
+              98
+            ],
+            [
+              272,
+              98
+            ],
+            [
+              272,
+              130
+            ],
+            [
+              236,
+              130
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "barrel_smithy",
+          "base_y": 143,
+          "poly": [
+            [
+              355,
+              110
+            ],
+            [
+              382,
+              110
+            ],
+            [
+              382,
+              145
+            ],
+            [
+              355,
+              145
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "shelf",
+          "base_y": 147,
+          "poly": [
+            [
+              385,
+              95
+            ],
+            [
+              414,
+              95
+            ],
+            [
+              414,
+              149
+            ],
+            [
+              385,
+              149
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "house_front",
+          "base_y": 150,
+          "poly": [
+            [
+              383,
+              30
+            ],
+            [
+              482,
+              30
+            ],
+            [
+              482,
+              151
+            ],
+            [
+              414,
+              151
+            ],
+            [
+              414,
+              95
+            ],
+            [
+              383,
+              95
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "house_side",
+          "base_y": 144,
+          "poly": [
+            [
+              482,
+              40
+            ],
+            [
+              522,
+              40
+            ],
+            [
+              522,
+              146
+            ],
+            [
+              482,
+              146
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "east_tree",
+          "base_y": 172,
+          "poly": [
+            [
+              548,
+              86
+            ],
+            [
+              571,
+              86
+            ],
+            [
+              571,
+              178
+            ],
+            [
+              540,
+              178
+            ],
+            [
+              534,
+              168
+            ],
+            [
+              545,
+              152
+            ],
+            [
+              548,
+              140
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "slab_house_left",
+          "base_y": 189,
+          "poly": [
+            [
+              450,
+              166
+            ],
+            [
+              499,
+              166
+            ],
+            [
+              499,
+              192
+            ],
+            [
+              450,
+              192
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "slab_house_right",
+          "base_y": 180,
+          "poly": [
+            [
+              498,
+              157
+            ],
+            [
+              540,
+              157
+            ],
+            [
+              540,
+              182
+            ],
+            [
+              498,
+              182
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "barrel_west_1",
+          "base_y": 232,
+          "poly": [
+            [
+              78,
+              206
+            ],
+            [
+              102,
+              206
+            ],
+            [
+              102,
+              234
+            ],
+            [
+              78,
+              234
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "barrel_west_2",
+          "base_y": 247,
+          "poly": [
+            [
+              60,
+              220
+            ],
+            [
+              85,
+              220
+            ],
+            [
+              85,
+              249
+            ],
+            [
+              60,
+              249
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "tilted_slab_west",
+          "base_y": 245,
+          "poly": [
+            [
+              111,
+              214
+            ],
+            [
+              147,
+              214
+            ],
+            [
+              147,
+              249
+            ],
+            [
+              111,
+              249
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "rubble_red",
+          "base_y": 263,
+          "poly": [
+            [
+              83,
+              243
+            ],
+            [
+              108,
+              243
+            ],
+            [
+              108,
+              266
+            ],
+            [
+              83,
+              266
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "shrine",
+          "base_y": 307,
+          "poly": [
+            [
+              120,
+              251
+            ],
+            [
+              155,
+              251
+            ],
+            [
+              155,
+              311
+            ],
+            [
+              120,
+              311
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "lamp_post",
+          "base_y": 305,
+          "poly": [
+            [
+              194,
+              238
+            ],
+            [
+              205,
+              238
+            ],
+            [
+              205,
+              244
+            ],
+            [
+              226,
+              248
+            ],
+            [
+              226,
+              257
+            ],
+            [
+              205,
+              257
+            ],
+            [
+              204,
+              306
+            ],
+            [
+              195,
+              306
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "lamp_lantern",
+          "base_y": 305,
+          "poly": [
+            [
+              213,
+              258
+            ],
+            [
+              223,
+              258
+            ],
+            [
+              229,
+              264
+            ],
+            [
+              229,
+              285
+            ],
+            [
+              213,
+              285
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "pile_back_rock",
+          "base_y": 290,
+          "poly": [
+            [
+              314,
+              238
+            ],
+            [
+              346,
+              238
+            ],
+            [
+              346,
+              292
+            ],
+            [
+              314,
+              292
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "pile_barrels_crate",
+          "base_y": 316,
+          "poly": [
+            [
+              338,
+              250
+            ],
+            [
+              398,
+              250
+            ],
+            [
+              398,
+              320
+            ],
+            [
+              338,
+              320
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "pile_rocks_right",
+          "base_y": 304,
+          "poly": [
+            [
+              396,
+              256
+            ],
+            [
+              434,
+              256
+            ],
+            [
+              434,
+              307
+            ],
+            [
+              396,
+              307
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "stone_pillar_east",
+          "base_y": 290,
+          "poly": [
+            [
+              494,
+              234
+            ],
+            [
+              523,
+              234
+            ],
+            [
+              523,
+              294
+            ],
+            [
+              494,
+              294
+            ]
+          ],
+          "refine": false
+        }
+      ]
+    },
+    "forest": {
+      "ground": "presentation/forest/forest_route_ground.png",
+      "trim_symbols": "34567",
+      "occluders": [
+        {
+          "id": "root_gate_left",
+          "base_y": 106,
+          "poly": [
+            [
+              310,
+              28
+            ],
+            [
+              345,
+              28
+            ],
+            [
+              345,
+              110
+            ],
+            [
+              310,
+              110
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "root_gate_middle",
+          "base_y": 105,
+          "hide_when": "gate_open",
+          "note": "the closed door part: hidden while the gate is open, so the hero walks through the gap between the side roots",
+          "poly": [
+            [
+              345,
+              26
+            ],
+            [
+              399,
+              26
+            ],
+            [
+              399,
+              107
+            ],
+            [
+              345,
+              107
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "root_gate_right",
+          "base_y": 118,
+          "poly": [
+            [
+              399,
+              28
+            ],
+            [
+              433,
+              28
+            ],
+            [
+              433,
+              121
+            ],
+            [
+              399,
+              121
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "pedestal_west",
+          "base_y": 147,
+          "poly": [
+            [
+              295,
+              97
+            ],
+            [
+              320,
+              97
+            ],
+            [
+              320,
+              150
+            ],
+            [
+              295,
+              150
+            ]
+          ]
+        },
+        {
+          "id": "pedestal_east",
+          "base_y": 170,
+          "poly": [
+            [
+              367,
+              117
+            ],
+            [
+              395,
+              117
+            ],
+            [
+              395,
+              173
+            ],
+            [
+              367,
+              173
+            ]
+          ]
+        },
+        {
+          "id": "signpost",
+          "base_y": 111,
+          "poly": [
+            [
+              133,
+              62
+            ],
+            [
+              164,
+              62
+            ],
+            [
+              164,
+              114
+            ],
+            [
+              133,
+              114
+            ]
+          ]
+        },
+        {
+          "id": "lantern_post",
+          "base_y": 116,
+          "poly": [
+            [
+              168,
+              70
+            ],
+            [
+              184,
+              70
+            ],
+            [
+              184,
+              118
+            ],
+            [
+              168,
+              118
+            ]
+          ]
+        },
+        {
+          "id": "mossy_stone",
+          "base_y": 124,
+          "poly": [
+            [
+              187,
+              82
+            ],
+            [
+              217,
+              82
+            ],
+            [
+              217,
+              127
+            ],
+            [
+              187,
+              127
+            ]
+          ],
+          "refine": false
+        },
+        {
+          "id": "mossy_rock_east",
+          "base_y": 184,
+          "poly": [
+            [
+              428,
+              150
+            ],
+            [
+              456,
+              150
+            ],
+            [
+              456,
+              187
+            ],
+            [
+              428,
+              187
+            ]
+          ]
+        }
+      ]
+    },
+    "arena": {
+      "ground": "presentation/arena/arena_ground.png",
+      "trim_symbols": "23456",
+      "occluders": [
+        {
+          "id": "statue",
+          "base_y": 95,
+          "poly": [
+            [
+              376,
+              14
+            ],
+            [
+              415,
+              14
+            ],
+            [
+              415,
+              97
+            ],
+            [
+              376,
+              97
+            ]
+          ]
+        },
+        {
+          "id": "pillar_nw",
+          "base_y": 106,
+          "poly": [
+            [
+              122,
+              70
+            ],
+            [
+              142,
+              70
+            ],
+            [
+              142,
+              108
+            ],
+            [
+              122,
+              108
+            ]
+          ]
+        },
+        {
+          "id": "pillar_ne_top",
+          "base_y": 104,
+          "poly": [
+            [
+              657,
+              82
+            ],
+            [
+              679,
+              82
+            ],
+            [
+              679,
+              107
+            ],
+            [
+              657,
+              107
+            ]
+          ]
+        },
+        {
+          "id": "pillar_ne",
+          "base_y": 157,
+          "poly": [
+            [
+              660,
+              124
+            ],
+            [
+              684,
+              124
+            ],
+            [
+              684,
+              160
+            ],
+            [
+              660,
+              160
+            ]
+          ]
+        },
+        {
+          "id": "rubble_sw",
+          "base_y": 378,
+          "poly": [
+            [
+              115,
+              346
+            ],
+            [
+              210,
+              346
+            ],
+            [
+              210,
+              382
+            ],
+            [
+              115,
+              382
+            ]
+          ]
+        },
+        {
+          "id": "rubble_se",
+          "base_y": 374,
+          "poly": [
+            [
+              608,
+              345
+            ],
+            [
+              655,
+              345
+            ],
+            [
+              655,
+              377
+            ],
+            [
+              608,
+              377
+            ]
+          ]
+        },
+        {
+          "id": "slab_se",
+          "base_y": 361,
+          "poly": [
+            [
+              652,
+              328
+            ],
+            [
+              683,
+              328
+            ],
+            [
+              683,
+              364
+            ],
+            [
+              652,
+              364
+            ]
+          ]
+        },
+        {
+          "id": "pillar_sw",
+          "base_y": 404,
+          "poly": [
+            [
+              121,
+              372
+            ],
+            [
+              140,
+              372
+            ],
+            [
+              140,
+              407
+            ],
+            [
+              121,
+              407
+            ]
+          ]
+        },
+        {
+          "id": "pillar_s_left",
+          "base_y": 408,
+          "poly": [
+            [
+              249,
+              372
+            ],
+            [
+              269,
+              372
+            ],
+            [
+              269,
+              411
+            ],
+            [
+              249,
+              411
+            ]
+          ]
+        },
+        {
+          "id": "pillar_s_right",
+          "base_y": 405,
+          "poly": [
+            [
+              530,
+              372
+            ],
+            [
+              549,
+              372
+            ],
+            [
+              549,
+              408
+            ],
+            [
+              530,
+              408
+            ]
+          ]
+        },
+        {
+          "id": "pillar_se",
+          "base_y": 397,
+          "poly": [
+            [
+              659,
+              364
+            ],
+            [
+              681,
+              364
+            ],
+            [
+              681,
+              400
+            ],
+            [
+              659,
+              400
+            ]
+          ]
+        },
+        {
+          "id": "altar",
+          "base_y": 407,
+          "poly": [
+            [
+              350,
+              374
+            ],
+            [
+              434,
+              374
+            ],
+            [
+              434,
+              411
+            ],
+            [
+              350,
+              411
+            ]
+          ]
+        },
+        {
+          "id": "wall_sw",
+          "base_y": 408,
+          "poly": [
+            [
+              150,
+              380
+            ],
+            [
+              243,
+              380
+            ],
+            [
+              243,
+              412
+            ],
+            [
+              150,
+              412
+            ]
+          ]
+        },
+        {
+          "id": "wall_se",
+          "base_y": 408,
+          "poly": [
+            [
+              556,
+              380
+            ],
+            [
+              652,
+              380
+            ],
+            [
+              652,
+              412
+            ],
+            [
+              556,
+              412
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

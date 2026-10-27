@@ -9,7 +9,7 @@ extends RefCounted
 ## hide_when). The scenes put every occluder into their y-sorted draw list with the sort key base_y - SORT_BIAS
 ## (drawables()), so an occluder covers every actor whose feet are north of its base line and stays under every actor
 ## on or south of it. Where nobody stands behind it, it redraws exactly the ground's own pixels (invisible).
-## Used by presentation/explore/explore_scene.gd (village, forest, glade) and presentation/arena/arena.gd (arena).
+## Used by presentation/arena/arena.gd only; layered exploration uses PropsLayer.
 ## Presentation only: the colliders (core layouts) keep actors out of the props' bases; nothing here is a game rule.
 
 const DIR: String = "res://presentation/common/occluders/"

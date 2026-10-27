@@ -10,7 +10,6 @@ const SceneDefs := preload("res://core/scene_defs.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const SaveStore := preload("res://core/save_store.gd")
 const SaveProfile := preload("res://core/save_profile.gd")
-const VillageLayout := preload("res://core/village_layout.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 const Title := preload("res://presentation/menu/title.gd")
 
@@ -79,9 +78,13 @@ func _run() -> void:
 
 
 func _every_scene_loads() -> void:
-	for scene_id: StringName in [SceneDefs.VILLAGE, SceneDefs.FOREST, SceneDefs.GLADE]:
+	for scene_id: StringName in [SceneDefs.VILLAGE_LAYERED, SceneDefs.FOREST_LAYERED, SceneDefs.GLADE_LAYERED]:
 		var scene: Explore = _spawn({"scene": scene_id})
 		await process_frame
+		for action: String in Explore.DEBUG_SCENES:
+			_expect(InputMap.has_action(action), "debug action remains bound: " + action)
+			_expect(Explore.DEBUG_SCENES[action] in SceneDefs.LAYERED or Explore.DEBUG_SCENES[action] == SceneDefs.ARENA, "all debug jumps target official scenes")
+
 		_expect(scene.snapshot != null and scene.snapshot.scene_id == scene_id, "%s loads" % scene_id)
 		var ground: Texture2D = scene.ground_texture(scene_id)
 		_expect(ground != null and ground.get_size() == scene.snapshot.size, "%s ground is the scene size" % scene_id)
@@ -90,7 +93,7 @@ func _every_scene_loads() -> void:
 		_expect(scene.fade_alpha() == 0.0, "the fade ends clear")
 		_expect(scene.hud.toast_text == SceneDefs.get_def(scene_id)["name"] and scene.hud.toast_alpha > 0.0, "%s shows its name toast" % scene_id)
 		for item: Dictionary in scene.drawables():
-			if item["kind"] in [&"occluder", &"firefly"]:
+			if item["kind"] in [&"prop", &"firefly"]:
 				continue  # the painted props drawn over actors behind them (smoke_depth_occluders.gd)
 			_expect(scene.frames.has(item["frame"]), "%s draws a missing frame %s" % [scene_id, item["frame"]])
 		_expect(Explore.AMBIENT.has(scene_id) and scene.ambient() == Explore.AMBIENT[scene_id], "%s has its ambient tint" % scene_id)
@@ -113,7 +116,7 @@ func _every_scene_loads() -> void:
 		scene.queue_free()
 		await process_frame
 	# the arena can be drawn by the explore renderer too (the game uses the fight scene there)
-	var arena_view: Explore = _spawn({"scene": SceneDefs.VILLAGE})
+	var arena_view: Explore = _spawn({"scene": SceneDefs.VILLAGE_LAYERED})
 	await process_frame
 	arena_view.core = ExploreCore.new(SceneDefs.ARENA)
 	_step(arena_view)
@@ -123,7 +126,7 @@ func _every_scene_loads() -> void:
 
 
 func _village() -> void:
-	var scene: Explore = _spawn({"scene": SceneDefs.VILLAGE, "entry": &"arrival"})
+	var scene: Explore = _spawn({"scene": SceneDefs.VILLAGE_LAYERED, "entry": &"arrival"})
 	await process_frame
 	_finish_fade(scene)
 	var npcs: Array[Dictionary] = []
@@ -131,14 +134,16 @@ func _village() -> void:
 		if item["kind"] == &"npc":
 			npcs.append(item)
 	_expect(npcs.size() == 6, "six people in the village: %d" % npcs.size())
-	var stand: Dictionary = {&"mira": &"mira", &"tovan": &"tovan", &"edda": &"edda", &"elder": &"villager_elder", &"child": &"villager_child", &"worker": &"villager_worker"}
+	var stand: Dictionary = {}
+	for npc: Dictionary in scene.snapshot.npcs:
+		stand[npc["id"]] = npc["position"]
 	for item: Dictionary in npcs:
-		_expect(Vector2(item["at"]) == VillageLayout.STAND_POINTS[stand[item["id"]]], "%s stands on its stand point" % item["id"])
+		_expect(Vector2(item["at"]) == stand[item["id"]], "%s stands on its stand point" % item["id"])
 		_expect(String(item["frame"]).begins_with("npc_%s_idle_right_" % String(item["id"])), "%s idles: %s" % [item["id"], item["frame"]])
 		_expect(float(item["shadow"]) > 5.0 and float(item["shadow"]) <= 10.0, "%s has a ground shadow scaled by height" % item["id"])
 	var chest: bool = false
 	for item: Dictionary in scene.drawables():
-		chest = chest or item.get("frame", "") == "obj_chest_closed_1"
+		chest = chest or item.get("type", "") == "village_chest"
 	_expect(chest, "the village chest is drawn closed")
 	# the idle loop advances (4 frames over 60 ticks)
 	var seen: Dictionary = {}
@@ -147,7 +152,10 @@ func _village() -> void:
 		seen[scene.npc_frames[&"tovan"]] = true
 	_expect(seen.size() == 4, "Tovan's idle loop shows 4 frames: %s" % str(seen.keys()))
 	# near Mira: hint, facing, bubble
-	var mira: Vector2 = VillageLayout.STAND_POINTS[&"mira"]
+	var mira: Vector2 = Vector2.ZERO
+	for npc: Dictionary in scene.snapshot.npcs:
+		if npc["id"] == &"mira":
+			mira = npc["position"]
 	scene.core.place_at(mira + Vector2(16, 2))
 	_step(scene)
 	_expect(scene.hud.hint_text == "[E] TALK", "the interact hint near Mira: '%s'" % scene.hud.hint_text)
@@ -178,17 +186,17 @@ func _village() -> void:
 
 
 func _jumps_gate_and_menu() -> void:
-	var scene: Explore = _spawn({"scene": SceneDefs.VILLAGE})
+	var scene: Explore = _spawn({"scene": SceneDefs.VILLAGE_LAYERED})
 	await process_frame
 	_finish_fade(scene)
-	for target: StringName in [SceneDefs.FOREST, SceneDefs.GLADE, SceneDefs.VILLAGE]:
+	for target: StringName in [SceneDefs.FOREST_LAYERED, SceneDefs.GLADE_LAYERED, SceneDefs.VILLAGE_LAYERED]:
 		scene.jump_to(target)
 		scene.advance_fade()
 		_expect(scene.fade_alpha() > 0.0 and scene.fade_alpha() < 1.0, "the fade runs")
 		_finish_fade(scene)
 		var def: Dictionary = SceneDefs.get_def(target)
 		_expect(scene.snapshot.scene_id == target and scene.snapshot.hero.position == def["entries"][def["default_entry"]], "jump to %s puts the hero at its entry" % target)
-	scene.jump_to(SceneDefs.FOREST)
+	scene.jump_to(SceneDefs.FOREST_LAYERED)
 	_finish_fade(scene)
 	scene.toggle_gate()
 	_expect(scene.gate_open and scene.core.gate_open and scene.snapshot.gate_open, "F6 opens the forest gate")
@@ -199,7 +207,7 @@ func _jumps_gate_and_menu() -> void:
 	_finish_fade(scene)
 	_expect(changed_to == [Explore.ARENA_SCENE], "F5 / the arena loads the Colossus fight: %s" % str(changed_to))
 	# the character menu
-	var menu_scene: Explore = _spawn({"scene": SceneDefs.VILLAGE})
+	var menu_scene: Explore = _spawn({"scene": SceneDefs.VILLAGE_LAYERED})
 	await process_frame
 	_finish_fade(menu_scene)
 	_expect(menu_scene.open_menu() and menu_scene.character_menu.is_open, "TAB opens the character menu in exploration")
@@ -213,13 +221,13 @@ func _jumps_gate_and_menu() -> void:
 
 func _save_and_continue() -> void:
 	SaveStore.delete(SAVE_PATH)
-	var scene: Explore = _spawn({"scene": SceneDefs.FOREST, "entry": &"village_side"}, true)
+	var scene: Explore = _spawn({"scene": SceneDefs.FOREST_LAYERED, "entry": &"village_side"}, true)
 	await process_frame
 	_finish_fade(scene)
 	_step(scene, Vector2.RIGHT)
 	_step(scene, Vector2.RIGHT)
 	var saved: SaveProfile = SaveStore.load_profile(SAVE_PATH)
-	_expect(saved.scene_id == &"forest" and saved.checkpoint_id == &"forest_entrance", "the forest entrance checkpoint is saved: %s / %s" % [saved.scene_id, saved.checkpoint_id])
+	_expect(saved.scene_id == &"forest_layered" and saved.checkpoint_id == &"forest_layered_entrance", "the forest entrance checkpoint is saved: %s / %s" % [saved.scene_id, saved.checkpoint_id])
 	scene.toggle_gate()
 	_expect(SaveStore.load_profile(SAVE_PATH).gate_open, "the gate flag is saved")
 	scene.queue_free()
@@ -236,7 +244,7 @@ func _save_and_continue() -> void:
 	title.queue_free()
 	var resumed: Explore = _spawn({}, true)  # the title set START_META
 	await process_frame
-	_expect(resumed.snapshot.scene_id == &"forest" and resumed.snapshot.hero.position == SceneDefs.checkpoint(&"forest", &"forest_entrance")["position"], "CONTINUE resumes at the forest checkpoint")
+	_expect(resumed.snapshot.scene_id == &"forest_layered" and resumed.snapshot.hero.position == SceneDefs.checkpoint(&"forest_layered", &"forest_layered_entrance")["position"], "CONTINUE resumes at the forest checkpoint")
 	_expect(resumed.core.gate_open, "with the gate open")
 	# ESC goes back to the title (through the real input map)
 	_finish_fade(resumed)

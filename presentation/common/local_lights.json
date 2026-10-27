@@ -117,64 +117,6 @@
       "pool_energy": 0.7
     }
   ],
-  "_painted_glade": [
-    {
-      "pixel": [
-        226,
-        148
-      ],
-      "halo_radius": 35.0,
-      "energy": 1.25,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
-      "pool_pixel": [
-        226,
-        163
-      ]
-    },
-    {
-      "pixel": [
-        303,
-        133
-      ],
-      "halo_radius": 35.0,
-      "energy": 1.25,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
-      "pool_pixel": [
-        303,
-        148
-      ]
-    },
-    {
-      "pixel": [
-        365,
-        155
-      ],
-      "halo_radius": 35.0,
-      "energy": 1.25,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
-      "pool_pixel": [
-        365,
-        170
-      ]
-    },
-    {
-      "pixel": [
-        267,
-        215
-      ],
-      "halo_radius": 35.0,
-      "energy": 1.25,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
-      "pool_pixel": [
-        267,
-        230
-      ]
-    }
-  ],
   "forest_pedestal_lit": [
     {
       "pixel": [

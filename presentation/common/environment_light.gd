@@ -10,7 +10,7 @@ static var _sockets: Dictionary = {}
 
 
 static func supports(scene: StringName) -> bool:
-	return scene in [&"village_layered", &"forest", &"glade", &"glade_layered", &"forest_layered"]
+	return scene in [&"village_layered", &"glade_layered", &"forest_layered"]
 
 
 static func make_material(scene: StringName, size: Vector2, placements: Array[Dictionary] = []) -> ShaderMaterial:
@@ -24,12 +24,9 @@ static func make_material(scene: StringName, size: Vector2, placements: Array[Di
 	result.set_shader_parameter("strength", 1.0)
 	result.set_shader_parameter("light_colour", Vector3(0.64, 0.77, 1.0) if scene == &"village_layered" else Vector3(0.60, 0.79, 1.0))
 	var practicals: Dictionary = lamp_plan(placements)
-	if scene in [&"glade", &"glade_layered"]:
+	if scene in [&"glade_layered"]:
 		result.set_shader_parameter("lamp_colour", Vector3(0.48, 0.94, 0.86))
 		result.set_shader_parameter("lamp_core_colour", Vector3(0.8, 1.0, 1.0))
-	if scene == &"glade":
-		var painted: Array[Dictionary] = [{"type": &"_painted_glade", "feet": Vector2.ZERO, "anchor": Vector2.ZERO}]
-		practicals = lamp_plan(painted)
 	result.set_shader_parameter("mixed_lights", scene == &"forest_layered")
 	result.set_shader_parameter("lamp_colours", practicals["colours"])
 	result.set_shader_parameter("lamp_core_colours", practicals["core_colours"])

@@ -166,7 +166,7 @@ func handle_event(event: GameEvent, scene: StringName = &"arena") -> void:
 				cue("chest_open", event.tick, 0.8)
 		&"flag_set":
 			var flag: String = String(event.data.get("flag", ""))
-			if scene in [&"village", &"village_layered"] and (flag.begins_with("lesson_") or flag == "training_done"):
+			if scene in [&"village_layered"] and (flag.begins_with("lesson_") or flag == "training_done"):
 				cue("lesson_complete", event.tick, 0.7)
 
 

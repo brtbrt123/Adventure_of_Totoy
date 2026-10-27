@@ -1,16 +1,6 @@
 extends SceneTree
 ## godot_console --headless --path . --script res://tests/smoke_depth_occluders.gd
-## The depth occluders and the shared actor shadow (2026-10-22):
-## - every scene's occluder atlas loads (presentation/common/depth_occluders.gd) and its items have rects and bases;
-## - the draw order in the real exploration scene: the hero behind the glade's back rune stone, the village gate's left
-##   pillar and the forest's east pedestal sorts BEFORE the occluder (it covers him); in front of them AFTER;
-## - the forest's root gate door occluder is drawn while the gate is closed and not while it is open (G / F6), and the
-##   side roots stay; a scene change swaps the occluders to the new scene's, and nothing is left over;
-## - the arena puts its occluders into its y-sorted list (a pillar after the hero behind it), also after a restart;
-## - the shadow routine (presentation/common/actor_shadow.gd): whole-pixel rows, a dithered ring, translucent (no black
-##   hole), centred under the feet and OFFSET_Y below them, smaller for smaller radii; the scenes draw it from
-##   _draw_item / _draw_actor before the sprite (checked in the source: the old ink ellipse is gone).
-const Explore := preload("res://presentation/explore/explore_scene.gd")
+## Arena depth occluders and shared actor-shadow regression. Layered depth/gate coverage lives in the layered suites.
 const Arena := preload("res://presentation/arena/arena.gd")
 const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
@@ -42,31 +32,9 @@ func _index(list: Array[Dictionary], kind: StringName, id: StringName = &"") -> 
 	return -1
 
 
-func _place(scene: Explore, at: Vector2) -> void:
-	scene.core.place_at(at)
-	scene.snapshot = scene.core.snapshot()
-	scene._update_camera()
-
-
-func _order(scene: Explore, scene_id: StringName, occluder: StringName, behind: Vector2, front: Vector2) -> void:
-	if scene.core.scene_id != scene_id:
-		scene.enter_scene(scene_id)
-	_place(scene, behind)
-	var list: Array[Dictionary] = scene.drawables()
-	var o: int = _index(list, &"occluder", occluder)
-	var h: int = _index(list, &"hero")
-	_expect(o >= 0, "%s: occluder %s is in the draw list near %s" % [scene_id, occluder, str(behind)])
-	_expect(h >= 0 and o > h, "%s: the hero at %s (behind) is drawn before %s (hero %d, occluder %d)" % [scene_id, str(behind), occluder, h, o])
-	_place(scene, front)
-	list = scene.drawables()
-	o = _index(list, &"occluder", occluder)
-	h = _index(list, &"hero")
-	_expect(o >= 0 and h > o, "%s: the hero at %s (in front) is drawn after %s (hero %d, occluder %d)" % [scene_id, str(front), occluder, h, o])
-
-
 func _run() -> void:
 	# the data of every scene
-	for scene_id: StringName in SceneDefs.IDS:
+	for scene_id: StringName in [SceneDefs.ARENA]:
 		var data: Dictionary = DepthOccluders.scene_data(scene_id)
 		_expect(not data.is_empty(), "%s: occluders load" % scene_id)
 		if data.is_empty():
@@ -78,46 +46,6 @@ func _run() -> void:
 			_expect(rect.size.x > 0 and rect.size.y > 0 and item["src"].size == rect.size, "%s/%s: rect and atlas region" % [scene_id, item["id"]])
 			_expect(float(item["base_y"]) >= rect.position.y, "%s/%s: base below the top" % [scene_id, item["id"]])
 	_expect(DepthOccluders.is_behind(140.0, 147.0) and not DepthOccluders.is_behind(147.0, 147.0) and not DepthOccluders.is_behind(150.0, 147.0), "is_behind: north of the base only")
-
-	# the exploration scene: draw order behind / in front
-	Engine.set_meta(Explore.START_META, {"scene": &"glade", "entry": &"entrance"})
-	var scene: Explore = (load("res://presentation/explore/explore_scene.tscn") as PackedScene).instantiate() as Explore
-	scene.change_scene = func(_path: String) -> void: pass
-	root.add_child(scene)
-	await process_frame
-	_order(scene, &"glade", &"rune_stone_back", Vector2(301, 133), Vector2(301, 160))
-	_order(scene, &"glade", &"rune_stone_front", Vector2(268, 218), Vector2(268, 246))
-	_order(scene, &"village", &"gate_left_pillar", Vector2(115, 172), Vector2(115, 200))
-	_order(scene, &"forest", &"pedestal_east", Vector2(382, 151), Vector2(382, 182))
-	# the root gate's door part follows the gate flag; the side roots stay; nothing of another scene is listed
-	if scene.gate_open:
-		scene.toggle_gate()
-	_place(scene, Vector2(372, 120))
-	var ids: Array[StringName] = []
-	for item: Dictionary in scene.drawables():
-		if item["kind"] == &"occluder":
-			ids.append(item["occluder"]["id"])
-	_expect(ids.has(&"root_gate_middle") and ids.has(&"root_gate_left"), "closed gate: the door and the side roots are drawn %s" % str(ids))
-	scene.toggle_gate()
-	ids.clear()
-	for item: Dictionary in scene.drawables():
-		if item["kind"] == &"occluder":
-			ids.append(item["occluder"]["id"])
-	_expect(not ids.has(&"root_gate_middle") and ids.has(&"root_gate_left"), "open gate: the door part is hidden, the sides stay %s" % str(ids))
-	scene.toggle_gate()
-	var glade_ids: Dictionary = {}
-	for item: Dictionary in DepthOccluders.scene_data(&"glade")["items"]:
-		glade_ids[item["id"]] = true
-	scene.enter_scene(&"glade")
-	_place(scene, Vector2(301, 133))
-	var listed: int = 0
-	for item: Dictionary in scene.drawables():
-		if item["kind"] == &"occluder":
-			listed += 1
-			_expect(glade_ids.has(item["occluder"]["id"]), "after the scene change only glade occluders are listed (%s)" % item["occluder"]["id"])
-	_expect(listed > 0, "the glade's occluders are listed after the scene change")
-	scene.queue_free()
-	await process_frame
 
 	# the arena: a pillar sorts after the hero behind it, also after a restart
 	var arena: Arena = (load("res://presentation/arena/arena.tscn") as PackedScene).instantiate() as Arena
@@ -157,7 +85,7 @@ func "))
 	var small: Dictionary = ActorShadow.plan(Vector2(100, 50), 6.0)
 	_expect(Array(small["core"]).size() <= core.size(), "a smaller radius gives a smaller shadow")
 	_expect(ActorShadow.ALPHA >= 0.15 and ActorShadow.ALPHA <= 0.3, "subtle grounded actor shadow (alpha %.2f)" % ActorShadow.ALPHA)
-	for scene_id: StringName in SceneDefs.IDS:
+	for scene_id: StringName in [SceneDefs.ARENA]:
 		var s: float = ActorShadow.strength_for(scene_id)
 		_expect(s >= 0.15 and s <= 0.3, "%s shadow strength %.2f" % [scene_id, s])
 	for path: String in ["res://presentation/explore/explore_scene.gd", "res://presentation/arena/arena.gd"]:

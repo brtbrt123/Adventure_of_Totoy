@@ -56,7 +56,7 @@ func walk_out(exit_id: StringName, target: StringName, max_ticks: int = 4000) ->
 func _run() -> void:
 	if Engine.has_meta(Explore.PERSIST_META):
 		Engine.remove_meta(Explore.PERSIST_META)
-	Engine.set_meta(Explore.START_META, {"scene": SceneDefs.VILLAGE, "entry": &"arrival"})
+	Engine.set_meta(Explore.START_META, {"scene": SceneDefs.VILLAGE_LAYERED, "entry": &"arrival"})
 	scene = (load("res://presentation/explore/explore_scene.tscn") as PackedScene).instantiate() as Explore
 	scene.change_scene = func(path: String) -> void: changed_to.append(path)
 	scene.set_physics_process(false)  # the bot drives every tick
@@ -64,19 +64,19 @@ func _run() -> void:
 	await process_frame
 	while scene.fade_phase != &"":
 		scene.advance_fade()
-	_expect(walk_out(&"to_forest", SceneDefs.FOREST), "village -> forest")
-	_expect(scene.snapshot.hero.position == SceneDefs.get_def(SceneDefs.FOREST)["entries"][&"village_side"], "arrives at the forest's village-side entry")
+	_expect(walk_out(&"to_forest", SceneDefs.FOREST_LAYERED), "village -> forest")
+	_expect(scene.snapshot.hero.position == SceneDefs.get_def(SceneDefs.FOREST_LAYERED)["entries"][&"village_side"], "arrives at the forest's village-side entry")
 	var blocked: ExploreBot = ExploreBot.new()
-	_expect(not blocked.plan(scene.core.size, scene.core.obstacles, scene.snapshot.hero.position, Vector2.ZERO, _exit_rect(SceneDefs.FOREST, &"to_glade")), "the closed root gate blocks the north exit")
+	_expect(not blocked.plan(scene.core.size, scene.core.obstacles, scene.snapshot.hero.position, Vector2.ZERO, _exit_rect(SceneDefs.FOREST_LAYERED, &"to_glade")), "the closed root gate blocks the north exit")
 	scene.toggle_gate()
-	_expect(walk_out(&"to_glade", SceneDefs.GLADE), "forest -> glade (gate open)")
-	_expect(scene.snapshot.hero.position == SceneDefs.get_def(SceneDefs.GLADE)["entries"][&"entrance"], "arrives at the glade entrance")
-	_expect(walk_out(&"to_forest", SceneDefs.FOREST), "glade -> forest (north)")
-	_expect(scene.snapshot.hero.position == SceneDefs.FOREST_NORTH_ENTRY, "arrives below the forest's north exit")
-	_expect(walk_out(&"to_village", SceneDefs.VILLAGE), "forest -> village (back through the open gate)")
-	_expect(scene.snapshot.hero.position == SceneDefs.get_def(SceneDefs.VILLAGE)["entries"][&"return"], "arrives at the village return spawn")
-	_expect(walk_out(&"to_forest", SceneDefs.FOREST), "village -> forest again")
-	_expect(walk_out(&"to_glade", SceneDefs.GLADE), "forest -> glade again")
+	_expect(walk_out(&"to_glade", SceneDefs.GLADE_LAYERED), "forest -> glade (gate open)")
+	_expect(scene.snapshot.hero.position == SceneDefs.get_def(SceneDefs.GLADE_LAYERED)["entries"][&"entrance"], "arrives at the glade entrance")
+	_expect(walk_out(&"to_forest", SceneDefs.FOREST_LAYERED), "glade -> forest (north)")
+	_expect(scene.snapshot.hero.position == SceneDefs.get_def(SceneDefs.FOREST_LAYERED)["entries"][&"north"], "arrives below the forest's north exit")
+	_expect(walk_out(&"to_village", SceneDefs.VILLAGE_LAYERED), "forest -> village (back through the open gate)")
+	_expect(scene.snapshot.hero.position == SceneDefs.get_def(SceneDefs.VILLAGE_LAYERED)["entries"][&"return"], "arrives at the village return spawn")
+	_expect(walk_out(&"to_forest", SceneDefs.FOREST_LAYERED), "village -> forest again")
+	_expect(walk_out(&"to_glade", SceneDefs.GLADE_LAYERED), "forest -> glade again")
 	_expect(walk_out(&"to_arena", SceneDefs.ARENA), "glade -> arena (the root arch)")
 	_expect(changed_to == [Explore.ARENA_SCENE], "the Colossus fight is loaded once: %s" % str(changed_to))
 	print("bot route: %d scene changes" % scene.transitions)

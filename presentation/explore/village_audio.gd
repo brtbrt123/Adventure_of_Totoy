@@ -38,7 +38,7 @@ func _process(delta: float) -> void:
 
 
 func set_scene(id: StringName) -> void:
-	set_music_active(id in [&"village", &"village_layered"])
-	ambience_active = id in [&"forest", &"forest_layered", &"glade", &"glade_layered"]
+	set_music_active(id in [&"village_layered"])
+	ambience_active = id in [&"forest_layered", &"glade_layered"]
 	if ambience_active and not ambience.playing and DisplayServer.get_name() != "headless":
 		ambience.play()
