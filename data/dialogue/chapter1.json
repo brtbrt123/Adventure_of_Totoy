@@ -7,10 +7,13 @@
    {"dialogue": "mira_intro"}
   ],
   "tovan": [
+   {"when": {"flags": ["tovan_graduated"]}, "dialogue": "tovan_after"},
+   {"when": {"flags": ["training_done"]}, "dialogue": "tovan_graduate"},
    {"when": {"flags": ["met_tovan"]}, "dialogue": "tovan_again"},
    {"dialogue": "tovan_intro"}
   ],
   "edda": [
+   {"when": {"flags": ["lesson_aspect"]}, "dialogue": "edda_aspect_done"},
    {"when": {"flags": ["met_edda"]}, "dialogue": "edda_again"},
    {"dialogue": "edda_intro"}
   ],
@@ -54,15 +57,30 @@
     {"text": "Worn, but the edge is honest. Mind the weight. A blade like that rewards patience."},
     {"text": "Dash is your best friend out there. It carries you through trouble faster than a sword can."},
     {"text": "Remember the colours. Gold attacks can be parried. Red attacks, you dodge. No exceptions."},
-    {"text": "Try it on the training post by my forge. It will not hit back, which is more than I can say for the forest."}
+    {"text": "Practise on the training post by my forge. It swings back to teach you, but it never hurts."}
    ]
   },
   "tovan_again": {
    "speaker": "Tovan", "portrait": "tovan",
    "lines": [
-    {"text": "Swing at the post until dashing feels like breathing."},
-    {"text": "Gold, parry. Red, dash. Say it until you stop thinking about it."},
-    {"text": "Bring me anything strange from the forest. I will tell you what it is, and what it is worth."}
+    {"text": "Step close to the post and it wakes. Dash once, then strike it three times."},
+    {"text": "When it glows gold, parry just before the hit. When it glows red, dash. A parry does nothing to red."},
+    {"text": "Come back when you have done all four lessons. Then we talk about the forest."}
+   ]
+  },
+  "tovan_graduate": {
+   "speaker": "Tovan", "portrait": "tovan", "set": ["tovan_graduated"],
+   "lines": [
+    {"text": "Dash, strike, parry, dodge. You learned all four, and the post never touched you. Better than I did."},
+    {"text": "Keep it simple out there. Gold, parry. Red, dash. Do not argue with a red attack."},
+    {"text": "And bring me anything strange the forest gives up. I will tell you what it is worth."}
+   ]
+  },
+  "tovan_after": {
+   "speaker": "Tovan", "portrait": "tovan",
+   "lines": [
+    {"text": "The forest is not a training post. It will not wait for you to be ready."},
+    {"text": "Come back and show me what you bring."}
    ]
   },
   "edda_intro": {
@@ -82,6 +100,13 @@
     {"text": "The Stag guards its glade beyond the root gate. Light both lanterns to open the way."},
     {"text": "Tab opens the character menu. Check your Aspects before you meet it."},
     {"text": "A bound power is a loan, not a gift. Treat it as one."}
+   ]
+  },
+  "edda_aspect_done": {
+   "speaker": "Edda", "portrait": "edda",
+   "lines": [
+    {"text": "You have bound your first Aspect. Feel how it answers when you call it?"},
+    {"text": "Use it in the glade. The Stag will test whether you listen."}
    ]
   },
   "elder_talk": {

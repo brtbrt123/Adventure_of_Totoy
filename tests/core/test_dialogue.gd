@@ -238,3 +238,20 @@ func test_the_conversation_is_deterministic() -> void:
 			log.append("%s|%s|%s" % [str(core.player.position), str(core.snapshot().dialogue.get("index", -1)), str(_types(core))])
 		runs.append("\n".join(log))
 	assert_eq(runs[0], runs[1])
+
+
+func test_tovan_and_edda_follow_the_lessons() -> void:
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"tovan")
+	core.set_story_flags([&"met_tovan"] as Array[StringName])
+	core.step(_frame(Vector2.ZERO, true))
+	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_again", "lessons not done: the reminder")
+	_talk_through(core)
+	core.set_story_flags([&"met_tovan", &"training_done"] as Array[StringName])
+	core.step(_frame(Vector2.ZERO, true))
+	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_graduate")
+	_talk_through(core)
+	assert_true(core.has_flag(&"tovan_graduated"))
+	core.step(_frame(Vector2.ZERO, true))
+	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_after", "he does not graduate you twice")
+	assert_eq(DialogueBook.pick(_book, &"edda", [&"met_edda", &"lesson_aspect"] as Array[StringName]), &"edda_aspect_done")
+	assert_eq(DialogueBook.pick(_book, &"edda", [&"met_edda"] as Array[StringName]), &"edda_again")

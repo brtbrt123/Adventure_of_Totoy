@@ -16,6 +16,10 @@ extends RefCounted
 ## walk, an `interact` event naming it. On an NPC it also starts that NPC's conversation (core/dialogue_book.gd, chosen by the
 ## story flags): the hero stops, `interact_pressed` shows the next line, `skip_pressed` ends it, and a finished or skipped
 ## conversation sets its flags (`flag_set`). NPCs turn toward the hero when he is near.
+##
+## A scene with a training post (a `dummy` object, the village) has a TrainingYard (core/training_yard.gd): once Tovan has been
+## heard and the hero stands in the yard he may also attack and parry (`attack_pressed`, `attack_held`, `parry_pressed`, `aim`),
+## the post teaches dash, attack, parry and dodge and sets the `lesson_*` flags. Everywhere else those inputs are ignored.
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -25,6 +29,7 @@ const Obstacle := preload("res://core/obstacle.gd")
 const Collision := preload("res://core/collision.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
 const DialogueBook := preload("res://core/dialogue_book.gd")
+const TrainingYard := preload("res://core/training_yard.gd")
 
 ## The hero can interact with an NPC or object when his centre is this close to its feet or its stand point.
 const INTERACT_RANGE: float = 24.0
@@ -58,6 +63,10 @@ class ExploreSnapshot:
 	var story_flags: Array[StringName] = []
 	## The running conversation, {} when none: {npc_id, dialogue_id, index (0-based), count, speaker, portrait, text}.
 	var dialogue: Dictionary = {}
+	## The training post (a scene with a `dummy` object), {} elsewhere: see TrainingYard.view(). `telegraphs` is its current
+	## warning in the fight's snapshot type (gold = parry it, red = dodge it); empty when the post rests.
+	var training: Dictionary = {}
+	var telegraphs: Array[Snapshots.TelegraphSnapshot] = []
 	var last_checkpoint: StringName = &""
 	## True from the tick an exit fired: the hero no longer moves; presentation changes scene.
 	var exiting: bool = false
@@ -89,6 +98,7 @@ var exit_fired: Dictionary = {}  # exit id -> true once fired (never twice per e
 var pending_exit: Dictionary = {}
 var interact_target: Dictionary = {}
 var npc_facing_left: Dictionary = {}  # npc id -> bool
+var training: TrainingYard = null  # the scene's practice post, if it has one
 var _talk: Dictionary = {}  # the running conversation: {npc_id, dialogue_id, index}; {} when none
 var _armed: Dictionary = {}  # exit id -> true once the hero has been outside it
 var _queued: Array[GameEvent] = []  # events raised between steps (gate changes), emitted with the next step
@@ -111,6 +121,7 @@ func _init(p_scene_id: StringName = SceneDefs.START_SCENE, entry: StringName = &
 	place_at(def["entries"][entry_id])
 	for npc: Dictionary in def["npcs"]:
 		npc_facing_left[npc["id"]] = bool(npc.get("face_left", false))
+	training = TrainingYard.for_scene(def)
 	_update_npcs()
 	interact_target = _find_interact_target()
 
@@ -166,6 +177,15 @@ func set_flag(flag: StringName) -> bool:
 	return true
 
 
+## Sets a flag now and announces it in `events` (the training yard's lessons). Returns true when it was new.
+func _grant_flag(flag: StringName, events: Array[GameEvent]) -> bool:
+	if story_flags.has(flag):
+		return false
+	story_flags.append(flag)
+	events.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+	return true
+
+
 func has_flag(flag: StringName) -> bool:
 	return story_flags.has(flag)
 
@@ -186,9 +206,16 @@ func step(input: InputFrame) -> void:
 	if not exiting and not talking:
 		frame.move = input.move
 		frame.dash_pressed = input.dash_pressed
+		if training != null and training.is_on(story_flags, player.position):
+			frame.attack_pressed = input.attack_pressed
+			frame.attack_held = input.attack_held
+			frame.parry_pressed = input.parry_pressed
+			frame.aim = input.aim
 	var before: Vector2 = player.position
 	player.step(frame, tick, events)
 	player.position = _clamp(Collision.move_resolved(obstacles, before, player.position, Tuning.PLAYER_RADIUS))
+	if training != null:
+		training.resolve(self, events)
 	if not exiting:
 		_check_checkpoints(events)
 		_check_exits(events)
@@ -240,6 +267,9 @@ func snapshot() -> ExploreSnapshot:
 	snap.lit_switches = lit_switches.duplicate()
 	snap.story_flags = story_flags.duplicate()
 	snap.dialogue = _dialogue_view()
+	if training != null:
+		snap.training = training.view(self)
+		snap.telegraphs = training.telegraph_snapshots()
 	snap.last_checkpoint = last_checkpoint
 	snap.exiting = exiting
 	snap.exit_target_scene = pending_exit.get("target_scene", &"")

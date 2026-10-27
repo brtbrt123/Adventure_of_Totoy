@@ -337,7 +337,7 @@ Each event is a `GameEvent` with `type: StringName`, `tick: int` and `data: Dict
 | `boss_phase_changed` | `entity_id`, `phase` |
 | `game_result` | `result` |
 
-Exploration events (`scene_exit`, `checkpoint`, `interact`, `gate_changed`) are listed in "Scenes and exploration mode". Dialogue events (`dialogue_started`, `dialogue_advanced`, `dialogue_ended`, `flag_set`) are listed under "Dialogue and story flags". Planned, not yet implemented: `aspect_dropped`, `artifact_dropped`, `quest_updated`, `entity_spawned`.
+Exploration events (`scene_exit`, `checkpoint`, `interact`, `gate_changed`) are listed in "Scenes and exploration mode". Training events (`training_post_hit`, `training_hero_hit`, `training_dodged`) are listed under "Training post and the village tutorial". Dialogue events (`dialogue_started`, `dialogue_advanced`, `dialogue_ended`, `flag_set`) are listed under "Dialogue and story flags". Planned, not yet implemented: `aspect_dropped`, `artifact_dropped`, `quest_updated`, `entity_spawned`.
 
 ## Scenes and exploration mode (chapter 1, 2026-10-22)
 
@@ -414,6 +414,16 @@ Core side of chapter 1's NPC conversations: `core/dialogue_book.gd` (static look
 - **Core API:** `ExploreCore.set_story_flags(flags)` (restore a save, no events), `set_flag(flag)` (a story event such as the Stag binding sets one; emits `flag_set` with the next step), `has_flag`, `is_talking`.
 - **Save:** `SaveProfile.story_flags` (an optional list in the JSON, version stays 1; unreadable entries are dropped, duplicates removed, at most 64); `reset_progress()` (a new game) clears it. Presentation saves on `flag_set` and passes `profile.story_flags` to `set_story_flags` when it builds the core of a scene.
 - **Flags in the placeholder book:** `met_mira`, `met_tovan`, `met_edda` (Mira's follow-up changes once Edda has been heard).
+
+## Training post and the village tutorial (2026-10-27)
+
+`core/training_yard.gd`, owned by `ExploreCore.training` (null in a scene without a `dummy` object: today the painted and the layered village). It is the village's combat tutorial.
+
+- **Unlock:** the flag `met_tovan` (Tovan's first conversation) and the hero within `YARD_RADIUS` (96) of the post's feet. Only then does ExploreCore pass `attack_pressed`, `attack_held`, `parry_pressed` and `aim` to the hero (everywhere else exploration still ignores them), and presentation must send them (new key mapping in exploration).
+- **Lessons**, each sets the story flag `lesson_<name>` (and a `flag_set` event), in the order the post asks for them: `dash` (a dash starts in the yard), `attack` (3 hits, one per swing, `HITS_NEEDED`; the post's body is a circle of radius 9, 12 px above its feet, reach and arc exactly like the fight's `_resolve_player_attack`), `parry` (the post winds up a GOLD cone, `WARN_TICKS` 54 then dangerous for `ACTIVE_TICKS` 5; a parry press within `PARRY_ACTIVE_TICKS` of the hit parries it: `parry_succeeded` with `attacker_id` 100, the hero is not hurt), `dodge` (a RED circle; the hero must start a dash during the warning and not be hit). When all four flags are set the core also sets `training_done`. Presentation sets `lesson_aspect` itself (`core.set_flag(&"lesson_aspect")` when the character menu equips an Aspect): Edda's follow-up reads it.
+- **Practice only:** an unparried gold or an undodged red hit emits `training_hero_hit` {scene, kind, position}; the hero loses nothing. The post retries `REST_TICKS` (90) after each attempt, gold until the parry is learned, then red until the dodge is, then it rests. No randomness; leaving the yard drops the warning.
+- **Snapshot:** `ExploreSnapshot.training` = `{object_id, awake, active, hint, lessons {dash, attack, parry, dodge}, done, hits, hits_needed, center, since_hit}` (`{}` when the scene has no post); `hint` is the next lesson to prompt (`dash`, `attack`, `parry`, `dodge`, or empty); `ExploreSnapshot.telegraphs` = the post's current warning as the fight's `TelegraphSnapshot` (kind gold or red, shape cone or circle, `start_tick`, `hit_tick`, `end_tick`), so the fight's warning drawing works unchanged. Events: `training_post_hit` {scene, object_id, hits, combo_index, position}, `training_hero_hit`, `training_dodged`, and the existing `dash_started`, `parry_succeeded`, `flag_set`.
+- **Tovan's dialogue follows it:** `tovan_again` (reminder), `tovan_graduate` once `training_done` (sets `tovan_graduated`), `tovan_after` after that. Edda: `edda_again`, then `edda_aspect_done` once `lesson_aspect` is set.
 
 ## Open questions (to resolve with playtesting and the next slice)
 
