@@ -1,5 +1,9 @@
 # STATUS (handoff note)
 
+## Owner's sounds (2026-10-27, Claude)
+
+The owner made 22 sounds on ElevenLabs sound effects (lightning, Aspects, forest puzzle, Stag, tutorial, ambience, beacon) and brought `electric_shock.mp3` for the Dual Dagger skill. Cleaned copies: `data/audio/owner_sounds/` (silence trimmed, normalised, fades; `sources.json` has origin and open licence questions). Task for Codex: `docs/CODEX_TASK_sounds.md` (which sound goes on which event). The downloaded CC0 candidates stay uncommitted in `data/audio_candidates/` as spares. Open: ElevenLabs plan licence, source of the YouTube file, a dialogue blip, the ambience loop seam. Nothing was heard by an agent.
+
 ## Village playtest polish and Claude handoff (2026-10-27, Codex)
 
 Owner found the dummy yard cramped, requested boss-like swing/parry effects and sounds, soft village music, a new unarmed arrival sheet, and item/weapon receipt popups. Confirmed sword comes from Tovan before training. Owner explicitly chose to leave required core changes to Claude. Concrete task/contract/coordinates/tests: `docs/CLAUDE_TASK_village_playtest_polish.md`.
