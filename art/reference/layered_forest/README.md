@@ -2,6 +2,10 @@
 
 Status: forest source images generated for HUMAN REVIEW; not approved or installed in runtime. Existing painted forest, painted glade and layered glade now share the selected soft village moonlight. Village lighting values are unchanged.
 
+## Human approval
+
+2026-10-27: the owner approved the displayed night lighting, teal rune glow and moving fireflies ("yes i like that"). Preserve this appearance when integrating the layered forest. This approval records the displayed runtime look; the forest source-image approval status above is unchanged.
+
 ## Source images
 
 - `forest_ground_only.png`: original generator output, 1619x971, intended conversion to 480x288 after approval. Ground only: left entrance, two clearings, top exit, east dead end; bottom exit removed in a second generation edit.
