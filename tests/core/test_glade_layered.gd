@@ -212,6 +212,40 @@ func test_the_root_arch_keeps_its_gap_open_and_its_feet_solid() -> void:
 		assert_true(p.y > arch.y - 6.0, "the arch's foot at dx %.0f stops the hero from the south (y %.1f)" % [foot_x, p.y])
 
 
+func test_nothing_but_the_arch_gap_leads_to_the_arena_exit() -> void:
+	# The smoke bot plans with radius 7; a radius-6 hero could fit where it cannot. Flood the real radius with the gap plugged.
+	var arch: Vector2 = _placement("glade_arch")["feet"]
+	var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(SCENE)
+	var arena_exit: Rect2 = Rect2()
+	for exit: Dictionary in _scene["exits"]:
+		if exit["target_scene"] == &"arena" or String(exit["target_scene"]) == "arena":
+			arena_exit = Rect2(exit["rect"][0], exit["rect"][1], exit["rect"][2], exit["rect"][3])
+	var plug: Obstacle = Obstacle.new()
+	plug.center = arch + Vector2(0, -4)
+	plug.radius = 9.0
+	var sealed: Array[Obstacle] = obstacles.duplicate()
+	sealed.append(plug)
+	for case: Array in [[obstacles, true], [sealed, false]]:
+		var seen: Dictionary = {}
+		var start: Vector2i = Vector2i(arch + Vector2(0, 48))
+		var queue: Array[Vector2i] = [start]
+		seen[start] = true
+		var head: int = 0
+		var reached: bool = false
+		while head < queue.size() and not reached:
+			var c: Vector2i = queue[head]
+			head += 1
+			reached = arena_exit.has_point(Vector2(c))
+			for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var n: Vector2i = c + d
+				if n.x < 0 or n.x > 560 or n.y < 0 or n.y > 336 or seen.has(n):
+					continue
+				if Collision.fits(case[0], Vector2(n), HERO):
+					seen[n] = true
+					queue.append(n)
+		assert_eq(reached, case[1], "arena exit reachable from the approach: %s" % ("through the open gap" if case[1] else "never around a plugged gap"))
+
+
 func test_the_bot_walks_entrance_to_both_exits() -> void:
 	for exit_id: StringName in [&"to_forest", &"to_arena"]:
 		var core: ExploreCore = ExploreCore.new(SCENE)
