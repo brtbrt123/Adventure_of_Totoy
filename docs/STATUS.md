@@ -1,3 +1,7 @@
+## HUD readability pass (2026-10-27, Codex; owner review pending)
+
+Updated the shared presentation HUD: compact teal portrait panel matching the approved cards, visible HP numbers, smaller Edge-cost plates, framed key badges and a weapon-name plate. Existing portrait, actual weapon/Aspect icons, snapshot values, socket positions and gameplay are preserved. Runtime preview: `art/build/arena_hud2.png`; damaged profile: `art/build/arena_profile2.png`. Godot 4.7.2 profile and skills presentation smoke tests and windowed profile capture pass. Full harness: Python, import, core tests and HUD checks pass; three exploration smoke suites fail (`smoke_explore_scenes`, `smoke_forest_layered`, `smoke_layered_scenes`) on route/checkpoint expectations and gate transitions. Concurrent core migration commits 4caed5f and 1c1910e arrived during this run; failures need Claude investigation. Full regression is NOT a pass. Human visual/readability approval and Claude cross-review remain pending; no core changes. The unrelated architecture edit remains untouched.
+
 # STATUS (handoff note)
 
 ## Layered maps are the official route (core and data, 2026-10-27, Claude)

@@ -312,13 +312,21 @@ func _draw_result() -> void:
 ## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	prepare_portrait()
-	bar(Vector2(47, 20), 68, h.player_hp, h.player_max_hp, colors["t"], 5, float(health_ghosts.get("player", h.player_hp)))
-	bar(Vector2(47, 33), 66, h.edge, h.edge_max, colors["v"], 2)
-	bar(Vector2(47, 40), 66, dash_fraction(h), 1.0, colors["n"], 2)
-	ui("ui_profile", Rect2(2, 2, 125, 48))
-	ui("ui_icon_edge_1", Rect2(39, 31, 6, 6))
-	ui("ui_icon_dash_1", Rect2(39, 38, 6, 6))
-	ui("ui_icon_parry_1", Rect2(116, 32, 7, 7))
+	# Quiet teal metalwork ties the persistent HUD to the approved reward cards.
+	UiPanel.draw_panel(self, Rect2(7, 7, 112, 35), &"info", colors, false)
+	# Leave the portrait aperture open: its smooth sprite renders behind this node.
+	draw_circle(PORTRAIT_CENTER, 15.0, colors["t"])
+	draw_circle(PORTRAIT_CENTER, 14.0, colors["0"])
+	if portrait_sprite != null:
+		portrait_sprite.show_behind_parent = false
+	lettering(Vector2(44, 11), "TOTOY", colors["1"], 1, menu_font(), 7)
+	var hp: String = "%d / %d" % [h.player_hp, h.player_max_hp]
+	lettering(Vector2(113 - text_width(hp, 1, stat_font(), 7), 11), hp, colors["u"], 1, stat_font(), 7)
+	bar(Vector2(44, 21), 69, h.player_hp, h.player_max_hp, colors["t"], 5, float(health_ghosts.get("player", h.player_hp)))
+	ui("ui_icon_edge_1", Rect2(42, 28, 6, 6))
+	bar(Vector2(50, 30), 63, h.edge, h.edge_max, colors["v"], 2)
+	ui("ui_icon_dash_1", Rect2(42, 34, 6, 6))
+	bar(Vector2(50, 36), 63, dash_fraction(h), 1.0, colors["n"], 2)
 
 func ui(key: String, rect: Rect2) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
@@ -440,7 +448,9 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	else:
 		ui("ui_weapon_frame_1", weapon_rect())
 		ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
-	centered(weapon_rect().get_center().x, weapon_rect().get_center().y + 14, weapon_label(snapshot.player.weapon_id), colors["j"], colors["0"])
+	var name_plate: Rect2 = Rect2(weapon_rect().position + Vector2(2, 37), Vector2(44, 10))
+	UiPanel.draw_panel(self, name_plate, &"info", colors, false)
+	centered(name_plate.get_center().x, name_plate.position.y + 2, weapon_label(snapshot.player.weapon_id), colors["1"], colors["0"], 1, null, 7)
 	_draw_weapon_active()
 	var hint: Dictionary = {}
 	for slot: int in range(3):
@@ -462,10 +472,12 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 		elif running <= 0.0 and int(row["cooldown"]) > 0:
 			_seconds(centre, int(row["cooldown"]), colors["p"])
 		var badge: Vector2 = socket.position + Vector2(-2, 16)
-		draw_rect(Rect2(badge - Vector2.ONE, Vector2(7, 7)), colors["0"])
+		draw_rect(Rect2(badge - Vector2.ONE, Vector2(8, 8)), colors["0"])
+		UiPanel.outline(self, Rect2(badge - Vector2.ONE, Vector2(8, 8)), colors["t"])
 		lettering(badge, row["key"], colors["1"], 1, stat_font())
 		var cost: String = "%dE" % int(row["cost"])
-		centered(centre.x, centre.y + 12, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"], 1, null, 12)
+		draw_rect(Rect2(centre.x - 10, centre.y + 12, 20, 8), colors["0"])
+		centered(centre.x, centre.y + 13, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"], 1, null, 7)
 		if socket.has_point(get_local_mouse_position()) or slot == hint_slot_override:
 			hint = row
 	if h.retaliate_ticks_left > 0:
