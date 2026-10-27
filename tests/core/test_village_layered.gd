@@ -60,7 +60,11 @@ func test_the_data_is_valid_and_every_type_is_classified() -> void:
 			assert_true(String(types[t].get("note", "")).length() > 3, "%s has a note saying what its colliders are" % t)
 	assert_eq(village_types, SOLID_TYPES.size() + DECOR_TYPES.size(), "every village type is classified in this test")
 	assert_false(types.has("village_anvil") or types.has("village_bench"), "the forge sprite already holds the anvil and the bench")
-	assert_eq(types.size(), village_types + 20, "the 20 glade types were not overwritten or lost")
+	var glade_types: int = 0
+	for t: String in types:
+		if t.begins_with("glade_"):
+			glade_types += 1
+	assert_eq(glade_types, 20, "the 20 glade types were not overwritten or lost (the forest's are checked in test_forest_layered)")
 	var forges: int = 0
 	var used: Dictionary = {}
 	for p: Dictionary in PropScene.placements(_scene, _defs):

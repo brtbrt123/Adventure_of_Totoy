@@ -50,6 +50,8 @@ const SCENE_EXIT: StringName = &"scene_exit"
 const CHECKPOINT: StringName = &"checkpoint"
 const INTERACT: StringName = &"interact"
 const GATE_CHANGED: StringName = &"gate_changed"
+## A lantern switch was lit: data {scene, switch_id, lit (every lit switch id), all_lit}.
+const SWITCH_LIT: StringName = &"switch_lit"
 
 var type: StringName = &""
 var tick: int = 0

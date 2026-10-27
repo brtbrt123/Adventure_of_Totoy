@@ -49,6 +49,8 @@ class ExploreSnapshot:
 	var interact_kind: StringName = &""
 	var interact_position: Vector2 = Vector2.ZERO
 	var gate_open: bool = false
+	## The lantern switches that are lit (a scene with a `puzzle`; empty elsewhere). The pedestal sprites follow this.
+	var lit_switches: Array[StringName] = []
 	var last_checkpoint: StringName = &""
 	## True from the tick an exit fired: the hero no longer moves; presentation changes scene.
 	var exiting: bool = false
@@ -68,6 +70,7 @@ var def: Dictionary = {}
 var size: Vector2 = Vector2.ZERO
 var margin: float = Tuning.PLAYER_RADIUS
 var gate_open: bool = false
+var lit_switches: Array[StringName] = []  # the lantern switches lit so far (the scene's `puzzle`, if any)
 var player: PlayerState = PlayerState.new()
 var obstacles: Array[Obstacle] = []
 var last_events: Array[GameEvent] = []
@@ -91,7 +94,9 @@ func _init(p_scene_id: StringName = SceneDefs.START_SCENE, entry: StringName = &
 	size = def["size"]
 	margin = float(def["margin"])
 	gate_open = p_gate_open
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open)
+	if gate_open:  # an opened gate was opened by lighting every switch (the save keeps only the gate)
+		lit_switches.append_array(_puzzle_switches())
+	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches)
 	entry_id = entry if def["entries"].has(entry) else StringName(def["default_entry"])
 	place_at(def["entries"][entry_id])
 	for npc: Dictionary in def["npcs"]:
@@ -120,13 +125,16 @@ func place_at(point: Vector2) -> void:
 		_armed[exit["id"]] = not _touches(exit["rect"])
 
 
-## The debug override (and later the lantern puzzle): opens or closes the forest's root gate. The hero is pushed out
-## of the gate if he stands in it. Emits `gate_changed` with the next step.
+## The debug override and the lantern puzzle: opens or closes the root gate. The hero is pushed out of the gate if he
+## stands in it. Emits `gate_changed` with the next step. Closing it again unlights the switches.
 func set_gate_open(open: bool) -> void:
 	if open == gate_open:
 		return
 	gate_open = open
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open)
+	lit_switches.clear()
+	if open:  # an open gate means every switch is lit
+		lit_switches.append_array(_puzzle_switches())
+	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches)
 	player.position = _clamp(player.position)
 	_queued.append(GameEvent.new(GameEvent.GATE_CHANGED, tick, {"scene": scene_id, "gate_open": gate_open}))
 
@@ -152,6 +160,7 @@ func step(input: InputFrame) -> void:
 	interact_target = _find_interact_target()
 	if input.interact_pressed and not exiting and not interact_target.is_empty() and (player.state == PlayerState.STATE_IDLE or player.state == PlayerState.STATE_WALK):
 		events.append(GameEvent.new(GameEvent.INTERACT, tick, {"scene": scene_id, "target_id": interact_target["id"], "kind": interact_target["kind"], "position": interact_target["position"]}))
+		_use_switch(interact_target["id"], events)
 	last_events = events
 
 
@@ -188,6 +197,7 @@ func snapshot() -> ExploreSnapshot:
 		snap.interact_kind = interact_target["kind"]
 		snap.interact_position = interact_target["position"]
 	snap.gate_open = gate_open
+	snap.lit_switches = lit_switches.duplicate()
 	snap.last_checkpoint = last_checkpoint
 	snap.exiting = exiting
 	snap.exit_target_scene = pending_exit.get("target_scene", &"")
@@ -198,6 +208,28 @@ func snapshot() -> ExploreSnapshot:
 	snap.checkpoints = def.get("checkpoints", []).duplicate(true)
 	snap.entries = def.get("entries", {}).duplicate()
 	return snap
+
+
+## The switch ids of the scene's lantern puzzle (empty: the scene has none).
+func _puzzle_switches() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for id: Variant in def.get("puzzle", {}).get("switches", []):
+		out.append(StringName(id))
+	return out
+
+
+## E on a puzzle switch lights it (once); when the last one is lit the gate opens. Other targets do nothing here.
+func _use_switch(target: StringName, events: Array[GameEvent]) -> void:
+	var switches: Array[StringName] = _puzzle_switches()
+	if not switches.has(target) or lit_switches.has(target):
+		return
+	lit_switches.append(target)
+	var all_lit: bool = lit_switches.size() == switches.size()
+	events.append(GameEvent.new(GameEvent.SWITCH_LIT, tick, {"scene": scene_id, "switch_id": target, "lit": lit_switches.duplicate(), "all_lit": all_lit}))
+	if all_lit:
+		set_gate_open(true)  # rebuilds the colliders and queues gate_changed for the next step
+	else:
+		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches)
 
 
 ## True when the hero's body (PLAYER_RADIUS) touches `rect`.

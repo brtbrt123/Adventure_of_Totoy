@@ -11,7 +11,10 @@ const ExploreCore := preload("res://core/explore_core.gd")
 const GROUNDS: Dictionary = {
 	&"village_layered": "res://presentation/village/village_layered_ground.png",
 	&"glade_layered": "res://presentation/forest/glade_layered_ground.png",
+	&"forest_layered": "res://presentation/forest/forest_layered_ground.png",
 }
+## Scenes whose converted ground Codex has not delivered yet (only the path is checked until then).
+const PENDING_GROUNDS: Array[StringName] = [&"forest_layered"]
 
 
 func test_the_runtime_grounds_are_in_presentation_and_fit_the_scene() -> void:
@@ -19,6 +22,8 @@ func test_the_runtime_grounds_are_in_presentation_and_fit_the_scene() -> void:
 		var data: Dictionary = SceneDefs.layered_data(scene)
 		assert_eq(String(data["ground"]), GROUNDS[scene], "%s uses its runtime ground" % scene)
 		assert_false(String(data["ground"]).begins_with("res://art/"), "%s does not load a ground from art/" % scene)
+		if scene in PENDING_GROUNDS and not FileAccess.file_exists(String(data["ground"])):
+			continue
 		var image: Image = Image.load_from_file(ProjectSettings.globalize_path(String(data["ground"])))
 		assert_true(image != null, "%s ground loads" % scene)
 		if image == null:

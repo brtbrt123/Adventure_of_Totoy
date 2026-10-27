@@ -20,6 +20,11 @@ extends RefCounted
 ##      uses it from, in front)}] (the props that are interactable stay ordinary props; the object row says how to use
 ##      them), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
 ##
+##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>",
+##     "on_type": "<type>"}. `states` = {"gate_open": bool, "lit": [switch ids]} (ExploreCore owns it; ExploreSnapshot
+##     exposes it). The two types of a pair share w, h and anchor (tools/art/normalize_state_pairs.py; validate() checks
+##     it), each has its own colliders: a closed root gate is solid across its doorway, the open one only at its trunks.
+##
 ## No sprites are loaded here (the core stays headless): sizes and colliders are numbers in the files.
 const Obstacle := preload("res://core/obstacle.gd")
 const SceneBounds := preload("res://core/scene_bounds.gd")
@@ -43,19 +48,39 @@ static func load_scene(path: String) -> Dictionary:
 	return read_json(path)
 
 
+## True when the state `when` ("gate_open" or "lit:<switch id>") holds in `states`.
+static func state_holds(when: String, states: Dictionary) -> bool:
+	if when == "gate_open":
+		return bool(states.get("gate_open", false))
+	if when.begins_with("lit:"):
+		var lit: Array = states.get("lit", [])
+		return lit.has(when.substr(4)) or lit.has(StringName(when.substr(4)))
+	return false
+
+
+## The type a placement row shows now: its `on_type` while its `when` state holds, else its own `type`.
+static func type_of(row: Dictionary, states: Dictionary) -> String:
+	if row.has("when") and row.has("on_type") and state_holds(str(row["when"]), states):
+		return str(row["on_type"])
+	return str(row.get("type", ""))
+
+
 ## The scene's prop placements with their def folded in, in file order:
-## [{id, type, feet (Vector2), flip, size (Vector2), anchor (Vector2), image, solid, shadow_radius?}]. Presentation
-## draws the sprite `image` with its anchor on `feet`, mirrored when `flip`, sorted by feet.y.
-static func placements(scene: Dictionary, defs: Dictionary) -> Array[Dictionary]:
+## [{id, type, feet (Vector2), flip, size (Vector2), anchor (Vector2), image, solid, shadow_radius?, state?}]. Presentation
+## draws the sprite `image` with its anchor on `feet`, mirrored when `flip`, sorted by feet.y. `states` (see the header)
+## picks the type of a stateful prop (`type` is then the shown one and `state` is &"on" or &"off"); the default is every
+## state off.
+static func placements(scene: Dictionary, defs: Dictionary, states: Dictionary = {}) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	var types: Dictionary = defs.get("props", {})
 	for row: Variant in scene.get("props", []):
 		var p: Dictionary = row
-		var def: Dictionary = types.get(p.get("type", ""), {})
+		var shown: String = type_of(p, states)
+		var def: Dictionary = types.get(shown, {})
 		var anchor: Array = def.get("anchor", [0, 0])
 		var entry: Dictionary = {
 			"id": StringName(str(p.get("id", ""))),
-			"type": StringName(str(p.get("type", ""))),
+			"type": StringName(shown),
 			"feet": Vector2(float(p.get("x", 0)), float(p.get("y", 0))),
 			"flip": bool(p.get("flip", false)),
 			"size": Vector2(float(def.get("w", 0)), float(def.get("h", 0))),
@@ -65,17 +90,19 @@ static func placements(scene: Dictionary, defs: Dictionary) -> Array[Dictionary]
 		}
 		if p.has("shadow_radius"):
 			entry["shadow_radius"] = float(p["shadow_radius"])
+		if p.has("when"):
+			entry["state"] = &"on" if shown != str(p.get("type", "")) else &"off"
 		out.append(entry)
 	return out
 
 
-## The collision circles of every solid prop at its place (a flipped prop mirrors dx).
-static func prop_colliders(scene: Dictionary, defs: Dictionary) -> Array[Vector3]:
+## The collision circles of every solid prop at its place (a flipped prop mirrors dx), for the types shown in `states`.
+static func prop_colliders(scene: Dictionary, defs: Dictionary, states: Dictionary = {}) -> Array[Vector3]:
 	var out: Array[Vector3] = []
 	var types: Dictionary = defs.get("props", {})
 	for row: Variant in scene.get("props", []):
 		var p: Dictionary = row
-		var def: Dictionary = types.get(p.get("type", ""), {})
+		var def: Dictionary = types.get(type_of(p, states), {})
 		if not bool(def.get("solid", false)):
 			continue
 		var flip: float = -1.0 if bool(p.get("flip", false)) else 1.0
@@ -129,9 +156,15 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 		var o: Dictionary = row
 		objects.append({"id": StringName(str(o["id"])), "kind": StringName(str(o["kind"])), "position": _vec(o["position"]),
 			"stand": _vec(o["stand"])})
-	return {"id": id, "name": str(scene.get("name", "")), "size": size(scene), "margin": margin, "entries": entries,
+	var result: Dictionary = {"id": id, "name": str(scene.get("name", "")), "size": size(scene), "margin": margin, "entries": entries,
 		"default_entry": StringName(str(scene.get("default_entry", ""))), "exits": exits, "checkpoints": checkpoints,
 		"npcs": npcs, "objects": objects}
+	if scene.has("puzzle"):  # {"switches": [object ids]}: lighting them all opens the gate (ExploreCore)
+		var switches: Array[StringName] = []
+		for switch_id: Variant in scene["puzzle"].get("switches", []):
+			switches.append(StringName(str(switch_id)))
+		result["puzzle"] = {"switches": switches}
+	return result
 
 
 ## The Stag fight room: {start (Vector2), radius, area (Rect2)}; empty when the scene has none.
@@ -147,15 +180,15 @@ static func size(scene: Dictionary) -> Vector2:
 
 
 ## The scene's solid colliders: the edge chain along the outline, then every solid prop's circles (visual_id empty:
-## presentation draws the props from the same placements).
-static func build(scene: Dictionary, defs: Dictionary) -> Array[Obstacle]:
+## presentation draws the props from the same placements), for the stateful props' types shown in `states`.
+static func build(scene: Dictionary, defs: Dictionary, states: Dictionary = {}) -> Array[Obstacle]:
 	var list: Array[Obstacle] = []
 	var line: Array[Vector2] = outline(scene)
 	var radius: float = float(scene.get("boundary_radius", 25.0))
 	var spacing: float = float(scene.get("boundary_spacing", 17.0))
 	for centre: Vector2 in SceneBounds.boundary_centres(line, radius, spacing, size(scene)):
 		SceneBounds.add(list, centre, SceneBounds.fit_radius(line, centre, radius), centre)
-	for c: Vector3 in prop_colliders(scene, defs):
+	for c: Vector3 in prop_colliders(scene, defs, states):
 		SceneBounds.add(list, Vector2(c.x, c.y), c.z, Vector2(c.x, c.y))
 	return list
 
@@ -210,8 +243,28 @@ static func validate(scene: Dictionary, defs: Dictionary) -> PackedStringArray:
 		seen[id] = true
 		if not types.has(p.get("type", "")):
 			errors.append("prop %s: unknown type '%s'" % [id, p.get("type", "")])
+		if p.has("when") or p.has("on_type"):
+			errors.append_array(_validate_state_row(id, p, types, scene))
 		var x: float = float(p.get("x", -1))
 		var y: float = float(p.get("y", -1))
 		if x < 0.0 or y < 0.0 or x > world.x or y > world.y:
 			errors.append("prop %s: anchor outside the world" % id)
+	return errors
+
+
+## Problems of a stateful row: a known `when`, an `on_type` that exists and has the SAME w, h and anchor as `type`
+## (the two states stand in one place), and a lit:<id> naming one of the scene's puzzle switches.
+static func _validate_state_row(id: String, row: Dictionary, types: Dictionary, scene: Dictionary) -> PackedStringArray:
+	var errors: PackedStringArray = PackedStringArray()
+	var when: String = str(row.get("when", ""))
+	if when != "gate_open" and not when.begins_with("lit:"):
+		errors.append("prop %s: unknown state '%s' (gate_open or lit:<switch>)" % [id, when])
+	elif when.begins_with("lit:") and not scene.get("puzzle", {}).get("switches", []).has(when.substr(4)):
+		errors.append("prop %s: '%s' is not a puzzle switch of the scene" % [id, when.substr(4)])
+	var base: Dictionary = types.get(row.get("type", ""), {})
+	var on: Dictionary = types.get(row.get("on_type", ""), {})
+	if on.is_empty():
+		errors.append("prop %s: unknown on_type '%s'" % [id, row.get("on_type", "")])
+	elif on.get("w") != base.get("w") or on.get("h") != base.get("h") or on.get("anchor") != base.get("anchor"):
+		errors.append("prop %s: the two states must share w, h and anchor" % id)
 	return errors

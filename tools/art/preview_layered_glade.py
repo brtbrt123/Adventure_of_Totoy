@@ -22,7 +22,10 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[2]
 SCENE = ROOT / "data" / "scenes" / "glade_layered_props.json"
 DEFS = ROOT / "data" / "props" / "prop_defs.json"
-PROPS_DIRS = [ROOT / "art" / "reference" / "layered_pilot" / "props", ROOT / "art" / "reference" / "layered_village" / "props"]
+PROPS_DIRS = [ROOT / "art" / "reference" / "layered_pilot" / "props", ROOT / "art" / "reference" / "layered_village" / "props",
+              ROOT / "data" / "props" / "cutouts_forest"]
+# a scene whose runtime ground is not delivered yet is previewed on its generated source
+SOURCE_GROUNDS = {"forest_layered": ROOT / "art" / "reference" / "layered_forest" / "forest_ground_only.png"}
 ZOOM = 3
 HERO = 6.0
 STEP = 2.0
@@ -40,10 +43,15 @@ def prop_image(name: str) -> Path:
     raise FileNotFoundError(name)
 
 
-def circles(scene: dict, defs: dict) -> list[tuple[float, float, float]]:
+def shown(p: dict, state_on: bool) -> str:
+    """The type a placement shows: its on_type when the preview state is ON (gate open, every pedestal lit)."""
+    return p["on_type"] if state_on and "on_type" in p else p["type"]
+
+
+def circles(scene: dict, defs: dict, state_on: bool = False) -> list[tuple[float, float, float]]:
     out = []
     for p in scene["props"]:
-        d = defs["props"][p["type"]]
+        d = defs["props"][shown(p, state_on)]
         if not d["solid"]:
             continue
         flip = -1.0 if p.get("flip") else 1.0
@@ -86,10 +94,10 @@ def edges(scene: dict) -> list[tuple[tuple[float, float], tuple[float, float]]]:
     return out
 
 
-def free_grid(scene: dict, defs: dict, radius: float):
+def free_grid(scene: dict, defs: dict, radius: float, state_on: bool = False):
     w, h = scene["size"]
     poly = [tuple(p) for p in scene["outline"]]
-    solid = circles(scene, defs)
+    solid = circles(scene, defs, state_on)
     walls = edges(scene)
     cols, rows = int(w / STEP), int(h / STEP)
     grid = [[False] * cols for _ in range(rows)]
@@ -150,13 +158,16 @@ def share(seen, rect: list[float]) -> float:
     return hit / max(1, total)
 
 
-def render(scene: dict, defs: dict, out: Path, reach: bool) -> dict:
+def render(scene: dict, defs: dict, out: Path, reach: bool, state_on: bool = False) -> dict:
     w, h = scene["size"]
-    ground = Image.open(ROOT / scene["ground"].replace("res://", "")).convert("RGBA")
+    ground_path = ROOT / scene["ground"].replace("res://", "")
+    if not ground_path.exists():
+        ground_path = SOURCE_GROUNDS[scene["scene"]]
+    ground = Image.open(ground_path).convert("RGBA")
     board = Image.new("RGBA", (w, h))
     board.paste(ground.resize((w, h), Image.NEAREST))
     for p in sorted(scene["props"], key=lambda q: q["y"]):
-        d = defs["props"][p["type"]]
+        d = defs["props"][shown(p, state_on)]
         img = Image.open(prop_image(d["image"])).convert("RGBA")
         if p.get("flip"):
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
@@ -164,7 +175,7 @@ def render(scene: dict, defs: dict, out: Path, reach: bool) -> dict:
         board.alpha_composite(img, (round(p["x"] - ax), round(p["y"] - d["anchor"][1])))
     stats = {}
     if reach and "stag_start" not in scene:
-        g_hero, cols, rows = free_grid(scene, defs, HERO)
+        g_hero, cols, rows = free_grid(scene, defs, HERO, state_on)
         hero_seen = flood(g_hero, cols, rows, scene["entries"][scene["default_entry"]])
         tint = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         tp = tint.load()
@@ -212,7 +223,7 @@ def render(scene: dict, defs: dict, out: Path, reach: bool) -> dict:
     z = ZOOM
     poly = [(x * z, y * z) for x, y in scene["outline"]]
     d.line(poly + [poly[0]], fill=(0, 255, 255, 255), width=2)
-    for cx, cy, r in circles(scene, defs):
+    for cx, cy, r in circles(scene, defs, state_on):
         d.ellipse([(cx - r) * z, (cy - r) * z, (cx + r) * z, (cy + r) * z], outline=(255, 160, 0, 255))
     if "fight_area" in scene:
         fa = scene["fight_area"]
@@ -246,10 +257,12 @@ def main() -> int:
     ap.add_argument("--scene", default="glade_layered")
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--no-reach", action="store_true")
+    ap.add_argument("--state-on", action="store_true", help="show the stateful props ON (the forest: gate open, pedestals lit)")
     args = ap.parse_args()
     scene, defs = load(args.scene)
-    out = args.out or ROOT / "docs" / "previews" / f"{args.scene.replace('_layered', '')}_layered_overlay.png"
-    stats = render(scene, defs, out, not args.no_reach)
+    suffix = "_open" if args.state_on else ""
+    out = args.out or ROOT / "docs" / "previews" / f"{args.scene.replace('_layered', '')}_layered_overlay{suffix}.png"
+    stats = render(scene, defs, out, not args.no_reach, args.state_on)
     print(json.dumps(stats, indent=1))
     print(out)
     return 0

@@ -1,8 +1,912 @@
 {
  "version": 1,
- "sheet": "village_props_b.png",
- "scale": 0.19584,
+ "sheet": "forest_props_sheet.png",
+ "scale": 0.29622,
  "props": {
+  "forest_sign": {
+   "w": 30,
+   "h": 45,
+   "anchor": [
+    15.5,
+    45
+   ],
+   "base_width": 25,
+   "solid": true,
+   "colliders": [
+    [
+     0,
+     -3,
+     4
+    ]
+   ],
+   "image": "forest_sign.png",
+   "src_bbox": [
+    49,
+    161,
+    151,
+    312
+   ],
+   "locked": true,
+   "note": "signpost: one small circle at the post (the sheet has one board, not two arrow boards)"
+  },
+  "forest_pedestal": {
+   "w": 26,
+   "h": 49,
+   "anchor": [
+    13.0,
+    49
+   ],
+   "base_width": 26,
+   "solid": true,
+   "colliders": [
+    [
+     -6,
+     -5,
+     6
+    ],
+    [
+     6,
+     -5,
+     6
+    ]
+   ],
+   "image": "forest_pedestal.png",
+   "src_bbox": [
+    195,
+    148,
+    283,
+    313
+   ],
+   "state_pair": [
+    "forest_pedestal",
+    "forest_pedestal_lit"
+   ],
+   "locked": true,
+   "note": "unlit lantern pedestal (the puzzle switch); same canvas, anchor and colliders as forest_pedestal_lit"
+  },
+  "forest_pedestal_lit": {
+   "w": 26,
+   "h": 49,
+   "anchor": [
+    13.0,
+    49
+   ],
+   "base_width": 26,
+   "solid": true,
+   "colliders": [
+    [
+     -6,
+     -5,
+     6
+    ],
+    [
+     6,
+     -5,
+     6
+    ]
+   ],
+   "image": "forest_pedestal_lit.png",
+   "src_bbox": [
+    451,
+    148,
+    537,
+    311
+   ],
+   "state_pair": [
+    "forest_pedestal",
+    "forest_pedestal_lit"
+   ],
+   "locked": true,
+   "note": "lit state of forest_pedestal: identical size, anchor and colliders"
+  },
+  "forest_lantern_post": {
+   "w": 25,
+   "h": 54,
+   "anchor": [
+    14.5,
+    54
+   ],
+   "base_width": 21,
+   "solid": true,
+   "colliders": [
+    [
+     0,
+     -3,
+     3.5
+    ]
+   ],
+   "image": "forest_lantern_post.png",
+   "src_bbox": [
+    576,
+    131,
+    660,
+    314
+   ],
+   "locked": true,
+   "note": "wooden lantern post: one small circle at its foot"
+  },
+  "forest_gate_closed": {
+   "w": 124,
+   "h": 87,
+   "anchor": [
+    61.0,
+    87
+   ],
+   "base_width": 120,
+   "solid": true,
+   "colliders": [
+    [
+     -52,
+     -6,
+     8
+    ],
+    [
+     -40,
+     -6,
+     8
+    ],
+    [
+     -27,
+     -5,
+     6
+    ],
+    [
+     -18,
+     -5,
+     6
+    ],
+    [
+     -9,
+     -5,
+     6
+    ],
+    [
+     0,
+     -5,
+     6
+    ],
+    [
+     9,
+     -5,
+     6
+    ],
+    [
+     18,
+     -5,
+     6
+    ],
+    [
+     27,
+     -5,
+     6
+    ],
+    [
+     35,
+     -5,
+     6
+    ],
+    [
+     44,
+     -6,
+     8
+    ],
+    [
+     54,
+     -6,
+     8
+    ]
+   ],
+   "image": "forest_gate_closed.png",
+   "src_bbox": [
+    672,
+    25,
+    1089,
+    318
+   ],
+   "state_pair": [
+    "forest_gate_closed",
+    "forest_gate_open"
+   ],
+   "locked": true,
+   "note": "root gate CLOSED: the two trunks and a continuous row across the doorway (spacing 9 < the hero's 12)"
+  },
+  "forest_gate_open": {
+   "w": 124,
+   "h": 87,
+   "anchor": [
+    61.0,
+    87
+   ],
+   "base_width": 120,
+   "solid": true,
+   "colliders": [
+    [
+     -52,
+     -6,
+     8
+    ],
+    [
+     -40,
+     -6,
+     8
+    ],
+    [
+     44,
+     -6,
+     8
+    ],
+    [
+     54,
+     -6,
+     8
+    ]
+   ],
+   "image": "forest_gate_open.png",
+   "src_bbox": [
+    1105,
+    24,
+    1518,
+    318
+   ],
+   "state_pair": [
+    "forest_gate_closed",
+    "forest_gate_open"
+   ],
+   "locked": true,
+   "note": "root gate OPEN: the same trunks only; the ~68 px walkway between them is free. Same canvas and anchor as forest_gate_closed"
+  },
+  "forest_tree_middle": {
+   "w": 95,
+   "h": 113,
+   "anchor": [
+    55.5,
+    113
+   ],
+   "base_width": 45,
+   "solid": true,
+   "colliders": [
+    [
+     -15,
+     -5,
+     7
+    ],
+    [
+     -5,
+     -4,
+     7
+    ],
+    [
+     5,
+     -4,
+     7
+    ],
+    [
+     15,
+     -5,
+     7
+    ]
+   ],
+   "image": "forest_tree_middle.png",
+   "src_bbox": [
+    766,
+    317,
+    1088,
+    700
+   ],
+   "locked": true,
+   "note": "trunk and root flare"
+  },
+  "forest_standing_stone": {
+   "w": 49,
+   "h": 61,
+   "anchor": [
+    24.0,
+    61
+   ],
+   "base_width": 44,
+   "solid": true,
+   "colliders": [
+    [
+     -8,
+     -5,
+     6.5
+    ],
+    [
+     0,
+     -5,
+     6.5
+    ],
+    [
+     8,
+     -5,
+     6.5
+    ]
+   ],
+   "image": "forest_standing_stone.png",
+   "src_bbox": [
+    18,
+    472,
+    184,
+    678
+   ],
+   "locked": true,
+   "note": "rune stone and its moss"
+  },
+  "forest_rock_root": {
+   "w": 57,
+   "h": 47,
+   "anchor": [
+    29.5,
+    47
+   ],
+   "base_width": 53,
+   "solid": true,
+   "colliders": [
+    [
+     -16,
+     -4,
+     7
+    ],
+    [
+     -6,
+     -4,
+     7
+    ],
+    [
+     5,
+     -4,
+     7
+    ],
+    [
+     16,
+     -4,
+     7
+    ]
+   ],
+   "image": "forest_rock_root.png",
+   "src_bbox": [
+    207,
+    523,
+    400,
+    680
+   ],
+   "locked": true,
+   "note": "mossy rock with a root over it"
+  },
+  "forest_tree_left": {
+   "w": 113,
+   "h": 103,
+   "anchor": [
+    58.5,
+    103
+   ],
+   "base_width": 69,
+   "solid": true,
+   "colliders": [
+    [
+     -24,
+     -5,
+     7
+    ],
+    [
+     -12,
+     -4,
+     7
+    ],
+    [
+     0,
+     -4,
+     7
+    ],
+    [
+     12,
+     -4,
+     7
+    ],
+    [
+     24,
+     -5,
+     7
+    ]
+   ],
+   "image": "forest_tree_left.png",
+   "src_bbox": [
+    367,
+    346,
+    748,
+    694
+   ],
+   "locked": true,
+   "note": "trunk and root flare"
+  },
+  "forest_tree_right": {
+   "w": 128,
+   "h": 104,
+   "anchor": [
+    75.0,
+    104
+   ],
+   "base_width": 88,
+   "solid": true,
+   "colliders": [
+    [
+     -33,
+     -5,
+     7
+    ],
+    [
+     -22,
+     -4,
+     7
+    ],
+    [
+     -11,
+     -4,
+     7
+    ],
+    [
+     0,
+     -4,
+     7
+    ],
+    [
+     11,
+     -4,
+     7
+    ],
+    [
+     22,
+     -4,
+     7
+    ],
+    [
+     33,
+     -5,
+     7
+    ]
+   ],
+   "image": "forest_tree_right.png",
+   "src_bbox": [
+    1081,
+    347,
+    1513,
+    699
+   ],
+   "locked": true,
+   "note": "wide trunk and root flare"
+  },
+  "forest_log_1": {
+   "w": 83,
+   "h": 42,
+   "anchor": [
+    54.0,
+    42
+   ],
+   "base_width": 50,
+   "solid": true,
+   "colliders": [
+    [
+     -17,
+     -4,
+     7
+    ],
+    [
+     -6,
+     -4,
+     7
+    ],
+    [
+     6,
+     -4,
+     7
+    ],
+    [
+     17,
+     -4,
+     7
+    ]
+   ],
+   "image": "forest_log_1.png",
+   "src_bbox": [
+    25,
+    708,
+    304,
+    849
+   ],
+   "locked": true,
+   "note": "fallen log"
+  },
+  "forest_log_2": {
+   "w": 70,
+   "h": 40,
+   "anchor": [
+    36.5,
+    40
+   ],
+   "base_width": 61,
+   "solid": true,
+   "colliders": [
+    [
+     -22,
+     -4,
+     7
+    ],
+    [
+     -11,
+     -4,
+     7
+    ],
+    [
+     0,
+     -4,
+     7
+    ],
+    [
+     11,
+     -4,
+     7
+    ],
+    [
+     22,
+     -4,
+     7
+    ]
+   ],
+   "image": "forest_log_2.png",
+   "src_bbox": [
+    345,
+    714,
+    582,
+    849
+   ],
+   "locked": true,
+   "note": "fallen log"
+  },
+  "forest_stump": {
+   "w": 70,
+   "h": 40,
+   "anchor": [
+    28.5,
+    40
+   ],
+   "base_width": 57,
+   "solid": true,
+   "colliders": [
+    [
+     -18,
+     -4,
+     7
+    ],
+    [
+     -9,
+     -4,
+     7
+    ],
+    [
+     0,
+     -4,
+     7
+    ],
+    [
+     9,
+     -4,
+     7
+    ],
+    [
+     18,
+     -4,
+     7
+    ]
+   ],
+   "image": "forest_stump.png",
+   "src_bbox": [
+    618,
+    716,
+    854,
+    851
+   ],
+   "locked": true,
+   "note": "stump with roots"
+  },
+  "forest_chest": {
+   "w": 47,
+   "h": 32,
+   "anchor": [
+    26.0,
+    32
+   ],
+   "base_width": 36,
+   "solid": true,
+   "colliders": [
+    [
+     -8,
+     -5,
+     6
+    ],
+    [
+     0,
+     -5,
+     6
+    ],
+    [
+     8,
+     -5,
+     6
+    ]
+   ],
+   "image": "forest_chest.png",
+   "src_bbox": [
+    893,
+    730,
+    1054,
+    838
+   ],
+   "locked": true,
+   "note": "closed chest (interactable, used from in front)"
+  },
+  "forest_thorns_1": {
+   "w": 64,
+   "h": 44,
+   "anchor": [
+    32.5,
+    44
+   ],
+   "base_width": 61,
+   "solid": true,
+   "colliders": [
+    [
+     -22,
+     -4,
+     7
+    ],
+    [
+     -11,
+     -4,
+     7
+    ],
+    [
+     0,
+     -4,
+     7
+    ],
+    [
+     11,
+     -4,
+     7
+    ],
+    [
+     22,
+     -4,
+     7
+    ]
+   ],
+   "image": "forest_thorns_1.png",
+   "src_bbox": [
+    1087,
+    706,
+    1307,
+    856
+   ],
+   "locked": true,
+   "note": "thorn bush (solid)"
+  },
+  "forest_thorns_2": {
+   "w": 52,
+   "h": 38,
+   "anchor": [
+    27.0,
+    38
+   ],
+   "base_width": 42,
+   "solid": true,
+   "colliders": [
+    [
+     -13,
+     -4,
+     7
+    ],
+    [
+     -4,
+     -4,
+     7
+    ],
+    [
+     4,
+     -4,
+     7
+    ],
+    [
+     13,
+     -4,
+     7
+    ]
+   ],
+   "image": "forest_thorns_2.png",
+   "src_bbox": [
+    1340,
+    730,
+    1515,
+    858
+   ],
+   "locked": true,
+   "note": "thorn bush (solid)"
+  },
+  "forest_bush_1": {
+   "w": 54,
+   "h": 40,
+   "anchor": [
+    27.0,
+    40
+   ],
+   "base_width": 44,
+   "solid": false,
+   "colliders": [],
+   "image": "forest_bush_1.png",
+   "src_bbox": [
+    29,
+    862,
+    213,
+    999
+   ],
+   "locked": true,
+   "note": "bush: decor (walk through)"
+  },
+  "forest_bush_2": {
+   "w": 52,
+   "h": 38,
+   "anchor": [
+    25.5,
+    38
+   ],
+   "base_width": 45,
+   "solid": false,
+   "colliders": [],
+   "image": "forest_bush_2.png",
+   "src_bbox": [
+    242,
+    870,
+    417,
+    999
+   ],
+   "locked": true,
+   "note": "bush: decor"
+  },
+  "forest_fern_1": {
+   "w": 61,
+   "h": 37,
+   "anchor": [
+    28.5,
+    37
+   ],
+   "base_width": 57,
+   "solid": false,
+   "colliders": [],
+   "image": "forest_fern_1.png",
+   "src_bbox": [
+    447,
+    873,
+    654,
+    999
+   ],
+   "locked": true,
+   "note": "fern: decor"
+  },
+  "forest_fern_small": {
+   "w": 38,
+   "h": 32,
+   "anchor": [
+    19.0,
+    32
+   ],
+   "base_width": 32,
+   "solid": false,
+   "colliders": [],
+   "image": "forest_fern_small.png",
+   "src_bbox": [
+    666,
+    886,
+    794,
+    996
+   ],
+   "locked": true,
+   "note": "small fern clump (the sheet's third fern slot reads as a small bush): decor"
+  },
+  "forest_fern_2": {
+   "w": 46,
+   "h": 38,
+   "anchor": [
+    22.0,
+    38
+   ],
+   "base_width": 40,
+   "solid": false,
+   "colliders": [],
+   "image": "forest_fern_2.png",
+   "src_bbox": [
+    808,
+    870,
+    964,
+    999
+   ],
+   "locked": true,
+   "note": "fern: decor"
+  },
+  "forest_flowers": {
+   "w": 54,
+   "h": 36,
+   "anchor": [
+    29.0,
+    36
+   ],
+   "base_width": 48,
+   "solid": false,
+   "colliders": [],
+   "image": "forest_flowers.png",
+   "src_bbox": [
+    980,
+    876,
+    1161,
+    999
+   ],
+   "locked": true,
+   "note": "glowing flowers: decor"
+  },
+  "forest_rocks": {
+   "w": 43,
+   "h": 31,
+   "anchor": [
+    18.5,
+    31
+   ],
+   "base_width": 29,
+   "solid": true,
+   "colliders": [
+    [
+     -8,
+     -3,
+     6
+    ],
+    [
+     0,
+     -3,
+     6
+    ],
+    [
+     8,
+     -3,
+     6
+    ]
+   ],
+   "image": "forest_rocks.png",
+   "src_bbox": [
+    1196,
+    895,
+    1342,
+    999
+   ],
+   "locked": true,
+   "note": "small rock pile"
+  },
+  "forest_mushrooms": {
+   "w": 36,
+   "h": 27,
+   "anchor": [
+    18.5,
+    27
+   ],
+   "base_width": 35,
+   "solid": false,
+   "colliders": [],
+   "image": "forest_mushrooms.png",
+   "src_bbox": [
+    1375,
+    904,
+    1497,
+    995
+   ],
+   "locked": true,
+   "note": "mushrooms: decor"
+  },
   "village_dummy": {
    "w": 28,
    "h": 38,

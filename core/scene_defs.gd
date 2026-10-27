@@ -37,10 +37,12 @@ const IDS: Array[StringName] = [VILLAGE, FOREST, GLADE, ARENA]
 ## The layered scenes (floor + prop sprites, built from data/scenes/<id>_props.json).
 const GLADE_LAYERED: StringName = &"glade_layered"
 const VILLAGE_LAYERED: StringName = &"village_layered"
-const LAYERED: Array[StringName] = [GLADE_LAYERED, VILLAGE_LAYERED]
+const FOREST_LAYERED: StringName = &"forest_layered"
+const LAYERED: Array[StringName] = [GLADE_LAYERED, VILLAGE_LAYERED, FOREST_LAYERED]
 const LAYERED_PATHS: Dictionary = {
 	GLADE_LAYERED: "res://data/scenes/glade_layered_props.json",
 	VILLAGE_LAYERED: "res://data/scenes/village_layered_props.json",
+	FOREST_LAYERED: "res://data/scenes/forest_layered_props.json",
 }
 
 ## Where a new game starts.
@@ -143,12 +145,13 @@ static func layered_data(scene_id: StringName) -> Dictionary:
 	return PropScene.load_scene(LAYERED_PATHS[scene_id])
 
 
-## The solid colliders of a scene: the layout's colliders (the forest with its root gate closed unless `gate_open`),
+## The solid colliders of a scene: the layout's colliders (the forest with its root gate closed unless `gate_open`; a
+## layered scene builds the types its stateful props show for `gate_open` and the `lit` switch ids),
 ## plus a small circle on every NPC and on the village chest (drawn as sprites, not painted).
-static func build_obstacles(scene_id: StringName, gate_open: bool = false) -> Array[Obstacle]:
+static func build_obstacles(scene_id: StringName, gate_open: bool = false, lit: Array = []) -> Array[Obstacle]:
 	var list: Array[Obstacle] = []
 	if scene_id in LAYERED:
-		list = PropScene.build(layered_data(scene_id), PropScene.load_defs())
+		list = PropScene.build(layered_data(scene_id), PropScene.load_defs(), {"gate_open": gate_open, "lit": lit})
 		for npc: Dictionary in get_def(scene_id)["npcs"]:
 			SceneBounds.add(list, npc["position"], NPC_RADIUS, npc["position"])
 		return list
