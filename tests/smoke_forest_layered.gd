@@ -83,21 +83,19 @@ func review_side(id: StringName, behind: bool, state: String) -> void:
 	var p: Dictionary = placement(id)
 	var feet: Vector2 = p["feet"]
 	var reached: bool = false
-	for distance: int in [4, 8, 12, 16, 24, 32, 40, 48]:
-		for dx: int in [0, -12, 12, -24, 24, -36, 36, -48, 48, -52, 52, -56, 56, -60, 60]:
-			var point: Vector2 = feet + Vector2(dx, -distance if behind else distance)
-			if Collision.fits(scene.core.obstacles, point, 6.0) and walk_to(point):
-				reached = true
+	if id == &"tree_middle" and behind:
+		var point: Vector2 = Vector2(248, 88)
+		reached = Collision.fits(scene.core.obstacles, point, 6.0) and walk_to(point)
+	else:
+		for distance: int in [4, 8, 12, 16, 24, 32, 40, 48]:
+			for dx: int in [0, -12, 12, -24, 24, -36, 36, -48, 48, -52, 52, -56, 56, -60, 60]:
+				var point: Vector2 = feet + Vector2(dx, -distance if behind else distance)
+				if Collision.fits(scene.core.obstacles, point, 6.0) and walk_to(point):
+					reached = true
+					break
+			if reached:
 				break
-		if reached:
-			break
 	var label: String = String(id) + "_" + state + ("_behind" if behind else "_front")
-	if not reached and id == &"tree_middle" and behind:
-		# A capture limitation, separate from the required puzzle/exit smoke test.
-		# The shared upper boundary seals this tree's north side; do not fake a walk.
-		review_limits.append(label + ": upper boundary prevents walking behind this tree")
-		records.append({"label": label, "walked": false, "capture": "unavailable", "reason": review_limits.back()})
-		return
 	expect(reached, "Walk to review " + label)
 	var items: Array[Dictionary] = scene.drawables()
 	var hero_index: int = -1

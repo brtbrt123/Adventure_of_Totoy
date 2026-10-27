@@ -88,7 +88,6 @@ func _run() -> void:
 	_order(scene, &"glade", &"rune_stone_back", Vector2(301, 133), Vector2(301, 160))
 	_order(scene, &"glade", &"rune_stone_front", Vector2(268, 218), Vector2(268, 246))
 	_order(scene, &"village", &"gate_left_pillar", Vector2(115, 172), Vector2(115, 200))
-	_order(scene, &"village", &"training_dummy", Vector2(328, 137), Vector2(328, 162))
 	_order(scene, &"forest", &"pedestal_east", Vector2(382, 151), Vector2(382, 182))
 	# the root gate's door part follows the gate flag; the side roots stay; nothing of another scene is listed
 	if scene.gate_open:

@@ -10,6 +10,8 @@ var controls_open: bool = false
 var portrait_frames: Dictionary = {}
 var portrait_sheet: Texture2D
 var _line_key: String = ""
+var blip: Callable = Callable()
+var typed_nonspaces: int = 0
 
 
 func _ready() -> void:
@@ -22,13 +24,20 @@ func sync(value: Dictionary) -> void:
 	var key: String = "%s/%s/%s" % [value.get("dialogue_id", ""), value.get("index", -1), value.get("text", "")]
 	if key != _line_key:
 		reveal = 0.0
+		typed_nonspaces = 0
 		_line_key = key
 	dialogue = value.duplicate()
 	queue_redraw()
 
 
 func tick() -> void:
+	var before: int = int(reveal)
 	reveal = minf(reveal + CHARACTERS_PER_SECOND / 60.0, full_text().length())
+	for i: int in range(before, int(reveal)):
+		if not full_text().substr(i, 1).strip_edges().is_empty():
+			typed_nonspaces += 1
+			if typed_nonspaces % 3 == 0 and blip.is_valid():
+				blip.call()
 	queue_redraw()
 
 

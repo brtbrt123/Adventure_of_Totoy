@@ -14,6 +14,8 @@ static func drawables(scene: StringName, tick: int, size: Vector2) -> Array[Dict
 	if _regions.is_empty():
 		_regions = JSON.parse_string(FileAccess.get_file_as_string("res://presentation/common/ambient_regions.json"))
 	var regions: Array = _regions.get(String(scene), [])
+	if regions.is_empty():
+		return out
 	var time: float = float(tick) / 60.0
 	for index: int in range(22):
 		var phase: float = float(index) * 2.399963

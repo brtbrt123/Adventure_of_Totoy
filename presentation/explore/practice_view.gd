@@ -25,7 +25,7 @@ func enter_scene(id: StringName) -> void:
 	seen_tells.clear()
 	impacts.clear()
 	audio.last_ticks.clear()
-	audio.set_music_active(id in [&"village", &"village_layered"])
+	audio.set_scene(id)
 
 
 func sync(value: ExploreCore.ExploreSnapshot, events: Array[Dictionary], art_frames: Dictionary, sheet: Texture2D) -> void:

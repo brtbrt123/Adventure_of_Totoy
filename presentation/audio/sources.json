@@ -475,5 +475,185 @@
       ]
     },
     "processing": "Existing credited mono PCM at 44100 Hz; linear resampling; bounded peak0.86; 1.5ms attack/16ms tail fades. No new recordings."
-  }
+  },
+  "owner_batch_2026_10_27": [
+    {
+      "source": "data/audio/owner_sounds/lightning_barrage_hum.wav",
+      "source_sha256": "ec6ba04458c1ffdc739e839f310ab839f1de3bac4b62dd5ac2125f6d0c5a6c8a",
+      "installed": "presentation/audio/owner/lightning_barrage_hum.wav",
+      "installed_sha256": "ec6ba04458c1ffdc739e839f310ab839f1de3bac4b62dd5ac2125f6d0c5a6c8a",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/lightning_blink.wav",
+      "source_sha256": "191d52ad9c0c51897e532ad556eb6e52f9d2188d0b73fffdd785a2dac3bd513a",
+      "installed": "presentation/audio/owner/lightning_blink.wav",
+      "installed_sha256": "191d52ad9c0c51897e532ad556eb6e52f9d2188d0b73fffdd785a2dac3bd513a",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/lightning_crack.wav",
+      "source_sha256": "b59624f9ff8503e006cad2ca63c4dcbac73dd531decc3b735b381443e0d4feed",
+      "installed": "presentation/audio/owner/lightning_crack.wav",
+      "installed_sha256": "b59624f9ff8503e006cad2ca63c4dcbac73dd531decc3b735b381443e0d4feed",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/sprint_whoosh.wav",
+      "source_sha256": "5ba0e77eb3fdcfd1f4f30393cc511873c8ff6aa798382cc11083e1015fd13532",
+      "installed": "presentation/audio/owner/sprint_whoosh.wav",
+      "installed_sha256": "5ba0e77eb3fdcfd1f4f30393cc511873c8ff6aa798382cc11083e1015fd13532",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/echo_place.wav",
+      "source_sha256": "e912b0c5f3a1839d10c54e2d64c023a865313752373ad25cdf35861259bd7f51",
+      "installed": "presentation/audio/owner/echo_place.wav",
+      "installed_sha256": "e912b0c5f3a1839d10c54e2d64c023a865313752373ad25cdf35861259bd7f51",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/echo_recall.wav",
+      "source_sha256": "8427aeb98c1dad503e03c89a72c1c27b5593ad8de2bbd03aa1993b83e301d4d5",
+      "installed": "presentation/audio/owner/echo_recall.wav",
+      "installed_sha256": "8427aeb98c1dad503e03c89a72c1c27b5593ad8de2bbd03aa1993b83e301d4d5",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/ward_raise.wav",
+      "source_sha256": "428bc2931f42570a52f4b71a74cfdc50f7bef28e9260a85478d0e61d2c43a3d3",
+      "installed": "presentation/audio/owner/ward_raise.wav",
+      "installed_sha256": "428bc2931f42570a52f4b71a74cfdc50f7bef28e9260a85478d0e61d2c43a3d3",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/ward_release.wav",
+      "source_sha256": "95ea8e5e20b4387ab7c4a5015e32aeb54271fd87329f15c4967debf00fa134f5",
+      "installed": "presentation/audio/owner/ward_release.wav",
+      "installed_sha256": "95ea8e5e20b4387ab7c4a5015e32aeb54271fd87329f15c4967debf00fa134f5",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/phantom_cut.wav",
+      "source_sha256": "c3e92e33160f23ab1a3477667dc6a36c7179335ed2d9ab2bcba4c10160bd1da3",
+      "installed": "presentation/audio/owner/phantom_cut.wav",
+      "installed_sha256": "c3e92e33160f23ab1a3477667dc6a36c7179335ed2d9ab2bcba4c10160bd1da3",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/chain_coil.wav",
+      "source_sha256": "59b95d6f9d55940a202b122d35609ebc1ebba39563d26c36b85815e4654e83b9",
+      "installed": "presentation/audio/owner/chain_coil.wav",
+      "installed_sha256": "59b95d6f9d55940a202b122d35609ebc1ebba39563d26c36b85815e4654e83b9",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/aspect_bind.wav",
+      "source_sha256": "b64d373a42034bd21ba9ebdee855c282a556f0d5e54662692475aadd14145132",
+      "installed": "presentation/audio/owner/aspect_bind.wav",
+      "installed_sha256": "b64d373a42034bd21ba9ebdee855c282a556f0d5e54662692475aadd14145132",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/root_gate_open.wav",
+      "source_sha256": "7b0a2416e8f987204f289a908d72746a0dcb43c67fc5fcb5acb33146de534775",
+      "installed": "presentation/audio/owner/root_gate_open.wav",
+      "installed_sha256": "7b0a2416e8f987204f289a908d72746a0dcb43c67fc5fcb5acb33146de534775",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/lantern_light.wav",
+      "source_sha256": "ac36645ee08c09019fa3b66f370595569c6bd18227b5d40d74551bf1d58e47f0",
+      "installed": "presentation/audio/owner/lantern_light.wav",
+      "installed_sha256": "ac36645ee08c09019fa3b66f370595569c6bd18227b5d40d74551bf1d58e47f0",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/chest_open.wav",
+      "source_sha256": "c2ff6d89dbe9b4ea93acfe0aff719f2c34e6cd0ac319ee73fdf30c4c760a47a6",
+      "installed": "presentation/audio/owner/chest_open.wav",
+      "installed_sha256": "c2ff6d89dbe9b4ea93acfe0aff719f2c34e6cd0ac319ee73fdf30c4c760a47a6",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/lesson_complete.wav",
+      "source_sha256": "bfff4051b14a7a34b92173a667c53e1b37b4d07914a539c9986252546040cd82",
+      "installed": "presentation/audio/owner/lesson_complete.wav",
+      "installed_sha256": "bfff4051b14a7a34b92173a667c53e1b37b4d07914a539c9986252546040cd82",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/try_again.wav",
+      "source_sha256": "de1eb8cddded64e7f687c44e21d1ae0ff018bb04fbc26ffbc6f92c7e8226d871",
+      "installed": "presentation/audio/owner/try_again.wav",
+      "installed_sha256": "de1eb8cddded64e7f687c44e21d1ae0ff018bb04fbc26ffbc6f92c7e8226d871",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": "Copied cleaned owner WAV unchanged"
+    },
+    {
+      "source": "data/audio/owner_sounds/night_forest_ambience.wav",
+      "source_sha256": "4f84754e107a55fb9c868d80ef0e8b62c8b4401f11f210ddb6afb9abdca1dd89",
+      "installed": "presentation/audio/owner/night_forest_ambience_loop.wav",
+      "installed_sha256": "a71242bc2fdfd39ef982c664851e16c660745ed4f0be42440ce9d6cd56290424",
+      "creator": "Project owner / ElevenLabs sound-effects",
+      "license": "UNCONFIRMED: owner must confirm ElevenLabs plan terms before release",
+      "processing": {
+        "source_seconds": 20.0,
+        "loop_seconds": 19.5,
+        "crossfade_seconds": 0.5,
+        "source_seam_jump": 0.511871337890625,
+        "loop_seam_jump": 0.02642822265625002,
+        "normalization_gain": 1,
+        "method": "equal-power tail/head overlap, omit first .5s, concatenate middle + overlap; no source files modified"
+      }
+    },
+    {
+      "source": "data/audio/owner_sounds/electric_shock.mp3",
+      "source_sha256": "eb176219194723e80187f09b25f3e90e7c8f0225258e40e279edae637d4c4301",
+      "installed": "presentation/audio/owner/electric_shock_short.wav",
+      "installed_sha256": "5e067073f454ee78de247e0f19115c45125c0eee7545fcdf6dea0f03e7d4cb72",
+      "creator": "Unknown YouTube source, supplied by owner",
+      "license": "UNKNOWN: YouTube source/permission not yet supplied",
+      "processing": "1.85s decoded PCM, 5ms attack and 200ms fade-out; no device playback used in conversion"
+    },
+    {
+      "source": "data/audio/cc0/dialogue_blip.ogg",
+      "installed": "presentation/audio/owner/dialogue_blip.ogg",
+      "sha256": "9d057b918024c787bbe6c00beed13a7ef72a3fa0c259add3cef36582792f4230",
+      "creator": "Kenney",
+      "license": "CC0-1.0",
+      "origin": "Interface Sounds tick_001.ogg; chosen by owner; copied unchanged"
+    }
+  ]
 }

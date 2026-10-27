@@ -511,5 +511,6 @@
    "flip": false,
    "shadow_radius": 12
   }
- ]
+ ],
+ "_note": "Accepted and installed as live shared data by Claude; review history only. Runtime reads data/scenes/village_layered_props.json."
 }

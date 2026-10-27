@@ -1,0 +1,9 @@
+{
+  "source_seconds": 20.0,
+  "loop_seconds": 19.5,
+  "crossfade_seconds": 0.5,
+  "source_seam_jump": 0.511871337890625,
+  "loop_seam_jump": 0.02642822265625002,
+  "normalization_gain": 1,
+  "method": "equal-power tail/head overlap, omit first .5s, concatenate middle + overlap; no source files modified"
+}

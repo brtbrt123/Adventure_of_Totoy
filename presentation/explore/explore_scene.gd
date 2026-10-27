@@ -146,6 +146,7 @@ func _ready() -> void:
 	$HUD.add_child(character_menu)
 	conversation = ConversationView.new()
 	$HUD.add_child(conversation)
+	conversation.blip = func() -> void: practice_view.audio.cue("dialogue_blip", snapshot.tick, 0.2)
 	reward_popup = RewardPopup.new()
 	$HUD.add_child(reward_popup)
 	var start: Dictionary = Engine.get_meta(START_META, {}) if Engine.has_meta(START_META) else {}
@@ -289,6 +290,7 @@ func advance(intent: InputFrame) -> void:
 
 
 func _on_event(event: GameEvent) -> void:
+	practice_view.audio.handle_event(event, snapshot.scene_id)
 	match event.type:
 		GameEvent.SCENE_EXIT:
 			begin_transition(event.data["target_scene"], event.data["target_entry"])
@@ -299,10 +301,14 @@ func _on_event(event: GameEvent) -> void:
 		GameEvent.GATE_CHANGED:
 			gate_open = snapshot.gate_open
 			_refresh_props()
-			_save_progress(core.scene_id, core.last_checkpoint)
+			if profile.gate_open != gate_open:
+				_save_progress(core.scene_id, core.last_checkpoint)
 		GameEvent.INTERACT:
 			if event.data["kind"] == &"npc" and snapshot.dialogue.is_empty():
 				bubbles[event.data["target_id"]] = BUBBLE_TICKS
+		GameEvent.ITEM_RECEIVED:
+			var icons: Dictionary = {&"black_katana": "ui_weapon_sword_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
+			show_reward({"kind": event.data["kind"], "name": event.data["name"], "quantity": event.data["quantity"], "icon": icons.get(StringName(event.data["item_id"]), "")})
 		GameEvent.FLAG_SET, GameEvent.DIALOGUE_ENDED:
 			_save_progress(core.scene_id, core.last_checkpoint)
 			if event.type == GameEvent.FLAG_SET:
@@ -420,6 +426,8 @@ func request_aspect_equip(aspect: StringName, slot: int) -> void:
 	frame.aspect_equip = aspect
 	frame.aspect_equip_slot = slot
 	loadout_core.step(frame)
+	for event: GameEvent in loadout_core.last_events:
+		practice_view.audio.handle_event(event, snapshot.scene_id)
 	if slot >= 1 and slot <= loadout_core.snapshot().player.equipped_aspects.size() and loadout_core.snapshot().player.equipped_aspects[slot - 1] == aspect:
 		core.set_flag(&"lesson_aspect")
 		snapshot = core.snapshot()
@@ -505,6 +513,13 @@ func drawables() -> Array[Dictionary]:
 		for object: Dictionary in snapshot.objects:
 			if object["kind"] == &"chest":  # the village chest is not painted (the forest's is, in its nook)
 				out.append({"kind": &"object", "id": object["id"], "at": object["position"], "frame": "obj_chest_closed_1", "left": false, "shadow": 0.0, "tint": Color.WHITE})
+	if snapshot.scene_id == SceneDefs.VILLAGE:
+		for object: Dictionary in snapshot.objects:
+			if object["kind"] == &"dummy":
+				var age: int = int(snapshot.training.get("since_hit", 1000))
+				var key: String = "obj_dummy_hit_%d" % (1 + mini(1, age / 4)) if age >= 0 and age < 8 else "obj_dummy_1"
+				var offset: Vector2 = Vector2(1 if age % 2 == 0 else -1, 0) if age >= 0 and age < 8 else Vector2.ZERO
+				out.append({"kind": &"object", "id": object["id"], "at": Vector2(object["position"]) + offset, "frame": key, "left": false, "shadow": 6.0, "tint": tint})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
