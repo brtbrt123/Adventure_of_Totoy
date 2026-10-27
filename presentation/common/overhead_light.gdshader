@@ -8,6 +8,8 @@ uniform float strength : hint_range(0.0, 1.0) = 1.0;
 uniform int lamp_count = 0;
 uniform vec4 lamps[16];
 uniform vec3 lamp_colour = vec3(1.0, 0.79, 0.52);
+uniform float emissive_pass_alpha = 0.99;
+uniform vec3 lamp_core_colour = vec3(1.05, 0.98, 0.88);
 varying vec2 world_position;
 varying vec4 draw_colour;
 
@@ -61,7 +63,9 @@ void fragment() {
 	}
 	bool shadow_pass = max(draw_colour.r, max(draw_colour.g, draw_colour.b)) < 0.001
 		&& draw_colour.a > 0.0 && draw_colour.a < 0.5;
-	if (shadow_pass) {
+	if (abs(draw_colour.a - emissive_pass_alpha) < 0.0001) {
+		COLOR = vec4(texture(TEXTURE, UV).rgb * draw_colour.rgb, texture(TEXTURE, UV).a);
+	} else if (shadow_pass) {
 		float radius = draw_colour.a > 0.25 ? 2.0 : 0.65;
 		vec2 step_uv = TEXTURE_PIXEL_SIZE * radius;
 		float mask = texture(TEXTURE, UV).a * 0.28;
@@ -80,7 +84,7 @@ void fragment() {
 		lit += lamp_colour * min(0.075, warm_halo * 0.035);
 		// The painted cream lamp/window/fire cores stay luminous at night.
 		float bright_paint = smoothstep(0.55, 0.88, max(base.r, max(base.g, base.b)));
-		lit = mix(lit, base.rgb * vec3(1.05, 0.98, 0.88), clamp(fixture_core * bright_paint, 0.0, 0.9));
+		lit = mix(lit, base.rgb * lamp_core_colour, clamp(fixture_core * bright_paint, 0.0, 0.9));
 		COLOR = vec4(clamp(lit, vec3(0.0), vec3(1.0)), base.a);
 	}
 }

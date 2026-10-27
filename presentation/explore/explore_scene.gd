@@ -29,6 +29,7 @@ const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
 const PropScene := preload("res://core/prop_scene.gd")
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
+const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
@@ -42,9 +43,6 @@ const GROUNDS: Dictionary = {
 	&"forest": "res://presentation/forest/forest_route_ground.png",
 	&"glade": "res://presentation/forest/stag_glade_ground.png",
 	&"arena": "res://presentation/arena/arena_ground.png",
-	# Runtime copies while Claude updates the shared scene files' ground strings.
-	&"village_layered": "res://presentation/village/village_layered_ground.png",
-	&"glade_layered": "res://presentation/forest/glade_layered_ground.png",
 }
 ## Per-scene ambient multiplied onto the actors (not the ground) so the sprites sit in the dusk paintings.
 const AMBIENT: Dictionary = {
@@ -426,9 +424,11 @@ func ambient() -> Color:
 	return AMBIENT.get(snapshot.scene_id, Color.WHITE) if snapshot != null else Color.WHITE
 
 
-## Everything drawn in the world this tick, y-sorted by feet: [{kind: hero|npc|object, at, frame, left, shadow, tint}]
-## and the depth occluders of the props in view ({kind: occluder, at: (x, base_y - bias), occluder}): an occluder sorts
-## after (in front of) every actor whose feet are north of its base.
+func _visible_world_rect() -> Rect2:
+	return Rect2(view_origin, VIEW_SIZE) if camera.enabled else Rect2(Vector2.ZERO, snapshot.size)
+
+
+## Actors, props, cosmetic motes and painted foreground occluders sorted by base.
 func drawables() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	var tint: Color = ambient()
@@ -440,9 +440,10 @@ func drawables() -> Array[Dictionary]:
 			if object["kind"] == &"chest":  # the village chest is not painted (the forest's is, in its nook)
 				out.append({"kind": &"object", "id": object["id"], "at": object["position"], "frame": "obj_chest_closed_1", "left": false, "shadow": 0.0, "tint": Color.WHITE})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
+	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
-		return PropsLayer.sorted_with_actors(PropsLayer.drawables(prop_placements, frames, Rect2(view_origin, VIEW_SIZE).grow(8)), out)
-	out.append_array(DepthOccluders.drawables(snapshot.scene_id, {&"gate_open": snapshot.gate_open}, Rect2(view_origin, VIEW_SIZE).grow(8.0)))
+		return PropsLayer.sorted_with_actors(PropsLayer.drawables(prop_placements, frames, _visible_world_rect().grow(8)), out)
+	out.append_array(DepthOccluders.drawables(snapshot.scene_id, {&"gate_open": snapshot.gate_open}, _visible_world_rect().grow(8.0)))
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
 	return out
 
@@ -460,7 +461,7 @@ func _draw() -> void:
 		for item: Dictionary in items:
 			if item["kind"] == &"prop":
 				PropsLayer.draw_shadow(self, item, shadow_strength(), sprites)
-			else:
+			elif item["kind"] in [&"hero", &"npc", &"object"]:
 				_draw_actor_cast(item)
 				ActorShadow.draw(self, item["at"], item["shadow"], shadow_strength())
 	for item: Dictionary in items:
@@ -475,6 +476,9 @@ func _draw() -> void:
 
 
 func _draw_item(item: Dictionary) -> void:
+	if item["kind"] == &"firefly":
+		AmbientFireflies.draw(self, item)
+		return
 	if item["kind"] == &"prop":
 		PropsLayer.draw(self, item, sprites, ambient())
 		return
@@ -515,7 +519,7 @@ func shadow_strength() -> float:
 
 
 func _update_lighting() -> void:
-	material = EnvironmentLight.make_material(snapshot.scene_id, snapshot.size, prop_placements) if lighting_enabled and SceneDefs.LAYERED.has(snapshot.scene_id) else null
+	material = EnvironmentLight.make_material(snapshot.scene_id, snapshot.size, prop_placements) if lighting_enabled and EnvironmentLight.supports(snapshot.scene_id) else null
 
 
 func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE) -> void:

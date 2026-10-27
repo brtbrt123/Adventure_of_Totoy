@@ -90,7 +90,7 @@ func _every_scene_loads() -> void:
 		_expect(scene.fade_alpha() == 0.0, "the fade ends clear")
 		_expect(scene.hud.toast_text == SceneDefs.get_def(scene_id)["name"] and scene.hud.toast_alpha > 0.0, "%s shows its name toast" % scene_id)
 		for item: Dictionary in scene.drawables():
-			if item["kind"] == &"occluder":
+			if item["kind"] in [&"occluder", &"firefly"]:
 				continue  # the painted props drawn over actors behind them (smoke_depth_occluders.gd)
 			_expect(scene.frames.has(item["frame"]), "%s draws a missing frame %s" % [scene_id, item["frame"]])
 		_expect(Explore.AMBIENT.has(scene_id) and scene.ambient() == Explore.AMBIENT[scene_id], "%s has its ambient tint" % scene_id)

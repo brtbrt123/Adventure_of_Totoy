@@ -1,9 +1,120 @@
 {
-  "village_lamp_post": [{"pixel": [30.5, 39.0], "halo_radius": 28.0, "energy": 1.15, "pool_radius": 45.0, "pool_energy": 0.80}],
-  "village_east_tree": [{"pixel": [89.0, 84.5], "halo_radius": 25.0, "energy": 1.00, "pool_radius": 42.0, "pool_energy": 0.70}],
-  "village_forge": [{"pixel": [33.0, 55.0], "halo_radius": 30.0, "energy": 1.35, "pool_radius": 50.0, "pool_energy": 1.00}],
+  "village_lamp_post": [
+    {
+      "pixel": [
+        30.5,
+        39.0
+      ],
+      "halo_radius": 28.0,
+      "energy": 1.15,
+      "pool_radius": 45.0,
+      "pool_energy": 0.8
+    }
+  ],
+  "village_east_tree": [
+    {
+      "pixel": [
+        89.0,
+        84.5
+      ],
+      "halo_radius": 25.0,
+      "energy": 1.0,
+      "pool_radius": 42.0,
+      "pool_energy": 0.7
+    }
+  ],
+  "village_forge": [
+    {
+      "pixel": [
+        33.0,
+        55.0
+      ],
+      "halo_radius": 30.0,
+      "energy": 1.35,
+      "pool_radius": 50.0,
+      "pool_energy": 1.0
+    }
+  ],
   "village_cottage": [
-    {"pixel": [42.0, 44.0], "halo_radius": 24.0, "energy": 1.05, "pool_radius": 37.0, "pool_energy": 0.45},
-    {"pixel": [96.0, 74.0], "halo_radius": 27.0, "energy": 1.15, "pool_radius": 44.0, "pool_energy": 0.70}
+    {
+      "pixel": [
+        42.0,
+        44.0
+      ],
+      "halo_radius": 24.0,
+      "energy": 1.05,
+      "pool_radius": 37.0,
+      "pool_energy": 0.45
+    },
+    {
+      "pixel": [
+        96.0,
+        74.0
+      ],
+      "halo_radius": 27.0,
+      "energy": 1.15,
+      "pool_radius": 44.0,
+      "pool_energy": 0.7
+    }
+  ],
+  "glade_stone_1": [
+    {
+      "pixel": [
+        28.0,
+        23.1
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7
+    }
+  ],
+  "glade_stone_2": [
+    {
+      "pixel": [
+        26.2,
+        23.6
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7
+    }
+  ],
+  "glade_stone_3": [
+    {
+      "pixel": [
+        24.8,
+        20.3
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7
+    }
+  ],
+  "glade_stone_4": [
+    {
+      "pixel": [
+        23.1,
+        23.7
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7
+    }
+  ],
+  "glade_stone_5": [
+    {
+      "pixel": [
+        17.5,
+        22.6
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7
+    }
   ]
 }

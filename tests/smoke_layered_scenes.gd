@@ -163,7 +163,7 @@ func run() -> void:
 		finish_fade()
 		expect(scene.snapshot.scene_id == Explore.DEBUG_SCENES[key], "Debug jump " + key)
 	expect(scene.ground_texture(&"glade_layered").get_size() == Vector2(560, 336), "Runtime glade ground")
-	expect((scene.material as ShaderMaterial).get_shader_parameter("lamp_count") == 0, "Village lamps do not leak into glade")
+	expect((scene.material as ShaderMaterial).get_shader_parameter("lamp_count") == 10, "Five glade rune stones have their own teal glow")
 	# The diagonal log's left end must sort earlier than its right end.
 	var props: Array[Dictionary] = PropsLayer.drawables(scene.prop_placements, scene.frames)
 	var low: float = INF

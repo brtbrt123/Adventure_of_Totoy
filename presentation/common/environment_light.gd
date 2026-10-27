@@ -1,19 +1,36 @@
 extends RefCounted
 ## Cool high moonlight and warm practical lamps. Sources are measured on the art.
+const Fireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const SHADER := preload("res://presentation/common/overhead_light.gdshader")
 const SHADOW_PROJECTION: Vector2 = Vector2(0.30, 0.25)
 const MAX_LIGHTS: int = 16
 static var _sockets: Dictionary = {}
 
 
+static func supports(scene: StringName) -> bool:
+	return scene in [&"village_layered", &"forest", &"glade", &"glade_layered", &"forest_layered"]
+
+
 static func make_material(scene: StringName, size: Vector2, placements: Array[Dictionary] = []) -> ShaderMaterial:
 	var result: ShaderMaterial = ShaderMaterial.new()
 	result.shader = SHADER
+	result.set_shader_parameter("emissive_pass_alpha", Fireflies.EMISSIVE_ALPHA)
 	result.set_shader_parameter("world_size", size)
 	result.set_shader_parameter("shaft_slope", SHADOW_PROJECTION.x / SHADOW_PROJECTION.y)
 	result.set_shader_parameter("strength", 1.0)
 	result.set_shader_parameter("light_colour", Vector3(0.64, 0.77, 1.0) if scene == &"village_layered" else Vector3(0.60, 0.79, 1.0))
 	var practicals: Dictionary = lamp_plan(placements)
+	if scene in [&"glade", &"glade_layered"]:
+		result.set_shader_parameter("lamp_colour", Vector3(0.48, 0.94, 0.86))
+		result.set_shader_parameter("lamp_core_colour", Vector3(0.8, 1.0, 1.0))
+	# Fixed fixture positions belong to the painted art; layered art uses sockets.
+	if scene == &"glade":
+		var points: PackedVector4Array = PackedVector4Array()
+		for at: Vector2 in [Vector2(226, 148), Vector2(303, 133), Vector2(365, 155), Vector2(267, 215)]:
+			points.append(Vector4(at.x, at.y, 35.0, 1.25))
+			points.append(Vector4(at.x, at.y + 15.0, 48.0, -0.7))
+		points.resize(MAX_LIGHTS)
+		practicals = {"points": points, "count": 8}
 	result.set_shader_parameter("lamp_count", practicals["count"])
 	result.set_shader_parameter("lamps", practicals["points"])
 	return result
