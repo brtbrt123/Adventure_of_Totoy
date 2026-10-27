@@ -1,6 +1,6 @@
 # Woodland Approach ground v1
 
-Built-in imagegen; generated 2026-10-27. Ground-first workflow, with separate assets and props afterward. Review-only source: not installed, resized or palette-normalized. Human approval pending. No runtime changes or tests for this inactive reference image.
+Built-in imagegen; generated 2026-10-27. Ground-first workflow, with separate assets and props afterward. Review-only source: not installed, resized or palette-normalized. Ground approved by the owner on 2026-10-27: "yes i approved". No runtime changes or tests for this inactive reference image.
 
 References: presentation/forest/forest_layered_ground.png (ground style); presentation/review/chapter1_expansion/current_forest_layered.png (world identity); presentation/review/chapter1_expansion/woodland_spaces.png (layout only).
 

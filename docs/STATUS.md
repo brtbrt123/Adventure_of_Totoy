@@ -1,3 +1,7 @@
+## Woodland floor approved; prop source generated (2026-10-27, Codex)
+
+Owner approved ground_raw.png. Ground is preserved. Generated a separate 12-object forest/camp prop source at `art/reference/woodland_approach_v1/props_raw.png`; exact generation and cleanup-attempt prompts in PROPS_PROMPT.md. Prop style approval is pending. Raw generated alpha has soft halos (0..254); this remains inactive source art requiring extraction, hard-alpha/palette normalization, scale/anchor checks before runtime import. A tool cleanup attempt did not reliably remove haze; no claim of production-ready transparency. No runtime changes or tests; existing chapter plan and architecture edit preserved.
+
 ## Woodland ground image v1 (2026-10-27, Codex; approval pending)
 
 Owner requested generation of ground first, then separate props, matching the existing layered forest. Built-in imagegen produced `art/reference/woodland_approach_v1/ground_raw.png` (1586x992 RGB); references and exact prompt are in PROMPT.md. Two main clearings and optional upper loop; no solid props. This is inactive unlit reference artwork, not installed/palette-normalized. Inspect generated image for owner approval before native-scale conversion and prop work. No runtime tests rerun because gameplay/runtime assets are untouched. Existing chapter plan and architecture edit preserved.
