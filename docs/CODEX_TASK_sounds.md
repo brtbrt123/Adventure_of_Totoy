@@ -28,7 +28,7 @@ The owner decided to use the sounds they made or brought, not the downloaded CC0
 | `stag_growl.wav`, `stag_charge.wav`, `stag_defeat.wav` | reserved for the Stag fight (not built yet) | |
 | `mossling_hit.wav` | reserved for the Mossling (not built yet) | |
 
-Still missing: a dialogue typewriter blip. Until the owner makes one, do not play any sound per character (or use a quiet tick of your choice and tell the owner).
+Dialogue typewriter blip: `data/audio/cc0/dialogue_blip.ogg` (Kenney tick, CC0; the owner did not like the generated one). Play it quietly on each typed character, no more often than every 2-3 characters, and not on spaces; the next-line press can stay silent or reuse it. Credit Kenney in `presentation/audio/sources.json`.
 
 ## Notes
 
