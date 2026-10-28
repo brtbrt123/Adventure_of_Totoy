@@ -73,17 +73,11 @@ func _draw() -> void:
 		return
 	if controls_open:
 		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], 0.55))
-		UiPanel.draw_panel(self, Rect2(42, 30, 236, 122), &"info", colors)
-		lettering(Vector2(58, 42), "Welcome to Lanternfen", colors["1"], 1, menu_font(), 11)
-		var rows: Array[String] = [
-			"Move    %s / %s / %s / %s" % [Bindings.action_label("arena_up"), Bindings.action_label("arena_left"), Bindings.action_label("arena_down"), Bindings.action_label("arena_right")],
-			"Dash    " + Bindings.action_label("arena_dash"),
-			"Talk / interact    " + Bindings.action_label("explore_interact"),
-			"Character / Aspects    " + Bindings.action_label("menu_toggle"),
-		]
-		for i: int in rows.size():
-			lettering(Vector2(58, 64 + i * 15), rows[i], colors["p"], 1, ui_font(), 9)
-		lettering(Vector2(58, 132), "%s / %s: begin" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next")], colors["u"])
+		UiPanel.draw_panel(self, Rect2(42, 50, 236, 80), &"info", colors)
+		lettering(Vector2(58, 62), "Welcome to Lanternfen", colors["1"], 1, menu_font(), 11)
+		lettering(Vector2(58, 85), "You made it home.", colors["p"], 1, ui_font(), 9)
+		lettering(Vector2(58, 97), "A familiar light still burns in the quiet.", colors["p"], 1, ui_font(), 9)
+		lettering(Vector2(58, 115), "%s / %s: continue" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next")], colors["u"])
 		return
 	if dialogue.is_empty():
 		return

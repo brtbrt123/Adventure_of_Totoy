@@ -92,8 +92,10 @@ func _title_screen() -> void:
 	title.started = false
 	changed_to.clear()
 	_expect(title.can_continue(), "a saved chapter can be continued")
+	Engine.set_meta(Title.SKIP_INTRO_META,true)
 	title.index = 0
 	title.activate()
+	Engine.remove_meta(Title.SKIP_INTRO_META)
 	_expect(changed_to == [Title.EXPLORE_SCENE], "NEW GAME opens the exploration scene: %s" % str(changed_to))
 	var start: Dictionary = Engine.get_meta(Title.EXPLORE_START_META, {})
 	_expect(start.get("scene", &"") == &"village_layered" and start.get("entry", &"") == &"arrival" and not bool(start.get("gate_open", true)), "NEW GAME starts at the village arrival: %s" % str(start))

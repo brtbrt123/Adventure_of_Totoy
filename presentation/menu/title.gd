@@ -6,8 +6,11 @@ extends "res://presentation/arena/hud.gd"
 ## HUD's 3x5 bitmap lettering and draws on the 320x180 canvas.
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const SaveStore := preload("res://core/save_store.gd")
+const CutsceneBook := preload("res://core/cutscene_book.gd")
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
+const INTRO_SCENE: String = "res://presentation/cutscene/intro.tscn"
+const SKIP_INTRO_META: StringName = &"totoy_skip_intro"
 const EXPLORE_SCENE: String = "res://presentation/explore/explore_scene.tscn"
 ## Read by presentation/explore/explore_scene.gd: where the chapter starts ({scene, entry, checkpoint, gate_open}).
 const SceneDefs := preload("res://core/scene_defs.gd")
@@ -64,7 +67,7 @@ const CREDIT_LINES: Array[String] = [
 	"SPRITES AND TILES: GENERATED WITH GEMINI",
 	"FROM THE OWNER'S DESIGNS",
 	"BUILT WITH GODOT 4, CLAUDE CODE AND CODEX",
-	"",
+	"INTRO MUSIC: ORIGINAL CODEX COMPOSITION",
 	"SOUND AND MUSIC (CC0):",
 	"STARNINJAS, ARTISTICDUDE, KENNEY,",
 	"BRIAN MACINTOSH (BMACZERO), MINTODOG",
@@ -231,19 +234,24 @@ func start_game() -> void:
 	change_scene.call(ARENA_SCENE)
 
 
-## NEW GAME: chapter 1 from the village arrival. The chapter progress in the save is cleared (the fight record and the
+## NEW GAME: the story intro, then village arrival. Explicit debug/test bypass goes straight to arrival.
+## The chapter progress in the save is cleared (the fight record and the
 ## loadout stay).
 func new_game() -> void:
 	if started:
 		return
+	var bypass_intro: bool = "--skip-intro" in OS.get_cmdline_user_args() or bool(Engine.get_meta(SKIP_INTRO_META,false)) or Engine.has_meta(EXPLORE_START_META)
 	started = true
 	Engine.set_meta(PERSIST_META, true)
 	if profile == null:
 		profile = SaveStore.load_profile()
 	profile.reset_progress()
+	if bypass_intro:
+		var flag: StringName = CutsceneBook.flag_of(CutsceneBook.default_book(),CutsceneBook.INTRO)
+		if flag != &"" and not profile.story_flags.has(flag):profile.story_flags.append(flag)
 	SaveStore.save(profile)
 	Engine.set_meta(EXPLORE_START_META, {"scene": SceneDefs.START_SCENE, "entry": SceneDefs.START_ENTRY, "checkpoint": &"", "gate_open": false})
-	change_scene.call(EXPLORE_SCENE)
+	change_scene.call(EXPLORE_SCENE if bypass_intro else INTRO_SCENE)
 
 
 ## True when the save has a chapter game to resume.

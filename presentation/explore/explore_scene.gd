@@ -104,6 +104,7 @@ var profile: SaveProfile = null
 var loadout_core: GameCore
 var character_menu: CharacterMenu
 var missing_frames: Dictionary = {}
+var intro_arrival_ticks: int = 0
 var transitions: int = 0  # scene changes done (tests)
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
 @onready var hud: ExploreHud = $HUD/Display
@@ -149,6 +150,9 @@ func _ready() -> void:
 	if not SceneDefs.LAYERED.has(scene):
 		scene = SceneDefs.START_SCENE
 	enter_scene(scene, StringName(start.get("entry", &"")), StringName(start.get("checkpoint", &"")))
+	if bool(start.get("intro_arrival",false)) and scene==SceneDefs.START_SCENE:
+		intro_arrival_ticks = 18
+		conversation.controls_open = false
 	fade_phase = &"in"
 	fade_ticks = 0
 	_update_hud()
@@ -234,6 +238,15 @@ func _physics_process(_delta: float) -> void:
 		return
 	if fade_phase != &"":
 		advance_fade()
+		return
+	if intro_arrival_ticks>0:
+		var arrival: InputFrame = InputFrame.new()
+		arrival.move = Vector2.DOWN
+		advance(arrival)
+		intro_arrival_ticks -= 1
+		if intro_arrival_ticks==0:
+			conversation.controls_open = not snapshot.story_flags.has(&"seen_controls") and snapshot.dialogue.is_empty()
+			_update_hud()
 		return
 	if conversation.controls_open:
 		if Input.is_action_just_pressed("explore_interact") or Input.is_action_just_pressed("dialogue_next") or Input.is_action_just_pressed("menu_back"):
