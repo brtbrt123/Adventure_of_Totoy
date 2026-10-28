@@ -10,7 +10,7 @@ const TrainingYard := preload("res://core/training_yard.gd")
 const Collision := preload("res://core/collision.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const ExploreBot := preload("res://tests/explore_bot.gd")
-const SCENES: Array[StringName] = [SceneDefs.VILLAGE, SceneDefs.VILLAGE_LAYERED]
+const SCENES: Array[StringName] = [SceneDefs.VILLAGE_LAYERED]
 
 
 func _frame(move: Vector2 = Vector2.ZERO, attack: bool = false, parry: bool = false, dash: bool = false) -> InputFrame:
@@ -39,7 +39,7 @@ func _stand(core: ExploreCore) -> Vector2:
 
 
 ## A core with the hero at the post's stand point, idle; `flags` already set.
-func _yard(scene: StringName = SceneDefs.VILLAGE, flags: Array[StringName] = [&"met_tovan"]) -> ExploreCore:
+func _yard(scene: StringName = SceneDefs.VILLAGE_LAYERED, flags: Array[StringName] = [&"met_tovan"]) -> ExploreCore:
 	var core: ExploreCore = ExploreCore.new(scene)
 	core.set_story_flags(flags)
 	core.place_at(_stand(core))
@@ -71,13 +71,13 @@ func _all_lessons() -> Array[StringName]:
 func test_only_scenes_with_a_post_have_a_yard() -> void:
 	for scene: StringName in SCENES:
 		assert_true(ExploreCore.new(scene).training != null, "%s has the post" % scene)
-	for scene: StringName in [SceneDefs.FOREST, SceneDefs.GLADE, SceneDefs.ARENA, SceneDefs.FOREST_LAYERED, SceneDefs.GLADE_LAYERED]:
+	for scene: StringName in [SceneDefs.FOREST_LAYERED, SceneDefs.GLADE_LAYERED, SceneDefs.ARENA, SceneDefs.FOREST_LAYERED, SceneDefs.GLADE_LAYERED]:
 		var core: ExploreCore = ExploreCore.new(scene)
 		assert_true(core.training == null and core.snapshot().training.is_empty(), "%s has none" % scene)
 
 
 func test_the_post_sleeps_until_tovan_has_been_heard() -> void:
-	var core: ExploreCore = _yard(SceneDefs.VILLAGE, [] as Array[StringName])
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [] as Array[StringName])
 	_swing(core)
 	assert_eq(core.training.hits, 0, "no hit before Tovan")
 	assert_eq(core.snapshot().hero.state, &"idle", "the attack input is ignored")
@@ -166,7 +166,7 @@ func test_an_unparried_gold_hit_is_a_practice_hit_and_the_post_tries_again() -> 
 
 
 func test_the_red_warning_needs_a_dash_and_comes_after_the_parry() -> void:
-	var core: ExploreCore = _yard(SceneDefs.VILLAGE, [&"met_tovan", &"lesson_parry"] as Array[StringName])
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_tovan", &"lesson_parry"] as Array[StringName])
 	var t: Telegraph = _until_warning(core)
 	assert_true(t != null and t.kind == Telegraph.KIND_RED, "red once the parry is learned")
 	# standing still is a practice hit and no credit
@@ -191,7 +191,7 @@ func test_the_red_warning_needs_a_dash_and_comes_after_the_parry() -> void:
 
 
 func test_the_last_lesson_sets_training_done_and_the_post_rests() -> void:
-	var core: ExploreCore = _yard(SceneDefs.VILLAGE, [&"met_tovan", &"lesson_dash", &"lesson_attack", &"lesson_parry"] as Array[StringName])
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_tovan", &"lesson_dash", &"lesson_attack", &"lesson_parry"] as Array[StringName])
 	var next: Telegraph = _until_warning(core)
 	for i: int in 120:
 		core.step(_frame(Vector2.DOWN if core.tick == next.hit_tick - 3 else Vector2.ZERO, false, false, core.tick == next.hit_tick - 3))
@@ -259,8 +259,8 @@ func test_a_talk_still_freezes_the_hero_in_the_yard() -> void:
 
 # --- the post moved to open ground south of the forge (2026-10-27) ---
 
-const OLD_POST: Dictionary = {&"village": Vector2(328, 148), &"village_layered": Vector2(345, 118)}
-const NEW_POST: Dictionary = {&"village": Vector2(390, 212), &"village_layered": Vector2(380, 180)}
+const OLD_POST: Dictionary = {&"village_layered": Vector2(345, 118)}
+const NEW_POST: Dictionary = {&"village_layered": Vector2(380, 180)}
 
 
 func _object(scene: StringName) -> Dictionary:
@@ -274,7 +274,7 @@ func test_the_post_stands_on_the_new_spot_in_both_villages() -> void:
 	for scene: StringName in SCENES:
 		var object: Dictionary = _object(scene)
 		assert_eq(object["position"], NEW_POST[scene], "%s: the post's feet" % scene)
-		assert_eq(object["stand"], NEW_POST[scene] + Vector2(0, 14 if scene == SceneDefs.VILLAGE else 16), "%s: the use spot in front" % scene)
+		assert_eq(object["stand"], NEW_POST[scene] + Vector2(0, 16), "%s: the use spot in front" % scene)
 		var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(scene)
 		assert_false(Collision.fits(obstacles, NEW_POST[scene], 6.0), "%s: the post is solid where it stands" % scene)
 		assert_true(Collision.fits(obstacles, OLD_POST[scene], 6.0), "%s: nothing invisible is left at the old spot" % scene)

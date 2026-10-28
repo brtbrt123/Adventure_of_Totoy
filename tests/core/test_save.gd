@@ -210,3 +210,30 @@ func test_the_store_keeps_the_chapter_progress() -> void:
 	assert_eq(back.scene_id, &"glade_layered")
 	assert_eq(back.checkpoint_id, &"glade_layered_entrance")
 	_clean()
+
+
+func test_the_inventory_round_trips_and_a_new_game_empties_it() -> void:
+	var p: SaveProfile = SaveProfile.new()
+	assert_eq(p.inventory, {}, "a new profile carries nothing")
+	p.inventory = {&"herb": 3, &"bell": 1}
+	var back: SaveProfile = SaveProfile.from_json(p.to_json()) as SaveProfile
+	assert_eq(back.inventory, {&"herb": 3, &"bell": 1})
+	assert_eq(back.to_json(), p.to_json(), "stable output (sorted keys)")
+	back.reset_progress()
+	assert_eq(back.inventory, {}, "NEW GAME empties it")
+
+
+func test_bad_inventory_entries_are_dropped_and_old_saves_have_none() -> void:
+	var old: SaveProfile = SaveProfile.from_json("{\"version\": 1, \"runs_started\": 2}") as SaveProfile
+	assert_eq(old.inventory, {}, "a save from before herbs")
+	assert_eq(old.load_note, "")
+	var messy: String = "{\"version\": 1, \"inventory\": {\"herb\": 500, \"BAD KEY\": 2, \"neg\": -4, \"text\": \"many\", \"zero\": 0, \"fine\": 2.9}}"
+	var p: SaveProfile = SaveProfile.from_json(messy) as SaveProfile
+	assert_eq(p.inventory, {&"herb": SaveProfile.MAX_STACK, &"fine": 2}, "capped, bad keys and counts dropped")
+	var shapes: SaveProfile = SaveProfile.from_json("{\"version\": 1, \"inventory\": [1, 2]}") as SaveProfile
+	assert_eq(shapes.inventory, {}, "a list is not an inventory")
+	var many: Dictionary = {}
+	for i: int in 40:
+		many["item_%d" % i] = 1
+	var capped: SaveProfile = SaveProfile.from_dict({"version": 1, "inventory": many}) as SaveProfile
+	assert_eq(capped.inventory.size(), SaveProfile.MAX_ITEMS, "at most MAX_ITEMS kinds")

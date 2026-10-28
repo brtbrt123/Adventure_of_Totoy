@@ -1,0 +1,537 @@
+{
+ "version": 1,
+ "scene": "woodland_layered",
+ "name": "WOODLAND APPROACH",
+ "size": [
+  640,
+  400
+ ],
+ "ground": "res://presentation/forest/woodland_approach_ground.png",
+ "outline": [
+  [
+   0,
+   230
+  ],
+  [
+   78,
+   230
+  ],
+  [
+   88,
+   214
+  ],
+  [
+   102,
+   196
+  ],
+  [
+   122,
+   176
+  ],
+  [
+   150,
+   152
+  ],
+  [
+   176,
+   128
+  ],
+  [
+   196,
+   114
+  ],
+  [
+   222,
+   100
+  ],
+  [
+   250,
+   84
+  ],
+  [
+   290,
+   74
+  ],
+  [
+   370,
+   74
+  ],
+  [
+   395,
+   88
+  ],
+  [
+   435,
+   108
+  ],
+  [
+   470,
+   130
+  ],
+  [
+   492,
+   165
+  ],
+  [
+   530,
+   200
+  ],
+  [
+   565,
+   220
+  ],
+  [
+   600,
+   224
+  ],
+  [
+   640,
+   230
+  ],
+  [
+   640,
+   264
+  ],
+  [
+   600,
+   272
+  ],
+  [
+   588,
+   292
+  ],
+  [
+   572,
+   322
+  ],
+  [
+   545,
+   342
+  ],
+  [
+   500,
+   348
+  ],
+  [
+   448,
+   348
+  ],
+  [
+   410,
+   338
+  ],
+  [
+   394,
+   310
+  ],
+  [
+   384,
+   270
+  ],
+  [
+   268,
+   270
+  ],
+  [
+   262,
+   310
+  ],
+  [
+   244,
+   336
+  ],
+  [
+   206,
+   348
+  ],
+  [
+   140,
+   348
+  ],
+  [
+   96,
+   336
+  ],
+  [
+   76,
+   310
+  ],
+  [
+   68,
+   266
+  ],
+  [
+   0,
+   266
+  ]
+ ],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "prop_margin": 40,
+ "entries": {
+  "west": [
+   24,
+   248
+  ],
+  "east": [
+   616,
+   248
+  ]
+ },
+ "default_entry": "west",
+ "exits": [
+  {
+   "id": "to_village",
+   "rect": [
+    0,
+    230,
+    7,
+    36
+   ],
+   "target_scene": "village_layered",
+   "target_entry": "return"
+  },
+  {
+   "id": "to_forest",
+   "rect": [
+    633,
+    230,
+    7,
+    34
+   ],
+   "target_scene": "forest_layered",
+   "target_entry": "village_side"
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "woodland_layered_west",
+   "position": [
+    36,
+    248
+   ]
+  },
+  {
+   "id": "woodland_layered_east",
+   "position": [
+    610,
+    246
+   ]
+  }
+ ],
+ "npcs": [],
+ "objects": [],
+ "encounters": [
+  {
+   "id": "mossling_clearing",
+   "name": "MOSSLING CLEARING",
+   "rect": [
+    80,
+    224,
+    180,
+    112
+   ],
+   "leash": 170,
+   "reward": {
+    "reward_id": "mossling_clearing_herbs",
+    "kind": "item",
+    "item": "herb",
+    "name": "Herb",
+    "quantity": 2
+   },
+   "mobs": [
+    {
+     "type": "mossling",
+     "x": 150,
+     "y": 272
+    },
+    {
+     "type": "mossling",
+     "x": 196,
+     "y": 298
+    },
+    {
+     "type": "mossling",
+     "x": 216,
+     "y": 262
+    }
+   ]
+  },
+  {
+   "id": "boar_clearing",
+   "name": "BOAR CLEARING",
+   "rect": [
+    390,
+    224,
+    180,
+    112
+   ],
+   "leash": 170,
+   "reward": {
+    "reward_id": "boar_clearing_herbs",
+    "kind": "item",
+    "item": "herb",
+    "name": "Herb",
+    "quantity": 3
+   },
+   "mobs": [
+    {
+     "type": "boar",
+     "x": 450,
+     "y": 262
+    },
+    {
+     "type": "boar",
+     "x": 495,
+     "y": 294
+    }
+   ]
+  },
+  {
+   "id": "camp_ambush",
+   "name": "ABANDONED CAMP",
+   "rect": [
+    248,
+    80,
+    144,
+    96
+   ],
+   "leash": 140,
+   "reward": {
+    "reward_id": "camp_ambush_herbs",
+    "kind": "item",
+    "item": "herb",
+    "name": "Herb",
+    "quantity": 2
+   },
+   "mobs": [
+    {
+     "type": "mossling",
+     "x": 290,
+     "y": 106
+    },
+    {
+     "type": "mossling",
+     "x": 344,
+     "y": 116
+    }
+   ]
+  }
+ ],
+ "props": [
+  {
+   "id": "prop_000",
+   "type": "woodland_tree_slender",
+   "x": 10,
+   "y": 70
+  },
+  {
+   "id": "prop_001",
+   "type": "woodland_tree_broad",
+   "x": 74,
+   "y": 70,
+   "flip": true
+  },
+  {
+   "id": "prop_002",
+   "type": "woodland_tree_slender",
+   "x": 138,
+   "y": 70
+  },
+  {
+   "id": "prop_003",
+   "type": "woodland_tree_broad",
+   "x": 202,
+   "y": 70
+  },
+  {
+   "id": "prop_004",
+   "type": "woodland_tree_broad",
+   "x": 266,
+   "y": 70,
+   "flip": true
+  },
+  {
+   "id": "prop_005",
+   "type": "woodland_tree_broad",
+   "x": 330,
+   "y": 70
+  },
+  {
+   "id": "prop_006",
+   "type": "woodland_tree_broad",
+   "x": 394,
+   "y": 70
+  },
+  {
+   "id": "prop_007",
+   "type": "woodland_tree_broad",
+   "x": 458,
+   "y": 70,
+   "flip": true
+  },
+  {
+   "id": "prop_008",
+   "type": "woodland_tree_broad",
+   "x": 522,
+   "y": 70
+  },
+  {
+   "id": "prop_009",
+   "type": "woodland_tree_slender",
+   "x": 586,
+   "y": 70
+  },
+  {
+   "id": "prop_010",
+   "type": "woodland_tree_broad",
+   "x": 650,
+   "y": 70,
+   "flip": true
+  },
+  {
+   "id": "prop_011",
+   "type": "woodland_tree_broad",
+   "x": 10,
+   "y": 205
+  },
+  {
+   "id": "prop_012",
+   "type": "woodland_tree_broad",
+   "x": 74,
+   "y": 205
+  },
+  {
+   "id": "prop_013",
+   "type": "woodland_tree_slender",
+   "x": 522,
+   "y": 205,
+   "flip": true
+  },
+  {
+   "id": "prop_014",
+   "type": "woodland_tree_slender",
+   "x": 586,
+   "y": 205
+  },
+  {
+   "id": "prop_015",
+   "type": "woodland_tree_slender",
+   "x": 650,
+   "y": 205
+  },
+  {
+   "id": "prop_016",
+   "type": "woodland_tree_slender",
+   "x": 10,
+   "y": 396,
+   "flip": true
+  },
+  {
+   "id": "prop_017",
+   "type": "woodland_tree_slender",
+   "x": 330,
+   "y": 396
+  },
+  {
+   "id": "prop_018",
+   "type": "woodland_tree_broad",
+   "x": 650,
+   "y": 396
+  },
+  {
+   "id": "prop_019",
+   "type": "woodland_tree_slender",
+   "x": 10,
+   "y": 435,
+   "flip": true
+  },
+  {
+   "id": "prop_020",
+   "type": "woodland_tree_slender",
+   "x": 650,
+   "y": 435
+  },
+  {
+   "id": "prop_021",
+   "type": "woodland_lantern",
+   "x": 48,
+   "y": 242
+  },
+  {
+   "id": "prop_022",
+   "type": "woodland_sign",
+   "x": 84,
+   "y": 210,
+   "flip": true
+  },
+  {
+   "id": "prop_025",
+   "type": "forest_chest",
+   "x": 320,
+   "y": 66,
+   "flip": true
+  },
+  {
+   "id": "prop_026",
+   "type": "woodland_lantern",
+   "x": 415,
+   "y": 202
+  },
+  {
+   "id": "prop_027",
+   "type": "woodland_rocks",
+   "x": 603,
+   "y": 224
+  },
+  {
+   "id": "prop_029",
+   "type": "woodland_bush",
+   "x": 345,
+   "y": 378
+  },
+  {
+   "id": "prop_030",
+   "type": "forest_flowers",
+   "x": 600,
+   "y": 350
+  },
+  {
+   "id": "prop_031",
+   "type": "forest_mushrooms",
+   "x": 218,
+   "y": 110,
+   "flip": true
+  },
+  {
+   "id": "prop_032",
+   "type": "woodland_bush",
+   "x": 42,
+   "y": 370
+  },
+  {
+   "id": "camp_chest",
+   "type": "forest_chest",
+   "x": 320,
+   "y": 216
+  },
+  {
+   "id": "camp_fire",
+   "type": "woodland_fire_ring",
+   "x": 295,
+   "y": 216
+  },
+  {
+   "id": "camp_bedroll",
+   "type": "woodland_bedroll",
+   "x": 360,
+   "y": 215
+  },
+  {
+   "id": "camp_supplies",
+   "type": "woodland_supplies",
+   "x": 320,
+   "y": 75
+  }
+ ]
+}

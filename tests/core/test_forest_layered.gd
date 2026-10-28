@@ -144,9 +144,8 @@ func test_the_scene_def_has_the_puzzle_and_the_route() -> void:
 	var targets: Array = []
 	for e: Dictionary in def["exits"]:
 		targets.append("%s>%s/%s" % [e["id"], e["target_scene"], e["target_entry"]])
-	assert_eq(targets, ["to_village>village_layered/return", "to_glade>glade_layered/entrance"], "the same exits as the painted forest, to the layered neighbours")
+	assert_eq(targets, ["to_village>woodland_layered/east", "to_glade>glade_layered/entrance"], "west back to the woodland, north to the glade")
 	assert_eq(SceneDefs.scene_of_checkpoint(&"forest_layered_puzzle"), SCENE, "the checkpoints belong to the scene")
-	assert_false(SceneDefs.get_def(SceneDefs.FOREST).has("puzzle"), "the painted forest has no puzzle: its pedestals do nothing")
 
 
 func test_lighting_both_pedestals_opens_the_gate() -> void:
@@ -179,17 +178,6 @@ func test_lighting_both_pedestals_opens_the_gate() -> void:
 	for e: GameEvent in core.last_events:
 		changed = changed or e.type == GameEvent.GATE_CHANGED
 	assert_true(changed, "gate_changed follows on the next step")
-
-
-func test_the_painted_forest_is_unchanged() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.FOREST)
-	for object: Dictionary in core.def["objects"]:
-		if object["kind"] == &"lantern_switch":
-			core.place_at(object["stand"])
-			core.step(InputFrame.new())
-			core.step(_press())
-	assert_false(core.gate_open, "E on the painted pedestals does not open the painted gate (it has no puzzle)")
-	assert_eq(core.snapshot().lit_switches.size(), 0, "and lights nothing")
 
 
 func test_a_saved_open_gate_comes_back_open_and_lit() -> void:

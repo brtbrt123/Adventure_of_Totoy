@@ -69,7 +69,7 @@ func _first_talk(core: ExploreCore, skip: bool) -> Array[GameEvent]:
 
 
 func test_the_hero_starts_unarmed_and_cannot_fight() -> void:
-	for scene: StringName in [SceneDefs.VILLAGE, SceneDefs.VILLAGE_LAYERED]:
+	for scene: StringName in [SceneDefs.VILLAGE_LAYERED, SceneDefs.VILLAGE_LAYERED]:
 		var core: ExploreCore = ExploreCore.new(scene)
 		assert_false(core.snapshot().armed, "%s: unarmed at the start" % scene)
 		core.place_at(_post_stand(core))
@@ -81,7 +81,7 @@ func test_the_hero_starts_unarmed_and_cannot_fight() -> void:
 
 
 func test_tovans_first_conversation_hands_over_the_sword_once() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	var events: Array[GameEvent] = _first_talk(core, false)
 	assert_eq(_count(events, &"item_received"), 1, "one receipt")
 	var got: GameEvent = null
@@ -108,14 +108,14 @@ func test_tovans_first_conversation_hands_over_the_sword_once() -> void:
 
 
 func test_skipping_the_conversation_still_hands_it_over() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	var events: Array[GameEvent] = _first_talk(core, true)
 	assert_eq(_count(events, &"item_received"), 1)
 	assert_true(core.snapshot().armed, "skip counts as heard and received")
 
 
 func test_a_new_core_from_the_save_does_not_receive_again() -> void:
-	var first: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var first: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	_first_talk(first, false)
 	var saved: Array[StringName] = first.story_flags.duplicate()
 	var again: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)  # another scene of the chapter
@@ -130,7 +130,7 @@ func test_a_new_core_from_the_save_does_not_receive_again() -> void:
 
 
 func test_an_older_save_that_met_tovan_is_armed_without_a_receipt() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	core.set_story_flags([&"met_tovan", &"lesson_dash"] as Array[StringName])
 	assert_true(core.snapshot().armed and core.has_flag(&"received_first_sword"), "migrated: the tutorial is not trapped")
 	core.step(_frame())
@@ -138,13 +138,13 @@ func test_an_older_save_that_met_tovan_is_armed_without_a_receipt() -> void:
 	core.place_at(_post_stand(core))
 	core.step(_frame())
 	assert_true(core.training.is_on(core.story_flags, core.player.position), "the post works for him")
-	var fresh: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var fresh: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	fresh.set_story_flags([&"met_mira"] as Array[StringName])
 	assert_false(fresh.snapshot().armed, "meeting Mira is not a sword")
 
 
 func test_other_npcs_give_nothing() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	for npc: StringName in [&"mira", &"edda", &"elder", &"child", &"worker"]:
 		_at(core, npc)
 		core.step(_frame(true))
@@ -157,19 +157,19 @@ func test_other_npcs_give_nothing() -> void:
 
 
 func test_the_post_wakes_after_the_handover_and_a_new_game_unarms() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	_first_talk(core, false)
 	core.place_at(_post_stand(core))
 	core.step(_frame())
 	assert_true(core.snapshot().training["active"], "the yard is open after the handover")
 	core.step(_frame(false, false, true))
 	assert_true(String(core.snapshot().hero.state).begins_with("attack"), "he swings")
-	var fresh: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)  # NEW GAME: no flags
+	var fresh: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)  # NEW GAME: no flags
 	assert_false(fresh.snapshot().armed)
 
 
 func test_the_snapshot_carries_the_real_combo_index_and_swing_speed() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	core.set_story_flags([&"received_first_sword"] as Array[StringName])
 	core.place_at(_post_stand(core))
 	core.step(_frame())

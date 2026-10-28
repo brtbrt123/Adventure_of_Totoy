@@ -1,11 +1,12 @@
 extends RefCounted
-## Exploration mode: the hero walking through one non-combat scene (chapter 1: village, forest route, Stag glade; the
-## arena works too, without the boss). No rendering. Presentation calls step() once per 60 Hz tick with an InputFrame,
+## Exploration mode: the hero walking through one scene of the chapter (village_layered, woodland_layered, forest_layered,
+## glade_layered; the arena works too, without the boss). No rendering. Presentation calls step() once per 60 Hz tick with an InputFrame,
 ## then reads snapshot() and last_events. Deterministic: same scene, entry and inputs = same result.
 ##
 ## The hero is the arena's Player (core/player.gd) fed only `move` and `dash_pressed`, so walking speed
 ## (Tuning.PLAYER_SPEED), the dash (DASH_SPEED, DASH_TICKS, DASH_COOLDOWN_TICKS) and facing are exactly the fight's;
-## states are idle, walk and dash only (no attacks, parries or skills in exploration). Movement is resolved against
+## states are idle, walk and dash, plus attack and parry where the scene allows fighting (below); no skills or weapon actives.
+## Movement is resolved against
 ## the scene's solid colliders with the same swept collision as the fight (core/collision.gd) and kept
 ## `margin` px inside the world.
 ##
@@ -22,6 +23,11 @@ extends RefCounted
 ## the post teaches dash, attack, parry and dodge and sets the `lesson_*` flags. Everywhere else those inputs are ignored.
 ## The hero starts unarmed: Tovan's first conversation hands him the Black Katana (flag `received_first_sword`, event `item_received`),
 ## and only an armed hero fights in the yard (`ExploreSnapshot.armed`).
+##
+## A scene with "encounters" (the Woodland Approach) has a MobField (core/mob_field.gd): an armed hero may attack and parry anywhere in it,
+## the mobs wake, chase and attack by their own rules, and the hero can fall (`hero_defeated`, then he stands up at the last checkpoint
+## HERO_DEFEAT_TICKS later with every uncleared encounter whole again). Clearing an encounter sets the flag `cleared_<id>` and pays its reward
+## into `inventory` (`item_received`); `use_herb_pressed` heals. docs/architecture.md "Chapter route, mobs and encounters".
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -32,10 +38,13 @@ const Collision := preload("res://core/collision.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
 const DialogueBook := preload("res://core/dialogue_book.gd")
 const TrainingYard := preload("res://core/training_yard.gd")
+const MobField := preload("res://core/mob_field.gd")
 
 ## The story flag that means the hero owns his first sword (Tovan's handover, DialogueBook grants). A save that has met Tovan
 ## but has no such flag is an older save from before the handover existed: it is treated as armed (set_story_flags).
 const ARMED_FLAG: StringName = &"received_first_sword"
+## The item that heals (Tuning.HERB_HEAL); encounters give it.
+const HERB_ITEM: StringName = &"herb"
 ## The hero can interact with an NPC or object when his centre is this close to its feet or its stand point.
 const INTERACT_RANGE: float = 24.0
 ## A checkpoint is reached when the hero's centre is this close to its point.
@@ -74,6 +83,14 @@ class ExploreSnapshot:
 	## warning in the fight's snapshot type (gold = parry it, red = dodge it); empty when the post rests.
 	var training: Dictionary = {}
 	var telegraphs: Array[Snapshots.TelegraphSnapshot] = []
+	## The scene's mobs and encounters (core/mob_field.gd mob_views / encounter_views); empty in a scene without "encounters". The mobs'
+	## warnings are in `telegraphs`.
+	var mobs: Array[Dictionary] = []
+	var encounters: Array[Dictionary] = []
+	## What the hero carries: {item id: count} (herbs from encounters). Presentation saves it (SaveProfile.inventory) on item_received and item_used.
+	var inventory: Dictionary = {}
+	## True from the tick the hero fell until he stands up again at the checkpoint (Tuning.HERO_DEFEAT_TICKS later).
+	var defeated: bool = false
 	var last_checkpoint: StringName = &""
 	## True from the tick an exit fired: the hero no longer moves; presentation changes scene.
 	var exiting: bool = false
@@ -106,6 +123,9 @@ var pending_exit: Dictionary = {}
 var interact_target: Dictionary = {}
 var npc_facing_left: Dictionary = {}  # npc id -> bool
 var training: TrainingYard = null  # the scene's practice post, if it has one
+var mobs: MobField = null  # the scene's encounters, if it has any
+var inventory: Dictionary = {}  # item id -> count
+var _defeat_ticks: int = 0  # ticks since the hero fell (0 = on his feet)
 var _talk: Dictionary = {}  # the running conversation: {npc_id, dialogue_id, index}; {} when none
 var _armed: Dictionary = {}  # exit id -> true once the hero has been outside it
 var _queued: Array[GameEvent] = []  # events raised between steps (gate changes), emitted with the next step
@@ -129,6 +149,7 @@ func _init(p_scene_id: StringName = SceneDefs.START_SCENE, entry: StringName = &
 	for npc: Dictionary in def["npcs"]:
 		npc_facing_left[npc["id"]] = bool(npc.get("face_left", false))
 	training = TrainingYard.for_scene(def)
+	mobs = MobField.for_scene(def)
 	_update_npcs()
 	interact_target = _find_interact_target()
 
@@ -175,6 +196,29 @@ func set_story_flags(flags: Array[StringName]) -> void:
 			story_flags.append(flag)
 	if story_flags.has(&"met_tovan") and not story_flags.has(ARMED_FLAG):
 		story_flags.append(ARMED_FLAG)  # an older save: Tovan was met before the handover existed; do not trap the tutorial
+	if mobs != null:
+		mobs.sync_flags(story_flags)  # a cleared encounter stays cleared
+
+
+## Replaces the inventory (CONTINUE from a save). No events. Unknown or empty counts are dropped.
+func set_inventory(items: Dictionary) -> void:
+	inventory.clear()
+	for key: Variant in items:
+		var count: int = clampi(int(items[key]), 0, Tuning.INVENTORY_MAX_STACK)
+		if count > 0:
+			inventory[StringName(str(key))] = count
+
+
+## The hero receives `reward` ({reward_id, kind, item, name, quantity}): the inventory grows (capped) and `item_received` follows,
+## the same event as a dialogue grant. `source` says where it came from (an encounter id).
+func give_item(reward: Dictionary, source: StringName, events: Array[GameEvent]) -> void:
+	var item: StringName = StringName(str(reward["item"]))
+	var quantity: int = int(reward.get("quantity", 1))
+	inventory[item] = mini(Tuning.INVENTORY_MAX_STACK, int(inventory.get(item, 0)) + quantity)
+	events.append(GameEvent.new(GameEvent.ITEM_RECEIVED, tick, {
+		"scene": scene_id, "reward_id": StringName(str(reward["reward_id"])), "kind": StringName(str(reward.get("kind", "item"))), "item_id": item,
+		"name": str(reward["name"]), "quantity": quantity, "source": source,
+	}))
 
 
 ## Sets a story flag (a new one emits `flag_set` with the next step). Returns true when it was new.
@@ -216,10 +260,11 @@ func step(input: InputFrame) -> void:
 	_queued.clear()
 	var frame: InputFrame = InputFrame.new()
 	var talking: bool = is_talking()
-	if not exiting and not talking:
+	var fallen: bool = player.state == PlayerState.STATE_DEAD
+	if not exiting and not talking and not fallen:
 		frame.move = input.move
 		frame.dash_pressed = input.dash_pressed
-		if training != null and training.is_on(story_flags, player.position):
+		if (training != null and training.is_on(story_flags, player.position)) or (mobs != null and is_armed()):
 			frame.attack_pressed = input.attack_pressed
 			frame.attack_held = input.attack_held
 			frame.parry_pressed = input.parry_pressed
@@ -229,6 +274,10 @@ func step(input: InputFrame) -> void:
 	player.position = _clamp(Collision.move_resolved(obstacles, before, player.position, Tuning.PLAYER_RADIUS))
 	if training != null:
 		training.resolve(self, events)
+	if mobs != null:
+		mobs.resolve(self, events)
+	_use_herb(input, talking, events)
+	_check_defeat(events)
 	if not exiting:
 		_check_checkpoints(events)
 		_check_exits(events)
@@ -285,6 +334,12 @@ func snapshot() -> ExploreSnapshot:
 	if training != null:
 		snap.training = training.view(self)
 		snap.telegraphs = training.telegraph_snapshots()
+	if mobs != null:
+		snap.mobs = mobs.mob_views(tick)
+		snap.encounters = mobs.encounter_views()
+		snap.telegraphs.append_array(mobs.telegraph_snapshots())
+	snap.inventory = inventory.duplicate()
+	snap.defeated = player.state == PlayerState.STATE_DEAD
 	snap.last_checkpoint = last_checkpoint
 	snap.exiting = exiting
 	snap.exit_target_scene = pending_exit.get("target_scene", &"")
@@ -295,6 +350,45 @@ func snapshot() -> ExploreSnapshot:
 	snap.checkpoints = def.get("checkpoints", []).duplicate(true)
 	snap.entries = def.get("entries", {}).duplicate()
 	return snap
+
+
+## A herb heals Tuning.HERB_HEAL hp (never above the maximum) and is used up; nothing happens at full health, with none left, while
+## talking, leaving or fallen.
+func _use_herb(input: InputFrame, talking: bool, events: Array[GameEvent]) -> void:
+	if not input.use_herb_pressed or talking or exiting or player.state == PlayerState.STATE_DEAD:
+		return
+	if int(inventory.get(HERB_ITEM, 0)) <= 0 or player.hp >= Tuning.PLAYER_MAX_HP:
+		return
+	var healed: int = mini(Tuning.HERB_HEAL, Tuning.PLAYER_MAX_HP - player.hp)
+	player.hp += healed
+	inventory[HERB_ITEM] = int(inventory[HERB_ITEM]) - 1
+	if int(inventory[HERB_ITEM]) <= 0:
+		inventory.erase(HERB_ITEM)
+	events.append(GameEvent.new(GameEvent.ITEM_USED, tick, {"scene": scene_id, "item_id": HERB_ITEM, "healed": healed, "hp": player.hp, "count": int(inventory.get(HERB_ITEM, 0))}))
+
+
+## The hero fell: `hero_defeated` on the first tick, then, Tuning.HERO_DEFEAT_TICKS later, he stands up at the last checkpoint (or the
+## entry he came in by) with full health and every uncleared encounter is whole again (`hero_respawned`).
+func _check_defeat(events: Array[GameEvent]) -> void:
+	if player.state != PlayerState.STATE_DEAD:
+		_defeat_ticks = 0
+		return
+	if _defeat_ticks == 0:
+		events.append(GameEvent.new(GameEvent.HERO_DEFEATED, tick, {"scene": scene_id, "position": player.position}))
+	_defeat_ticks += 1
+	if _defeat_ticks < Tuning.HERO_DEFEAT_TICKS:
+		return
+	var weapon: StringName = player.weapon_id
+	var aspects: Array[StringName] = player.equipped_aspects.duplicate()
+	player = PlayerState.new()
+	player.weapon_id = weapon
+	player.equipped_aspects = aspects
+	var c: Dictionary = SceneDefs.checkpoint(scene_id, last_checkpoint)
+	place_at(c["position"] if not c.is_empty() else def["entries"][entry_id])
+	_defeat_ticks = 0
+	if mobs != null:
+		mobs.reset_all(tick, &"defeat", events)
+	events.append(GameEvent.new(GameEvent.HERO_RESPAWNED, tick, {"scene": scene_id, "checkpoint_id": last_checkpoint if not c.is_empty() else &"", "position": player.position}))
 
 
 ## Starts the NPC's conversation for the flags set so far (nothing when it has none).

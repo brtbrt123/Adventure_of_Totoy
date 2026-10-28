@@ -7,6 +7,8 @@ const VERSION: int = 1  # equipped_aspects (2026-10-21) and scene_id / checkpoin
 const Aspects := preload("res://core/aspects.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
 const MAX_FLAGS: int = 64
+const MAX_ITEMS: int = 16
+const MAX_STACK: int = 99
 const RESULT_VICTORY: StringName = &"victory"
 const RESULT_DEFEAT: StringName = &"defeat"
 
@@ -27,6 +29,8 @@ var checkpoint_id: StringName = &""
 var gate_open: bool = false
 ## The story flags set by conversations (ExploreCore.story_flags), e.g. met_mira. Optional in the file: older saves have none.
 var story_flags: Array[StringName] = []
+## What the hero carries ({item id: count}, e.g. herb from an encounter). Optional in the file: older saves carry nothing.
+var inventory: Dictionary = {}
 ## Why this profile is a fresh one instead of a loaded one ("" when it was loaded or never saved before).
 var load_note: String = ""
 
@@ -50,6 +54,9 @@ func record_result(result: StringName, ticks: int) -> bool:
 
 ## Records where the player is: the scene and its last checkpoint (empty = none reached there yet).
 func record_scene(scene: StringName, checkpoint: StringName = &"") -> void:
+	var moved: Dictionary = SceneDefs.migrate_legacy(scene, checkpoint)  # a painted scene or checkpoint becomes its layered twin
+	scene = moved["scene"]
+	checkpoint = moved["checkpoint"]
 	scene_id = scene if SceneDefs.is_known(scene) else &""
 	checkpoint_id = checkpoint if scene_id != &"" and not SceneDefs.checkpoint(scene_id, checkpoint).is_empty() else &""
 
@@ -65,6 +72,7 @@ func reset_progress() -> void:
 	checkpoint_id = &""
 	gate_open = false
 	story_flags.clear()
+	inventory.clear()
 
 
 func to_dict() -> Dictionary:
@@ -81,7 +89,17 @@ func to_dict() -> Dictionary:
 		"checkpoint_id": String(checkpoint_id),
 		"gate_open": gate_open,
 		"story_flags": story_flags.map(func(flag: StringName) -> String: return String(flag)),
+		"inventory": _inventory_dict(),
 	}
+
+
+func _inventory_dict() -> Dictionary:
+	var out: Dictionary = {}
+	var keys: Array = inventory.keys()
+	keys.sort()  # a stable file
+	for key: Variant in keys:
+		out[String(key)] = int(inventory[key])
+	return out
 
 
 func to_json() -> String:
@@ -112,8 +130,7 @@ static func from_dict(data: Dictionary) -> Object:
 			profile.equipped_aspects.append(StringName(value))
 	var scene: Variant = data.get("scene_id", "")
 	var checkpoint: Variant = data.get("checkpoint_id", "")
-	var moved: Dictionary = SceneDefs.migrate_legacy(StringName(scene) if scene is String else &"", StringName(checkpoint) if checkpoint is String else &"")  # a save from the painted maps resumes on the layered ones
-	profile.record_scene(moved["scene"], moved["checkpoint"])
+	profile.record_scene(StringName(scene) if scene is String else &"", StringName(checkpoint) if checkpoint is String else &"")  # a save from the painted maps resumes on the layered ones (record_scene migrates)
 	var gate: Variant = data.get("gate_open", false)
 	profile.gate_open = gate if gate is bool else false
 	var flags: Variant = data.get("story_flags", [])
@@ -121,6 +138,12 @@ static func from_dict(data: Dictionary) -> Object:
 		for flag: Variant in flags:
 			if flag is String and _is_flag(flag) and profile.story_flags.size() < MAX_FLAGS and not profile.story_flags.has(StringName(flag)):
 				profile.story_flags.append(StringName(flag))
+	var items: Variant = data.get("inventory", {})
+	if items is Dictionary:
+		for key: Variant in items:
+			var count: Variant = items[key]
+			if key is String and _is_flag(key) and (count is int or count is float) and profile.inventory.size() < MAX_ITEMS and int(count) > 0:
+				profile.inventory[StringName(key)] = mini(int(count), MAX_STACK)
 	return profile
 
 

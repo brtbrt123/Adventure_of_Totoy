@@ -3,7 +3,8 @@ extends RefCounted
 ## places and colliders come from two plain JSON files that core and presentation both read, so what blocks the hero
 ## and what is drawn never disagree (docs/architecture.md "Layered scenes", docs/LAYERED_SCENE_PILOT.md).
 ##
-##   prop DEFS   data/props/prop_defs.json  (written by tools/art/extract_props.py; "locked" entries are hand-tuned)
+##   prop DEFS   data/props/prop_defs.json  (written by tools/art/extract_props.py; "locked" entries are hand-tuned), plus
+##               data/props/prop_defs_woodland.json (the Woodland Approach props, same format, merged by load_defs())
 ##     {"version": 1, "props": {"<type>": {"image", "w", "h", "anchor": [ax, ay], "base_width", "solid",
 ##                                         "colliders": [[dx, dy, r], ...]}}}
 ##     anchor = the middle of the base, in sprite pixels from the sprite's top left; colliders are circles relative to
@@ -18,7 +19,9 @@ extends RefCounted
 ##      target_scene, target_entry}], "checkpoints": [{id, position}], "npcs": [{id, visual, position (where the person
 ##      stands), face_left}], "objects": [{id, kind (chest, door, dummy, ...), position (its feet), stand (where the hero
 ##      uses it from, in front)}] (the props that are interactable stay ordinary props; the object row says how to use
-##      them), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
+##      them), "encounters": [{id, name, rect [x, y, w, h], leash, reward {reward_id, kind, item, name, quantity},
+##      mobs [{type, x, y}]}] (the mobs of a scene, core/mob_field.gd), "prop_margin" (props may stand this far outside the
+##      world: trees hanging over the edge), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
 ##
 ##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>",
 ##     "on_type": "<type>"}. `states` = {"gate_open": bool, "lit": [switch ids]} (ExploreCore owns it; ExploreSnapshot
@@ -30,6 +33,8 @@ const Obstacle := preload("res://core/obstacle.gd")
 const SceneBounds := preload("res://core/scene_bounds.gd")
 
 const DEFS_PATH: String = "res://data/props/prop_defs.json"
+## Catalogues of later areas, merged into the main one by load_defs() (a type in the main file wins).
+const EXTRA_DEFS_PATHS: Array[String] = ["res://data/props/prop_defs_woodland.json"]
 
 
 ## Reads a JSON file into a Dictionary; empty when it is missing or not an object (callers validate()).
@@ -41,7 +46,15 @@ static func read_json(path: String) -> Dictionary:
 
 
 static func load_defs(path: String = DEFS_PATH) -> Dictionary:
-	return read_json(path)
+	var defs: Dictionary = read_json(path)
+	if path != DEFS_PATH or defs.is_empty():
+		return defs
+	for extra: String in EXTRA_DEFS_PATHS:
+		var more: Dictionary = read_json(extra).get("props", {})
+		for type_id: Variant in more:
+			if not defs["props"].has(type_id):
+				defs["props"][type_id] = more[type_id]
+	return defs
 
 
 static func load_scene(path: String) -> Dictionary:
@@ -159,6 +172,7 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 	var result: Dictionary = {"id": id, "name": str(scene.get("name", "")), "size": size(scene), "margin": margin, "entries": entries,
 		"default_entry": StringName(str(scene.get("default_entry", ""))), "exits": exits, "checkpoints": checkpoints,
 		"npcs": npcs, "objects": objects}
+	result["encounters"] = scene.get("encounters", []).duplicate(true)  # raw rows: core/mob_field.gd reads them
 	if scene.has("puzzle"):  # {"switches": [object ids]}: lighting them all opens the gate (ExploreCore)
 		var switches: Array[StringName] = []
 		for switch_id: Variant in scene["puzzle"].get("switches", []):
@@ -247,7 +261,8 @@ static func validate(scene: Dictionary, defs: Dictionary) -> PackedStringArray:
 			errors.append_array(_validate_state_row(id, p, types, scene))
 		var x: float = float(p.get("x", -1))
 		var y: float = float(p.get("y", -1))
-		if x < 0.0 or y < 0.0 or x > world.x or y > world.y:
+		var slack: float = float(scene.get("prop_margin", 0.0))
+		if x < -slack or y < -slack or x > world.x + slack or y > world.y + slack:
 			errors.append("prop %s: anchor outside the world" % id)
 	return errors
 

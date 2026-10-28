@@ -93,36 +93,27 @@ func test_the_renderer_takes_the_placements_as_they_are() -> void:
 		assert_eq(landed, p["feet"].round(), "%s: the anchor lands on the feet" % item["id"])
 
 
-func test_the_cast_and_spots_match_the_painted_village() -> void:
-	var painted: Dictionary = SceneDefs.get_def(SceneDefs.VILLAGE)
+func test_the_cast_and_spots() -> void:
 	var layered: Dictionary = SceneDefs.get_def(SCENE)
 	assert_eq(layered["id"], SCENE)
 	assert_true(SceneDefs.is_known(SCENE), "known to the scene table")
-	assert_false(SCENE in SceneDefs.IDS, "not in the painted IDS (the painted village is the retired twin)")
-	assert_eq(layered["size"], Vector2(571, 336), "the ground's size is the painted village's")
-	assert_eq(layered["name"], painted["name"], "same display name")
-	# sort Strings, not StringNames (Godot orders StringNames by address: the order changes with what else is loaded)
-	var painted_ids: Array = []
-	for n: Dictionary in painted["npcs"]:
-		painted_ids.append(String(n["id"]))
+	assert_false(SCENE in SceneDefs.IDS, "not among the non-layered scenes")
+	assert_eq(layered["size"], Vector2(571, 336), "the ground's size")
+	assert_eq(layered["name"], "LANTERNFEN", "the display name")
+	var visuals: Dictionary = {"mira": "npc_mira", "tovan": "npc_tovan", "edda": "npc_edda", "elder": "npc_elder", "child": "npc_child", "worker": "npc_worker"}
 	var ids: Array = []
 	for n: Dictionary in layered["npcs"]:
 		ids.append(String(n["id"]))
-		for pn: Dictionary in painted["npcs"]:
-			if pn["id"] == n["id"]:
-				assert_eq(n["visual"], pn["visual"], "%s keeps its sprite" % n["id"])
-	painted_ids.sort()
+		assert_eq(String(n["visual"]), visuals[String(n["id"])], "%s keeps its sprite" % n["id"])
 	ids.sort()
-	assert_eq(ids, painted_ids, "the same six people")
-	var painted_objects: Array = []
-	for o: Dictionary in painted["objects"]:
-		painted_objects.append(String(o["id"]) + ":" + String(o["kind"]))
+	var expected: Array = visuals.keys()
+	expected.sort()
+	assert_eq(ids, expected, "the six people")
 	var objects: Array = []
 	for o: Dictionary in layered["objects"]:
 		objects.append(String(o["id"]) + ":" + String(o["kind"]))
-	painted_objects.sort()
 	objects.sort()
-	assert_eq(objects, painted_objects, "the same chest, door and training dummy interactions")
+	assert_eq(objects, ["chest:chest", "edda_door:door", "training_dummy:dummy"], "the chest, door and training dummy interactions")
 	var keys: Array = []
 	for key: Variant in layered["entries"]:
 		keys.append(String(key))
@@ -130,8 +121,8 @@ func test_the_cast_and_spots_match_the_painted_village() -> void:
 	assert_eq(keys, ["arrival", "return"], "the same entries")
 	assert_eq(layered["default_entry"], &"arrival")
 	assert_eq(layered["exits"].size(), 1, "one exit")
-	assert_eq(layered["exits"][0]["target_scene"], SceneDefs.FOREST_LAYERED, "the east exit leads to the layered forest")
-	assert_eq(layered["exits"][0]["target_entry"], painted["exits"][0]["target_entry"], "and the same entry")
+	assert_eq(layered["exits"][0]["target_scene"], SceneDefs.WOODLAND_LAYERED, "the east exit leads to the woodland approach")
+	assert_eq(layered["exits"][0]["target_entry"], &"west", "at its west end")
 	assert_true(SceneDefs.get_def(layered["exits"][0]["target_scene"])["entries"].has(layered["exits"][0]["target_entry"]), "that entry exists")
 	assert_eq(SceneDefs.scene_of_checkpoint(&"village_layered_gate"), SCENE, "the checkpoint belongs to the scene")
 	assert_true(layered["entries"][&"return"].x > 500.0, "the return entry is by the east road")

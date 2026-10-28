@@ -383,3 +383,42 @@ const CHARGE_WIDTH: float = 28.0
 const CHARGE_ACTIVE_TICKS: int = 8
 const CHARGE_DAMAGE: int = 28
 const CHARGE_RECOVER_TICKS: int = 34
+
+# Mobs (core/mob_field.gd): the regular enemies of the exploration scenes (chapter 1: Mossling, Thornback Boar). Every type
+# has at most two attacks and obeys the gold/red rule (gold lunge = parry it, red charge = dash it). No randomness.
+#   hp, radius (body circle), speed (chase px/tick), aggro (the hero this close wakes the whole encounter), tether (a mob
+#   that gets this far from home gives up), hold (it stops chasing this far from the hero), wait (it holds this far away while
+#   two others attack)
+#   attack: kind (gold or red), start_min/start_max (the hero's distance that starts it), windup (warning ticks, aim locked on the
+#   first one), strike_ticks and strike_speed (the lunge/charge: px per tick), width (warning lane), damage, recover (ticks after a
+#   miss), cooldown (ticks before it may start another), interrupt (a normal hit during the windup cancels it), crash (the
+#   charge stops at a prop and the mob is stunned and exposed this long; 0 = no crash)
+const MOBS: Dictionary = {
+	&"mossling": {
+		"hp": 30, "radius": 6.0, "speed": 0.65, "aggro": 84.0, "tether": 230.0, "hold": 24.0, "wait": 56.0,
+		"attack": {"id": &"lunge", "kind": &"gold", "start_min": 14.0, "start_max": 50.0, "windup": 36, "strike_ticks": 10, "strike_speed": 5.2,
+			"width": 18.0, "damage": 12, "recover": 36, "cooldown": 70, "interrupt": true, "crash": 0},
+	},
+	&"boar": {
+		"hp": 70, "radius": 9.0, "speed": 0.55, "aggro": 110.0, "tether": 260.0, "hold": 100.0, "wait": 110.0,
+		"attack": {"id": &"charge", "kind": &"red", "start_min": 56.0, "start_max": 140.0, "windup": 50, "strike_ticks": 38, "strike_speed": 3.4,
+			"width": 24.0, "damage": 20, "recover": 40, "cooldown": 90, "interrupt": false, "crash": 70},
+	},
+}
+const MOB_MAX_ATTACKERS: int = 2  # mobs of one encounter that may wind up or strike at the same time
+const MOB_FIRST_COOLDOWN: int = 30  # a woken mob waits this long, plus MOB_COOLDOWN_STAGGER x its place, before its first attack
+const MOB_COOLDOWN_STAGGER: int = 25
+const MOB_ALERT_TICKS: int = 24  # the pause when the pack wakes
+const MOB_HURT_TICKS: int = 10  # a hit that did not cancel anything staggers the mob's walk this long
+const MOB_STAGGER_TICKS: int = 90  # a mob whose lunge was parried is stunned and exposed this long
+const MOB_EXPOSED_MULT: float = 3.0  # damage multiplier on an exposed mob (parried or crashed)
+const MOB_DEATH_TICKS: int = 40  # a defeated mob stays in the snapshot (state dead) this long
+const MOB_RETURN_SPEED_MULT: float = 1.6  # a mob walking home
+const MOB_LEASH_GRACE_TICKS: int = 60  # the hero outside the encounter's leash this long: the mobs give up and walk home
+const MOB_RESET_TICKS: int = 240  # ...and this long: an uncleared encounter is whole again (dead mobs return)
+const MOB_SEPARATION_PUSH: float = 0.5
+
+# Hero in exploration: death and healing items.
+const HERO_DEFEAT_TICKS: int = 120  # from the hero's death to his return at the last checkpoint
+const HERB_HEAL: int = 35
+const INVENTORY_MAX_STACK: int = 99

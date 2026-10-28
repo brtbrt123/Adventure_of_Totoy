@@ -1,7 +1,7 @@
 extends RefCounted
-## Shared helpers for the painted chapter scenes (core/forest_layout.gd, core/glade_layout.gd): the forest-edge chain
+## Shared helpers for the walkable scenes (core/prop_scene.gd, core/arena_layout.gd): the forest-edge chain
 ## of circles along a walkable outline and a walkability test, the same construction as core/arena_layout.gd
-## (boundary_centres) so every painted scene uses one collider model. Static functions only; no state.
+## (boundary_centres) so every scene uses one collider model. Static functions only; no state.
 const Obstacle := preload("res://core/obstacle.gd")
 
 

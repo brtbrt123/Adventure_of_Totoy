@@ -5,7 +5,7 @@ extends "res://tests/test_case.gd"
 const Collision := preload("res://core/collision.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const ArenaLayout := preload("res://core/arena_layout.gd")
-const VillageLayout := preload("res://core/village_layout.gd")
+const SceneDefs := preload("res://core/scene_defs.gd")
 
 
 # --- the pre-extraction GameCore code, copied verbatim (as static reference functions) ---
@@ -75,9 +75,9 @@ func test_the_shared_helper_gives_the_old_results() -> void:
 
 
 func test_clamp_point_keeps_a_body_inside_the_box_and_out_of_props() -> void:
-	var obstacles: Array[Obstacle] = VillageLayout.build()
+	var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(SceneDefs.VILLAGE_LAYERED)
 	var low: Vector2 = Vector2(6, 6)
-	var high: Vector2 = VillageLayout.VILLAGE_SIZE - low
+	var high: Vector2 = SceneDefs.get_def(SceneDefs.VILLAGE_LAYERED)["size"] - low
 	for o: Obstacle in obstacles:
 		var p: Vector2 = Collision.clamp_point(obstacles, o.center, 6.0, low, high)
 		assert_true(p.x >= low.x and p.y >= low.y and p.x <= high.x and p.y <= high.y, "inside the box")

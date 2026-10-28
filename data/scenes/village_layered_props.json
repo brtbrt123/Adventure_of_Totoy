@@ -131,8 +131,8 @@
     6,
     42
    ],
-   "target_scene": "forest_layered",
-   "target_entry": "village_side"
+   "target_scene": "woodland_layered",
+   "target_entry": "west"
   }
  ],
  "checkpoints": [

@@ -77,3 +77,22 @@ func _init(p_type: StringName = &"", p_tick: int = 0, p_data: Dictionary = {}) -
 	type = p_type
 	tick = p_tick
 	data = p_data
+## Mobs (core/mob_field.gd). `encounter_started` {scene, encounter_id}; `mob_alerted` {scene, mob_id, type, encounter_id, position} (the pack
+## woke); `mob_staggered` {scene, mob_id, reason (parry or crash), position}; `mob_defeated` {scene, mob_id, type, encounter_id, position};
+## `mob_leashed` {scene, mob_id, encounter_id} (it gave up and walks home); `encounter_reset` {scene, encounter_id, reason (leash or defeat)};
+## `encounter_cleared` {scene, encounter_id, reward_id}. A mob's warning is `attack_telegraphed` (owner_id = mob id); the hero's blows are
+## `attack_hit` {attacker_id, target_id (mob id), damage, kind (normal or counter), position, combo_index, weapon_id}; his wounds are
+## `damage_taken` {entity_id, amount, source_id (mob id)}; a parry is `parry_succeeded` {attacker_id (mob id), ...} as at the post.
+const ENCOUNTER_STARTED: StringName = &"encounter_started"
+const MOB_ALERTED: StringName = &"mob_alerted"
+const MOB_STAGGERED: StringName = &"mob_staggered"
+const MOB_DEFEATED: StringName = &"mob_defeated"
+const MOB_LEASHED: StringName = &"mob_leashed"
+const ENCOUNTER_RESET: StringName = &"encounter_reset"
+const ENCOUNTER_CLEARED: StringName = &"encounter_cleared"
+## The hero fell (`hero_defeated` {scene, position}) and, HERO_DEFEAT_TICKS later, stood up at the last checkpoint with full health
+## (`hero_respawned` {scene, checkpoint_id, position}); every uncleared encounter of the scene is whole again.
+const HERO_DEFEATED: StringName = &"hero_defeated"
+const HERO_RESPAWNED: StringName = &"hero_respawned"
+## An item was used: {scene, item_id, healed, hp, count (left)}.
+const ITEM_USED: StringName = &"item_used"

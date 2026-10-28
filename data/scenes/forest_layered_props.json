@@ -147,8 +147,8 @@
     7,
     40
    ],
-   "target_scene": "village_layered",
-   "target_entry": "return"
+   "target_scene": "woodland_layered",
+   "target_entry": "east"
   },
   {
    "id": "to_glade",

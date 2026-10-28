@@ -53,7 +53,7 @@ func _talk_through(core: ExploreCore) -> int:
 
 func test_the_book_is_valid_for_every_scene() -> void:
 	var npcs: Array[StringName] = []
-	for scene: StringName in SceneDefs.IDS + SceneDefs.LAYERED:
+	for scene: StringName in SceneDefs.ALL:
 		for row: Dictionary in SceneDefs.get_def(scene)["npcs"]:
 			if not npcs.has(row["id"]):
 				npcs.append(row["id"])
@@ -82,7 +82,7 @@ func test_the_flags_choose_the_dialogue() -> void:
 
 
 func test_interact_on_an_npc_starts_the_conversation_and_stops_the_hero() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"mira")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"mira")
 	core.step(_frame(Vector2.ZERO, true))
 	assert_true(core.is_talking(), "talking")
 	assert_true(&"interact" in _types(core) and &"dialogue_started" in _types(core), "interact and dialogue_started")
@@ -100,7 +100,7 @@ func test_interact_on_an_npc_starts_the_conversation_and_stops_the_hero() -> voi
 
 
 func test_interact_shows_each_line_then_ends_and_sets_the_flags_once() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"mira")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"mira")
 	core.step(_frame(Vector2.ZERO, true))
 	var count: int = int(core.snapshot().dialogue["count"])
 	var seen: Array[String] = [String(core.snapshot().dialogue["text"])]
@@ -127,7 +127,7 @@ func test_interact_shows_each_line_then_ends_and_sets_the_flags_once() -> void:
 
 
 func test_skip_ends_the_conversation_and_still_sets_the_flags() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"edda")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"edda")
 	core.step(_frame(Vector2.ZERO, true))
 	core.step(_frame(Vector2.ZERO, false, true))
 	assert_false(core.is_talking())
@@ -140,14 +140,14 @@ func test_skip_ends_the_conversation_and_still_sets_the_flags() -> void:
 
 
 func test_skip_does_nothing_when_nobody_talks() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"mira")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"mira")
 	core.step(_frame(Vector2.ZERO, false, true))
 	assert_false(core.is_talking())
 	assert_eq(core.last_events.size(), 0)
 
 
 func test_the_second_talk_plays_the_follow_up_and_flags_are_never_set_twice() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"mira")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"mira")
 	core.step(_frame(Vector2.ZERO, true))
 	_talk_through(core)
 	core.step(_frame(Vector2.ZERO, true))
@@ -158,7 +158,7 @@ func test_the_second_talk_plays_the_follow_up_and_flags_are_never_set_twice() ->
 
 
 func test_conversations_unlock_each_other_across_npcs() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"edda")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"edda")
 	core.step(_frame(Vector2.ZERO, true))
 	_talk_through(core)
 	for row: Dictionary in core.def["npcs"]:
@@ -170,7 +170,7 @@ func test_conversations_unlock_each_other_across_npcs() -> void:
 
 
 func test_objects_and_scenes_without_npcs_start_no_conversation() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.FOREST)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.FOREST_LAYERED)
 	core.place_at(core.def["objects"][0]["stand"])
 	core.step(_frame())
 	core.step(_frame(Vector2.ZERO, true))
@@ -181,7 +181,7 @@ func test_objects_and_scenes_without_npcs_start_no_conversation() -> void:
 
 
 func test_set_flag_and_set_story_flags() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE)
+	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	assert_true(core.set_flag(&"stag_bound"))
 	assert_false(core.set_flag(&"stag_bound"), "a flag is new once")
 	core.step(_frame())
@@ -192,7 +192,7 @@ func test_set_flag_and_set_story_flags() -> void:
 
 
 func test_a_restored_flag_changes_what_the_npc_says() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"tovan")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"tovan")
 	core.set_story_flags([&"met_tovan"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_again")
@@ -231,7 +231,7 @@ func test_a_damaged_save_cannot_poison_the_flags() -> void:
 func test_the_conversation_is_deterministic() -> void:
 	var runs: Array[String] = []
 	for n: int in 2:
-		var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"edda")
+		var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"edda")
 		var log: Array[String] = []
 		for i: int in 12:
 			core.step(_frame(Vector2.RIGHT if i % 3 == 0 else Vector2.ZERO, i % 2 == 0, i == 9))
@@ -241,7 +241,7 @@ func test_the_conversation_is_deterministic() -> void:
 
 
 func test_tovan_and_edda_follow_the_lessons() -> void:
-	var core: ExploreCore = _beside(SceneDefs.VILLAGE, &"tovan")
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"tovan")
 	core.set_story_flags([&"met_tovan"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_again", "lessons not done: the reminder")

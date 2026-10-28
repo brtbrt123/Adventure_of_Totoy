@@ -1,0 +1,379 @@
+{
+ "version": 1,
+ "note": "Production defs of the Woodland Approach props (2026-10-28): size, anchor, base colliders read from the approved sprites. Merged into the catalogue by PropScene.load_defs(); presentation/common/prop_art.json carries their art metadata (Codex merges art/reference/woodland_approach_v1/review_prop_art.json).",
+ "props": {
+  "woodland_tree_broad": {
+   "w": 108,
+   "h": 102,
+   "anchor": [
+    54,
+    102
+   ],
+   "base_width": 58,
+   "solid": true,
+   "colliders": [
+    [
+     -22.0,
+     -5,
+     7
+    ],
+    [
+     -12.5,
+     -5,
+     7
+    ],
+    [
+     -3.0,
+     -5,
+     7
+    ],
+    [
+     6.5,
+     -5,
+     7
+    ],
+    [
+     16.0,
+     -5,
+     7
+    ]
+   ],
+   "image": "woodland_tree_broad.png",
+   "locked": true,
+   "note": "trunk base and the exposed roots; the canopy stays walk-behind (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_tree_slender": {
+   "w": 62,
+   "h": 99,
+   "anchor": [
+    31,
+    99
+   ],
+   "base_width": 30,
+   "solid": true,
+   "colliders": [
+    [
+     -9.0,
+     -4,
+     6
+    ],
+    [
+     -1.5,
+     -4,
+     6
+    ],
+    [
+     6.0,
+     -4,
+     6
+    ]
+   ],
+   "image": "woodland_tree_slender.png",
+   "locked": true,
+   "note": "slim trunk base; the canopy stays walk-behind (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_bush": {
+   "w": 60,
+   "h": 41,
+   "anchor": [
+    30,
+    41
+   ],
+   "base_width": 30,
+   "solid": false,
+   "colliders": [],
+   "image": "woodland_bush.png",
+   "locked": true,
+   "note": "bush: decor (walk through), like the forest bushes (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_brambles": {
+   "w": 68,
+   "h": 49,
+   "anchor": [
+    34,
+    49
+   ],
+   "base_width": 48,
+   "solid": true,
+   "colliders": [
+    [
+     -17.0,
+     -4,
+     7
+    ],
+    [
+     -9.2,
+     -4,
+     7
+    ],
+    [
+     -1.5,
+     -4,
+     7
+    ],
+    [
+     6.2,
+     -4,
+     7
+    ],
+    [
+     14.0,
+     -4,
+     7
+    ]
+   ],
+   "image": "woodland_brambles.png",
+   "locked": true,
+   "note": "brambles (solid, like the forest thorns) (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_rocks": {
+   "w": 70,
+   "h": 39,
+   "anchor": [
+    35,
+    39
+   ],
+   "base_width": 54,
+   "solid": true,
+   "colliders": [
+    [
+     -14.0,
+     -5,
+     7
+    ],
+    [
+     -5.5,
+     -5,
+     7
+    ],
+    [
+     3.0,
+     -5,
+     7
+    ],
+    [
+     11.5,
+     -5,
+     7
+    ],
+    [
+     20.0,
+     -5,
+     7
+    ]
+   ],
+   "image": "woodland_rocks.png",
+   "locked": true,
+   "note": "rock pile footprint (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_log": {
+   "w": 70,
+   "h": 34,
+   "anchor": [
+    35,
+    34
+   ],
+   "base_width": 54,
+   "solid": true,
+   "colliders": [
+    [
+     -17.0,
+     -4,
+     7
+    ],
+    [
+     -7.8,
+     -4,
+     7
+    ],
+    [
+     1.5,
+     -4,
+     7
+    ],
+    [
+     10.8,
+     -4,
+     7
+    ],
+    [
+     20.0,
+     -4,
+     7
+    ]
+   ],
+   "image": "woodland_log.png",
+   "locked": true,
+   "note": "fallen log (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_stump": {
+   "w": 73,
+   "h": 46,
+   "anchor": [
+    36,
+    46
+   ],
+   "base_width": 56,
+   "solid": true,
+   "colliders": [
+    [
+     -11.0,
+     -4,
+     7
+    ],
+    [
+     -3.0,
+     -4,
+     7
+    ],
+    [
+     5.0,
+     -4,
+     7
+    ],
+    [
+     13.0,
+     -4,
+     7
+    ],
+    [
+     21.0,
+     -4,
+     7
+    ]
+   ],
+   "image": "woodland_stump.png",
+   "locked": true,
+   "note": "stump with roots (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_lantern": {
+   "w": 30,
+   "h": 59,
+   "anchor": [
+    15,
+    59
+   ],
+   "base_width": 16,
+   "solid": true,
+   "colliders": [
+    [
+     4.5,
+     -3,
+     3.5
+    ]
+   ],
+   "image": "woodland_lantern.png",
+   "locked": true,
+   "note": "lantern post: one small circle at its foot (the pole stands right of the sprite centre) (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_sign": {
+   "w": 40,
+   "h": 56,
+   "anchor": [
+    20,
+    56
+   ],
+   "base_width": 10,
+   "solid": true,
+   "colliders": [
+    [
+     1,
+     -3,
+     4
+    ]
+   ],
+   "image": "woodland_sign.png",
+   "locked": true,
+   "note": "wooden sign: one small circle at the post (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_fire_ring": {
+   "w": 63,
+   "h": 34,
+   "anchor": [
+    32,
+    34
+   ],
+   "base_width": 44,
+   "solid": true,
+   "colliders": [
+    [
+     -15.0,
+     -6,
+     7
+    ],
+    [
+     -5.7,
+     -6,
+     7
+    ],
+    [
+     3.7,
+     -6,
+     7
+    ],
+    [
+     13.0,
+     -6,
+     7
+    ]
+   ],
+   "image": "woodland_fire_ring.png",
+   "locked": true,
+   "note": "stone fire ring (the walk-around is the base line) (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_bedroll": {
+   "w": 55,
+   "h": 27,
+   "anchor": [
+    28,
+    27
+   ],
+   "base_width": 27,
+   "solid": false,
+   "colliders": [],
+   "image": "woodland_bedroll.png",
+   "locked": true,
+   "note": "bedroll: flat, walk over it (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  },
+  "woodland_supplies": {
+   "w": 65,
+   "h": 42,
+   "anchor": [
+    32,
+    42
+   ],
+   "base_width": 52,
+   "solid": true,
+   "colliders": [
+    [
+     -13.0,
+     -5,
+     7
+    ],
+    [
+     -5.0,
+     -5,
+     7
+    ],
+    [
+     3.0,
+     -5,
+     7
+    ],
+    [
+     11.0,
+     -5,
+     7
+    ],
+    [
+     19.0,
+     -5,
+     7
+    ]
+   ],
+   "image": "woodland_supplies.png",
+   "locked": true,
+   "note": "stacked crates and sacks (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+  }
+ }
+}
