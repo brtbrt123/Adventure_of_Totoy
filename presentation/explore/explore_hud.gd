@@ -122,7 +122,8 @@ var item_flash_tick: int = -1000
 var shown_level: int = 0
 var combat_scene: StringName = &""
 func sync_combat(value: ExploreCore.ExploreSnapshot) -> void:
-	var changed: bool = combat_scene != value.scene_id
+	var changed: bool = combat_scene != value.scene_id or (combat != null and value.tick < combat.tick)
+	if changed:reset_combat_feedback()
 	combat = value
 	combat_scene = value.scene_id
 	var target: float = 1.0 if value.exp_to_next == 0 else clampf(float(value.exp)/value.exp_to_next,0.0,1.0)
@@ -130,6 +131,14 @@ func sync_combat(value: ExploreCore.ExploreSnapshot) -> void:
 	elif shown_level != value.level: exp_fill = 0.0
 	else: exp_fill = move_toward(exp_fill,target,0.035)
 	shown_level = value.level
+func reset_combat_feedback() -> void:
+	exp_glow_tick = -1000
+	level_up_tick = -1000
+	item_flash_tick = -1000
+static func feedback_active(now: int, started: int, duration: int) -> bool:
+	return started>=0 and now>=started and now-started<duration
+func level_banner_visible() -> bool:
+	return combat != null and feedback_active(combat.tick,level_up_tick,65)
 func combat_event(event: GameEvent) -> void:
 	match event.type:
 		GameEvent.EXP_GAINED: exp_glow_tick = event.tick
@@ -170,9 +179,9 @@ func _draw_combat() -> void:
 	draw_rect(Rect2(12,117-height,4,height),colors["u"])
 	if height>0:draw_rect(Rect2(12,117-height,4,1),colors["p"])
 	centered(14,127,"MAX" if combat.exp_to_next==0 else "EXP",colors["o"],colors["0"],1,ui_font(),7)
-	if combat.tick-exp_glow_tick<24:UiPanel.outline(self,Rect2(7,46,14,78),colors["p"])
-	if combat.tick-item_flash_tick<15:UiPanel.outline(self,Rect2(177,149,26,26),colors["u"])
-	if combat.tick-level_up_tick<65:
+	if feedback_active(combat.tick,exp_glow_tick,24):UiPanel.outline(self,Rect2(7,46,14,78),colors["p"])
+	if feedback_active(combat.tick,item_flash_tick,15):UiPanel.outline(self,Rect2(177,149,26,26),colors["u"])
+	if level_banner_visible():
 		UiPanel.draw_panel(self,Rect2(120,22,80,14),&"info",colors,false)
 		centered(160,26,"LEVEL UP",colors["p"],colors["0"],1,ui_font(),8)
 	if combat.defeated:

@@ -183,6 +183,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 		core = ExploreCore.at_checkpoint(scene, checkpoint, gate_open) as ExploreCore
 	else:
 		core = ExploreCore.new(scene, entry, gate_open)
+	hud.reset_combat_feedback()
 	core.set_story_flags(profile.story_flags)
 	core.set_inventory(profile.inventory)
 	core.set_exp(profile.exp_total)
