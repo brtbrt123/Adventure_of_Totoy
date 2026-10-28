@@ -5,7 +5,7 @@ const Tuning := preload("res://core/tuning.gd")
 const WHITE := preload("res://art/build/sprites_white.png")
 const STATES: Dictionary = {
  "mossling": {"idle":["idle",4,12,true], "alert":["spawn",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["attack_tell",3,1,false], "strike":["attack_lunge",3,3,false], "recover":["attack_recover",3,8,false], "crash":["attack_recover",3,8,true], "stagger":["attack_recover",3,8,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]},
- "boar": {"idle":["idle",4,14,true], "alert":["idle",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["charge_tell",4,1,false], "strike":["charge_run",4,4,true], "recover":["crash_stun",3,9,false], "crash":["crash_stun",3,9,true], "stagger":["crash_stun",3,9,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]}}
+ "boar": {"idle":["idle",4,14,true], "alert":["idle",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["charge_tell",4,1,false], "strike":["charge_run",4,2,true], "recover":["crash_stun",3,9,false], "crash":["crash_stun",3,9,true], "stagger":["crash_stun",3,9,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]}}
 static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> String:
 	var table: Dictionary = STATES[String(mob["type"])]
 	var pose: Array = table.get(String(mob["state"]), table["idle"])
@@ -16,6 +16,8 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 		for tell: Snapshots.TelegraphSnapshot in tells:
 			if tell.owner_id == mob["id"]:
 				n = floori(float(tick-tell.start_tick) / maxi(1,tell.hit_tick-tell.start_tick) * int(pose[1]))
+	if mob["type"]==&"boar" and mob["state"]==&"windup" and n>=2:
+		n=2+posmod(int(mob["state_ticks"])/4,2)
 	if mob["state"] == &"dead":
 		n = floori(float(mob["state_ticks"]) / Tuning.MOB_DEATH_TICKS * int(pose[1]))
 	n = posmod(n,int(pose[1])) if bool(pose[3]) else clampi(n,0,int(pose[1])-1)

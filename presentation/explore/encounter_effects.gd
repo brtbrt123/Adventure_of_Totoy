@@ -2,13 +2,17 @@ extends "res://presentation/arena/hud.gd"
 ## Cosmetic event history only. Damage, healing, drops and state timing remain core-owned.
 const ExploreCore := preload("res://core/explore_core.gd")
 const GameEvent := preload("res://core/game_event.gd")
+const BoarMotion := preload("res://presentation/explore/boar_motion.gd")
+var boar_motion: BoarMotion = BoarMotion.new()
 var view: ExploreCore.ExploreSnapshot
 var effects: Array[Dictionary] = []
 var numbers: Array[Dictionary] = []
 func clear() -> void:
+	boar_motion.clear()
 	effects.clear()
 	numbers.clear()
 func sync(value: ExploreCore.ExploreSnapshot, palette: Dictionary, frames: Dictionary, atlas: Texture2D) -> void:
+	boar_motion.sync(value)
 	view = value
 	colors = palette
 	ui_frames = frames
@@ -46,10 +50,12 @@ func handle_event(event: GameEvent, state: ExploreCore.ExploreSnapshot) -> void:
 		GameEvent.MOB_DEFEATED: family = "death"
 		GameEvent.MOB_DROPPED: family = "drop"
 	if not family.is_empty():effects.append({"family":family,"at":at,"tick":event.tick})
-func fx(family: String, at: Vector2, age: int) -> void:
-	ui("woodland_fx_%s_%d" % [family,mini(6,age/4+1)],Rect2((at-Vector2(12,12)).round(),Vector2(24,24)))
+func fx(family: String, at: Vector2, age: int, scale_value: int = 1) -> void:
+	ui("woodland_fx_%s_%d" % [family,mini(6,age/4+1)],Rect2((at-Vector2(12,12)*scale_value).round(),Vector2(24,24)*scale_value))
 func _draw() -> void:
 	if view == null or colors.is_empty():return
+	for plan: Dictionary in boar_motion.plans(view):
+		fx(plan["family"],plan["at"],plan["age"],plan["scale"])
 	for e: Dictionary in effects:
 		var age: int = view.tick-int(e["tick"])
 		var at: Vector2 = e["at"]
