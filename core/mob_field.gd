@@ -13,7 +13,10 @@ extends RefCounted
 ##            touched is whole again, dead mobs included (`encounter_reset`, reason leash). A mob that gets beyond its `tether` from home
 ##            also walks home. The hero's defeat resets every uncleared encounter (reason defeat), and leaving the scene destroys the core.
 ##   cleared  the last mob fell: the flag `cleared_<id>` is set (saved with the story flags: a cleared encounter never spawns again,
-##            also after CONTINUE), `encounter_cleared` and the reward as `item_received` (kind item) with the inventory credited.
+##            also after CONTINUE), `encounter_cleared` and the encounter's own `reward` (if its scene row has one) as `item_received`.
+## Every felled mob is felled for good: the flag `killed_<encounter>_<n>` is set the first time (and only then it pays its `exp` as
+## `exp_gained` and rolls its `drop` once, the same result every time: `mob_dropped` + `item_received`), a reset or CONTINUE never brings it
+## back and it never pays twice.
 ## Attacks (each mob has one): the warning is a Telegraph LINE locked on the hero when the windup began; `strike` moves the mob along it.
 ##   mossling lunge   GOLD: parry it while the lunge connects (parry window) and it is stunned and exposed; a dash dodges it; a normal hit
 ##                    during the windup cancels it.
@@ -100,6 +103,26 @@ func sync_flags(flags: Array[StringName]) -> void:
 		if flags.has(enc.flag):
 			enc.state = CLEARED
 			enc.mobs.clear()
+			continue
+		for mob: Mob in enc.mobs:
+			if flags.has(kill_flag(enc, mob)):  # felled in an earlier visit: stays down
+				mob.killed = true
+				mob.hp = 0
+				mob.state = &"dead"
+				mob.state_ticks = Tuning.MOB_DEATH_TICKS + 1
+
+
+## The story flag that records a mob as felled.
+static func kill_flag(enc: Encounter, mob: Mob) -> StringName:
+	return StringName("killed_%s_%d" % [String(enc.id), mob.slot + 1])
+
+
+## The same number in [0, 1) for the same mob, always: a drop is decided by the mob, not by luck at the moment.
+static func drop_roll(mob_id: int) -> float:
+	var x: int = (mob_id * 7919 + 12353) & 0x7fffffff
+	x = (x * 1103515245 + 12345) & 0x7fffffff
+	x = (x * 1103515245 + 12345) & 0x7fffffff
+	return float((x >> 8) % 1000) / 1000.0
 
 
 ## The fight is on: some encounter is awake.
@@ -212,7 +235,8 @@ func reset_all(tick: int, reason: StringName, events: Array[GameEvent]) -> void:
 func reset_encounter(enc: Encounter, tick: int, reason: StringName, events: Array[GameEvent]) -> void:
 	var was_touched: bool = enc.touched
 	for mob: Mob in enc.mobs:
-		mob.reset()
+		if not mob.killed:
+			mob.reset()
 	enc.state = DORMANT
 	enc.outside_ticks = 0
 	enc.touched = false
@@ -240,7 +264,7 @@ func _hero_blows(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> 
 		if enc.state == DORMANT:
 			_wake(core, enc, events)
 		var exposed: bool = mob.is_exposed()
-		var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult
+		var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult * float(core.damage_mult())
 		var damage: int = maxi(1, roundi(base * (Tuning.MOB_EXPOSED_MULT if exposed else 1.0)))
 		mob.hp = maxi(0, mob.hp - damage)
 		mob.last_hit_tick = core.tick
@@ -266,6 +290,15 @@ func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent])
 	mob.telegraph = null
 	mob.set_state(&"dead")
 	events.append(GameEvent.new(GameEvent.MOB_DEFEATED, core.tick, {"scene": scene_id, "mob_id": mob.id, "type": mob.type, "encounter_id": enc.id, "position": mob.position}))
+	mob.killed = true
+	var flag: StringName = kill_flag(enc, mob)
+	if core._grant_flag(flag, events):  # the first time only
+		var stats: Dictionary = mob.stats()
+		core.give_exp(int(stats["exp"]), mob.id, events)
+		var drop: Dictionary = stats["drop"]
+		if drop_roll(mob.id) < float(drop["chance"]):
+			events.append(GameEvent.new(GameEvent.MOB_DROPPED, core.tick, {"scene": scene_id, "mob_id": mob.id, "item_id": drop["item"], "position": mob.position}))
+			core.give_item({"reward_id": "%s_drop" % flag, "kind": "item", "item": drop["item"], "name": String(drop["item"]).capitalize(), "quantity": 1}, enc.id, events)
 	if _alive(enc).is_empty():
 		_clear(core, enc, events)
 
@@ -450,7 +483,7 @@ static func _toward(from: Vector2, to: Vector2, fallback: Vector2) -> Vector2:
 
 # ---- what presentation reads --------------------------------------------------------------------------------------------------
 
-## Every mob worth drawing: [{id, type, visual_id, encounter_id, position, facing, state, state_ticks, hp, max_hp, radius, exposed,
+## Every mob worth drawing: [{id, type, visual_id, level, encounter_id, position, facing, state, state_ticks, hp, max_hp, radius, exposed,
 ## attack (the warning's attack id, else empty), since_hit (ticks since the hero's blow)}]; a defeated one only for MOB_DEATH_TICKS.
 func mob_views(tick: int) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
@@ -459,7 +492,7 @@ func mob_views(tick: int) -> Array[Dictionary]:
 			if mob.state == &"dead" and mob.state_ticks >= Tuning.MOB_DEATH_TICKS:
 				continue
 			out.append({
-				"id": mob.id, "type": mob.type, "visual_id": mob.type, "encounter_id": enc.id, "position": mob.position, "facing": mob.facing,
+				"id": mob.id, "type": mob.type, "visual_id": mob.type, "level": int(mob.stats()["level"]), "encounter_id": enc.id, "position": mob.position, "facing": mob.facing,
 				"state": mob.state, "state_ticks": mob.state_ticks, "hp": mob.hp, "max_hp": mob.max_hp, "radius": mob.radius,
 				"exposed": mob.is_exposed(), "attack": mob.telegraph.attack if mob.telegraph != null else &"", "since_hit": tick - mob.last_hit_tick,
 			})

@@ -237,3 +237,16 @@ func test_bad_inventory_entries_are_dropped_and_old_saves_have_none() -> void:
 		many["item_%d" % i] = 1
 	var capped: SaveProfile = SaveProfile.from_dict({"version": 1, "inventory": many}) as SaveProfile
 	assert_eq(capped.inventory.size(), SaveProfile.MAX_ITEMS, "at most MAX_ITEMS kinds")
+
+
+func test_exp_round_trips_cleans_and_a_new_game_resets_it() -> void:
+	var p: SaveProfile = SaveProfile.new()
+	assert_eq(p.exp_total, 0)
+	p.exp_total = 123
+	var back: SaveProfile = SaveProfile.from_json(p.to_json()) as SaveProfile
+	assert_eq(back.exp_total, 123)
+	back.reset_progress()
+	assert_eq(back.exp_total, 0)
+	assert_eq((SaveProfile.from_json("{\"version\": 1}") as SaveProfile).exp_total, 0, "an older save starts at level 1")
+	assert_eq((SaveProfile.from_json("{\"version\": 1, \"exp\": -5}") as SaveProfile).exp_total, 0)
+	assert_eq((SaveProfile.from_json("{\"version\": 1, \"exp\": \"lots\"}") as SaveProfile).exp_total, 0)

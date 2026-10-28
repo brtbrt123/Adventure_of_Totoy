@@ -43,8 +43,15 @@ const MobField := preload("res://core/mob_field.gd")
 ## The story flag that means the hero owns his first sword (Tovan's handover, DialogueBook grants). A save that has met Tovan
 ## but has no such flag is an older save from before the handover existed: it is treated as armed (set_story_flags).
 const ARMED_FLAG: StringName = &"received_first_sword"
-## The item that heals (Tuning.HERB_HEAL); encounters give it.
+## The item that heals (Tuning.HERB_HEAL); mobs drop it.
 const HERB_ITEM: StringName = &"herb"
+## The item slots of the HUD (keys 1 and 2): the item each holds and the story flag that unlocks it ("" = the sword). Slot 2 is not
+## given to the hero yet: no flag sets it, so presentation shows it locked.
+const ITEM_SLOTS: Array[Dictionary] = [{"item": &"herb", "unlock": &""}, {"item": &"", "unlock": &"unlocked_item_slot_2"}]
+## The Aspect sockets (Z, X, C). Aspect skills do not work in exploration yet (only against the boss), so every socket is reported locked
+## here; flip this when they do and the sockets then follow `ASPECT_UNLOCKS`.
+const ASPECTS_IN_EXPLORATION: bool = false
+const ASPECT_UNLOCKS: Array[StringName] = [&"lesson_aspect", &"unlocked_aspect_slot_2", &"unlocked_aspect_slot_3"]
 ## The hero can interact with an NPC or object when his centre is this close to its feet or its stand point.
 const INTERACT_RANGE: float = 24.0
 ## A checkpoint is reached when the hero's centre is this close to its point.
@@ -87,8 +94,17 @@ class ExploreSnapshot:
 	## warnings are in `telegraphs`.
 	var mobs: Array[Dictionary] = []
 	var encounters: Array[Dictionary] = []
-	## What the hero carries: {item id: count} (herbs from encounters). Presentation saves it (SaveProfile.inventory) on item_received and item_used.
+	## What the hero carries: {item id: count} (herbs from mobs). Presentation saves it (SaveProfile.inventory) on item_received and item_used.
 	var inventory: Dictionary = {}
+	## Hero level (1..Tuning.LEVEL_MAX), EXP earned inside this level, and what this level needs (0 at the top level), plus the total EXP the
+	## save keeps (SaveProfile.exp_total). The hero's max health is `hero.max_hp`. Presentation saves exp_total on exp_gained.
+	var level: int = 1
+	var exp: int = 0
+	var exp_to_next: int = 0
+	var exp_total: int = 0
+	## The HUD's item boxes [{slot (1 or 2), item (id or empty), unlocked, count}] and Aspect sockets [{slot (1-3), aspect (equipped id), unlocked}].
+	var item_slots: Array[Dictionary] = []
+	var aspect_slots: Array[Dictionary] = []
 	## True from the tick the hero fell until he stands up again at the checkpoint (Tuning.HERO_DEFEAT_TICKS later).
 	var defeated: bool = false
 	var last_checkpoint: StringName = &""
@@ -125,6 +141,7 @@ var npc_facing_left: Dictionary = {}  # npc id -> bool
 var training: TrainingYard = null  # the scene's practice post, if it has one
 var mobs: MobField = null  # the scene's encounters, if it has any
 var inventory: Dictionary = {}  # item id -> count
+var exp_total: int = 0  # all the EXP the hero earned (his level follows)
 var _defeat_ticks: int = 0  # ticks since the hero fell (0 = on his feet)
 var _talk: Dictionary = {}  # the running conversation: {npc_id, dialogue_id, index}; {} when none
 var _armed: Dictionary = {}  # exit id -> true once the hero has been outside it
@@ -198,6 +215,59 @@ func set_story_flags(flags: Array[StringName]) -> void:
 		story_flags.append(ARMED_FLAG)  # an older save: Tovan was met before the handover existed; do not trap the tutorial
 	if mobs != null:
 		mobs.sync_flags(story_flags)  # a cleared encounter stays cleared
+
+
+## Replaces the EXP (CONTINUE from a save). No events; the hero starts the scene at full health of his level.
+func set_exp(total: int) -> void:
+	exp_total = maxi(0, total)
+	player.hp = hero_max_hp()
+
+
+## The hero's level for his EXP (1..Tuning.LEVEL_MAX).
+func level() -> int:
+	var lv: int = 1
+	var left: int = exp_total
+	while lv < Tuning.LEVEL_MAX and left >= Tuning.EXP_TO_NEXT[lv - 1]:
+		left -= Tuning.EXP_TO_NEXT[lv - 1]
+		lv += 1
+	return lv
+
+
+## EXP earned inside the current level.
+func exp_in_level() -> int:
+	var lv: int = 1
+	var left: int = exp_total
+	while lv < Tuning.LEVEL_MAX and left >= Tuning.EXP_TO_NEXT[lv - 1]:
+		left -= Tuning.EXP_TO_NEXT[lv - 1]
+		lv += 1
+	return 0 if lv >= Tuning.LEVEL_MAX else left
+
+
+## What the current level needs to reach the next one (0 at the top level).
+func exp_to_next() -> int:
+	var lv: int = level()
+	return 0 if lv >= Tuning.LEVEL_MAX else Tuning.EXP_TO_NEXT[lv - 1]
+
+
+func hero_max_hp() -> int:
+	return Tuning.PLAYER_MAX_HP + Tuning.LEVEL_HP_BONUS * (level() - 1)
+
+
+## The hero's damage multiplier from his level (his blows against mobs).
+func damage_mult() -> float:
+	return 1.0 + Tuning.LEVEL_DAMAGE_BONUS * float(level() - 1)
+
+
+## EXP for the hero: `exp_gained`, and `level_up` (with a full heal) for every level it crosses.
+func give_exp(amount: int, source: int, events: Array[GameEvent]) -> void:
+	if amount <= 0:
+		return
+	var before: int = level()
+	exp_total += amount
+	events.append(GameEvent.new(GameEvent.EXP_GAINED, tick, {"scene": scene_id, "amount": amount, "source": source, "level": level(), "exp": exp_in_level(), "exp_to_next": exp_to_next()}))
+	for lv: int in range(before + 1, level() + 1):
+		player.hp = hero_max_hp()
+		events.append(GameEvent.new(GameEvent.LEVEL_UP, tick, {"scene": scene_id, "level": lv, "max_hp": hero_max_hp()}))
 
 
 ## Replaces the inventory (CONTINUE from a save). No events. Unknown or empty counts are dropped.
@@ -276,7 +346,7 @@ func step(input: InputFrame) -> void:
 		training.resolve(self, events)
 	if mobs != null:
 		mobs.resolve(self, events)
-	_use_herb(input, talking, events)
+	_use_item(input, talking, events)
 	_check_defeat(events)
 	if not exiting:
 		_check_checkpoints(events)
@@ -307,7 +377,7 @@ func snapshot() -> ExploreSnapshot:
 	hero.position = player.position
 	hero.facing = player.facing
 	hero.hp = player.hp
-	hero.max_hp = Tuning.PLAYER_MAX_HP
+	hero.max_hp = hero_max_hp()
 	hero.invulnerable = player.is_invulnerable()
 	hero.weapon_id = player.weapon_id
 	hero.combo_index = player.combo_index
@@ -339,6 +409,15 @@ func snapshot() -> ExploreSnapshot:
 		snap.encounters = mobs.encounter_views()
 		snap.telegraphs.append_array(mobs.telegraph_snapshots())
 	snap.inventory = inventory.duplicate()
+	snap.level = level()
+	snap.exp = exp_in_level()
+	snap.exp_to_next = exp_to_next()
+	snap.exp_total = exp_total
+	for i: int in ITEM_SLOTS.size():
+		var slot: Dictionary = ITEM_SLOTS[i]
+		snap.item_slots.append({"slot": i + 1, "item": slot["item"], "unlocked": _slot_unlocked(slot), "count": int(inventory.get(slot["item"], 0)) if slot["item"] != &"" else 0})
+	for i: int in ASPECT_UNLOCKS.size():
+		snap.aspect_slots.append({"slot": i + 1, "aspect": player.equipped_aspects[i] if i < player.equipped_aspects.size() else &"", "unlocked": ASPECTS_IN_EXPLORATION and story_flags.has(ASPECT_UNLOCKS[i])})
 	snap.defeated = player.state == PlayerState.STATE_DEAD
 	snap.last_checkpoint = last_checkpoint
 	snap.exiting = exiting
@@ -352,14 +431,24 @@ func snapshot() -> ExploreSnapshot:
 	return snap
 
 
-## A herb heals Tuning.HERB_HEAL hp (never above the maximum) and is used up; nothing happens at full health, with none left, while
-## talking, leaving or fallen.
-func _use_herb(input: InputFrame, talking: bool, events: Array[GameEvent]) -> void:
-	if not input.use_herb_pressed or talking or exiting or player.state == PlayerState.STATE_DEAD:
+func _slot_unlocked(slot: Dictionary) -> bool:
+	if slot["item"] == &"":
+		return false
+	return slot["unlock"] == &"" and is_armed() or (slot["unlock"] != &"" and story_flags.has(slot["unlock"]))
+
+
+## Item slot 1 (the herb) heals Tuning.HERB_HEAL hp (never above the maximum) and is used up; nothing happens at full health, with none
+## left, in a locked slot, while talking, leaving or fallen.
+func _use_item(input: InputFrame, talking: bool, events: Array[GameEvent]) -> void:
+	var wanted: int = input.use_item_slot if input.use_item_slot != 0 else (1 if input.use_herb_pressed else 0)
+	if wanted < 1 or wanted > ITEM_SLOTS.size() or talking or exiting or player.state == PlayerState.STATE_DEAD:
 		return
-	if int(inventory.get(HERB_ITEM, 0)) <= 0 or player.hp >= Tuning.PLAYER_MAX_HP:
+	var slot: Dictionary = ITEM_SLOTS[wanted - 1]
+	if slot["item"] != HERB_ITEM or not _slot_unlocked(slot):
 		return
-	var healed: int = mini(Tuning.HERB_HEAL, Tuning.PLAYER_MAX_HP - player.hp)
+	if int(inventory.get(HERB_ITEM, 0)) <= 0 or player.hp >= hero_max_hp():
+		return
+	var healed: int = mini(Tuning.HERB_HEAL, hero_max_hp() - player.hp)
 	player.hp += healed
 	inventory[HERB_ITEM] = int(inventory[HERB_ITEM]) - 1
 	if int(inventory[HERB_ITEM]) <= 0:
@@ -385,6 +474,7 @@ func _check_defeat(events: Array[GameEvent]) -> void:
 	player.equipped_aspects = aspects
 	var c: Dictionary = SceneDefs.checkpoint(scene_id, last_checkpoint)
 	place_at(c["position"] if not c.is_empty() else def["entries"][entry_id])
+	player.hp = hero_max_hp()
 	_defeat_ticks = 0
 	if mobs != null:
 		mobs.reset_all(tick, &"defeat", events)

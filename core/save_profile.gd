@@ -31,6 +31,8 @@ var gate_open: bool = false
 var story_flags: Array[StringName] = []
 ## What the hero carries ({item id: count}, e.g. herb from an encounter). Optional in the file: older saves carry nothing.
 var inventory: Dictionary = {}
+## Total EXP earned (the level follows from it, Tuning.EXP_TO_NEXT). Optional in the file: older saves start at level 1.
+var exp_total: int = 0
 ## Why this profile is a fresh one instead of a loaded one ("" when it was loaded or never saved before).
 var load_note: String = ""
 
@@ -73,6 +75,7 @@ func reset_progress() -> void:
 	gate_open = false
 	story_flags.clear()
 	inventory.clear()
+	exp_total = 0
 
 
 func to_dict() -> Dictionary:
@@ -90,6 +93,7 @@ func to_dict() -> Dictionary:
 		"gate_open": gate_open,
 		"story_flags": story_flags.map(func(flag: StringName) -> String: return String(flag)),
 		"inventory": _inventory_dict(),
+		"exp": exp_total,
 	}
 
 
@@ -138,6 +142,7 @@ static func from_dict(data: Dictionary) -> Object:
 		for flag: Variant in flags:
 			if flag is String and _is_flag(flag) and profile.story_flags.size() < MAX_FLAGS and not profile.story_flags.has(StringName(flag)):
 				profile.story_flags.append(StringName(flag))
+	profile.exp_total = _count(data.get("exp", 0))
 	var items: Variant = data.get("inventory", {})
 	if items is Dictionary:
 		for key: Variant in items:

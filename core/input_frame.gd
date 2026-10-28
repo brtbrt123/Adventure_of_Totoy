@@ -14,4 +14,5 @@ var aspect_equip: StringName = &""  # equip this aspect (an Aspects.ALL id) into
 var aspect_equip_slot: int = 0  # 1-3, the slot for aspect_equip
 var interact_pressed: bool = false  # also the dialogue's "next line"
 var skip_pressed: bool = false  # ends a running dialogue (ignored otherwise)
-var use_herb_pressed: bool = false  # exploration only: use one herb (heals Tuning.HERB_HEAL hp)
+var use_herb_pressed: bool = false  # the older name of use_item_slot = 1 (the herb); still honoured, new code sends use_item_slot
+var use_item_slot: int = 0  # exploration only: item slot 1 or 2 pressed this tick (keys 1 and 2), else 0. Slot 1 is the herb (heals Tuning.HERB_HEAL hp); slot 2 is locked until a flag unlocks it

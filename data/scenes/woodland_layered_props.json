@@ -232,13 +232,6 @@
     112
    ],
    "leash": 170,
-   "reward": {
-    "reward_id": "mossling_clearing_herbs",
-    "kind": "item",
-    "item": "herb",
-    "name": "Herb",
-    "quantity": 2
-   },
    "mobs": [
     {
      "type": "mossling",
@@ -267,13 +260,6 @@
     112
    ],
    "leash": 170,
-   "reward": {
-    "reward_id": "boar_clearing_herbs",
-    "kind": "item",
-    "item": "herb",
-    "name": "Herb",
-    "quantity": 3
-   },
    "mobs": [
     {
      "type": "boar",

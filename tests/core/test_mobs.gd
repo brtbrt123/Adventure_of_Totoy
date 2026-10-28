@@ -99,7 +99,7 @@ func test_the_scene_has_the_designed_encounters() -> void:
 	assert_eq(plan, {"mossling_clearing": {"mossling": 3}, "boar_clearing": {"boar": 2}, "camp_ambush": {"mossling": 2}}, "3 Mosslings, 2 Boars, a 2-Mossling camp ambush")
 	for enc: MobField.Encounter in core.mobs.encounters:
 		assert_eq(enc.state, MobField.DORMANT)
-		assert_false(enc.reward.is_empty(), "%s has a reward" % enc.id)
+		assert_eq(enc.reward.is_empty(), enc.id != &"camp_ambush", "only the camp has a guaranteed reward (%s)" % enc.id)
 		for mob: Mob in enc.mobs:
 			assert_eq(mob.state, &"idle")
 			assert_eq(mob.hp, mob.max_hp)
@@ -344,17 +344,14 @@ func test_a_boar_that_charges_into_a_prop_crashes_and_is_exposed() -> void:
 	assert_eq(_event(core, GameEvent.MOB_STAGGERED).data["reason"], &"crash")
 
 
-func test_three_blows_fell_a_mossling_and_clearing_all_three_pays_once() -> void:
-	var core: ExploreCore = _core()
-	core.place_at(Vector2(172, 280))
-	var cleared: int = 0
-	var defeated: int = 0
-	var received: Array[Dictionary] = []
-	var flags: int = 0
-	for i: int in 4000:
+## Fells every mob of an encounter by walking up to the nearest and swinging; returns every event seen, in order.
+func _clear_encounter(core: ExploreCore, id: StringName, start: Vector2, limit: int = 4000) -> Array[GameEvent]:
+	core.place_at(start)
+	var seen: Array[GameEvent] = []
+	for i: int in limit:
 		var target: Mob = null
 		var best: float = INF
-		for mob: Mob in _mobs(core, &"mossling_clearing"):
+		for mob: Mob in _mobs(core, id):
 			if mob.is_alive() and core.player.position.distance_to(mob.position) < best:
 				best = core.player.position.distance_to(mob.position)
 				target = mob
@@ -364,30 +361,175 @@ func test_three_blows_fell_a_mossling_and_clearing_all_three_pays_once() -> void
 			f = _swing(to.normalized())
 			f.move = to.normalized() if to.length() > 18.0 else Vector2.ZERO
 		core.step(f)
-		core.player.hp = Tuning.PLAYER_MAX_HP  # this test is about the reward, not the danger
-		cleared += _count(core, GameEvent.ENCOUNTER_CLEARED)
-		defeated += _count(core, GameEvent.MOB_DEFEATED)
-		for e: GameEvent in core.last_events:
-			if e.type == GameEvent.ITEM_RECEIVED:
-				received.append(e.data)
-			if e.type == GameEvent.FLAG_SET and e.data["flag"] == &"cleared_mossling_clearing":
-				flags += 1
-		if cleared > 0:
+		core.player.hp = core.hero_max_hp()  # these tests are about rewards, not danger
+		seen.append_array(core.last_events)
+		if _encounter(core, id).state == MobField.CLEARED:
 			break
-	assert_eq(defeated, 3, "three Mosslings fell")
-	assert_eq(cleared, 1, "encounter_cleared once")
-	assert_eq(flags, 1, "the flag was announced")
+	return seen
+
+
+func _of(events: Array[GameEvent], type: StringName) -> Array[GameEvent]:
+	var out: Array[GameEvent] = []
+	for e: GameEvent in events:
+		if e.type == type:
+			out.append(e)
+	return out
+
+
+func test_three_blows_fell_a_mossling_and_clearing_all_three_pays_exp_and_the_fixed_drops_once() -> void:
+	var core: ExploreCore = _core()
+	var seen: Array[GameEvent] = _clear_encounter(core, &"mossling_clearing", Vector2(172, 280))
+	assert_eq(_of(seen, GameEvent.MOB_DEFEATED).size(), 3, "three Mosslings fell")
+	assert_eq(_of(seen, GameEvent.ENCOUNTER_CLEARED).size(), 1, "encounter_cleared once")
 	assert_true(core.has_flag(&"cleared_mossling_clearing"))
 	assert_eq(_encounter(core, &"mossling_clearing").state, MobField.CLEARED)
-	assert_eq(received.size(), 1, "one receipt")
-	assert_true(received[0]["item_id"] == &"herb" and received[0]["quantity"] == 2 and received[0]["kind"] == &"item" and received[0]["source"] == &"mossling_clearing" and received[0]["reward_id"] == &"mossling_clearing_herbs", str(received))
-	assert_eq(core.inventory, {&"herb": 2})
-	assert_eq(core.snapshot().inventory, {&"herb": 2})
-	# keep fighting nothing, waiting, leaving: no second payment
+	for n: int in [1, 2, 3]:
+		assert_true(core.has_flag(StringName("killed_mossling_clearing_%d" % n)), "kill %d is on record" % n)
+	assert_eq(_of(seen, GameEvent.EXP_GAINED).size(), 3, "each kill pays its EXP once")
+	assert_eq(core.exp_total, 3 * int(Tuning.MOBS[&"mossling"]["exp"]))
+	assert_eq(_of(seen, GameEvent.LEVEL_UP).size(), 1, "30 EXP is level 2")
+	assert_eq(core.level(), 2)
+	# drops: not guaranteed, decided by the mob (the same every time): this clearing's second Mossling drops one herb, the others nothing
+	assert_eq(_of(seen, GameEvent.MOB_DROPPED).size(), 1, "one of the three Mosslings dropped something")
+	var receipts: Array[GameEvent] = _of(seen, GameEvent.ITEM_RECEIVED)
+	assert_eq(receipts.size(), 1, "one receipt: the drop")
+	assert_true(receipts[0].data["item_id"] == &"herb" and receipts[0].data["quantity"] == 1 and receipts[0].data["kind"] == &"item" and receipts[0].data["source"] == &"mossling_clearing", str(receipts[0].data))
+	assert_eq(core.inventory, {&"herb": 1})
+	# nothing pays twice
 	for i: int in 300:
 		core.step(_frame())
-		assert_eq(_count(core, GameEvent.ITEM_RECEIVED), 0)
-	assert_eq(core.inventory, {&"herb": 2})
+		assert_eq(_count(core, GameEvent.ITEM_RECEIVED) + _count(core, GameEvent.EXP_GAINED), 0)
+	assert_eq(core.inventory, {&"herb": 1})
+
+
+func test_the_drop_roll_is_the_same_every_time_and_follows_the_chance() -> void:
+	var rolls: Array = []
+	for id: int in range(201, 208):
+		assert_eq(MobField.drop_roll(id), MobField.drop_roll(id), "mob %d rolls the same" % id)
+		assert_true(MobField.drop_roll(id) >= 0.0 and MobField.drop_roll(id) < 1.0)
+		rolls.append(roundi(MobField.drop_roll(id) * 100.0))
+	assert_eq(rolls, [41, 32, 63, 54, 84, 75, 5], "the rolls the design was tuned against (west 1 drop of 3, east 1 of 2, camp 1 of 2)")
+	var core: ExploreCore = _core()
+	var seen: Array[GameEvent] = _clear_encounter(core, &"boar_clearing", Vector2(520, 290), 9000)
+	assert_eq(_of(seen, GameEvent.MOB_DEFEATED).size(), 2, "both Boars fell")
+	assert_eq(_of(seen, GameEvent.MOB_DROPPED).size(), 1, "one of the two drops")
+	assert_eq(core.exp_total, 2 * int(Tuning.MOBS[&"boar"]["exp"]))
+	assert_eq(core.inventory, {&"herb": 1})
+
+
+func test_the_camp_pays_its_guaranteed_herbs_on_top_of_the_drop() -> void:
+	var core: ExploreCore = _core()
+	var seen: Array[GameEvent] = _clear_encounter(core, &"camp_ambush", Vector2(318, 140))
+	assert_eq(_of(seen, GameEvent.MOB_DEFEATED).size(), 2)
+	var total: int = 0
+	for e: GameEvent in _of(seen, GameEvent.ITEM_RECEIVED):
+		total += int(e.data["quantity"])
+	assert_eq(total, 3, "2 guaranteed herbs plus the one drop")
+	assert_eq(core.inventory[&"herb"], 3)
+
+
+func test_a_felled_mob_stays_down_after_a_reset_and_after_continue_and_never_pays_twice() -> void:
+	var core: ExploreCore = _core()
+	core.place_at(WEST_SPOT)
+	var first: Mob = _mobs(core, &"mossling_clearing")[0]
+	core.set_story_flags([&"received_first_sword", &"killed_mossling_clearing_1"] as Array[StringName])
+	assert_true(first.killed and not first.is_alive(), "felled in an earlier visit: down from the start")
+	assert_eq(core.snapshot().mobs.size(), 6, "its body is not drawn")
+	var events: Array[GameEvent] = []
+	core.mobs.reset_all(core.tick, &"defeat", events)
+	assert_false(first.is_alive(), "a reset does not revive it")
+	core.place_at(Vector2(172, 280))
+	for i: int in 400:
+		core.step(_frame())
+	assert_eq(_encounter(core, &"mossling_clearing").state, MobField.ACTIVE, "the other two still fight")
+	var seen: Array[GameEvent] = _clear_encounter(core, &"mossling_clearing", core.player.position)
+	assert_eq(_of(seen, GameEvent.EXP_GAINED).size(), 2, "only the two that fell now pay")
+	assert_eq(core.exp_total, 20)
+
+
+func test_levels_follow_the_exp_curve_and_scale_health_and_damage() -> void:
+	var core: ExploreCore = _core()
+	assert_eq([core.level(), core.exp_in_level(), core.exp_to_next(), core.hero_max_hp()], [1, 0, 30, 100])
+	core.set_exp(29)
+	assert_eq(core.level(), 1)
+	core.set_exp(30)
+	assert_eq([core.level(), core.exp_in_level(), core.exp_to_next(), core.hero_max_hp()], [2, 0, 50, 110])
+	assert_eq(core.player.hp, 110, "a restored hero stands at full health of his level")
+	core.set_exp(30 + 49)
+	assert_eq([core.level(), core.exp_in_level()], [2, 49])
+	var total: int = 0
+	for need: int in Tuning.EXP_TO_NEXT:
+		total += need
+	core.set_exp(total)
+	assert_eq([core.level(), core.exp_to_next()], [Tuning.LEVEL_MAX, 0], "the top level needs nothing more")
+	core.set_exp(total + 99999)
+	assert_eq(core.level(), Tuning.LEVEL_MAX, "no level past the maximum")
+	assert_true(is_equal_approx(core.damage_mult(), 1.0 + Tuning.LEVEL_DAMAGE_BONUS * float(Tuning.LEVEL_MAX - 1)))
+	var snap: ExploreCore.ExploreSnapshot = core.snapshot()
+	assert_eq([snap.level, snap.exp_to_next, snap.hero.max_hp, snap.exp_total], [Tuning.LEVEL_MAX, 0, 100 + 10 * (Tuning.LEVEL_MAX - 1), total + 99999])
+
+
+func test_a_level_up_heals_to_full_and_a_stronger_hero_hits_harder() -> void:
+	var core: ExploreCore = _core()
+	core.player.hp = 20
+	var events: Array[GameEvent] = []
+	core.give_exp(30, 201, events)
+	var lv: Array[GameEvent] = _of(events, GameEvent.LEVEL_UP)
+	assert_eq(lv.size(), 1)
+	assert_true(lv[0].data["level"] == 2 and lv[0].data["max_hp"] == 110)
+	assert_eq(core.player.hp, 110, "full health after a level up")
+	var ev: GameEvent = _of(events, GameEvent.EXP_GAINED)[0]
+	assert_true(ev.data["amount"] == 30 and ev.data["level"] == 2 and ev.data["exp"] == 0 and ev.data["exp_to_next"] == 50, str(ev.data))
+	core.give_exp(50 + 80 + 120, 201, events)
+	assert_eq(_of(events, GameEvent.LEVEL_UP).size(), 4, "one event per level crossed")
+	core.place_at(Vector2(150, 300))
+	var mossling: Mob = _mobs(core, &"mossling_clearing")[0]
+	mossling.position = Vector2(166, 300)
+	core.player.facing = Vector2.RIGHT
+	for i: int in 60:
+		core.step(_swing(Vector2.RIGHT))
+		var hit: GameEvent = _event(core, GameEvent.ATTACK_HIT)
+		if hit != null and hit.data["target_id"] == mossling.id:
+			assert_eq(hit.data["damage"], roundi(Tuning.ATTACK_DAMAGE * core.damage_mult()), "level scales the blow")
+			return
+	assert_true(false, "the blow connected")
+
+
+func test_item_slots_one_and_two_and_the_locks() -> void:
+	var core: ExploreCore = _core()
+	var slots: Array[Dictionary] = core.snapshot().item_slots
+	assert_eq(slots.size(), 2)
+	assert_true(slots[0]["slot"] == 1 and slots[0]["item"] == &"herb" and slots[0]["unlocked"] == true and slots[0]["count"] == 0)
+	assert_true(slots[1]["slot"] == 2 and slots[1]["unlocked"] == false, "slot 2 is locked")
+	assert_false(_core(false).snapshot().item_slots[0]["unlocked"], "an unarmed hero has no herb slot")
+	core.set_inventory({&"herb": 2})
+	assert_eq(core.snapshot().item_slots[0]["count"], 2)
+	core.player.hp = 50
+	var two: InputFrame = InputFrame.new()
+	two.use_item_slot = 2
+	core.step(two)
+	assert_eq(core.player.hp, 50, "the locked slot does nothing")
+	assert_eq(core.inventory[&"herb"], 2)
+	var one: InputFrame = InputFrame.new()
+	one.use_item_slot = 1
+	core.step(one)
+	assert_eq(core.player.hp, 85, "slot 1 is the herb")
+	assert_eq(core.inventory[&"herb"], 1)
+	var aspects: Array[Dictionary] = core.snapshot().aspect_slots
+	assert_eq(aspects.size(), 3)
+	for a: Dictionary in aspects:
+		assert_false(a["unlocked"], "Aspect skills do not work in exploration yet: every socket shows locked")
+
+
+func test_a_boar_keeps_attacking_a_hero_who_stands_close() -> void:
+	var core: ExploreCore = _core()
+	core.place_at(Vector2(470, 280))
+	var charges: int = 0
+	for i: int in 1500:
+		core.step(_frame())
+		charges += _count(core, GameEvent.ATTACK_TELEGRAPHED)
+		core.player.hp = core.hero_max_hp()
+	assert_true(charges >= 4, "the Boars wind up again and again, also at point-blank range (%d warnings)" % charges)
 
 
 func test_a_cleared_encounter_stays_cleared_after_continue() -> void:

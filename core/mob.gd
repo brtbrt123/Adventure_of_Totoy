@@ -25,6 +25,7 @@ var strike_left: int = 0  # strike ticks left
 var attack_done: bool = false  # the strike already hit the hero (or was parried): once per attack
 var last_hit_tick: int = -1000  # the tick the hero's blow last landed (hit flash)
 var last_swing: int = -1  # the swing serial of the last blow taken (one hit per swing)
+var killed: bool = false  # felled for good (story flag killed_<encounter>_<n>): a reset never revives it
 
 
 ## Fills a fresh mob (home and position, full health, idle).

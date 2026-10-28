@@ -386,7 +386,8 @@ const CHARGE_RECOVER_TICKS: int = 34
 
 # Mobs (core/mob_field.gd): the regular enemies of the exploration scenes (chapter 1: Mossling, Thornback Boar). Every type
 # has at most two attacks and obeys the gold/red rule (gold lunge = parry it, red charge = dash it). No randomness.
-#   hp, radius (body circle), speed (chase px/tick), aggro (the hero this close wakes the whole encounter), tether (a mob
+#   level (shown on its bar), exp (paid once, the first time the hero fells it), drop {item, chance 0-1: rolled once per mob, the same
+#   result every time), hp, radius (body circle), speed (chase px/tick), aggro (the hero this close wakes the whole encounter), tether (a mob
 #   that gets this far from home gives up), hold (it stops chasing this far from the hero), wait (it holds this far away while
 #   two others attack)
 #   attack: kind (gold or red), start_min/start_max (the hero's distance that starts it), windup (warning ticks, aim locked on the
@@ -395,13 +396,13 @@ const CHARGE_RECOVER_TICKS: int = 34
 #   charge stops at a prop and the mob is stunned and exposed this long; 0 = no crash)
 const MOBS: Dictionary = {
 	&"mossling": {
-		"hp": 30, "radius": 6.0, "speed": 0.65, "aggro": 84.0, "tether": 230.0, "hold": 24.0, "wait": 56.0,
+		"level": 1, "exp": 10, "drop": {"item": &"herb", "chance": 0.4}, "hp": 30, "radius": 6.0, "speed": 0.65, "aggro": 84.0, "tether": 230.0, "hold": 24.0, "wait": 56.0,
 		"attack": {"id": &"lunge", "kind": &"gold", "start_min": 14.0, "start_max": 50.0, "windup": 36, "strike_ticks": 10, "strike_speed": 5.2,
 			"width": 18.0, "damage": 12, "recover": 36, "cooldown": 70, "interrupt": true, "crash": 0},
 	},
 	&"boar": {
-		"hp": 70, "radius": 9.0, "speed": 0.55, "aggro": 110.0, "tether": 260.0, "hold": 100.0, "wait": 110.0,
-		"attack": {"id": &"charge", "kind": &"red", "start_min": 56.0, "start_max": 140.0, "windup": 50, "strike_ticks": 38, "strike_speed": 3.4,
+		"level": 2, "exp": 25, "drop": {"item": &"herb", "chance": 0.6}, "hp": 70, "radius": 9.0, "speed": 0.55, "aggro": 110.0, "tether": 260.0, "hold": 100.0, "wait": 110.0,
+		"attack": {"id": &"charge", "kind": &"red", "start_min": 24.0, "start_max": 140.0, "windup": 50, "strike_ticks": 38, "strike_speed": 3.4,
 			"width": 24.0, "damage": 20, "recover": 40, "cooldown": 90, "interrupt": false, "crash": 70},
 	},
 }
@@ -422,3 +423,11 @@ const MOB_SEPARATION_PUSH: float = 0.5
 const HERO_DEFEAT_TICKS: int = 120  # from the hero's death to his return at the last checkpoint
 const HERB_HEAL: int = 35
 const INVENTORY_MAX_STACK: int = 99
+
+# Hero level and EXP (exploration; ExploreCore). EXP comes from felling mobs, once per mob (the story flag killed_<encounter>_<n>).
+# EXP_TO_NEXT[i] is what level i+1 needs to reach level i+2. A level gives LEVEL_HP_BONUS max health (and a full heal) and
+# LEVEL_DAMAGE_BONUS more damage per level above 1 on the hero's blows against mobs.
+const LEVEL_MAX: int = 10
+const EXP_TO_NEXT: Array[int] = [30, 50, 80, 120, 170, 230, 300, 380, 470]
+const LEVEL_HP_BONUS: int = 10
+const LEVEL_DAMAGE_BONUS: float = 0.05
