@@ -32,16 +32,30 @@ func icon(name: String, at: Vector2, scale_value: int = 1) -> void:
 	var texture: Texture2D = textures[name]
 	draw_texture_rect(texture,Rect2(at,texture.get_size()*scale_value),false)
 func plate(rect: Rect2, strong: bool = false) -> void:
-	UiPanel.draw_panel(self,rect,&"menu" if strong else &"info",colors,false)
+	# Review-only weathered stone with copper corners; palette browns, never cue gold.
+	draw_rect(rect.grow(1),colors["0"])
+	draw_rect(rect,colors["f"])
+	draw_rect(rect.grow(-1),colors["i"])
+	draw_rect(rect.grow(-3),colors["e"])
+	draw_rect(rect.grow(-4),colors["0"])
+	draw_line(rect.position+Vector2(3,2),rect.position+Vector2(rect.size.x-4,2),colors["j"],1)
+	for corner: Vector2 in [rect.position,rect.position+Vector2(rect.size.x-5,0),rect.position+Vector2(0,rect.size.y-5),rect.end-Vector2(5,5)]:
+		draw_rect(Rect2(corner,Vector2(5,5)),colors["q"])
+		draw_rect(Rect2(corner+Vector2.ONE,Vector2(3,3)),colors["r"])
+		draw_rect(Rect2(corner+Vector2(2,1),Vector2.ONE),colors["s"])
+	# Small deterministic chips in the stone edge.
+	if rect.size.x>35:
+		draw_rect(Rect2(rect.position+Vector2(17,1),Vector2(2,1)),colors["g"])
+		draw_rect(Rect2(rect.end-Vector2(21,2),Vector2(3,1)),colors["g"])
 func badge(at: Vector2, key: String, dim: bool = false) -> void:
 	draw_rect(Rect2(at,Vector2(8,8)),colors["0"])
-	UiPanel.outline(self,Rect2(at,Vector2(8,8)),colors["f" if dim else "t"])
+	UiPanel.outline(self,Rect2(at,Vector2(8,8)),colors["f" if dim else "r"])
 	label_at(at+Vector2(2,1),key,"g" if dim else "1",7)
 func slot(at: Vector2, key: String, locked: bool, count: String = "--", aspect: String = "") -> void:
 	plate(Rect2(at,Vector2(26,26)))
 	if locked:
 		draw_rect(Rect2(at+Vector2(3,3),Vector2(20,20)),colors["8"])
-		UiPanel.outline(self,Rect2(at+Vector2(1,1),Vector2(24,24)),colors["f"])
+		UiPanel.outline(self,Rect2(at+Vector2(2,2),Vector2(22,22)),colors["f"])
 		icon("lock",at+Vector2(5,3))
 	else:
 		if aspect.is_empty():icon("herb_bundle",at+Vector2(5,3))
@@ -60,14 +74,23 @@ func gauge(at: Vector2, fraction: float, level: String, glow: bool = false, unav
 		icon("heal_3",at+Vector2(-4,-5))
 	centered(at.x+8,at.y+76,"EXP",colors["g" if unavailable else "u"],colors["0"],1,null,7)
 func mob_plate(at: Vector2, name: String, level: String, hp: float, ghost: float, strong: bool = false) -> void:
-	var width: int = 76 if strong else 58
-	var height: int = 16 if strong else 14
-	plate(Rect2(at,Vector2(width,height)),strong)
-	label_at(at+Vector2(4,3),"L"+level,"v" if strong else "u",7)
-	label_at(at+Vector2(17,3),name,"1",7)
-	draw_rect(Rect2(at+Vector2(4,height-6),Vector2(width-8,3)),colors["e"])
-	draw_rect(Rect2(at+Vector2(4,height-6),Vector2(floori((width-8)*ghost),3)),colors["i"])
-	draw_rect(Rect2(at+Vector2(4,height-6),Vector2(floori((width-8)*hp),3)),colors["v" if strong else "u"])
+	# Owner revision: original 22x4 green bar, level only; no name plate/ghost.
+	if level.is_valid_int():MobView.draw_level(self,at+Vector2(4,-7),int(level),colors)
+	draw_rect(Rect2(at,Vector2(22,4)),colors["0"])
+	draw_rect(Rect2(at+Vector2.ONE,Vector2(floori(20*hp),2)),colors["7"])
+func medallion(at: Vector2) -> void:
+	for layer: int in 5:
+		var points: PackedVector2Array = PackedVector2Array()
+		var radius: int = 24-layer
+		for n: int in 32:
+			var angle: float = TAU*n/32.0
+			points.append((at+Vector2(cos(angle),sin(angle))*radius).round())
+		draw_colored_polygon(points,colors[["0","q","r","s","0"][layer]])
+	for n: int in 8:
+		var angle: float = TAU*n/8.0
+		var point: Vector2 = (at+Vector2(cos(angle),sin(angle))*22).round()
+		draw_rect(Rect2(point-Vector2.ONE,Vector2(3,3)),colors["e"])
+		draw_rect(Rect2(point,Vector2.ONE),colors["i"])
 func creature(key: String, feet: Vector2, white: bool = false) -> void:
 	var f: Dictionary = ui_frames[key]
 	draw_texture_rect_region(MobView.WHITE if white else portrait_atlas,Rect2(feet-Vector2(f["ax"],f["ay"]),Vector2(f["w"],f["h"])),Rect2(f["x"],f["y"],f["w"],f["h"]))
@@ -81,21 +104,21 @@ func draw_hud() -> void:
 	label_at(Vector2(29,7),title,"u",7)
 	var exp_fill: float = (float(world.snapshot.exp)/maxi(1,world.snapshot.exp_to_next) if world.snapshot.exp_to_next>0 else 1.0) if live else (0.0 if locked else 0.55)
 	gauge(Vector2(6,47),exp_fill,str(world.snapshot.level) if live else ("?" if locked else "5"),mode == "hud_gain",locked)
-	ui("ui_weapon_frame_1",Rect2(3,130,48,48))
+	medallion(Vector2(27,154))
 	ui("ui_weapon_totoy_blade_1",Rect2(11,138,32,32))
 	plate(Rect2(54,148,113,29))
-	bar(Vector2(60,153),100,world.snapshot.hero.hp if live else (0 if down else 74),world.snapshot.hero.max_hp if live else 140,colors["t"],6,-1.0 if live else 108)
+	bar(Vector2(60,153),100,world.snapshot.hero.hp if live else (0 if down else 74),world.snapshot.hero.max_hp if live else 140,colors["A"],7,-1.0 if live else 108)
 	label_at(Vector2(64,153),("%d / %d" % [world.snapshot.hero.hp,world.snapshot.hero.max_hp]) if live else ("DOWN" if down else "74 / 140"),"1",7)
-	bar(Vector2(60,164),88,0 if down or live else 45,100,colors["v"],3)
+	bar(Vector2(60,164),88,0 if down or live else 45,100,colors["m"],3)
 	if live:label_at(Vector2(89,162),"--","g",7)
-	bar(Vector2(60,171),72,0 if down else 80,100,colors["n"],2)
+	bar(Vector2(60,171),72,0 if down else 80,100,colors["v"],2)
 	ui("ui_icon_edge_1",Rect2(52,161,6,6))
 	ui("ui_icon_dash_1",Rect2(52,168,6,6))
-	slot(Vector2(60,118),"1",not bool(world.snapshot.item_slots[0].get("unlocked",false)) if live else locked,str(world.snapshot.item_slots[0]["count"]) if live else ("--" if locked else "3"))
-	slot(Vector2(92,118),"2",true)
-	slot(Vector2(178,148),"Z",true)
-	slot(Vector2(210,148),"X",true)
-	slot(Vector2(242,148),"C",true)
+	slot(Vector2(178,148),"1",not bool(world.snapshot.item_slots[0].get("unlocked",false)) if live else locked,str(world.snapshot.item_slots[0]["count"]) if live else ("--" if locked else "3"))
+	slot(Vector2(206,148),"2",true)
+	slot(Vector2(234,148),"Z",true)
+	slot(Vector2(262,148),"X",true)
+	slot(Vector2(290,148),"C",true)
 	if world != null:
 		var index: int = 0
 		for mob: Dictionary in world.snapshot.mobs:
@@ -135,16 +158,16 @@ func draw_slots() -> void:
 	label_at(Vector2(151,120),"item_used: burst + slot flash", "o",8)
 	label_at(Vector2(111,149),"Exploration: Aspects + slot 2 locked.","g",8)
 func draw_mob_bars() -> void:
-	label_at(Vector2(8,8),"MOB PLATES - HERO LV 5 FIXTURE", "u",10)
+	label_at(Vector2(8,8),"ORIGINAL MOB HP BAR + LEVEL ONLY", "u",10)
 	label_at(Vector2(12,29),"Normal / lower level","o",8)
-	label_at(Vector2(174,29),"Stronger / lilac frame","v",8)
+	label_at(Vector2(174,29),"Same bar / higher level","v",8)
 	mob_plate(Vector2(29,62),"Mossling","2",fill,minf(1.0,fill+0.25))
 	mob_plate(Vector2(177,48),"Thorn Boar","8",fill,minf(1.0,fill+0.25),true)
 	creature("mossling_idle_right_1",Vector2(61,105))
 	creature("boar_idle_right_1",Vector2(219,105))
-	label_at(Vector2(9,122),"HP %d%% - pale grey = delayed damage" % int(fill*100),"1",8)
+	label_at(Vector2(9,122),"HP %d%% - original size and colour" % int(fill*100),"1",8)
 	mob_plate(Vector2(30,149),"Mossling","?",0.5,0.65)
-	label_at(Vector2(108,153),"Unknown level: neutral plate", "g",8)
+	label_at(Vector2(108,153),"Level comes from snapshot", "g",8)
 func draw_drop() -> void:
 	label_at(Vector2(9,8),"MOB DROP - VISUAL RECEIPT / NO PICKUP RULE","u",9)
 	for n: int in 4:
