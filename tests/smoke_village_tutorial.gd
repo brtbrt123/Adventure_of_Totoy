@@ -37,7 +37,7 @@ func next_line(scene: Explore) -> void:
 
 func wait_warning(scene: Explore) -> bool:
 	for i: int in 400:
-		if not scene.snapshot.telegraphs.is_empty():
+		if not scene.snapshot.telegraphs.is_empty() and scene.snapshot.telegraphs[0].hit_tick>scene.snapshot.tick+6:
 			return true
 		scene.advance(frame())
 	return false
@@ -101,18 +101,7 @@ func run() -> void:
 				break
 			scene.advance(bot.next_input(scene.snapshot.hero.position))
 		expect(scene.snapshot.hero.position.distance_to(stand) < 4, "walked to post")
-		expect(scene.hud.training_hint().contains(Bindings.action_label("arena_dash")), "dash prompt uses map")
-		var remap: InputEventKey = InputEventKey.new()
-		remap.physical_keycode = KEY_V
-		InputMap.action_erase_events("arena_dash")
-		InputMap.action_add_event("arena_dash", remap)
-		expect(scene.hud.training_hint().contains("V"), "dash hint follows remapped input")
-		Bindings.register()
-		scene.advance(frame(false, false, true))
-		for i: int in 40:
-			scene.advance(frame())
-		scene.core.place_at(stand)
-		scene.advance(frame())
+		expect(scene.hud.training_hint().contains(Bindings.action_label("arena_attack")),"attack is first lesson")
 		for swing: int in 3:
 			scene.advance(frame(true))
 			expect(scene.snapshot.hero.state == &"attack_windup" and scene.hero_frame.contains("attack"), "attack uses combat animation")
@@ -128,6 +117,22 @@ func run() -> void:
 			expect(impact_seen, "post hit reaction recorded")
 			expect(slash_seen, "imported slash accompanies the swing")
 			expect(scene.frames.has(scene.hero_frame), "combat pose exists")
+		expect(scene.hud.training_hint().contains(Bindings.action_label("arena_dash")),"dash prompt uses map after attack")
+		var remap: InputEventKey=InputEventKey.new()
+		remap.physical_keycode=KEY_V
+		InputMap.action_erase_events("arena_dash")
+		InputMap.action_add_event("arena_dash",remap)
+		expect(scene.hud.training_hint().contains("V"),"dash hint follows remapped input")
+		Bindings.register()
+		var ring: Dictionary=scene.snapshot.training["ring"]
+		scene.core.place_at(ring["center"]+Vector2(-26,0))
+		var ring_dash: Intent=frame(false,false,true)
+		ring_dash.move=Vector2.RIGHT
+		scene.advance(ring_dash)
+		for i: int in 40:scene.advance(frame())
+		expect(scene.snapshot.story_flags.has(&"lesson_dash"),"dash through actual ring")
+		scene.core.place_at(stand)
+		scene.advance(frame())
 		if wait_warning(scene):
 			var tell: RefCounted = scene.snapshot.telegraphs[0]
 			expect(tell.kind == &"gold" and TelegraphView.warning_visible(tell, scene.snapshot.tick) and TelegraphView.outline(tell).size() > 3, "gold warning geometry visible")
@@ -155,7 +160,9 @@ func run() -> void:
 		expect(scene.toast_message == "TRAINING COMPLETE", "completion confirmation")
 		scene.request_aspect_equip(&"not_an_aspect", 1)
 		expect(not scene.snapshot.story_flags.has(&"lesson_aspect"), "rejected aspect does not teach lesson")
-		scene.request_aspect_equip(&"gale_cut", 1)
+		scene.core.set_flag(&"aspect_owned_sprint")  # separate equip fixture; full Edda chain has its own smoke
+		scene.advance(frame())
+		scene.request_aspect_equip(&"sprint", 1)
 		expect(Store.load_profile().story_flags.has(&"lesson_aspect"), "aspect equip lesson saved")
 		expect(int(scene.practice_view.audio.played.get("swing", 0)) >= 3, "recorded sword swishes")
 		expect(int(scene.practice_view.audio.played.get("perfect_parry", 0)) + int(scene.practice_view.audio.played.get("deflect", 0)) >= 1, "recorded parry cue")
@@ -183,7 +190,7 @@ func run() -> void:
 				resumed.core.place_at(npc["position"] + Vector2(16, 2))
 		resumed.advance(frame())
 		next_line(resumed)
-		expect(resumed.snapshot.dialogue.get("dialogue_id", &"") == &"mira_again", "follow-up selected from restored flags")
+		expect(resumed.snapshot.dialogue.get("dialogue_id", &"") == &"mira_after_edda", "advanced follow-up selected from restored equip-lesson flags")
 		resumed.queue_free()
 		await process_frame
 	# All existing portrait names and every authored line fit the presentation contract.

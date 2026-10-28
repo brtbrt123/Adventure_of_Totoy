@@ -84,6 +84,7 @@ func inventory_test() -> void:
 	var profile: Explore.SaveProfile = Explore.SaveProfile.new()
 	profile.record_scene(SceneDefs.WOODLAND_LAYERED,&"woodland_layered_west")
 	profile.story_flags.append(&"received_first_sword")
+	profile.story_flags.append(&"unlocked_item_slot_1")
 	profile.inventory = {"herb":3}
 	Explore.SaveStore.save(profile)
 	spawn(true)

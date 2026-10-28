@@ -22,6 +22,8 @@ func spawn(id: StringName) -> Explore:
 	root.add_child(scene)
 	scene.set_physics_process(false)
 	scene.fade_phase = &""
+	scene.core.set_flag(&"unlocked_dash")  # animation fixture, independent of the real unlock sequence
+	scene.advance(Intent.new())
 	if scene.conversation.controls_open:
 		scene.dismiss_controls()
 	return scene
@@ -80,6 +82,8 @@ func run() -> void:
 			expect(scene.hero_frame.begins_with("totoy_unarmed_dash_"), "unarmed dashing uses approved set")
 			for i: int in 40:
 				scene.advance(Intent.new())
+			scene.core.set_flag(&"met_mira")  # prerequisite; actual sequence covered by smoke_progression
+			scene.advance(Intent.new())
 			talk(scene, skipped)
 			expect(scene.snapshot.armed and Store.load_profile().story_flags.has(&"received_first_sword"), "handover saved")
 			expect(scene.hero_frame.begins_with("hero2_"), "handover immediately selects armed poses")

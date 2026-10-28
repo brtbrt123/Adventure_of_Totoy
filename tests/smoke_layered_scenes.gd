@@ -91,6 +91,8 @@ func run() -> void:
 	scene = (load("res://presentation/explore/explore_scene.tscn") as PackedScene).instantiate() as Explore
 	scene.set_physics_process(false)
 	root.add_child(scene)
+	scene.core.set_flag(&"debug_all_unlocked")
+	scene.advance(InputFrame.new())
 	await process_frame
 	finish_fade()
 	expect(scene.snapshot.scene_id == &"village_layered", "Loads via START_META")

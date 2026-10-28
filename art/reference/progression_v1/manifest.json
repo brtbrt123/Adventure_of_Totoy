@@ -1,5 +1,5 @@
 {
-  "status": "OWNER_REVIEW_REQUIRED_NOT_INSTALLED",
+  "status": "OWNER_APPROVED_INSTALLED",
   "core_commit": "7afdfcc",
   "source_sha256": "3ecc15aceea65f0d54090d23cc86e3decb8032404b74af504997339742ae3485",
   "size": [

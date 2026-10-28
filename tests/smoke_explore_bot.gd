@@ -62,6 +62,8 @@ func _run() -> void:
 	scene.set_physics_process(false)  # the bot drives every tick
 	root.add_child(scene)
 	await process_frame
+	scene.core.set_flag(&"debug_all_unlocked")
+	scene.advance(Explore.InputFrame.new())
 	while scene.fade_phase != &"":
 		scene.advance_fade()
 	_expect(walk_out(&"to_forest", SceneDefs.WOODLAND_LAYERED), "village -> woodland")

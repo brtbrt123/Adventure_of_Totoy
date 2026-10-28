@@ -49,6 +49,7 @@ func run() -> void:
 	await process_frame
 	expect(walk(Vector2(616,248)),"walk west to east")
 	expect(walk(Vector2(24,248)),"walk east to west")
+	scene.core.set_flag(&"debug_all_unlocked")
 	scene.core.set_flag(&"received_first_sword")
 	step()
 	# Full production map, dormant creatures at real scale.

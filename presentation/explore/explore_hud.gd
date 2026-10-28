@@ -25,7 +25,7 @@ const Bindings := preload("res://presentation/arena/input_bindings.gd")
 
 func training_hint() -> String:
 	match String(training.get("hint", "")):
-		"dash": return "Dash: " + Bindings.action_label("arena_dash")
+		"dash": return "Dash through ring: " + Bindings.action_label("arena_dash")
 		"attack": return "Attack 3 times: %s (%d/%d)" % [Bindings.action_label("arena_attack"), training.get("hits", 0), training.get("hits_needed", 3)]
 		"parry": return "Parry GOLD just before hit: " + Bindings.action_label("arena_parry")
 		"dodge": return "Dash through RED: " + Bindings.action_label("arena_dash")
@@ -57,7 +57,8 @@ func _draw() -> void:
 		return
 	if fight_hud:
 		_draw_combat()
-	if toast_text != "" and toast_alpha > 0.0 and not bool(training.get("active", false)):
+	_draw_progression()
+	if toast_text != "" and toast_alpha > 0.0 and not bool(training.get("active", false)) and (combat==null or combat.objective.is_empty()):
 		var rect: Rect2 = toast_rect()
 		draw_rect(rect, Color(colors["0"], 0.78 * toast_alpha))
 		draw_rect(Rect2(rect.position + Vector2(0, rect.size.y - 1), Vector2(rect.size.x, 1)), Color(colors["u"], toast_alpha))
@@ -81,24 +82,25 @@ func _draw() -> void:
 
 ## Same teal frame, corner gems, title face and body font as the controls/dialogue cards.
 func _draw_training_cards() -> void:
+	var dy: int=104  # keep the post, its warnings and the practice ring unobscured
 	var lesson: String = String(training.get("hint", ""))
 	var titles: Dictionary = {"dash": "Dash", "attack": "Attack", "parry": "Parry gold", "dodge": "Dodge red"}
-	var details: Dictionary = {"dash": "Dash once in the training yard.", "attack": "Hit the post: %d / %d" % [training.get("hits", 0), training.get("hits_needed", 3)], "parry": "Press just before the gold hit.", "dodge": "Dash through the red hit."}
+	var details: Dictionary = {"dash": "Dash through the marked ring.", "attack": "Hit the post: %d / %d" % [training.get("hits", 0), training.get("hits_needed", 3)], "parry": "Press just before the gold hit.", "dodge": "Dash through the red hit."}
 	var actions: Dictionary = {"dash": "arena_dash", "attack": "arena_attack", "parry": "arena_parry", "dodge": "arena_dash"}
 	var feedback: bool = not training_feedback.is_empty() and toast_alpha > 0.0
 	if titles.has(lesson) or (bool(training.get("done", false)) and feedback):
-		UiPanel.draw_panel(self, Rect2(6, 6, 184, 29), &"info", colors)
-		lettering(Vector2(14, 12), titles.get(lesson, "Training complete"), colors["u"], 1, menu_font(), 8)
-		lettering(Vector2(14, 25), training_feedback if feedback else String(details.get(lesson, "All four lessons learned.")), colors["1"], 1, ui_font(), 8)
+		UiPanel.draw_panel(self, Rect2(6, 6+dy, 184, 29), &"info", colors)
+		lettering(Vector2(14, 12+dy), titles.get(lesson, "Training complete"), colors["u"], 1, menu_font(), 8)
+		lettering(Vector2(14, 25+dy), training_feedback if feedback else String(details.get(lesson, "All four lessons learned.")), colors["1"], 1, ui_font(), 8)
 		var key: String = Bindings.action_label(actions[lesson]) if actions.has(lesson) else "Done"
 		var width: float = text_width(key, 1, ui_font(), 8) + 10
-		var badge: Rect2 = Rect2(182 - width, 10, width, 12)
+		var badge: Rect2 = Rect2(182 - width, 10+dy, width, 12)
 		draw_rect(badge, colors["8"])
 		UiPanel.outline(self, badge, colors["t"])
 		lettering(badge.position + Vector2(5, 3), key, colors["1"], 1, ui_font(), 8)
 	UiPanel.draw_panel(self, Rect2(180, 145, 134, 29), &"info", colors)
 	var checks: Dictionary = training.get("lessons", {})
-	var names: Array[String] = ["dash", "attack", "parry", "dodge"]
+	var names: Array[String] = ["attack", "dash", "parry", "dodge"]
 	for i: int in names.size():
 		var name: String = names[i]
 		var done: bool = bool(checks.get(name, false))
@@ -121,9 +123,16 @@ var level_up_tick: int = -1000
 var item_flash_tick: int = -1000
 var shown_level: int = 0
 var combat_scene: StringName = &""
+var dash_peak: int=1
+var dash_previous: int=0
 func sync_combat(value: ExploreCore.ExploreSnapshot) -> void:
 	var changed: bool = combat_scene != value.scene_id or (combat != null and value.tick < combat.tick)
 	if changed:reset_combat_feedback()
+	if changed:
+		dash_peak=1
+		dash_previous=0
+	if value.dash_cooldown_ticks>dash_previous:dash_peak=value.dash_cooldown_ticks
+	dash_previous=value.dash_cooldown_ticks
 	combat = value
 	combat_scene = value.scene_id
 	var target: float = 1.0 if value.exp_to_next == 0 else clampf(float(value.exp)/value.exp_to_next,0.0,1.0)
@@ -135,6 +144,9 @@ func reset_combat_feedback() -> void:
 	exp_glow_tick = -1000
 	level_up_tick = -1000
 	item_flash_tick = -1000
+	task_tick=-1000
+	gate_tick=-1000
+	locked_tick=-1000
 static func feedback_active(now: int, started: int, duration: int) -> bool:
 	return started>=0 and now>=started and now-started<duration
 func level_banner_visible() -> bool:
@@ -142,7 +154,12 @@ func level_banner_visible() -> bool:
 func combat_event(event: GameEvent) -> void:
 	match event.type:
 		GameEvent.EXP_GAINED: exp_glow_tick = event.tick
-		GameEvent.LEVEL_UP: level_up_tick = event.tick
+		GameEvent.LEVEL_UP:
+			level_up_tick = event.tick
+			level_points = int(event.data.get("points",0))
+		GameEvent.QUEST_COMPLETED:
+			task_tick=event.tick
+			task_message="Task complete +%d EXP" % int(event.data.get("exp",0))
 		GameEvent.ITEM_USED: item_flash_tick = event.tick
 func combat_slot(at: Vector2, key: String, value: Dictionary, item: bool) -> void:
 	ui("hud_copper_slot",Rect2(at,Vector2(24,24)))
@@ -152,6 +169,11 @@ func combat_slot(at: Vector2, key: String, value: Dictionary, item: bool) -> voi
 		ui("hud_copper_lock",Rect2(at+Vector2(8,3),Vector2(8,16)))
 	elif item and String(value.get("item","")) == "herb":
 		ui("hud_copper_herb",Rect2(at+Vector2(4,2),Vector2(16,16)))
+	elif not item:
+		ui(aspect_icon(StringName(value.get("aspect",&""))),Rect2(at+Vector2.ONE,Vector2(22,22)))
+		if not bool(value.get("usable",false)):
+			draw_rect(Rect2(at+Vector2(3,3),Vector2(18,18)),Color(colors["0"],0.65))
+			if combat!=null and not combat.owned_aspects.has(StringName(value.get("aspect",&""))):ui("hud_copper_lock",Rect2(at+Vector2(8,3),Vector2(8,16)))
 	var badge: Rect2 = Rect2(at+Vector2(-1,17),Vector2(8,8))
 	draw_rect(badge,colors["0"])
 	UiPanel.outline(self,badge,colors["g"])
@@ -167,7 +189,7 @@ func _draw_combat() -> void:
 	outlined(Vector2(64,153),"%d / %d" % [combat.hero.hp,combat.hero.max_hp],colors["1"],colors["0"],1,ui_font(),7)
 	# Edge is not in ExploreSnapshot. Show an unavailable track, never invent a value.
 	outlined(Vector2(92,162),"--",colors["g"],colors["0"],1,ui_font(),6)
-	bar(Vector2(62,170),72,Tuning.DASH_COOLDOWN_TICKS-combat.dash_cooldown_ticks,Tuning.DASH_COOLDOWN_TICKS,colors["v"],2)
+	bar(Vector2(62,170),72,maxi(0,dash_peak-combat.dash_cooldown_ticks) if bool(combat.unlocked.get("dash",false)) else 0,dash_peak,colors["v"],2)
 	for i: int in 2:
 		combat_slot(Vector2(178+i*28,150),str(i+1),combat.item_slots[i] if i<combat.item_slots.size() else {},true)
 	for i: int in 3:
@@ -181,9 +203,50 @@ func _draw_combat() -> void:
 	centered(14,127,"MAX" if combat.exp_to_next==0 else "EXP",colors["o"],colors["0"],1,ui_font(),7)
 	if feedback_active(combat.tick,exp_glow_tick,24):UiPanel.outline(self,Rect2(7,46,14,78),colors["p"])
 	if feedback_active(combat.tick,item_flash_tick,15):UiPanel.outline(self,Rect2(177,149,26,26),colors["u"])
-	if level_banner_visible():
-		UiPanel.draw_panel(self,Rect2(120,22,80,14),&"info",colors,false)
-		centered(160,26,"LEVEL UP",colors["p"],colors["0"],1,ui_font(),8)
 	if combat.defeated:
 		draw_rect(Rect2(0,130,320,50),Color(colors["0"],0.6))
 		centered(105,155,"DOWN",colors["o"],colors["0"],1,ui_font(),9)
+
+var task_message: String=""
+var task_tick: int=-1000
+var gate_message: String=""
+var gate_tick: int=-1000
+var locked_message: String=""
+var locked_tick: int=-1000
+var level_points: int=0
+func locked_hint(text: String) -> void:
+	locked_message=text
+	locked_tick=combat.tick if combat!=null else 0
+func _draw_progression() -> void:
+	if combat==null:return
+	if not combat.objective.is_empty():
+		UiPanel.draw_panel(self,Rect2(5,5,310,16),&"info",colors,false)
+		outlined(Vector2(12,10),String(combat.objective.get("text","")),colors["1"],colors["0"],1,ui_font(),8)
+	if level_banner_visible():
+		UiPanel.draw_panel(self,Rect2(206,24,108,25),&"info",colors,false)
+		centered(260,28,"LEVEL UP",colors["p"],colors["0"],1,ui_font(),8)
+		centered(260,39,"+%d stat points" % level_points,colors["u"],colors["0"],1,ui_font(),7)
+	if feedback_active(combat.tick,task_tick,100):
+		outlined(Vector2(9,25),task_message,colors["u"],colors["0"],1,ui_font(),8)
+	if feedback_active(combat.tick,gate_tick,160):
+		UiPanel.draw_panel(self,Rect2(12,35,296,27),&"info",colors,false)
+		var words: PackedStringArray=gate_message.split(" ")
+		var rows: Array[String]=[""]
+		for word: String in words:
+			var candidate: String=rows[-1]+(" " if not rows[-1].is_empty() else "")+word
+			if text_width(candidate,1,ui_font(),8)>278:rows.append(word)
+			else:rows[-1]=candidate
+		for i: int in mini(2,rows.size()):outlined(Vector2(20,43+i*8),rows[i],colors["1"],colors["0"],1,ui_font(),8)
+	var x0: int=60 if fight_hud else 6
+	var y0: int=126 if fight_hud else 155
+	for i: int in 3:
+		var name: String=["dash","attack","parry"][i]
+		var unlocked: bool=bool(combat.unlocked.get(name,false))
+		var at: Vector2=Vector2(x0+i*34,y0)
+		draw_rect(Rect2(at,Vector2(32,17)),colors["0"])
+		UiPanel.outline(self,Rect2(at,Vector2(32,17)),colors["t" if unlocked else "f"])
+		if not unlocked:ui("hud_copper_lock",Rect2(at+Vector2(1,2),Vector2(6,12)))
+		var key: String=Bindings.action_label(["arena_dash","arena_attack","arena_parry"][i]).replace("Left click","LMB")
+		outlined(at+Vector2(9 if not unlocked else 3,5),key,colors["p" if unlocked else "g"],colors["0"],1,ui_font(),6)
+	if feedback_active(combat.tick,locked_tick,70):outlined(Vector2(x0,y0-11),locked_message,colors["o"],colors["0"],1,ui_font(),7)
+	outlined(Vector2(6,118) if fight_hud else Vector2(124,160),"TAB"+(" !" if combat.stat_points_unspent>0 else ""),colors["u"],colors["0"],1,ui_font(),7)

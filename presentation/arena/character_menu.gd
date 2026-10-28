@@ -66,6 +66,11 @@ const ACTIVE_KEYS: Dictionary = {Tuning.WEAPON_BLACK_KATANA: &"black_form", Tuni
 const ACTIVE_ROW_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK FORM", Tuning.WEAPON_DUAL_DAGGER: "BARRAGE", Tuning.WEAPON_CHAIN_SCYTHE: "REAPER'S COIL"}
 const SHORT_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "KATANA", Tuning.WEAPON_DUAL_DAGGER: "DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "SCYTHE"}
 
+const ExploreCore := preload("res://core/explore_core.gd")
+var progression: ExploreCore.ExploreSnapshot
+var stat_request: Callable=Callable()
+var respec_request: Callable=Callable()
+var stats_notice: String=""
 var is_open: bool = false
 var tab: int = TAB_STATS
 ## STATS: the selected item key (&"" = none yet); INVENTORY: the selected slot index.
@@ -102,10 +107,11 @@ func _ready() -> void:
 
 
 func open() -> void:
+	stats_notice=""
 	is_open = true
 	visible = true
 	tab = TAB_STATS
-	stats_selection = &""
+	stats_selection = &"stat_vitality" if progression!=null else &""
 	hover_key = &""
 	feedback = {}
 	close_picker()
@@ -202,6 +208,7 @@ func set_tab(index: int) -> void:
 
 ## Every selectable item of the STATS tab with its rect: the weapon slot, the three Aspect slots, the stat rows.
 func stats_items() -> Array[Dictionary]:
+	if progression!=null:return progression_items()
 	var items: Array[Dictionary] = [{"key": &"weapon", "rect": WEAPON_SLOT}]
 	for i: int in range(3):
 		items.append({"key": ASPECT_KEYS[i], "rect": aspect_rect(i)})
@@ -249,7 +256,7 @@ func move_selection(direction: Vector2i) -> void:
 		if item["key"] == stats_selection:
 			current = item["rect"]
 	if current.size == Vector2.ZERO:
-		stats_selection = &"weapon"
+		stats_selection = items[0]["key"]
 		queue_redraw()
 		return
 	var from: Vector2 = current.get_center()
@@ -315,7 +322,9 @@ func click(pos: Vector2) -> void:
 			if Rect2(item["rect"]).has_point(pos):
 				stats_selection = item["key"]
 				hover_key = &""
-				if item["key"] in ASPECT_KEYS:
+				if progression!=null and (String(item["key"]).begins_with("stat_") or item["key"]==&"respec"):
+					accept()
+				elif item["key"] in ASPECT_KEYS:
 					open_picker(ASPECT_KEYS.find(item["key"]) + 1)
 		return
 	for index: int in range(GRID_COLS * GRID_ROWS):
@@ -326,6 +335,16 @@ func click(pos: Vector2) -> void:
 
 ## ENTER: on INVENTORY equip the selected weapon through the core; on STATS pin the selection (first press: weapon).
 func accept() -> void:
+	if progression!=null and not picker_open() and tab==TAB_STATS:
+		if String(stats_selection).begins_with("stat_"):
+			if stat_request.is_valid():stat_request.call(StringName(String(stats_selection).trim_prefix("stat_")))
+			queue_redraw()
+			return
+		if stats_selection==&"respec":
+			if progression.scene_id==&"village_layered" and respec_request.is_valid():respec_request.call()
+			else:stats_notice="Respec in the village"
+			queue_redraw()
+			return
 	if picker_open():
 		_equip_aspect(Aspects.ALL[picker_selection])
 		return
@@ -355,6 +374,13 @@ func picker_open() -> bool:
 
 ## Opens the picker for slot 1-3 with the aspect already there highlighted.
 func open_picker(slot: int) -> void:
+	if progression!=null:
+		var unlocked: bool=slot<=progression.aspect_slots.size() and bool(progression.aspect_slots[slot-1].get("unlocked",false))
+		var binding_lesson: bool=slot==1 and String(progression.objective.get("id",""))=="edda_equip"
+		if not unlocked and not binding_lesson:
+			stats_notice="Socket locked"
+			queue_redraw()
+			return
 	picker_slot = clampi(slot, 1, 3)
 	picker_selection = maxi(0, Aspects.ALL.find(slot_aspect(picker_slot)))
 	picker_scroll = 0
@@ -428,7 +454,11 @@ func aspect_slot_of(aspect: StringName) -> int:
 ## One core step with aspect_equip + aspect_equip_slot (the core swaps when the aspect sits in another slot); the result
 ## is read from the snapshot. The aspect already in the slot sends nothing.
 func _equip_aspect(aspect: StringName) -> void:
-	if aspect != slot_aspect(picker_slot) and aspect_request.is_valid():
+	if not aspect_owned(aspect):
+		picker_feedback={"aspect":aspect,"ok":false,"reason":"LOCKED","left":FEEDBACK_SECONDS}
+		queue_redraw()
+		return
+	if (progression!=null or aspect != slot_aspect(picker_slot)) and aspect_request.is_valid():
 		aspect_request.call(aspect, picker_slot)
 	if not is_open:
 		return  # the step ended the fight and the arena closed the menu
@@ -751,10 +781,11 @@ func _draw() -> void:
 	_draw_tabs()
 	_text(Vector2(160, 168), FOOTER, colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	if tab == TAB_STATS:
-		_draw_stats()
+		if progression!=null:_draw_progression_stats()
+		else:_draw_stats()
 	else:
 		_draw_inventory()
-	_draw_description(description_key())
+	if progression==null or tab!=TAB_STATS:_draw_description(description_key())
 
 
 func _draw_tabs() -> void:
@@ -873,10 +904,13 @@ func _draw_picker() -> void:
 			draw_rect(Rect2(row.position.x, row.end.y - 1, row.size.x, 1), colors["1"])
 		# the icon's inner 16x16 (the ring cropped) at native size
 		_ui(Hud.aspect_icon(aspect), Rect2(row.position + Vector2(2, 0), Vector2(16, 16)), Vector2(4, 4), Vector2(16, 16))
-		_text(Vector2(row.position.x + 22, row.position.y + 4), Aspects.display_name(aspect), colors["1"] if on else colors["j"])
+		if not aspect_owned(aspect):
+			draw_rect(row,Color(colors["0"],0.72))
+			_ui("hud_copper_lock",Rect2(row.position+Vector2(4,0),Vector2(8,16)))
+		_text(Vector2(row.position.x + 22, row.position.y + 4), Aspects.display_name(aspect), colors["1"] if on and aspect_owned(aspect) else colors["g"])
 		_text(Vector2(row.end.x - 26, row.position.y + 4), "%sE" % num(Aspects.edge_cost(aspect)), colors["v"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
 		var slot: int = aspect_slot_of(aspect)
-		if slot > 0:
+		if slot > 0 and aspect_owned(aspect):
 			_key_badge(Vector2(row.end.x - 22, row.position.y + 4), SLOT_LETTERS[slot - 1])
 			_tick(Vector2(row.end.x - 11, row.position.y + 5), colors["u"])
 
@@ -966,6 +1000,9 @@ func _draw_inventory() -> void:
 		var grid_item: StringName = grid_aspect(index)
 		if grid_item != &"":
 			_ui(Hud.aspect_icon(grid_item), Rect2(rect.position + Vector2(4, 4), Vector2(24, 24)))
+			if not aspect_owned(grid_item):
+				draw_rect(rect.grow(-2),Color(colors["0"],0.8))
+				_ui("hud_copper_lock",Rect2(rect.position+Vector2(12,7),Vector2(8,16)))
 			var held: int = aspect_slot_of(grid_item)
 			if held > 0:
 				_key_badge(rect.position + Vector2(23, 1), SLOT_LETTERS[held - 1])
@@ -999,6 +1036,9 @@ func _draw_inventory() -> void:
 
 ## An aspect's card (view-only): its icon in a slot frame, name, the slot holding it, Edge cost and cooldown.
 func _draw_aspect_card(aspect: StringName, cx: float) -> void:
+	if not aspect_owned(aspect):
+		_text(Vector2(cx,82),"LOCKED",colors["g"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_CENTER)
+		return
 	var frame: Rect2 = Rect2(cx - 13, 33, 26, 26)
 	UiPanel.slot(self, frame, false, colors)
 	_ui(Hud.aspect_icon(aspect), Rect2(frame.position + Vector2.ONE, Vector2(24, 24)))
@@ -1045,3 +1085,45 @@ func _draw_description(key: StringName) -> void:
 	for i: int in range(lines.size()):
 		if not String(lines[i]).is_empty():
 			_text(Vector2(x0, DESC.position.y + 13 + i * 8), lines[i], colors["o"] if i == 2 else colors["j"])
+
+func aspect_owned(aspect: StringName) -> bool:
+	return progression==null or progression.owned_aspects.has(aspect)
+static func progression_aspect_rect(i: int) -> Rect2:return Rect2(22+i*32,130,26,26)
+func progression_items() -> Array[Dictionary]:
+	var items: Array[Dictionary]=[]
+	for i: int in 3:items.append({"key":StringName("stat_"+["vitality","might","agility"][i]),"rect":Rect2(274,42+i*24,16,16)})
+	items.append({"key":&"respec","rect":Rect2(224,127,74,16)})
+	for i: int in 3:items.append({"key":ASPECT_KEYS[i],"rect":progression_aspect_rect(i)})
+	return items
+func _draw_progression_stats() -> void:
+	_text(Vector2(18,25),"UNSPENT POINTS: %d" % progression.stat_points_unspent,colors["u"])
+	_text(Vector2(298,25),"LV %d   HP %d" % [progression.level,progression.hero.max_hp],colors["1"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
+	for i: int in 3:
+		var stat: String=["vitality","might","agility"][i]
+		var value: int=int(progression.stats.get(stat,0))
+		var cap: int=int(progression.stat_caps.get(stat,0))
+		var y: int=43+i*24
+		var on: bool=stats_selection==StringName("stat_"+stat)
+		draw_rect(Rect2(16,y-3,278,22),colors["e"] if on else colors["0"])
+		_text(Vector2(22,y),stat,colors["1"])
+		_text(Vector2(260,y),"%d / %d" % [value,cap],colors["p"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
+		_text(Vector2(22,y+10),["+6 max health a point","+3% damage a point","Shorter dash cooldown; a little faster"][i],colors["i"],null,6)
+		var enabled: bool=progression.stat_points_unspent>0 and value<cap
+		UiPanel.outline(self,Rect2(274,y-1,16,16),colors["u" if enabled else "f"])
+		_text(Vector2(282,y+1),"+",colors["1" if enabled else "g"],null,10,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(22,119),"ASPECT SOCKETS",colors["i"])
+	for i: int in 3:
+		var rect: Rect2=progression_aspect_rect(i)
+		UiPanel.slot(self,rect,stats_selection==ASPECT_KEYS[i],colors)
+		var slot: Dictionary=progression.aspect_slots[i] if i<progression.aspect_slots.size() else {}
+		if not bool(slot.get("unlocked",false)) or not aspect_owned(StringName(slot.get("aspect",&""))):
+			_ui("hud_copper_lock",Rect2(rect.position+Vector2(9,4),Vector2(8,16)))
+		else:_ui(Hud.aspect_icon(slot.get("aspect",&"")),Rect2(rect.position+Vector2.ONE,Vector2(24,24)))
+		_key_badge(rect.position+Vector2(-2,17),SLOT_LETTERS[i])
+	var village: bool=progression.scene_id==&"village_layered"
+	UiPanel.outline(self,Rect2(224,127,74,16),colors["u" if village else "f"])
+	_text(Vector2(261,132),"RESPEC",colors["1" if village else "g"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(261,147),"FREE IN VILLAGE" if village else "VILLAGE ONLY",colors["i"],null,6,HORIZONTAL_ALIGNMENT_CENTER)
+	if not stats_notice.is_empty():_text(Vector2(125,155),stats_notice,colors["o"],null,6)
+	elif String(progression.objective.get("id",""))=="edda_equip":_text(Vector2(125,155),"SELECT FIRST SOCKET TO BIND SPRINT",colors["u"],null,6)
+	if picker_open():_draw_picker()

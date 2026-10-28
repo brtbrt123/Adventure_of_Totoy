@@ -1,0 +1,131 @@
+extends SceneTree
+const Explore := preload("res://presentation/explore/explore_scene.gd")
+var scene: Explore
+var failures: int=0
+var previous: String=""
+func _init() -> void:call_deferred("run")
+func expect(ok: bool,label: String) -> void:
+	if not ok:
+		printerr("PROGRESSION FAIL: ",label)
+		failures+=1
+func step(frame: Explore.InputFrame=null) -> void:scene.advance(frame if frame!=null else Explore.InputFrame.new())
+func talk(id: StringName) -> void:
+	for npc: Dictionary in scene.snapshot.npcs:
+		if npc["id"]==id:scene.core.place_at(npc["position"]+Vector2(0,14))
+	step()
+	var press: Explore.InputFrame=Explore.InputFrame.new()
+	press.interact_pressed=true
+	step(press)
+	var skip: Explore.InputFrame=Explore.InputFrame.new()
+	skip.skip_pressed=true
+	step(skip)
+func run() -> void:
+	previous=OS.get_environment(Explore.SaveStore.PATH_ENV)
+	OS.set_environment(Explore.SaveStore.PATH_ENV,"res://art/build/arena_progression_test_save.json")
+	Explore.SaveStore.delete()
+	Engine.set_meta(Explore.PERSIST_META,true)
+	Engine.set_meta(Explore.START_META,{"scene":&"village_layered"})
+	scene=load("res://presentation/explore/explore_scene.tscn").instantiate()
+	root.add_child(scene)
+	scene.set_physics_process(false)
+	scene.fade_phase=&""
+	scene.dismiss_controls()
+	await process_frame
+	expect(scene.snapshot.objective.get("target",&"")==&"mira","first objective is Mira")
+	expect(not scene.snapshot.unlocked["dash"] and not scene.snapshot.unlocked["attack"],"initial abilities locked")
+	var dash: Explore.InputFrame=Explore.InputFrame.new()
+	dash.dash_pressed=true
+	step(dash)
+	expect(scene.hud.locked_message=="Dash locked" and scene.snapshot.hero.state!=&"dash","locked input has tiny hint and no dash")
+	scene.core.place_at(Rect2(scene.core.def["exits"][0]["rect"]).get_center()+Vector2(-26,0))
+	var move: Explore.InputFrame=Explore.InputFrame.new()
+	move.move=Vector2.RIGHT
+	for i: int in 120:step(move)
+	expect(not scene.hud.gate_message.is_empty() and not scene.snapshot.exiting,"east gate banner while road closed")
+	talk(&"mira")
+	expect(scene.snapshot.story_flags.has(&"met_mira") and scene.snapshot.objective["target"]==&"tovan","Mira advances objective")
+	expect(scene.hud.task_message.contains("10 EXP"),"task toast uses event EXP")
+	talk(&"tovan")
+	expect(scene.snapshot.armed and scene.snapshot.unlocked["attack"] and not scene.snapshot.unlocked["dash"],"sword unlocks attack only")
+	scene.core.set_flag(&"lesson_attack")
+	step()
+	expect(scene.snapshot.unlocked["dash"] and not scene.snapshot.unlocked["parry"],"dash starts after attack")
+	var ring: Dictionary=scene.snapshot.training.get("ring",{})
+	scene.core.place_at(ring["center"]+Vector2(-26,0))
+	step()
+	expect(bool(scene.snapshot.training["ring"]["active"]),"snapshot ring active for dash lesson")
+	dash.aim=Vector2.RIGHT
+	dash.move=Vector2.RIGHT
+	step(dash)
+	for i: int in 15:step()
+	expect(scene.snapshot.story_flags.has(&"lesson_dash") and scene.snapshot.unlocked["parry"],"real dash through ring advances quest")
+	scene.core.set_flag(&"lesson_parry")
+	scene.core.set_flag(&"lesson_dodge")
+	scene.core.set_flag(&"training_done")
+	step()
+	talk(&"tovan")
+	talk(&"elder")
+	expect(scene.snapshot.objective.get("target",&"")==&"chest","Elder sends player to chest")
+	for object: Dictionary in scene.core.def["objects"]:
+		if object["id"]==&"chest":scene.core.place_at(object["position"]+Vector2(0,14))
+	step()
+	var interact: Explore.InputFrame=Explore.InputFrame.new()
+	interact.interact_pressed=true
+	step(interact)
+	expect(scene.snapshot.story_flags.has(&"basket_found") and scene.progression_view.chest_tick>=0,"chest confirmed animation event")
+	expect(scene.hud.task_message=="The Elder's basket.","basket message")
+	talk(&"elder")
+	expect(scene.snapshot.item_slots[0]["unlocked"] and scene.snapshot.inventory.get("herb",0)==2,"Elder reward unlocks herb slot")
+	talk(&"edda")
+	expect(scene.snapshot.owned_aspects.has(&"sprint"),"Edda grants owned Sprint")
+	expect(not scene.character_menu.aspect_owned(&"moon_cleave"),"menu rejects unowned Aspect")
+	scene.request_aspect_equip(&"moon_cleave",1)
+	expect(not scene.snapshot.story_flags.has(&"lesson_aspect"),"unowned equip cannot finish lesson")
+	scene.open_menu()
+	scene.character_menu.open_picker(1)
+	expect(scene.character_menu.picker_open(),"first socket offers binding during Edda equip lesson")
+	scene.character_menu.picker_selection=scene.character_menu.Aspects.ALL.find(&"sprint")
+	scene.character_menu.accept()
+	scene.character_menu.close()
+	expect(scene.snapshot.story_flags.has(&"lesson_aspect") and scene.snapshot.aspect_slots[0]["usable"],"confirmed Sprint binding completes lesson")
+	expect(scene.snapshot.objective.is_empty(),"quest chain complete")
+	expect(scene.snapshot.exp_total==95,"full quest rewards total95")
+	expect(scene.snapshot.stat_points_unspent==4,"two points per level")
+	var max_hp: int=scene.snapshot.hero.max_hp
+	scene.open_menu()
+	scene.character_menu.click(Vector2(282,49))
+	scene.character_menu.close()
+	expect(scene.snapshot.hero.max_hp==max_hp+6 and scene.snapshot.stat_points_unspent==3,"spend intent changes authoritative health")
+	expect(Explore.SaveStore.load_profile().stats.get("vitality",0)==1,"spent stats saved")
+	scene.enter_scene(&"forest_layered")
+	expect(scene.snapshot.stats[&"vitality"]==1,"stats restored on next core")
+	scene.request_stats_reset()
+	expect(scene.snapshot.stats[&"vitality"]==1,"outside-village respec refused")
+	scene.enter_scene(&"village_layered")
+	scene.request_stats_reset()
+	expect(scene.snapshot.stats[&"vitality"]==0 and scene.snapshot.stat_points_unspent==4,"village respec refunds")
+	scene.jump_to(&"woodland_layered")
+	expect(scene.snapshot.story_flags.has(&"debug_all_unlocked"),"debug jump sets debug flag")
+	scene.queue_free()
+	await process_frame
+	Explore.SaveStore.delete()
+	Engine.set_meta(Explore.START_META,{"scene":&"village_layered"})
+	var fresh: Explore=load("res://presentation/explore/explore_scene.tscn").instantiate()
+	root.add_child(fresh)
+	fresh.set_physics_process(false)
+	fresh.jump_to(&"woodland_layered")
+	for tick: int in 40:
+		if fresh.fade_phase!=&"":fresh.advance_fade()
+	expect(fresh.snapshot.armed and fresh.snapshot.unlocked["attack"] and fresh.snapshot.unlocked["dash"],"fresh debug jump also equips the debug hero for combat")
+	var attack: Explore.InputFrame=Explore.InputFrame.new()
+	attack.attack_pressed=true
+	fresh.advance(attack)
+	expect(fresh.snapshot.hero.state==&"attack_windup","fresh debug jump can actually fight")
+	fresh.queue_free()
+	await process_frame
+	Explore.SaveStore.delete()
+	OS.set_environment(Explore.SaveStore.PATH_ENV,previous)
+	Engine.remove_meta(Explore.PERSIST_META)
+	if Engine.has_meta(Explore.START_META):Engine.remove_meta(Explore.START_META)
+	print("PROGRESSION SMOKE OK" if failures==0 else "PROGRESSION SMOKE FAILED")
+	quit(0 if failures==0 else 1)

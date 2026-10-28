@@ -18,6 +18,7 @@ func run() -> void:
 	scene.fade_phase = &""
 	await process_frame
 	scene.core.set_flag(&"received_first_sword")
+	scene.core.set_flag(&"unlocked_item_slot_1")
 	scene.core.set_inventory({"herb":3})
 	scene.snapshot = scene.core.snapshot()
 	scene._update_hud()

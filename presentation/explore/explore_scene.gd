@@ -36,6 +36,8 @@ var defeat_started_tick: int = -1
 var world_cues: Array[Dictionary] = []
 const EncounterEffects := preload("res://presentation/explore/encounter_effects.gd")
 var encounter_effects: EncounterEffects
+const ProgressionView := preload("res://presentation/explore/progression_view.gd")
+var progression_view: ProgressionView
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
@@ -112,6 +114,8 @@ var change_scene: Callable = func(path: String) -> void: get_tree().change_scene
 
 func _ready() -> void:
 	Bindings.register()
+	progression_view=ProgressionView.new()
+	add_child(progression_view)
 	encounter_effects = EncounterEffects.new()
 	add_child(encounter_effects)
 	practice_view = PracticeView.new()
@@ -136,6 +140,8 @@ func _ready() -> void:
 	character_menu = CharacterMenu.new()
 	character_menu.equip_request = request_equip
 	character_menu.aspect_request = request_aspect_equip
+	character_menu.stat_request=request_stat_spend
+	character_menu.respec_request=request_stats_reset
 	$HUD.add_child(character_menu)
 	conversation = ConversationView.new()
 	$HUD.add_child(conversation)
@@ -191,11 +197,14 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	core.set_story_flags(profile.story_flags)
 	core.set_inventory(profile.inventory)
 	core.set_exp(profile.exp_total)
+	core.set_stats(profile.stats)
+	core.set_loadout(profile.weapon_id,profile.equipped_aspects)
 	snapshot = core.snapshot()
 	practice_effects.clear()
 	hero_hit_tick = -1000
 	world_cues.clear()
 	encounter_effects.clear()
+	progression_view.clear()
 	defeat_started_tick = -1
 	practice_view.enter_scene(scene)
 	conversation.sync(snapshot.dialogue)
@@ -213,6 +222,8 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
+	progression_view.sync(snapshot, colors, frames, sprites)
+	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
 	queue_redraw()
 
@@ -224,6 +235,7 @@ func _save_progress(scene: StringName, checkpoint: StringName) -> void:
 		profile.story_flags = snapshot.story_flags.duplicate()
 		profile.inventory = snapshot.inventory.duplicate(true)
 		profile.exp_total = snapshot.exp_total
+		profile.stats = snapshot.stats.duplicate()
 	if persist:
 		SaveStore.save(profile)
 
@@ -286,10 +298,17 @@ func advance(intent: InputFrame) -> void:
 		conversation.finish_typing()
 		intent = InputFrame.new()
 		intent.interact_pressed = false
+	for ability: String in ["attack","dash","parry"]:
+		var pressed: bool=intent.attack_pressed if ability=="attack" else (intent.dash_pressed if ability=="dash" else intent.parry_pressed)
+		if pressed and not bool(snapshot.unlocked.get(ability,false)):
+			hud.locked_hint(ability.capitalize()+" locked")
+			practice_view.audio.cue("slot_locked",snapshot.tick,0.4)
 	if intent.use_item_slot>0 and intent.use_item_slot<=snapshot.item_slots.size() and not bool(snapshot.item_slots[intent.use_item_slot-1].get("unlocked",false)):
 		practice_view.audio.cue("slot_locked",snapshot.tick,0.4)
+		hud.locked_hint("Item slot locked")
 	if intent.skill_pressed>0 and intent.skill_pressed<=snapshot.aspect_slots.size() and not bool(snapshot.aspect_slots[intent.skill_pressed-1].get("unlocked",false)):
 		practice_view.audio.cue("slot_locked",snapshot.tick,0.4)
+		hud.locked_hint("Aspect socket locked")
 	core.step(intent)
 	snapshot = core.snapshot()
 	gate_open = snapshot.gate_open
@@ -308,6 +327,8 @@ func advance(intent: InputFrame) -> void:
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
+	progression_view.sync(snapshot, colors, frames, sprites)
+	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
 	_update_hud()
 	queue_redraw()
@@ -323,7 +344,18 @@ func _on_event(event: GameEvent) -> void:
 		toast_message = "CLEARING CLEARED"
 		toast_ticks = 110
 	match event.type:
+		GameEvent.QUEST_COMPLETED, GameEvent.STAT_SPENT, GameEvent.STATS_RESET:
+			_save_progress(core.scene_id,core.last_checkpoint)
+		GameEvent.EXIT_BLOCKED:
+			hud.gate_message=String(event.data.get("text",""))
+			hud.gate_tick=snapshot.tick
+		GameEvent.CHEST_OPENED:
+			progression_view.chest_tick=snapshot.tick
+			hud.task_message="The Elder's basket."
+			hud.task_tick=snapshot.tick
+			practice_view.audio.cue("chest_open",snapshot.tick,0.7)
 		GameEvent.HERO_DEFEATED:
+			character_menu.close()
 			defeat_started_tick = snapshot.tick
 		GameEvent.HERO_RESPAWNED:
 			defeat_started_tick = -1
@@ -347,7 +379,7 @@ func _on_event(event: GameEvent) -> void:
 			_save_progress(core.scene_id, core.last_checkpoint)
 		GameEvent.ITEM_RECEIVED:
 			_save_progress(core.scene_id, core.last_checkpoint)
-			var icons: Dictionary = {&"herb": "hud_copper_herb", &"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
+			var icons: Dictionary = {&"sprint": "ui_aspect_sprint_1", &"herb": "hud_copper_herb", &"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
 			show_reward({"kind": event.data["kind"], "name": event.data["name"], "quantity": event.data["quantity"], "icon": icons.get(StringName(event.data["item_id"]), "")})
 		GameEvent.FLAG_SET, GameEvent.DIALOGUE_ENDED:
 			_save_progress(core.scene_id, core.last_checkpoint)
@@ -413,6 +445,10 @@ func fade_alpha() -> float:
 
 ## Debug jump (F2-F5 or 1-4): to the scene's default entry, with the fade.
 func jump_to(scene: StringName) -> void:
+	core.set_flag(&"received_first_sword")  # debug combat needs an armed hero as well as ability unlocks
+	core.set_flag(&"debug_all_unlocked")
+	snapshot=core.snapshot()
+	_save_progress(core.scene_id,core.last_checkpoint)
 	begin_transition(scene, &"")
 
 
@@ -438,6 +474,7 @@ func toast_text() -> String:
 func hint_text() -> String:
 	if snapshot == null or not snapshot.dialogue.is_empty() or bool(snapshot.training.get("active", false)) or snapshot.interact_target == &"" or snapshot.exiting or bubbles.has(snapshot.interact_target):
 		return ""
+	if snapshot.interact_target==&"chest" and snapshot.story_flags.has(&"basket_found"):return "[E] LOOK"
 	return HINT_OVERRIDES.get(snapshot.interact_target, HINTS.get(snapshot.interact_kind, "[E] LOOK"))
 
 
@@ -471,24 +508,38 @@ func request_equip(weapon: StringName) -> void:
 
 
 func request_aspect_equip(aspect: StringName, slot: int) -> void:
+	if not snapshot.owned_aspects.has(aspect):return
 	var frame: InputFrame = InputFrame.new()
 	frame.aspect_equip = aspect
 	frame.aspect_equip_slot = slot
 	loadout_core.step(frame)
 	for event: GameEvent in loadout_core.last_events:
 		practice_view.audio.handle_event(event, snapshot.scene_id)
-	if slot >= 1 and slot <= loadout_core.snapshot().player.equipped_aspects.size() and loadout_core.snapshot().player.equipped_aspects[slot - 1] == aspect:
+	if aspect==&"sprint" and slot==1 and loadout_core.snapshot().player.equipped_aspects[0]==aspect:
 		core.set_flag(&"lesson_aspect")
-		snapshot = core.snapshot()
-		_save_progress(core.scene_id, core.last_checkpoint)
+		advance(InputFrame.new())
 	_save_loadout()
 	_update_hud()
+
+
+func request_stat_spend(stat: StringName) -> void:
+	var frame: InputFrame=InputFrame.new()
+	frame.spend_stat=stat
+	advance(frame)
+
+
+func request_stats_reset() -> void:
+	var frame: InputFrame=InputFrame.new()
+	frame.respec_stats=true
+	advance(frame)
 
 
 func _save_loadout() -> void:
 	var player: Snapshots.EntitySnapshot = loadout_core.snapshot().player
 	profile.weapon_id = player.weapon_id
 	profile.equipped_aspects = player.equipped_aspects.duplicate()
+	core.set_loadout(profile.weapon_id,profile.equipped_aspects)
+	snapshot=core.snapshot()
 	if persist:
 		SaveStore.save(profile)
 
@@ -572,7 +623,16 @@ func drawables() -> Array[Dictionary]:
 		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick), "left": Vector2(mob["facing"]).x < 0.0, "shadow": float(mob["radius"]), "tint": tint, "height": 30.0, "mob": mob})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
-		return PropsLayer.sorted_with_actors(PropsLayer.drawables(prop_placements, frames, _visible_world_rect().grow(8)), out)
+		var props: Array[Dictionary]=PropsLayer.drawables(prop_placements,frames,_visible_world_rect().grow(8))
+		if snapshot.story_flags.has(&"basket_found"):
+			var age: int=snapshot.tick-progression_view.chest_tick
+			var n: int=mini(6,age/5+1) if progression_view.chest_tick>=0 and age>=0 else 6
+			var f: Dictionary=frames["progress_chest_open_%d" % n]
+			for item: Dictionary in props:
+				if item["type"]==&"village_chest":
+					item["rect"]=Rect2((Vector2(item["at"])-Vector2(f["ax"],f["ay"])).round(),Vector2(f["w"],f["h"]))
+					item["src"]=Rect2(f["x"],f["y"],f["w"],f["h"])
+		return PropsLayer.sorted_with_actors(props,out)
 	return out
 
 
@@ -584,6 +644,12 @@ func _draw() -> void:
 	var ground: Texture2D = ground_texture(snapshot.scene_id)
 	if ground != null:
 		draw_texture(ground, Vector2.ZERO)
+	var ring: Dictionary = snapshot.training.get("ring",{})
+	if bool(ring.get("active",false)):
+		var at: Vector2=ring["center"]
+		var f: Dictionary=frames["progress_ring_%d" % (posmod(snapshot.tick/10,4)+1)]
+		var diameter: float=float(ring["radius"])*2.0
+		draw_texture_rect_region(sprites,Rect2((at-Vector2.ONE*diameter/2).round(),Vector2.ONE*diameter),Rect2(f["x"]+6,f["y"]+6,28,28))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
 	var items: Array[Dictionary] = drawables()
@@ -757,6 +823,7 @@ func _update_hud() -> void:
 	if debug_enabled:
 		hud.debug_lines = ["SCENE %s  TICK %d" % [String(snapshot.scene_id).to_upper(), snapshot.tick], "HERO %d,%d %s" % [int(snapshot.hero.position.x), int(snapshot.hero.position.y), String(snapshot.hero.state).to_upper()], "CHECKPOINT %s" % String(snapshot.last_checkpoint).to_upper(), "GATE %s (F6/G)" % ("OPEN" if snapshot.gate_open else "CLOSED")]
 	hud.queue_redraw()
+	character_menu.progression=snapshot
 	character_menu.snapshot = loadout_core.snapshot()
 	character_menu.colors = colors
 	character_menu.atlas = sprites
