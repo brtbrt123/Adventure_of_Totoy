@@ -13,6 +13,7 @@ class SeparateShadowLayerTests(unittest.TestCase):
     def test_all_props_have_independent_shadow_layers(self):
         manifest = json.loads((ROOT / 'art/reference/shadow_layers/manifest.json').read_text())
         defs = json.loads((ROOT / 'data/props/prop_defs.json').read_text())['props']
+        defs.update(json.loads((ROOT / 'data/props/prop_defs_woodland.json').read_text())['props'])
         frames = json.loads((ROOT / 'art/build/sprites.json').read_text())['frames']
         renderer = json.loads((ROOT / 'presentation/common/prop_art.json').read_text())['props']
         self.assertEqual(set(defs), set(manifest['props']))

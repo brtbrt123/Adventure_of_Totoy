@@ -25,8 +25,8 @@ def main():
     palette = ground.palette
     sheet = Image.open(HERE / 'props_raw.png').convert('RGBA')
     defs = {'version':1, 'props':{}}
-    art_path = HERE / 'review_prop_art.json'
-    art = {'props':{}}
+    art_path = ROOT / 'presentation/common/prop_art.json'
+    art = json.loads(art_path.read_text())
     manifest = {'scale':0.23,'alpha_threshold':244,'ground_size':[640,400], 'props':{}, 'approvals': {'ground':'2026-10-27: yes i approved','props':'2026-10-27: aight thats good'}, 'source_sha256': {n:hashlib.sha256((HERE/n).read_bytes()).hexdigest() for n in ['ground_raw.png','props_raw.png']}}
     (HERE / 'props').mkdir(exist_ok=True)
     floor = Image.open(HERE / 'ground_raw.png').convert('RGB').resize((640,400), Image.Resampling.LANCZOS)
@@ -63,7 +63,7 @@ def main():
         manifest['props'][name]={'crop':list(crop),'alpha_crop':list(bounds),'size':list(image.size),'anchor':anchor,'padded':[w,h]}
         print(name,image.size,anchor)
     art_path.write_text(json.dumps(art,indent=2)+'\n')
-    (HERE/'review_prop_defs.json').write_text(json.dumps(defs,indent=2)+'\n')
+    (HERE/'imported_prop_geometry.json').write_text(json.dumps(defs,indent=2)+'\n')
     (HERE/'import_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     lights_path=ROOT/'presentation/common/local_lights.json'
     lights=json.loads(lights_path.read_text()); lights['woodland_lantern']=copy.deepcopy(lights['forest_lantern_post'])

@@ -3883,6 +3883,618 @@
           "blur_padding": 4
         }
       }
+    },
+    "woodland_tree_broad": {
+      "object": "woodland_tree_broad",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_tree_broad.png",
+      "object_size": [
+        108,
+        102
+      ],
+      "object_anchor": [
+        54,
+        102
+      ],
+      "object_rgba_sha256": "0a8b4de52630062a01eb8a6c8503392b90312967b22ced1116d9a5910148da28",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_tree_broad_1",
+          "size": [
+            120,
+            40
+          ],
+          "anchor": [
+            43,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -39,
+            0,
+            70,
+            27
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_tree_broad_flipped_1",
+          "size": [
+            120,
+            40
+          ],
+          "anchor": [
+            44,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -40,
+            0,
+            71,
+            27
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_tree_slender": {
+      "object": "woodland_tree_slender",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_tree_slender.png",
+      "object_size": [
+        62,
+        99
+      ],
+      "object_anchor": [
+        31,
+        99
+      ],
+      "object_rgba_sha256": "93146c62a1b664b53593119cc9f88e097e8f48c4db3fb102ce9d61a5ad518819",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_tree_slender_1",
+          "size": [
+            80,
+            40
+          ],
+          "anchor": [
+            22,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -17,
+            0,
+            52,
+            26
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_tree_slender_flipped_1",
+          "size": [
+            88,
+            40
+          ],
+          "anchor": [
+            24,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            52,
+            26
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_bush": {
+      "object": "woodland_bush",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_bush.png",
+      "object_size": [
+        60,
+        41
+      ],
+      "object_anchor": [
+        30,
+        41
+      ],
+      "object_rgba_sha256": "a8b31a8c4486118953a4f7eddac0ac5e829cf92048f6fb7de084e667d0c72455",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_bush_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -26,
+            0,
+            37,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_bush_flipped_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -25,
+            0,
+            37,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_brambles": {
+      "object": "woodland_brambles",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_brambles.png",
+      "object_size": [
+        68,
+        49
+      ],
+      "object_anchor": [
+        34,
+        49
+      ],
+      "object_rgba_sha256": "8922e94064955409546c80529af94b15f5057c891b4bbb2d9d04ec3a958241c6",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_brambles_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            36,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -32,
+            0,
+            40,
+            13
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_brambles_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            36,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -31,
+            0,
+            40,
+            13
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_rocks": {
+      "object": "woodland_rocks",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_rocks.png",
+      "object_size": [
+        70,
+        39
+      ],
+      "object_anchor": [
+        35,
+        39
+      ],
+      "object_rgba_sha256": "7a44185f34f4e5810b108f2f7aa7e636d0e9f137c5544a42cae2ff59fe0fd16e",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_rocks_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            37,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -33,
+            0,
+            39,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_rocks_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            37,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -33,
+            0,
+            42,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_log": {
+      "object": "woodland_log",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_log.png",
+      "object_size": [
+        70,
+        34
+      ],
+      "object_anchor": [
+        35,
+        34
+      ],
+      "object_rgba_sha256": "bff3b26fb75c72cb3e8664ca69b44a4462474d619fd06e9bbcc15dffb644bb52",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_log_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            36,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -32,
+            0,
+            41,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_log_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            39,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -34,
+            0,
+            41,
+            9
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_stump": {
+      "object": "woodland_stump",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_stump.png",
+      "object_size": [
+        73,
+        46
+      ],
+      "object_anchor": [
+        36,
+        46
+      ],
+      "object_rgba_sha256": "8439b798a7c05e5b1c62c4d4355ea2a6e67836ce5282275042fb1a55acd88923",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_stump_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            38,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -34,
+            0,
+            42,
+            12
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_stump_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            38,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -34,
+            0,
+            40,
+            12
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_lantern": {
+      "object": "woodland_lantern",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_lantern.png",
+      "object_size": [
+        30,
+        59
+      ],
+      "object_anchor": [
+        15,
+        59
+      ],
+      "object_rgba_sha256": "06ebab3f27f286a386065bb6f90bdb63fe8f71636de518d360af45e14b8b3c4a",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_lantern_1",
+          "size": [
+            48,
+            24
+          ],
+          "anchor": [
+            10,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -6,
+            0,
+            26,
+            16
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_lantern_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            19,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            29,
+            16
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_sign": {
+      "object": "woodland_sign",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_sign.png",
+      "object_size": [
+        40,
+        56
+      ],
+      "object_anchor": [
+        20,
+        56
+      ],
+      "object_rgba_sha256": "f4c34e6f2712a00d2116efc126694001b2ede35d98da150dccc273d95d7fd091",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_sign_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            15,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -11,
+            0,
+            32,
+            15
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_sign_flipped_1",
+          "size": [
+            56,
+            24
+          ],
+          "anchor": [
+            17,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            34,
+            15
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_fire_ring": {
+      "object": "woodland_fire_ring",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_fire_ring.png",
+      "object_size": [
+        63,
+        34
+      ],
+      "object_anchor": [
+        32,
+        34
+      ],
+      "object_rgba_sha256": "91cf4ae5069b40b2545cf4b57c9340e3989e7b0f2451189830d3309a5dd4509c",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_fire_ring_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            33,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -28,
+            0,
+            37,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_fire_ring_flipped_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            38,
+            9
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_bedroll": {
+      "object": "woodland_bedroll",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_bedroll.png",
+      "object_size": [
+        55,
+        27
+      ],
+      "object_anchor": [
+        28,
+        27
+      ],
+      "object_rgba_sha256": "8487de9002f03c2c2fda2c91ab67c48fa069ea699e04eab558f6aaa43f98df92",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_bedroll_1",
+          "size": [
+            72,
+            16
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -25,
+            0,
+            32,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_bedroll_flipped_1",
+          "size": [
+            72,
+            16
+          ],
+          "anchor": [
+            29,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            34,
+            8
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "woodland_supplies": {
+      "object": "woodland_supplies",
+      "object_source": "art/reference/woodland_approach_v1/props/woodland_supplies.png",
+      "object_size": [
+        65,
+        42
+      ],
+      "object_anchor": [
+        32,
+        42
+      ],
+      "object_rgba_sha256": "929576c85c2480b961d59f41ebf7578dddea8863c9f4b9e7d7df75b131c3a857",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_woodland_supplies_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            32,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -28,
+            0,
+            38,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_woodland_supplies_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            34,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -30,
+            0,
+            43,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
     }
   }
 }

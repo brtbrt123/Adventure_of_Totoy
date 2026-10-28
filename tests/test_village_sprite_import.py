@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class VillageSpriteImportTests(unittest.TestCase):
     def test_padding_preserves_shared_content_and_base(self):
         defs = json.loads((ROOT / 'data/props/prop_defs.json').read_text())['props']
+        defs.update(json.loads((ROOT / 'data/props/prop_defs_woodland.json').read_text())['props'])
         manifest = json.loads((ROOT / 'art/reference/layered_village/import_manifest.json').read_text())['props']
         art = json.loads((ROOT / 'presentation/common/prop_art.json').read_text())['props']
         frames = json.loads((ROOT / 'art/build/sprites.json').read_text())['frames']
@@ -45,6 +46,7 @@ class VillageSpriteImportTests(unittest.TestCase):
     def test_contact_shadows_do_not_bridge_gate_or_float_below_bases(self):
         art = json.loads((ROOT / 'presentation/common/prop_art.json').read_text())['props']
         defs = json.loads((ROOT / 'data/props/prop_defs.json').read_text())['props']
+        defs.update(json.loads((ROOT / 'data/props/prop_defs_woodland.json').read_text())['props'])
         self.assertEqual(set(defs), set(art))
         for name, metadata in art.items():
             with self.subTest(prop=name):

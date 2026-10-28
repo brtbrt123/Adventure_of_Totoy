@@ -1,0 +1,121 @@
+{
+  "mossling": {
+    "source": "art/reference/chapter1_creatures/creature_mossling_v1.png",
+    "sha256": "265a88580ab0350d86ecd41a1fa181373e23ce3ffa747690fab3c1f5d86e7082",
+    "frames": 30,
+    "states": {
+      "idle": {
+        "frames": 4,
+        "ticks_per_frame": 12,
+        "loop": true,
+        "names": "creature_mossling_idle_1..4",
+        "note": "breathing bob, crest sways"
+      },
+      "walk": {
+        "frames": 6,
+        "ticks_per_frame": 5,
+        "loop": true,
+        "names": "creature_mossling_walk_1..6",
+        "note": "hop cycle: squash, take-off, air, air, land, settle (6 x 5 = 0.5 s per hop)"
+      },
+      "attack_tell": {
+        "frames": 3,
+        "ticks_per_frame": "telegraph",
+        "loop": false,
+        "names": "creature_mossling_attack_tell_1..3",
+        "note": "GOLD lunge tell: crouches, eyes flare, crest pins back, kicks dirt. Telegraph-driven: frame = floor(progress x 3), hold frame 3 until the strike (~8 ticks each)"
+      },
+      "attack_lunge": {
+        "frames": 3,
+        "ticks_per_frame": 3,
+        "loop": false,
+        "names": "creature_mossling_attack_lunge_1..3",
+        "note": "active: stretched leap, mouth open; frames stay near the anchor, the core moves the entity"
+      },
+      "attack_recover": {
+        "frames": 3,
+        "ticks_per_frame": 8,
+        "loop": false,
+        "names": "creature_mossling_attack_recover_1..3",
+        "note": "lands, dazed shake (the punish window), settles"
+      },
+      "hurt": {
+        "frames": 2,
+        "ticks_per_frame": 4,
+        "loop": false,
+        "names": "creature_mossling_hurt_1..2",
+        "note": "flash + recoil, then back"
+      },
+      "death": {
+        "frames": 5,
+        "ticks_per_frame": 6,
+        "loop": false,
+        "names": "creature_mossling_death_1..5",
+        "note": "pops (with fx_ch1_leaf_puff), crumbles into moss and leaves; hold 5 then remove"
+      },
+      "spawn": {
+        "frames": 4,
+        "ticks_per_frame": 7,
+        "loop": false,
+        "names": "creature_mossling_spawn_1..4",
+        "note": "emerges from a moss mound"
+      }
+    }
+  },
+  "boar": {
+    "source": "art/reference/chapter1_creatures/creature_thornback_boar_v1.png",
+    "sha256": "4d3ef2ee6d97993d48575bf1a773174869ef2a9e047c4ca770a8ac8e00aea863",
+    "frames": 28,
+    "states": {
+      "idle": {
+        "frames": 4,
+        "ticks_per_frame": 14,
+        "loop": true,
+        "names": "creature_thornback_boar_idle_1..4",
+        "note": "breathing, tail flick, spines lie flat"
+      },
+      "walk": {
+        "frames": 6,
+        "ticks_per_frame": 6,
+        "loop": true,
+        "names": "creature_thornback_boar_walk_1..6",
+        "note": "4-leg trot"
+      },
+      "charge_tell": {
+        "frames": 4,
+        "ticks_per_frame": "telegraph",
+        "loop": false,
+        "names": "creature_thornback_boar_charge_tell_1..4",
+        "note": "RED charge tell: head down, paws the ground twice (dust), spines rise and quiver, eye glows. Telegraph-driven over the windup (~10 ticks each)"
+      },
+      "charge_run": {
+        "frames": 4,
+        "ticks_per_frame": 3,
+        "loop": true,
+        "names": "creature_thornback_boar_charge_run_1..4",
+        "note": "gallop loop, spines swept back; draw fx_ch1_boar_dust behind the hind feet"
+      },
+      "crash_stun": {
+        "frames": 3,
+        "ticks_per_frame": 10,
+        "loop": false,
+        "names": "creature_thornback_boar_crash_stun_1..3",
+        "note": "1 = impact (draw fx_ch1_boar_crash at the snout), 2-3 dazed: loop 2-3 while stunned (the punish window)"
+      },
+      "hurt": {
+        "frames": 2,
+        "ticks_per_frame": 4,
+        "loop": false,
+        "names": "creature_thornback_boar_hurt_1..2",
+        "note": "flash + flinch"
+      },
+      "death": {
+        "frames": 5,
+        "ticks_per_frame": 8,
+        "loop": false,
+        "names": "creature_thornback_boar_death_1..5",
+        "note": "flinch, legs buckle, lies down, moss grows over it, a mossy mound remains"
+      }
+    }
+  }
+}
