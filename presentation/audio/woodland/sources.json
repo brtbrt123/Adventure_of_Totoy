@@ -1,0 +1,96 @@
+{
+  "source": "Owner-supplied AI generated WAVs; runtime gain and 2ms edge fades only. Source files preserved.",
+  "files": [
+    {
+      "file": "boar_alert.wav",
+      "seconds": 0.6065,
+      "source": "data\\audio_candidates\\boar_alert.wav",
+      "gain": 1.1737971893083494,
+      "source_peak": 0.553741455078125
+    },
+    {
+      "file": "boar_charge.wav",
+      "seconds": 0.6865,
+      "source": "data\\audio_candidates\\boar_charge.wav",
+      "gain": 2.272087689353531,
+      "source_peak": 0.28607177734375
+    },
+    {
+      "file": "boar_crash.wav",
+      "seconds": 0.6065,
+      "source": "data\\audio_candidates\\boar_crash.wav",
+      "gain": 1.1764554794520548,
+      "source_peak": 0.552490234375
+    },
+    {
+      "file": "boar_death.wav",
+      "seconds": 0.8865,
+      "source": "data\\audio_candidates\\boar_death.wav",
+      "gain": 0.7123975649730742,
+      "source_peak": 0.912384033203125
+    },
+    {
+      "file": "boar_hurt.wav",
+      "seconds": 0.4865,
+      "source": "data\\audio_candidates\\boar_hurt.wav",
+      "gain": 0.7320347138683623,
+      "source_peak": 0.887908935546875
+    },
+    {
+      "file": "herb_use.wav",
+      "seconds": 0.6865,
+      "source": "data\\audio_candidates\\herb_use.wav",
+      "gain": 6.85722794591114,
+      "source_peak": 0.09478759765625
+    },
+    {
+      "file": "item_received.wav",
+      "seconds": 0.4865,
+      "source": "data\\audio_candidates\\item_received.wav",
+      "gain": 8.0,
+      "source_peak": 0.0213623046875
+    },
+    {
+      "file": "level_up.wav",
+      "seconds": 1.2,
+      "source": "data\\audio_candidates\\level_up.wav",
+      "gain": 6.577686843730698,
+      "source_peak": 0.09881591796875
+    },
+    {
+      "file": "mob_stagger.wav",
+      "seconds": 0.4865,
+      "source": "data\\audio_candidates\\mob_stagger.wav",
+      "gain": 1.7843959450402145,
+      "source_peak": 0.3642578125
+    },
+    {
+      "file": "mossling_alert.wav",
+      "seconds": 0.4865,
+      "source": "data\\audio_candidates\\mossling_alert.wav",
+      "gain": 3.329979674796748,
+      "source_peak": 0.1951904296875
+    },
+    {
+      "file": "mossling_death.wav",
+      "seconds": 0.6865,
+      "source": "data\\audio_candidates\\mossling_death.wav",
+      "gain": 8.0,
+      "source_peak": 0.0806884765625
+    },
+    {
+      "file": "mossling_hurt.wav",
+      "seconds": 0.4865,
+      "source": "data\\audio_candidates\\mossling_hurt.wav",
+      "gain": 0.8956873712098911,
+      "source_peak": 0.725677490234375
+    },
+    {
+      "file": "slot_locked.wav",
+      "seconds": 1.0,
+      "source": "data\\audio_candidates\\slot_locked.wav",
+      "gain": 2.24810534093308,
+      "source_peak": 0.28912353515625
+    }
+  ]
+}
