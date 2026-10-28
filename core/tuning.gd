@@ -424,10 +424,21 @@ const HERO_DEFEAT_TICKS: int = 120  # from the hero's death to his return at the
 const HERB_HEAL: int = 35
 const INVENTORY_MAX_STACK: int = 99
 
-# Hero level and EXP (exploration; ExploreCore). EXP comes from felling mobs, once per mob (the story flag killed_<encounter>_<n>).
-# EXP_TO_NEXT[i] is what level i+1 needs to reach level i+2. A level gives LEVEL_HP_BONUS max health (and a full heal) and
-# LEVEL_DAMAGE_BONUS more damage per level above 1 on the hero's blows against mobs.
+# Hero level, EXP and stat points (exploration; ExploreCore; docs/PROGRESSION_PLAN.md). EXP comes from felling mobs (once per mob, the story flag
+# killed_<encounter>_<n>) and from the village tasks. EXP_TO_NEXT[i] is what level i+1 needs to reach level i+2. Each level above 1 gives
+# LEVEL_HP_BONUS max health on its own (a hero who ignores the menu is fine), a full heal, and STAT_POINTS_PER_LEVEL points to spend on
+# three modest stats (the design keeps stat boosts small: the real power is learning the attacks). No defence stat on purpose.
 const LEVEL_MAX: int = 10
 const EXP_TO_NEXT: Array[int] = [30, 50, 80, 120, 170, 230, 300, 380, 470]
-const LEVEL_HP_BONUS: int = 10
-const LEVEL_DAMAGE_BONUS: float = 0.05
+const LEVEL_HP_BONUS: int = 5
+const STAT_POINTS_PER_LEVEL: int = 2
+const STAT_IDS: Array[StringName] = [&"vitality", &"might", &"agility"]
+const STAT_CAP: Dictionary = {&"vitality": 10, &"might": 10, &"agility": 10}
+const VITALITY_HP_PER_POINT: int = 6  # max health
+const MIGHT_DAMAGE_PER_POINT: float = 0.03  # +3 % damage on the hero's blows (mobs and the boss alike)
+const AGILITY_DASH_COOLDOWN_TICKS_PER_POINT: int = 2  # shorter dash cooldown, for the first AGILITY_DASH_POINTS points
+const AGILITY_DASH_POINTS: int = 6
+const AGILITY_SPEED_PER_POINT: float = 0.005  # +0.5 % walking speed
+
+# Exploration: Edge (the Aspect meter) fills this much per tick while no encounter is awake (travel), so Sprint can be used on the road.
+const EXPLORE_EDGE_REGEN_PER_TICK: float = 0.25

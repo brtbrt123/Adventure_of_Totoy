@@ -5,8 +5,9 @@ extends RefCounted
 
 const VERSION: int = 1  # equipped_aspects (2026-10-21) and scene_id / checkpoint_id / gate_open (2026-10-22) are optional fields: older version-1 saves load with the defaults
 const Aspects := preload("res://core/aspects.gd")
+const Tuning := preload("res://core/tuning.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
-const MAX_FLAGS: int = 64
+const MAX_FLAGS: int = 96
 const MAX_ITEMS: int = 16
 const MAX_STACK: int = 99
 const RESULT_VICTORY: StringName = &"victory"
@@ -33,6 +34,8 @@ var story_flags: Array[StringName] = []
 var inventory: Dictionary = {}
 ## Total EXP earned (the level follows from it, Tuning.EXP_TO_NEXT). Optional in the file: older saves start at level 1.
 var exp_total: int = 0
+## The stat points spent ({vitality, might, agility}: counts); the unspent ones follow from the level. Optional in the file.
+var stats: Dictionary = {}
 ## Why this profile is a fresh one instead of a loaded one ("" when it was loaded or never saved before).
 var load_note: String = ""
 
@@ -76,6 +79,7 @@ func reset_progress() -> void:
 	story_flags.clear()
 	inventory.clear()
 	exp_total = 0
+	stats.clear()
 
 
 func to_dict() -> Dictionary:
@@ -94,7 +98,15 @@ func to_dict() -> Dictionary:
 		"story_flags": story_flags.map(func(flag: StringName) -> String: return String(flag)),
 		"inventory": _inventory_dict(),
 		"exp": exp_total,
+		"stats": _stats_dict(),
 	}
+
+
+func _stats_dict() -> Dictionary:
+	var out: Dictionary = {}
+	for stat: StringName in Tuning.STAT_IDS:
+		out[String(stat)] = int(stats.get(stat, 0))
+	return out
 
 
 func _inventory_dict() -> Dictionary:
@@ -143,6 +155,12 @@ static func from_dict(data: Dictionary) -> Object:
 			if flag is String and _is_flag(flag) and profile.story_flags.size() < MAX_FLAGS and not profile.story_flags.has(StringName(flag)):
 				profile.story_flags.append(StringName(flag))
 	profile.exp_total = _count(data.get("exp", 0))
+	var spent: Variant = data.get("stats", {})
+	if spent is Dictionary:
+		for stat: StringName in Tuning.STAT_IDS:
+			var points: Variant = (spent as Dictionary).get(String(stat), 0)
+			if (points is int or points is float) and int(points) > 0:
+				profile.stats[stat] = mini(int(points), int(Tuning.STAT_CAP[stat]))
 	var items: Variant = data.get("inventory", {})
 	if items is Dictionary:
 		for key: Variant in items:

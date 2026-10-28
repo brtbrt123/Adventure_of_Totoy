@@ -1,0 +1,113 @@
+{
+ "version": 1,
+ "note": "The village sequence of Chapter 1 (docs/PROGRESSION_PLAN.md). One step at a time: a step is current when every flag it `requires` is set and its `done_flag` is not. When the done_flag is set the reward is paid once (exp, items, flags) and the next step starts. `unlocks` are the ability flags set the moment a step becomes current. `target` is an NPC id or an object id (the HUD marker). Totals: 95 EXP.",
+ "steps": [
+  {
+   "id": "mira",
+   "requires": [],
+   "done_flag": "met_mira",
+   "objective": "Speak to Mira by the gate.",
+   "target": "mira",
+   "reward": {"exp": 10}
+  },
+  {
+   "id": "sword",
+   "requires": ["met_mira"],
+   "done_flag": "received_first_sword",
+   "objective": "Visit Tovan at the forge.",
+   "target": "tovan",
+   "reward": {}
+  },
+  {
+   "id": "attack",
+   "requires": ["received_first_sword"],
+   "done_flag": "lesson_attack",
+   "objective": "Strike the training post three times.",
+   "target": "training_dummy",
+   "unlocks": ["unlocked_attack"],
+   "reward": {"exp": 10}
+  },
+  {
+   "id": "dash",
+   "requires": ["lesson_attack"],
+   "done_flag": "lesson_dash",
+   "objective": "Dash through the ring.",
+   "target": "training_dummy",
+   "unlocks": ["unlocked_dash"],
+   "reward": {"exp": 10}
+  },
+  {
+   "id": "parry",
+   "requires": ["lesson_dash"],
+   "done_flag": "lesson_parry",
+   "objective": "Parry the post's gold warning.",
+   "target": "training_dummy",
+   "unlocks": ["unlocked_parry"],
+   "reward": {"exp": 10}
+  },
+  {
+   "id": "dodge",
+   "requires": ["lesson_parry"],
+   "done_flag": "lesson_dodge",
+   "objective": "Dash out of the post's red warning.",
+   "target": "training_dummy",
+   "reward": {"exp": 10}
+  },
+  {
+   "id": "tovan_done",
+   "requires": ["lesson_dodge"],
+   "done_flag": "tovan_graduated",
+   "objective": "Return to Tovan.",
+   "target": "tovan",
+   "reward": {"exp": 10}
+  },
+  {
+   "id": "elder_talk",
+   "requires": ["tovan_graduated"],
+   "done_flag": "met_elder",
+   "objective": "Speak to the Elder at the shrine.",
+   "target": "elder",
+   "reward": {"exp": 5}
+  },
+  {
+   "id": "elder_chest",
+   "requires": ["met_elder"],
+   "done_flag": "basket_found",
+   "objective": "Open the chest on the west lawn.",
+   "target": "chest",
+   "reward": {}
+  },
+  {
+   "id": "elder_done",
+   "requires": ["basket_found"],
+   "done_flag": "elder_done",
+   "objective": "Bring the basket to the Elder.",
+   "target": "elder",
+   "reward": {
+    "exp": 10,
+    "items": [{"reward_id": "elder_herbs", "kind": "item", "item": "herb", "name": "Herb", "quantity": 2}],
+    "flags": ["unlocked_item_slot_1"]
+   }
+  },
+  {
+   "id": "edda_talk",
+   "requires": ["elder_done"],
+   "done_flag": "met_edda",
+   "objective": "Visit Edda at her hut.",
+   "target": "edda",
+   "reward": {"exp": 5}
+  },
+  {
+   "id": "edda_equip",
+   "requires": ["met_edda"],
+   "done_flag": "lesson_aspect",
+   "objective": "Open the menu (TAB) and equip Sprint.",
+   "target": "",
+   "reward": {"exp": 15}
+  }
+ ],
+ "road": {
+  "requires": ["lesson_aspect"],
+  "blocked_text": "The rune gate holds. Finish your tasks in Lanternfen first."
+ }
+}

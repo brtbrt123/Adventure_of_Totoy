@@ -39,6 +39,8 @@ const SceneDefs := preload("res://core/scene_defs.gd")
 const DialogueBook := preload("res://core/dialogue_book.gd")
 const TrainingYard := preload("res://core/training_yard.gd")
 const MobField := preload("res://core/mob_field.gd")
+const QuestBook := preload("res://core/quest_book.gd")
+const Aspects := preload("res://core/aspects.gd")
 
 ## The story flag that means the hero owns his first sword (Tovan's handover, DialogueBook grants). A save that has met Tovan
 ## but has no such flag is an older save from before the handover existed: it is treated as armed (set_story_flags).
@@ -47,11 +49,14 @@ const ARMED_FLAG: StringName = &"received_first_sword"
 const HERB_ITEM: StringName = &"herb"
 ## The item slots of the HUD (keys 1 and 2): the item each holds and the story flag that unlocks it ("" = the sword). Slot 2 is not
 ## given to the hero yet: no flag sets it, so presentation shows it locked.
-const ITEM_SLOTS: Array[Dictionary] = [{"item": &"herb", "unlock": &""}, {"item": &"", "unlock": &"unlocked_item_slot_2"}]
-## The Aspect sockets (Z, X, C). Aspect skills do not work in exploration yet (only against the boss), so every socket is reported locked
-## here; flip this when they do and the sockets then follow `ASPECT_UNLOCKS`.
-const ASPECTS_IN_EXPLORATION: bool = false
+const ITEM_SLOTS: Array[Dictionary] = [{"item": &"herb", "unlock": &"unlocked_item_slot_1"}, {"item": &"", "unlock": &"unlocked_item_slot_2"}]
+## The Aspect sockets (Z, X, C) follow `ASPECT_UNLOCKS`: socket 1 opens with Edda's equip lesson. Only the Aspects in EXPLORATION_ASPECTS work here.
+const ASPECTS_IN_EXPLORATION: bool = true
 const ASPECT_UNLOCKS: Array[StringName] = [&"lesson_aspect", &"unlocked_aspect_slot_2", &"unlocked_aspect_slot_3"]
+## The Aspects that work in exploration (self buffs that need no boss to aim at): Sprint. The others stay in their socket but cannot be used here.
+const EXPLORATION_ASPECTS: Array[StringName] = [Aspects.SPRINT]
+## An Aspect is owned once Edda or a reward gave it: the story flag aspect_owned_<id>.
+const ASPECT_OWNED_PREFIX: String = "aspect_owned_"
 ## The hero can interact with an NPC or object when his centre is this close to its feet or its stand point.
 const INTERACT_RANGE: float = 24.0
 ## A checkpoint is reached when the hero's centre is this close to its point.
@@ -102,9 +107,19 @@ class ExploreSnapshot:
 	var exp: int = 0
 	var exp_to_next: int = 0
 	var exp_total: int = 0
+	## The village sequence (core/quest_book.gd): the current step as {id, text, target (an NPC or object id, may be empty), position (where the
+	## marker goes, ZERO when unknown)}; {} when every step is done. `unlocked` says which abilities the hero may use now:
+	## {attack, dash, parry, item_slot_1, aspect_socket_1}.
+	var objective: Dictionary = {}
+	var unlocked: Dictionary = {}
 	## The HUD's item boxes [{slot (1 or 2), item (id or empty), unlocked, count}] and Aspect sockets [{slot (1-3), aspect (equipped id), unlocked}].
 	var item_slots: Array[Dictionary] = []
 	var aspect_slots: Array[Dictionary] = []
+	## The Aspects he owns (what the menu may equip), the stat points he has spent ({stat: count}), the ones left to spend, and each stat's cap.
+	var owned_aspects: Array[StringName] = []
+	var stats: Dictionary = {}
+	var stat_points_unspent: int = 0
+	var stat_caps: Dictionary = {}
 	## True from the tick the hero fell until he stands up again at the checkpoint (Tuning.HERO_DEFEAT_TICKS later).
 	var defeated: bool = false
 	var last_checkpoint: StringName = &""
@@ -140,11 +155,14 @@ var interact_target: Dictionary = {}
 var npc_facing_left: Dictionary = {}  # npc id -> bool
 var training: TrainingYard = null  # the scene's practice post, if it has one
 var mobs: MobField = null  # the scene's encounters, if it has any
+var quests: Dictionary = QuestBook.default_book()  # the village sequence
 var inventory: Dictionary = {}  # item id -> count
 var exp_total: int = 0  # all the EXP the hero earned (his level follows)
+var stats: Dictionary = {&"vitality": 0, &"might": 0, &"agility": 0}  # stat points spent
 var _defeat_ticks: int = 0  # ticks since the hero fell (0 = on his feet)
 var _talk: Dictionary = {}  # the running conversation: {npc_id, dialogue_id, index}; {} when none
 var _armed: Dictionary = {}  # exit id -> true once the hero has been outside it
+var _blocked_told: Dictionary = {}  # exit id -> true while the hero stands in a closed exit (the message is said once per visit)
 var _queued: Array[GameEvent] = []  # events raised between steps (gate changes), emitted with the next step
 
 
@@ -167,6 +185,7 @@ func _init(p_scene_id: StringName = SceneDefs.START_SCENE, entry: StringName = &
 		npc_facing_left[npc["id"]] = bool(npc.get("face_left", false))
 	training = TrainingYard.for_scene(def)
 	mobs = MobField.for_scene(def)
+	_apply_stats()
 	_update_npcs()
 	interact_target = _find_interact_target()
 
@@ -213,8 +232,31 @@ func set_story_flags(flags: Array[StringName]) -> void:
 			story_flags.append(flag)
 	if story_flags.has(&"met_tovan") and not story_flags.has(ARMED_FLAG):
 		story_flags.append(ARMED_FLAG)  # an older save: Tovan was met before the handover existed; do not trap the tutorial
+	_migrate_old_flags()
+	for flag: StringName in QuestBook.missing_unlocks(quests, story_flags):
+		story_flags.append(flag)  # the step he is on has already unlocked what it teaches
 	if mobs != null:
 		mobs.sync_flags(story_flags)  # a cleared encounter stays cleared
+
+
+## A save from before the village sequence had these steps: whatever he finished then counts now, so nothing is locked behind a task
+## he already did (older lessons unlock their abilities; the Elder's errand and Edda's visit come with her lesson).
+func _migrate_old_flags() -> void:
+	var add: Array[StringName] = []
+	if story_flags.has(&"lesson_parry"):
+		add.append_array([&"lesson_attack", &"lesson_dash"])
+	if story_flags.has(&"lesson_dodge") or story_flags.has(&"training_done"):
+		add.append_array([&"lesson_attack", &"lesson_dash", &"lesson_parry", &"lesson_dodge"])
+	for lesson: StringName in [&"attack", &"dash", &"parry"]:
+		if story_flags.has(StringName("lesson_" + String(lesson))) or add.has(StringName("lesson_" + String(lesson))):
+			add.append(StringName("unlocked_" + String(lesson)))
+	if story_flags.has(&"met_edda") or story_flags.has(&"lesson_aspect"):
+		add.append_array([&"met_elder", &"basket_found", &"elder_done", &"unlocked_item_slot_1"])
+	if story_flags.has(&"lesson_aspect"):
+		add.append(&"met_edda")
+	for flag: StringName in add:
+		if not story_flags.has(flag):
+			story_flags.append(flag)
 
 
 ## Replaces the EXP (CONTINUE from a save). No events; the hero starts the scene at full health of his level.
@@ -250,12 +292,90 @@ func exp_to_next() -> int:
 
 
 func hero_max_hp() -> int:
-	return Tuning.PLAYER_MAX_HP + Tuning.LEVEL_HP_BONUS * (level() - 1)
+	return Tuning.PLAYER_MAX_HP + Tuning.LEVEL_HP_BONUS * (level() - 1) + Tuning.VITALITY_HP_PER_POINT * int(stats[&"vitality"])
 
 
-## The hero's damage multiplier from his level (his blows against mobs).
+## The hero's damage multiplier from the Might stat (his blows against mobs).
 func damage_mult() -> float:
-	return 1.0 + Tuning.LEVEL_DAMAGE_BONUS * float(level() - 1)
+	return 1.0 + Tuning.MIGHT_DAMAGE_PER_POINT * float(stats[&"might"])
+
+
+## Stat points: 2 per level above 1; those not spent yet are free to place (the menu sends `spend_stat`).
+func stat_points_total() -> int:
+	return Tuning.STAT_POINTS_PER_LEVEL * (level() - 1)
+
+
+func stat_points_spent() -> int:
+	var total: int = 0
+	for stat: StringName in Tuning.STAT_IDS:
+		total += int(stats[stat])
+	return total
+
+
+func stat_points_unspent() -> int:
+	return maxi(0, stat_points_total() - stat_points_spent())
+
+
+## Replaces the spent points (CONTINUE from a save): each stat is kept inside its cap and the total inside the points the level gives.
+func set_stats(values: Dictionary) -> void:
+	for stat: StringName in Tuning.STAT_IDS:
+		stats[stat] = clampi(int(values.get(stat, values.get(String(stat), 0))), 0, int(Tuning.STAT_CAP[stat]))
+	var over: int = stat_points_spent() - stat_points_total()
+	for stat: StringName in Tuning.STAT_IDS:
+		var cut: int = mini(over, int(stats[stat]))
+		if cut > 0:
+			stats[stat] = int(stats[stat]) - cut
+			over -= cut
+	_apply_stats()
+	player.hp = hero_max_hp()
+
+
+## The stats the player sees at work: the dash cooldown and the walking speed live in the Player.
+func _apply_stats() -> void:
+	player.dash_cooldown_bonus = Tuning.AGILITY_DASH_COOLDOWN_TICKS_PER_POINT * mini(int(stats[&"agility"]), Tuning.AGILITY_DASH_POINTS)
+	player.stat_speed_mult = 1.0 + Tuning.AGILITY_SPEED_PER_POINT * float(stats[&"agility"])
+
+
+func _spend_stat(stat: StringName, events: Array[GameEvent]) -> void:
+	if not Tuning.STAT_IDS.has(stat) or stat_points_unspent() <= 0 or int(stats[stat]) >= int(Tuning.STAT_CAP[stat]):
+		return
+	var before: int = hero_max_hp()
+	stats[stat] = int(stats[stat]) + 1
+	_apply_stats()
+	player.hp = mini(hero_max_hp(), player.hp + (hero_max_hp() - before))  # a point of vitality is health right away
+	events.append(GameEvent.new(GameEvent.STAT_SPENT, tick, {"scene": scene_id, "stat": stat, "value": int(stats[stat]), "unspent": stat_points_unspent(), "max_hp": hero_max_hp()}))
+
+
+## Takes every point back: free, and only in Lanternfen (the village).
+func _respec(events: Array[GameEvent]) -> void:
+	if scene_id != SceneDefs.VILLAGE_LAYERED or stat_points_spent() == 0:
+		return
+	for stat: StringName in Tuning.STAT_IDS:
+		stats[stat] = 0
+	_apply_stats()
+	player.hp = mini(player.hp, hero_max_hp())
+	events.append(GameEvent.new(GameEvent.STATS_RESET, tick, {"scene": scene_id, "unspent": stat_points_unspent()}))
+
+
+## The weapon and the three Aspects in his slots (CONTINUE: SaveProfile.weapon_id / equipped_aspects). Anything invalid is ignored.
+func set_loadout(weapon: StringName, aspects: Array[StringName]) -> void:
+	if [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE].has(weapon):
+		player.weapon_id = weapon
+	if Aspects.is_valid_loadout(aspects):
+		player.equipped_aspects = aspects.duplicate()
+
+
+## True when he owns `aspect` (the flag aspect_owned_<id>, or a debug flag).
+func owns_aspect(aspect: StringName) -> bool:
+	return story_flags.has(QuestBook.DEBUG_FLAG) or story_flags.has(StringName(ASPECT_OWNED_PREFIX + String(aspect)))
+
+
+## The Aspect in socket `slot` (1-3) may be used now: the socket is unlocked, he owns the Aspect and it works in exploration.
+func _aspect_usable(slot: int) -> bool:
+	if slot < 1 or slot > ASPECT_UNLOCKS.size() or slot > player.equipped_aspects.size():
+		return false
+	var aspect: StringName = player.equipped_aspects[slot - 1]
+	return ASPECTS_IN_EXPLORATION and (story_flags.has(QuestBook.DEBUG_FLAG) or story_flags.has(ASPECT_UNLOCKS[slot - 1])) and EXPLORATION_ASPECTS.has(aspect) and owns_aspect(aspect)
 
 
 ## EXP for the hero: `exp_gained`, and `level_up` (with a full heal) for every level it crosses.
@@ -267,7 +387,7 @@ func give_exp(amount: int, source: int, events: Array[GameEvent]) -> void:
 	events.append(GameEvent.new(GameEvent.EXP_GAINED, tick, {"scene": scene_id, "amount": amount, "source": source, "level": level(), "exp": exp_in_level(), "exp_to_next": exp_to_next()}))
 	for lv: int in range(before + 1, level() + 1):
 		player.hp = hero_max_hp()
-		events.append(GameEvent.new(GameEvent.LEVEL_UP, tick, {"scene": scene_id, "level": lv, "max_hp": hero_max_hp()}))
+		events.append(GameEvent.new(GameEvent.LEVEL_UP, tick, {"scene": scene_id, "level": lv, "max_hp": hero_max_hp(), "points": Tuning.STAT_POINTS_PER_LEVEL}))
 
 
 ## Replaces the inventory (CONTINUE from a save). No events. Unknown or empty counts are dropped.
@@ -297,6 +417,9 @@ func set_flag(flag: StringName) -> bool:
 		return false
 	story_flags.append(flag)
 	_queued.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+	var later: Array[GameEvent] = []
+	_flag_added(flag, later)
+	_queued.append_array(later)
 	return true
 
 
@@ -306,7 +429,34 @@ func _grant_flag(flag: StringName, events: Array[GameEvent]) -> bool:
 		return false
 	story_flags.append(flag)
 	events.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+	_flag_added(flag, events)
 	return true
+
+
+## A new story flag was set (and announced): pay the village step it completes, then unlock what the next step teaches.
+func _flag_added(flag: StringName, events: Array[GameEvent]) -> void:
+	for step: Dictionary in QuestBook.steps_done_by(quests, flag):
+		_pay_step(step, events)
+	for unlock: StringName in QuestBook.missing_unlocks(quests, story_flags):
+		_grant_flag(unlock, events)
+
+
+func _pay_step(step: Dictionary, events: Array[GameEvent]) -> void:
+	var reward: Dictionary = step.get("reward", {})
+	var items: Array[StringName] = []
+	events.append(GameEvent.new(GameEvent.QUEST_COMPLETED, tick, {"scene": scene_id, "step_id": StringName(str(step["id"])), "exp": int(reward.get("exp", 0)), "items": items}))
+	give_exp(int(reward.get("exp", 0)), 0, events)
+	for item: Variant in reward.get("items", []):
+		var row: Dictionary = item
+		give_item(row, StringName(str(step["id"])), events)
+		items.append(StringName(str(row["item"])))
+	for flag: Variant in reward.get("flags", []):
+		_grant_flag(StringName(str(flag)), events)
+
+
+## True when the hero may use `ability` (attack, dash, parry): its quest step has begun, or a debug flag lifts every lock.
+func is_unlocked(ability: StringName) -> bool:
+	return story_flags.has(QuestBook.DEBUG_FLAG) or story_flags.has(StringName(QuestBook.ABILITY_FLAGS.get(ability, &"")))
 
 
 func is_armed() -> bool:
@@ -333,12 +483,14 @@ func step(input: InputFrame) -> void:
 	var fallen: bool = player.state == PlayerState.STATE_DEAD
 	if not exiting and not talking and not fallen:
 		frame.move = input.move
-		frame.dash_pressed = input.dash_pressed
+		frame.dash_pressed = input.dash_pressed and is_unlocked(&"dash")
 		if (training != null and training.is_on(story_flags, player.position)) or (mobs != null and is_armed()):
-			frame.attack_pressed = input.attack_pressed
-			frame.attack_held = input.attack_held
-			frame.parry_pressed = input.parry_pressed
+			frame.attack_pressed = input.attack_pressed and is_unlocked(&"attack")
+			frame.attack_held = input.attack_held and is_unlocked(&"attack")
+			frame.parry_pressed = input.parry_pressed and is_unlocked(&"parry")
 			frame.aim = input.aim
+		if _aspect_usable(input.skill_pressed):
+			frame.skill_pressed = input.skill_pressed
 	var before: Vector2 = player.position
 	player.step(frame, tick, events)
 	player.position = _clamp(Collision.move_resolved(obstacles, before, player.position, Tuning.PLAYER_RADIUS))
@@ -347,6 +499,13 @@ func step(input: InputFrame) -> void:
 	if mobs != null:
 		mobs.resolve(self, events)
 	_use_item(input, talking, events)
+	if not talking and not exiting and player.state != PlayerState.STATE_DEAD:
+		if input.spend_stat != &"":
+			_spend_stat(input.spend_stat, events)
+		if input.respec_stats:
+			_respec(events)
+	if (mobs == null or not mobs.is_engaged()) and player.state != PlayerState.STATE_DEAD:
+		player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.EXPLORE_EDGE_REGEN_PER_TICK)
 	_check_defeat(events)
 	if not exiting:
 		_check_checkpoints(events)
@@ -358,6 +517,7 @@ func step(input: InputFrame) -> void:
 	elif input.interact_pressed and not exiting and not interact_target.is_empty() and (player.state == PlayerState.STATE_IDLE or player.state == PlayerState.STATE_WALK):
 		events.append(GameEvent.new(GameEvent.INTERACT, tick, {"scene": scene_id, "target_id": interact_target["id"], "kind": interact_target["kind"], "position": interact_target["position"]}))
 		_use_switch(interact_target["id"], events)
+		_open_chest(interact_target["id"], events)
 		if interact_target["kind"] == &"npc":
 			_start_talk(interact_target["id"], events)
 	last_events = events
@@ -409,6 +569,15 @@ func snapshot() -> ExploreSnapshot:
 		snap.encounters = mobs.encounter_views()
 		snap.telegraphs.append_array(mobs.telegraph_snapshots())
 	snap.inventory = inventory.duplicate()
+	snap.objective = _objective_view()
+	snap.unlocked = {"attack": is_unlocked(&"attack"), "dash": is_unlocked(&"dash"), "parry": is_unlocked(&"parry"),
+		"item_slot_1": _slot_unlocked(ITEM_SLOTS[0]), "aspect_socket_1": ASPECTS_IN_EXPLORATION and (story_flags.has(ASPECT_UNLOCKS[0]) or story_flags.has(QuestBook.DEBUG_FLAG))}
+	snap.stats = stats.duplicate()
+	snap.stat_points_unspent = stat_points_unspent()
+	snap.stat_caps = Tuning.STAT_CAP.duplicate()
+	for aspect: StringName in Aspects.ALL:
+		if owns_aspect(aspect):
+			snap.owned_aspects.append(aspect)
 	snap.level = level()
 	snap.exp = exp_in_level()
 	snap.exp_to_next = exp_to_next()
@@ -417,7 +586,7 @@ func snapshot() -> ExploreSnapshot:
 		var slot: Dictionary = ITEM_SLOTS[i]
 		snap.item_slots.append({"slot": i + 1, "item": slot["item"], "unlocked": _slot_unlocked(slot), "count": int(inventory.get(slot["item"], 0)) if slot["item"] != &"" else 0})
 	for i: int in ASPECT_UNLOCKS.size():
-		snap.aspect_slots.append({"slot": i + 1, "aspect": player.equipped_aspects[i] if i < player.equipped_aspects.size() else &"", "unlocked": ASPECTS_IN_EXPLORATION and story_flags.has(ASPECT_UNLOCKS[i])})
+		snap.aspect_slots.append({"slot": i + 1, "aspect": player.equipped_aspects[i] if i < player.equipped_aspects.size() else &"", "unlocked": ASPECTS_IN_EXPLORATION and (story_flags.has(ASPECT_UNLOCKS[i]) or story_flags.has(QuestBook.DEBUG_FLAG)), "usable": _aspect_usable(i + 1)})
 	snap.defeated = player.state == PlayerState.STATE_DEAD
 	snap.last_checkpoint = last_checkpoint
 	snap.exiting = exiting
@@ -434,7 +603,7 @@ func snapshot() -> ExploreSnapshot:
 func _slot_unlocked(slot: Dictionary) -> bool:
 	if slot["item"] == &"":
 		return false
-	return slot["unlock"] == &"" and is_armed() or (slot["unlock"] != &"" and story_flags.has(slot["unlock"]))
+	return story_flags.has(QuestBook.DEBUG_FLAG) or story_flags.has(slot["unlock"])
 
 
 ## Item slot 1 (the herb) heals Tuning.HERB_HEAL hp (never above the maximum) and is used up; nothing happens at full health, with none
@@ -514,6 +683,8 @@ func _end_talk(def_: Dictionary, skipped: bool, events: Array[GameEvent]) -> voi
 	events.append(GameEvent.new(GameEvent.DIALOGUE_ENDED, tick, {"scene": scene_id, "npc_id": finished["npc_id"], "dialogue_id": finished["dialogue_id"], "skipped": skipped, "flags_set": added}))
 	for flag: StringName in added:
 		events.append(GameEvent.new(GameEvent.FLAG_SET, tick, {"flag": flag, "flags": story_flags.duplicate()}))
+	for flag: StringName in added:
+		_flag_added(flag, events)
 	for grant: Dictionary in DialogueBook.grants_of(def_):
 		var flag: StringName = StringName(grant["flag"])
 		if story_flags.has(flag):
@@ -524,6 +695,7 @@ func _end_talk(def_: Dictionary, skipped: bool, events: Array[GameEvent]) -> voi
 			"scene": scene_id, "reward_id": StringName(grant["reward_id"]), "kind": StringName(grant["kind"]), "item_id": StringName(grant["item"]),
 			"name": String(grant["name"]), "quantity": int(grant.get("quantity", 1)), "source": finished["npc_id"],
 		}))
+		_flag_added(flag, events)
 
 
 ## What the dialogue box shows now, {} when nobody is talking.
@@ -533,6 +705,30 @@ func _dialogue_view() -> Dictionary:
 	var def_: Dictionary = DialogueBook.dialogue(book, _talk["dialogue_id"])
 	var row: Dictionary = DialogueBook.line(def_, int(_talk["index"]))
 	return {"npc_id": _talk["npc_id"], "dialogue_id": _talk["dialogue_id"], "index": int(_talk["index"]), "count": (def_["lines"] as Array).size(), "speaker": row["speaker"], "portrait": row["portrait"], "text": row["text"]}
+
+
+## The current village step for the HUD ({} when the sequence is finished); the position is where the NPC or object stands in THIS scene.
+func _objective_view() -> Dictionary:
+	var step: Dictionary = QuestBook.current(quests, story_flags)
+	if step.is_empty():
+		return {}
+	var target: StringName = StringName(str(step.get("target", "")))
+	var at: Vector2 = Vector2.ZERO
+	for npc: Dictionary in def.get("npcs", []):
+		if npc["id"] == target:
+			at = npc["position"]
+	for object: Dictionary in def.get("objects", []):
+		if object["id"] == target:
+			at = object["position"]
+	return {"id": StringName(str(step["id"])), "text": str(step["objective"]), "target": target, "position": at}
+
+
+## The Elder's errand: the village chest opens once, only after the Elder asked for his basket.
+func _open_chest(target: StringName, events: Array[GameEvent]) -> void:
+	if scene_id != SceneDefs.VILLAGE_LAYERED or target != &"chest" or not story_flags.has(&"met_elder"):
+		return
+	if _grant_flag(&"basket_found", events):
+		events.append(GameEvent.new(GameEvent.CHEST_OPENED, tick, {"scene": scene_id, "object_id": target}))
 
 
 ## The switch ids of the scene's lantern puzzle (empty: the scene has none).
@@ -581,8 +777,14 @@ func _check_exits(events: Array[GameEvent]) -> void:
 		var touching: bool = _touches(exit["rect"])
 		if not touching:
 			_armed[exit["id"]] = true
+			_blocked_told.erase(exit["id"])
 			continue
 		if not _armed.get(exit["id"], false) or exit_fired.has(exit["id"]):
+			continue
+		if exit.get("gate", &"") == &"road" and not (story_flags.has(QuestBook.DEBUG_FLAG) or QuestBook.road_open(quests, story_flags)):
+			if not _blocked_told.has(exit["id"]):
+				_blocked_told[exit["id"]] = true
+				events.append(GameEvent.new(GameEvent.EXIT_BLOCKED, tick, {"scene": scene_id, "exit_id": exit["id"], "text": QuestBook.blocked_text(quests)}))
 			continue
 		exit_fired[exit["id"]] = true
 		exiting = true

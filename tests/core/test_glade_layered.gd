@@ -30,6 +30,13 @@ var _scene: Dictionary = SceneDefs.layered_data(SCENE)
 var _defs: Dictionary = PropScene.load_defs()
 
 
+
+## A core with every ability unlocked and the village road open (these tests are about movement, not about the village sequence).
+func _new(scene_id: StringName, entry: StringName = &"", gate: bool = false) -> ExploreCore:
+	var core: ExploreCore = ExploreCore.new(scene_id, entry, gate)
+	core.set_story_flags([&"debug_all_unlocked"] as Array[StringName])
+	return core
+
 func _frame(move: Vector2, dash: bool = false) -> InputFrame:
 	var f: InputFrame = InputFrame.new()
 	f.move = move.normalized()
@@ -141,7 +148,7 @@ func test_entry_checkpoint_exits_are_free() -> void:
 		for exit: Dictionary in def["exits"]:
 			var r: Rect2 = exit["rect"]
 			assert_true(p.clamp(r.position, r.end).distance_to(p) > HERO, "%s does not touch exit %s" % [key, exit["id"]])
-	assert_eq(ExploreCore.new(SCENE).player.position, def["entries"][def["default_entry"]], "spawns on the entry")
+	assert_eq(_new(SCENE).player.position, def["entries"][def["default_entry"]], "spawns on the entry")
 	assert_eq(ExploreCore.at_checkpoint(SCENE, &"glade_layered_entrance").last_checkpoint, &"glade_layered_entrance", "continue from the checkpoint")
 
 
@@ -156,7 +163,7 @@ func test_the_hero_cannot_enter_a_solid_prop_walking_or_dashing_and_reaches_ever
 			for circle: Vector3 in circles:
 				for dir: Vector2 in DIRECTIONS:
 					var centre: Vector2 = Vector2(circle.x, circle.y)
-					var core: ExploreCore = ExploreCore.new(SCENE)
+					var core: ExploreCore = _new(SCENE)
 					var start: Vector2 = centre - dir.normalized() * (circle.z + 34.0)
 					if not Collision.fits(core.obstacles, start, HERO):
 						continue
@@ -195,7 +202,7 @@ func test_the_root_arch_keeps_its_gap_open_and_its_feet_solid() -> void:
 				break
 		assert_true(crossed, "the hero walks %s through the arch's gap (ended at %s)" % [str(dir), str(pos)])
 	# the dash through the gap
-	var core: ExploreCore = ExploreCore.new(SCENE)
+	var core: ExploreCore = _new(SCENE)
 	core.place_at(arch + Vector2(0, 30))
 	for i: int in 40:
 		core.step(_frame(Vector2.UP, i == 2))
@@ -248,7 +255,7 @@ func test_nothing_but_the_arch_gap_leads_to_the_arena_exit() -> void:
 
 func test_the_bot_walks_entrance_to_both_exits() -> void:
 	for exit_id: StringName in [&"to_forest", &"to_arena"]:
-		var core: ExploreCore = ExploreCore.new(SCENE)
+		var core: ExploreCore = _new(SCENE)
 		var rect: Rect2 = Rect2()
 		for exit: Dictionary in core.def["exits"]:
 			if exit["id"] == exit_id:
@@ -263,7 +270,7 @@ func test_the_bot_walks_entrance_to_both_exits() -> void:
 			if core.exiting:
 				break
 		assert_true(core.exiting and core.pending_exit.get("exit_id", &"") == exit_id, "%s: the hero reaches it (at %s)" % [exit_id, str(core.player.position)])
-	var entrance: ExploreCore = ExploreCore.new(SCENE)
+	var entrance: ExploreCore = _new(SCENE)
 	var bot2: ExploreBot = ExploreBot.new()
 	var fight: Dictionary = PropScene.fight_room(_scene)
 	assert_true(bot2.plan(entrance.size, entrance.obstacles, entrance.player.position, (fight["area"] as Rect2).get_center()), "entrance -> the middle of the fight area")
@@ -272,7 +279,7 @@ func test_the_bot_walks_entrance_to_both_exits() -> void:
 func test_walking_is_deterministic() -> void:
 	var runs: Array = []
 	for r: int in 2:
-		var core: ExploreCore = ExploreCore.new(SCENE)
+		var core: ExploreCore = _new(SCENE)
 		var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.seed = 7
 		var trace: PackedVector2Array = PackedVector2Array()
@@ -291,7 +298,7 @@ func test_walking_is_deterministic() -> void:
 
 
 func test_random_walks_never_stand_in_a_collider() -> void:
-	var core: ExploreCore = ExploreCore.new(SCENE)
+	var core: ExploreCore = _new(SCENE)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = 11
 	var dir: Vector2 = Vector2.RIGHT

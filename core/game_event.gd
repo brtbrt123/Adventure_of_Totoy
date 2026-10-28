@@ -94,10 +94,18 @@ const ENCOUNTER_CLEARED: StringName = &"encounter_cleared"
 ## (`hero_respawned` {scene, checkpoint_id, position}); every uncleared encounter of the scene is whole again.
 const HERO_DEFEATED: StringName = &"hero_defeated"
 const HERO_RESPAWNED: StringName = &"hero_respawned"
-## `exp_gained` {scene, amount, source (mob id), level, exp (inside the level), exp_to_next}; `level_up` {scene, level, max_hp} (the hero is healed
+## `exp_gained` {scene, amount, source (mob id), level, exp (inside the level), exp_to_next}; `level_up` {scene, level, max_hp, points (stat points gained)} (the hero is healed
 ## to full); `mob_dropped` {scene, mob_id, item_id, position} (a felled mob's drop, always followed by its `item_received`).
 const EXP_GAINED: StringName = &"exp_gained"
 const LEVEL_UP: StringName = &"level_up"
 const MOB_DROPPED: StringName = &"mob_dropped"
+## The village sequence (core/quest_book.gd): `quest_completed` {scene, step_id, exp, items (item ids paid)} when a step's done flag is set,
+## `chest_opened` {scene, object_id} (the Elder's basket chest), `exit_blocked` {scene, exit_id, text} (the east gate is closed: say why).
+const QUEST_COMPLETED: StringName = &"quest_completed"
+const CHEST_OPENED: StringName = &"chest_opened"
+const EXIT_BLOCKED: StringName = &"exit_blocked"
+## Stat points (ExploreCore): `stat_spent` {scene, stat, value, unspent, max_hp}; `stats_reset` {scene, unspent}.
+const STAT_SPENT: StringName = &"stat_spent"
+const STATS_RESET: StringName = &"stats_reset"
 ## An item was used: {scene, item_id, healed, hp, count (left)}.
 const ITEM_USED: StringName = &"item_used"

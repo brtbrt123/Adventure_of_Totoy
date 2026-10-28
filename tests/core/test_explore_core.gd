@@ -9,6 +9,13 @@ const Obstacle := preload("res://core/obstacle.gd")
 const ExploreBot := preload("res://tests/explore_bot.gd")
 
 
+
+## A core with every ability unlocked and the village road open (these tests are about movement, not about the village sequence).
+func _new(scene_id: StringName, entry: StringName = &"", gate: bool = false) -> ExploreCore:
+	var core: ExploreCore = ExploreCore.new(scene_id, entry, gate)
+	core.set_story_flags([&"debug_all_unlocked"] as Array[StringName])
+	return core
+
 func _frame(move: Vector2 = Vector2.ZERO, dash: bool = false, interact: bool = false) -> InputFrame:
 	var f: InputFrame = InputFrame.new()
 	f.move = move
@@ -33,7 +40,7 @@ func _event(core: ExploreCore, type: StringName) -> GameEvent:
 
 ## A core in the village with no colliders, the hero in the middle (pure movement rules).
 func _open_core() -> ExploreCore:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+	var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED)
 	core.obstacles = [] as Array[Obstacle]
 	core.place_at(Vector2(280, 170))
 	return core
@@ -77,7 +84,7 @@ func test_no_attacks_parries_or_skills_in_exploration() -> void:
 	for i: int in 30:
 		core.step(f)
 		assert_true(core.player.state == PlayerState.STATE_IDLE, "only idle/walk/dash: got %s" % core.player.state)
-	assert_eq(core.player.edge, 0.0)
+	assert_true(core.player.edge <= Tuning.EXPLORE_EDGE_REGEN_PER_TICK * 60.0 * 10.0, "Edge only comes from the road regeneration here")
 
 
 func test_entries_and_checkpoints_are_free_spots_outside_the_exits() -> void:
@@ -96,7 +103,7 @@ func test_entries_and_checkpoints_are_free_spots_outside_the_exits() -> void:
 				for exit: Dictionary in def["exits"]:
 					var r: Rect2 = exit["rect"]
 					assert_true(p.clamp(r.position, r.end).distance_to(p) > Tuning.PLAYER_RADIUS, "%s %s touches exit %s" % [scene_id, key, exit["id"]])
-			var core: ExploreCore = ExploreCore.new(scene_id, &"", gate)
+			var core: ExploreCore = _new(scene_id, &"", gate)
 			assert_eq(core.player.position, def["entries"][def["default_entry"]], "%s spawns exactly on its default entry" % scene_id)
 
 
@@ -141,7 +148,7 @@ func _exit(scene_id: StringName, exit_id: StringName) -> Dictionary:
 
 ## Walks a fresh core from `entry` to the exit `exit_id` with the bot. Returns the core after the exit fired (or not).
 func _walk_to_exit(scene_id: StringName, entry: StringName, exit_id: StringName, gate: bool, max_ticks: int = 3000) -> ExploreCore:
-	var core: ExploreCore = ExploreCore.new(scene_id, entry, gate)
+	var core: ExploreCore = _new(scene_id, entry, gate)
 	var bot: ExploreBot = ExploreBot.new()
 	var exit: Dictionary = _exit(scene_id, exit_id)
 	if not bot.plan(core.size, core.obstacles, core.player.position, Vector2.ZERO, exit["rect"]):
@@ -170,7 +177,7 @@ func test_the_walking_bot_crosses_every_exit_through_the_real_layouts() -> void:
 
 
 func test_the_closed_root_gate_blocks_the_forest_exit() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.FOREST_LAYERED, &"village_side", false)
+	var core: ExploreCore = _new(SceneDefs.FOREST_LAYERED, &"village_side", false)
 	var bot: ExploreBot = ExploreBot.new()
 	assert_false(bot.plan(core.size, core.obstacles, core.player.position, Vector2.ZERO, _exit(SceneDefs.FOREST_LAYERED, &"to_glade")["rect"]), "no path to the north exit while the gate is closed")
 	core.set_gate_open(true)
@@ -182,7 +189,7 @@ func test_the_closed_root_gate_blocks_the_forest_exit() -> void:
 
 
 func test_closing_the_gate_on_the_hero_pushes_him_out() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.FOREST_LAYERED, &"village_side", true)
+	var core: ExploreCore = _new(SceneDefs.FOREST_LAYERED, &"village_side", true)
 	core.place_at(Vector2(377, 109))
 	core.set_gate_open(false)
 	assert_true(Collision.fits(core.obstacles, core.player.position, Tuning.PLAYER_RADIUS), "not left inside the gate")
@@ -193,7 +200,7 @@ func test_the_hero_never_enters_a_collider_or_leaves_the_world() -> void:
 	rng.seed = 4242
 	for scene_id: StringName in SceneDefs.ALL:
 		for gate: bool in ([false, true] if scene_id == SceneDefs.FOREST_LAYERED else [false]):
-			var core: ExploreCore = ExploreCore.new(scene_id, &"", gate)
+			var core: ExploreCore = _new(scene_id, &"", gate)
 			var move: Vector2 = Vector2.RIGHT
 			var bad: int = 0
 			for i: int in 2400:
@@ -204,13 +211,13 @@ func test_the_hero_never_enters_a_collider_or_leaves_the_world() -> void:
 				if not Collision.fits(core.obstacles, p, Tuning.PLAYER_RADIUS) or p.x < core.margin - 0.001 or p.y < core.margin - 0.001 or p.x > core.size.x - core.margin + 0.001 or p.y > core.size.y - core.margin + 0.001:
 					bad += 1
 				if core.exiting:
-					core = ExploreCore.new(scene_id, &"", gate)  # walked out: start again
+					core = _new(scene_id, &"", gate)  # walked out: start again
 			assert_eq(bad, 0, "%s (gate %s): ticks inside a collider or outside the world" % [scene_id, gate])
 
 
 func test_walking_straight_into_every_solid_prop_stops_at_its_edge() -> void:
 	for scene_id: StringName in SceneDefs.ALL:
-		var core: ExploreCore = ExploreCore.new(scene_id)
+		var core: ExploreCore = _new(scene_id)
 		for o: Obstacle in core.obstacles:
 			if o.radius < 3.0:
 				continue
@@ -227,7 +234,7 @@ func test_walking_straight_into_every_solid_prop_stops_at_its_edge() -> void:
 func test_exploration_is_deterministic() -> void:
 	var runs: Array = []
 	for r: int in 2:
-		var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+		var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED)
 		var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.seed = 7
 		var trace: Array[Vector2] = []
@@ -239,7 +246,7 @@ func test_exploration_is_deterministic() -> void:
 
 
 func test_an_exit_fires_once_and_then_the_hero_stops() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED, &"return")
+	var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED, &"return")
 	var fired: int = 0
 	for i: int in 120:
 		core.step(_frame(Vector2.RIGHT))
@@ -259,7 +266,7 @@ func test_an_exit_fires_once_and_then_the_hero_stops() -> void:
 
 
 func test_an_exit_the_hero_stands_in_waits_until_he_left_it() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+	var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED)
 	core.place_at(Vector2(560, 172))
 	core.step(_frame(Vector2.RIGHT))
 	assert_false(core.exiting, "placed inside the trigger: not armed")
@@ -272,14 +279,14 @@ func test_an_exit_the_hero_stands_in_waits_until_he_left_it() -> void:
 
 
 func test_checkpoints_are_recorded_once() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+	var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED)
 	core.step(_frame())
 	var e: GameEvent = _event(core, GameEvent.CHECKPOINT)
 	assert_true(e != null and e.data["checkpoint_id"] == &"village_layered_gate", "the arrival spot is the village gate checkpoint")
 	assert_eq(core.last_checkpoint, &"village_layered_gate")
 	core.step(_frame())
 	assert_true(_event(core, GameEvent.CHECKPOINT) == null, "not again while it is the last one")
-	var forest: ExploreCore = ExploreCore.new(SceneDefs.FOREST_LAYERED)
+	var forest: ExploreCore = _new(SceneDefs.FOREST_LAYERED)
 	var bot: ExploreBot = ExploreBot.new()
 	assert_true(bot.plan(forest.size, forest.obstacles, forest.player.position, Vector2(332, 148)))
 	var seen: Array[StringName] = []
@@ -305,7 +312,7 @@ func test_continue_at_a_checkpoint() -> void:
 
 
 func test_interact_names_the_nearest_npc_in_range() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+	var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED)
 	core.step(_frame(Vector2.ZERO, false, true))
 	assert_true(_event(core, GameEvent.INTERACT) == null, "Mira is not in range at the gate spawn")
 	var mira: Vector2 = SceneDefs.get_def(SceneDefs.VILLAGE_LAYERED)["npcs"][0]["position"]
@@ -318,7 +325,7 @@ func test_interact_names_the_nearest_npc_in_range() -> void:
 	var e: GameEvent = _event(core, GameEvent.INTERACT)
 	assert_true(e != null and e.data["target_id"] == &"mira" and e.data["kind"] == &"npc", "interact event names Mira")
 	# an object
-	var forest: ExploreCore = ExploreCore.new(SceneDefs.FOREST_LAYERED)
+	var forest: ExploreCore = _new(SceneDefs.FOREST_LAYERED)
 	forest.place_at(Vector2(157, 126))
 	forest.step(_frame(Vector2.ZERO, false, true))
 	var sign_event: GameEvent = _event(forest, GameEvent.INTERACT)
@@ -326,7 +333,7 @@ func test_interact_names_the_nearest_npc_in_range() -> void:
 
 
 func test_npcs_turn_toward_the_hero_when_near() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+	var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED)
 	var child: Vector2 = Vector2(253, 210)
 	var facing: Dictionary = {}
 	for npc: Dictionary in core.snapshot().npcs:
@@ -345,7 +352,7 @@ func test_npcs_turn_toward_the_hero_when_near() -> void:
 
 
 func test_npcs_and_the_village_chest_are_solid() -> void:
-	var core: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+	var core: ExploreCore = _new(SceneDefs.VILLAGE_LAYERED)
 	var mira: Vector2 = SceneDefs.get_def(SceneDefs.VILLAGE_LAYERED)["npcs"][0]["position"]
 	core.place_at(mira + Vector2(-20, 0))
 	for i: int in 40:
@@ -354,7 +361,7 @@ func test_npcs_and_the_village_chest_are_solid() -> void:
 
 
 func test_snapshot_lists_the_scene() -> void:
-	var snap: ExploreCore.ExploreSnapshot = ExploreCore.new(SceneDefs.VILLAGE_LAYERED).snapshot()
+	var snap: ExploreCore.ExploreSnapshot = _new(SceneDefs.VILLAGE_LAYERED).snapshot()
 	assert_eq(snap.scene_id, SceneDefs.VILLAGE_LAYERED)
 	assert_eq(snap.size, Vector2(571, 336))
 	assert_eq(snap.npcs.size(), 6)
@@ -362,4 +369,4 @@ func test_snapshot_lists_the_scene() -> void:
 	assert_eq(snap.hero.visual_id, &"totoy")
 	assert_eq(snap.hero.weapon_id, Tuning.WEAPON_BLACK_KATANA)
 	assert_true(snap.obstacles.size() > 50 and snap.exits.size() == 1 and snap.checkpoints.size() == 1)
-	assert_eq(ExploreCore.new(SceneDefs.FOREST_LAYERED).snapshot().objects.size(), 5)
+	assert_eq(_new(SceneDefs.FOREST_LAYERED).snapshot().objects.size(), 5)

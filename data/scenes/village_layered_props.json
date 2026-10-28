@@ -132,7 +132,8 @@
     42
    ],
    "target_scene": "woodland_layered",
-   "target_entry": "west"
+   "target_entry": "west",
+   "gate": "road"
   }
  ],
  "checkpoints": [

@@ -1,11 +1,13 @@
 extends RefCounted
 ## Tovan's practice post: the village's combat tutorial. A scene with a `dummy` object (the training post) gets one yard.
 ## Once the hero owns his first sword (flag `received_first_sword`, Tovan's handover) and stands within YARD_RADIUS of the post, ExploreCore lets him attack
-## and parry (the rest of exploration never does), and the post teaches four lessons in order of difficulty:
-##   dash   start a dash in the yard
+## and parry (the rest of exploration never does), and the post teaches four lessons IN THIS ORDER (docs/PROGRESSION_PLAN.md); each lesson
+## unlocks its ability when it begins (core/quest_book.gd `unlocks`: the key does nothing before):
 ##   attack hit the post HITS_NEEDED times
+##   dash   dash through the marked ring (RING_OFFSET from the post, RING_RADIUS)
 ##   parry  the post winds up a GOLD cone (warning drawn by presentation like the boss's); parry it in the window
 ##   dodge  the post winds up a RED circle; dash (or leave) so it misses
+## The post only winds up once the attack and dash lessons are done.
 ## Each lesson sets the story flag `lesson_<name>` (ExploreCore emits `flag_set`); when all four are set `training_done` is
 ## set too (Tovan then says something else). Practice hits cost nothing: the hero has no HP loss here, he only sees
 ## `training_hero_hit`. No randomness: the post attacks REST_TICKS after the last one, the gold lesson first, then the red.
@@ -20,7 +22,10 @@ const PlayerState := preload("res://core/player.gd")
 
 const WAKE_FLAG: StringName = &"received_first_sword"
 const DONE_FLAG: StringName = &"training_done"
-const LESSONS: Array[StringName] = [&"dash", &"attack", &"parry", &"dodge"]
+const LESSONS: Array[StringName] = [&"attack", &"dash", &"parry", &"dodge"]
+## The dash lesson's ring: where it stands relative to the post's feet and how big it is. A dash that passes through it counts.
+const RING_OFFSET: Vector2 = Vector2(0, 52)
+const RING_RADIUS: float = 14.0
 ## The hero may fight within this distance of the post's feet.
 const YARD_RADIUS: float = 96.0
 ## The post's body is a circle this big, BODY_LIFT above its feet.
@@ -60,6 +65,11 @@ static func for_scene(def: Dictionary) -> RefCounted:
 
 func center() -> Vector2:
 	return base - Vector2(0, BODY_LIFT)
+
+
+## The middle of the dash lesson's ring.
+func ring_center() -> Vector2:
+	return base + RING_OFFSET
 
 
 func lesson_flag(lesson: StringName) -> StringName:
@@ -104,11 +114,12 @@ func resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 	for event: GameEvent in events:
 		if event.type == GameEvent.DASH_STARTED:
 			_dashed = true
-			_grant(core, &"dash", events)
+	if player.state == PlayerState.STATE_DASH and flags.has(lesson_flag(&"attack")) and player.position.distance_to(ring_center()) <= RING_RADIUS + Tuning.PLAYER_RADIUS:
+		_grant(core, &"dash", events)  # he dashed through the ring
 	_resolve_swing(core, events)
 	if telegraph != null:
 		_resolve_telegraph(core, events)
-	elif not (flags.has(lesson_flag(&"parry")) and flags.has(lesson_flag(&"dodge"))):
+	elif flags.has(lesson_flag(&"attack")) and flags.has(lesson_flag(&"dash")) and not (flags.has(lesson_flag(&"parry")) and flags.has(lesson_flag(&"dodge"))):
 		_rest -= 1
 		if _rest <= 0:
 			_spawn(core)
@@ -191,7 +202,7 @@ func _grant(core: RefCounted, lesson: StringName, events: Array[GameEvent]) -> v
 	core._grant_flag(DONE_FLAG, events)
 
 
-## What presentation shows: {object_id, awake, active, hint, lessons {name: bool}, done, hits, hits_needed, center, since_hit}.
+## What presentation shows: {object_id, awake, active, hint, lessons {name: bool}, done, hits, hits_needed, center, since_hit, ring {center, radius, active}}.
 func view(core: RefCounted) -> Dictionary:
 	var flags: Array[StringName] = core.story_flags
 	var hero: Vector2 = (core.player as PlayerState).position
@@ -199,6 +210,7 @@ func view(core: RefCounted) -> Dictionary:
 		"object_id": object_id, "awake": is_awake(flags), "active": is_on(flags, hero), "hint": hint(flags, hero),
 		"lessons": lessons(flags), "done": flags.has(DONE_FLAG), "hits": mini(hits, HITS_NEEDED), "hits_needed": HITS_NEEDED,
 		"center": center(), "since_hit": core.tick - last_hit_tick,
+		"ring": {"center": ring_center(), "radius": RING_RADIUS, "active": is_on(flags, hero) and hint(flags, hero) == &"dash"},
 	}
 
 

@@ -2,6 +2,13 @@
 
 Status: a plan, nothing in this file is built yet. Written 2026-10-28 by Claude from the numbers in `core/tuning.gd` and the current flags in `data/dialogue/chapter1.json`. Everything marked **DECIDE** is the owner's call. Claude cannot judge whether the sequence is fun or the numbers feel fair; the numbers below are first guesses to be tuned in playtests.
 
+## Decisions (owner, 2026-10-28)
+
+- Order Mira, Tovan, Elder, Edda: **approved**. The Elder's basket errand and the closed east road: **approved**. Quests pay EXP and rewards that fit the task: **approved**. Stat points **option B**: **approved**.
+- **Sprint** is the first Aspect, bound by Edda as the reward for the village tasks (it is the only Aspect that works without a boss, so it is usable in the woodland at once).
+- Defaults I used for what was not answered (change any of them): abilities stay unlocked for good; 2 points per level; Vitality +6 health, Might +3 %, Agility -2 dash ticks (first 6 points) and +0.5 % speed; free respec in Lanternfen; level gap rule off; 95 village EXP.
+- Built: quest data and gating, the new training order, the stat points and Sprint in exploration (`docs/architecture.md` "The village sequence, unlocks and stat points"). Codex task: `docs/CODEX_TASK_progression.md`.
+
 ## Part A. The village sequence (one task unlocks the next)
 
 ### A1. The rule

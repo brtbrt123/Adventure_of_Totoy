@@ -46,6 +46,7 @@ func test_the_layered_exits_form_the_chapter_route() -> void:
 func test_walking_through_every_exit_hands_over_to_the_next_scene() -> void:
 	for link: Array in [[SceneDefs.VILLAGE_LAYERED, SceneDefs.WOODLAND_LAYERED], [SceneDefs.WOODLAND_LAYERED, SceneDefs.VILLAGE_LAYERED], [SceneDefs.WOODLAND_LAYERED, SceneDefs.FOREST_LAYERED], [SceneDefs.FOREST_LAYERED, SceneDefs.WOODLAND_LAYERED], [SceneDefs.FOREST_LAYERED, SceneDefs.GLADE_LAYERED], [SceneDefs.GLADE_LAYERED, SceneDefs.FOREST_LAYERED], [SceneDefs.GLADE_LAYERED, SceneDefs.ARENA]]:
 		var core: ExploreCore = ExploreCore.new(link[0], &"", true)  # gate open so the forest's north exit is reachable
+		core.set_story_flags([&"debug_all_unlocked"] as Array[StringName])  # and the village road is open
 		var exit: Dictionary = _exit_to(link[0], link[1])
 		var goal: Vector2 = exit["rect"].get_center()
 		var inward: Vector2 = (core.size * 0.5 - goal).normalized()

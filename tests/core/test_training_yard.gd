@@ -1,6 +1,6 @@
 extends "res://tests/test_case.gd"
 ## The village's training post (core/training_yard.gd, used by core/explore_core.gd): only a scene with a post has a yard, the
-## hero fights only in it and only after Tovan, the four lessons (dash, attack, parry, dodge) set their flags, practice hits
+## hero fights only in it and only after Tovan, the four lessons (attack, dash, parry, dodge, in that order) set their flags and each ability unlocks when its lesson begins, practice hits
 ## cost nothing, nothing is random, and training_done follows the last lesson.
 
 const ExploreCore := preload("res://core/explore_core.gd")
@@ -65,7 +65,12 @@ func _until_warning(core: ExploreCore, limit: int = 400) -> Telegraph:
 
 
 func _all_lessons() -> Array[StringName]:
-	return [&"met_tovan", &"lesson_dash", &"lesson_attack", &"lesson_parry", &"lesson_dodge"] as Array[StringName]
+	return [&"met_tovan", &"lesson_attack", &"lesson_dash", &"lesson_parry", &"lesson_dodge"] as Array[StringName]
+
+
+## The flags of a hero who has done the attack and dash lessons (the post winds up from here).
+func _past_dash() -> Array[StringName]:
+	return [&"met_tovan", &"lesson_attack", &"lesson_dash"] as Array[StringName]
 
 
 func test_only_scenes_with_a_post_have_a_yard() -> void:
@@ -119,19 +124,63 @@ func test_a_missed_swing_does_not_count() -> void:
 	assert_eq(core.training.hits, 0)
 
 
-func test_a_dash_in_the_yard_teaches_the_dash_and_one_outside_does_not() -> void:
-	var core: ExploreCore = _yard()
+func test_the_dash_lesson_wants_the_ring_after_the_attack_lesson() -> void:
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_tovan", &"lesson_attack"] as Array[StringName])
+	assert_true(core.snapshot().training["ring"]["active"], "the ring shows while the dash lesson is the current one")
+	var ring: Vector2 = core.training.ring_center()
+	assert_true(Collision.fits(core.obstacles, ring, 6.0), "the ring stands on free ground")
+	# a dash elsewhere in the yard teaches nothing
+	core.place_at(_stand(core) + Vector2(60, 0))
+	core.step(_frame())
 	core.step(_frame(Vector2.RIGHT, false, false, true))
+	for i: int in 12:
+		core.step(_frame())
+	assert_false(core.has_flag(&"lesson_dash"), "a dash that misses the ring teaches nothing")
+	for i: int in Tuning.DASH_COOLDOWN_TICKS + 5:
+		core.step(_frame())  # the dash is ready again
+	# a dash through it does
+	core.place_at(ring + Vector2(-14, 0))
+	core.step(_frame())
+	core.step(_frame(Vector2.RIGHT, false, false, true))
+	for i: int in 10:
+		core.step(_frame())
 	assert_true(core.has_flag(&"lesson_dash"), "dash taught")
-	assert_true(&"flag_set" in _types(core))
-	var far: ExploreCore = _yard()
-	far.place_at(_stand(far) + Vector2(TrainingYard.YARD_RADIUS + 60.0, 0))
-	far.step(_frame(Vector2.RIGHT, false, false, true))
-	assert_false(far.has_flag(&"lesson_dash"), "a dash elsewhere teaches nothing")
+	assert_true(core.has_flag(&"unlocked_parry"), "the parry lesson begins: the parry unlocks")
+	assert_false(core.snapshot().training["ring"]["active"])
+
+
+func test_the_dash_is_locked_until_its_lesson_and_the_ring_waits_for_the_attack() -> void:
+	var core: ExploreCore = _yard()
+	assert_true(core.has_flag(&"unlocked_attack") and not core.has_flag(&"unlocked_dash"), "only the attack is unlocked after the sword")
+	var at: Vector2 = core.player.position
+	core.step(_frame(Vector2.RIGHT, false, false, true))
+	core.step(_frame())
+	assert_true(core.player.state != PlayerState.STATE_DASH and not core.has_flag(&"lesson_dash"), "the dash key does nothing yet")
+	var walked: bool = core.player.position.distance_to(at) < Tuning.DASH_SPEED * Tuning.DASH_TICKS
+	assert_true(walked, "he only walked")
+	assert_false(core.snapshot().training["ring"]["active"], "no ring before the attack is learned")
+	assert_false(core.snapshot().unlocked["dash"] or core.snapshot().unlocked["parry"])
+	core.set_story_flags([&"met_tovan", &"lesson_attack"] as Array[StringName])
+	assert_true(core.snapshot().unlocked["dash"] and not core.snapshot().unlocked["parry"], "the attack lesson is done: the dash lesson begins")
+	core.set_story_flags(_past_dash())
+	assert_true(core.snapshot().unlocked["parry"], "then the parry")
+
+
+func test_the_post_does_not_wind_up_before_the_attack_and_dash_lessons() -> void:
+	var core: ExploreCore = _yard()
+	for i: int in 400:
+		core.step(_frame())
+	assert_true(core.training.telegraph == null, "no warning while the attack is still being learned")
+	core.set_story_flags([&"met_tovan", &"lesson_attack"] as Array[StringName])
+	for i: int in 400:
+		core.step(_frame())
+	assert_true(core.training.telegraph == null, "nor while the dash is")
+	core.set_story_flags(_past_dash())
+	assert_true(_until_warning(core) != null, "after both, it winds up")
 
 
 func test_the_gold_warning_comes_first_and_a_timed_parry_teaches_it() -> void:
-	var core: ExploreCore = _yard()
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, _past_dash())
 	var t: Telegraph = _until_warning(core)
 	assert_true(t != null and t.kind == Telegraph.KIND_GOLD, "the first warning is gold")
 	var snap: ExploreCore.ExploreSnapshot = core.snapshot()
@@ -150,7 +199,7 @@ func test_the_gold_warning_comes_first_and_a_timed_parry_teaches_it() -> void:
 
 
 func test_an_unparried_gold_hit_is_a_practice_hit_and_the_post_tries_again() -> void:
-	var core: ExploreCore = _yard()
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, _past_dash())
 	var t: Telegraph = _until_warning(core)
 	var struck: bool = false
 	for i: int in 120:
@@ -166,7 +215,7 @@ func test_an_unparried_gold_hit_is_a_practice_hit_and_the_post_tries_again() -> 
 
 
 func test_the_red_warning_needs_a_dash_and_comes_after_the_parry() -> void:
-	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_tovan", &"lesson_parry"] as Array[StringName])
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_tovan", &"lesson_attack", &"lesson_dash", &"lesson_parry"] as Array[StringName])
 	var t: Telegraph = _until_warning(core)
 	assert_true(t != null and t.kind == Telegraph.KIND_RED, "red once the parry is learned")
 	# standing still is a practice hit and no credit
@@ -191,7 +240,7 @@ func test_the_red_warning_needs_a_dash_and_comes_after_the_parry() -> void:
 
 
 func test_the_last_lesson_sets_training_done_and_the_post_rests() -> void:
-	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_tovan", &"lesson_dash", &"lesson_attack", &"lesson_parry"] as Array[StringName])
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_tovan", &"lesson_attack", &"lesson_dash", &"lesson_parry"] as Array[StringName])
 	var next: Telegraph = _until_warning(core)
 	for i: int in 120:
 		core.step(_frame(Vector2.DOWN if core.tick == next.hit_tick - 3 else Vector2.ZERO, false, false, core.tick == next.hit_tick - 3))
@@ -207,14 +256,38 @@ func test_the_last_lesson_sets_training_done_and_the_post_rests() -> void:
 
 func test_the_hint_follows_the_lessons_in_order() -> void:
 	var core: ExploreCore = _yard()
-	assert_eq(core.snapshot().training["hint"], &"dash")
-	core.set_story_flags([&"met_tovan", &"lesson_dash"] as Array[StringName])
 	assert_eq(core.snapshot().training["hint"], &"attack")
-	core.set_story_flags([&"met_tovan", &"lesson_dash", &"lesson_attack"] as Array[StringName])
+	core.set_story_flags([&"met_tovan", &"lesson_attack"] as Array[StringName])
+	assert_eq(core.snapshot().training["hint"], &"dash")
+	core.set_story_flags(_past_dash())
 	assert_eq(core.snapshot().training["hint"], &"parry")
+	core.set_story_flags([&"met_tovan", &"lesson_attack", &"lesson_dash", &"lesson_parry"] as Array[StringName])
+	assert_eq(core.snapshot().training["hint"], &"dodge")
 	core.set_story_flags(_all_lessons())
 	assert_eq(core.snapshot().training["hint"], &"")
-	assert_eq(core.snapshot().training["lessons"], {&"dash": true, &"attack": true, &"parry": true, &"dodge": true})
+	assert_eq(core.snapshot().training["lessons"], {&"attack": true, &"dash": true, &"parry": true, &"dodge": true})
+
+
+func test_each_lesson_pays_its_exp_once_and_the_objective_follows() -> void:
+	var core: ExploreCore = _yard(SceneDefs.VILLAGE_LAYERED, [&"met_mira", &"received_first_sword", &"met_tovan"] as Array[StringName])
+	assert_eq(core.snapshot().objective["id"], &"attack")
+	assert_eq(core.snapshot().objective["target"], &"training_dummy")
+	_swing(core)
+	_swing(core)
+	_swing(core)
+	assert_true(core.has_flag(&"lesson_attack"))
+	assert_eq(core.exp_total, 10, "the attack lesson pays 10 EXP")
+	assert_eq(core.snapshot().objective["id"], &"dash", "and the next task is the dash")
+	var ring: Vector2 = core.training.ring_center()
+	core.place_at(ring + Vector2(-14, 0))
+	core.step(_frame())
+	core.step(_frame(Vector2.RIGHT, false, false, true))
+	for i: int in 10:
+		core.step(_frame())
+	assert_eq(core.exp_total, 20)
+	for i: int in 60:
+		core.step(_frame())
+	assert_eq(core.exp_total, 20, "nothing pays twice")
 
 
 func test_leaving_the_yard_drops_the_warning() -> void:

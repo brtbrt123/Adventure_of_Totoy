@@ -204,6 +204,7 @@ func test_every_mob_stands_on_free_ground_apart_from_the_others() -> void:
 
 func test_walking_from_the_west_end_to_the_east_end() -> void:
 	var core: ExploreCore = ExploreCore.new(SCENE, &"west")
+	core.set_story_flags([&"debug_all_unlocked"] as Array[StringName])
 	var bot: ExploreBot = ExploreBot.new()
 	var exit: Rect2 = _def["exits"][1]["rect"]
 	assert_true(bot.plan(core.size, core.obstacles, core.player.position, Vector2.ZERO, exit), "a path exists")

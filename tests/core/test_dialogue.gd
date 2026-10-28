@@ -128,6 +128,7 @@ func test_interact_shows_each_line_then_ends_and_sets_the_flags_once() -> void:
 
 func test_skip_ends_the_conversation_and_still_sets_the_flags() -> void:
 	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"edda")
+	core.set_story_flags([&"met_mira", &"elder_done"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	core.step(_frame(Vector2.ZERO, false, true))
 	assert_false(core.is_talking())
@@ -159,6 +160,7 @@ func test_the_second_talk_plays_the_follow_up_and_flags_are_never_set_twice() ->
 
 func test_conversations_unlock_each_other_across_npcs() -> void:
 	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"edda")
+	core.set_story_flags([&"met_mira", &"elder_done"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	_talk_through(core)
 	for row: Dictionary in core.def["npcs"]:
@@ -193,13 +195,14 @@ func test_set_flag_and_set_story_flags() -> void:
 
 func test_a_restored_flag_changes_what_the_npc_says() -> void:
 	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"tovan")
-	core.set_story_flags([&"met_tovan"] as Array[StringName])
+	core.set_story_flags([&"met_mira", &"met_tovan"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_again")
 
 
 func test_the_layered_village_talks_the_same() -> void:
 	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"tovan")
+	core.set_story_flags([&"met_mira"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_intro")
 
@@ -242,11 +245,11 @@ func test_the_conversation_is_deterministic() -> void:
 
 func test_tovan_and_edda_follow_the_lessons() -> void:
 	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"tovan")
-	core.set_story_flags([&"met_tovan"] as Array[StringName])
+	core.set_story_flags([&"met_mira", &"met_tovan"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_again", "lessons not done: the reminder")
 	_talk_through(core)
-	core.set_story_flags([&"met_tovan", &"training_done"] as Array[StringName])
+	core.set_story_flags([&"met_mira", &"met_tovan", &"training_done"] as Array[StringName])
 	core.step(_frame(Vector2.ZERO, true))
 	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_graduate")
 	_talk_through(core)
@@ -255,3 +258,41 @@ func test_tovan_and_edda_follow_the_lessons() -> void:
 	assert_eq(core.snapshot().dialogue["dialogue_id"], &"tovan_after", "he does not graduate you twice")
 	assert_eq(DialogueBook.pick(_book, &"edda", [&"met_edda", &"lesson_aspect"] as Array[StringName]), &"edda_aspect_done")
 	assert_eq(DialogueBook.pick(_book, &"edda", [&"met_edda"] as Array[StringName]), &"edda_again")
+
+
+func test_the_main_chain_sends_him_back_when_he_comes_too_early() -> void:
+	var picks: Array = [
+		[&"tovan", [], &"tovan_not_yet"],
+		[&"tovan", [&"met_mira"], &"tovan_intro"],
+		[&"elder", [&"met_mira", &"met_tovan"], &"elder_not_yet"],
+		[&"elder", [&"tovan_graduated"], &"elder_talk"],
+		[&"elder", [&"tovan_graduated", &"met_elder"], &"elder_errand_again"],
+		[&"elder", [&"tovan_graduated", &"met_elder", &"basket_found"], &"elder_basket"],
+		[&"elder", [&"tovan_graduated", &"met_elder", &"basket_found", &"elder_done"], &"elder_thanks"],
+		[&"edda", [&"tovan_graduated"], &"edda_not_yet"],
+		[&"edda", [&"elder_done"], &"edda_intro"],
+	]
+	for row: Array in picks:
+		var flags: Array[StringName] = []
+		flags.append_array(row[1])
+		assert_eq(DialogueBook.pick(_book, row[0], flags), row[2], "%s with %s" % [row[0], str(row[1])])
+	assert_eq(DialogueBook.pick(_book, &"child", [] as Array[StringName]), &"child_talk", "the flavour villagers talk to anyone")
+	assert_eq(DialogueBook.pick(_book, &"worker", [] as Array[StringName]), &"worker_talk")
+
+
+func test_edda_binds_sprint_for_him_once() -> void:
+	var core: ExploreCore = _beside(SceneDefs.VILLAGE_LAYERED, &"edda")
+	core.set_story_flags([&"met_mira", &"elder_done"] as Array[StringName])
+	core.step(_frame(Vector2.ZERO, true))
+	var seen: Array[GameEvent] = []
+	for i: int in 30:
+		if not core.is_talking():
+			break
+		core.step(_frame(Vector2.ZERO, true))
+		seen.append_array(core.last_events)
+	var got: GameEvent = null
+	for e: GameEvent in seen:
+		if e.type == GameEvent.ITEM_RECEIVED:
+			got = e
+	assert_true(got != null and got.data["kind"] == &"aspect" and got.data["item_id"] == &"sprint" and got.data["source"] == &"edda", "Edda hands over Sprint")
+	assert_true(core.has_flag(&"aspect_owned_sprint") and core.has_flag(&"met_edda"))

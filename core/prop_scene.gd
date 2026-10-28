@@ -153,8 +153,11 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 	var exits: Array = []
 	for row: Variant in scene.get("exits", []):
 		var e: Dictionary = row
-		exits.append({"id": StringName(str(e["id"])), "rect": _rect(e["rect"]), "target_scene": StringName(str(e["target_scene"])),
-			"target_entry": StringName(str(e["target_entry"]))})
+		var exit_row: Dictionary = {"id": StringName(str(e["id"])), "rect": _rect(e["rect"]), "target_scene": StringName(str(e["target_scene"])),
+			"target_entry": StringName(str(e["target_entry"]))}
+		if e.has("gate"):  # "road": closed until the village sequence is done (core/quest_book.gd)
+			exit_row["gate"] = StringName(str(e["gate"]))
+		exits.append(exit_row)
 	var checkpoints: Array = []
 	for row: Variant in scene.get("checkpoints", []):
 		var c: Dictionary = row

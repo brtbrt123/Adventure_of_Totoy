@@ -31,6 +31,13 @@ var _scene: Dictionary = SceneDefs.layered_data(SCENE)
 var _defs: Dictionary = PropScene.load_defs()
 
 
+
+## A core with every ability unlocked and the village road open (these tests are about movement, not about the village sequence).
+func _new(scene_id: StringName, entry: StringName = &"", gate: bool = false) -> ExploreCore:
+	var core: ExploreCore = ExploreCore.new(scene_id, entry, gate)
+	core.set_story_flags([&"debug_all_unlocked"] as Array[StringName])
+	return core
+
 func _frame(move: Vector2, dash: bool = false) -> InputFrame:
 	var f: InputFrame = InputFrame.new()
 	f.move = move.normalized()
@@ -151,7 +158,7 @@ func test_every_spot_is_free_and_reachable() -> void:
 		assert_true(Collision.fits(obstacles, o["stand"], HERO), "%s: the use spot is free" % o["id"])
 		assert_true(grid.reaches(o["stand"]), "%s: the use spot is reachable" % o["id"])
 		assert_true((o["stand"] as Vector2).y > (o["position"] as Vector2).y + 8.0, "%s: used from in front (south of it)" % o["id"])
-		var core: ExploreCore = ExploreCore.new(SCENE)
+		var core: ExploreCore = _new(SCENE)
 		core.place_at(o["stand"])
 		core.step(InputFrame.new())
 		assert_eq(core.interact_target.get("id", &""), o["id"], "%s: standing on the use spot targets it" % o["id"])
@@ -163,7 +170,7 @@ func test_every_spot_is_free_and_reachable() -> void:
 			door = o["position"]
 	assert_false(Collision.fits(obstacles, door, HERO), "the cottage door is solid, as in the painted village")
 	for n: Dictionary in def["npcs"]:
-		var near: ExploreCore = ExploreCore.new(SCENE)
+		var near: ExploreCore = _new(SCENE)
 		var placed: bool = false
 		for dir: Vector2 in DIRECTIONS:
 			var at: Vector2 = n["position"] + dir.normalized() * 14.0
@@ -187,7 +194,7 @@ func test_the_hero_cannot_enter_a_solid_prop_walking_or_dashing_and_reaches_ever
 			for circle: Vector3 in circles:
 				for dir: Vector2 in DIRECTIONS:
 					var centre: Vector2 = Vector2(circle.x, circle.y)
-					var core: ExploreCore = ExploreCore.new(SCENE)
+					var core: ExploreCore = _new(SCENE)
 					var start: Vector2 = centre - dir.normalized() * (circle.z + 34.0)
 					if not Collision.fits(core.obstacles, start, HERO):
 						continue
@@ -224,7 +231,7 @@ func test_the_rune_gate_passage_is_open_and_the_pillars_are_solid() -> void:
 				crossed = true
 				break
 		assert_true(crossed, "the hero walks %s through the gate's opening (ended at %s)" % [str(dir), str(pos)])
-	var core: ExploreCore = ExploreCore.new(SCENE)
+	var core: ExploreCore = _new(SCENE)
 	core.place_at(Vector2(gap_x, gate.y + 30.0))
 	for i: int in 40:
 		core.step(_frame(Vector2.UP, i == 2))
@@ -256,7 +263,7 @@ func test_the_rune_gate_passage_is_open_and_the_pillars_are_solid() -> void:
 
 
 func test_the_bot_walks_arrival_to_the_exit_and_back() -> void:
-	var core: ExploreCore = ExploreCore.new(SCENE)
+	var core: ExploreCore = _new(SCENE)
 	var rect: Rect2 = core.def["exits"][0]["rect"]
 	var bot: ExploreBot = ExploreBot.new()
 	assert_true(bot.plan(core.size, core.obstacles, core.player.position, Vector2.ZERO, rect), "a path exists from the arrival to the east exit")
@@ -265,7 +272,7 @@ func test_the_bot_walks_arrival_to_the_exit_and_back() -> void:
 		if core.exiting:
 			break
 	assert_true(core.exiting and core.pending_exit.get("exit_id", &"") == &"to_forest", "the hero reaches the exit (at %s)" % str(core.player.position))
-	var back: ExploreCore = ExploreCore.new(SCENE, &"return")
+	var back: ExploreCore = _new(SCENE, &"return")
 	var gate: Dictionary = SceneDefs.checkpoint(SCENE, &"village_layered_gate")
 	var bot2: ExploreBot = ExploreBot.new()
 	assert_true(bot2.plan(back.size, back.obstacles, back.player.position, gate["position"]), "the way back from the forest to the gate checkpoint")
@@ -279,7 +286,7 @@ func test_the_bot_walks_arrival_to_the_exit_and_back() -> void:
 func test_walking_is_deterministic_and_never_inside_a_collider() -> void:
 	var runs: Array = []
 	for r: int in 2:
-		var core: ExploreCore = ExploreCore.new(SCENE)
+		var core: ExploreCore = _new(SCENE)
 		var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.seed = 5
 		var dir: Vector2 = Vector2.RIGHT

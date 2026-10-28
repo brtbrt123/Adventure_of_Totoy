@@ -1,6 +1,6 @@
 # Chapter 1 dialogue (draft, read-only copy)
 
-Generated from `data/dialogue/chapter1.json`, which is the real file the game reads. Tell Claude your edits (or edit the JSON). Lines must stay under 110 characters; the book has 47 of 60 lines.
+Generated from `data/dialogue/chapter1.json`, which is the real file the game reads. Tell Claude your edits (or edit the JSON). Lines must stay under 110 characters; the book has 57 of 60 lines.
 
 ## Mira
 
@@ -35,7 +35,7 @@ Generated from `data/dialogue/chapter1.json`, which is the real file the game re
 
 ### Later, once Tovan has been heard (`tovan_again`)
 
-- Step close to the post and it wakes. Dash once, then strike it three times.
+- Step close to the post and it wakes. Strike it three times, then dash through the ring.
 - When it glows gold, parry just before the hit. When it glows red, dash. A parry does nothing to red.
 - Come back when you have done all four lessons. Then we talk about the forest.
 
@@ -50,6 +50,11 @@ Generated from `data/dialogue/chapter1.json`, which is the real file the game re
 - The forest is not a training post. It will not wait for you to be ready.
 - Come back and show me what you bring.
 
+### Later, too early: not yet Mira has been heard (`tovan_not_yet`)
+
+- The forge is hot, and I do not hand blades to strangers.
+- Mira will vouch for you. See her at the gate first.
+
 ## Edda
 
 ### First visit (`edda_intro`)
@@ -58,8 +63,13 @@ Generated from `data/dialogue/chapter1.json`, which is the real file the game re
 - The creatures in the forest were not always like this. Something frightened their hearts.
 - When one falls, a fragment of its power is left behind. Most people would let it fade.
 - I teach another way. You can bind that fragment, without destroying what remains of it.
-- Open the character menu with Tab and put an Aspect in a skill slot. It will answer to you.
+- Take this: a fragment of the fleet-footed ones. Sprint. Open the menu with Tab and bind it to a slot.
 - The Thornback Stag, past the root gate, is calm enough to bind. Find it, and be gentle.
+
+### Later, too early: not yet the Elder has his basket (`edda_not_yet`)
+
+- The door stays shut until the Elder has spoken with you.
+- Visit him at the shrine first, Totoy.
 
 ### Later, once Edda has been heard (`edda_again`)
 
@@ -79,13 +89,31 @@ Generated from `data/dialogue/chapter1.json`, which is the real file the game re
 - The Night of Returning Lights was never quiet before. Now only one hill answers.
 - The shrine remembers every song, even the ones we have forgotten.
 - You walk like someone who has lost something. I know that walk well.
-- Go and listen at the shrine, if you like. Songs return to those who listen.
+- Before you go, fetch my herb basket from the chest on the west lawn. Herbs mend what a blade cannot.
+
+### Later, once the Elder has asked for his basket (`elder_errand_again`)
+
+- My herb basket is in the chest on the west lawn. Bring it back to me, please.
+
+### Later, once the basket has been found (`elder_basket`)
+
+- You found it. My herb basket, safe and sound.
+- Take these herbs. Press 1 in the field and they will mend you.
+- Now go and see Edda. She has been asking after you.
+
+### Later, once the Elder has his basket (`elder_thanks`)
+
+- Edda is waiting at her hut. The forest will not wait much longer.
 
 ### Later, once Edda has been heard (`elder_after_edda`)
 
 - Edda has taught you to bind? Then the old ways are not dead after all.
 - Do not waste what you bind, child. The valley has little power left to spare.
 - May the lanterns guide you. They have guided every Waykeeper before you.
+
+### Later, too early: not yet Tovan has praised the training (`elder_not_yet`)
+
+- Your smith is still waiting on you, young one. Finish your training, then come and sit with me.
 
 ## Child
 

@@ -115,6 +115,8 @@ var retaliate_ticks: int = 0  # Breaking Edge is usable while this is above zero
 var skill_dir: Vector2 = Vector2.RIGHT  # direction fixed when the skill was pressed
 var skill_motion: bool = false  # true on a tick in which a skill moved the player (Gale Cut's dash)
 var pending_release: StringName = &""  # set on the tick a skill enters skill_active; the core reads and clears it
+var dash_cooldown_bonus: int = 0  # ticks off the dash cooldown (the Agility stat, set by ExploreCore)
+var stat_speed_mult: float = 1.0  # walking speed multiplier from the Agility stat
 var combo_index: int = 1  # swing in progress (or the last swing during the chain grace window); 1 otherwise
 
 var _dash_dir: Vector2 = Vector2.RIGHT
@@ -709,7 +711,7 @@ func damage_mult() -> float:
 ## Current walking speed multiplier: the weapon buff's own value while it runs (1.0 for every weapon now), times
 ## SPRINT_MOVE_SPEED_MULT while Sprint runs.
 func move_speed_mult() -> float:
-	var mult: float = Weapons.active_move_speed_mult(weapon_id) if buff_ticks > 0 else 1.0
+	var mult: float = (Weapons.active_move_speed_mult(weapon_id) if buff_ticks > 0 else 1.0) * stat_speed_mult
 	if sprint_ticks_left > 0:
 		mult *= Tuning.SPRINT_MOVE_SPEED_MULT
 	return mult
@@ -772,7 +774,7 @@ func reset_combo() -> void:
 
 func _start_dash(move: Vector2, tick: int, events: Array[GameEvent]) -> void:
 	_dash_dir = move.normalized() if move.length_squared() > 0.0001 else facing
-	dash_cooldown = Tuning.DASH_COOLDOWN_TICKS
+	dash_cooldown = maxi(1, Tuning.DASH_COOLDOWN_TICKS - dash_cooldown_bonus)
 	_dash_invuln = Tuning.DASH_INVULN_TICKS
 	reset_combo()
 	_set_state(STATE_DASH)

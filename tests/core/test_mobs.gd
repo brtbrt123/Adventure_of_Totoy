@@ -13,7 +13,7 @@ const Collision := preload("res://core/collision.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 
 const SCENE: StringName = SceneDefs.WOODLAND_LAYERED
-const ARMED: Array[StringName] = [&"received_first_sword"]
+const ARMED: Array[StringName] = [&"received_first_sword", &"debug_all_unlocked"]
 ## A hero spot inside the Mossling clearing, in plain view of the mobs (about 40 px from the nearest).
 const WEST_SPOT: Vector2 = Vector2(112, 276)
 ## The same for the Boar clearing.
@@ -453,8 +453,8 @@ func test_levels_follow_the_exp_curve_and_scale_health_and_damage() -> void:
 	core.set_exp(29)
 	assert_eq(core.level(), 1)
 	core.set_exp(30)
-	assert_eq([core.level(), core.exp_in_level(), core.exp_to_next(), core.hero_max_hp()], [2, 0, 50, 110])
-	assert_eq(core.player.hp, 110, "a restored hero stands at full health of his level")
+	assert_eq([core.level(), core.exp_in_level(), core.exp_to_next(), core.hero_max_hp()], [2, 0, 50, 105])
+	assert_eq(core.player.hp, 105, "a restored hero stands at full health of his level")
 	core.set_exp(30 + 49)
 	assert_eq([core.level(), core.exp_in_level()], [2, 49])
 	var total: int = 0
@@ -464,24 +464,25 @@ func test_levels_follow_the_exp_curve_and_scale_health_and_damage() -> void:
 	assert_eq([core.level(), core.exp_to_next()], [Tuning.LEVEL_MAX, 0], "the top level needs nothing more")
 	core.set_exp(total + 99999)
 	assert_eq(core.level(), Tuning.LEVEL_MAX, "no level past the maximum")
-	assert_true(is_equal_approx(core.damage_mult(), 1.0 + Tuning.LEVEL_DAMAGE_BONUS * float(Tuning.LEVEL_MAX - 1)))
+	assert_true(is_equal_approx(core.damage_mult(), 1.0), "damage comes from the Might stat, not from the level")
 	var snap: ExploreCore.ExploreSnapshot = core.snapshot()
-	assert_eq([snap.level, snap.exp_to_next, snap.hero.max_hp, snap.exp_total], [Tuning.LEVEL_MAX, 0, 100 + 10 * (Tuning.LEVEL_MAX - 1), total + 99999])
+	assert_eq([snap.level, snap.exp_to_next, snap.hero.max_hp, snap.exp_total], [Tuning.LEVEL_MAX, 0, 100 + Tuning.LEVEL_HP_BONUS * (Tuning.LEVEL_MAX - 1), total + 99999])
 
 
-func test_a_level_up_heals_to_full_and_a_stronger_hero_hits_harder() -> void:
+func test_a_level_up_heals_to_full_and_might_makes_the_hero_hit_harder() -> void:
 	var core: ExploreCore = _core()
 	core.player.hp = 20
 	var events: Array[GameEvent] = []
 	core.give_exp(30, 201, events)
 	var lv: Array[GameEvent] = _of(events, GameEvent.LEVEL_UP)
 	assert_eq(lv.size(), 1)
-	assert_true(lv[0].data["level"] == 2 and lv[0].data["max_hp"] == 110)
-	assert_eq(core.player.hp, 110, "full health after a level up")
+	assert_true(lv[0].data["level"] == 2 and lv[0].data["max_hp"] == 105 and lv[0].data["points"] == 2)
+	assert_eq(core.player.hp, 105, "full health after a level up")
 	var ev: GameEvent = _of(events, GameEvent.EXP_GAINED)[0]
 	assert_true(ev.data["amount"] == 30 and ev.data["level"] == 2 and ev.data["exp"] == 0 and ev.data["exp_to_next"] == 50, str(ev.data))
 	core.give_exp(50 + 80 + 120, 201, events)
 	assert_eq(_of(events, GameEvent.LEVEL_UP).size(), 4, "one event per level crossed")
+	core.set_stats({&"might": 4})  # level 5 has 8 points: four on Might is +12 % damage
 	core.place_at(Vector2(150, 300))
 	var mossling: Mob = _mobs(core, &"mossling_clearing")[0]
 	mossling.position = Vector2(166, 300)
@@ -490,7 +491,7 @@ func test_a_level_up_heals_to_full_and_a_stronger_hero_hits_harder() -> void:
 		core.step(_swing(Vector2.RIGHT))
 		var hit: GameEvent = _event(core, GameEvent.ATTACK_HIT)
 		if hit != null and hit.data["target_id"] == mossling.id:
-			assert_eq(hit.data["damage"], roundi(Tuning.ATTACK_DAMAGE * core.damage_mult()), "level scales the blow")
+			assert_eq(hit.data["damage"], 11, "10 damage x 1.12")
 			return
 	assert_true(false, "the blow connected")
 
@@ -518,7 +519,11 @@ func test_item_slots_one_and_two_and_the_locks() -> void:
 	var aspects: Array[Dictionary] = core.snapshot().aspect_slots
 	assert_eq(aspects.size(), 3)
 	for a: Dictionary in aspects:
-		assert_false(a["unlocked"], "Aspect skills do not work in exploration yet: every socket shows locked")
+		assert_false(a["usable"], "the default Aspects need the boss: none is usable on the road")
+	assert_false(_core().snapshot().owned_aspects.is_empty() and false)
+	var fresh: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
+	for a: Dictionary in fresh.snapshot().aspect_slots:
+		assert_false(a["unlocked"], "a new hero's sockets are locked")
 
 
 func test_a_boar_keeps_attacking_a_hero_who_stands_close() -> void:
