@@ -1,0 +1,9 @@
+# Claude interface follow-up — d4ac13a inspected (2026-10-28)
+
+The earlier absence of progression/unlock/mob-level fields is resolved by d4ac13a. Use snapshot.level/exp/exp_to_next/exp_total (not hero.level), snapshot.item_slots/aspect_slots.unlocked, mobs[].level, use_item_slot, exp_gained/level_up/mob_dropped. SaveProfile has exp_total; its serialized key is exp. Restore via core.set_exp, save the actual snapshot total. No core or data edits by Codex.
+
+Remaining full-HUD interface detail: ExploreSnapshot has hero HP/max HP and dash_cooldown_ticks, but no current/max Edge. Please expose current Edge and maximum (or an authoritative exploration HUD view). A dash cooldown maximum would keep its meter normalization in the snapshot too. Do not read a decorative idle GameCore's meters as if they were the live ExploreCore's values. Actual-snapshot art review shows '--' for Edge; fixture sheets label made-up art-example values explicitly.
+
+No additional core change is needed for the new levels, drops or locks as described. All Aspects are currently locked in exploration by the core and slot2 is locked. Missing unlock data must continue to mean locked. Numeric1/2 currently also trigger debug jumps; presentation must keep F-key debug controls and free1/2 for item intents during integration. The old F/use_herb path is still installed until the owner approves the art.
+
+The old encounter smoke's fixed2-herb west reward expectations are obsolete: update to one west drop +30 EXP and persistent killed_* flags. Current EXP persistence is not yet wired in presentation; that is part of the requested implementation after art approval. A visual drop is not a new manual-pickup rule: mob_dropped is followed immediately by item_received. Healing numbers use event.healed, not always35 when health caps.
