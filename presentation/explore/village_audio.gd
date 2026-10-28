@@ -43,17 +43,61 @@ func set_scene(id: StringName) -> void:
 	if ambience_active and not ambience.playing and DisplayServer.get_name() != "headless":
 		ambience.play()
 
-## Existing recordings reused at restrained levels; owner must judge the live mix.
+## Owner-generated woodland recordings; retained originals and gain report in audio/woodland.
+var mob_types: Dictionary = {}
+const WOODLAND_CUES: Dictionary = {
+	"boar_alert": preload("res://presentation/audio/woodland/boar_alert.wav"),
+	"boar_charge": preload("res://presentation/audio/woodland/boar_charge.wav"),
+	"boar_crash": preload("res://presentation/audio/woodland/boar_crash.wav"),
+	"boar_death": preload("res://presentation/audio/woodland/boar_death.wav"),
+	"boar_hurt": preload("res://presentation/audio/woodland/boar_hurt.wav"),
+	"herb_use": preload("res://presentation/audio/woodland/herb_use.wav"),
+	"item_received": preload("res://presentation/audio/woodland/item_received.wav"),
+	"level_up": preload("res://presentation/audio/woodland/level_up.wav"),
+	"mob_stagger": preload("res://presentation/audio/woodland/mob_stagger.wav"),
+	"mossling_alert": preload("res://presentation/audio/woodland/mossling_alert.wav"),
+	"mossling_death": preload("res://presentation/audio/woodland/mossling_death.wav"),
+	"mossling_hurt": preload("res://presentation/audio/woodland/mossling_hurt.wav"),
+	"slot_locked": preload("res://presentation/audio/woodland/slot_locked.wav"),
+}
+func cue(key: String, tick: int, strength: float = 1.0) -> void:
+	if not WOODLAND_CUES.has(key):
+		super.cue(key,tick,strength)
+		return
+	# Pack alerts share one cue; don't multiply loudness for each creature.
+	var gap: int = 12 if key.ends_with("alert") or key=="slot_locked" else 1
+	if tick-int(last_ticks.get(key,-1000))<gap:return
+	last_ticks[key] = tick
+	played[key] = int(played.get(key,0))+1
+	if DisplayServer.get_name()=="headless" or voices.is_empty():return
+	var voice: AudioStreamPlayer = voices[next_voice]
+	for candidate: AudioStreamPlayer in voices:
+		if not candidate.playing:
+			voice = candidate
+			break
+	next_voice = (next_voice+1)%voices.size()
+	voice.stop()
+	voice.stream = WOODLAND_CUES[key]
+	voice.pitch_scale = 1.0
+	voice.volume_db = -13.0+linear_to_db(clampf(strength,0.2,1.0))
+	voice.play()
 func handle_event(event: GameEvent, scene: StringName = &"arena") -> void:
-	super.handle_event(event, scene)
+	super.handle_event(event,scene)
+	var mob_type: String = String(event.data.get("type",mob_types.get(int(event.data.get("mob_id",event.data.get("target_id",-1))),"mossling")))
 	match event.type:
-		&"encounter_started", &"mob_alerted": cue("dash",event.tick,0.3)
-		&"attack_telegraphed": cue("gold_warning" if event.data.get("kind",&"") == &"gold" else "red_warning",event.tick,0.45)
-		&"attack_hit": cue("counter_hit" if event.data.get("kind",&"") == &"counter" else "armor_hit",event.tick,0.65)
-		&"parry_succeeded": cue("perfect_parry" if event.data.get("quality",&"") == &"perfect" else "deflect",event.tick)
-		&"mob_staggered": cue("posture_break",event.tick,0.35)
-		&"mob_defeated": cue("golem_sweep",event.tick,0.25)
-		&"encounter_cleared": cue("lesson_complete",event.tick,0.55)
-		&"item_used": cue("lantern_light",event.tick,0.45)
-		&"damage_taken", &"hero_defeated": cue("player_hurt",event.tick,0.65)
-		&"hero_respawned": cue("aspect_bind",event.tick,0.45)
+		&"mob_alerted":cue(mob_type+"_alert",event.tick,0.65)
+		&"attack_telegraphed":
+			cue("gold_warning" if event.data.get("kind",&"")==&"gold" else "red_warning",event.tick,0.6)
+			if mob_type=="boar":cue("boar_charge",event.tick,0.55)
+		&"attack_hit":
+			cue("counter_hit" if event.data.get("kind",&"")==&"counter" else "armor_hit",event.tick,0.55)
+			cue(mob_type+"_hurt",event.tick,0.65)
+		&"parry_succeeded":cue("perfect_parry" if event.data.get("quality",&"")==&"perfect" else "deflect",event.tick)
+		&"mob_staggered":cue("boar_crash" if event.data.get("reason",&"")==&"crash" else "mob_stagger",event.tick,0.65)
+		&"mob_defeated":cue(mob_type+"_death",event.tick,0.7)
+		&"encounter_cleared":cue("lesson_complete",event.tick,0.5)
+		&"item_used":cue("herb_use",event.tick,0.8)
+		&"item_received":cue("item_received",event.tick,0.8)
+		&"level_up":cue("level_up",event.tick)
+		&"damage_taken", &"hero_defeated":cue("player_hurt",event.tick,0.65)
+		&"hero_respawned":cue("aspect_bind",event.tick,0.45)

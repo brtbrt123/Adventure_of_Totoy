@@ -1,0 +1,20 @@
+# Woodland presentation polish installed (2026-10-28)
+
+Owner approved generated copper/stone HUD art and authorized wiring the supplied sounds and all approved assets. No core/data/tools/harness edits. The pre-existing docs/architecture.md edit stays untouched. No merge or push.
+
+## Implementation
+- Approved HUD sheet extracted into native text grids, Totoy36 palette/hard alpha; generated labels and counts are discarded. Existing approved weapon/hero/environment art preserved. Art validate/build/preview run; regenerated atlases/contact sheets included. Native sizes/crops in art/reference/hud_copper_generated_v1/IMPORT.md.
+- Full exploration HUD only for nonempty encounters, hidden in village/dialogue/menu. Bottom meters, weapon circle, two item boxes and three Aspect sockets, left level/EXP. Slots and locks read core arrays exactly. Keys1/2 send use_item_slot; F2/F3 debug destinations remain. Item2 and all Aspects stay core-locked. Down look follows defeated.
+- HP uses hero.max_hp. EXP rises, gain glints, level up has brief banner/sound. No authoritative Edge field exists: its track says --. Dash uses snapshot remaining cooldown and read-only Tuning maximum. Claude: please expose current/max Edge or explicitly declare Edge unused in exploration.
+- Event-driven merged cream mob damage, larger cyan counter, lilac hero damage and green actual healed amounts. Existing hero hit flash/hurt/impact remain. Counter/normal amounts never guessed from animation.
+- Compact approved mob HP asset with level label only (owner rejected ornate name plates, stronger plates and ghost segment). Hurt or close mobs show it, dead mobs don't. All11 core states resolve existing body art; Mossling stagger is dazed hurt plus stars, Boar recovery reverses its tell. Added approved alert/hit/parry/heal/crash/stagger/death/exposed frames. Warning lanes remain the exact core geometry.
+- Visible mob_dropped glint is cosmetic; inventory grant remains item_received. Herb receipts and slots share one icon. Consume burst/slot flash only after item_used.
+- Every ExploreCore restores inventory and exp_total before snapshot; item/EXP events save profile plus killed_* story flags. Real west-clearing smoke now expects30 EXP and one deterministic herb drop, no reroll on Continue.
+-13 owner WAVs from data/audio_candidates copied to presentation/audio/woodland, sources unchanged. Readable48kHz16-bit stereo, no full-scale source peaks. Runtime gain balance capped8x and2ms edge fades; full metrics in sources.json. Mossling/Boar alerts/hurt/death, Boar charge/crash, shared stagger, item/heal/level/locked cues wired. Pack alerts deduplicate, warnings/parries retain existing recordings. No automatic claim about subjective sound quality.
+
+## Captures and checks
+Production-renderer fixture captures: art/reference/woodland_installed_20261028. HUD lock state, EXP0/25/50/95/MAX, level-up, HP100/55/15 and varied levels, all11 states per mob, damage styles, event effects, down. Marked fixtures; no real save writes. Reproduce with presentation/review/woodland_polish_v1/capture_installed.gd (windowed).
+Focused hit-feedback, woodland-polish, woodland-presentation and real woodland-encounter smokes pass. Full harness passes: Python unittest discovery, Godot import, core run_tests and every smoke suite, including updated woodland encounters and new woodland polish. Log: art/build/arena_polish_full_harness.log (ignored). Godot4.7.2 windowed captures pass with no script errors. A Windows root-certificate-store warning occurs in this environment; checks still exit0.
+
+## Owner playtest / Claude cross-review
+Playtest overall UI size/readability at320x180, sound levels with multiple attackers, Mossling/Boar pose timing versus warning/body contact, parry/counter/heal feedback, EXP level-up and Continue persistence. Technical tests cannot judge fun, art approval, audio quality or combat feel. Claude cross-review remains required, no automated cross-review was requested. No difficulty, collision, reward, unlock or hit rules changed.

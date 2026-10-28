@@ -46,10 +46,10 @@ func run() -> void:
 				expect(scene.frames.has(Explore.MobView.frame(sample,scene.snapshot.telegraphs,scene.snapshot.tick)), "every core mob state has art")
 	Input.action_press("arena_attack")
 	Input.action_press("arena_parry")
-	Input.action_press("explore_use_herb")
+	Input.action_press("explore_item_1")
 	var intent: InputFrame = Explore.Bindings.read_frame()
-	expect(intent.attack_pressed and intent.attack_held and intent.parry_pressed and intent.use_herb_pressed, "fight and herb input forwarding")
-	for action: String in ["arena_attack", "arena_parry", "explore_use_herb"]:
+	expect(intent.attack_pressed and intent.attack_held and intent.parry_pressed and intent.use_item_slot == 1, "fight and herb input forwarding")
+	for action: String in ["arena_attack", "arena_parry", "explore_item_1"]:
 		Input.action_release(action)
 	var death_events: Array[Explore.GameEvent] = []
 	scene.core.player.die(scene.core.tick, death_events)
@@ -69,7 +69,7 @@ func run() -> void:
 	var audio: Explore.PracticeView.VillageAudio = scene.practice_view.audio
 	for type: StringName in [&"encounter_started",&"mob_alerted",&"attack_telegraphed",&"attack_hit",&"mob_staggered",&"mob_defeated",&"encounter_cleared",&"item_used",&"hero_defeated",&"hero_respawned"]:
 		audio.handle_event(Explore.GameEvent.new(type,scene.snapshot.tick+audio.played.size()+10,{"kind":&"counter"}),SceneDefs.WOODLAND_LAYERED)
-	for cue: String in ["dash","red_warning","counter_hit","posture_break","golem_sweep","lesson_complete","lantern_light","player_hurt","aspect_bind"]:
+	for cue: String in ["mossling_alert","red_warning","counter_hit","mob_stagger","mossling_death","lesson_complete","herb_use","player_hurt","aspect_bind"]:
 		expect(int(audio.played.get(cue,0)) > 0, "recorded event cue: "+cue)
 	scene.queue_free()
 	await process_frame
@@ -91,7 +91,7 @@ func inventory_test() -> void:
 	expect(int(scene.snapshot.inventory.get("herb",0)) == 3, "core inventory restores on entry")
 	scene.core.player.hp = 70
 	var use: InputFrame = InputFrame.new()
-	use.use_herb_pressed = true
+	use.use_item_slot = 1
 	scene.advance(use)
 	expect(scene.snapshot.hero.hp == scene.snapshot.hero.max_hp and int(scene.snapshot.inventory.get("herb",0)) == 2, "herb heals through real core intent")
 	expect(int(Explore.SaveStore.load_profile().inventory.get("herb",0)) == 2 and scene.hud.herb_count == 2, "herb use saves and updates HUD")
@@ -99,7 +99,7 @@ func inventory_test() -> void:
 	expect(int(scene.snapshot.inventory.get("herb",0)) == 2, "inventory survives another core/scene")
 	scene.enter_scene(SceneDefs.WOODLAND_LAYERED)
 	scene._on_event(Explore.GameEvent.new(&"item_received",scene.snapshot.tick,{"kind":&"item","item_id":&"herb","name":"Herb","quantity":2}))
-	expect(scene.reward_popup.pending[-1]["icon"] == "ui_item_herb_1" and scene.frames.has("ui_item_herb_1"), "herb receipt uses actual consumable icon")
+	expect(scene.reward_popup.pending[-1]["icon"] == "hud_copper_herb" and scene.frames.has("hud_copper_herb"), "herb receipt uses actual consumable icon")
 	expect(int(scene.snapshot.inventory.get("herb",0)) == 2, "receipt never grants an item in presentation")
 	scene.queue_free()
 	await process_frame

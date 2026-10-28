@@ -99,9 +99,10 @@ func run() -> void:
 		strike.aim = Vector2.RIGHT
 		step(strike)
 	expect(cleared and awards == 1,"clear pack and grant exactly one receipt")
-	expect(int(scene.profile.inventory.get("herb",0)) == 2 and scene.profile.story_flags.has(&"cleared_mossling_clearing"),"reward and cleared flag saved together")
+	expect(int(scene.profile.inventory.get("herb",0)) == 1 and scene.profile.story_flags.has(&"cleared_mossling_clearing"),"reward and cleared flag saved together")
+	expect(scene.profile.exp_total == 30,"west clearing saves30 EXP alongside one drop")
 	scene.reward_popup.advance(0.0)
-	expect(scene.reward_popup.receipt.get("icon","") == "ui_item_herb_1","real reward popup icon")
+	expect(scene.reward_popup.receipt.get("icon","") == "hud_copper_herb","real reward popup icon")
 	await snap("west_cleared_receipt")
 	for area: Dictionary in [{"name":"east_red_warning","at":Vector2(560,276),"enc":&"boar_clearing"},{"name":"camp_gold_warning","at":Vector2(320,128),"enc":&"camp_ambush"}]:
 		scene.core.player.hp = Explore.Tuning.PLAYER_MAX_HP
@@ -134,7 +135,8 @@ func run() -> void:
 	for mob: Dictionary in scene.snapshot.mobs:
 		if mob["encounter_id"] == &"mossling_clearing":west_alive += 1
 	expect(scene.snapshot.scene_id == Explore.SceneDefs.WOODLAND_LAYERED and west_alive == 0,"Continue keeps west pack cleared")
-	expect(int(scene.snapshot.inventory.get("herb",0)) == 2 and scene.reward_popup.pending.is_empty(),"Continue keeps herbs and never replays reward")
+	expect(int(scene.snapshot.inventory.get("herb",0)) == 1 and scene.reward_popup.pending.is_empty(),"Continue keeps herbs and never replays reward")
+	expect(scene.snapshot.exp_total == 30,"Continue restores earned EXP")
 	scene.queue_free()
 	await process_frame
 	Explore.SaveStore.delete()

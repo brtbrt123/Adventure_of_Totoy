@@ -9,6 +9,8 @@ const STATES: Dictionary = {
 static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> String:
 	var table: Dictionary = STATES[String(mob["type"])]
 	var pose: Array = table.get(String(mob["state"]), table["idle"])
+	if mob["type"]==&"mossling" and mob["state"]==&"stagger":pose=["hurt",2,6,true]
+	if mob["type"]==&"boar" and mob["state"]==&"recover":pose=["charge_tell",4,6,false]
 	var n: int = int(mob["state_ticks"]) / int(pose[2])
 	if mob["state"] == &"windup":
 		for tell: Snapshots.TelegraphSnapshot in tells:
@@ -17,16 +19,18 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 	if mob["state"] == &"dead":
 		n = floori(float(mob["state_ticks"]) / Tuning.MOB_DEATH_TICKS * int(pose[1]))
 	n = posmod(n,int(pose[1])) if bool(pose[3]) else clampi(n,0,int(pose[1])-1)
+	if mob["type"]==&"boar" and mob["state"]==&"recover":n=3-n
 	return "%s_%s_right_%d" % [mob["type"],pose[0],n+1]
-static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary) -> void:
+static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary, hero_at: Vector2, frames: Dictionary, atlas: Texture2D) -> void:
 	if mob["state"] == &"dead": return
 	var at: Vector2 = mob["position"]
 	var top: Vector2 = (at-Vector2(0,31 if mob["type"] == &"boar" else 25)).round()
-	if int(mob["hp"]) < int(mob["max_hp"]):
+	if int(mob["hp"]) < int(mob["max_hp"]) or at.distance_to(hero_at)<72.0:
 		if mob.has("level"):
 			draw_level(canvas, top + Vector2(-7,-7), int(mob["level"]), colors)
-		canvas.draw_rect(Rect2(top+Vector2(-11,0),Vector2(22,4)),colors["0"])
-		canvas.draw_rect(Rect2(top+Vector2(-10,1),Vector2(floori(20.0*float(mob["hp"])/int(mob["max_hp"])),2)),colors["7"])
+		var frame_data: Dictionary = frames["hud_copper_mob"]
+		canvas.draw_texture_rect_region(atlas,Rect2(top+Vector2(-16,0),Vector2(32,8)),Rect2(frame_data["x"],frame_data["y"],frame_data["w"],frame_data["h"]))
+		canvas.draw_rect(Rect2(top+Vector2(-14,3),Vector2(floori(28.0*float(mob["hp"])/int(mob["max_hp"])),2)),colors["A"])
 	if bool(mob["exposed"]):
 		canvas.draw_polyline(PackedVector2Array([top+Vector2(0,-8),top+Vector2(3,-5),top+Vector2(0,-2),top+Vector2(-3,-5),top+Vector2(0,-8)]),colors["u"],1.0)
 	if mob["state"] == &"alert":

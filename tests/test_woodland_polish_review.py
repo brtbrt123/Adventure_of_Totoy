@@ -1,4 +1,4 @@
-"""Only review-source contracts; no runtime assets are installed by this stage."""
+"""Approved review sources retain palette/frame contracts after runtime installation."""
 from pathlib import Path
 import sys, unittest
 ROOT=Path(__file__).resolve().parents[1]
@@ -16,7 +16,8 @@ class PolishReview(unittest.TestCase):
                 used=set(''.join(sprite.rows))
                 if not path.stem.startswith('parry_'):
                     self.assertFalse(used & palette.reserved)
-                self.assertFalse((ROOT/'art/src'/('polish_'+path.name)).exists(),'review sources must not install themselves')
+                if path.stem not in ('herb_bundle','lock'):
+                    self.assertEqual(path.read_text(),(ROOT/'art/src'/('woodland_fx_'+path.name)).read_text())
     def test_all_requested_effects_have_six_review_frames(self):
         root=ROOT/'art/reference/woodland_polish_v1/grids'
         for effect in ['heal','alert','hit','parry','dust','stagger','death','exposed']:

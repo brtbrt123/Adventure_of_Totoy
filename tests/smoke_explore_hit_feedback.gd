@@ -18,7 +18,7 @@ func run() -> void:
 	scene.snapshot = scene.core.snapshot()
 	check(not scene.hero_hit_flash(),"no flash without a damage event")
 	var hp: int = scene.snapshot.hero.hp
-	var event: Explore.GameEvent = Explore.GameEvent.new(Explore.GameEvent.DAMAGE_TAKEN,scene.snapshot.tick,{"damage":10,"entity_id":scene.snapshot.hero.id})
+	var event: Explore.GameEvent = Explore.GameEvent.new(Explore.GameEvent.DAMAGE_TAKEN,scene.snapshot.tick,{"amount":10,"entity_id":scene.snapshot.hero.id})
 	scene._on_event(event)
 	scene._choose_frames()
 	check(scene.hero_hit_flash(),"confirmed hit flashes hero")
