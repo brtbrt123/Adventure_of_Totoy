@@ -47,7 +47,7 @@ func _catalog() -> void:
 		if arena.frames.has(icons[slot]):
 			var icon: Dictionary = arena.frames[icons[slot]]
 			_expect(Vector2(icon["w"], icon["h"]) == sockets[slot].size, "medallion must use native pixel size")
-		_expect(Rect2(0, 0, 320, 180).encloses(sockets[slot]), "socket clipped by viewport")
+		_expect(Rect2(0, 0, 384, 216).encloses(sockets[slot]), "socket clipped by viewport")
 		for other: int in range(slot):
 			_expect(sockets[slot].get_center().distance_to(sockets[other].get_center()) >= (sockets[slot].size.x + sockets[other].size.x) * 0.5, "overlapping medallion frames")
 	_expect(sockets[3].size == sockets[0].size * 2, "weapon icon must be larger than Aspects")
@@ -78,9 +78,9 @@ func _catalog() -> void:
 	var charge: Vector2 = arena.head_anchors["golem2_charge_4"]
 	_expect(not idle.is_equal_approx(charge), "charge lean must move head")
 	_expect(Vector2(arena.head_anchors["golem2_slam_3"]).y >= 4, "raised fist mistaken for head")
-	for at: Vector2 in [Vector2.ZERO, Vector2(320, 0), Vector2(0, 180), Vector2(320, 180)]:
+	for at: Vector2 in [Vector2.ZERO, Vector2(384, 0), Vector2(0, 216), Vector2(384, 216)]:
 		for counter: bool in [false, true]:
-			_expect(Rect2(1, 1, 318, 165).encloses(arena.hud.boss_panel(at, counter).grow(1)), "panel/highlight left screen")
+			_expect(Rect2(1, 1, 382, 201).encloses(arena.hud.boss_panel(at, counter).grow(1)), "panel/highlight left screen")
 	arena.hud.reset_head()
 	arena.hud.track_head(Vector2(100, 100), 0, 2)
 	arena.hud.track_head(Vector2(110, 106), 1, 2)

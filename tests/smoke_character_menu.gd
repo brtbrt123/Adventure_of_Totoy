@@ -366,7 +366,7 @@ func shared_frame() -> void:
 	check(UiPanel.drawn > before, "the skill tooltip does not use the shared frame")
 	await save("tooltip")
 	arena.hud.hint_slot_override = -1
-	check(Hud.aspect_hint_rect().end.x <= 320 and Hud.aspect_hint_rect().end.y <= Hud.aspect_rects()[1].position.y + 30, "tooltip rect")
+	check(Hud.aspect_hint_rect().end.x <= 384 and Hud.aspect_hint_rect().end.y <= Hud.aspect_rects()[1].position.y + 30, "tooltip rect")
 	# the menu: every tab and a hover each
 	check(arena.open_menu(), "open")
 	before = UiPanel.drawn
@@ -414,7 +414,7 @@ func shared_frame() -> void:
 		await process_frame
 		check(UiPanel.drawn > before, "the %s panel does not use the shared frame" % result)
 		var rect: Rect2 = Hud.result_panel_rect(arena.hud.result_lines.size(), true)
-		check(rect.position.y - 8 >= 0 and rect.end.y <= 180, "%s panel off screen: %s" % [result, rect])
+		check(rect.position.y - 8 >= 0 and rect.end.y <= 216, "%s panel off screen: %s" % [result, rect])
 		await save(String(result))
 	arena.hud.result_lines = []
 	arena.hud.result_hint = ""

@@ -73,8 +73,8 @@ func capture_overview(label: String) -> void:
 			scene.snapshot.tick += 12
 			await capture("motion_%02d" % frame)
 	scene.hud.visible = true
-	root.content_scale_size = Vector2i(320, 180)
-	root.size = Vector2i(1280, 720)
+	root.content_scale_size = Vector2i(384, 216)
+	root.size = Vector2i(1152, 648)
 	scene.camera.enabled = true
 	scene._update_camera()
 

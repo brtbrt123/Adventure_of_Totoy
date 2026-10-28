@@ -43,7 +43,7 @@ const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const START_META: StringName = &"totoy_explore_start"
 const PERSIST_META: StringName = &"totoy_persist"
-const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
+const VIEW_SIZE: Vector2 = Vector2(384.0, 216.0)
 
 const GROUNDS: Dictionary = {
 	&"arena": "res://presentation/arena/arena_ground.png",
@@ -546,7 +546,7 @@ func _save_loadout() -> void:
 
 # --- drawing ---
 
-## Follows the hero on a fixed 320x180 screen, locked to his rounded position and clamped to the scene (the arena's rule).
+## Follows the hero on a fixed 384x216 screen, locked to his rounded position and clamped to the scene (the arena's rule).
 func _update_camera() -> void:
 	if camera == null or snapshot == null:
 		return

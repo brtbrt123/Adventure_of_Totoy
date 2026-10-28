@@ -19,7 +19,7 @@ const EXPLORE_START_META: StringName = &"totoy_explore_start"
 ## not set it and never touch the player's save).
 const PERSIST_META: StringName = &"totoy_persist"
 
-const MENU_TOP: int = 103  # y of the first menu line, in game pixels
+const MENU_TOP: int = 134  # y of the first menu line, in game pixels
 const MENU_STEP: int = 12
 const MENU_SIZE: int = 13  # menu item font size (Cinzel capitals)
 const PAGE_SIZE: int = 10  # body text on the controls and credits pages
@@ -106,7 +106,7 @@ func _ready() -> void:
 		background_sprite = Sprite2D.new()
 		background_sprite.texture = background
 		background_sprite.centered = false
-		background_sprite.scale = Vector2(320.0, 180.0) / background.get_size()
+		background_sprite.scale = Vector2(384.0, 216.0) / background.get_size()
 		background_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		background_sprite.show_behind_parent = true
 		add_child(background_sprite)
@@ -120,7 +120,7 @@ func _ready() -> void:
 		logo_sprite.texture = logo
 		logo_sprite.centered = false
 		logo_sprite.scale = Vector2.ONE * (LOGO_WIDTH / logo.get_width())
-		logo_sprite.position = Vector2(floorf((320.0 - LOGO_WIDTH) * 0.5), 2.0)
+		logo_sprite.position = Vector2(floorf((384.0 - LOGO_WIDTH) * 0.5), 6.0)
 		logo_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST if logo_pixel else CanvasItem.TEXTURE_FILTER_LINEAR
 		logo_sprite.show_behind_parent = true
 		add_child(logo_sprite)
@@ -143,7 +143,7 @@ func _add_text_layer() -> void:
 	while palette_vectors.size() < 36:
 		palette_vectors.append(palette_vectors[count - 1])
 	text_viewport = SubViewport.new()
-	text_viewport.size = Vector2i(320, 180)
+	text_viewport.size = Vector2i(384, 216)
 	text_viewport.transparent_bg = true
 	text_viewport.disable_3d = true
 	text_viewport.gui_disable_input = true
@@ -275,7 +275,7 @@ func continue_game() -> void:
 ## The menu line under a canvas point, or -1.
 func item_at(point: Vector2) -> int:
 	for i: int in ITEMS.size():
-		if Rect2(100, MENU_TOP + i * MENU_STEP - 2, 120, MENU_STEP - 1).has_point(point):
+		if Rect2(132, MENU_TOP + i * MENU_STEP - 2, 120, MENU_STEP - 1).has_point(point):
 			return i
 	return -1
 
@@ -310,9 +310,9 @@ func draw_text_layer(canvas: Object) -> void:
 ## (controls, credits) the picture is dimmed so the lettering reads.
 func _draw_background() -> void:
 	if background == null:
-		draw_rect(Rect2(0, 0, 320, 180), colors["2"])
+		draw_rect(Rect2(0, 0, 384, 216), colors["2"])
 	elif not painted:
-		draw_texture_rect(background, Rect2(0, 0, 320, 180), false)
+		draw_texture_rect(background, Rect2(0, 0, 384, 216), false)
 	# mist: thin pale bands that drift sideways at different speeds (pixel rows; only over the pixel-art fallback)
 	var mist: Color = colors["p"]
 	for band: int in (0 if painted else 6):
@@ -328,7 +328,7 @@ func _draw_background() -> void:
 	var rnd: RandomNumberGenerator = RandomNumberGenerator.new()
 	rnd.seed = 77
 	for i: int in FIREFLIES:
-		var home: Vector2 = Vector2(rnd.randf_range(14.0, 306.0), rnd.randf_range(60.0, 172.0))
+		var home: Vector2 = Vector2(rnd.randf_range(14.0, 370.0), rnd.randf_range(70.0, 206.0))
 		var rate: Vector2 = Vector2(rnd.randf_range(0.25, 0.6), rnd.randf_range(0.2, 0.5))
 		var phase: float = rnd.randf_range(0.0, TAU)
 		var at: Vector2 = home + Vector2(sin(time * rate.x + phase) * 9.0, cos(time * rate.y + phase * 1.3) * 5.0)
@@ -338,12 +338,12 @@ func _draw_background() -> void:
 		draw_rect(Rect2(dot - Vector2(0, 1), Vector2(1, 3)), Color(colors["1"], 0.18 * pulse))
 		draw_rect(Rect2(dot, Vector2(1, 1)), Color(colors["p"], 0.55 + 0.45 * pulse))
 	if screen != SCREEN_TITLE:
-		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], 0.74))
+		draw_rect(Rect2(0, 0, 384, 216), Color(colors["0"], 0.74))
 
 
 func _draw_title(canvas: Object) -> void:
 	if logo_sprite == null:  # without the logo image the title is plain lettering
-		canvas.centered(160, 30, "ADVENTURE OF TOTOY", colors["1"], colors["0"], 1, canvas.menu_font(), FALLBACK_TITLE_SIZE)
+		canvas.centered(192, 34, "ADVENTURE OF TOTOY", colors["1"], colors["0"], 1, canvas.menu_font(), FALLBACK_TITLE_SIZE)
 	var face: Font = canvas.menu_font()
 	for i: int in ITEMS.size():
 		var selected: bool = i == index
@@ -351,32 +351,32 @@ func _draw_title(canvas: Object) -> void:
 		if selected:
 			# an opaque dark plate behind the chosen item with a cream line under it (the layer is hard pixels:
 			# translucent fills would be cut away)
-			canvas.draw_rect(Rect2(96, y - 3, 128, MENU_STEP - 1), colors["k"])
-			canvas.draw_rect(Rect2(96, y - 3 + MENU_STEP - 2, 128, 1), colors["1"])
-			canvas.outlined(Vector2(100, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
+			canvas.draw_rect(Rect2(128, y - 3, 128, MENU_STEP - 1), colors["k"])
+			canvas.draw_rect(Rect2(128, y - 3 + MENU_STEP - 2, 128, 1), colors["1"])
+			canvas.outlined(Vector2(132, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
 		var tone: Color = colors["1"] if selected else colors["p"]
 		if ITEMS[i] == "CONTINUE" and not can_continue():
 			tone = colors["h"]  # nothing saved to continue
-		canvas.centered(160, y, ITEMS[i], tone, colors["0"], 1, face, MENU_SIZE)
+		canvas.centered(192, y, ITEMS[i], tone, colors["0"], 1, face, MENU_SIZE)
 	var note: String = String(profile.load_note) if profile != null else ""
 	if note != "":
-		canvas.centered(160, 175, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)
+		canvas.centered(192, 207, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)
 
 
 func _draw_page(canvas: Object, heading: String, lines: Array[String], footer: Array[String]) -> void:
 	var face: Font = canvas.menu_font()
-	canvas.centered(160, 4, heading, colors["1"], colors["0"], 1, face, 20)
-	var y: int = 26
+	canvas.centered(192, 8, heading, colors["1"], colors["0"], 1, face, 20)
+	var y: int = 34
 	for line: String in lines:
 		var split: int = line.find(":")
 		if split > 0 and lines == CONTROL_LINES:
-			canvas.outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"], 1, face, PAGE_SIZE)
-			canvas.outlined(Vector2(104, y), line.substr(split + 1), colors["j"], colors["0"], 1, face, PAGE_SIZE)
+			canvas.outlined(Vector2(52, y), line.substr(0, split), colors["1"], colors["0"], 1, face, PAGE_SIZE)
+			canvas.outlined(Vector2(136, y), line.substr(split + 1), colors["j"], colors["0"], 1, face, PAGE_SIZE)
 		else:
-			canvas.outlined(Vector2(20, y), line, colors["j"], colors["0"], 1, face, PAGE_SIZE)
+			canvas.outlined(Vector2(52, y), line, colors["j"], colors["0"], 1, face, PAGE_SIZE)
 		y += 10
 	y += 4
 	for line: String in footer:
-		canvas.outlined(Vector2(20, y), line, colors["o"], colors["0"], 1, face, PAGE_SIZE)
+		canvas.outlined(Vector2(52, y), line, colors["o"], colors["0"], 1, face, PAGE_SIZE)
 		y += 10
-	canvas.outlined(Vector2(20, 168), "ESC OR ENTER: BACK", colors["1"], colors["0"], 1, face, PAGE_SIZE)
+	canvas.outlined(Vector2(52, 200), "ESC OR ENTER: BACK", colors["1"], colors["0"], 1, face, PAGE_SIZE)

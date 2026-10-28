@@ -103,10 +103,10 @@ func _every_scene_loads() -> void:
 			scene.core.place_at(corner)
 			_step(scene)
 			var o: Vector2 = scene.view_origin
-			_expect(o.x >= 0.0 and o.y >= 0.0 and o.x <= size.x - 320.0 and o.y <= size.y - 180.0, "%s camera stays inside (%s)" % [scene_id, o])
+			_expect(o.x >= 0.0 and o.y >= 0.0 and o.x <= size.x - 384.0 and o.y <= size.y - 216.0, "%s camera stays inside (%s)" % [scene_id, o])
 			_expect(o == o.round(), "whole-pixel camera")
 			var on_screen: Vector2 = scene.snapshot.hero.position - o
-			_expect(on_screen.x >= 0.0 and on_screen.y >= 0.0 and on_screen.x <= 320.0 and on_screen.y <= 180.0, "%s hero on screen" % scene_id)
+			_expect(on_screen.x >= 0.0 and on_screen.y >= 0.0 and on_screen.x <= 384.0 and on_screen.y <= 216.0, "%s hero on screen" % scene_id)
 		# walking follows the core armed/unarmed state
 		scene.core.place_at(SceneDefs.get_def(scene_id)["entries"][SceneDefs.get_def(scene_id)["default_entry"]])
 		for i: int in 12:

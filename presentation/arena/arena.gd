@@ -38,10 +38,10 @@ const OCCLUDER_SCENE: StringName = &"arena"
 ## The ground is drawn at this modulate; the occluders (cut from it) must match.
 const GROUND_MODULATE: Color = Color(0.92, 0.92, 0.92)
 const GROUND_PATH: String = "res://presentation/arena/arena_ground.png"
-const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
+const VIEW_SIZE: Vector2 = Vector2(384.0, 216.0)
 ## Non-solid decoration (the solid props come from the core's snapshot).
 var decor: Array[Dictionary] = []
-## The camera follows the player on the same 320x180 screen. `view_origin` is the world position of the screen's
+## The camera follows the player on the same 384x216 screen. `view_origin` is the world position of the screen's
 ## top-left corner, whole pixels, kept inside the arena.
 var camera: Camera2D
 var camera_focus: Vector2 = Vector2.ZERO

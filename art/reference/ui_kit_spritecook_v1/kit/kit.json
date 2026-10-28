@@ -102,8 +102,8 @@
   },
   "aspect_socket_active": {
    "size": [
-    28,
-    31
+    37,
+    40
    ],
    "nine_slice": null,
    "source_rect": [
@@ -115,8 +115,8 @@
   },
   "aspect_socket_locked": {
    "size": [
-    28,
-    31
+    37,
+    40
    ],
    "nine_slice": null,
    "source_rect": [
@@ -128,8 +128,8 @@
   },
   "weapon_medallion": {
    "size": [
-    40,
-    44
+    48,
+    52
    ],
    "nine_slice": null,
    "source_rect": [
@@ -339,8 +339,8 @@
   },
   "level_shield": {
    "size": [
-    18,
-    21
+    24,
+    28
    ],
    "nine_slice": null,
    "source_rect": [
@@ -556,8 +556,8 @@
   },
   "aspect_socket_open": {
    "size": [
-    28,
-    31
+    37,
+    40
    ],
    "assembled_from_kit": true
   },
@@ -591,8 +591,8 @@
   },
   "aspect_socket_sprint": {
    "size": [
-    28,
-    31
+    37,
+    40
    ],
    "assembled_from_kit": true
   }

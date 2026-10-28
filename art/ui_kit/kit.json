@@ -1,0 +1,323 @@
+{
+ "units": "game pixels",
+ "parts": {
+  "panel_large_ornate": {
+   "size": [
+    137,
+    91
+   ],
+   "nine_slice": [
+    30,
+    20,
+    30,
+    20
+   ]
+  },
+  "panel_medium": {
+   "size": [
+    102,
+    58
+   ],
+   "nine_slice": [
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "panel_small": {
+   "size": [
+    54,
+    47
+   ],
+   "nine_slice": [
+    10,
+    10,
+    10,
+    10
+   ]
+  },
+  "slot_frame": {
+   "size": [
+    36,
+    36
+   ],
+   "nine_slice": [
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "slot_floor": {
+   "size": [
+    18,
+    18
+   ]
+  },
+  "cooldown_sweep": {
+   "size": [
+    12,
+    12
+   ]
+  },
+  "aspect_socket_open": {
+   "size": [
+    37,
+    40
+   ]
+  },
+  "aspect_socket_locked": {
+   "size": [
+    37,
+    40
+   ]
+  },
+  "weapon_medallion": {
+   "size": [
+    48,
+    52
+   ]
+  },
+  "health_bar_frame": {
+   "size": [
+    109,
+    14
+   ],
+   "nine_slice": [
+    14,
+    0,
+    13,
+    0
+   ]
+  },
+  "fill_health": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ]
+  },
+  "fill_ghost": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ]
+  },
+  "fill_edge": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ]
+  },
+  "fill_exp": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ]
+  },
+  "thin_bar_frame": {
+   "size": [
+    58,
+    9
+   ],
+   "nine_slice": [
+    4,
+    0,
+    4,
+    0
+   ]
+  },
+  "fill_health_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ]
+  },
+  "fill_ghost_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ]
+  },
+  "fill_edge_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ]
+  },
+  "fill_exp_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ]
+  },
+  "level_pillar": {
+   "size": [
+    21,
+    93
+   ],
+   "nine_slice": [
+    0,
+    28,
+    0,
+    10
+   ]
+  },
+  "level_shield": {
+   "size": [
+    24,
+    28
+   ]
+  },
+  "name_ribbon": {
+   "size": [
+    88,
+    16
+   ],
+   "nine_slice": [
+    26,
+    0,
+    26,
+    0
+   ]
+  },
+  "tab_on": {
+   "size": [
+    43,
+    16
+   ],
+   "nine_slice": [
+    6,
+    5,
+    6,
+    5
+   ]
+  },
+  "tab_off": {
+   "size": [
+    44,
+    16
+   ],
+   "nine_slice": [
+    6,
+    5,
+    6,
+    5
+   ]
+  },
+  "button_normal": {
+   "size": [
+    41,
+    16
+   ],
+   "nine_slice": [
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "button_pressed": {
+   "size": [
+    41,
+    16
+   ],
+   "nine_slice": [
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "button_locked": {
+   "size": [
+    41,
+    16
+   ],
+   "nine_slice": [
+    6,
+    6,
+    6,
+    6
+   ]
+  },
+  "key_badge": {
+   "size": [
+    11,
+    11
+   ],
+   "nine_slice": [
+    4,
+    4,
+    4,
+    4
+   ]
+  },
+  "icon_padlock": {
+   "size": [
+    8,
+    10
+   ]
+  },
+  "icon_check": {
+   "size": [
+    12,
+    12
+   ]
+  },
+  "icon_rune": {
+   "size": [
+    12,
+    12
+   ]
+  }
+ }
+}

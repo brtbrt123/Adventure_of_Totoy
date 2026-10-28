@@ -20,42 +20,44 @@ const Snapshots := preload("res://core/snapshots.gd")
 const Aspects := preload("res://core/aspects.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
+const Kit := preload("res://presentation/common/ui_kit.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
 const TAB_STATS: int = 0
 const TAB_INVENTORY: int = 1
 const TAB_NAMES: Array[String] = ["STATS", "INVENTORY"]
-## Tab plates on the panel's top edge (x, width), as in the mockup.
-const TAB_SPECS: Array[Vector2i] = [Vector2i(12, 54), Vector2i(68, 84)]
-const PANEL: Rect2 = Rect2(6, 16, 308, 162)
-const DESC: Rect2 = Rect2(11, 125, 298, 40)
+## Tab plates on the panel's top edge (x, width), kit tabs.
+const TAB_SPECS: Array[Vector2i] = [Vector2i(14, 62), Vector2i(80, 86)]
+const PANEL: Rect2 = Rect2(6, 24, 372, 176)
+const DESC: Rect2 = Rect2(40, 150, 304, 42)
 const VEIL_ALPHA: float = 0.62
 const FOOTER: String = "TAB/ESC: CLOSE    Q/E: SWITCH TAB"
-## STATS layout
-const FIGURE: Rect2 = Rect2(11, 21, 52, 101)
-const WEAPON_SLOT: Rect2 = Rect2(85, 27, 50, 50)
-const MID_X: float = 110.0
-const STAT_X0: float = 159.0
-const STAT_X1: float = 307.0
-const STAT_TOP: float = 21.0
+## STATS layout (384x216, kit frames)
+const FIGURE: Rect2 = Rect2(16, 36, 58, 110)
+const WEAPON_SLOT: Rect2 = Rect2(110, 36, 48, 48)
+const MID_X: float = 134.0
+const STAT_X0: float = 204.0
+const STAT_X1: float = 362.0
+const STAT_TOP: float = 36.0
 const ROW_STEP: float = 8.0
 ## The STATS items of the three Aspect slots (Z, X, C); their description is the aspect slotted there.
 const ASPECT_KEYS: Array[StringName] = [&"aspect_slot_1", &"aspect_slot_2", &"aspect_slot_3"]
 const SLOT_LETTERS: Array[String] = ["Z", "X", "C"]
 ## The aspect picker (ENTER/click on an Aspect slot): every aspect in a list over the stat list, in the shared frame.
-const PICKER: Rect2 = Rect2(154, 18, 157, 104)
-const PICKER_ROW_TOP: float = 33.0
+const PICKER: Rect2 = Rect2(196, 28, 178, 118)
+const PICKER_ROW_TOP: float = 52.0
 const PICKER_ROW_STEP: float = 17.0
-## Whole rows that fit in the picker (33 + 5 x 17 <= its bottom); more aspects scroll (arrows / wheel), never a half row.
+## Whole rows that fit in the picker (52 + 5 x 17 = 137, inside its bottom bronze); more aspects scroll (arrows / wheel), never a half row.
 const PICKER_VISIBLE_ROWS: int = 5
 ## The scroll bar on the picker's right edge (shown only when the list is longer than the window).
 const PICKER_BAR_W: float = 3.0
-## INVENTORY layout: 6x3 slots of 32 px, step 33; the weapons fill the first slots in Weapons.IDS order.
-const GRID_ORIGIN: Vector2 = Vector2(13, 23)
-const GRID_STEP: float = 33.0
+## INVENTORY layout: 6x3 slots of 36 px, step 38; the weapons fill the first slots in Weapons.IDS order.
+const GRID_ORIGIN: Vector2 = Vector2(20, 38)
+const GRID_STEP: float = 38.0
 const GRID_COLS: int = 6
 const GRID_ROWS: int = 3
-const CARD: Rect2 = Rect2(216, 21, 93, 101)
+const SLOT_SIZE: float = 36.0
+const CARD: Rect2 = Rect2(260, 36, 108, 106)
 ## INVENTORY: the aspects fill the second grid row (view-only; they are slotted on STATS).
 const ASPECT_GRID_START: int = GRID_COLS
 const FEEDBACK_SECONDS: float = 1.6
@@ -221,16 +223,16 @@ func stats_items() -> Array[Dictionary]:
 
 
 static func aspect_rect(index: int) -> Rect2:
-	return Rect2(68 + index * 29, 96, 26, 26)
+	return Rect2(78 + index * 38, 107, 37, 40)
 
 
 static func inventory_rect(index: int) -> Rect2:
-	return Rect2(GRID_ORIGIN + Vector2(index % GRID_COLS, index / GRID_COLS) * GRID_STEP, Vector2(32, 32))
+	return Rect2(GRID_ORIGIN + Vector2(index % GRID_COLS, index / GRID_COLS) * GRID_STEP, Vector2(SLOT_SIZE, SLOT_SIZE))
 
 
 static func tab_rect(index: int) -> Rect2:
 	var spec: Vector2i = TAB_SPECS[index]
-	return Rect2(spec.x, 3, spec.y, PANEL.position.y - 2)
+	return Rect2(spec.x, 8, spec.y, 17)
 
 
 ## Arrow keys: on STATS the nearest item in that direction (spatial), on INVENTORY the grid neighbour (clamped).
@@ -427,8 +429,8 @@ func scroll_picker(delta: int) -> void:
 
 ## Row `index` of the picker drawn with the window scrolled to `scroll` (whole rows, so nothing is ever half cut).
 static func picker_row_rect(index: int, scroll: int = 0) -> Rect2:
-	var width: float = PICKER.size.x - 8 - (PICKER_BAR_W + 2 if picker_max_scroll() > 0 else 0.0)
-	return Rect2(PICKER.position.x + 4, PICKER_ROW_TOP + (index - scroll) * PICKER_ROW_STEP, width, PICKER_ROW_STEP - 1)
+	var width: float = PICKER.size.x - 18 - (PICKER_BAR_W + 3 if picker_max_scroll() > 0 else 0.0)
+	return Rect2(PICKER.position.x + 9, PICKER_ROW_TOP + (index - scroll) * PICKER_ROW_STEP, width, PICKER_ROW_STEP - 1)
 
 
 ## The slotted aspects (Z, X, C) from the snapshot.
@@ -770,16 +772,16 @@ func _ellipse(centre: Vector2, radii: Vector2, color: Color) -> void:
 
 func _key_badge(at: Vector2, letter: String) -> void:
 	UiPanel.key_badge(self, at, colors)
-	_text(at + Vector2(4, 1), letter, colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(at + Vector2(4.5, 1), letter, colors["1"], null, 7, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw() -> void:
 	if not is_open or colors.is_empty() or snapshot == null:
 		return
-	draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], VEIL_ALPHA))
+	draw_rect(Rect2(0, 0, 384, 216), Color(colors["0"], VEIL_ALPHA))
 	UiPanel.draw_panel(self, PANEL, &"menu", colors)
 	_draw_tabs()
-	_text(Vector2(160, 168), FOOTER, colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(192, 202), FOOTER, colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	if tab == TAB_STATS:
 		if progression!=null:_draw_progression_stats()
 		else:_draw_stats()
@@ -789,44 +791,36 @@ func _draw() -> void:
 
 
 func _draw_tabs() -> void:
-	var top: float = PANEL.position.y + 1  # the panel's accent line
 	for index: int in range(TAB_NAMES.size()):
-		if index == tab:
-			continue
-		var x: float = TAB_SPECS[index].x
-		var w: float = TAB_SPECS[index].y
-		draw_rect(Rect2(x, 7, w, top - 7), colors["0"])
-		draw_rect(Rect2(x + 1, 8, w - 2, 1), colors["f"])
-		draw_rect(Rect2(x + 1, 8, 1, top - 8), colors["f"])
-		draw_rect(Rect2(x + w - 2, 8, 1, top - 8), colors["f"])
-		_text(Vector2(x + w / 2, 10), TAB_NAMES[index], colors["i"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_CENTER)
-	var ax: float = TAB_SPECS[tab].x
-	var aw: float = TAB_SPECS[tab].y
-	draw_rect(Rect2(ax, 3, aw, top), colors["0"])
-	draw_rect(Rect2(ax + 1, 4, aw - 2, 1), colors["v"])
-	draw_rect(Rect2(ax + 1, 4, 1, top - 3), colors["v"])
-	draw_rect(Rect2(ax + aw - 2, 4, 1, top - 3), colors["v"])
-	draw_rect(Rect2(ax + 3, 6, aw - 6, 1), colors["f"])
-	UiPanel.gem(self, Vector2(ax + 1, 4), &"menu", colors)
-	UiPanel.gem(self, Vector2(ax + aw - 2, 4), &"menu", colors)
-	_text(Vector2(ax + aw / 2, 8), TAB_NAMES[tab], colors["1"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_CENTER)
-	var name_width: float = _text(Vector2(308, 9), "TOTOY", colors["j"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(Vector2(308 - name_width - 6, 10), "WAYKEEPER", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
+		var rect: Rect2 = tab_rect(index)
+		Kit.tab(self, rect, index == tab)
+		_text(Vector2(rect.get_center().x, rect.position.y + 4), TAB_NAMES[index], colors["1"] if index == tab else colors["i"], Hud.menu_font(), 9, HORIZONTAL_ALIGNMENT_CENTER)
+	var name_width: float = _text(Vector2(368, 11), "TOTOY", colors["j"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(Vector2(368 - name_width - 6, 12), "WAYKEEPER", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
-## The weapon's 48 px socket art: the katana's frame plus blade glyph, or the dagger's / scythe's whole medallion.
+## The weapon's socket art: the katana's kit medallion around its blade glyph (48x52), or the dagger's / scythe's whole
+## 48 px medallion.
 func _draw_medallion(weapon: StringName, at: Vector2) -> void:
 	if Hud.MEDALLIONS.has(weapon):
 		_ui(Hud.MEDALLIONS[weapon], Rect2(at, Vector2(48, 48)))
 	else:
-		_ui("ui_weapon_frame_1", Rect2(at, Vector2(48, 48)))
-		_ui("ui_weapon_totoy_blade_1", Rect2(at + Vector2(8, 8), Vector2(32, 32)))
+		Kit.medallion(self, at - Vector2(0, 2))
+		_ui("ui_weapon_totoy_blade_1", Rect2(Kit.medallion_centre(at - Vector2(0, 2)) - Vector2(16, 16), Vector2(32, 32)))
+
+
+## Teal corner brackets round `rect` (the selection mark; the kit frames carry no highlight of their own).
+func _brackets(rect: Rect2) -> void:
+	for corner: Array in [[rect.position.x - 2, rect.position.y - 2, 1, 1], [rect.end.x + 1, rect.position.y - 2, -1, 1], [rect.position.x - 2, rect.end.y + 1, 1, -1], [rect.end.x + 1, rect.end.y + 1, -1, -1]]:
+		var bx: float = corner[0]
+		var by: float = corner[1]
+		draw_rect(Rect2(minf(bx, bx + 3 * corner[2]), by, 4, 1), colors["u"])
+		draw_rect(Rect2(bx, minf(by, by + 3 * corner[3]), 1, 4), colors["u"])
 
 
 func _equipped_badge(rect: Rect2) -> void:
-	draw_rect(rect, colors["0"])
-	UiPanel.outline(self, rect, colors["v"])
-	_text(Vector2(rect.position.x + rect.size.x * 0.5, rect.position.y + 1), "E", colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	Kit.badge(self, rect)
+	_text(Vector2(rect.position.x + rect.size.x * 0.5, rect.position.y + 1), "E", colors["1"], null, 7, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func highlighted_key() -> StringName:
@@ -837,27 +831,30 @@ func _draw_stats() -> void:
 	var equipped: StringName = _equipped()
 	var lit: StringName = highlighted_key()
 	# the figure box: Totoy at 2x, holding the equipped weapon, on a stone strip with a shadow
-	draw_rect(FIGURE, colors["0"])
-	UiPanel.outline(self, FIGURE, colors["f"])
-	var strip_y: float = FIGURE.end.y - 16
-	draw_rect(Rect2(FIGURE.position.x + 1, strip_y, FIGURE.size.x - 2, 15), colors["e"])
-	draw_rect(Rect2(FIGURE.position.x + 1, strip_y, FIGURE.size.x - 2, 1), colors["f"])
-	var feet: Vector2 = Vector2(FIGURE.get_center().x, FIGURE.end.y - 9)
+	Kit.nine(self, "slot_frame", FIGURE)
+	var strip_y: float = FIGURE.end.y - 20
+	draw_rect(Rect2(FIGURE.position.x + 3, strip_y, FIGURE.size.x - 6, 17), colors["e"])
+	draw_rect(Rect2(FIGURE.position.x + 3, strip_y, FIGURE.size.x - 6, 1), colors["f"])
+	var feet: Vector2 = Vector2(FIGURE.get_center().x, FIGURE.end.y - 11)
 	_ellipse(feet, Vector2(13, 3), colors["0"])
 	_draw_figure(figure_frame(equipped), feet)
 	# weapon slot
-	_text(Vector2(MID_X, 20), "WEAPON", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	UiPanel.slot(self, WEAPON_SLOT, lit == &"weapon", colors)
-	_draw_medallion(equipped, WEAPON_SLOT.position + Vector2.ONE)
-	_equipped_badge(Rect2(WEAPON_SLOT.position + Vector2(41, 1), Vector2(8, 8)))
-	_text(Vector2(MID_X, 80), WEAPON_NAMES.get(equipped, "WEAPON"), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(MID_X, 28), "WEAPON", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_draw_medallion(equipped, WEAPON_SLOT.position)
+	if lit == &"weapon":
+		_brackets(WEAPON_SLOT)
+	_equipped_badge(Rect2(WEAPON_SLOT.position + Vector2(38, 0), Vector2(10, 10)))
+	_text(Vector2(MID_X, 90), WEAPON_NAMES.get(equipped, "WEAPON"), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	# aspects
-	_text(Vector2(MID_X, 89), "ASPECTS", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(MID_X, 99), "ASPECTS", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	for i: int in range(3):
 		var rect: Rect2 = aspect_rect(i)
-		UiPanel.slot(self, rect, lit == ASPECT_KEYS[i] or picker_slot == i + 1, colors)
-		_ui(Hud.aspect_icon(slot_aspect(i + 1)), Rect2(rect.position + Vector2.ONE, Vector2(24, 24)))
-		_key_badge(rect.position + Vector2(-2, 17), SLOT_LETTERS[i])
+		Kit.socket(self, rect.position, false)
+		_ui(Hud.aspect_icon(slot_aspect(i + 1)), Kit.socket_icon_rect(rect.position), Vector2(4, 4), Vector2(16, 16))
+		if lit == ASPECT_KEYS[i] or picker_slot == i + 1:
+			_brackets(rect)
+		var key_at: Vector2 = Kit.socket_key(rect.position)
+		_text(Vector2(key_at.x, key_at.y - 3), SLOT_LETTERS[i], colors["1"], null, 8, HORIZONTAL_ALIGNMENT_CENTER)
 	# the stat list
 	var y: float = STAT_TOP
 	for row: Array in stat_rows(equipped):
@@ -881,16 +878,16 @@ func _draw_stats() -> void:
 ## Edge cost, and for a slotted one its key badge and a tick.
 func _draw_picker() -> void:
 	UiPanel.draw_panel(self, PICKER, &"info", colors)
-	var x0: float = PICKER.position.x + 6
-	var title_y: float = PICKER.position.y + 6
+	var x0: float = PICKER.position.x + 10
+	var title_y: float = PICKER.position.y + 10
 	if picker_feedback.is_empty():
 		_text(Vector2(x0, title_y), "ASPECT FOR SLOT " + SLOT_LETTERS[picker_slot - 1], colors["1"])
-		_text(Vector2(PICKER.end.x - 6, title_y), "ESC: BACK", colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
+		_text(Vector2(PICKER.end.x - 10, title_y), "ESC: BACK", colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
 	elif bool(picker_feedback["ok"]):
 		_text(Vector2(x0, title_y), "EQUIPPED!", colors["u"])
 	else:
 		_text(Vector2(x0, title_y), "NOT NOW  " + String(picker_feedback["reason"]), colors["q"])
-	draw_rect(Rect2(x0, title_y + 9, PICKER.size.x - 12, 1), colors["f"])
+	draw_rect(Rect2(x0, title_y + 11, PICKER.size.x - 20, 1), colors["f"])
 	if picker_max_scroll() > 0:
 		_draw_picker_bar()
 	for index: int in range(Aspects.ALL.size()):
@@ -906,7 +903,7 @@ func _draw_picker() -> void:
 		_ui(Hud.aspect_icon(aspect), Rect2(row.position + Vector2(2, 0), Vector2(16, 16)), Vector2(4, 4), Vector2(16, 16))
 		if not aspect_owned(aspect):
 			draw_rect(row,Color(colors["0"],0.72))
-			_ui("hud_copper_lock",Rect2(row.position+Vector2(4,0),Vector2(8,16)))
+			Kit.put(self,"icon_padlock",row.position+Vector2(6,3))
 		_text(Vector2(row.position.x + 22, row.position.y + 4), Aspects.display_name(aspect), colors["1"] if on and aspect_owned(aspect) else colors["g"])
 		_text(Vector2(row.end.x - 26, row.position.y + 4), "%sE" % num(Aspects.edge_cost(aspect)), colors["v"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
 		var slot: int = aspect_slot_of(aspect)
@@ -918,7 +915,7 @@ func _draw_picker() -> void:
 ## The picker's scroll bar: a dark track along the rows, a thumb sized to the window, and a small arrow at each end
 ## while more rows lie that way.
 static func picker_bar_rect() -> Rect2:
-	return Rect2(PICKER.end.x - 4 - PICKER_BAR_W, PICKER_ROW_TOP + 4, PICKER_BAR_W, PICKER_VISIBLE_ROWS * PICKER_ROW_STEP - 9)
+	return Rect2(PICKER.end.x - 10 - PICKER_BAR_W, PICKER_ROW_TOP + 4, PICKER_BAR_W, PICKER_VISIBLE_ROWS * PICKER_ROW_STEP - 9)
 
 
 func picker_thumb_rect() -> Rect2:
@@ -995,60 +992,63 @@ func _draw_inventory() -> void:
 	var equipped: StringName = _equipped()
 	for index: int in range(GRID_COLS * GRID_ROWS):
 		var rect: Rect2 = inventory_rect(index)
-		UiPanel.slot(self, rect, index == inventory_selection, colors)
+		Kit.slot(self, rect, &"normal")
+		if index == inventory_selection:
+			_brackets(rect)
 		var weapon: StringName = slot_weapon(index)
 		var grid_item: StringName = grid_aspect(index)
 		if grid_item != &"":
-			_ui(Hud.aspect_icon(grid_item), Rect2(rect.position + Vector2(4, 4), Vector2(24, 24)))
+			_ui(Hud.aspect_icon(grid_item), Rect2(rect.position + Vector2(6, 6), Vector2(24, 24)))
 			if not aspect_owned(grid_item):
-				draw_rect(rect.grow(-2),Color(colors["0"],0.8))
-				_ui("hud_copper_lock",Rect2(rect.position+Vector2(12,7),Vector2(8,16)))
+				draw_rect(rect.grow(-3),Color(colors["0"],0.8))
+				Kit.put(self,"icon_padlock",rect.get_center() - Vector2(4, 5))
 			var held: int = aspect_slot_of(grid_item)
 			if held > 0:
-				_key_badge(rect.position + Vector2(23, 1), SLOT_LETTERS[held - 1])
+				_key_badge(rect.position + Vector2(26, 1), SLOT_LETTERS[held - 1])
 			continue
 		if weapon == &"":
 			continue
-		_draw_item_icon(weapon, rect.position)
+		_draw_item_icon(weapon, rect.position + Vector2(2, 2))
 		if weapon == equipped:
-			_equipped_badge(Rect2(rect.position + Vector2(24, 1), Vector2(7, 8)))
+			_equipped_badge(Rect2(rect.position + Vector2(26, 1), Vector2(9, 9)))
 	# the detail card
-	draw_rect(CARD, colors["0"])
-	UiPanel.outline(self, CARD, colors["f"])
+	Kit.panel(self, CARD)
 	var cx: float = CARD.get_center().x
+	var top: float = CARD.position.y
 	var weapon: StringName = slot_weapon(inventory_selection)
 	var card_aspect: StringName = grid_aspect(inventory_selection)
 	if card_aspect != &"":
 		_draw_aspect_card(card_aspect, cx)
 		return
 	if weapon == &"":
-		_text(Vector2(cx, 66), "EMPTY", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+		_text(Vector2(cx, top + 48), "EMPTY", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 		return
-	_draw_medallion(weapon, Vector2(cx - 24, 25))
-	_text(Vector2(cx, 76), WEAPON_NAMES[weapon], colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_draw_medallion(weapon, Vector2(cx - 24, top + 8))
+	_text(Vector2(cx, top + 62), WEAPON_NAMES[weapon], colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	var equipped_now: bool = weapon == equipped
-	_text(Vector2(cx, 85), "EQUIPPED" if equipped_now else "NOT EQUIPPED", colors["v"] if equipped_now else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	draw_rect(Rect2(CARD.position.x + 6, 95, CARD.size.x - 12, 1), colors["f"])
+	_text(Vector2(cx, top + 71), "EQUIPPED" if equipped_now else "NOT EQUIPPED", colors["v"] if equipped_now else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	draw_rect(Rect2(CARD.position.x + 12, top + 81, CARD.size.x - 24, 1), colors["f"])
 	var lines: Array = card_lines(weapon)
-	_text(Vector2(cx, 99), lines[0], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(cx, 107), lines[1], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(cx, top + 85), lines[0], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(cx, top + 93), lines[1], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 
 
-## An aspect's card (view-only): its icon in a slot frame, name, the slot holding it, Edge cost and cooldown.
+## An aspect's card (view-only): its icon in a socket, name, the slot holding it, Edge cost and cooldown.
 func _draw_aspect_card(aspect: StringName, cx: float) -> void:
+	var top: float = CARD.position.y
 	if not aspect_owned(aspect):
-		_text(Vector2(cx,82),"LOCKED",colors["g"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_CENTER)
+		_text(Vector2(cx, top + 48), "LOCKED", colors["g"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 		return
-	var frame: Rect2 = Rect2(cx - 13, 33, 26, 26)
-	UiPanel.slot(self, frame, false, colors)
-	_ui(Hud.aspect_icon(aspect), Rect2(frame.position + Vector2.ONE, Vector2(24, 24)))
-	_text(Vector2(cx, 76), Aspects.display_name(aspect), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	var at: Vector2 = Vector2(cx - 18.5, top + 12)
+	Kit.socket(self, at, false)
+	_ui(Hud.aspect_icon(aspect), Kit.socket_icon_rect(at), Vector2(4, 4), Vector2(16, 16))
+	_text(Vector2(cx, top + 62), Aspects.display_name(aspect), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	var slot: int = aspect_slot_of(aspect)
-	_text(Vector2(cx, 85), "SLOT " + SLOT_LETTERS[slot - 1] if slot > 0 else "NOT SLOTTED", colors["v"] if slot > 0 else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	draw_rect(Rect2(CARD.position.x + 6, 95, CARD.size.x - 12, 1), colors["f"])
+	_text(Vector2(cx, top + 71), "SLOT " + SLOT_LETTERS[slot - 1] if slot > 0 else "NOT SLOTTED", colors["v"] if slot > 0 else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	draw_rect(Rect2(CARD.position.x + 12, top + 81, CARD.size.x - 24, 1), colors["f"])
 	var cd: int = Aspects.cooldown(aspect)
-	_text(Vector2(cx, 99), "%s EDGE" % num(Aspects.edge_cost(aspect)) + ("  CD %s S" % secs(cd) if cd > 0 else ""), colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(cx, 107), "SLOT ON STATS", colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(cx, top + 85), "%s EDGE" % num(Aspects.edge_cost(aspect)) + ("  CD %s S" % secs(cd) if cd > 0 else ""), colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(cx, top + 93), "SLOT ON STATS", colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 ## The two lines under the card's divider and their colour symbol: the equip feedback, else how to equip.
@@ -1074,56 +1074,64 @@ func _draw_description(key: StringName) -> void:
 	var all: Dictionary = descriptions(_equipped(), equipped_aspects())
 	var entry: Array = all.get(key, all[&"none"])
 	UiPanel.draw_panel(self, DESC, &"info", colors, false)
-	var x0: float = DESC.position.x + 5
+	var x0: float = DESC.position.x + 10
 	var lines: Array = entry[2]
 	if String(entry[0]).is_empty():
-		_text(Vector2(160, DESC.position.y + 9), lines[0], colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		_text(Vector2(160, DESC.position.y + 23), lines[2], colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+		_text(Vector2(192, DESC.position.y + 12), lines[0], colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+		_text(Vector2(192, DESC.position.y + 26), lines[2], colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 		return
-	_text(Vector2(x0, DESC.position.y + 4), entry[0], colors["1"], Hud.menu_font(), 10)
-	_text(Vector2(DESC.end.x - 6, DESC.position.y + 4), entry[1], colors["u"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(Vector2(x0, DESC.position.y + 7), entry[0], colors["1"], Hud.menu_font(), 10)
+	_text(Vector2(DESC.end.x - 10, DESC.position.y + 8), entry[1], colors["u"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
 	for i: int in range(lines.size()):
 		if not String(lines[i]).is_empty():
-			_text(Vector2(x0, DESC.position.y + 13 + i * 8), lines[i], colors["o"] if i == 2 else colors["j"])
+			_text(Vector2(x0, DESC.position.y + 18 + i * 8), lines[i], colors["o"] if i == 2 else colors["j"], null, 7)
 
 func aspect_owned(aspect: StringName) -> bool:
 	return progression==null or progression.owned_aspects.has(aspect)
-static func progression_aspect_rect(i: int) -> Rect2:return Rect2(22+i*32,130,26,26)
+static func progression_aspect_rect(i: int) -> Rect2:return Rect2(28+i*46,150,37,40)
+static func progression_row_rect(i: int) -> Rect2:return Rect2(20,56+i*30,298,28)
+static func progression_plus_rect(i: int) -> Rect2:return Rect2(292,61+i*30,18,18)
+static func respec_rect() -> Rect2:return Rect2(246,152,116,20)
 func progression_items() -> Array[Dictionary]:
 	var items: Array[Dictionary]=[]
-	for i: int in 3:items.append({"key":StringName("stat_"+["vitality","might","agility"][i]),"rect":Rect2(274,42+i*24,16,16)})
-	items.append({"key":&"respec","rect":Rect2(224,127,74,16)})
+	for i: int in 3:items.append({"key":StringName("stat_"+["vitality","might","agility"][i]),"rect":progression_plus_rect(i)})
+	items.append({"key":&"respec","rect":respec_rect()})
 	for i: int in 3:items.append({"key":ASPECT_KEYS[i],"rect":progression_aspect_rect(i)})
 	return items
 func _draw_progression_stats() -> void:
-	_text(Vector2(18,25),"UNSPENT POINTS: %d" % progression.stat_points_unspent,colors["u"])
-	_text(Vector2(298,25),"LV %d   HP %d" % [progression.level,progression.hero.max_hp],colors["1"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(Vector2(22,38),"UNSPENT POINTS: %d" % progression.stat_points_unspent,colors["u"],Hud.menu_font(),10)
+	_text(Vector2(362,39),"LV %d   HP %d" % [progression.level,progression.hero.max_hp],colors["1"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
 	for i: int in 3:
 		var stat: String=["vitality","might","agility"][i]
 		var value: int=int(progression.stats.get(stat,0))
 		var cap: int=int(progression.stat_caps.get(stat,0))
-		var y: int=43+i*24
+		var row: Rect2=progression_row_rect(i)
 		var on: bool=stats_selection==StringName("stat_"+stat)
-		draw_rect(Rect2(16,y-3,278,22),colors["e"] if on else colors["0"])
-		_text(Vector2(22,y),stat,colors["1"])
-		_text(Vector2(260,y),"%d / %d" % [value,cap],colors["p"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
-		_text(Vector2(22,y+10),["+6 max health a point","+3% damage a point","Shorter dash cooldown; a little faster"][i],colors["i"],null,6)
+		Kit.panel(self,row)
+		if on:_brackets(row)
+		_text(Vector2(30,row.position.y+7),stat,colors["1"],Hud.menu_font(),9)
+		_text(Vector2(30,row.position.y+18),["+6 max health a point","+3% damage a point","Shorter dash cooldown; a little faster"][i],colors["i"],null,6)
+		_text(Vector2(278,row.position.y+11),"%d / %d" % [value,cap],colors["p"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
 		var enabled: bool=progression.stat_points_unspent>0 and value<cap
-		UiPanel.outline(self,Rect2(274,y-1,16,16),colors["u" if enabled else "f"])
-		_text(Vector2(282,y+1),"+",colors["1" if enabled else "g"],null,10,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(22,119),"ASPECT SOCKETS",colors["i"])
+		var plus: Rect2=progression_plus_rect(i)
+		Kit.button(self,plus,&"normal" if enabled else &"locked")
+		_text(Vector2(plus.get_center().x,plus.position.y+4),"+",colors["u" if enabled else "g"],null,10,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(28,141),"ASPECT SOCKETS",colors["i"])
 	for i: int in 3:
 		var rect: Rect2=progression_aspect_rect(i)
-		UiPanel.slot(self,rect,stats_selection==ASPECT_KEYS[i],colors)
 		var slot: Dictionary=progression.aspect_slots[i] if i<progression.aspect_slots.size() else {}
-		if not bool(slot.get("unlocked",false)) or not aspect_owned(StringName(slot.get("aspect",&""))):
-			_ui("hud_copper_lock",Rect2(rect.position+Vector2(9,4),Vector2(8,16)))
-		else:_ui(Hud.aspect_icon(slot.get("aspect",&"")),Rect2(rect.position+Vector2.ONE,Vector2(24,24)))
-		_key_badge(rect.position+Vector2(-2,17),SLOT_LETTERS[i])
+		var open: bool=bool(slot.get("unlocked",false)) and aspect_owned(StringName(slot.get("aspect",&"")))
+		Kit.socket(self,rect.position,not open)
+		if open:_ui(Hud.aspect_icon(slot.get("aspect",&"")),Kit.socket_icon_rect(rect.position),Vector2(4,4),Vector2(16,16))
+		if stats_selection==ASPECT_KEYS[i]:_brackets(rect)
+		var key_at: Vector2=Kit.socket_key(rect.position)
+		_text(Vector2(key_at.x,key_at.y-3),SLOT_LETTERS[i],colors["1" if open else "g"],null,8,HORIZONTAL_ALIGNMENT_CENTER)
 	var village: bool=progression.scene_id==&"village_layered"
-	UiPanel.outline(self,Rect2(224,127,74,16),colors["u" if village else "f"])
-	_text(Vector2(261,132),"RESPEC",colors["1" if village else "g"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(261,147),"FREE IN VILLAGE" if village else "VILLAGE ONLY",colors["i"],null,6,HORIZONTAL_ALIGNMENT_CENTER)
-	if not stats_notice.is_empty():_text(Vector2(125,155),stats_notice,colors["o"],null,6)
-	elif String(progression.objective.get("id",""))=="edda_equip":_text(Vector2(125,155),"SELECT FIRST SOCKET TO BIND SPRINT",colors["u"],null,6)
+	var respec: Rect2=respec_rect()
+	Kit.button(self,respec,&"normal" if village else &"locked")
+	if stats_selection==&"respec":_brackets(respec)
+	_text(Vector2(respec.get_center().x,respec.position.y+5),"RESPEC",colors["1" if village else "g"],Hud.menu_font(),9,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(Vector2(respec.get_center().x,respec.end.y+5),"FREE IN VILLAGE" if village else "VILLAGE ONLY",colors["i"],null,6,HORIZONTAL_ALIGNMENT_CENTER)
+	if not stats_notice.is_empty():_text(Vector2(160,184),stats_notice,colors["o"],null,6)
+	elif String(progression.objective.get("id",""))=="edda_equip":_text(Vector2(160,184),"SELECT FIRST SOCKET TO BIND SPRINT",colors["u"],null,6)
 	if picker_open():_draw_picker()

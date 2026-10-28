@@ -35,6 +35,8 @@ var save_error: int = OK
 var save_attempts: int = 0
 var audio: VillageAudio
 var panel: Texture2D
+## Where the 320x180 panel sits in the 384x216 view.
+const PANEL_ORIGIN: Vector2 = Vector2(32, 18)
 var overscan: Texture2D
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
 var _next_requested: bool = false
@@ -242,7 +244,7 @@ func wrapped_lines(text: String) -> Array[String]:
 
 func caption_rect() -> Rect2:
 	var height: int = maxi(32, _caption_lines.size() * 8 + 10)
-	return Rect2(5, 179 - height, 310, height)
+	return Rect2(5, 211 - height, 374, height)
 
 
 ## An overscan crop always maps one source pixel to one game pixel. Smooth fractional zoom
@@ -263,12 +265,13 @@ func panel_region() -> Rect2:
 func _draw() -> void:
 	if colors.is_empty():
 		return
-	draw_rect(Rect2(0, 0, 320, 180), colors["0"])
+	draw_rect(Rect2(0, 0, 384, 216), colors["0"])
 	var effect: String = str(current_beat().get("effect", "fade_in"))
+	# the approved panels are 320x180 pixel art: shown 1:1 in the middle of the 384x216 view, never scaled
 	if overscan != null and effect in ["pan_down", "slow_zoom"]:
-		draw_texture_rect_region(overscan, Rect2(0, 0, 320, 180), panel_region())
+		draw_texture_rect_region(overscan, Rect2(PANEL_ORIGIN, Vector2(320, 180)), panel_region())
 	elif panel != null:
-		draw_texture(panel, Vector2.ZERO)
+		draw_texture(panel, PANEL_ORIGIN)
 	var card: Rect2 = caption_rect()
 	UiPanel.draw_panel(self, card, &"info", colors)
 	var remaining: int = int(reveal)
@@ -278,10 +281,10 @@ func _draw() -> void:
 		remaining -= _caption_lines[i].length() + 1
 	var hint: String = "%s: %s   %s: Skip" % [Bindings.action_label("dialogue_next"), "Next" if complete() else "Reveal", Bindings.action_label("dialogue_skip")]
 	var width: float = text_width(hint, 1, ui_font(), 7)
-	draw_rect(Rect2(313 - ceilf(width), 4, ceilf(width) + 3, 10), colors["0"])
-	lettering(Vector2(314 - ceilf(width), 6), hint, colors["p"], 1, ui_font(), 7)
+	draw_rect(Rect2(377 - ceilf(width), 4, ceilf(width) + 3, 10), colors["0"])
+	lettering(Vector2(378 - ceilf(width), 6), hint, colors["p"], 1, ui_font(), 7)
 	if effect == "flash" and beat_ticks < 6 and fade_phase == &"":
-		draw_rect(Rect2(0, 0, 320, 180), Color(colors["p"], (1.0 - float(beat_ticks) / 6.0) * 0.5))
+		draw_rect(Rect2(0, 0, 384, 216), Color(colors["p"], (1.0 - float(beat_ticks) / 6.0) * 0.5))
 	var alpha: float = fade_alpha()
 	if alpha > 0.0:
-		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], alpha))
+		draw_rect(Rect2(0, 0, 384, 216), Color(colors["0"], alpha))

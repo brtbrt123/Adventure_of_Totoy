@@ -122,7 +122,7 @@ func pure_helpers() -> void:
 	check(Vector2(arena.frames[Hud.LIGHTNING_FORM_ICON]["w"], arena.frames[Hud.LIGHTNING_FORM_ICON]["h"]) == Hud.form_icon_rect().size, "form icon must be drawn at its native 24 px")
 	for rect: Rect2 in Hud.aspect_rects() + [Hud.weapon_rect()]:
 		check(not rect.intersects(Hud.form_icon_rect()), "form icon overlaps a socket")
-	check(Rect2(0, 0, 320, 180).encloses(Hud.form_icon_rect()), "form icon off screen")
+	check(Rect2(0, 0, 384, 216).encloses(Hud.form_icon_rect()), "form icon off screen")
 	# the cut travels from the blink side through the boss
 	for side: int in range(8):
 		var arrival: Vector2 = Vector2(400, 240) + Weapons.blink_direction(side) * 30.0
