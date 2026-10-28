@@ -45,7 +45,7 @@ func sync(value: ExploreCore.ExploreSnapshot, events: Array[Dictionary], art_fra
 			continue
 		if effect["type"] == &"parry_succeeded":
 			audio.cue("perfect_parry" if bool(effect["perfect"]) else "deflect", snapshot.tick)
-		else:
+		elif effect["type"] == &"training_post_hit":
 			audio.cue("armor_hit", snapshot.tick, 0.65)
 	previous_state = hero.state
 	previous_combo = hero.combo_index
@@ -84,7 +84,7 @@ func _draw() -> void:
 		var age: int = snapshot.tick - int(effect["tick"])
 		if age < 0 or age >= 12:
 			continue
-		var parry: bool = effect["type"] == &"parry_succeeded"
+		var parry: bool = effect["type"] == &"parry_succeeded" or bool(effect.get("counter",false))
 		var at: Vector2 = Vector2(effect["at"]) + (Vector2(0, -14) if parry else Vector2.ZERO)
 		_draw_frame("fx_%s_%d" % ["parry" if parry else "hit", mini(5, age / 2) + 1], at, false, 1.15 if bool(effect["perfect"]) else 1.0)
 		if age < 2:

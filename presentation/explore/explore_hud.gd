@@ -14,6 +14,10 @@ var hint_at: Vector2 = Vector2.INF
 var fade_alpha: float = 0.0
 var debug_lines: Array[String] = []
 var training: Dictionary = {}
+var herb_count: int = 0
+var explore_hp: int = 0
+var explore_max_hp: int = 0
+var fight_hud: bool = false
 var training_feedback: String = ""
 var training_at: Vector2 = Vector2.INF
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
@@ -51,6 +55,13 @@ func hint_rect() -> Rect2:
 func _draw() -> void:
 	if colors.is_empty():
 		return
+	if fight_hud:
+		UiPanel.draw_panel(self, Rect2(6,146,118,28), &"info", colors, false)
+		bar(Vector2(12,153),70,explore_hp,explore_max_hp,colors["t"],4)
+		lettering(Vector2(12,163),"%d / %d" % [explore_hp,explore_max_hp],colors["1"],1,stat_font(),7)
+		ui("ui_item_herb_1",Rect2(86,151,16,16))
+		lettering(Vector2(104,151),str(herb_count),colors["1"],1,stat_font(),8)
+		lettering(Vector2(104,162),Bindings.action_label("explore_use_herb"),colors["u"],1,ui_font(),7)
 	if toast_text != "" and toast_alpha > 0.0 and not bool(training.get("active", false)):
 		var rect: Rect2 = toast_rect()
 		draw_rect(rect, Color(colors["0"], 0.78 * toast_alpha))
