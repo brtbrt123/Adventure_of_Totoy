@@ -1,5 +1,5 @@
 {
-  "status": "OWNER_REVIEW_REQUIRED_NOT_INSTALLED",
+  "status": "OWNER_APPROVED_INSTALLED",
   "core_commit": "d2070b2",
   "art_direction_model": "gpt-6-astra",
   "generation": "built-in image_gen",
@@ -100,5 +100,6 @@
       ]
     }
   ],
-  "native_conversion": "BOX area reduction320x180; gamma0.82 shadow lift before fixed palette quantization, no dithering; opaque native RGBA. Review only."
+  "native_conversion": "BOX area reduction320x180; gamma0.82 shadow lift before fixed palette quantization, no dithering; opaque native RGBA. Review only.",
+  "implementation": "presentation/cutscene/intro.tscn"
 }
