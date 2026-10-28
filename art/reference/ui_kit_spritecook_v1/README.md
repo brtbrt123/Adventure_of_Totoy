@@ -7,6 +7,16 @@ Look at these first:
 - `kit_sheet.png`: every part at 4x, plus the slots, socket and bars assembled at game size.
 - `mockups/1_hud.png`, `2_dialogue.png`, `3_status.png`, `4_aspects.png`, `5_cards.png`: 1280x720 (320x180 x4, nearest-neighbour). `mockups/contact.png` puts all of them on one page.
 
+## 384x216 version
+
+`mockups_384x216/` (1536x864, 4x nearest-neighbour; `contact.png` shows all five) re-spaces the same five screens for the 384x216 view from `art/reference/ui_resolution_comparison/`. The kit is unchanged; no new credits were used. Built by `mockups_384.py`.
+
+- **Backgrounds.** Woodland screens are true 384x216 cuts of `woodland_full.png`, found by matching the existing captures. The HUD cut is clamped to the map's left edge, so it shows the same road a little off-centre. Village and glade screens are cropped to 16:9 and scaled.
+- **HUD.** Everything is re-anchored to the new edges: the objective plate is wider, the level pillar taller (116 px), and the health bar longer (136 px). The sockets sit 3 px from the right edge. Slot, socket and medallion sizes are the same as at 320x180, so the HUD takes a smaller share of the screen.
+- **Menus.** The TAB shell is 376x204. Status gets room for Damage and Dash again, 32 px stat rows and a Confirm/Undo/Respec button row. Aspects gets a bigger detail card and 28 px locked slots.
+- **Dialogue and cards.** The dialogue card is 372 px wide, so each line has room to run longer. The cards use two 184 px columns.
+- **Window size.** At the current 1280x720 window, 384x216 would run at 3x with letterboxing; 4x needs a 1536x864 window.
+
 ## What is in the folder
 
 | Path | What |
