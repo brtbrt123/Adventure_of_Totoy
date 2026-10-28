@@ -1,0 +1,104 @@
+{
+  "status": "OWNER_REVIEW_REQUIRED_NOT_INSTALLED",
+  "core_commit": "d2070b2",
+  "art_direction_model": "gpt-6-astra",
+  "generation": "built-in image_gen",
+  "panels": [
+    {
+      "id": "intro_01_night_of_lights",
+      "raw_source": "exec-ec86a137-6393-4cdb-9997-a2b6801f9acf.png",
+      "native_size": [
+        320,
+        180
+      ],
+      "raw_sha256": "806f3667f1a4898eeae78afb80c566ab1de4bb036a540a6f7e46ed2e5ce73ffc",
+      "effect": "fade_in",
+      "lines": [
+        "Every year, on the Night of Returning Lights, six beacons answer one another across the valley."
+      ]
+    },
+    {
+      "id": "intro_02_dark_hills",
+      "raw_source": "exec-22e98872-6195-4929-b33f-49667a03edd2.png",
+      "native_size": [
+        320,
+        180
+      ],
+      "raw_sha256": "ebca31c5365ba1156d9a9d512791bb4ee7311a8e001ac559043fbe14fd49baa3",
+      "effect": "slow_zoom",
+      "lines": [
+        "This year, only one answered.",
+        "The rest stayed dark."
+      ]
+    },
+    {
+      "id": "intro_03_heartloom",
+      "raw_source": "exec-ee1c0acd-173c-4347-910d-43e39575d489.png",
+      "native_size": [
+        320,
+        180
+      ],
+      "raw_sha256": "1863c85d2b3cc0e96ae93d3ad7dfeacd2c692654a6a157665a736ba525717d4a",
+      "effect": "pan_down",
+      "lines": [
+        "Warmth, rain and memory flowed through the valley by way of the Heartloom, an old living mechanism.",
+        "Then the Heartloom failed."
+      ]
+    },
+    {
+      "id": "intro_04_strange_weather",
+      "raw_source": "exec-8df62104-2ef2-4924-afcf-374c1aa739f0.png",
+      "native_size": [
+        320,
+        180
+      ],
+      "raw_sha256": "14c5db35ce091981b1256d7d65db4fb4777f6b83126a8d6604c3ceec41d443f4",
+      "effect": "slow_zoom",
+      "lines": [
+        "The seasons lost their order. Animals changed. Familiar paths began to lead somewhere else."
+      ]
+    },
+    {
+      "id": "intro_05_totoy_on_the_road",
+      "raw_source": "exec-55b85b91-f8b7-4050-bcab-76fbab0aeedd.png",
+      "native_size": [
+        320,
+        180
+      ],
+      "raw_sha256": "63f8fcf9f026437c9d173b48ecd39064ef42dd788cea749526349d1c40f8cdd8",
+      "effect": "fade_in",
+      "lines": [
+        "Totoy, a young Waykeeper, woke on a road he did not recognise, a broken beacon key in his hand.",
+        "He could not remember the night it all went wrong."
+      ]
+    },
+    {
+      "id": "intro_06_lanternfen_below",
+      "raw_source": "exec-5240876c-44d7-46a1-b460-4784bf921dca.png",
+      "native_size": [
+        320,
+        180
+      ],
+      "raw_sha256": "74309725f3453843c91e0a116678b42e07bd4e1e95e6f47e56af16df42acfcaa",
+      "effect": "pan_down",
+      "lines": [
+        "Far below, one lantern still burned. Lanternfen. Home."
+      ]
+    },
+    {
+      "id": "intro_07_the_rune_gate",
+      "raw_source": "exec-e0562b78-6dee-4fdf-bebe-a7effe17d775.png",
+      "native_size": [
+        320,
+        180
+      ],
+      "raw_sha256": "f4034f860869bd78d359073efbfbe640a67cc8f714617d500074623bde730ae3",
+      "effect": "fade_in",
+      "lines": [
+        "The rune gate knew the key, even if he did not.",
+        "It opened."
+      ]
+    }
+  ],
+  "native_conversion": "BOX area reduction320x180; gamma0.82 shadow lift before fixed palette quantization, no dithering; opaque native RGBA. Review only."
+}
