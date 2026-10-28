@@ -1,0 +1,600 @@
+{
+ "units": "game pixels (320x180 base)",
+ "source_sheet": "raw/sheet_1.png",
+ "parts": {
+  "panel_large_ornate": {
+   "size": [
+    137,
+    91
+   ],
+   "nine_slice": [
+    30,
+    20,
+    30,
+    20
+   ],
+   "source_rect": [
+    40,
+    40,
+    960,
+    640
+   ]
+  },
+  "panel_medium": {
+   "size": [
+    102,
+    58
+   ],
+   "nine_slice": [
+    10,
+    10,
+    10,
+    10
+   ],
+   "source_rect": [
+    1049,
+    116,
+    610,
+    347
+   ]
+  },
+  "panel_small": {
+   "size": [
+    54,
+    47
+   ],
+   "nine_slice": [
+    10,
+    10,
+    10,
+    10
+   ],
+   "source_rect": [
+    1697,
+    175,
+    325,
+    282
+   ]
+  },
+  "slot_frame": {
+   "size": [
+    36,
+    36
+   ],
+   "nine_slice": [
+    8,
+    8,
+    8,
+    8
+   ],
+   "source_rect": [
+    1791,
+    508,
+    216,
+    216
+   ]
+  },
+  "slot_floor": {
+   "size": [
+    18,
+    18
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1050,
+    508,
+    210,
+    216
+   ]
+  },
+  "cooldown_sweep": {
+   "size": [
+    12,
+    12
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1542,
+    508,
+    217,
+    216
+   ]
+  },
+  "aspect_socket_active": {
+   "size": [
+    28,
+    31
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    28,
+    724,
+    313,
+    342
+   ]
+  },
+  "aspect_socket_locked": {
+   "size": [
+    28,
+    31
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    358,
+    724,
+    313,
+    342
+   ]
+  },
+  "weapon_medallion": {
+   "size": [
+    40,
+    44
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    708,
+    729,
+    411,
+    452
+   ]
+  },
+  "health_bar_frame": {
+   "size": [
+    109,
+    14
+   ],
+   "nine_slice": [
+    14,
+    0,
+    13,
+    0
+   ],
+   "source_rect": [
+    1147,
+    782,
+    875,
+    114
+   ]
+  },
+  "fill_health": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ],
+   "source_rect": [
+    1228,
+    926,
+    714,
+    58
+   ]
+  },
+  "fill_ghost": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ],
+   "source_rect": [
+    1228,
+    1013,
+    714,
+    59
+   ]
+  },
+  "fill_edge": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ],
+   "source_rect": [
+    1228,
+    1101,
+    714,
+    59
+   ]
+  },
+  "fill_exp": {
+   "size": [
+    98,
+    8
+   ],
+   "nine_slice": [
+    2,
+    0,
+    4,
+    0
+   ],
+   "source_rect": [
+    1228,
+    1189,
+    714,
+    59
+   ]
+  },
+  "thin_bar_frame": {
+   "size": [
+    58,
+    9
+   ],
+   "nine_slice": [
+    4,
+    0,
+    4,
+    0
+   ],
+   "source_rect": [
+    56,
+    1127,
+    639,
+    95
+   ]
+  },
+  "fill_edge_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ],
+   "source_rect": [
+    1228,
+    1101,
+    714,
+    59
+   ]
+  },
+  "fill_exp_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ],
+   "source_rect": [
+    1228,
+    1189,
+    714,
+    59
+   ]
+  },
+  "fill_health_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ],
+   "source_rect": [
+    1228,
+    926,
+    714,
+    58
+   ]
+  },
+  "fill_ghost_thin": {
+   "size": [
+    62,
+    5
+   ],
+   "nine_slice": [
+    1,
+    0,
+    2,
+    0
+   ],
+   "source_rect": [
+    1228,
+    1013,
+    714,
+    59
+   ]
+  },
+  "level_pillar": {
+   "size": [
+    21,
+    93
+   ],
+   "nine_slice": [
+    0,
+    28,
+    0,
+    10
+   ],
+   "source_rect": [
+    39,
+    1252,
+    165,
+    744
+   ]
+  },
+  "level_shield": {
+   "size": [
+    18,
+    21
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    236,
+    1398,
+    185,
+    215
+   ]
+  },
+  "name_ribbon": {
+   "size": [
+    88,
+    16
+   ],
+   "nine_slice": [
+    26,
+    0,
+    26,
+    0
+   ],
+   "source_rect": [
+    480,
+    1292,
+    872,
+    155
+   ]
+  },
+  "tab_on": {
+   "size": [
+    43,
+    16
+   ],
+   "nine_slice": [
+    6,
+    5,
+    6,
+    5
+   ],
+   "source_rect": [
+    539,
+    1513,
+    342,
+    127
+   ]
+  },
+  "tab_off": {
+   "size": [
+    44,
+    16
+   ],
+   "nine_slice": [
+    6,
+    5,
+    6,
+    5
+   ],
+   "source_rect": [
+    909,
+    1513,
+    351,
+    127
+   ]
+  },
+  "button_normal": {
+   "size": [
+    41,
+    16
+   ],
+   "nine_slice": [
+    6,
+    6,
+    6,
+    6
+   ],
+   "source_rect": [
+    244,
+    1722,
+    370,
+    142
+   ]
+  },
+  "button_pressed": {
+   "size": [
+    41,
+    16
+   ],
+   "nine_slice": [
+    6,
+    6,
+    6,
+    6
+   ],
+   "source_rect": [
+    652,
+    1723,
+    373,
+    143
+   ]
+  },
+  "button_locked": {
+   "size": [
+    41,
+    16
+   ],
+   "nine_slice": [
+    6,
+    6,
+    6,
+    6
+   ],
+   "source_rect": [
+    1060,
+    1723,
+    369,
+    144
+   ]
+  },
+  "key_badge": {
+   "size": [
+    11,
+    11
+   ],
+   "nine_slice": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "source_rect": [
+    1574,
+    1799,
+    110,
+    111
+   ]
+  },
+  "icon_padlock": {
+   "size": [
+    8,
+    10
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1745,
+    1798,
+    97,
+    125
+   ]
+  },
+  "icon_herb": {
+   "size": [
+    14,
+    14
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1415,
+    1332,
+    176,
+    177
+   ]
+  },
+  "icon_katana": {
+   "size": [
+    20,
+    20
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1618,
+    1332,
+    178,
+    177
+   ]
+  },
+  "icon_sprint": {
+   "size": [
+    13,
+    13
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1823,
+    1332,
+    178,
+    177
+   ]
+  },
+  "icon_check": {
+   "size": [
+    12,
+    12
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1512,
+    1549,
+    181,
+    179
+   ]
+  },
+  "icon_rune": {
+   "size": [
+    12,
+    12
+   ],
+   "nine_slice": null,
+   "source_rect": [
+    1721,
+    1549,
+    183,
+    179
+   ]
+  },
+  "aspect_socket_open": {
+   "size": [
+    28,
+    31
+   ],
+   "assembled_from_kit": true
+  },
+  "slot_empty": {
+   "size": [
+    24,
+    24
+   ],
+   "assembled_from_kit": true
+  },
+  "slot_normal": {
+   "size": [
+    24,
+    24
+   ],
+   "assembled_from_kit": true
+  },
+  "slot_locked": {
+   "size": [
+    24,
+    24
+   ],
+   "assembled_from_kit": true
+  },
+  "slot_cooldown": {
+   "size": [
+    24,
+    24
+   ],
+   "assembled_from_kit": true
+  },
+  "aspect_socket_sprint": {
+   "size": [
+    28,
+    31
+   ],
+   "assembled_from_kit": true
+  }
+ }
+}
