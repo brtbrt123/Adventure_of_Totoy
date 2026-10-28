@@ -31,6 +31,7 @@ const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 var conversation: ConversationView
 var practice_effects: Array[Dictionary] = []
+var hero_hit_tick: int = -1000
 var defeat_started_tick: int = -1
 var world_cues: Array[Dictionary] = []
 
@@ -182,6 +183,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	core.set_inventory(profile.inventory)
 	snapshot = core.snapshot()
 	practice_effects.clear()
+	hero_hit_tick = -1000
 	world_cues.clear()
 	defeat_started_tick = -1
 	practice_view.enter_scene(scene)
@@ -324,6 +326,9 @@ func _on_event(event: GameEvent) -> void:
 					practice_message("TRAINING COMPLETE")
 				elif flag.begins_with("lesson_"):
 					practice_message(flag.trim_prefix("lesson_").to_upper() + " LEARNED")
+		GameEvent.DAMAGE_TAKEN:
+			hero_hit_tick = snapshot.tick
+			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": snapshot.hero.position + Vector2(0,-14), "perfect": false})
 		GameEvent.ATTACK_HIT:
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": Vector2(event.data["position"])+Vector2(0,-8), "perfect": event.data.get("kind", &"") == &"counter", "counter": event.data.get("kind", &"") == &"counter"})
 		GameEvent.MOB_STAGGERED:
@@ -475,6 +480,8 @@ func _choose_frames() -> void:
 		facing_left = hero.facing.x < 0.0
 	previous_hero_position = hero.position
 	hero_frame = hero_frame_for(hero, snapshot.armed)
+	if snapshot.armed and snapshot.tick - hero_hit_tick >= 0 and snapshot.tick - hero_hit_tick < 8:
+		hero_frame = ArenaAnimation.hero_frame(ArenaAnimation.SET_KATANA, "hurt", mini(4, (snapshot.tick - hero_hit_tick) / 2 + 1))
 	# Core returns to idle on success; hold the same brief contact pose as the arena.
 	for effect: Dictionary in practice_effects:
 		if snapshot.armed and effect["type"] == GameEvent.PARRY_SUCCEEDED and snapshot.tick - int(effect["tick"]) < 3 and hero.state in [&"idle", &"walk", &"parry"]:
@@ -585,6 +592,11 @@ func _draw() -> void:
 		_draw_debug()
 
 
+func hero_hit_flash() -> bool:
+	var age: int = snapshot.tick - hero_hit_tick
+	return age >= 0 and age < 12 and (age < 4 or age % 4 < 2)
+
+
 func _draw_item(item: Dictionary) -> void:
 	if item["kind"] == &"firefly":
 		AmbientFireflies.draw(self, item)
@@ -611,7 +623,8 @@ func _draw_item(item: Dictionary) -> void:
 		draw_rect(Rect2(at - Vector2(6, 24), Vector2(12, 24)), colors["g"])
 		return
 	var frame: Dictionary = frames[key]
-	var sheet: Texture2D = MobView.WHITE if item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4 else sprites
+	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
+	var sheet: Texture2D = MobView.WHITE if white else sprites
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
 
 
