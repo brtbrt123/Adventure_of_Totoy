@@ -1,0 +1,87 @@
+{
+ "version": 1,
+ "note": "PLACEHOLDER story text drafted from docs/GAME_DESIGN.md and docs/CHAPTER1_PLAN.md (Arrival). The owner rewrites it. Edit the lines, order and timing here; docs/CUTSCENE_intro.md is a readable copy. Art ids are placeholders for the panels Codex will make for approval.",
+ "cutscenes": {
+  "intro": {
+   "flag": "intro_seen",
+   "skippable": true,
+   "music": "intro_theme",
+   "beats": [
+    {
+     "id": "night",
+     "art": "intro_01_night_of_lights",
+     "effect": "fade_in",
+     "hold": 300,
+     "sound": "",
+     "lines": [
+      "Every year, on the Night of Returning Lights, six beacons answer one another across the valley."
+     ]
+    },
+    {
+     "id": "dark",
+     "art": "intro_02_dark_hills",
+     "effect": "slow_zoom",
+     "hold": 300,
+     "sound": "",
+     "lines": [
+      "This year, only one answered.",
+      "The rest stayed dark."
+     ]
+    },
+    {
+     "id": "heartloom",
+     "art": "intro_03_heartloom",
+     "effect": "pan_down",
+     "hold": 360,
+     "sound": "",
+     "lines": [
+      "Warmth, rain and memory flowed through the valley by way of the Heartloom, an old living mechanism.",
+      "Then the Heartloom failed."
+     ]
+    },
+    {
+     "id": "weather",
+     "art": "intro_04_strange_weather",
+     "effect": "slow_zoom",
+     "hold": 300,
+     "sound": "",
+     "lines": [
+      "The seasons lost their order. Animals changed. Familiar paths began to lead somewhere else."
+     ]
+    },
+    {
+     "id": "road",
+     "art": "intro_05_totoy_on_the_road",
+     "effect": "fade_in",
+     "hold": 360,
+     "sound": "",
+     "lines": [
+      "Totoy, a young Waykeeper, woke on a road he did not recognise, a broken beacon key in his hand.",
+      "He could not remember the night it all went wrong."
+     ]
+    },
+    {
+     "id": "lantern",
+     "art": "intro_06_lanternfen_below",
+     "effect": "pan_down",
+     "hold": 360,
+     "sound": "",
+     "lines": [
+      "Far below, one lantern still burned. Lanternfen. Home."
+     ]
+    },
+    {
+     "id": "gate",
+     "art": "intro_07_the_rune_gate",
+     "effect": "fade_in",
+     "hold": 300,
+     "sound": "",
+     "lines": [
+      "The rune gate knew the key, even if he did not.",
+      "It opened."
+     ]
+    }
+   ]
+  }
+ }
+}
