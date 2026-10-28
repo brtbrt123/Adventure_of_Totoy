@@ -1,0 +1,26 @@
+{
+  "status": "OWNER_REVIEW_REQUIRED_NOT_INSTALLED",
+  "core_commit": "7afdfcc",
+  "source_sha256": "3ecc15aceea65f0d54090d23cc86e3decb8032404b74af504997339742ae3485",
+  "size": [
+    1536,
+    1024
+  ],
+  "alpha_range": [
+    0,
+    254
+  ],
+  "contains": [
+    "six chest opening candidates",
+    "four objective arrow frames",
+    "four dash ring frames",
+    "existing-lock style preview",
+    "stats card style preview"
+  ],
+  "production_cleanup": [
+    "keep original chest closed appearance and base/perspective consistent; align all frames to existing feet/colliders",
+    "extract text-grid sprites at native sizes; hard alpha; Totoy36 only, no reserved colours",
+    "remove generator glow/soft halo; keep ring exact core center/radius14",
+    "render all stat values/counts/effects and button labels from snapshot/runtime text"
+  ]
+}
