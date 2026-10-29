@@ -5,8 +5,11 @@ const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
 const Kit := preload("res://presentation/common/ui_kit.gd")
+const ArenaStrip := preload("res://presentation/ui/arena_strip.tscn")
 const Aspects := preload("res://core/aspects.gd")
 var snapshot: Snapshots.GameSnapshot
+## The fight HUD's fixed pieces (presentation/ui/arena_strip.tscn), made when the fight HUD first draws.
+var arena_strip: Control = null
 var colors: Dictionary = {}
 var debug_enabled: bool = false
 # Extra result-screen lines (the arena fills them when progress is saved).
@@ -341,27 +344,25 @@ const THIN_Y: float = 203.0
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	if portrait_sprite != null:
 		portrait_sprite.hide()
-	var hp: String = "%d / %d" % [h.player_hp, h.player_max_hp]
-	outlined(Vector2(STRIP_X + 2, HP_Y - 11), "HEALTH", colors["u"], colors["0"], 1, null, 7)
-	outlined(Vector2(STRIP_X + STRIP_W - 2 - text_width(hp, 1, stat_font(), 8), HP_Y - 12), hp, colors["1"], colors["0"], 1, stat_font(), 8)
-	var hp_max: float = maxf(1.0, float(h.player_max_hp))
-	Kit.bar(self, Vector2(STRIP_X, HP_Y), STRIP_W, [["fill_ghost", float(health_ghosts.get("player", h.player_hp)) / hp_max], ["fill_health", float(h.player_hp) / hp_max]])
-	outlined(Vector2(STRIP_X + 2, THIN_Y - 8), "EDGE", colors["u"], colors["0"], 1, null, 6)
-	Kit.bar(self, Vector2(STRIP_X, THIN_Y), 84, [["fill_edge_thin", h.edge / maxf(1.0, h.edge_max)]], true)
-	outlined(Vector2(STRIP_X + 100, THIN_Y - 8), "DASH", colors["v"], colors["0"], 1, null, 6)
-	Kit.bar(self, Vector2(STRIP_X + 98, THIN_Y), 38, [["fill_exp_thin", dash_fraction(h)]], true)
-	_draw_status_icons(h)
-
-## Only active states exposed by the core appear here; no invented debuff rules.
-func _draw_status_icons(h: Snapshots.HudSnapshot) -> void:
-	var index: int = 0
+	if arena_strip == null:
+		arena_strip = ArenaStrip.instantiate()
+		add_child(arena_strip)
+	arena_strip.atlas = portrait_atlas
+	arena_strip.frames = ui_frames
+	var weapon: StringName = snapshot.player.weapon_id
+	var status: Array = []
 	for row: Dictionary in skill_rows(h, snapshot.tick):
-		if not bool(row["running"]):
-			continue
-		var rect: Rect2 = Rect2(88 + index * 26, 150, 18, 18)
-		Kit.slot(self, rect.grow(4), &"normal")
-		ui(row["icon"], rect)
-		index += 1
+		if bool(row["running"]):
+			status.append(row["icon"])
+	var rows: Array[Dictionary] = skill_rows(h, snapshot.tick)
+	var sockets: Array = []
+	for row: Dictionary in rows:
+		sockets.append({"icon": row["icon"], "key": row["key"], "cost": "%dE" % int(row["cost"]), "cost_color": colors["v"] if h.edge >= float(row["cost"]) else colors["i"]})
+	arena_strip.apply({
+		"whole_medallion": MEDALLIONS.get(weapon, ""), "glyph": weapon_icon_key, "plate": weapon_label(weapon),
+		"hp": h.player_hp, "max_hp": h.player_max_hp, "ghost": float(health_ghosts.get("player", h.player_hp)),
+		"edge": h.edge / maxf(1.0, h.edge_max), "dash": dash_fraction(h), "status": status, "sockets": sockets,
+	})
 
 func ui(key: String, rect: Rect2, source_offset: Vector2 = Vector2.ZERO, source_size: Vector2 = Vector2.ZERO) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
@@ -480,31 +481,9 @@ func _seconds(centre: Vector2, ticks: int, color: Color) -> void:
 	draw_rect(Rect2(centre + Vector2(-seconds_width * 0.5 - 1, -5), Vector2(seconds_width + 2, 10)), colors["0"])
 	lettering(centre + Vector2(-seconds_width * 0.5, -4), seconds, color, 1, null, 12)
 
-## The weapon socket: the kit medallion around the katana's own 32 px glyph; the dagger's and the scythe's art are whole
-## 48 px medallions of their own, drawn as they are.
-func draw_weapon_socket(weapon: StringName, glyph_key: String) -> void:
-	if MEDALLIONS.has(weapon):
-		ui(MEDALLIONS[weapon], weapon_rect())
-		return
-	var at: Vector2 = weapon_rect().position - Vector2(0, 2)
-	Kit.medallion(self, at)
-	ui(glyph_key, Rect2(Kit.medallion_centre(at) - Vector2(16, 16), Vector2(32, 32)))
-
-
-## The key letter in a socket's stem (the kit leaves it empty): `letter` centred on the stem, cream when it is usable.
-func draw_socket_key(at: Vector2, letter: String, color: Color) -> void:
-	var centre: Vector2 = Kit.socket_key(at)
-	var half: float = text_width(letter, 1, stat_font(), 8) * 0.5
-	lettering(Vector2(centre.x - half, centre.y - 4.0), letter, color, 1, stat_font(), 8)
-
-
 func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var rows: Array[Dictionary] = skill_rows(h, snapshot.tick)
 	var sockets: Array[Rect2] = aspect_rects()
-	draw_weapon_socket(snapshot.player.weapon_id, weapon_icon_key)
-	var name_plate: Rect2 = Rect2(weapon_rect().position + Vector2(2, 42), Vector2(44, 12))
-	Kit.button(self, name_plate, &"normal")
-	centered(name_plate.get_center().x, name_plate.position.y + 3, weapon_label(snapshot.player.weapon_id), colors["1"], colors["0"], 1, null, 6)
 	_draw_weapon_active()
 	var hint: Dictionary = {}
 	for slot: int in range(3):
@@ -512,8 +491,6 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 		var socket: Rect2 = sockets[slot]
 		var icon: Rect2 = aspect_icon_rect(slot)
 		var centre: Vector2 = icon.get_center()
-		Kit.socket(self, socket.position, false)
-		ui(row["icon"], icon, Vector2(4, 4), Vector2(16, 16))
 		# Snapshot-only rings. The core still accepts or rejects every press.
 		var running: float = run_fraction(row)
 		if int(row["cooldown"]) > 0:
@@ -527,9 +504,6 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 			_seconds(centre, int(row["ticks_left"]), colors["v"])  # buffs, the echo countdown, the ward: seconds still running
 		elif running <= 0.0 and int(row["cooldown"]) > 0:
 			_seconds(centre, int(row["cooldown"]), colors["p"])
-		draw_socket_key(socket.position, row["key"], colors["1"])
-		var cost: String = "%dE" % int(row["cost"])
-		centered(centre.x, socket.position.y - 8, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"], 1, null, 7)
 		if socket.has_point(get_local_mouse_position()) or slot == hint_slot_override:
 			hint = row
 	if h.retaliate_ticks_left > 0:

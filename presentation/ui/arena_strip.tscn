@@ -1,0 +1,473 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/arena_strip.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/weapon_medallion.png" id="3_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/button_normal.png" id="4_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/health_bar_frame.png" id="5_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/fill_ghost.png" id="6_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/fill_health.png" id="7_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/thin_bar_frame.png" id="8_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/fill_edge_thin.png" id="9_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/fill_exp_thin.png" id="10_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="11_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/aspect_socket_open.png" id="12_tex"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="13_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="14_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("13_fon")
+variation_opentype = {2003265652: 900.0}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("14_fon")
+variation_opentype = {2003265652: 400.0}
+
+[node name="ArenaStrip" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+show_behind_parent = true
+script = ExtResource("1_scr")
+
+[node name="Medallion" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 4
+offset_top = 162
+offset_right = 4
+offset_bottom = 162
+mouse_filter = 2
+texture = ExtResource("3_tex")
+
+[node name="Glyph" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 12
+offset_top = 171
+offset_right = 44
+offset_bottom = 203
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="WholeMedallion" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 4
+offset_top = 164
+offset_right = 52
+offset_bottom = 212
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="NamePlate" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 6
+offset_top = 203
+offset_right = 50
+offset_bottom = 215
+mouse_filter = 2
+texture = ExtResource("4_tex")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Name" type="Label" parent="NamePlate"]
+layout_mode = 0
+offset_left = 0
+offset_top = 1
+offset_right = 44
+offset_bottom = 11
+mouse_filter = 2
+text = "BLACK"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="HealthLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 60
+offset_top = 171
+offset_right = 100
+offset_bottom = 181
+mouse_filter = 2
+text = "HEALTH"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="HealthValue" type="Label" parent="."]
+layout_mode = 0
+offset_left = 110
+offset_top = 170
+offset_right = 192
+offset_bottom = 181
+mouse_filter = 2
+text = "100 / 100"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="HealthBar" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 58
+offset_top = 182
+offset_right = 194
+offset_bottom = 196
+mouse_filter = 2
+texture = ExtResource("5_tex")
+patch_margin_left = 14
+patch_margin_top = 0
+patch_margin_right = 13
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Ghost" type="NinePatchRect" parent="HealthBar"]
+layout_mode = 0
+offset_left = 11
+offset_top = 3
+offset_right = 125
+offset_bottom = 11
+mouse_filter = 2
+texture = ExtResource("6_tex")
+patch_margin_left = 2
+patch_margin_top = 0
+patch_margin_right = 4
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Fill" type="NinePatchRect" parent="HealthBar"]
+layout_mode = 0
+offset_left = 11
+offset_top = 3
+offset_right = 125
+offset_bottom = 11
+mouse_filter = 2
+texture = ExtResource("7_tex")
+patch_margin_left = 2
+patch_margin_top = 0
+patch_margin_right = 4
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="EdgeLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 60
+offset_top = 195
+offset_right = 100
+offset_bottom = 203
+mouse_filter = 2
+text = "EDGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="EdgeBar" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 58
+offset_top = 203
+offset_right = 142
+offset_bottom = 212
+mouse_filter = 2
+texture = ExtResource("8_tex")
+patch_margin_left = 4
+patch_margin_top = 0
+patch_margin_right = 4
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Fill" type="NinePatchRect" parent="EdgeBar"]
+layout_mode = 0
+offset_left = 2
+offset_top = 2
+offset_right = 81
+offset_bottom = 7
+mouse_filter = 2
+texture = ExtResource("9_tex")
+patch_margin_left = 1
+patch_margin_top = 0
+patch_margin_right = 2
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="DashLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 158
+offset_top = 195
+offset_right = 188
+offset_bottom = 203
+mouse_filter = 2
+text = "DASH"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="DashBar" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 156
+offset_top = 203
+offset_right = 194
+offset_bottom = 212
+mouse_filter = 2
+texture = ExtResource("8_tex")
+patch_margin_left = 4
+patch_margin_top = 0
+patch_margin_right = 4
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Fill" type="NinePatchRect" parent="DashBar"]
+layout_mode = 0
+offset_left = 2
+offset_top = 2
+offset_right = 35
+offset_bottom = 7
+mouse_filter = 2
+texture = ExtResource("10_tex")
+patch_margin_left = 1
+patch_margin_top = 0
+patch_margin_right = 2
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Status1" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 84
+offset_top = 146
+offset_right = 110
+offset_bottom = 172
+mouse_filter = 2
+texture = ExtResource("11_tex")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Icon" type="TextureRect" parent="Status1"]
+layout_mode = 0
+offset_left = 4
+offset_top = 4
+offset_right = 22
+offset_bottom = 22
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Status2" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 110
+offset_top = 146
+offset_right = 136
+offset_bottom = 172
+mouse_filter = 2
+texture = ExtResource("11_tex")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Icon" type="TextureRect" parent="Status2"]
+layout_mode = 0
+offset_left = 4
+offset_top = 4
+offset_right = 22
+offset_bottom = 22
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Status3" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 136
+offset_top = 146
+offset_right = 162
+offset_bottom = 172
+mouse_filter = 2
+texture = ExtResource("11_tex")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Icon" type="TextureRect" parent="Status3"]
+layout_mode = 0
+offset_left = 4
+offset_top = 4
+offset_right = 22
+offset_bottom = 22
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Socket1" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 268
+offset_top = 172
+offset_right = 268
+offset_bottom = 172
+mouse_filter = 2
+texture = ExtResource("12_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket1"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket1"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "Z"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Cost" type="Label" parent="Socket1"]
+layout_mode = 0
+offset_left = -4
+offset_top = -9
+offset_right = 41
+offset_bottom = 0
+mouse_filter = 2
+text = "20E"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="Socket2" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 306
+offset_top = 172
+offset_right = 306
+offset_bottom = 172
+mouse_filter = 2
+texture = ExtResource("12_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket2"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket2"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "X"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Cost" type="Label" parent="Socket2"]
+layout_mode = 0
+offset_left = -4
+offset_top = -9
+offset_right = 41
+offset_bottom = 0
+mouse_filter = 2
+text = "20E"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="Socket3" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 344
+offset_top = 172
+offset_right = 344
+offset_bottom = 172
+mouse_filter = 2
+texture = ExtResource("12_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket3"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket3"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "C"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Cost" type="Label" parent="Socket3"]
+layout_mode = 0
+offset_left = -4
+offset_top = -9
+offset_right = 41
+offset_bottom = 0
+mouse_filter = 2
+text = "20E"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2

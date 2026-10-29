@@ -95,4 +95,22 @@ func run() -> void:
 	scene.conversation.controls_open = true
 	await frames(4)
 	await save("controls_card")
+	# the boss fight HUD
+	scene.queue_free()
+	await process_frame
+	var arena: Node = (load("res://presentation/arena/arena.tscn") as PackedScene).instantiate()
+	root.add_child(arena)
+	await process_frame
+	arena.set_physics_process(false)
+	arena.core.player.position = Vector2(400, 300)
+	arena.core.step(InputFrameClass.new())
+	arena.snapshot = arena.core.snapshot()
+	arena._update_camera(true)
+	arena.prepare_visuals()
+	arena._update_hud()
+	arena.queue_redraw()
+	await frames(3)
+	await save("arena_hud")
 	quit(0)
+
+const InputFrameClass := preload("res://core/input_frame.gd")
