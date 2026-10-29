@@ -21,6 +21,8 @@ const Aspects := preload("res://core/aspects.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
 const Kit := preload("res://presentation/common/ui_kit.gd")
+const MenuShell := preload("res://presentation/ui/menu_shell.tscn")
+const MenuStatus := preload("res://presentation/ui/menu_status.tscn")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
 const TAB_STATS: int = 0
@@ -92,6 +94,9 @@ var picker_selection: int = 0
 var picker_scroll: int = 0
 var picker_feedback: Dictionary = {}
 var snapshot: Snapshots.GameSnapshot
+## The editable scenes behind this menu's drawing (presentation/ui/menu_shell.tscn, menu_status.tscn).
+var shell: Control = null
+var status_scene: Control = null
 var colors: Dictionary = {}
 var atlas: Texture2D
 var frames: Dictionary = {}
@@ -108,6 +113,10 @@ var _used_rects: Dictionary = {}
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	visible = false
+	shell = MenuShell.instantiate()
+	add_child(shell)
+	status_scene = MenuStatus.instantiate()
+	add_child(status_scene)
 
 
 func open() -> void:
@@ -792,10 +801,7 @@ func _key_badge(at: Vector2, letter: String) -> void:
 func _draw() -> void:
 	if not is_open or colors.is_empty() or snapshot == null:
 		return
-	draw_rect(Rect2(0, 0, 384, 216), Color(colors["0"], VEIL_ALPHA))
-	UiPanel.draw_panel(self, PANEL, &"menu", colors)
-	_draw_tabs()
-	_text(Vector2(192, 202), FOOTER, colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_sync_scenes()
 	if tab == TAB_STATS:
 		if progression!=null:_draw_progression_stats()
 		else:_draw_stats()
@@ -809,12 +815,32 @@ func _draw() -> void:
 		_draw_description(description_key())
 
 
-func _draw_tabs() -> void:
-	for index: int in range(TAB_NAMES.size()):
-		var rect: Rect2 = tab_rect(index)
-		Kit.tab(self, rect, index == tab)
-		_text(Vector2(rect.get_center().x, rect.position.y + 4), TAB_NAMES[index], colors["1"] if index == tab else colors["i"], Hud.menu_font(), 9, HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(368, 11), "TOTOY", colors["j"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_RIGHT)
+## Hands the open tab and the STATUS numbers to the scenes drawn behind this menu.
+func _sync_scenes() -> void:
+	if shell == null:
+		return
+	shell.apply(tab, TAB_NAMES)
+	var show_status: bool = tab == TAB_STATS and progression != null
+	status_scene.visible = show_status
+	if not show_status:
+		return
+	status_scene.atlas = atlas
+	status_scene.frames = frames
+	var rows: Array = []
+	for i: int in 3:
+		var stat: String = ["vitality", "might", "agility"][i]
+		var value: int = int(progression.stats.get(stat, 0))
+		var cap: int = int(progression.stat_caps.get(stat, 0))
+		rows.append({"value": value, "cap": cap, "enabled": progression.stat_points_unspent > 0 and value < cap})
+	var sockets: Array = []
+	for i: int in 3:
+		var slot: Dictionary = progression.aspect_slots[i] if i < progression.aspect_slots.size() else {}
+		var aspect: StringName = StringName(slot.get("aspect", &""))
+		sockets.append({"open": bool(slot.get("unlocked", false)) and aspect_owned(aspect), "icon": Hud.aspect_icon(aspect)})
+	var notice: String = stats_notice
+	if notice.is_empty() and String(progression.objective.get("id", "")) == "edda_equip":
+		notice = "Select first socket to bind Sprint"
+	status_scene.apply({"unspent": progression.stat_points_unspent, "level": progression.level, "hp": progression.hero.max_hp, "rows": rows, "sockets": sockets, "village": progression.scene_id == &"village_layered", "notice": notice})
 
 
 ## The weapon's socket art: the katana's kit medallion around its blade glyph (48x52), or the dagger's / scythe's whole
@@ -1168,39 +1194,12 @@ func progression_items() -> Array[Dictionary]:
 	for i: int in 3:items.append({"key":ASPECT_KEYS[i],"rect":progression_aspect_rect(i)})
 	return items
 func _draw_progression_stats() -> void:
-	_text(Vector2(22,38),"UNSPENT POINTS: %d" % progression.stat_points_unspent,colors["u"],Hud.menu_font(),10)
-	_text(Vector2(362,39),"LV %d   HP %d" % [progression.level,progression.hero.max_hp],colors["1"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
+	# everything but the selection marks and the picker is the scene menu_status.tscn
 	for i: int in 3:
-		var stat: String=["vitality","might","agility"][i]
-		var value: int=int(progression.stats.get(stat,0))
-		var cap: int=int(progression.stat_caps.get(stat,0))
-		var row: Rect2=progression_row_rect(i)
-		var on: bool=stats_selection==StringName("stat_"+stat)
-		Kit.panel(self,row)
-		if on:_brackets(row)
-		_text(Vector2(30,row.position.y+7),stat,colors["1"],Hud.menu_font(),9)
-		_text(Vector2(30,row.position.y+18),["+6 max health a point","+3% damage a point","Shorter dash cooldown; a little faster"][i],colors["i"],null,6)
-		_text(Vector2(278,row.position.y+11),"%d / %d" % [value,cap],colors["p"],null,Hud.FONT_SIZE,HORIZONTAL_ALIGNMENT_RIGHT)
-		var enabled: bool=progression.stat_points_unspent>0 and value<cap
-		var plus: Rect2=progression_plus_rect(i)
-		Kit.button(self,plus,&"normal" if enabled else &"locked")
-		_text(Vector2(plus.get_center().x,plus.position.y+4),"+",colors["u" if enabled else "g"],null,10,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(28,141),"ASPECT SOCKETS",colors["i"])
-	for i: int in 3:
-		var rect: Rect2=progression_aspect_rect(i)
-		var slot: Dictionary=progression.aspect_slots[i] if i<progression.aspect_slots.size() else {}
-		var open: bool=bool(slot.get("unlocked",false)) and aspect_owned(StringName(slot.get("aspect",&"")))
-		Kit.socket(self,rect.position,not open)
-		if open:_ui(Hud.aspect_icon(slot.get("aspect",&"")),Kit.socket_icon_rect(rect.position),Vector2(4,4),Vector2(16,16))
-		if stats_selection==ASPECT_KEYS[i]:_brackets(rect)
-		var key_at: Vector2=Kit.socket_key(rect.position)
-		_text(Vector2(key_at.x,key_at.y-3),SLOT_LETTERS[i],colors["1" if open else "g"],null,8,HORIZONTAL_ALIGNMENT_CENTER)
-	var village: bool=progression.scene_id==&"village_layered"
-	var respec: Rect2=respec_rect()
-	Kit.button(self,respec,&"normal" if village else &"locked")
-	if stats_selection==&"respec":_brackets(respec)
-	_text(Vector2(respec.get_center().x,respec.position.y+5),"RESPEC",colors["1" if village else "g"],Hud.menu_font(),9,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(respec.get_center().x,respec.end.y+5),"FREE IN VILLAGE" if village else "VILLAGE ONLY",colors["i"],null,6,HORIZONTAL_ALIGNMENT_CENTER)
-	if not stats_notice.is_empty():_text(Vector2(160,184),stats_notice,colors["o"],null,6)
-	elif String(progression.objective.get("id",""))=="edda_equip":_text(Vector2(160,184),"SELECT FIRST SOCKET TO BIND SPRINT",colors["u"],null,6)
+		if stats_selection == StringName("stat_" + ["vitality", "might", "agility"][i]):
+			_brackets(progression_row_rect(i))
+		if stats_selection == ASPECT_KEYS[i]:
+			_brackets(progression_aspect_rect(i))
+	if stats_selection == &"respec":
+		_brackets(respec_rect())
 	if picker_open():_draw_picker()
