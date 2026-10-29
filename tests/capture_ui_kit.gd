@@ -60,7 +60,10 @@ func run() -> void:
 	await save("menu_stats")
 	scene.character_menu.set_tab(1)
 	await frames(4)
-	await save("menu_inventory")
+	await save("menu_aspects")
+	scene.character_menu.set_tab(3)
+	await frames(4)
+	await save("menu_quests")
 	scene.character_menu.close()
 	# village: objective, chips, dialogue, reward card
 	await fresh({"scene": &"village_layered", "entry": &"arrival"})

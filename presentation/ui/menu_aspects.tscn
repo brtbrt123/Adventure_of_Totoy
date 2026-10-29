@@ -1,0 +1,214 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/menu_aspects.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/aspect_socket_locked.png" id="3_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="4_tex"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="5_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="6_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("5_fon")
+variation_opentype = {2003265652: 900.0}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("6_fon")
+variation_opentype = {2003265652: 400.0}
+
+[node name="MenuAspects" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+show_behind_parent = true
+script = ExtResource("1_scr")
+
+[node name="Caption" type="Label" parent="."]
+layout_mode = 0
+offset_left = 26
+offset_top = 33
+offset_right = 226
+offset_bottom = 47
+mouse_filter = 2
+text = "ASPECT SOCKETS"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Socket1" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 30
+offset_top = 55
+offset_right = 30
+offset_bottom = 55
+mouse_filter = 2
+texture = ExtResource("3_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket1"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket1"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "Z"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Socket2" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 78
+offset_top = 55
+offset_right = 78
+offset_bottom = 55
+mouse_filter = 2
+texture = ExtResource("3_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket2"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket2"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "X"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Socket3" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 126
+offset_top = 55
+offset_right = 126
+offset_bottom = 55
+mouse_filter = 2
+texture = ExtResource("3_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket3"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket3"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "C"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Help1" type="Label" parent="."]
+layout_mode = 0
+offset_left = 26
+offset_top = 106
+offset_right = 356
+offset_bottom = 116
+mouse_filter = 2
+text = "SELECT A SOCKET, THEN CHOOSE AN ASPECT."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7
+
+[node name="Help2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 26
+offset_top = 121
+offset_right = 356
+offset_bottom = 131
+mouse_filter = 2
+text = "LOCKED SOCKETS OPEN AS YOUR STORY ADVANCES."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7
+
+[node name="Notice" type="Label" parent="."]
+layout_mode = 0
+offset_left = 26
+offset_top = 131
+offset_right = 356
+offset_bottom = 141
+mouse_filter = 2
+text = ""
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7
+
+[node name="Detail" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 22
+offset_top = 142
+offset_right = 362
+offset_bottom = 190
+mouse_filter = 2
+texture = ExtResource("4_tex")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Name" type="Label" parent="Detail"]
+layout_mode = 0
+offset_left = 12
+offset_top = 7
+offset_right = 312
+offset_bottom = 21
+mouse_filter = 2
+text = "BREAKING EDGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+
+[node name="Stats" type="Label" parent="Detail"]
+layout_mode = 0
+offset_left = 12
+offset_top = 24
+offset_right = 312
+offset_bottom = 36
+mouse_filter = 2
+text = "25 EDGE   COOLDOWN 0 S"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 8

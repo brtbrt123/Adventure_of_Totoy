@@ -23,6 +23,8 @@ const UiPanel := preload("res://presentation/arena/ui_panel.gd")
 const Kit := preload("res://presentation/common/ui_kit.gd")
 const MenuShell := preload("res://presentation/ui/menu_shell.tscn")
 const MenuStatus := preload("res://presentation/ui/menu_status.tscn")
+const MenuAspects := preload("res://presentation/ui/menu_aspects.tscn")
+const MenuQuests := preload("res://presentation/ui/menu_quests.tscn")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
 const TAB_STATS: int = 0
@@ -97,6 +99,8 @@ var snapshot: Snapshots.GameSnapshot
 ## The editable scenes behind this menu's drawing (presentation/ui/menu_shell.tscn, menu_status.tscn).
 var shell: Control = null
 var status_scene: Control = null
+var aspects_scene: Control = null
+var quests_scene: Control = null
 var colors: Dictionary = {}
 var atlas: Texture2D
 var frames: Dictionary = {}
@@ -117,6 +121,10 @@ func _ready() -> void:
 	add_child(shell)
 	status_scene = MenuStatus.instantiate()
 	add_child(status_scene)
+	aspects_scene = MenuAspects.instantiate()
+	add_child(aspects_scene)
+	quests_scene = MenuQuests.instantiate()
+	add_child(quests_scene)
 
 
 func open() -> void:
@@ -815,11 +823,33 @@ func _draw() -> void:
 		_draw_description(description_key())
 
 
+## The ASPECTS tab's numbers: the three sockets and the selected one's name and cost.
+func _sync_aspects_scene() -> void:
+	aspects_scene.atlas = atlas
+	aspects_scene.frames = frames
+	var sockets: Array = []
+	for i: int in 3:
+		var aspect: StringName = slot_aspect(i + 1)
+		var unlocked: bool = progression == null or (i < progression.aspect_slots.size() and bool(progression.aspect_slots[i].get("unlocked", false)))
+		sockets.append({"open": unlocked and aspect_owned(aspect), "icon": Hud.aspect_icon(aspect)})
+	var id: StringName = slot_aspect(maxi(0, ASPECT_KEYS.find(stats_selection)) + 1)
+	var owned: bool = aspect_owned(id)
+	aspects_scene.apply({"sockets": sockets, "name": Aspects.display_name(id) if owned else "Locked aspect",
+		"stats": "%s Edge   Cooldown %s s" % [num(Aspects.edge_cost(id)), secs(Aspects.cooldown(id))] if owned else "", "notice": stats_notice})
+
+
 ## Hands the open tab and the STATUS numbers to the scenes drawn behind this menu.
 func _sync_scenes() -> void:
 	if shell == null:
 		return
 	shell.apply(tab, TAB_NAMES)
+	aspects_scene.visible = tab == TAB_ASPECTS
+	quests_scene.visible = tab == TAB_QUESTS
+	if tab == TAB_ASPECTS:
+		_sync_aspects_scene()
+	elif tab == TAB_QUESTS:
+		var objective: String = String(progression.objective.get("text", "Your village tasks are complete.")) if progression != null else "Defeat the Mossbound Colossus."
+		quests_scene.apply({"objective": objective, "hint": "Follow the objective marker on the road."})
 	var show_status: bool = tab == TAB_STATS and progression != null
 	status_scene.visible = show_status
 	if not show_status:
@@ -1139,50 +1169,18 @@ static func aspects_tab_rect(index: int) -> Rect2:
 
 
 func _draw_aspects_tab() -> void:
-	_text(Vector2(26, 37), "ASPECT SOCKETS", colors["u"], Hud.menu_font(), 9)
+	# everything but the selection mark and the picker is the scene menu_aspects.tscn
 	for i: int in 3:
-		var rect: Rect2 = aspects_tab_rect(i)
-		var aspect: StringName = slot_aspect(i + 1)
-		var unlocked: bool = progression == null or (i < progression.aspect_slots.size() and bool(progression.aspect_slots[i].get("unlocked", false)))
-		Kit.socket(self, rect.position, not unlocked or not aspect_owned(aspect))
-		if unlocked and aspect_owned(aspect):
-			_ui(Hud.aspect_icon(aspect), Kit.socket_icon_rect(rect.position), Vector2(4, 4), Vector2(16, 16))
-		var at: Vector2 = Kit.socket_key(rect.position)
-		_text(Vector2(at.x, at.y - 3), SLOT_LETTERS[i], colors["1" if unlocked else "g"], Hud.stat_font(), 8, HORIZONTAL_ALIGNMENT_CENTER)
 		if stats_selection == ASPECT_KEYS[i]:
-			_brackets(rect)
-	_text(Vector2(26, 108), "Select a socket, then choose an Aspect.", colors["i"], null, 7)
-	_text(Vector2(26, 123), "Locked sockets open as your story advances.", colors["i"], null, 7)
-	var selected: int = maxi(0, ASPECT_KEYS.find(stats_selection))
-	var id: StringName = slot_aspect(selected + 1)
-	var detail: Rect2 = Rect2(22, 142, 340, 48)
-	Kit.panel(self, detail)
-	_text(Vector2(34, 151), Aspects.display_name(id) if aspect_owned(id) else "LOCKED ASPECT", colors["1"], Hud.menu_font(), 10)
-	if aspect_owned(id):
-		_text(Vector2(34, 168), "%s Edge   Cooldown %s s" % [num(Aspects.edge_cost(id)), secs(Aspects.cooldown(id))], colors["u"], null, 8)
-	if not stats_notice.is_empty():
-		_text(Vector2(26, 132), stats_notice, colors["o"], null, 7)
+			_brackets(aspects_tab_rect(i))
 	if picker_open():
 		_draw_picker()
 
 
 func _draw_quests_tab() -> void:
-	_text(Vector2(30, 44), "CURRENT OBJECTIVE", colors["u"], Hud.menu_font(), 11)
-	var card: Rect2 = Rect2(24, 66, 336, 106)
-	Kit.panel(self, card)
-	var objective: String = String(progression.objective.get("text", "Your village tasks are complete.")) if progression != null else "Defeat the Mossbound Colossus."
-	var y: float = 82.0
-	var line: String = ""
-	for word: String in objective.split(" "):
-		var candidate: String = word if line.is_empty() else line + " " + word
-		if Hud.text_width(candidate, 1, Hud.ui_font(), 10) > 300.0:
-			_text(Vector2(38, y), line, colors["1"], null, 10)
-			y += 15.0
-			line = word
-		else:
-			line = candidate
-	_text(Vector2(38, y), line, colors["1"], null, 10)
-	_text(Vector2(38, 150), "Follow the objective marker on the road.", colors["i"], null, 8)
+	pass  # the scene menu_quests.tscn draws it
+
+
 static func progression_aspect_rect(i: int) -> Rect2:return Rect2(28+i*46,150,37,40)
 static func progression_row_rect(i: int) -> Rect2:return Rect2(20,56+i*30,298,28)
 static func progression_plus_rect(i: int) -> Rect2:return Rect2(292,61+i*30,18,18)
