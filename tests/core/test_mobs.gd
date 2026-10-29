@@ -519,7 +519,7 @@ func test_item_slots_one_and_two_and_the_locks() -> void:
 	var aspects: Array[Dictionary] = core.snapshot().aspect_slots
 	assert_eq(aspects.size(), 3)
 	for a: Dictionary in aspects:
-		assert_false(a["usable"], "the default Aspects need the boss: none is usable on the road")
+		assert_true(a["usable"], "every Aspect works on the road now (Echo Step, Ward, Lantern, Phantom Cut and the three skills)")
 	assert_false(_core().snapshot().owned_aspects.is_empty() and false)
 	var fresh: ExploreCore = ExploreCore.new(SceneDefs.VILLAGE_LAYERED)
 	for a: Dictionary in fresh.snapshot().aspect_slots:

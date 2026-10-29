@@ -41,6 +41,7 @@ const TrainingYard := preload("res://core/training_yard.gd")
 const MobField := preload("res://core/mob_field.gd")
 const QuestBook := preload("res://core/quest_book.gd")
 const Aspects := preload("res://core/aspects.gd")
+const ExploreSkills := preload("res://core/explore_skills.gd")
 
 ## The story flag that means the hero owns his first sword (Tovan's handover, DialogueBook grants). A save that has met Tovan
 ## but has no such flag is an older save from before the handover existed: it is treated as armed (set_story_flags).
@@ -53,8 +54,8 @@ const ITEM_SLOTS: Array[Dictionary] = [{"item": &"herb", "unlock": &"unlocked_it
 ## The Aspect sockets (Z, X, C) follow `ASPECT_UNLOCKS`: socket 1 opens with Edda's equip lesson. Only the Aspects in EXPLORATION_ASPECTS work here.
 const ASPECTS_IN_EXPLORATION: bool = true
 const ASPECT_UNLOCKS: Array[StringName] = [&"lesson_aspect", &"unlocked_aspect_slot_2", &"unlocked_aspect_slot_3"]
-## The Aspects that work in exploration (self buffs that need no boss to aim at): Sprint. The others stay in their socket but cannot be used here.
-const EXPLORATION_ASPECTS: Array[StringName] = [Aspects.SPRINT]
+## The Aspects that work in exploration: all of them. Skills hit mobs through MobField.hit_mob() (core/explore_skills.gd).
+const EXPLORATION_ASPECTS: Array[StringName] = Aspects.ALL
 ## An Aspect is owned once Edda or a reward gave it: the story flag aspect_owned_<id>.
 const ASPECT_OWNED_PREFIX: String = "aspect_owned_"
 ## The hero can interact with an NPC or object when his centre is this close to its feet or its stand point.
@@ -115,6 +116,10 @@ class ExploreSnapshot:
 	## The HUD's item boxes [{slot (1 or 2), item (id or empty), unlocked, count}] and Aspect sockets [{slot (1-3), aspect (equipped id), unlocked}].
 	var item_slots: Array[Dictionary] = []
 	var aspect_slots: Array[Dictionary] = []
+	## The hero's world objects (same classes as the fight's snapshot): live skill attacks, Spirit Lanterns, Echo Step anchors.
+	var skill_attacks: Array[Snapshots.SkillAttackSnapshot] = []
+	var lanterns: Array[Snapshots.LanternSnapshot] = []
+	var echoes: Array[Snapshots.EchoSnapshot] = []
 	## The Aspects he owns (what the menu may equip), the stat points he has spent ({stat: count}), the ones left to spend, and each stat's cap.
 	var owned_aspects: Array[StringName] = []
 	var stats: Dictionary = {}
@@ -154,6 +159,7 @@ var pending_exit: Dictionary = {}
 var interact_target: Dictionary = {}
 var npc_facing_left: Dictionary = {}  # npc id -> bool
 var training: TrainingYard = null  # the scene's practice post, if it has one
+var skills: ExploreSkills = ExploreSkills.new()
 var mobs: MobField = null  # the scene's encounters, if it has any
 var quests: Dictionary = QuestBook.default_book()  # the village sequence
 var inventory: Dictionary = {}  # item id -> count
@@ -492,8 +498,10 @@ func step(input: InputFrame) -> void:
 		if _aspect_usable(input.skill_pressed):
 			frame.skill_pressed = input.skill_pressed
 	var before: Vector2 = player.position
+	skills.before_player(self)
 	player.step(frame, tick, events)
 	player.position = _clamp(Collision.move_resolved(obstacles, before, player.position, Tuning.PLAYER_RADIUS))
+	skills.after_move(self, before, events)
 	if training != null:
 		training.resolve(self, events)
 	if mobs != null:
@@ -546,7 +554,14 @@ func snapshot() -> ExploreSnapshot:
 	hero.move_speed_mult = player.move_speed_mult()
 	hero.equipped_aspects = player.equipped_aspects.duplicate()
 	hero.sprint_ticks_left = player.sprint_ticks_left
+	hero.skill_id = player.skill_id
+	hero.phantom_ticks_left = player.phantom_ticks_left
+	hero.phantom_pending_echoes = skills.phantom_echoes.size()
+	hero.echo_invuln_ticks = player.echo_invuln_ticks()
+	hero.ward_ticks_left = player.ward_ticks_left if player.state == PlayerState.STATE_WARD else 0
+	hero.ward_stored = player.ward_stored if player.state == PlayerState.STATE_WARD else 0
 	snap.hero = hero
+	skills.fill_snapshot(self, snap)
 	snap.dash_cooldown_ticks = player.dash_cooldown
 	for npc: Dictionary in def.get("npcs", []):
 		var at: Vector2 = npc["position"]
@@ -639,6 +654,7 @@ func _check_defeat(events: Array[GameEvent]) -> void:
 		return
 	var weapon: StringName = player.weapon_id
 	var aspects: Array[StringName] = player.equipped_aspects.duplicate()
+	skills.clear()
 	player = PlayerState.new()
 	player.weapon_id = weapon
 	player.equipped_aspects = aspects
@@ -758,6 +774,11 @@ func _use_switch(target: StringName, events: Array[GameEvent]) -> void:
 func _touches(rect: Rect2) -> bool:
 	var nearest: Vector2 = player.position.clamp(rect.position, rect.end)
 	return nearest.distance_to(player.position) <= Tuning.PLAYER_RADIUS
+
+
+## A point kept inside the scene and out of the solids (the hero's Echo Step arrives here).
+func clamp_to_scene(point: Vector2) -> Vector2:
+	return _clamp(point)
 
 
 func _clamp(point: Vector2) -> Vector2:

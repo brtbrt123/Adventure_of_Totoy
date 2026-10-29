@@ -261,28 +261,55 @@ func _hero_blows(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> 
 			continue
 		mob.last_swing = _swing_serial
 		player.attack_hit_done = true
-		if enc.state == DORMANT:
-			_wake(core, enc, events)
-		var exposed: bool = mob.is_exposed()
 		var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult * float(core.damage_mult())
-		var damage: int = maxi(1, roundi(base * (Tuning.MOB_EXPOSED_MULT if exposed else 1.0)))
-		mob.hp = maxi(0, mob.hp - damage)
-		mob.last_hit_tick = core.tick
-		enc.touched = true
-		events.append(GameEvent.new(GameEvent.ATTACK_HIT, core.tick, {
-			"attacker_id": player.id, "target_id": mob.id, "damage": damage, "kind": &"counter" if exposed else &"normal",
-			"position": mob.position, "combo_index": player.combo_index, "weapon_id": weapon,
-		}))
-		if mob.hp <= 0:
-			_kill(core, enc, mob, events)
-			if enc.state == CLEARED:
-				return
-		elif mob.state == &"windup" and bool(mob.attack_stats()["interrupt"]):
-			mob.telegraph = null
-			mob.cooldown = int(mob.attack_stats()["cooldown"])
-			mob.set_state(&"hurt")
-		elif mob.state in [&"alert", &"chase", &"recover", &"hurt", &"return"]:
-			mob.set_state(&"hurt")
+		var cleared: bool = hit_mob(core, enc, mob, base, {"combo_index": player.combo_index, "weapon_id": weapon}, events)
+		core.skills.on_swing_hit(core, mob.id, base, player.combo_index, weapon)
+		if cleared:
+			return
+
+
+## Every living mob of the encounters that are not cleared, with its encounter: [{"enc", "mob"}]. The hero's skills (aspects)
+## look for their targets here.
+func living() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for enc: Encounter in encounters:
+		if enc.state == CLEARED:
+			continue
+		for mob: Mob in _alive(enc):
+			out.append({"enc": enc, "mob": mob})
+	return out
+
+
+## One hero hit on `mob` of `enc`: wakes a dormant group, an exposed mob takes Tuning.MOB_EXPOSED_MULT (kind counter), the
+## hit may fell it (exp, drop, the group's clear) or interrupt its windup. `base` is the damage before that multiplier;
+## `extra` is merged into the attack_hit event (combo_index, weapon_id, skill_id, ...). Returns true when the hit cleared
+## the whole encounter (the caller stops looking for more targets then).
+func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dictionary, events: Array[GameEvent]) -> bool:
+	var player: PlayerState = core.player
+	if enc.state == DORMANT:
+		_wake(core, enc, events)
+	var exposed: bool = mob.is_exposed()
+	var damage: int = maxi(1, roundi(base * (Tuning.MOB_EXPOSED_MULT if exposed else 1.0)))
+	mob.hp = maxi(0, mob.hp - damage)
+	mob.last_hit_tick = core.tick
+	enc.touched = true
+	var data: Dictionary = {
+		"attacker_id": player.id, "target_id": mob.id, "damage": damage, "kind": &"counter" if exposed else &"normal",
+		"position": mob.position,
+	}
+	data.merge(extra)
+	events.append(GameEvent.new(GameEvent.ATTACK_HIT, core.tick, data))
+	if mob.hp <= 0:
+		_kill(core, enc, mob, events)
+		if enc.state == CLEARED:
+			return true
+	elif mob.state == &"windup" and bool(mob.attack_stats()["interrupt"]):
+		mob.telegraph = null
+		mob.cooldown = int(mob.attack_stats()["cooldown"])
+		mob.set_state(&"hurt")
+	elif mob.state in [&"alert", &"chase", &"recover", &"hurt", &"return"]:
+		mob.set_state(&"hurt")
+	return false
 
 
 func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent]) -> void:
