@@ -377,7 +377,7 @@ func shared_frame() -> void:
 	check(arena.open_menu(), "open")
 	before = UiPanel.drawn
 	await process_frame
-	check(UiPanel.drawn >= before + 2, "the menu does not use the shared frame (panel + description)")
+	check(arena.character_menu.shell != null and arena.character_menu.shell.visible and arena.character_menu.shell.get_node("Panel") is NinePatchRect and arena.character_menu.description_scene.visible, "the menu does not show its frame and description scenes (menu_shell.tscn, menu_description.tscn)")
 	await save("stats")
 	menu.hover_key = &"weapon"
 	await save("stats_weapon")

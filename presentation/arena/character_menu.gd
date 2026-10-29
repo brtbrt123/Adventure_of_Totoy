@@ -25,6 +25,8 @@ const MenuShell := preload("res://presentation/ui/menu_shell.tscn")
 const MenuStatus := preload("res://presentation/ui/menu_status.tscn")
 const MenuAspects := preload("res://presentation/ui/menu_aspects.tscn")
 const MenuQuests := preload("res://presentation/ui/menu_quests.tscn")
+const MenuItems := preload("res://presentation/ui/menu_items.tscn")
+const MenuDescription := preload("res://presentation/ui/menu_description.tscn")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
 const TAB_STATS: int = 0
@@ -101,6 +103,8 @@ var shell: Control = null
 var status_scene: Control = null
 var aspects_scene: Control = null
 var quests_scene: Control = null
+var items_scene: Control = null
+var description_scene: Control = null
 var colors: Dictionary = {}
 var atlas: Texture2D
 var frames: Dictionary = {}
@@ -125,6 +129,10 @@ func _ready() -> void:
 	add_child(aspects_scene)
 	quests_scene = MenuQuests.instantiate()
 	add_child(quests_scene)
+	items_scene = MenuItems.instantiate()
+	add_child(items_scene)
+	description_scene = MenuDescription.instantiate()
+	add_child(description_scene)
 
 
 func open() -> void:
@@ -823,6 +831,44 @@ func _draw() -> void:
 		_draw_description(description_key())
 
 
+## The ITEMS tab's slots and detail card.
+func _sync_items_scene() -> void:
+	items_scene.atlas = atlas
+	items_scene.frames = frames
+	var equipped: StringName = _equipped()
+	var slots: Array = []
+	for index: int in range(GRID_COLS * GRID_ROWS):
+		var weapon: StringName = slot_weapon(index)
+		var aspect: StringName = grid_aspect(index)
+		if aspect != &"":
+			var held: int = aspect_slot_of(aspect)
+			slots.append({"kind": "aspect", "frame": Hud.aspect_icon(aspect), "owned": aspect_owned(aspect), "held": SLOT_LETTERS[held - 1] if held > 0 and aspect_owned(aspect) else ""})
+		elif weapon != &"":
+			var whole: bool = Hud.MEDALLIONS.has(weapon)
+			slots.append({"kind": "weapon", "frame": Hud.MEDALLIONS[weapon] if whole else "ui_weapon_totoy_blade_1", "crop": Rect2(8, 8, 32, 32) if whole else Rect2(), "equipped": weapon == equipped})
+		else:
+			slots.append({"kind": "empty"})
+	var weapon_sel: StringName = slot_weapon(inventory_selection)
+	var aspect_sel: StringName = grid_aspect(inventory_selection)
+	var card: Dictionary = {"kind": "empty"}
+	if aspect_sel != &"":
+		if not aspect_owned(aspect_sel):
+			card = {"kind": "locked"}
+		else:
+			var slot: int = aspect_slot_of(aspect_sel)
+			var cd: int = Aspects.cooldown(aspect_sel)
+			card = {"kind": "aspect", "aspect": Hud.aspect_icon(aspect_sel), "name": Aspects.display_name(aspect_sel),
+				"status": "Slot " + SLOT_LETTERS[slot - 1] if slot > 0 else "Not slotted", "status_color": colors["v"] if slot > 0 else colors["i"],
+				"line1": "%s Edge" % num(Aspects.edge_cost(aspect_sel)) + ("  CD %s s" % secs(cd) if cd > 0 else ""), "line2": "Slot on stats", "line_color": colors["o"]}
+	elif weapon_sel != &"":
+		var lines: Array = card_lines(weapon_sel)
+		var equipped_now: bool = weapon_sel == equipped
+		card = {"kind": "weapon", "katana": not Hud.MEDALLIONS.has(weapon_sel), "medallion": Hud.MEDALLIONS.get(weapon_sel, ""),
+			"name": WEAPON_NAMES[weapon_sel], "status": "Equipped" if equipped_now else "Not equipped",
+			"status_color": colors["v"] if equipped_now else colors["i"], "line1": lines[0], "line2": lines[1], "line_color": colors[lines[2]]}
+	items_scene.apply({"slots": slots, "card": card})
+
+
 ## The ASPECTS tab's numbers: the three sockets and the selected one's name and cost.
 func _sync_aspects_scene() -> void:
 	aspects_scene.atlas = atlas
@@ -843,6 +889,14 @@ func _sync_scenes() -> void:
 	if shell == null:
 		return
 	shell.apply(tab, TAB_NAMES)
+	items_scene.visible = tab == TAB_INVENTORY
+	var describing: bool = tab == TAB_INVENTORY or (tab == TAB_STATS and progression == null)
+	description_scene.visible = describing
+	if describing:
+		var all: Dictionary = descriptions(_equipped(), equipped_aspects())
+		description_scene.apply(all.get(description_key(), all[&"none"]))
+	if tab == TAB_INVENTORY:
+		_sync_items_scene()
 	aspects_scene.visible = tab == TAB_ASPECTS
 	quests_scene.visible = tab == TAB_QUESTS
 	if tab == TAB_ASPECTS:
@@ -1063,66 +1117,8 @@ func _used_rect(key: String) -> Rect2i:
 
 
 func _draw_inventory() -> void:
-	var equipped: StringName = _equipped()
-	for index: int in range(GRID_COLS * GRID_ROWS):
-		var rect: Rect2 = inventory_rect(index)
-		Kit.slot(self, rect, &"normal")
-		if index == inventory_selection:
-			_brackets(rect)
-		var weapon: StringName = slot_weapon(index)
-		var grid_item: StringName = grid_aspect(index)
-		if grid_item != &"":
-			_ui(Hud.aspect_icon(grid_item), Rect2(rect.position + Vector2(6, 6), Vector2(24, 24)))
-			if not aspect_owned(grid_item):
-				draw_rect(rect.grow(-3),Color(colors["0"],0.8))
-				Kit.put(self,"icon_padlock",rect.get_center() - Vector2(4, 5))
-			var held: int = aspect_slot_of(grid_item)
-			if held > 0:
-				_key_badge(rect.position + Vector2(26, 1), SLOT_LETTERS[held - 1])
-			continue
-		if weapon == &"":
-			continue
-		_draw_item_icon(weapon, rect.position + Vector2(2, 2))
-		if weapon == equipped:
-			_equipped_badge(Rect2(rect.position + Vector2(26, 1), Vector2(9, 9)))
-	# the detail card
-	Kit.panel(self, CARD)
-	var cx: float = CARD.get_center().x
-	var top: float = CARD.position.y
-	var weapon: StringName = slot_weapon(inventory_selection)
-	var card_aspect: StringName = grid_aspect(inventory_selection)
-	if card_aspect != &"":
-		_draw_aspect_card(card_aspect, cx)
-		return
-	if weapon == &"":
-		_text(Vector2(cx, top + 48), "EMPTY", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		return
-	_draw_medallion(weapon, Vector2(cx - 24, top + 8))
-	_text(Vector2(cx, top + 62), WEAPON_NAMES[weapon], colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	var equipped_now: bool = weapon == equipped
-	_text(Vector2(cx, top + 71), "EQUIPPED" if equipped_now else "NOT EQUIPPED", colors["v"] if equipped_now else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	draw_rect(Rect2(CARD.position.x + 12, top + 81, CARD.size.x - 24, 1), colors["f"])
-	var lines: Array = card_lines(weapon)
-	_text(Vector2(cx, top + 85), lines[0], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(cx, top + 93), lines[1], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-
-
-## An aspect's card (view-only): its icon in a socket, name, the slot holding it, Edge cost and cooldown.
-func _draw_aspect_card(aspect: StringName, cx: float) -> void:
-	var top: float = CARD.position.y
-	if not aspect_owned(aspect):
-		_text(Vector2(cx, top + 48), "LOCKED", colors["g"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		return
-	var at: Vector2 = Vector2(cx - 18.5, top + 12)
-	Kit.socket(self, at, false)
-	_ui(Hud.aspect_icon(aspect), Kit.socket_icon_rect(at), Vector2(4, 4), Vector2(16, 16))
-	_text(Vector2(cx, top + 62), Aspects.display_name(aspect), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	var slot: int = aspect_slot_of(aspect)
-	_text(Vector2(cx, top + 71), "SLOT " + SLOT_LETTERS[slot - 1] if slot > 0 else "NOT SLOTTED", colors["v"] if slot > 0 else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	draw_rect(Rect2(CARD.position.x + 12, top + 81, CARD.size.x - 24, 1), colors["f"])
-	var cd: int = Aspects.cooldown(aspect)
-	_text(Vector2(cx, top + 85), "%s EDGE" % num(Aspects.edge_cost(aspect)) + ("  CD %s S" % secs(cd) if cd > 0 else ""), colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(cx, top + 93), "SLOT ON STATS", colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	# everything but the selection mark is the scene menu_items.tscn
+	_brackets(inventory_rect(inventory_selection))
 
 
 ## The two lines under the card's divider and their colour symbol: the equip feedback, else how to equip.
@@ -1144,21 +1140,9 @@ func _draw_item_icon(weapon: StringName, at: Vector2) -> void:
 		_ui("ui_weapon_totoy_blade_1", Rect2(at, Vector2(32, 32)))
 
 
-func _draw_description(key: StringName) -> void:
-	var all: Dictionary = descriptions(_equipped(), equipped_aspects())
-	var entry: Array = all.get(key, all[&"none"])
-	UiPanel.draw_panel(self, DESC, &"info", colors, false)
-	var x0: float = DESC.position.x + 10
-	var lines: Array = entry[2]
-	if String(entry[0]).is_empty():
-		_text(Vector2(192, DESC.position.y + 12), lines[0], colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		_text(Vector2(192, DESC.position.y + 26), lines[2], colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		return
-	_text(Vector2(x0, DESC.position.y + 7), entry[0], colors["1"], Hud.menu_font(), 10)
-	_text(Vector2(DESC.end.x - 10, DESC.position.y + 8), entry[1], colors["u"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-	for i: int in range(lines.size()):
-		if not String(lines[i]).is_empty():
-			_text(Vector2(x0, DESC.position.y + 17 + i * 8), lines[i], colors["o"] if i == 2 else colors["j"], null, 7)
+func _draw_description(_key: StringName) -> void:
+	pass  # the scene menu_description.tscn draws it
+
 
 func aspect_owned(aspect: StringName) -> bool:
 	return progression==null or progression.owned_aspects.has(aspect)

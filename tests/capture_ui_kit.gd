@@ -61,6 +61,13 @@ func run() -> void:
 	scene.character_menu.set_tab(1)
 	await frames(4)
 	await save("menu_aspects")
+	scene.character_menu.set_tab(2)
+	scene.character_menu.inventory_selection = 0
+	await frames(4)
+	await save("menu_items")
+	scene.character_menu.inventory_selection = 6
+	await frames(4)
+	await save("menu_items_aspect")
 	scene.character_menu.set_tab(3)
 	await frames(4)
 	await save("menu_quests")
