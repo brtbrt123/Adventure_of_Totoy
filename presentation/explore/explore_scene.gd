@@ -200,6 +200,8 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	dash_ghosts.clear()
 	sprint_trail.clear()
 	wes_fx.clear()
+	aspect_fx.clear()
+	hero_hidden_until = -1
 	_motion_seen = false
 	previous_player_position = snapshot.hero.position
 	hero_hit_tick = -1000
@@ -396,9 +398,11 @@ func _on_event(event: GameEvent) -> void:
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": snapshot.hero.position + Vector2(0,-14), "perfect": false})
 		GameEvent.ATTACK_HIT:
 			# the hero's swing: the same burst, sparks and shake as in the fight (presentation/common/hero_fx.gd)
+			if bool(event.data.get("echo", false)):
+				return  # a Phantom echo is not a swing: its own light effects come from phantom_echo
 			var counter: bool = event.data.get("kind", &"") == &"counter"
-			var finisher: bool = int(event.data.get("combo_index", 0)) >= snapshot.hero.combo_max and snapshot.hero.combo_max > 0
-			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -12), counter, finisher)
+			var finisher: bool = (int(event.data.get("combo_index", 0)) >= snapshot.hero.combo_max and snapshot.hero.combo_max > 0) or event.data.get("skill_id", &"") == &"moon_cleave" or bool(event.data.get("ward_release", false))
+			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -12), counter, finisher, event.data.get("skill_id", event.data.get("aspect_id", &"")))
 		GameEvent.MOB_STAGGERED:
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": false})
 		GameEvent.TRAINING_POST_HIT:
@@ -408,6 +412,14 @@ func _on_event(event: GameEvent) -> void:
 			# kept for the brief parry pose; the picture, sparks and shake come from the shared layer
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": event.data.get("quality", &"") == &"perfect"})
 			on_hero_parry(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -8), event.data.get("quality", &"") == &"perfect")
+		&"lantern_placed", &"lantern_pulse", &"lantern_expired", &"phantom_cut_started", &"phantom_cut_ended", &"phantom_echo":
+			_on_aspect_event(event)
+		&"skill_started":
+			on_hero_skill_event(event)
+			practice_view.audio.cue("skill_" + String(event.data["skill_id"]), event.tick)
+		&"skill_released":
+			if on_hero_skill_event(event):
+				practice_view.audio.cue("release_" + String(event.data["skill_id"]), event.tick)
 		&"sprint_started", &"sprint_ended", &"echo_placed", &"echo_recall", &"echo_expired", &"ward_raised", &"ward_blocked", &"ward_released":
 			_on_ward_echo_sprint(event)
 		GameEvent.TRAINING_HERO_HIT:
@@ -584,6 +596,15 @@ func fx_hero_frame() -> String:
 	return hero_frame
 
 
+func fx_snapshot() -> RefCounted:
+	return snapshot
+
+
+## A mob's body: a little above its feet.
+func fx_target_contact(_target_id: int, fallback: Vector2) -> Vector2:
+	return fallback + Vector2(0, -14)
+
+
 func fx_cue(key: String, tick: int, strength: float = 1.0) -> void:
 	practice_view.audio.cue(key, tick, strength)
 
@@ -688,8 +709,11 @@ func _draw() -> void:
 		draw_texture_rect_region(sprites,Rect2((at-Vector2.ONE*diameter/2).round(),Vector2.ONE*diameter),Rect2(f["x"]+6,f["y"]+6,28,28))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
+	_draw_lantern_ground()
 	_draw_ward_echo_ground()
 	draw_dash_fx()
+	for prop: Dictionary in lantern_drawables() + echo_drawables():
+		_draw_imported(prop["name"], prop["at"], prop["scale"])
 	var items: Array[Dictionary] = drawables()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		# All shadows lie on the floor, never on a lower-sorted prop or actor.
@@ -702,6 +726,7 @@ func _draw() -> void:
 	for item: Dictionary in items:
 		_draw_item(item)
 	_draw_ward_echo_front(shake_offset())
+	_draw_aspects_front()
 	for item: Dictionary in items:
 		if item["kind"] == &"npc" and bubbles.has(item["id"]):
 			_draw_bubble(Vector2(item["at"]) - Vector2(0, float(item["height"]) + 6.0))
@@ -709,6 +734,9 @@ func _draw() -> void:
 		if TelegraphView.warning_visible(tell, snapshot.tick):
 			TelegraphView.draw_marker(self, tell, colors["x"] if tell.kind == &"gold" else colors["z"], colors["0"])
 	draw_hero_impacts()
+	_draw_skill_effect(shake_offset())
+	_draw_skill_projectiles(shake_offset())
+	_draw_skill_contacts()
 	for effect: Dictionary in practice_effects:
 		if effect["type"] in [GameEvent.PARRY_SUCCEEDED, GameEvent.TRAINING_POST_HIT]:
 			continue  # drawn by the shared layer
@@ -762,12 +790,15 @@ func _draw_item(item: Dictionary) -> void:
 		draw_rect(Rect2(at - Vector2(6, 24), Vector2(12, 24)), colors["g"])
 		return
 	var frame: Dictionary = frames[key]
+	if item["kind"] == &"hero" and hero_hidden():
+		return  # an Echo Step arrival's first frame: only the echo flares
 	if item["kind"] == &"hero":
 		_draw_sprint_back(snapshot.hero, at, bool(item["left"]))
 	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
 	var sheet: Texture2D = MobView.WHITE if white else sprites
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
 	if item["kind"] == &"hero":
+		_draw_phantom_glow(snapshot.hero, key, at, bool(item["left"]))
 		_draw_hero_aspect_overlays(snapshot.hero, key, at, bool(item["left"]))
 
 
