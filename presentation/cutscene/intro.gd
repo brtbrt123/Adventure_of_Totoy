@@ -44,6 +44,13 @@ var _skip_requested: bool = false
 var _exit_start_alpha: float = 0.0
 var _caption_lines: Array[String] = []
 var _voice_exit_levels: Array[float] = []
+@onready var picture: TextureRect = $Picture
+@onready var card: NinePatchRect = $CaptionCard
+@onready var caption: Label = $CaptionCard/Caption
+@onready var hint_plate: ColorRect = $HintPlate
+@onready var hint: Label = $HintPlate/Hint
+@onready var flash: ColorRect = $Flash
+@onready var fade: ColorRect = $Fade
 
 
 func _ready() -> void:
@@ -136,7 +143,7 @@ func advance(next_pressed: bool = false, skip_pressed: bool = false) -> void:
 			if hold_ticks >= int(current_beat().get("hold", 300)):
 				_next_beat()
 	_update_audio()
-	queue_redraw()
+	_sync()
 
 
 func _next_beat() -> void:
@@ -167,7 +174,7 @@ func _enter_beat() -> void:
 		audio.ambience_active = str(beat.get("id", "")) in ["weather", "road"]
 		if audio.ambience_active and not audio.ambience.playing and DisplayServer.get_name() != "headless":
 			audio.ambience.play()
-	queue_redraw()
+	_sync()
 
 
 ## Save immediately, even when skipping a transition. Repeated calls never save or route twice.
@@ -190,7 +197,7 @@ func finish(skip: bool = false) -> void:
 	if audio != null:
 		for voice: AudioStreamPlayer in audio.voices:
 			_voice_exit_levels.append(voice.volume_db)
-	queue_redraw()
+	_sync()
 
 
 func _handover() -> void:
@@ -262,29 +269,45 @@ func panel_region() -> Rect2:
 	return Rect2(x, y, 320, 180)
 
 
+## The screen is the editable scene intro.tscn (Backdrop, Picture, CaptionCard with its Caption, HintPlate with its Hint, Flash,
+## Fade): open it in Godot to move or restyle anything. This script only says what each node shows.
 func _draw() -> void:
-	if colors.is_empty():
+	pass  # the arena HUD's drawing is not wanted here; everything on this screen is a node
+
+
+func _sync() -> void:
+	if picture == null or colors.is_empty():
 		return
-	draw_rect(Rect2(0, 0, 384, 216), colors["0"])
 	var effect: String = str(current_beat().get("effect", "fade_in"))
 	# the approved panels are 320x180 pixel art: shown 1:1 in the middle of the 384x216 view, never scaled
 	if overscan != null and effect in ["pan_down", "slow_zoom"]:
-		draw_texture_rect_region(overscan, Rect2(PANEL_ORIGIN, Vector2(320, 180)), panel_region())
-	elif panel != null:
-		draw_texture(panel, PANEL_ORIGIN)
-	var card: Rect2 = caption_rect()
-	UiPanel.draw_panel(self, card, &"info", colors)
+		var crop: AtlasTexture = AtlasTexture.new()
+		crop.atlas = overscan
+		crop.region = panel_region()
+		picture.texture = crop
+	else:
+		picture.texture = panel
+	picture.position = PANEL_ORIGIN
+	var card_rect: Rect2 = caption_rect()
+	card.position = card_rect.position
+	card.size = card_rect.size
+	var shown: PackedStringArray = PackedStringArray()
 	var remaining: int = int(reveal)
-	for i: int in _caption_lines.size():
-		var shown: String = _caption_lines[i].substr(0, maxi(0, remaining))
-		draw_string(ui_font(), Vector2(14, card.position.y + 11 + i * 8), shown, HORIZONTAL_ALIGNMENT_LEFT, -1, CAPTION_SIZE, colors["1"])
-		remaining -= _caption_lines[i].length() + 1
-	var hint: String = "%s: %s   %s: Skip" % [Bindings.action_label("dialogue_next"), "Next" if complete() else "Reveal", Bindings.action_label("dialogue_skip")]
-	var width: float = text_width(hint, 1, ui_font(), 7)
-	draw_rect(Rect2(377 - ceilf(width), 4, ceilf(width) + 3, 10), colors["0"])
-	lettering(Vector2(378 - ceilf(width), 6), hint, colors["p"], 1, ui_font(), 7)
-	if effect == "flash" and beat_ticks < 6 and fade_phase == &"":
-		draw_rect(Rect2(0, 0, 384, 216), Color(colors["p"], (1.0 - float(beat_ticks) / 6.0) * 0.5))
+	for line: String in _caption_lines:
+		shown.append(line.substr(0, maxi(0, remaining)))
+		remaining -= line.length() + 1
+	caption.text = "
+".join(shown)
+	caption.size = card_rect.size - Vector2(18, 6)
+	var hint_text: String = ("%s: %s   %s: Skip" % [Bindings.action_label("dialogue_next"), "Next" if complete() else "Reveal", Bindings.action_label("dialogue_skip")]).to_upper()
+	hint.text = hint_text
+	var width: float = ceilf(hint.get_theme_font("font").get_string_size(hint_text, HORIZONTAL_ALIGNMENT_LEFT, -1, hint.get_theme_font_size("font_size")).x)
+	hint_plate.position = Vector2(377 - width, 4)
+	hint_plate.size = Vector2(width + 3, 10)
+	hint.position = Vector2(1, -1)
+	hint.size = Vector2(width + 1, 12)
+	flash.visible = effect == "flash" and beat_ticks < 6 and fade_phase == &""
+	flash.color = Color(colors["p"], (1.0 - float(beat_ticks) / 6.0) * 0.5)
 	var alpha: float = fade_alpha()
-	if alpha > 0.0:
-		draw_rect(Rect2(0, 0, 384, 216), Color(colors["0"], alpha))
+	fade.visible = alpha > 0.0
+	fade.color = Color(colors["0"], alpha)

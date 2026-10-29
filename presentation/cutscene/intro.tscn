@@ -1,7 +1,87 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://presentation/cutscene/intro.gd" id="1"]
+[ext_resource type="Script" path="res://presentation/cutscene/intro.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="2_fon"]
+[ext_resource type="Texture2D" path="res://presentation/cutscene/panels/intro_01_night_of_lights.png" id="3_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="4_tex"]
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("2_fon")
+variation_opentype = {
+2003265652: 400.0
+}
 
 [node name="Intro" type="Node2D"]
 texture_filter = 1
-script = ExtResource("1")
+script = ExtResource("1_scr")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+color = Color(0.1098, 0.0941, 0.1412, 1)
+
+[node name="Picture" type="TextureRect" parent="."]
+offset_left = 32.0
+offset_top = 18.0
+offset_right = 352.0
+offset_bottom = 198.0
+mouse_filter = 2
+texture = ExtResource("3_tex")
+
+[node name="CaptionCard" type="NinePatchRect" parent="."]
+offset_left = 5.0
+offset_top = 179.0
+offset_right = 379.0
+offset_bottom = 211.0
+texture = ExtResource("4_tex")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Caption" type="Label" parent="CaptionCard"]
+offset_left = 9.0
+offset_top = 4.0
+offset_right = 365.0
+offset_bottom = 29.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_constants/line_spacing = -3
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8
+text = "Every year, on the Night of Returning Lights, six"
+
+[node name="HintPlate" type="ColorRect" parent="."]
+offset_left = 267.0
+offset_top = 4.0
+offset_right = 380.0
+offset_bottom = 14.0
+mouse_filter = 2
+color = Color(0.1098, 0.0941, 0.1412, 1)
+
+[node name="Hint" type="Label" parent="HintPlate"]
+offset_left = 1.0
+offset_top = -1.0
+offset_right = 112.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7
+text = "ENTER: REVEAL   ESCAPE: SKIP"
+horizontal_alignment = 2
+
+[node name="Flash" type="ColorRect" parent="."]
+visible = false
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+color = Color(0.8784, 0.9412, 0.9255, 0.5)
+
+[node name="Fade" type="ColorRect" parent="."]
+visible = false
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+color = Color(0.1098, 0.0941, 0.1412, 0)
