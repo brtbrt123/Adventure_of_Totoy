@@ -1,4 +1,6 @@
+@tool
 extends Control
+const EditorBackdrop := preload("res://presentation/ui/editor_backdrop.gd")
 ## The description box at the bottom of the TAB menu (ITEMS tab and the arena's STATUS tab) as a Godot scene
 ## (menu_description.tscn), drawn behind the menu's own drawing (show_behind_parent). Open the scene in the editor to move
 ## or restyle it; this script only fills in the text.
@@ -6,6 +8,7 @@ extends Control
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	EditorBackdrop.add(self, 2)
 
 
 ## entry: [title, tag, [line, line, line]] as in character_menu.gd's descriptions(); an empty title shows the centred hint.

@@ -1,3 +1,4 @@
+@tool
 extends Control
 ## The TAB menu's frame as a Godot scene (menu_shell.tscn): the dim veil, the big carved panel, the four tabs, the name at
 ## the top right and the footer line. It sits behind the menu's own drawing (show_behind_parent), so the code-drawn

@@ -1,5 +1,6 @@
 @tool
 extends Control
+const EditorBackdrop := preload("res://presentation/ui/editor_backdrop.gd")
 ## The Aspect picker of the TAB menu (menu_picker.tscn): a carved list that opens over the stat list with the title, five
 ## rows (icon, name, Edge cost, key badge and tick) and a scroll bar. It sits above the menu's own drawing. Open the scene in
 ## the editor to move or restyle anything; this script only fills in the rows.
@@ -17,6 +18,7 @@ const SELECTED: Color = Color("24365c")
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	EditorBackdrop.add(self, 0)
 
 
 func _icon(frame: String) -> Texture2D:

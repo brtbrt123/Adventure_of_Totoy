@@ -1,4 +1,6 @@
+@tool
 extends Control
+const EditorBackdrop := preload("res://presentation/ui/editor_backdrop.gd")
 ## The STATUS tab of the explore TAB menu (stat points, aspect sockets, respec) as a Godot scene (menu_status.tscn). It sits
 ## behind the menu's drawing (show_behind_parent): the menu still draws the selection brackets and the aspect picker on
 ## top. Open the scene in the editor to move or restyle any piece; this script only fills in the numbers and icons.
@@ -19,6 +21,7 @@ const DIM: Color = Color(1, 1, 1, 0.45)
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	EditorBackdrop.add(self, 0)
 
 
 func _icon(frame: String) -> Texture2D:

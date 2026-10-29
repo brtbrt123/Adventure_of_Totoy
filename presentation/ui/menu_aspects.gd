@@ -1,4 +1,6 @@
+@tool
 extends Control
+const EditorBackdrop := preload("res://presentation/ui/editor_backdrop.gd")
 ## The ASPECTS tab of the TAB menu as a Godot scene (menu_aspects.tscn), drawn behind the menu's own drawing
 ## (show_behind_parent; the menu still draws the selection brackets and the aspect picker on top). Open the scene in the
 ## editor to move or restyle anything; this script only fills in names and icons.
@@ -17,6 +19,7 @@ const DIM: Color = Color(1, 1, 1, 0.45)
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	EditorBackdrop.add(self, 1)
 
 
 func _icon(frame: String) -> Texture2D:

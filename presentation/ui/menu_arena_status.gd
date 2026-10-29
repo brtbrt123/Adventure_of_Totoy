@@ -1,4 +1,6 @@
+@tool
 extends Control
+const EditorBackdrop := preload("res://presentation/ui/editor_backdrop.gd")
 ## The boss-fight menu's STATUS tab as a Godot scene (menu_arena_status.tscn): the figure box, the weapon medallion and name, the
 ## three Aspect sockets and the stat list. Drawn behind the menu's own drawing (show_behind_parent): the menu still draws
 ## Totoy himself (a clipped sprite), his shadow, the selection brackets and the Aspect picker on top. Open the scene in the
@@ -25,6 +27,7 @@ var _icons: Dictionary = {}
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	EditorBackdrop.add(self, 0)
 
 
 func _icon(frame: String, crop: Rect2 = Rect2()) -> Texture2D:

@@ -1,4 +1,6 @@
+@tool
 extends Control
+const EditorBackdrop := preload("res://presentation/ui/editor_backdrop.gd")
 ## The ITEMS tab of the TAB menu as a Godot scene (menu_items.tscn): the 6x3 slot grid and the detail card on the right.
 ## Drawn behind the menu's own drawing (show_behind_parent; the menu still draws the selection brackets on top). Open the
 ## scene in the editor to move or restyle anything; this script only fills in icons and words.
@@ -15,6 +17,7 @@ const SLOT_COUNT: int = 18
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	EditorBackdrop.add(self, 2)
 
 
 func _icon(frame: String, crop: Rect2 = Rect2()) -> Texture2D:
