@@ -14,6 +14,9 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - Decisions: [[0001-stage1-setup-choices]], [[0002-totoy36-palette]], [[0003-core-test-runner-and-preload]], [[0004-sharp-ui-text]], [[0005-384x216-fantasy-ui]]
 - The rules for agents live in `AGENTS.md` at the project root (not in the vault)
 
+## Shared presentation
+- [[WEAPON_PATHS]]: global weapon trails, glow/particles, finisher correction and regression captures
+
 ## Work in progress
 - [[CLAUDE_TASK_village_playtest_polish]]: roomier training yard, Tovan first sword/unarmed state and reward event; Codex presentation ready
 - [[LAYERED_SCENE_PILOT]]: floor painting plus separate props; prompts for the images

@@ -3,6 +3,8 @@ extends Node2D
 const ExploreCore := preload("res://core/explore_core.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const VillageAudio := preload("res://presentation/explore/village_audio.gd")
+const WeaponPaths := preload("res://presentation/common/weapon_paths.gd")
+const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 var audio: VillageAudio
 var snapshot: ExploreCore.ExploreSnapshot
 var frames: Dictionary = {}
@@ -56,12 +58,10 @@ func slash_effect() -> Dictionary:
 	if snapshot == null:
 		return {}
 	var hero: Snapshots.EntitySnapshot = snapshot.hero
-	if hero.state != &"attack_active" and not (hero.state == &"attack_recovery" and hero.state_ticks < 6):
+	var key: String = WeaponPaths.key(hero, ArenaAnimation.choose(hero, Snapshots.GameSnapshot.new(), {})) if snapshot.armed else ""
+	if key.is_empty():
 		return {}
-	var index: int = mini(5, hero.state_ticks / 2) + 1
-	if hero.state == &"attack_recovery":
-		index = mini(6, 4 + hero.state_ticks / 2)
-	return {"key": "fx_slash_small_%d" % index, "at": hero.position + Vector2(-13 if hero.facing.x < -0.3 else 13, -14), "left": hero.facing.x < -0.3}
+	return {"key": key, "at": hero.position, "left": hero.facing.x < -0.3}
 
 
 func _draw_frame(key: String, at: Vector2, left: bool = false, scale_value: float = 1.0) -> void:
@@ -77,9 +77,8 @@ func _draw_frame(key: String, at: Vector2, left: bool = false, scale_value: floa
 func _draw() -> void:
 	if snapshot == null:
 		return
-	var slash: Dictionary = slash_effect()
-	if not slash.is_empty():
-		_draw_frame(slash["key"], slash["at"], slash["left"], 1.5)
+	# Weapon paths draw once through the shared hero_fx base, at the hero's sorted depth. This node keeps the
+	# practice audio and confirmed impact effects; it must not add a separate road-only swing crescent.
 	for effect: Dictionary in impacts:
 		var age: int = snapshot.tick - int(effect["tick"])
 		if age < 0 or age >= 12:

@@ -1,5 +1,7 @@
 # HANDOFF: Adventure of Totoy (rewritten 2026-10-22 for the next session)
 
+> **Weapon paths (2026-10-29):** approved trails, glow and particles use the shared `hero_fx.gd` base in both arena and exploration. Future hero renderers must call `draw_hero_back`; see [[WEAPON_PATHS]]. The third katana cut was corrected to travel forward over the head.
+
 > **UI update (2026-10-29):** owner approved switching the base view to 384x216 and installing the SpriteCook bronze/teal kit with existing game icons. See decision [[0005-384x216-fantasy-ui]], newest STATUS and live captures in `presentation/review/ui_kit_live/`.
 
 > **Current owner direction (2026-10-27): the clean glade arch/bush/path layout is APPROVED ("yes thats good"). See [CODEX_NEXT_SESSION.md](CODEX_NEXT_SESSION.md) and newest STATUS. Preserve the uncommitted CHAPTER1_PLAN.md edit. Older forest/redo task lists below are historical.**

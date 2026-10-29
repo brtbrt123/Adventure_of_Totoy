@@ -813,8 +813,7 @@ func _draw_item(item: Dictionary) -> void:
 	if item["kind"] == &"hero" and hero_hidden():
 		return  # an Echo Step arrival's first frame: only the echo flares
 	if item["kind"] == &"hero":
-		_draw_sprint_back(snapshot.hero, at, bool(item["left"]))
-		_draw_buff_aura(snapshot.hero, false)
+		draw_hero_back(snapshot.hero, key, at, bool(item["left"]))
 	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
 	var sheet: Texture2D = MobView.WHITE if white else (empowered_sprites if item["kind"] == &"hero" and empowered_sprites != null and black_form_look(snapshot.hero) else sprites)
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])

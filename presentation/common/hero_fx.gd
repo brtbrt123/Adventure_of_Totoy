@@ -15,6 +15,18 @@ const AspectEffects := preload("res://presentation/arena/aspect_effects.gd")
 const Weapons := preload("res://core/weapons.gd")
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
+const WeaponPaths := preload("res://presentation/common/weapon_paths.gd")
+const WeaponPathGlow := preload("res://presentation/common/weapon_path_glow.gd")
+const EMISSIVE_ALPHA: float = preload("res://presentation/common/ambient_fireflies.gd").EMISSIVE_ALPHA
+var weapon_path_glow: WeaponPathGlow
+## Count actual render submissions (capture tests verify both the road and arena use this shared entry point).
+var weapon_path_draws: int = 0
+
+
+func _init() -> void:
+	weapon_path_glow = WeaponPathGlow.new()
+	weapon_path_glow.name = "SharedWeaponGlow"
+	add_child(weapon_path_glow)
 
 var colors: Dictionary = {}
 var frames: Dictionary = {}
@@ -66,6 +78,21 @@ var released_skill_attacks: Dictionary = {}
 
 
 # --- what a scene tells this layer (override in the scene) ---
+
+## All effects behind the hero go through one entry point in every scene. Keep new weapon effects here so a scene
+## cannot accidentally get Sprint/aura but omit regular weapon paths. Draw immediately before the hero's body.
+func draw_hero_back(actor: Snapshots.EntitySnapshot, pose: String, at: Vector2, left: bool) -> void:
+	var path: String = WeaponPaths.key(actor, pose) if fx_playing() else ""
+	if not path.is_empty() and frames.has(path):
+		_draw_anchored(path, at, left, Color(1, 1, 1, EMISSIVE_ALPHA))
+		weapon_path_draws += 1
+	_draw_sprint_back(actor, at, left)
+	_draw_buff_aura(actor, false)
+
+
+## The plan is shared as well as rendering; headless tests can exercise it through either scene's snapshot hooks.
+func hero_weapon_path_key() -> String:
+	return WeaponPaths.key(fx_hero(), fx_hero_frame()) if fx_playing() and not hero_hidden() else ""
 
 func fx_hero() -> Snapshots.EntitySnapshot:
 	return null
@@ -331,11 +358,11 @@ func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE)
 	draw_texture_rect_region(sprites, Rect2(origin.round(), extent * size_scale), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 
 ## A frame by its own anchor, mirrored around it for `left` (the same rule as the hero frames).
-func _draw_anchored(key: String, at: Vector2, left: bool) -> void:
+func _draw_anchored(key: String, at: Vector2, left: bool, tint: Color = Color.WHITE) -> void:
 	if not frames.has(key):
 		return
 	var f: Dictionary = frames[key]
-	draw_texture_rect_region(sprites, ArenaAnimation.destination(at, f, left), Rect2(f["x"], f["y"], f["w"], f["h"]))
+	draw_texture_rect_region(sprites, ArenaAnimation.destination(at, f, left), Rect2(f["x"], f["y"], f["w"], f["h"]), tint)
 
 ## A frame by its own anchor at `scale_px` (1 = native), as _draw_imported does.
 func _draw_scaled(key: String, at: Vector2, scale_px: float) -> void:

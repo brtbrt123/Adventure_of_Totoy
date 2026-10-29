@@ -948,8 +948,7 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 	var destination: Rect2 = ArenaAnimation.destination(at, frame, left)
 	if not silhouette_only:
 		if actor.id == snapshot.player.id:
-			_draw_sprint_back(actor, at, left)
-			_draw_buff_aura(actor, false)
+			draw_hero_back(actor, chosen, at, left)
 			_draw_spin_ring(actor, false)
 		var actor_texture: Texture2D = empowered_sprites if actor.id == snapshot.player.id and black_form_look(actor) else sprites
 		draw_texture_rect_region(actor_texture, destination, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
@@ -1155,9 +1154,8 @@ func _draw_coil_ground() -> void:
 ## Swing arcs, the chain with its flying head, the pull streaks on a dragged golem, dizzy stars over a stunned one, and
 ## the event sequences (clink, poof, stagger burst, sparks, dust).
 func _draw_scythe(shake_offset: Vector2) -> void:
-	var arc: Dictionary = scythe_arc_effect()
-	if not arc.is_empty():
-		_draw_anchored(arc["key"], arc["at"], bool(arc["left"]))
+	# Regular swing trails are drawn by shared draw_hero_back in both the arena and exploration.
+	# Keep only the skill's chain/hook/spin effects here, avoiding an extra arena-only arc over the shared trail.
 	var hero: Snapshots.EntitySnapshot = snapshot.player
 	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
 	for actor: Snapshots.EntitySnapshot in snapshot.entities:
