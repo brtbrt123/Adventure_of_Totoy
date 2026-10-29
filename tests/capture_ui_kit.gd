@@ -111,6 +111,12 @@ func run() -> void:
 	arena.queue_redraw()
 	await frames(3)
 	await save("arena_hud")
+	arena.open_menu()
+	await frames(4)
+	await save("arena_menu_status")
+	arena.character_menu.stats_selection = &"stat_damage"
+	await frames(4)
+	await save("arena_menu_status_row")
 	quit(0)
 
 const InputFrameClass := preload("res://core/input_frame.gd")

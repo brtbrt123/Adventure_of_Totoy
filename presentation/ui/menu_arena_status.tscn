@@ -1,0 +1,1292 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/menu_arena_status.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="3_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/weapon_medallion.png" id="4_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/key_badge.png" id="5_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/aspect_socket_open.png" id="6_tex"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="7_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="8_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("7_fon")
+variation_opentype = {2003265652: 900.0}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("8_fon")
+variation_opentype = {2003265652: 400.0}
+
+[node name="MenuArenaStatus" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+show_behind_parent = true
+script = ExtResource("1_scr")
+
+[node name="FigureFrame" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 16
+offset_top = 36
+offset_right = 74
+offset_bottom = 146
+mouse_filter = 2
+texture = ExtResource("3_tex")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Floor" type="ColorRect" parent="FigureFrame"]
+layout_mode = 0
+offset_left = 3
+offset_top = 90
+offset_right = 55
+offset_bottom = 107
+mouse_filter = 2
+color = Color(0.1843, 0.1961, 0.1922, 1.0)
+
+[node name="FloorLine" type="ColorRect" parent="FigureFrame"]
+layout_mode = 0
+offset_left = 3
+offset_top = 90
+offset_right = 55
+offset_bottom = 91
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+
+[node name="WeaponLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 84
+offset_top = 27
+offset_right = 184
+offset_bottom = 37
+mouse_filter = 2
+text = "WEAPON"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Medallion" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 110
+offset_top = 34
+offset_right = 110
+offset_bottom = 34
+mouse_filter = 2
+texture = ExtResource("4_tex")
+
+[node name="Glyph" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 118
+offset_top = 43
+offset_right = 150
+offset_bottom = 75
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="WholeMedallion" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 110
+offset_top = 36
+offset_right = 158
+offset_bottom = 84
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="EquippedBadge" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 148
+offset_top = 36
+offset_right = 158
+offset_bottom = 46
+mouse_filter = 2
+texture = ExtResource("5_tex")
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Letter" type="Label" parent="EquippedBadge"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 10
+offset_bottom = 10
+mouse_filter = 2
+text = "E"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 7
+
+[node name="WeaponName" type="Label" parent="."]
+layout_mode = 0
+offset_left = 84
+offset_top = 89
+offset_right = 184
+offset_bottom = 99
+mouse_filter = 2
+text = "BLACK KATANA"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="AspectsLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 84
+offset_top = 98
+offset_right = 184
+offset_bottom = 108
+mouse_filter = 2
+text = "ASPECTS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Socket1" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 78
+offset_top = 107
+offset_right = 78
+offset_bottom = 107
+mouse_filter = 2
+texture = ExtResource("6_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket1"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket1"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "Z"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Socket2" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 116
+offset_top = 107
+offset_right = 116
+offset_bottom = 107
+mouse_filter = 2
+texture = ExtResource("6_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket2"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket2"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "X"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Socket3" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 154
+offset_top = 107
+offset_right = 154
+offset_bottom = 107
+mouse_filter = 2
+texture = ExtResource("6_tex")
+
+[node name="Icon" type="TextureRect" parent="Socket3"]
+layout_mode = 0
+offset_left = 11
+offset_top = 10
+offset_right = 27
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Key" type="Label" parent="Socket3"]
+layout_mode = 0
+offset_left = 4
+offset_top = 29
+offset_right = 33
+offset_bottom = 39
+mouse_filter = 2
+text = "C"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
+
+[node name="Row0" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 36
+offset_right = 362
+offset_bottom = 44
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row0"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row0"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row0"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row0"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row0"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row0"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row1" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 44
+offset_right = 362
+offset_bottom = 52
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row1"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row1"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row1"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row1"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row1"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row1"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row2" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 52
+offset_right = 362
+offset_bottom = 60
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row2"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row2"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row2"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row2"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row2"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row2"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row3" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 60
+offset_right = 362
+offset_bottom = 68
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row3"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row3"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row3"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row3"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row3"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row3"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row4" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 68
+offset_right = 362
+offset_bottom = 76
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row4"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row4"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row4"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row4"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row4"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row4"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row5" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 76
+offset_right = 362
+offset_bottom = 84
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row5"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row5"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row5"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row5"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row5"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row5"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row6" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 84
+offset_right = 362
+offset_bottom = 92
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row6"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row6"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row6"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row6"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row6"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row6"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row7" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 92
+offset_right = 362
+offset_bottom = 100
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row7"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row7"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row7"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row7"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row7"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row7"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row8" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 100
+offset_right = 362
+offset_bottom = 108
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row8"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row8"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row8"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row8"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row8"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row8"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row9" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 108
+offset_right = 362
+offset_bottom = 116
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row9"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row9"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row9"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row9"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row9"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row9"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row10" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 116
+offset_right = 362
+offset_bottom = 124
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row10"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row10"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row10"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row10"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row10"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row10"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row11" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 124
+offset_right = 362
+offset_bottom = 132
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row11"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row11"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row11"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row11"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row11"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row11"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false
+
+[node name="Row12" type="Control" parent="."]
+layout_mode = 0
+offset_left = 204
+offset_top = 132
+offset_right = 362
+offset_bottom = 140
+mouse_filter = 2
+
+[node name="Highlight" type="ColorRect" parent="Row12"]
+layout_mode = 0
+offset_left = -2
+offset_top = -1
+offset_right = 158
+offset_bottom = 7
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+visible = false
+
+[node name="Underline" type="ColorRect" parent="Row12"]
+layout_mode = 0
+offset_left = -2
+offset_top = 7
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+visible = false
+
+[node name="Arrow" type="Label" parent="Row12"]
+layout_mode = 0
+offset_left = -1
+offset_top = 0
+offset_right = 5
+offset_bottom = 8
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+visible = false
+
+[node name="Name" type="Label" parent="Row12"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 100
+offset_bottom = 8
+mouse_filter = 2
+text = "DAMAGE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Value" type="Label" parent="Row12"]
+layout_mode = 0
+offset_left = 58
+offset_top = 0
+offset_right = 158
+offset_bottom = 8
+mouse_filter = 2
+text = "10/12/20"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+vertical_alignment = 0
+
+[node name="Rule" type="ColorRect" parent="Row12"]
+layout_mode = 0
+offset_left = 40
+offset_top = 3
+offset_right = 140
+offset_bottom = 4
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+visible = false

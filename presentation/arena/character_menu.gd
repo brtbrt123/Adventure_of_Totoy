@@ -26,6 +26,7 @@ const MenuStatus := preload("res://presentation/ui/menu_status.tscn")
 const MenuAspects := preload("res://presentation/ui/menu_aspects.tscn")
 const MenuQuests := preload("res://presentation/ui/menu_quests.tscn")
 const MenuItems := preload("res://presentation/ui/menu_items.tscn")
+const MenuArenaStatus := preload("res://presentation/ui/menu_arena_status.tscn")
 const MenuDescription := preload("res://presentation/ui/menu_description.tscn")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
@@ -104,6 +105,7 @@ var status_scene: Control = null
 var aspects_scene: Control = null
 var quests_scene: Control = null
 var items_scene: Control = null
+var arena_status_scene: Control = null
 var description_scene: Control = null
 var colors: Dictionary = {}
 var atlas: Texture2D
@@ -131,6 +133,8 @@ func _ready() -> void:
 	add_child(quests_scene)
 	items_scene = MenuItems.instantiate()
 	add_child(items_scene)
+	arena_status_scene = MenuArenaStatus.instantiate()
+	add_child(arena_status_scene)
 	description_scene = MenuDescription.instantiate()
 	add_child(description_scene)
 
@@ -831,6 +835,21 @@ func _draw() -> void:
 		_draw_description(description_key())
 
 
+## The boss-fight STATUS tab's medallion, sockets and stat list.
+func _sync_arena_status_scene() -> void:
+	arena_status_scene.atlas = atlas
+	arena_status_scene.frames = frames
+	var equipped: StringName = _equipped()
+	var lit: StringName = highlighted_key()
+	var sockets: Array = []
+	for i: int in 3:
+		sockets.append({"icon": Hud.aspect_icon(slot_aspect(i + 1)), "key": SLOT_LETTERS[i]})
+	var rows: Array = []
+	for row: Array in stat_rows(equipped):
+		rows.append({"header": row[0] == "header", "name": row[1] if row[0] == "header" else row[0], "value": "" if row[0] == "header" else row[1], "lit": row[0] != "header" and lit == row[2]})
+	arena_status_scene.apply({"whole_medallion": Hud.MEDALLIONS.get(equipped, ""), "weapon_name": WEAPON_NAMES.get(equipped, "WEAPON"), "sockets": sockets, "rows": rows})
+
+
 ## The ITEMS tab's slots and detail card.
 func _sync_items_scene() -> void:
 	items_scene.atlas = atlas
@@ -890,6 +909,9 @@ func _sync_scenes() -> void:
 		return
 	shell.apply(tab, TAB_NAMES)
 	items_scene.visible = tab == TAB_INVENTORY
+	arena_status_scene.visible = tab == TAB_STATS and progression == null
+	if arena_status_scene.visible:
+		_sync_arena_status_scene()
 	var describing: bool = tab == TAB_INVENTORY or (tab == TAB_STATS and progression == null)
 	description_scene.visible = describing
 	if describing:
@@ -958,46 +980,16 @@ func highlighted_key() -> StringName:
 func _draw_stats() -> void:
 	var equipped: StringName = _equipped()
 	var lit: StringName = highlighted_key()
-	# the figure box: Totoy at 2x, holding the equipped weapon, on a stone strip with a shadow
-	Kit.nine(self, "slot_frame", FIGURE)
-	var strip_y: float = FIGURE.end.y - 20
-	draw_rect(Rect2(FIGURE.position.x + 3, strip_y, FIGURE.size.x - 6, 17), colors["e"])
-	draw_rect(Rect2(FIGURE.position.x + 3, strip_y, FIGURE.size.x - 6, 1), colors["f"])
+	# the frame, medallion, sockets and stat list are the scene menu_arena_status.tscn; here only Totoy himself (a clipped
+	# sprite) and his shadow, then the selection marks and the picker
 	var feet: Vector2 = Vector2(FIGURE.get_center().x, FIGURE.end.y - 11)
 	_ellipse(feet, Vector2(13, 3), colors["0"])
 	_draw_figure(figure_frame(equipped), feet)
-	# weapon slot
-	_text(Vector2(MID_X, 28), "WEAPON", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	_draw_medallion(equipped, WEAPON_SLOT.position)
 	if lit == &"weapon":
 		_brackets(WEAPON_SLOT)
-	_equipped_badge(Rect2(WEAPON_SLOT.position + Vector2(38, 0), Vector2(10, 10)))
-	_text(Vector2(MID_X, 90), WEAPON_NAMES.get(equipped, "WEAPON"), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	# aspects
-	_text(Vector2(MID_X, 99), "ASPECTS", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
 	for i: int in range(3):
-		var rect: Rect2 = aspect_rect(i)
-		Kit.socket(self, rect.position, false)
-		_ui(Hud.aspect_icon(slot_aspect(i + 1)), Kit.socket_icon_rect(rect.position), Vector2(4, 4), Vector2(16, 16))
 		if lit == ASPECT_KEYS[i] or picker_slot == i + 1:
-			_brackets(rect)
-		var key_at: Vector2 = Kit.socket_key(rect.position)
-		_text(Vector2(key_at.x, key_at.y - 3), SLOT_LETTERS[i], colors["1"], null, 8, HORIZONTAL_ALIGNMENT_CENTER)
-	# the stat list
-	var y: float = STAT_TOP
-	for row: Array in stat_rows(equipped):
-		if row[0] == "header":
-			var w: float = _text(Vector2(STAT_X0, y), row[1], colors["v"])
-			draw_rect(Rect2(STAT_X0 + w + 4, y + 3, STAT_X1 - STAT_X0 - w - 4, 1), colors["f"])
-		else:
-			var on: bool = lit == row[2]
-			if on:
-				draw_rect(Rect2(STAT_X0 - 2, y - 1, STAT_X1 - STAT_X0 + 3, 8), colors["k"])
-				draw_rect(Rect2(STAT_X0 - 2, y + 7, STAT_X1 - STAT_X0 + 3, 1), colors["1"])
-				_text(Vector2(STAT_X0 - 1, y), ">", colors["1"])
-			_text(Vector2(STAT_X0 + (5 if on else 0), y), row[0], colors["1"] if on else colors["i"])
-			_text(Vector2(STAT_X1, y), row[1], colors["1"] if on else colors["j"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-		y += ROW_STEP
+			_brackets(aspect_rect(i))
 	if picker_open():
 		_draw_picker()
 
