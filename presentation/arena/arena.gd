@@ -16,9 +16,7 @@ const Aspects := preload("res://core/aspects.gd")
 const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
 ## Height above the ground plane where the Reaper's Coil chain flies and bites (the hand is at about this height).
 const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
-const Weapons := preload("res://core/weapons.gd")
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
-const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
@@ -44,10 +42,6 @@ const CharacterMenu := preload("res://presentation/arena/character_menu.gd")
 ## except once for each weapon equip request it sends.
 var character_menu: CharacterMenu
 
-var empowered_sprites: Texture2D
-var buff_textures: Dictionary = {}
-var buff_events: Dictionary = {}
-var buff_transition: Dictionary = {}
 var combat_audio: CombatAudio
 ## Progress is saved only when the game was started from the title screen (it sets this Engine meta).
 var persist: bool = false
@@ -493,26 +487,18 @@ func _on_event(event: GameEvent) -> void:
 	combat_audio.handle_event(event)
 	match event.type:
 		&"weapon_buff_started", &"weapon_buff_ended":
-			var identity: String = "%s:%d:%d" % [event.type, event.tick, int(event.data["entity_id"])]
-			if buff_events.has(identity):
+			var buff: Dictionary = on_hero_weapon_buff(event)
+			if buff.is_empty():
 				return
-			buff_events[identity] = true
-			var started: bool = event.type == &"weapon_buff_started"
-			# Older events have no form: the weapon says which active it was.
-			var form: StringName = StringName(event.data.get("form", Weapons.active_form(StringName(event.data.get("weapon_id", Tuning.WEAPON_BLACK_KATANA)))))
-			var lightning: bool = form == Weapons.FORM_LIGHTNING
-			var coil: bool = form == Weapons.FORM_REAPER_COIL
 			# Each active plays its own cut-in: Lightning Form, Reaper's Coil, else the katana's Black Form.
-			if started:
-				if lightning and lightning_cutin != null:
+			if buff["started"]:
+				if buff["form"] == Weapons.FORM_LIGHTNING and lightning_cutin != null:
 					lightning_cutin.start()
-				elif coil and coil_cutin != null:
+				elif buff["form"] == Weapons.FORM_REAPER_COIL and coil_cutin != null:
 					coil_cutin.start()
-				elif not lightning and not coil and cutin != null:
+				elif buff["form"] not in [Weapons.FORM_LIGHTNING, Weapons.FORM_REAPER_COIL] and cutin != null:
 					cutin.start()
-			buff_transition = {"tick": event.tick, "started": started, "at": snapshot.player.position, "form": form}
-			combat_audio.cue("weapon_buff_start" if started else "weapon_buff_end", event.tick)
-			_burst(snapshot.player.position - Vector2(0, 12), 12 if started else 6, colors["o"] if lightning else (colors["u"] if coil else colors["k"]), 0.8)
+			combat_audio.cue("weapon_buff_start" if buff["started"] else "weapon_buff_end", event.tick)
 		&"lightning_blink":
 			_on_lightning_blink(event)
 		&"lightning_strike":
@@ -980,18 +966,6 @@ func fx_hero_frame() -> String:
 	return String(selected_frames.get(snapshot.player.id, ""))
 
 
-func fx_black_form() -> bool:
-	return black_form_look(snapshot.player)
-
-
-func fx_dark_sprites() -> Texture2D:
-	return empowered_sprites
-
-
-func fx_black_ghost(at: Vector2, left: bool) -> void:
-	_draw_buff_frame("fx_black_aura_back_%d" % (posmod(snapshot.tick / 5, 6) + 1), at, 1, left)
-
-
 func _draw_dash() -> void:
 	draw_dash_fx()
 
@@ -1074,77 +1048,6 @@ func _sound_boss_phase_changed(_event: GameEvent) -> void:
 func _sound_game_result(_event: GameEvent) -> void:
 	combat_audio.set_music_active(false)
 
-
-func weapon_buff_effect() -> Dictionary:
-	return WeaponBuffView.plan(snapshot)
-
-## Binary pixel coverage instead of translucent aura edges.
-func _buff_texture(key: String, level: int) -> Texture2D:
-	var cache_key: String = "%s:%d" % [key, level]
-	if buff_textures.has(cache_key):
-		return buff_textures[cache_key]
-	if not frames.has(key) or level <= 0:
-		return null
-	var f: Dictionary = frames[key]
-	var image: Image = sprites.get_image().get_region(Rect2i(f["x"], f["y"], f["w"], f["h"]))
-	image.convert(Image.FORMAT_RGBA8)
-	if level < 4:
-		for y: int in range(image.get_height()):
-			for x: int in range(image.get_width()):
-				if posmod(x + y * 2, 4) >= level:
-					image.set_pixel(x, y, Color.TRANSPARENT)
-	var texture: Texture2D = ImageTexture.create_from_image(image)
-	buff_textures[cache_key] = texture
-	return texture
-
-func _draw_buff_frame(key: String, at: Vector2, level: int, left: bool) -> void:
-	var texture: Texture2D = _buff_texture(key, level)
-	if texture == null:
-		return
-	var f: Dictionary = frames[key]
-	draw_texture_rect_region(texture, ArenaAnimation.destination(at, f, left), Rect2(0, 0, f["w"], f["h"]))
-
-func _draw_buff_aura(actor: Snapshots.EntitySnapshot, front: bool) -> void:
-	var effect: Dictionary = weapon_buff_effect()
-	if effect.is_empty():
-		return
-	_draw_buff_frame(effect["front" if front else "back"], actor.position, int(effect["level"]), facing_left)
-
-## Match the painted side-view blade rather than rotating independently toward aim.
-func weapon_slash_effect() -> Dictionary:
-	var effect: Dictionary = weapon_buff_effect()
-	if effect.is_empty() or String(effect["slash"]).is_empty():
-		return {}
-	var chosen: String = String(selected_frames.get(snapshot.player.id, ""))
-	if not chosen.begins_with("hero2_attack") and not (snapshot.player.state == &"skill_active" and chosen.begins_with("hero2_dash")):
-		return {}
-	return {"key": effect["slash"], "at": (snapshot.player.position + Vector2(-15 if facing_left else 15, -12)).round(), "left": facing_left, "level": effect["level"]}
-
-func _draw_buff_slash(_shake_offset: Vector2) -> void:
-	var effect: Dictionary = weapon_slash_effect()
-	if effect.is_empty():
-		return
-	# Draw directly in world coordinates, sharing the actor's current canvas transform.
-	_draw_buff_frame(effect["key"], effect["at"], int(effect["level"]), bool(effect["left"]))
-
-func _draw_buff_transition() -> void:
-	if buff_transition.is_empty():
-		return
-	var age: int = snapshot.tick + snapshot.result_ticks - int(buff_transition["tick"])
-	if age < 0 or age >= 12:
-		return
-	var level: int = maxi(1, 4 - age / 3)
-	var at: Vector2 = snapshot.player.position if bool(buff_transition["started"]) else Vector2(buff_transition["at"])
-	if buff_transition.get("form", &"") == Weapons.FORM_LIGHTNING:
-		_draw_buff_frame("fx_lightning_aura_back_%d" % (mini(9, age) + 1), at, level, facing_left)
-		return
-	if buff_transition.get("form", &"") == Weapons.FORM_REAPER_COIL:
-		return  # no aura: the coil's chain and ring are its look
-	_draw_buff_frame("fx_black_aura_back_%d" % (mini(5, age / 2) + 1), at, level, facing_left)
-
-## The darkened Black Form hero and its black dash ghosts: only the katana's buff, never the dagger or the scythe.
-func black_form_look(actor: Snapshots.EntitySnapshot) -> bool:
-	return actor.weapon_buff_active and actor.weapon_id == Tuning.WEAPON_BLACK_KATANA and actor.weapon_form not in [Weapons.FORM_LIGHTNING, Weapons.FORM_REAPER_COIL]
 
 ## Scorch decals of sky strikes, on the floor under everything standing.
 func _draw_lightning_ground() -> void:

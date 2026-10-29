@@ -69,6 +69,31 @@ func run() -> void:
 		check(scene.ward_echo_ground_plan().size() >= 0 and scene.ward_echo_front_plan().size() >= 0, "%s: ward/echo plans build" % aspect)
 		scene.queue_free()
 		await process_frame
+	# the katana's Black Form: the cut-in plays and freezes the road, then the dark hero and aura show
+	Engine.set_meta(Explore.START_META, {"scene": Explore.SceneDefs.WOODLAND_LAYERED})
+	var form: Explore = load("res://presentation/explore/explore_scene.tscn").instantiate()
+	root.add_child(form)
+	form.set_physics_process(false)
+	form.fade_phase = &""
+	await process_frame
+	var flags2: Array[StringName] = [&"received_first_sword", &"debug_all_unlocked"]
+	form.core.set_story_flags(flags2)
+	form.core.player.edge = 100.0
+	var active: InputFrame = InputFrame.new()
+	active.weapon_active_pressed = true
+	form.advance(active)
+	check(form.snapshot.hero.weapon_buff_active, "Black Form started on the road")
+	check(form.cutin.active, "its cut-in is playing")
+	var tick_before: int = form.snapshot.tick
+	for i: int in 200:
+		if form.cutin.active:
+			form.cutin.advance(1.0 / 60.0)
+	check(not form.cutin.active, "the cut-in finishes")
+	check(form.snapshot.tick == tick_before, "the road did not step while it played")
+	check(form.black_form_look(form.snapshot.hero), "the hero has the Black Form look")
+	check(not form.weapon_buff_effect().is_empty(), "the aura plan exists")
+	form.queue_free()
+	await process_frame
 	if failures == 0:
 		print("ROAD ASPECTS OK")
 	quit(1 if failures else 0)

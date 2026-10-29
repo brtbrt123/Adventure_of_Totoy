@@ -180,3 +180,27 @@ func test_the_same_inputs_give_the_same_skill_fight() -> void:
 			core.step(InputFrame.new())
 		results.append("%d|%d|%d" % [_enc(core).mobs[0].hp, core.player.hp, int(core.player.edge)])
 	assert_eq(results[0], results[1])
+
+
+func test_black_form_runs_on_the_road_and_the_boss_actives_refuse() -> void:
+	var core: ExploreCore = _core(Aspects.SPRINT)
+	core.player.edge = Tuning.EDGE_MAX
+	var press: InputFrame = InputFrame.new()
+	press.weapon_active_pressed = true
+	var started: int = 0
+	core.step(press)
+	for e: GameEvent in core.last_events:
+		if e.type == GameEvent.WEAPON_BUFF_STARTED:
+			started += 1
+	assert_eq(started, 1, "the katana's Black Form starts on the road")
+	assert_true(core.snapshot().hero.weapon_buff_active, "the snapshot says it runs")
+	var dagger: ExploreCore = _core(Aspects.SPRINT)
+	dagger.set_loadout(&"dual_dagger", _loadout(Aspects.SPRINT))
+	dagger.player.edge = Tuning.EDGE_MAX
+	dagger.step(press)
+	assert_false(dagger.snapshot().hero.weapon_buff_active, "Lightning Form needs a boss: it does not start here")
+	var scythe: ExploreCore = _core(Aspects.SPRINT)
+	scythe.set_loadout(&"chain_scythe", _loadout(Aspects.SPRINT))
+	scythe.player.edge = Tuning.EDGE_MAX
+	scythe.step(press)
+	assert_false(scythe.snapshot().hero.weapon_buff_active, "Reaper's Coil needs a boss: it does not start here")

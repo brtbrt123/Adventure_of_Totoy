@@ -36,6 +36,7 @@ func clear() -> void:
 ## Before the hero's own step: he must know whether an echo anchor exists (Echo Step needs none, or recalls).
 func before_player(core: RefCounted) -> void:
 	core.player.echo_exists = _player_echo(core) != null
+	core.player.barrage_target_alive = false  # Lightning Form and Reaper's Coil need a boss to aim at; the road has none
 
 
 ## After the hero moved this tick. `player_before` is where he stood before the move (a dash lane sweeps from there).

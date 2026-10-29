@@ -495,6 +495,7 @@ func step(input: InputFrame) -> void:
 			frame.attack_held = input.attack_held and is_unlocked(&"attack")
 			frame.parry_pressed = input.parry_pressed and is_unlocked(&"parry")
 			frame.aim = input.aim
+			frame.weapon_active_pressed = input.weapon_active_pressed  # the weapon's active (Black Form); the targeted ones refuse (no boss here)
 		if _aspect_usable(input.skill_pressed):
 			frame.skill_pressed = input.skill_pressed
 	var before: Vector2 = player.position
@@ -555,6 +556,9 @@ func snapshot() -> ExploreSnapshot:
 	hero.equipped_aspects = player.equipped_aspects.duplicate()
 	hero.sprint_ticks_left = player.sprint_ticks_left
 	hero.skill_id = player.skill_id
+	hero.weapon_buff_active = player.is_buff_active()
+	hero.weapon_buff_ticks_left = player.buff_ticks
+	hero.weapon_form = player.active_form()
 	hero.phantom_ticks_left = player.phantom_ticks_left
 	hero.phantom_pending_echoes = skills.phantom_echoes.size()
 	hero.echo_invuln_ticks = player.echo_invuln_ticks()

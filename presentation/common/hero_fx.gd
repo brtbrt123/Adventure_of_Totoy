@@ -12,6 +12,8 @@ const PlayerState := preload("res://core/player.gd")
 const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 const WardEchoSprintEffects := preload("res://presentation/arena/ward_echo_sprint_effects.gd")
 const AspectEffects := preload("res://presentation/arena/aspect_effects.gd")
+const Weapons := preload("res://core/weapons.gd")
+const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 
 var colors: Dictionary = {}
@@ -43,6 +45,12 @@ var hero_hidden_until: int = -1
 ## Tick of the latest ward_blocked (the barrier shows the absorb flash for a few ticks).
 var ward_absorb_tick: int = -1000
 var previous_player_position: Vector2 = Vector2.ZERO
+## The Black Form hero (a darkened copy of the atlas), the weapon buff's pixel-coverage textures, the weapon_buff_* events
+## already seen, and the latest start/end ({"tick", "started", "at", "form"}) that draws a short aura burst.
+var empowered_sprites: Texture2D
+var buff_textures: Dictionary = {}
+var buff_events: Dictionary = {}
+var buff_transition: Dictionary = {}
 ## A lantern sorts just in front of a body standing on the same ground row (it is placed at the hero's feet and would
 ## otherwise vanish behind his legs); under a pixel, so the whole-pixel draw position does not move.
 const LANTERN_SORT_BIAS: Vector2 = Vector2(0, 0.4)
@@ -194,16 +202,41 @@ func fx_hero_frame() -> String:
 
 ## The Black Form look (a dark hero): the dash afterimages use `fx_dark_sprites()` instead of white ones.
 func fx_black_form() -> bool:
-	return false
+	return black_form_look(fx_hero())
 
 
 func fx_dark_sprites() -> Texture2D:
-	return sprites
+	return empowered_sprites
 
 
-## Extra picture behind a dash afterimage in the Black Form look (the fight draws its dark aura there).
-func fx_black_ghost(_position: Vector2, _left: bool) -> void:
-	pass
+## The dark aura behind a dash afterimage in the Black Form look.
+func fx_black_ghost(at: Vector2, left: bool) -> void:
+	_draw_buff_frame("fx_black_aura_back_%d" % (posmod(fx_tick() / 5, 6) + 1), at, 1, left)
+
+
+## weapon_buff_started / weapon_buff_ended: the aura burst and particles. Returns {"started", "form"} for the scene to play its
+## cut-in and sound, or {} for an event already seen.
+func on_hero_weapon_buff(event: GameEvent) -> Dictionary:
+	var identity: String = "%s:%d:%d" % [event.type, event.tick, int(event.data["entity_id"])]
+	if buff_events.has(identity):
+		return {}
+	buff_events[identity] = true
+	var started: bool = event.type == &"weapon_buff_started"
+	# Older events have no form: the weapon says which active it was.
+	var form: StringName = StringName(event.data.get("form", Weapons.active_form(StringName(event.data.get("weapon_id", Tuning.WEAPON_BLACK_KATANA)))))
+	var lightning: bool = form == Weapons.FORM_LIGHTNING
+	var coil: bool = form == Weapons.FORM_REAPER_COIL
+	buff_transition = {"tick": event.tick, "started": started, "at": fx_hero().position, "form": form}
+	_burst(fx_hero().position - Vector2(0, 12), 12 if started else 6, colors["o"] if lightning else (colors["u"] if coil else colors["k"]), 0.8)
+	return {"started": started, "form": form}
+
+
+## The copies of the atlas the shared effects need (built by tools/art/build_art.py): the white silhouette and the dark hero.
+func load_variant_atlases() -> void:
+	if ResourceLoader.exists("res://art/build/sprites_white.png"):
+		white_sprites = load("res://art/build/sprites_white.png") as Texture2D
+	if ResourceLoader.exists("res://art/build/sprites_dark.png"):
+		empowered_sprites = load("res://art/build/sprites_dark.png") as Texture2D
 
 
 ## The hero's movement for this fresh tick: dash afterimages, footstep and dash dust, the Sprint trail. `was_left` is
@@ -804,3 +837,77 @@ func _on_aspect_event(event: GameEvent) -> void:
 			var contact: Vector2 = fx_target_contact(int(event.data.get("target_id", -1)), Vector2(event.data.get("position", hero.position)))
 			AspectEffects.add(aspect_fx, {"kind": "echo_spark", "tick": tick + AspectEffects.ECHO_SPARK_DELAY, "at": contact.round(), "life": AspectEffects.ECHO_SPARK_DELAY + AspectEffects.sequence_length(AspectEffects.ECHO_SPARK_TICKS)})
 			fx_cue("swing", tick, 0.45)
+
+
+# --- the weapon buff (Black Form, Lightning Form; moved here from the arena) ---
+
+func weapon_buff_effect() -> Dictionary:
+	return WeaponBuffView.plan_for(fx_hero(), fx_tick(), Weapons.active_duration(fx_hero().weapon_id), fx_playing())
+
+## Binary pixel coverage instead of translucent aura edges.
+func _buff_texture(key: String, level: int) -> Texture2D:
+	var cache_key: String = "%s:%d" % [key, level]
+	if buff_textures.has(cache_key):
+		return buff_textures[cache_key]
+	if not frames.has(key) or level <= 0:
+		return null
+	var f: Dictionary = frames[key]
+	var image: Image = sprites.get_image().get_region(Rect2i(f["x"], f["y"], f["w"], f["h"]))
+	image.convert(Image.FORMAT_RGBA8)
+	if level < 4:
+		for y: int in range(image.get_height()):
+			for x: int in range(image.get_width()):
+				if posmod(x + y * 2, 4) >= level:
+					image.set_pixel(x, y, Color.TRANSPARENT)
+	var texture: Texture2D = ImageTexture.create_from_image(image)
+	buff_textures[cache_key] = texture
+	return texture
+
+func _draw_buff_frame(key: String, at: Vector2, level: int, left: bool) -> void:
+	var texture: Texture2D = _buff_texture(key, level)
+	if texture == null:
+		return
+	var f: Dictionary = frames[key]
+	draw_texture_rect_region(texture, ArenaAnimation.destination(at, f, left), Rect2(0, 0, f["w"], f["h"]))
+
+func _draw_buff_aura(actor: Snapshots.EntitySnapshot, front: bool) -> void:
+	var effect: Dictionary = weapon_buff_effect()
+	if effect.is_empty():
+		return
+	_draw_buff_frame(effect["front" if front else "back"], actor.position, int(effect["level"]), facing_left)
+
+## Match the painted side-view blade rather than rotating independently toward aim.
+func weapon_slash_effect() -> Dictionary:
+	var effect: Dictionary = weapon_buff_effect()
+	if effect.is_empty() or String(effect["slash"]).is_empty():
+		return {}
+	var chosen: String = fx_hero_frame()
+	if not chosen.begins_with("hero2_attack") and not (fx_hero().state == &"skill_active" and chosen.begins_with("hero2_dash")):
+		return {}
+	return {"key": effect["slash"], "at": (fx_hero().position + Vector2(-15 if facing_left else 15, -12)).round(), "left": facing_left, "level": effect["level"]}
+
+func _draw_buff_slash(_shake_offset: Vector2) -> void:
+	var effect: Dictionary = weapon_slash_effect()
+	if effect.is_empty():
+		return
+	# Draw directly in world coordinates, sharing the actor's current canvas transform.
+	_draw_buff_frame(effect["key"], effect["at"], int(effect["level"]), bool(effect["left"]))
+
+func _draw_buff_transition() -> void:
+	if buff_transition.is_empty():
+		return
+	var age: int = fx_tick() + fx_result_ticks() - int(buff_transition["tick"])
+	if age < 0 or age >= 12:
+		return
+	var level: int = maxi(1, 4 - age / 3)
+	var at: Vector2 = fx_hero().position if bool(buff_transition["started"]) else Vector2(buff_transition["at"])
+	if buff_transition.get("form", &"") == Weapons.FORM_LIGHTNING:
+		_draw_buff_frame("fx_lightning_aura_back_%d" % (mini(9, age) + 1), at, level, facing_left)
+		return
+	if buff_transition.get("form", &"") == Weapons.FORM_REAPER_COIL:
+		return  # no aura: the coil's chain and ring are its look
+	_draw_buff_frame("fx_black_aura_back_%d" % (mini(5, age / 2) + 1), at, level, facing_left)
+
+## The darkened Black Form hero and its black dash ghosts: only the katana's buff, never the dagger or the scythe.
+func black_form_look(actor: Snapshots.EntitySnapshot) -> bool:
+	return actor.weapon_buff_active and actor.weapon_id == Tuning.WEAPON_BLACK_KATANA and actor.weapon_form not in [Weapons.FORM_LIGHTNING, Weapons.FORM_REAPER_COIL]

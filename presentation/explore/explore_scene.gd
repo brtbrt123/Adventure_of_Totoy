@@ -97,6 +97,9 @@ var profile: SaveProfile = null
 var loadout_core: GameCore
 var character_menu: CharacterMenu
 var missing_frames: Dictionary = {}
+## The katana's Black Form cut-in (drawn on the HUD layer). While it plays the road does not step the core.
+const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
+var cutin: BlackFormCutIn
 var intro_arrival_ticks: int = 0
 var transitions: int = 0  # scene changes done (tests)
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
@@ -116,8 +119,10 @@ func _ready() -> void:
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
 	sprites = load("res://art/build/sprites.png") as Texture2D
-	if ResourceLoader.exists("res://art/build/sprites_white.png"):
-		white_sprites = load("res://art/build/sprites_white.png") as Texture2D
+	load_variant_atlases()
+	cutin = BlackFormCutIn.new()
+	cutin.position = Vector2(32, 18)
+	$HUD.add_child(cutin)
 	var manifest: Dictionary = _read_json(NPC_MANIFEST)
 	var states: Dictionary = manifest.get("states", {})
 	for npc_name: String in states:
@@ -201,6 +206,10 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	sprint_trail.clear()
 	wes_fx.clear()
 	aspect_fx.clear()
+	buff_events.clear()
+	buff_transition.clear()
+	if cutin != null:
+		cutin.stop()
 	hero_hidden_until = -1
 	_motion_seen = false
 	previous_player_position = snapshot.hero.position
@@ -243,7 +252,10 @@ func _save_progress(scene: StringName, checkpoint: StringName) -> void:
 		SaveStore.save(profile)
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	if cutin != null and cutin.active:
+		cutin.advance(delta)
+		return
 	if snapshot != null and snapshot.defeated:
 		advance(InputFrame.new())
 		return
@@ -414,6 +426,12 @@ func _on_event(event: GameEvent) -> void:
 			on_hero_parry(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -8), event.data.get("quality", &"") == &"perfect")
 		&"lantern_placed", &"lantern_pulse", &"lantern_expired", &"phantom_cut_started", &"phantom_cut_ended", &"phantom_echo":
 			_on_aspect_event(event)
+		&"weapon_buff_started", &"weapon_buff_ended":
+			var buff: Dictionary = on_hero_weapon_buff(event)
+			if not buff.is_empty():
+				if buff["started"] and cutin != null:
+					cutin.start()
+				practice_view.audio.cue("weapon_buff_start" if buff["started"] else "weapon_buff_end", event.tick)
 		&"skill_started":
 			on_hero_skill_event(event)
 			practice_view.audio.cue("skill_" + String(event.data["skill_id"]), event.tick)
@@ -737,6 +755,8 @@ func _draw() -> void:
 	_draw_skill_effect(shake_offset())
 	_draw_skill_projectiles(shake_offset())
 	_draw_skill_contacts()
+	_draw_buff_slash(shake_offset())
+	_draw_buff_transition()
 	for effect: Dictionary in practice_effects:
 		if effect["type"] in [GameEvent.PARRY_SUCCEEDED, GameEvent.TRAINING_POST_HIT]:
 			continue  # drawn by the shared layer
@@ -794,11 +814,13 @@ func _draw_item(item: Dictionary) -> void:
 		return  # an Echo Step arrival's first frame: only the echo flares
 	if item["kind"] == &"hero":
 		_draw_sprint_back(snapshot.hero, at, bool(item["left"]))
+		_draw_buff_aura(snapshot.hero, false)
 	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
-	var sheet: Texture2D = MobView.WHITE if white else sprites
+	var sheet: Texture2D = MobView.WHITE if white else (empowered_sprites if item["kind"] == &"hero" and empowered_sprites != null and black_form_look(snapshot.hero) else sprites)
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
 	if item["kind"] == &"hero":
 		_draw_phantom_glow(snapshot.hero, key, at, bool(item["left"]))
+		_draw_buff_aura(snapshot.hero, true)
 		_draw_hero_aspect_overlays(snapshot.hero, key, at, bool(item["left"]))
 
 
