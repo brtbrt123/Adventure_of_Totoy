@@ -1,73 +1,67 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene format=3 uid="uid://daam17pf16777"]
 
 [ext_resource type="Script" path="res://presentation/ui/arena_strip.gd" id="1_scr"]
-[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/weapon_medallion.png" id="3_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/button_normal.png" id="4_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/health_bar_frame.png" id="5_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/fill_ghost.png" id="6_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/fill_health.png" id="7_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/thin_bar_frame.png" id="8_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/fill_edge_thin.png" id="9_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/fill_exp_thin.png" id="10_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="11_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/aspect_socket_open.png" id="12_tex"]
-[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="13_fon"]
-[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="14_fon"]
-
-[sub_resource type="FontVariation" id="cinzel"]
-base_font = ExtResource("13_fon")
-variation_opentype = {2003265652: 900.0}
+[ext_resource type="FontFile" uid="uid://bpdmvxnu2ubib" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" uid="uid://ldwvoh6kfrav" path="res://art/ui_kit/weapon_medallion.png" id="3_tex"]
+[ext_resource type="Texture2D" uid="uid://b7cjht10qtx7j" path="res://art/ui_kit/button_normal.png" id="4_tex"]
+[ext_resource type="Texture2D" uid="uid://dtmwjrhnvo3w7" path="res://art/ui_kit/health_bar_frame.png" id="5_tex"]
+[ext_resource type="Texture2D" uid="uid://cta1x16uvxsai" path="res://art/ui_kit/fill_ghost.png" id="6_tex"]
+[ext_resource type="Texture2D" uid="uid://bdxlqy42i6spx" path="res://art/ui_kit/fill_health.png" id="7_tex"]
+[ext_resource type="Texture2D" uid="uid://bi2ys6f1o5u15" path="res://art/ui_kit/thin_bar_frame.png" id="8_tex"]
+[ext_resource type="Texture2D" uid="uid://v4ithi24ewgg" path="res://art/ui_kit/fill_edge_thin.png" id="9_tex"]
+[ext_resource type="Texture2D" uid="uid://bpmoto53glfxk" path="res://art/ui_kit/fill_exp_thin.png" id="10_tex"]
+[ext_resource type="Texture2D" uid="uid://bu7rys2wkil6j" path="res://art/ui_kit/slot_frame.png" id="11_tex"]
+[ext_resource type="Texture2D" uid="uid://d2a2guxdbvixr" path="res://art/ui_kit/aspect_socket_open.png" id="12_tex"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="14_fon"]
 
 [sub_resource type="FontVariation" id="pixel"]
 base_font = ExtResource("14_fon")
-variation_opentype = {2003265652: 400.0}
+variation_opentype = {
+2003265652: 400.0
+}
 
-[node name="ArenaStrip" type="Control"]
+[node name="ArenaStrip" type="Control" unique_id=1643309475]
+show_behind_parent = true
 layout_mode = 3
 anchors_preset = 0
 offset_right = 384.0
 offset_bottom = 216.0
 mouse_filter = 2
-show_behind_parent = true
 script = ExtResource("1_scr")
 
-[node name="Medallion" type="TextureRect" parent="."]
+[node name="Medallion" type="TextureRect" parent="." unique_id=406041541]
 layout_mode = 0
-offset_left = 4
-offset_top = 162
-offset_right = 4
-offset_bottom = 162
+offset_left = 4.0
+offset_top = 162.0
+offset_right = 4.0
+offset_bottom = 162.0
 mouse_filter = 2
 texture = ExtResource("3_tex")
 
-[node name="Glyph" type="TextureRect" parent="."]
+[node name="Glyph" type="TextureRect" parent="." unique_id=69254251]
 layout_mode = 0
-offset_left = 12
-offset_top = 171
-offset_right = 44
-offset_bottom = 203
+offset_left = 12.0
+offset_top = 171.0
+offset_right = 44.0
+offset_bottom = 203.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="WholeMedallion" type="TextureRect" parent="."]
+[node name="WholeMedallion" type="TextureRect" parent="." unique_id=1359337483]
 layout_mode = 0
-offset_left = 4
-offset_top = 164
-offset_right = 52
-offset_bottom = 212
+offset_left = 4.0
+offset_top = 164.0
+offset_right = 52.0
+offset_bottom = 212.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="NamePlate" type="NinePatchRect" parent="."]
+[node name="NamePlate" type="NinePatchRect" parent="." unique_id=1626180218]
 layout_mode = 0
-offset_left = 6
-offset_top = 203
-offset_right = 50
-offset_bottom = 215
-mouse_filter = 2
+offset_left = 6.0
+offset_top = 203.0
+offset_right = 50.0
+offset_bottom = 215.0
 texture = ExtResource("4_tex")
 patch_margin_left = 6
 patch_margin_top = 6
@@ -76,193 +70,162 @@ patch_margin_bottom = 6
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Name" type="Label" parent="NamePlate"]
+[node name="Name" type="Label" parent="NamePlate" unique_id=1985599529]
 layout_mode = 0
-offset_left = 0
-offset_top = 1
-offset_right = 44
-offset_bottom = 11
-mouse_filter = 2
+offset_top = 1.0
+offset_right = 44.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 6
 text = "BLACK"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 6
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
 
-[node name="HealthLabel" type="Label" parent="."]
+[node name="HealthLabel" type="Label" parent="." unique_id=1517395174]
 layout_mode = 0
-offset_left = 60
-offset_top = 171
-offset_right = 100
-offset_bottom = 181
-mouse_filter = 2
-text = "HEALTH"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+offset_left = 60.0
+offset_top = 171.0
+offset_right = 100.0
+offset_bottom = 181.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 7
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "HEALTH"
 
-[node name="HealthValue" type="Label" parent="."]
+[node name="HealthValue" type="Label" parent="." unique_id=1598255988]
 layout_mode = 0
-offset_left = 110
-offset_top = 170
-offset_right = 192
-offset_bottom = 181
-mouse_filter = 2
+offset_left = 110.0
+offset_top = 170.0
+offset_right = 192.0
+offset_bottom = 181.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
 text = "100 / 100"
 horizontal_alignment = 2
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 8
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
 
-[node name="HealthBar" type="NinePatchRect" parent="."]
+[node name="HealthBar" type="NinePatchRect" parent="." unique_id=859373448]
 layout_mode = 0
-offset_left = 58
-offset_top = 182
-offset_right = 194
-offset_bottom = 196
-mouse_filter = 2
+offset_left = 58.0
+offset_top = 182.0
+offset_right = 194.0
+offset_bottom = 196.0
 texture = ExtResource("5_tex")
 patch_margin_left = 14
-patch_margin_top = 0
 patch_margin_right = 13
-patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Ghost" type="NinePatchRect" parent="HealthBar"]
+[node name="Ghost" type="NinePatchRect" parent="HealthBar" unique_id=2027356760]
 layout_mode = 0
-offset_left = 11
-offset_top = 3
-offset_right = 125
-offset_bottom = 11
-mouse_filter = 2
+offset_left = 11.0
+offset_top = 3.0
+offset_right = 125.0
+offset_bottom = 11.0
 texture = ExtResource("6_tex")
 patch_margin_left = 2
-patch_margin_top = 0
 patch_margin_right = 4
-patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Fill" type="NinePatchRect" parent="HealthBar"]
+[node name="Fill" type="NinePatchRect" parent="HealthBar" unique_id=1672998352]
 layout_mode = 0
-offset_left = 11
-offset_top = 3
-offset_right = 125
-offset_bottom = 11
-mouse_filter = 2
+offset_left = 11.0
+offset_top = 3.0
+offset_right = 125.0
+offset_bottom = 11.0
 texture = ExtResource("7_tex")
 patch_margin_left = 2
-patch_margin_top = 0
 patch_margin_right = 4
-patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="EdgeLabel" type="Label" parent="."]
+[node name="EdgeLabel" type="Label" parent="." unique_id=1111687176]
 layout_mode = 0
-offset_left = 60
-offset_top = 195
-offset_right = 100
-offset_bottom = 203
-mouse_filter = 2
-text = "EDGE"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+offset_left = 60.0
+offset_top = 195.0
+offset_right = 100.0
+offset_bottom = 203.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 6
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "EDGE"
 
-[node name="EdgeBar" type="NinePatchRect" parent="."]
+[node name="EdgeBar" type="NinePatchRect" parent="." unique_id=1929370671]
 layout_mode = 0
-offset_left = 58
-offset_top = 203
-offset_right = 142
-offset_bottom = 212
-mouse_filter = 2
+offset_left = 58.0
+offset_top = 203.0
+offset_right = 142.0
+offset_bottom = 212.0
 texture = ExtResource("8_tex")
 patch_margin_left = 4
-patch_margin_top = 0
 patch_margin_right = 4
-patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Fill" type="NinePatchRect" parent="EdgeBar"]
+[node name="Fill" type="NinePatchRect" parent="EdgeBar" unique_id=2021539093]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 81
-offset_bottom = 7
-mouse_filter = 2
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 81.0
+offset_bottom = 7.0
 texture = ExtResource("9_tex")
 patch_margin_left = 1
-patch_margin_top = 0
 patch_margin_right = 2
-patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="DashLabel" type="Label" parent="."]
+[node name="DashLabel" type="Label" parent="." unique_id=46251882]
 layout_mode = 0
-offset_left = 158
-offset_top = 195
-offset_right = 188
-offset_bottom = 203
-mouse_filter = 2
-text = "DASH"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+offset_left = 158.0
+offset_top = 195.0
+offset_right = 188.0
+offset_bottom = 203.0
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 6
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "DASH"
 
-[node name="DashBar" type="NinePatchRect" parent="."]
+[node name="DashBar" type="NinePatchRect" parent="." unique_id=1491699616]
 layout_mode = 0
-offset_left = 156
-offset_top = 203
-offset_right = 194
-offset_bottom = 212
-mouse_filter = 2
+offset_left = 156.0
+offset_top = 203.0
+offset_right = 194.0
+offset_bottom = 212.0
 texture = ExtResource("8_tex")
 patch_margin_left = 4
-patch_margin_top = 0
 patch_margin_right = 4
-patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Fill" type="NinePatchRect" parent="DashBar"]
+[node name="Fill" type="NinePatchRect" parent="DashBar" unique_id=1149425621]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 35
-offset_bottom = 7
-mouse_filter = 2
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 35.0
+offset_bottom = 7.0
 texture = ExtResource("10_tex")
 patch_margin_left = 1
-patch_margin_top = 0
 patch_margin_right = 2
-patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Status1" type="NinePatchRect" parent="."]
+[node name="Status1" type="NinePatchRect" parent="." unique_id=1425140722]
 layout_mode = 0
-offset_left = 84
-offset_top = 146
-offset_right = 110
-offset_bottom = 172
-mouse_filter = 2
+offset_left = 84.0
+offset_top = 146.0
+offset_right = 110.0
+offset_bottom = 172.0
 texture = ExtResource("11_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -271,23 +234,21 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Icon" type="TextureRect" parent="Status1"]
+[node name="Icon" type="TextureRect" parent="Status1" unique_id=1216658329]
 layout_mode = 0
-offset_left = 4
-offset_top = 4
-offset_right = 22
-offset_bottom = 22
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 22.0
+offset_bottom = 22.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Status2" type="NinePatchRect" parent="."]
+[node name="Status2" type="NinePatchRect" parent="." unique_id=1249035227]
 layout_mode = 0
-offset_left = 110
-offset_top = 146
-offset_right = 136
-offset_bottom = 172
-mouse_filter = 2
+offset_left = 110.0
+offset_top = 146.0
+offset_right = 136.0
+offset_bottom = 172.0
 texture = ExtResource("11_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -296,23 +257,21 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Icon" type="TextureRect" parent="Status2"]
+[node name="Icon" type="TextureRect" parent="Status2" unique_id=1668941623]
 layout_mode = 0
-offset_left = 4
-offset_top = 4
-offset_right = 22
-offset_bottom = 22
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 22.0
+offset_bottom = 22.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Status3" type="NinePatchRect" parent="."]
+[node name="Status3" type="NinePatchRect" parent="." unique_id=230197223]
 layout_mode = 0
-offset_left = 136
-offset_top = 146
-offset_right = 162
-offset_bottom = 172
-mouse_filter = 2
+offset_left = 136.0
+offset_top = 146.0
+offset_right = 162.0
+offset_bottom = 172.0
 texture = ExtResource("11_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -321,153 +280,140 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Icon" type="TextureRect" parent="Status3"]
+[node name="Icon" type="TextureRect" parent="Status3" unique_id=798853519]
 layout_mode = 0
-offset_left = 4
-offset_top = 4
-offset_right = 22
-offset_bottom = 22
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 22.0
+offset_bottom = 22.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Socket1" type="TextureRect" parent="."]
+[node name="Socket1" type="TextureRect" parent="." unique_id=1632707594]
 layout_mode = 0
-offset_left = 268
-offset_top = 172
-offset_right = 268
-offset_bottom = 172
+offset_left = 268.0
+offset_top = 172.0
+offset_right = 268.0
+offset_bottom = 172.0
 mouse_filter = 2
 texture = ExtResource("12_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket1"]
+[node name="Icon" type="TextureRect" parent="Socket1" unique_id=1409288320]
 layout_mode = 0
-offset_left = 11
-offset_top = 10
-offset_right = 27
-offset_bottom = 26
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Key" type="Label" parent="Socket1"]
+[node name="Key" type="Label" parent="Socket1" unique_id=1907815952]
 layout_mode = 0
-offset_left = 4
-offset_top = 29
-offset_right = 33
-offset_bottom = 39
-mouse_filter = 2
+offset_left = 4.0
+offset_top = 29.0
+offset_right = 33.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 8
 
-[node name="Cost" type="Label" parent="Socket1"]
+[node name="Cost" type="Label" parent="Socket1" unique_id=422968769]
 layout_mode = 0
-offset_left = -4
-offset_top = -9
-offset_right = 41
-offset_bottom = 0
-mouse_filter = 2
-text = "20E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+offset_left = -4.0
+offset_top = -9.0
+offset_right = 41.0
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 7
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "20E"
+horizontal_alignment = 1
 
-[node name="Socket2" type="TextureRect" parent="."]
+[node name="Socket2" type="TextureRect" parent="." unique_id=324087448]
 layout_mode = 0
-offset_left = 306
-offset_top = 172
-offset_right = 306
-offset_bottom = 172
+offset_left = 306.0
+offset_top = 172.0
+offset_right = 306.0
+offset_bottom = 172.0
 mouse_filter = 2
 texture = ExtResource("12_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket2"]
+[node name="Icon" type="TextureRect" parent="Socket2" unique_id=2022017369]
 layout_mode = 0
-offset_left = 11
-offset_top = 10
-offset_right = 27
-offset_bottom = 26
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Key" type="Label" parent="Socket2"]
+[node name="Key" type="Label" parent="Socket2" unique_id=1955069824]
 layout_mode = 0
-offset_left = 4
-offset_top = 29
-offset_right = 33
-offset_bottom = 39
-mouse_filter = 2
+offset_left = 4.0
+offset_top = 29.0
+offset_right = 33.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
 text = "X"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 8
 
-[node name="Cost" type="Label" parent="Socket2"]
+[node name="Cost" type="Label" parent="Socket2" unique_id=1329277032]
 layout_mode = 0
-offset_left = -4
-offset_top = -9
-offset_right = 41
-offset_bottom = 0
-mouse_filter = 2
-text = "20E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+offset_left = -4.0
+offset_top = -9.0
+offset_right = 41.0
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 7
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "20E"
+horizontal_alignment = 1
 
-[node name="Socket3" type="TextureRect" parent="."]
+[node name="Socket3" type="TextureRect" parent="." unique_id=606757594]
 layout_mode = 0
-offset_left = 344
-offset_top = 172
-offset_right = 344
-offset_bottom = 172
+offset_left = 344.0
+offset_top = 172.0
+offset_right = 344.0
+offset_bottom = 172.0
 mouse_filter = 2
 texture = ExtResource("12_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket3"]
+[node name="Icon" type="TextureRect" parent="Socket3" unique_id=1316124191]
 layout_mode = 0
-offset_left = 11
-offset_top = 10
-offset_right = 27
-offset_bottom = 26
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Key" type="Label" parent="Socket3"]
+[node name="Key" type="Label" parent="Socket3" unique_id=790429866]
 layout_mode = 0
-offset_left = 4
-offset_top = 29
-offset_right = 33
-offset_bottom = 39
-mouse_filter = 2
-text = "C"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 4.0
+offset_top = 29.0
+offset_right = 33.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 8
-
-[node name="Cost" type="Label" parent="Socket3"]
-layout_mode = 0
-offset_left = -4
-offset_top = -9
-offset_right = 41
-offset_bottom = 0
-mouse_filter = 2
-text = "20E"
+text = "C"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
+
+[node name="Cost" type="Label" parent="Socket3" unique_id=144650253]
+layout_mode = 0
+offset_left = -4.0
+offset_top = -9.0
+offset_right = 41.0
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 7
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "20E"
+horizontal_alignment = 1

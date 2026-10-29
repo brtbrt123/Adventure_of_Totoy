@@ -5,10 +5,10 @@ const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
 const Kit := preload("res://presentation/common/ui_kit.gd")
-const ArenaStrip := preload("res://presentation/ui/arena_strip.tscn")
+const HudStrip := preload("res://presentation/ui/hud_strip.tscn")
 const Aspects := preload("res://core/aspects.gd")
 var snapshot: Snapshots.GameSnapshot
-## The fight HUD's fixed pieces (presentation/ui/arena_strip.tscn), made when the fight HUD first draws.
+## The HUD strip (presentation/ui/hud_strip.tscn, the same scene the road uses), made when the fight HUD first draws.
 var arena_strip: Control = null
 var colors: Dictionary = {}
 var debug_enabled: bool = false
@@ -345,7 +345,8 @@ func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	if portrait_sprite != null:
 		portrait_sprite.hide()
 	if arena_strip == null:
-		arena_strip = ArenaStrip.instantiate()
+		arena_strip = HudStrip.instantiate()
+		arena_strip.show_behind_parent = true  # the rings and seconds drawn by this script go on top
 		add_child(arena_strip)
 	arena_strip.atlas = portrait_atlas
 	arena_strip.frames = ui_frames
@@ -354,14 +355,13 @@ func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	for row: Dictionary in skill_rows(h, snapshot.tick):
 		if bool(row["running"]):
 			status.append(row["icon"])
-	var rows: Array[Dictionary] = skill_rows(h, snapshot.tick)
-	var sockets: Array = []
-	for row: Dictionary in rows:
-		sockets.append({"icon": row["icon"], "key": row["key"], "cost": "%dE" % int(row["cost"]), "cost_color": colors["v"] if h.edge >= float(row["cost"]) else colors["i"]})
+	var aspects: Array = []
+	for row: Dictionary in skill_rows(h, snapshot.tick):
+		aspects.append({"unlocked": true, "owned": true, "usable": true, "icon": row["icon"], "key": row["key"], "cost": "%dE" % int(row["cost"]), "cost_color": colors["v"] if h.edge >= float(row["cost"]) else colors["i"]})
 	arena_strip.apply({
-		"whole_medallion": MEDALLIONS.get(weapon, ""), "glyph": weapon_icon_key, "plate": weapon_label(weapon),
+		"whole_medallion": MEDALLIONS.get(weapon, ""), "weapon_glyph": weapon_icon_key, "armed": true, "plate": weapon_label(weapon),
 		"hp": h.player_hp, "max_hp": h.player_max_hp, "ghost": float(health_ghosts.get("player", h.player_hp)),
-		"edge": h.edge / maxf(1.0, h.edge_max), "dash": dash_fraction(h), "status": status, "sockets": sockets,
+		"edge": h.edge / maxf(1.0, h.edge_max), "dash": dash_fraction(h), "status": status, "aspects": aspects,
 	})
 
 func ui(key: String, rect: Rect2, source_offset: Vector2 = Vector2.ZERO, source_size: Vector2 = Vector2.ZERO) -> void:

@@ -1,63 +1,63 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://bccq4gghg5diu"]
 
-[ext_resource type="Script" path="res://presentation/ui/menu_status.gd" id="1_scr"]
-[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/button_locked.png" id="4_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/aspect_socket_locked.png" id="5_tex"]
-[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="6_fon"]
-[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="7_fon"]
+[ext_resource type="Script" uid="uid://woba4f4iqe08" path="res://presentation/ui/menu_status.gd" id="1_scr"]
+[ext_resource type="FontFile" uid="uid://bpdmvxnu2ubib" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" uid="uid://cd5ohkqft00a6" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
+[ext_resource type="Texture2D" uid="uid://cqn7bo2qau7mk" path="res://art/ui_kit/button_locked.png" id="4_tex"]
+[ext_resource type="Texture2D" uid="uid://c3ivgeunpa2a7" path="res://art/ui_kit/aspect_socket_locked.png" id="5_tex"]
+[ext_resource type="FontFile" uid="uid://bxa12or38dv8m" path="res://presentation/fonts/Cinzel.ttf" id="6_fon"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="7_fon"]
 
 [sub_resource type="FontVariation" id="cinzel"]
 base_font = ExtResource("6_fon")
-variation_opentype = {2003265652: 900.0}
+variation_opentype = {
+2003265652: 900.0
+}
 
 [sub_resource type="FontVariation" id="pixel"]
 base_font = ExtResource("7_fon")
-variation_opentype = {2003265652: 400.0}
+variation_opentype = {
+2003265652: 400.0
+}
 
-[node name="MenuStatus" type="Control"]
+[node name="MenuStatus" type="Control" unique_id=1704556282]
+show_behind_parent = true
 layout_mode = 3
 anchors_preset = 0
 offset_right = 384.0
 offset_bottom = 216.0
 mouse_filter = 2
-show_behind_parent = true
 script = ExtResource("1_scr")
 
-[node name="Unspent" type="Label" parent="."]
+[node name="Unspent" type="Label" parent="." unique_id=1805689137]
 layout_mode = 0
-offset_left = 22
-offset_top = 33
-offset_right = 242
-offset_bottom = 47
-mouse_filter = 2
-text = "UNSPENT POINTS: 0"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+offset_left = 22.0
+offset_top = 33.0
+offset_right = 242.0
+offset_bottom = 47.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
 theme_override_fonts/font = SubResource("cinzel")
 theme_override_font_sizes/font_size = 10
+text = "UNSPENT POINTS: 0"
 
-[node name="LevelHp" type="Label" parent="."]
+[node name="LevelHp" type="Label" parent="." unique_id=1406639695]
 layout_mode = 0
-offset_left = 200
-offset_top = 35
-offset_right = 362
-offset_bottom = 47
-mouse_filter = 2
+offset_left = 200.0
+offset_top = 35.0
+offset_right = 362.0
+offset_bottom = 47.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
 text = "LV 1   HP 100"
 horizontal_alignment = 2
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 9
 
-[node name="Row1" type="NinePatchRect" parent="."]
+[node name="Row1" type="NinePatchRect" parent="." unique_id=1834166054]
 layout_mode = 0
-offset_left = 20
-offset_top = 56
-offset_right = 318
-offset_bottom = 84
-mouse_filter = 2
+offset_left = 20.0
+offset_top = 56.0
+offset_right = 318.0
+offset_bottom = 84.0
 texture = ExtResource("3_tex")
 patch_margin_left = 10
 patch_margin_top = 10
@@ -66,52 +66,46 @@ patch_margin_bottom = 10
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Name" type="Label" parent="Row1"]
+[node name="Name" type="Label" parent="Row1" unique_id=856016316]
 layout_mode = 0
-offset_left = 10
-offset_top = 3
-offset_right = 160
-offset_bottom = 15
-mouse_filter = 2
+offset_left = 15.0
+offset_top = 5.0
+offset_right = 165.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 9
 text = "VITALITY"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = SubResource("cinzel")
-theme_override_font_sizes/font_size = 9
 
-[node name="Hint" type="Label" parent="Row1"]
+[node name="Hint" type="Label" parent="Row1" unique_id=853066701]
 layout_mode = 0
-offset_left = 10
-offset_top = 15
-offset_right = 230
-offset_bottom = 23
-mouse_filter = 2
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 235.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 6
 text = "+6 MAX HEALTH A POINT"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 6
 
-[node name="Value" type="Label" parent="Row1"]
+[node name="Value" type="Label" parent="Row1" unique_id=98225786]
 layout_mode = 0
-offset_left = 190
-offset_top = 9
-offset_right = 272
-offset_bottom = 19
-mouse_filter = 2
-text = "0 / 10"
-horizontal_alignment = 2
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+offset_left = 189.0
+offset_top = 11.0
+offset_right = 271.0
+offset_bottom = 21.0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 8
+text = "0 / 10"
+horizontal_alignment = 2
 
-[node name="Plus" type="NinePatchRect" parent="Row1"]
+[node name="Plus" type="NinePatchRect" parent="Row1" unique_id=520189584]
 layout_mode = 0
-offset_left = 272
-offset_top = 5
-offset_right = 290
-offset_bottom = 23
-mouse_filter = 2
+offset_left = 272.0
+offset_top = 5.0
+offset_right = 290.0
+offset_bottom = 23.0
 texture = ExtResource("4_tex")
 patch_margin_left = 6
 patch_margin_top = 6
@@ -120,26 +114,23 @@ patch_margin_bottom = 6
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Sign" type="Label" parent="Row1/Plus"]
+[node name="Sign" type="Label" parent="Row1/Plus" unique_id=227889336]
 layout_mode = 0
-offset_left = 0
-offset_top = 3
-offset_right = 18
-offset_bottom = 15
-mouse_filter = 2
-text = "+"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+offset_top = 3.0
+offset_right = 18.0
+offset_bottom = 15.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 10
+text = "+"
+horizontal_alignment = 1
 
-[node name="Row2" type="NinePatchRect" parent="."]
+[node name="Row2" type="NinePatchRect" parent="." unique_id=943599164]
 layout_mode = 0
-offset_left = 20
-offset_top = 86
-offset_right = 318
-offset_bottom = 114
-mouse_filter = 2
+offset_left = 20.0
+offset_top = 86.0
+offset_right = 318.0
+offset_bottom = 114.0
 texture = ExtResource("3_tex")
 patch_margin_left = 10
 patch_margin_top = 10
@@ -148,52 +139,46 @@ patch_margin_bottom = 10
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Name" type="Label" parent="Row2"]
+[node name="Name" type="Label" parent="Row2" unique_id=1576350037]
 layout_mode = 0
-offset_left = 10
-offset_top = 3
-offset_right = 160
-offset_bottom = 15
-mouse_filter = 2
+offset_left = 15.0
+offset_top = 5.0
+offset_right = 165.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 9
 text = "MIGHT"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = SubResource("cinzel")
-theme_override_font_sizes/font_size = 9
 
-[node name="Hint" type="Label" parent="Row2"]
+[node name="Hint" type="Label" parent="Row2" unique_id=246278294]
 layout_mode = 0
-offset_left = 10
-offset_top = 15
-offset_right = 230
-offset_bottom = 23
-mouse_filter = 2
-text = "+3% DAMAGE A POINT"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 235.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 6
+text = "+3% DAMAGE A POINT"
 
-[node name="Value" type="Label" parent="Row2"]
+[node name="Value" type="Label" parent="Row2" unique_id=323612727]
 layout_mode = 0
-offset_left = 190
-offset_top = 9
-offset_right = 272
-offset_bottom = 19
-mouse_filter = 2
-text = "0 / 10"
-horizontal_alignment = 2
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+offset_left = 188.0
+offset_top = 11.0
+offset_right = 270.0
+offset_bottom = 21.0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 8
+text = "0 / 10"
+horizontal_alignment = 2
 
-[node name="Plus" type="NinePatchRect" parent="Row2"]
+[node name="Plus" type="NinePatchRect" parent="Row2" unique_id=1074796565]
 layout_mode = 0
-offset_left = 272
-offset_top = 5
-offset_right = 290
-offset_bottom = 23
-mouse_filter = 2
+offset_left = 272.0
+offset_top = 5.0
+offset_right = 290.0
+offset_bottom = 23.0
 texture = ExtResource("4_tex")
 patch_margin_left = 6
 patch_margin_top = 6
@@ -202,26 +187,23 @@ patch_margin_bottom = 6
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Sign" type="Label" parent="Row2/Plus"]
+[node name="Sign" type="Label" parent="Row2/Plus" unique_id=1172114910]
 layout_mode = 0
-offset_left = 0
-offset_top = 3
-offset_right = 18
-offset_bottom = 15
-mouse_filter = 2
-text = "+"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+offset_top = 3.0
+offset_right = 18.0
+offset_bottom = 15.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 10
+text = "+"
+horizontal_alignment = 1
 
-[node name="Row3" type="NinePatchRect" parent="."]
+[node name="Row3" type="NinePatchRect" parent="." unique_id=1969864156]
 layout_mode = 0
-offset_left = 20
-offset_top = 116
-offset_right = 318
-offset_bottom = 144
-mouse_filter = 2
+offset_left = 20.0
+offset_top = 116.0
+offset_right = 318.0
+offset_bottom = 144.0
 texture = ExtResource("3_tex")
 patch_margin_left = 10
 patch_margin_top = 10
@@ -230,52 +212,46 @@ patch_margin_bottom = 10
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Name" type="Label" parent="Row3"]
+[node name="Name" type="Label" parent="Row3" unique_id=1117699537]
 layout_mode = 0
-offset_left = 10
-offset_top = 3
-offset_right = 160
-offset_bottom = 15
-mouse_filter = 2
-text = "AGILITY"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 15.0
+offset_top = 5.0
+offset_right = 160.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = SubResource("cinzel")
 theme_override_font_sizes/font_size = 9
+text = "AGILITY"
 
-[node name="Hint" type="Label" parent="Row3"]
+[node name="Hint" type="Label" parent="Row3" unique_id=186955369]
 layout_mode = 0
-offset_left = 10
-offset_top = 15
-offset_right = 230
-offset_bottom = 23
-mouse_filter = 2
-text = "SHORTER DASH COOLDOWN; A LITTLE FASTER"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+offset_left = 14.0
+offset_top = 15.0
+offset_right = 234.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 6
+text = "SHORTER DASH COOLDOWN; A LITTLE FASTER"
 
-[node name="Value" type="Label" parent="Row3"]
+[node name="Value" type="Label" parent="Row3" unique_id=1310872764]
 layout_mode = 0
-offset_left = 190
-offset_top = 9
-offset_right = 272
-offset_bottom = 19
-mouse_filter = 2
-text = "0 / 10"
-horizontal_alignment = 2
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+offset_left = 190.0
+offset_top = 11.0
+offset_right = 272.0
+offset_bottom = 21.0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 8
+text = "0 / 10"
+horizontal_alignment = 2
 
-[node name="Plus" type="NinePatchRect" parent="Row3"]
+[node name="Plus" type="NinePatchRect" parent="Row3" unique_id=2124216451]
 layout_mode = 0
-offset_left = 272
-offset_top = 5
-offset_right = 290
-offset_bottom = 23
-mouse_filter = 2
+offset_left = 272.0
+offset_top = 5.0
+offset_right = 290.0
+offset_bottom = 23.0
 texture = ExtResource("4_tex")
 patch_margin_left = 6
 patch_margin_top = 6
@@ -284,135 +260,113 @@ patch_margin_bottom = 6
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Sign" type="Label" parent="Row3/Plus"]
+[node name="Sign" type="Label" parent="Row3/Plus" unique_id=944620021]
 layout_mode = 0
-offset_left = 0
-offset_top = 3
-offset_right = 18
-offset_bottom = 15
-mouse_filter = 2
-text = "+"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+offset_top = 3.0
+offset_right = 18.0
+offset_bottom = 15.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 10
+text = "+"
+horizontal_alignment = 1
 
-[node name="Caption" type="Label" parent="."]
+[node name="Socket1" type="TextureRect" parent="." unique_id=884639903]
 layout_mode = 0
-offset_left = 28
-offset_top = 141
-offset_right = 168
-offset_bottom = 151
-mouse_filter = 2
-text = "ASPECT SOCKETS"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 9
-
-[node name="Socket1" type="TextureRect" parent="."]
-layout_mode = 0
-offset_left = 28
-offset_top = 150
-offset_right = 28
-offset_bottom = 150
+offset_left = 28.0
+offset_top = 150.0
+offset_right = 28.0
+offset_bottom = 150.0
 mouse_filter = 2
 texture = ExtResource("5_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket1"]
+[node name="Icon" type="TextureRect" parent="Socket1" unique_id=2018546958]
 layout_mode = 0
-offset_left = 11
-offset_top = 10
-offset_right = 27
-offset_bottom = 26
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Key" type="Label" parent="Socket1"]
+[node name="Key" type="Label" parent="Socket1" unique_id=586310152]
 layout_mode = 0
-offset_left = 4
-offset_top = 29
-offset_right = 33
-offset_bottom = 39
-mouse_filter = 2
+offset_left = 4.0
+offset_top = 29.0
+offset_right = 33.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 8
 
-[node name="Socket2" type="TextureRect" parent="."]
+[node name="Socket2" type="TextureRect" parent="." unique_id=1667771728]
 layout_mode = 0
-offset_left = 74
-offset_top = 150
-offset_right = 74
-offset_bottom = 150
+offset_left = 74.0
+offset_top = 150.0
+offset_right = 74.0
+offset_bottom = 150.0
 mouse_filter = 2
 texture = ExtResource("5_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket2"]
+[node name="Icon" type="TextureRect" parent="Socket2" unique_id=1093798563]
 layout_mode = 0
-offset_left = 11
-offset_top = 10
-offset_right = 27
-offset_bottom = 26
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Key" type="Label" parent="Socket2"]
+[node name="Key" type="Label" parent="Socket2" unique_id=223433203]
 layout_mode = 0
-offset_left = 4
-offset_top = 29
-offset_right = 33
-offset_bottom = 39
-mouse_filter = 2
+offset_left = 4.0
+offset_top = 29.0
+offset_right = 33.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 8
 text = "X"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 8
 
-[node name="Socket3" type="TextureRect" parent="."]
+[node name="Socket3" type="TextureRect" parent="." unique_id=606252103]
 layout_mode = 0
-offset_left = 120
-offset_top = 150
-offset_right = 120
-offset_bottom = 150
+offset_left = 120.0
+offset_top = 150.0
+offset_right = 120.0
+offset_bottom = 150.0
 mouse_filter = 2
 texture = ExtResource("5_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket3"]
+[node name="Icon" type="TextureRect" parent="Socket3" unique_id=625620965]
 layout_mode = 0
-offset_left = 11
-offset_top = 10
-offset_right = 27
-offset_bottom = 26
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Key" type="Label" parent="Socket3"]
+[node name="Key" type="Label" parent="Socket3" unique_id=1602451355]
 layout_mode = 0
-offset_left = 4
-offset_top = 29
-offset_right = 33
-offset_bottom = 39
-mouse_filter = 2
-text = "C"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 4.0
+offset_top = 29.0
+offset_right = 33.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 8
+text = "C"
+horizontal_alignment = 1
 
-[node name="Respec" type="NinePatchRect" parent="."]
+[node name="Respec" type="NinePatchRect" parent="." unique_id=1320923590]
 layout_mode = 0
-offset_left = 246
-offset_top = 152
-offset_right = 362
-offset_bottom = 172
-mouse_filter = 2
+offset_left = 246.0
+offset_top = 152.0
+offset_right = 362.0
+offset_bottom = 172.0
 texture = ExtResource("4_tex")
 patch_margin_left = 6
 patch_margin_top = 6
@@ -421,41 +375,35 @@ patch_margin_bottom = 6
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Name" type="Label" parent="Respec"]
+[node name="Name" type="Label" parent="Respec" unique_id=1661139254]
 layout_mode = 0
-offset_left = 0
-offset_top = 4
-offset_right = 116
-offset_bottom = 16
-mouse_filter = 2
-text = "RESPEC"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_top = 4.0
+offset_right = 116.0
+offset_bottom = 16.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = SubResource("cinzel")
 theme_override_font_sizes/font_size = 9
-
-[node name="RespecNote" type="Label" parent="."]
-layout_mode = 0
-offset_left = 246
-offset_top = 176
-offset_right = 362
-offset_bottom = 184
-mouse_filter = 2
-text = "VILLAGE ONLY"
+text = "RESPEC"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+
+[node name="RespecNote" type="Label" parent="." unique_id=1561341435]
+layout_mode = 0
+offset_left = 246.0
+offset_top = 176.0
+offset_right = 362.0
+offset_bottom = 184.0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 6
+text = "VILLAGE ONLY"
+horizontal_alignment = 1
 
-[node name="Notice" type="Label" parent="."]
+[node name="Notice" type="Label" parent="." unique_id=1179207933]
 layout_mode = 0
-offset_left = 160
-offset_top = 184
-offset_right = 360
-offset_bottom = 192
-mouse_filter = 2
-text = ""
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+offset_left = 160.0
+offset_top = 184.0
+offset_right = 360.0
+offset_bottom = 192.0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 6

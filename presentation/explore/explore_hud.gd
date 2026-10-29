@@ -179,7 +179,6 @@ func combat_event(event: GameEvent) -> void:
 			task_tick=event.tick
 			task_message="Task complete +%d EXP" % int(event.data.get("exp",0))
 		GameEvent.ITEM_USED: item_flash_tick = event.tick
-const HudStrip := preload("res://presentation/ui/hud_strip.tscn")
 ## The bottom strip, level pillar and sockets are the editable scene presentation/ui/hud_strip.tscn (open it in Godot to
 ## move or re-texture anything); this script only hands it numbers from the snapshot.
 var strip: Control = null

@@ -16,11 +16,17 @@ func apply(entry: Array) -> void:
 	$Tag.visible = not plain
 	for i: int in range(3):
 		get_node("Line%d" % (i + 1)).visible = not plain
-	$HintTop.visible = plain
-	$HintBottom.visible = plain
+	var hint_top: Label = get_node_or_null("HintTop") as Label  # optional: the scene may leave a hint out
+	var hint_bottom: Label = get_node_or_null("HintBottom") as Label
+	if hint_top != null:
+		hint_top.visible = plain
+	if hint_bottom != null:
+		hint_bottom.visible = plain
 	if plain:
-		$HintTop.text = String(lines[0]).to_upper()
-		$HintBottom.text = String(lines[2]).to_upper()
+		if hint_top != null:
+			hint_top.text = String(lines[0]).to_upper()
+		if hint_bottom != null:
+			hint_bottom.text = String(lines[2]).to_upper()
 		return
 	$Title.text = String(entry[0]).to_upper()
 	$Tag.text = String(entry[1]).to_upper()

@@ -1,21 +1,17 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://cjs73bfso4v8w"]
 
-[ext_resource type="Script" path="res://presentation/ui/reward_card.gd" id="1_scr"]
-[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="4_tex"]
-[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="5_fon"]
-[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="6_fon"]
-
-[sub_resource type="FontVariation" id="cinzel"]
-base_font = ExtResource("5_fon")
-variation_opentype = {2003265652: 900.0}
+[ext_resource type="Script" uid="uid://k1xwpbnwado5" path="res://presentation/ui/reward_card.gd" id="1_scr"]
+[ext_resource type="Texture2D" uid="uid://cd5ohkqft00a6" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
+[ext_resource type="Texture2D" uid="uid://bu7rys2wkil6j" path="res://art/ui_kit/slot_frame.png" id="4_tex"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="6_fon"]
 
 [sub_resource type="FontVariation" id="pixel"]
 base_font = ExtResource("6_fon")
-variation_opentype = {2003265652: 400.0}
+variation_opentype = {
+2003265652: 400.0
+}
 
-[node name="RewardCard" type="Control"]
+[node name="RewardCard" type="Control" unique_id=883025368]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 384.0
@@ -23,13 +19,12 @@ offset_bottom = 216.0
 mouse_filter = 2
 script = ExtResource("1_scr")
 
-[node name="Card" type="NinePatchRect" parent="."]
+[node name="Card" type="NinePatchRect" parent="." unique_id=2072281198]
 layout_mode = 0
-offset_left = 262
-offset_top = 64
-offset_right = 380
-offset_bottom = 100
-mouse_filter = 2
+offset_left = 262.0
+offset_top = 64.0
+offset_right = 380.0
+offset_bottom = 100.0
 texture = ExtResource("3_tex")
 patch_margin_left = 10
 patch_margin_top = 10
@@ -38,13 +33,12 @@ patch_margin_bottom = 10
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Well" type="NinePatchRect" parent="Card"]
+[node name="Well" type="NinePatchRect" parent="Card" unique_id=1005723057]
 layout_mode = 0
-offset_left = 8
-offset_top = 6
-offset_right = 32
-offset_bottom = 30
-mouse_filter = 2
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 32.0
+offset_bottom = 30.0
 texture = ExtResource("4_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -53,42 +47,37 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Icon" type="TextureRect" parent="Card"]
+[node name="Icon" type="TextureRect" parent="Card" unique_id=848924865]
 layout_mode = 0
-offset_left = 12
-offset_top = 10
-offset_right = 28
-offset_bottom = 26
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 28.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Caption" type="Label" parent="Card"]
+[node name="Caption" type="Label" parent="Card" unique_id=1450044132]
 layout_mode = 0
-offset_left = 38
-offset_top = 5
-offset_right = 110
-offset_bottom = 13
-mouse_filter = 2
-text = "RECEIVED"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+offset_left = 81.0
+offset_top = 6.0
+offset_right = 153.0
+offset_bottom = 14.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 6
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "RECEIVED"
 
-[node name="Name" type="Label" parent="Card"]
+[node name="Name" type="Label" parent="Card" unique_id=805921760]
 layout_mode = 0
-offset_left = 38
-offset_top = 14
-offset_right = 110
-offset_bottom = 28
-mouse_filter = 2
-text = "BLACK KATANA"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 32.0
+offset_top = 12.0
+offset_right = 104.0
+offset_bottom = 26.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 9
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "BLACK KATANA"

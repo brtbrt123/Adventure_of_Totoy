@@ -1,5 +1,5 @@
 extends Control
-## The bottom-of-screen exploration HUD as a Godot scene (hud_strip.tscn): the weapon medallion, the HEALTH / EDGE / DASH
+## The bottom-of-screen HUD (the road and the boss fight) as ONE Godot scene (hud_strip.tscn): the weapon medallion, the HEALTH / EDGE / DASH
 ## bars, the two item slots, the three Aspect sockets and the level pillar. Open the scene in the editor to move, resize or
 ## re-texture any piece; this script only fills them in from numbers. It draws nothing and holds no rules.
 ##
@@ -24,6 +24,9 @@ var _ink: Color = Color.BLACK
 @onready var level_label: Label = $LevelPillar/Level
 @onready var exp_label: Label = $LevelPillar/ExpLabel
 @onready var down_label: Label = $Down
+@onready var whole_medallion: TextureRect = $WholeMedallion
+@onready var kit_medallion: TextureRect = $Medallion
+@onready var name_plate: Control = $NamePlate
 
 
 func _ready() -> void:
@@ -55,18 +58,34 @@ func _set_fraction(node: Control, fraction: float, full: float) -> void:
 
 
 ## data keys (all optional; a missing key leaves that piece as it is):
-##   armed: bool, weapon_glyph: String (atlas frame)
+##   armed: bool, weapon_glyph: String (atlas frame), whole_medallion: atlas frame of a whole 48 px medallion (dagger, scythe)
+##   plate: the weapon's short name (boss fight)
+##   status: Array (up to 3) of atlas frames of the Aspects running now (boss fight)
 ##   hp, max_hp, ghost: ints (ghost = the delayed segment)
 ##   edge: float 0..1, or -1 when the road does not know it yet
 ##   dash: float 0..1
-##   items: Array of {unlocked, item, count}   (two slots)
-##   aspects: Array of {unlocked, owned, usable, icon: String (atlas frame)}   (three sockets)
-##   level: int, exp: float 0..1, exp_label: String
+##   items: Array of {unlocked, item, count}   (two slots; hidden when the key is absent)
+##   aspects: Array of {unlocked, owned, usable, icon: String (atlas frame), key, cost, cost_color}   (three sockets)
+##   level: int, exp: float 0..1, exp_label: String   (the pillar is hidden when "level" is absent)
 ##   defeated: bool
 func apply(data: Dictionary) -> void:
+	var whole: String = String(data.get("whole_medallion", ""))
+	kit_medallion.visible = whole.is_empty()
+	whole_medallion.visible = not whole.is_empty()
+	if not whole.is_empty():
+		whole_medallion.texture = icon(whole)
+	name_plate.visible = data.has("plate")
+	if data.has("plate"):
+		name_plate.get_node("Name").text = String(data["plate"]).to_upper()
 	if data.has("weapon_glyph"):
 		weapon_glyph.texture = icon(String(data["weapon_glyph"]))
 		weapon_glyph.visible = bool(data.get("armed", true))
+	var status: Array = data.get("status", [])
+	for i: int in range(3):
+		var slot_node: Control = get_node("Status%d" % (i + 1))
+		slot_node.visible = i < status.size()
+		if i < status.size():
+			slot_node.get_node("Icon").texture = icon(String(status[i]))
 	if data.has("hp"):
 		var max_hp: float = maxf(1.0, float(data.get("max_hp", 1)))
 		health_value.text = "%d / %d" % [int(data["hp"]), int(max_hp)]
@@ -76,12 +95,14 @@ func apply(data: Dictionary) -> void:
 	if data.has("edge"):
 		var edge: float = float(data["edge"])
 		edge_label.text = "EDGE  --" if edge < 0.0 else "EDGE"
+		edge_label.add_theme_color_override("font_color", Color("5a625e") if edge < 0.0 else Color("6aa89a"))
 		_set_fraction(edge_fill, maxf(0.0, edge), 79.0)
 	if data.has("dash"):
 		_set_fraction(dash_fill, float(data["dash"]), 33.0)
 	var items: Array = data.get("items", [])
 	for i: int in range(2):
 		var slot: Control = get_node("ItemSlot%d" % (i + 1))
+		slot.visible = data.has("items")
 		var value: Dictionary = items[i] if i < items.size() else {}
 		var unlocked: bool = bool(value.get("unlocked", false))
 		slot.get_node("Locked").visible = not unlocked
@@ -102,6 +123,14 @@ func apply(data: Dictionary) -> void:
 		glyph.texture = icon(String(value.get("icon", "")), Rect2(4, 4, 16, 16))
 		glyph.modulate = Color.WHITE if bool(value.get("usable", false)) else Color(1, 1, 1, 0.45)
 		socket.get_node("Key").modulate = Color.WHITE if open else Color(1, 1, 1, 0.45)
+		if value.has("key"):
+			socket.get_node("Key").text = String(value["key"])
+		var cost: Label = socket.get_node("Cost")
+		cost.visible = value.has("cost")
+		if value.has("cost"):
+			cost.text = String(value["cost"]).to_upper()
+			cost.add_theme_color_override("font_color", value.get("cost_color", Color.WHITE))
+	$LevelPillar.visible = data.has("level")
 	if data.has("level"):
 		level_label.text = str(int(data["level"]))
 		exp_label.text = String(data.get("exp_label", "EXP"))

@@ -1,40 +1,45 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene format=3 uid="uid://buh5vbhwlnmy1"]
 
-[ext_resource type="Script" path="res://presentation/ui/menu_items.gd" id="1_scr"]
-[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="3_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/icon_padlock.png" id="4_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/key_badge.png" id="5_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="6_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/weapon_medallion.png" id="7_tex"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/aspect_socket_open.png" id="8_tex"]
-[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="9_fon"]
-[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="10_fon"]
-
-[sub_resource type="FontVariation" id="cinzel"]
-base_font = ExtResource("9_fon")
-variation_opentype = {2003265652: 900.0}
+[ext_resource type="Script" uid="uid://bp1blkrpufkdi" path="res://presentation/ui/menu_items.gd" id="1_scr"]
+[ext_resource type="FontFile" uid="uid://bpdmvxnu2ubib" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" uid="uid://bu7rys2wkil6j" path="res://art/ui_kit/slot_frame.png" id="3_tex"]
+[ext_resource type="Texture2D" uid="uid://c5lajp7rr5id5" path="res://art/ui_kit/icon_padlock.png" id="4_tex"]
+[ext_resource type="Texture2D" uid="uid://cy8vdqlmn87kd" path="res://art/ui_kit/key_badge.png" id="5_tex"]
+[ext_resource type="Texture2D" uid="uid://cd5ohkqft00a6" path="res://art/ui_kit/panel_medium.png" id="6_tex"]
+[ext_resource type="Texture2D" uid="uid://ldwvoh6kfrav" path="res://art/ui_kit/weapon_medallion.png" id="7_tex"]
+[ext_resource type="Texture2D" uid="uid://d2a2guxdbvixr" path="res://art/ui_kit/aspect_socket_open.png" id="8_tex"]
+[ext_resource type="FontFile" uid="uid://bxa12or38dv8m" path="res://presentation/fonts/Cinzel.ttf" id="9_fon"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="10_fon"]
 
 [sub_resource type="FontVariation" id="pixel"]
 base_font = ExtResource("10_fon")
-variation_opentype = {2003265652: 400.0}
+variation_opentype = {
+2003265652: 400.0
+}
 
-[node name="MenuItems" type="Control"]
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("9_fon")
+variation_opentype = {
+2003265652: 900.0
+}
+
+[node name="MenuItems" type="Control" unique_id=1359947602]
+show_behind_parent = true
 layout_mode = 3
 anchors_preset = 0
-offset_right = 384.0
-offset_bottom = 216.0
+offset_left = -72.0
+offset_top = -5.0
+offset_right = 312.0
+offset_bottom = 211.0
 mouse_filter = 2
-show_behind_parent = true
 script = ExtResource("1_scr")
 
-[node name="Slot0" type="NinePatchRect" parent="."]
+[node name="Slot0" type="NinePatchRect" parent="." unique_id=1063950259]
 layout_mode = 0
-offset_left = 20
-offset_top = 38
-offset_right = 56
-offset_bottom = 74
-mouse_filter = 2
+offset_left = 20.0
+offset_top = 38.0
+offset_right = 56.0
+offset_bottom = 74.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -43,52 +48,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot0"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot0" unique_id=795509689]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot0"]
+[node name="AspectIcon" type="TextureRect" parent="Slot0" unique_id=1671823469]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot0"]
+[node name="Dim" type="ColorRect" parent="Slot0" unique_id=519878805]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot0"]
+[node name="Lock" type="TextureRect" parent="Slot0" unique_id=542505411]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot0"]
+[node name="Held" type="NinePatchRect" parent="Slot0" unique_id=675148382]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -97,26 +99,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot0/Held"]
+[node name="Letter" type="Label" parent="Slot0/Held" unique_id=1094588175]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot0"]
+[node name="Equipped" type="NinePatchRect" parent="Slot0" unique_id=299323108]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -125,26 +123,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot0/Equipped"]
+[node name="Letter" type="Label" parent="Slot0/Equipped" unique_id=1707831274]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot1" type="NinePatchRect" parent="."]
+[node name="Slot1" type="NinePatchRect" parent="." unique_id=733184650]
 layout_mode = 0
-offset_left = 58
-offset_top = 38
-offset_right = 94
-offset_bottom = 74
-mouse_filter = 2
+offset_left = 58.0
+offset_top = 38.0
+offset_right = 94.0
+offset_bottom = 74.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -153,52 +149,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot1"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot1" unique_id=1869331289]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot1"]
+[node name="AspectIcon" type="TextureRect" parent="Slot1" unique_id=33889588]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot1"]
+[node name="Dim" type="ColorRect" parent="Slot1" unique_id=1657927524]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot1"]
+[node name="Lock" type="TextureRect" parent="Slot1" unique_id=814039900]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot1"]
+[node name="Held" type="NinePatchRect" parent="Slot1" unique_id=28057237]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -207,26 +200,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot1/Held"]
+[node name="Letter" type="Label" parent="Slot1/Held" unique_id=1027186851]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot1"]
+[node name="Equipped" type="NinePatchRect" parent="Slot1" unique_id=1542188743]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -235,26 +224,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot1/Equipped"]
+[node name="Letter" type="Label" parent="Slot1/Equipped" unique_id=1702350057]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot2" type="NinePatchRect" parent="."]
+[node name="Slot2" type="NinePatchRect" parent="." unique_id=2044913853]
 layout_mode = 0
-offset_left = 96
-offset_top = 38
-offset_right = 132
-offset_bottom = 74
-mouse_filter = 2
+offset_left = 96.0
+offset_top = 38.0
+offset_right = 132.0
+offset_bottom = 74.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -263,52 +250,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot2"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot2" unique_id=2136975740]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot2"]
+[node name="AspectIcon" type="TextureRect" parent="Slot2" unique_id=2126203311]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot2"]
+[node name="Dim" type="ColorRect" parent="Slot2" unique_id=39890797]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot2"]
+[node name="Lock" type="TextureRect" parent="Slot2" unique_id=636688476]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot2"]
+[node name="Held" type="NinePatchRect" parent="Slot2" unique_id=1041775150]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -317,26 +301,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot2/Held"]
+[node name="Letter" type="Label" parent="Slot2/Held" unique_id=1348993394]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot2"]
+[node name="Equipped" type="NinePatchRect" parent="Slot2" unique_id=1424571262]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -345,26 +325,26 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot2/Equipped"]
-layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+[node name="Letter" type="Label" parent="Slot2/Equipped" unique_id=1204516105]
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 0.5
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 6.5
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot3" type="NinePatchRect" parent="."]
+[node name="Slot3" type="NinePatchRect" parent="." unique_id=1534276309]
 layout_mode = 0
-offset_left = 134
-offset_top = 38
-offset_right = 170
-offset_bottom = 74
-mouse_filter = 2
+offset_left = 134.0
+offset_top = 38.0
+offset_right = 170.0
+offset_bottom = 74.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -373,52 +353,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot3"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot3" unique_id=1195915331]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot3"]
+[node name="AspectIcon" type="TextureRect" parent="Slot3" unique_id=224720640]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot3"]
+[node name="Dim" type="ColorRect" parent="Slot3" unique_id=1371105222]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot3"]
+[node name="Lock" type="TextureRect" parent="Slot3" unique_id=1487530072]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot3"]
+[node name="Held" type="NinePatchRect" parent="Slot3" unique_id=1877244886]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -427,26 +404,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot3/Held"]
+[node name="Letter" type="Label" parent="Slot3/Held" unique_id=610017431]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot3"]
+[node name="Equipped" type="NinePatchRect" parent="Slot3" unique_id=1046280451]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -455,26 +428,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot3/Equipped"]
+[node name="Letter" type="Label" parent="Slot3/Equipped" unique_id=1377029401]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot4" type="NinePatchRect" parent="."]
+[node name="Slot4" type="NinePatchRect" parent="." unique_id=1568364582]
 layout_mode = 0
-offset_left = 172
-offset_top = 38
-offset_right = 208
-offset_bottom = 74
-mouse_filter = 2
+offset_left = 172.0
+offset_top = 38.0
+offset_right = 208.0
+offset_bottom = 74.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -483,52 +454,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot4"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot4" unique_id=1595130811]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot4"]
+[node name="AspectIcon" type="TextureRect" parent="Slot4" unique_id=1223184277]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot4"]
+[node name="Dim" type="ColorRect" parent="Slot4" unique_id=2982663]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot4"]
+[node name="Lock" type="TextureRect" parent="Slot4" unique_id=1078887141]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot4"]
+[node name="Held" type="NinePatchRect" parent="Slot4" unique_id=2028228774]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -537,26 +505,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot4/Held"]
+[node name="Letter" type="Label" parent="Slot4/Held" unique_id=1088946975]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot4"]
+[node name="Equipped" type="NinePatchRect" parent="Slot4" unique_id=863659628]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -565,26 +529,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot4/Equipped"]
+[node name="Letter" type="Label" parent="Slot4/Equipped" unique_id=1035783706]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot5" type="NinePatchRect" parent="."]
+[node name="Slot5" type="NinePatchRect" parent="." unique_id=694866318]
 layout_mode = 0
-offset_left = 210
-offset_top = 38
-offset_right = 246
-offset_bottom = 74
-mouse_filter = 2
+offset_left = 210.0
+offset_top = 38.0
+offset_right = 246.0
+offset_bottom = 74.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -593,52 +555,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot5"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot5" unique_id=1168540658]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot5"]
+[node name="AspectIcon" type="TextureRect" parent="Slot5" unique_id=1851108249]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot5"]
+[node name="Dim" type="ColorRect" parent="Slot5" unique_id=1078854256]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot5"]
+[node name="Lock" type="TextureRect" parent="Slot5" unique_id=186472516]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot5"]
+[node name="Held" type="NinePatchRect" parent="Slot5" unique_id=392864585]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -647,26 +606,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot5/Held"]
+[node name="Letter" type="Label" parent="Slot5/Held" unique_id=193263184]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot5"]
+[node name="Equipped" type="NinePatchRect" parent="Slot5" unique_id=1962928892]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -675,26 +630,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot5/Equipped"]
+[node name="Letter" type="Label" parent="Slot5/Equipped" unique_id=668425533]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot6" type="NinePatchRect" parent="."]
+[node name="Slot6" type="NinePatchRect" parent="." unique_id=1708096417]
 layout_mode = 0
-offset_left = 20
-offset_top = 76
-offset_right = 56
-offset_bottom = 112
-mouse_filter = 2
+offset_left = 20.0
+offset_top = 76.0
+offset_right = 56.0
+offset_bottom = 112.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -703,52 +656,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot6"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot6" unique_id=477363158]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot6"]
+[node name="AspectIcon" type="TextureRect" parent="Slot6" unique_id=779968458]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot6"]
+[node name="Dim" type="ColorRect" parent="Slot6" unique_id=32134183]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot6"]
+[node name="Lock" type="TextureRect" parent="Slot6" unique_id=2118394786]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot6"]
+[node name="Held" type="NinePatchRect" parent="Slot6" unique_id=694826805]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -757,26 +707,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot6/Held"]
+[node name="Letter" type="Label" parent="Slot6/Held" unique_id=285827769]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot6"]
+[node name="Equipped" type="NinePatchRect" parent="Slot6" unique_id=1875945952]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -785,26 +731,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot6/Equipped"]
+[node name="Letter" type="Label" parent="Slot6/Equipped" unique_id=1609730893]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot7" type="NinePatchRect" parent="."]
+[node name="Slot7" type="NinePatchRect" parent="." unique_id=440204074]
 layout_mode = 0
-offset_left = 58
-offset_top = 76
-offset_right = 94
-offset_bottom = 112
-mouse_filter = 2
+offset_left = 58.0
+offset_top = 76.0
+offset_right = 94.0
+offset_bottom = 112.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -813,52 +757,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot7"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot7" unique_id=928114791]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot7"]
+[node name="AspectIcon" type="TextureRect" parent="Slot7" unique_id=1275941411]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot7"]
+[node name="Dim" type="ColorRect" parent="Slot7" unique_id=1295749331]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot7"]
+[node name="Lock" type="TextureRect" parent="Slot7" unique_id=1254097679]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot7"]
+[node name="Held" type="NinePatchRect" parent="Slot7" unique_id=1775201257]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -867,26 +808,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot7/Held"]
+[node name="Letter" type="Label" parent="Slot7/Held" unique_id=650933714]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot7"]
+[node name="Equipped" type="NinePatchRect" parent="Slot7" unique_id=1504677939]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -895,26 +832,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot7/Equipped"]
+[node name="Letter" type="Label" parent="Slot7/Equipped" unique_id=1467686052]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot8" type="NinePatchRect" parent="."]
+[node name="Slot8" type="NinePatchRect" parent="." unique_id=327069885]
 layout_mode = 0
-offset_left = 96
-offset_top = 76
-offset_right = 132
-offset_bottom = 112
-mouse_filter = 2
+offset_left = 96.0
+offset_top = 76.0
+offset_right = 132.0
+offset_bottom = 112.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -923,52 +858,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot8"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot8" unique_id=1328860142]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot8"]
+[node name="AspectIcon" type="TextureRect" parent="Slot8" unique_id=1355593876]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot8"]
+[node name="Dim" type="ColorRect" parent="Slot8" unique_id=2023679769]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot8"]
+[node name="Lock" type="TextureRect" parent="Slot8" unique_id=1859615802]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot8"]
+[node name="Held" type="NinePatchRect" parent="Slot8" unique_id=389983467]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -977,26 +909,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot8/Held"]
+[node name="Letter" type="Label" parent="Slot8/Held" unique_id=2131906758]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot8"]
+[node name="Equipped" type="NinePatchRect" parent="Slot8" unique_id=1756547890]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1005,26 +933,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot8/Equipped"]
+[node name="Letter" type="Label" parent="Slot8/Equipped" unique_id=477761139]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot9" type="NinePatchRect" parent="."]
+[node name="Slot9" type="NinePatchRect" parent="." unique_id=15349958]
 layout_mode = 0
-offset_left = 134
-offset_top = 76
-offset_right = 170
-offset_bottom = 112
-mouse_filter = 2
+offset_left = 134.0
+offset_top = 76.0
+offset_right = 170.0
+offset_bottom = 112.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1033,52 +959,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot9"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot9" unique_id=2092653130]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot9"]
+[node name="AspectIcon" type="TextureRect" parent="Slot9" unique_id=95511121]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot9"]
+[node name="Dim" type="ColorRect" parent="Slot9" unique_id=1469248806]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot9"]
+[node name="Lock" type="TextureRect" parent="Slot9" unique_id=362266515]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot9"]
+[node name="Held" type="NinePatchRect" parent="Slot9" unique_id=1774292581]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1087,26 +1010,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot9/Held"]
+[node name="Letter" type="Label" parent="Slot9/Held" unique_id=1891379082]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot9"]
+[node name="Equipped" type="NinePatchRect" parent="Slot9" unique_id=1799805179]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1115,26 +1034,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot9/Equipped"]
+[node name="Letter" type="Label" parent="Slot9/Equipped" unique_id=1012293283]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot10" type="NinePatchRect" parent="."]
+[node name="Slot10" type="NinePatchRect" parent="." unique_id=1546457362]
 layout_mode = 0
-offset_left = 172
-offset_top = 76
-offset_right = 208
-offset_bottom = 112
-mouse_filter = 2
+offset_left = 172.0
+offset_top = 76.0
+offset_right = 208.0
+offset_bottom = 112.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1143,52 +1060,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot10"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot10" unique_id=1769536616]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot10"]
+[node name="AspectIcon" type="TextureRect" parent="Slot10" unique_id=1392462298]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot10"]
+[node name="Dim" type="ColorRect" parent="Slot10" unique_id=482727298]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot10"]
+[node name="Lock" type="TextureRect" parent="Slot10" unique_id=1152001984]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot10"]
+[node name="Held" type="NinePatchRect" parent="Slot10" unique_id=1991027759]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1197,26 +1111,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot10/Held"]
+[node name="Letter" type="Label" parent="Slot10/Held" unique_id=747336224]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot10"]
+[node name="Equipped" type="NinePatchRect" parent="Slot10" unique_id=2001517491]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1225,26 +1135,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot10/Equipped"]
+[node name="Letter" type="Label" parent="Slot10/Equipped" unique_id=911171868]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot11" type="NinePatchRect" parent="."]
+[node name="Slot11" type="NinePatchRect" parent="." unique_id=1442538728]
 layout_mode = 0
-offset_left = 210
-offset_top = 76
-offset_right = 246
-offset_bottom = 112
-mouse_filter = 2
+offset_left = 210.0
+offset_top = 76.0
+offset_right = 246.0
+offset_bottom = 112.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1253,52 +1161,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot11"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot11" unique_id=1410992502]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot11"]
+[node name="AspectIcon" type="TextureRect" parent="Slot11" unique_id=132156787]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot11"]
+[node name="Dim" type="ColorRect" parent="Slot11" unique_id=933443130]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot11"]
+[node name="Lock" type="TextureRect" parent="Slot11" unique_id=718488271]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot11"]
+[node name="Held" type="NinePatchRect" parent="Slot11" unique_id=583134102]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1307,26 +1212,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot11/Held"]
+[node name="Letter" type="Label" parent="Slot11/Held" unique_id=1920083008]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot11"]
+[node name="Equipped" type="NinePatchRect" parent="Slot11" unique_id=1673330552]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1335,26 +1236,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot11/Equipped"]
+[node name="Letter" type="Label" parent="Slot11/Equipped" unique_id=1395920045]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot12" type="NinePatchRect" parent="."]
+[node name="Slot12" type="NinePatchRect" parent="." unique_id=2081991194]
 layout_mode = 0
-offset_left = 20
-offset_top = 114
-offset_right = 56
-offset_bottom = 150
-mouse_filter = 2
+offset_left = 20.0
+offset_top = 114.0
+offset_right = 56.0
+offset_bottom = 150.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1363,52 +1262,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot12"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot12" unique_id=388499566]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot12"]
+[node name="AspectIcon" type="TextureRect" parent="Slot12" unique_id=479780756]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot12"]
+[node name="Dim" type="ColorRect" parent="Slot12" unique_id=985853443]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot12"]
+[node name="Lock" type="TextureRect" parent="Slot12" unique_id=1514639427]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot12"]
+[node name="Held" type="NinePatchRect" parent="Slot12" unique_id=1033086156]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1417,26 +1313,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot12/Held"]
+[node name="Letter" type="Label" parent="Slot12/Held" unique_id=521537305]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot12"]
+[node name="Equipped" type="NinePatchRect" parent="Slot12" unique_id=921785194]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1445,26 +1337,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot12/Equipped"]
+[node name="Letter" type="Label" parent="Slot12/Equipped" unique_id=1839416430]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot13" type="NinePatchRect" parent="."]
+[node name="Slot13" type="NinePatchRect" parent="." unique_id=83557483]
 layout_mode = 0
-offset_left = 58
-offset_top = 114
-offset_right = 94
-offset_bottom = 150
-mouse_filter = 2
+offset_left = 58.0
+offset_top = 114.0
+offset_right = 94.0
+offset_bottom = 150.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1473,52 +1363,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot13"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot13" unique_id=1902210100]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot13"]
+[node name="AspectIcon" type="TextureRect" parent="Slot13" unique_id=1531900703]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot13"]
+[node name="Dim" type="ColorRect" parent="Slot13" unique_id=760805974]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot13"]
+[node name="Lock" type="TextureRect" parent="Slot13" unique_id=1445364140]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot13"]
+[node name="Held" type="NinePatchRect" parent="Slot13" unique_id=1765708852]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1527,26 +1414,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot13/Held"]
+[node name="Letter" type="Label" parent="Slot13/Held" unique_id=1532248903]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot13"]
+[node name="Equipped" type="NinePatchRect" parent="Slot13" unique_id=144007821]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1555,26 +1438,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot13/Equipped"]
+[node name="Letter" type="Label" parent="Slot13/Equipped" unique_id=350226427]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot14" type="NinePatchRect" parent="."]
+[node name="Slot14" type="NinePatchRect" parent="." unique_id=264872333]
 layout_mode = 0
-offset_left = 96
-offset_top = 114
-offset_right = 132
-offset_bottom = 150
-mouse_filter = 2
+offset_left = 96.0
+offset_top = 114.0
+offset_right = 132.0
+offset_bottom = 150.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1583,52 +1464,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot14"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot14" unique_id=472339030]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot14"]
+[node name="AspectIcon" type="TextureRect" parent="Slot14" unique_id=473582454]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot14"]
+[node name="Dim" type="ColorRect" parent="Slot14" unique_id=1929594886]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot14"]
+[node name="Lock" type="TextureRect" parent="Slot14" unique_id=1289501943]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot14"]
+[node name="Held" type="NinePatchRect" parent="Slot14" unique_id=1709916232]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1637,26 +1515,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot14/Held"]
+[node name="Letter" type="Label" parent="Slot14/Held" unique_id=506974300]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot14"]
+[node name="Equipped" type="NinePatchRect" parent="Slot14" unique_id=114117528]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1665,26 +1539,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot14/Equipped"]
+[node name="Letter" type="Label" parent="Slot14/Equipped" unique_id=2024444066]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot15" type="NinePatchRect" parent="."]
+[node name="Slot15" type="NinePatchRect" parent="." unique_id=1602482024]
 layout_mode = 0
-offset_left = 134
-offset_top = 114
-offset_right = 170
-offset_bottom = 150
-mouse_filter = 2
+offset_left = 134.0
+offset_top = 114.0
+offset_right = 170.0
+offset_bottom = 150.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1693,52 +1565,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot15"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot15" unique_id=553046866]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot15"]
+[node name="AspectIcon" type="TextureRect" parent="Slot15" unique_id=1024187400]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot15"]
+[node name="Dim" type="ColorRect" parent="Slot15" unique_id=884133999]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot15"]
+[node name="Lock" type="TextureRect" parent="Slot15" unique_id=2118124348]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot15"]
+[node name="Held" type="NinePatchRect" parent="Slot15" unique_id=2067319459]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1747,26 +1616,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot15/Held"]
+[node name="Letter" type="Label" parent="Slot15/Held" unique_id=309623179]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot15"]
+[node name="Equipped" type="NinePatchRect" parent="Slot15" unique_id=256515203]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1775,26 +1640,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot15/Equipped"]
+[node name="Letter" type="Label" parent="Slot15/Equipped" unique_id=1145348733]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot16" type="NinePatchRect" parent="."]
+[node name="Slot16" type="NinePatchRect" parent="." unique_id=1744900251]
 layout_mode = 0
-offset_left = 172
-offset_top = 114
-offset_right = 208
-offset_bottom = 150
-mouse_filter = 2
+offset_left = 172.0
+offset_top = 114.0
+offset_right = 208.0
+offset_bottom = 150.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1803,52 +1666,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot16"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot16" unique_id=1863523872]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot16"]
+[node name="AspectIcon" type="TextureRect" parent="Slot16" unique_id=954592639]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot16"]
+[node name="Dim" type="ColorRect" parent="Slot16" unique_id=864267046]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot16"]
+[node name="Lock" type="TextureRect" parent="Slot16" unique_id=2070526850]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot16"]
+[node name="Held" type="NinePatchRect" parent="Slot16" unique_id=935967854]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1857,26 +1717,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot16/Held"]
+[node name="Letter" type="Label" parent="Slot16/Held" unique_id=2108141285]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot16"]
+[node name="Equipped" type="NinePatchRect" parent="Slot16" unique_id=1725500096]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1885,26 +1741,25 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot16/Equipped"]
-layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+[node name="Letter" type="Label" parent="Slot16/Equipped" unique_id=771380434]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Slot17" type="NinePatchRect" parent="."]
+[node name="Slot17" type="NinePatchRect" parent="." unique_id=444247681]
 layout_mode = 0
-offset_left = 210
-offset_top = 114
-offset_right = 246
-offset_bottom = 150
-mouse_filter = 2
+offset_left = 210.0
+offset_top = 114.0
+offset_right = 246.0
+offset_bottom = 150.0
 texture = ExtResource("3_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1913,52 +1768,49 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="WeaponIcon" type="TextureRect" parent="Slot17"]
+[node name="WeaponIcon" type="TextureRect" parent="Slot17" unique_id=843529920]
 layout_mode = 0
-offset_left = 2
-offset_top = 2
-offset_right = 34
-offset_bottom = 34
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 34.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="AspectIcon" type="TextureRect" parent="Slot17"]
+[node name="AspectIcon" type="TextureRect" parent="Slot17" unique_id=975433414]
 layout_mode = 0
-offset_left = 6
-offset_top = 6
-offset_right = 30
-offset_bottom = 30
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 30.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Dim" type="ColorRect" parent="Slot17"]
+[node name="Dim" type="ColorRect" parent="Slot17" unique_id=1464639940]
+visible = false
 layout_mode = 0
-offset_left = 3
-offset_top = 3
-offset_right = 33
-offset_bottom = 33
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 33.0
+offset_bottom = 33.0
 mouse_filter = 2
 color = Color(0.1098, 0.0941, 0.1412, 0.8)
-visible = false
 
-[node name="Lock" type="TextureRect" parent="Slot17"]
+[node name="Lock" type="TextureRect" parent="Slot17" unique_id=1481088862]
 layout_mode = 0
-offset_left = 14
-offset_top = 11
-offset_right = 14
-offset_bottom = 11
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 14.0
+offset_bottom = 11.0
 mouse_filter = 2
 texture = ExtResource("4_tex")
 
-[node name="Held" type="NinePatchRect" parent="Slot17"]
+[node name="Held" type="NinePatchRect" parent="Slot17" unique_id=1249105063]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1967,26 +1819,22 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot17/Held"]
+[node name="Letter" type="Label" parent="Slot17/Held" unique_id=1602151911]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
+offset_right = 9.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
 text = "Z"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
 
-[node name="Equipped" type="NinePatchRect" parent="Slot17"]
+[node name="Equipped" type="NinePatchRect" parent="Slot17" unique_id=866710637]
 layout_mode = 0
-offset_left = 26
-offset_top = 1
-offset_right = 35
-offset_bottom = 10
-mouse_filter = 2
+offset_left = 26.0
+offset_top = 1.0
+offset_right = 35.0
+offset_bottom = 10.0
 texture = ExtResource("5_tex")
 patch_margin_left = 4
 patch_margin_top = 4
@@ -1995,26 +1843,24 @@ patch_margin_bottom = 4
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Letter" type="Label" parent="Slot17/Equipped"]
+[node name="Letter" type="Label" parent="Slot17/Equipped" unique_id=27341664]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 9
-offset_bottom = 9
-mouse_filter = 2
-text = "E"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 10.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
+text = "E"
+horizontal_alignment = 1
 
-[node name="Card" type="NinePatchRect" parent="."]
+[node name="Card" type="NinePatchRect" parent="." unique_id=791712552]
 layout_mode = 0
-offset_left = 260
-offset_top = 36
-offset_right = 368
-offset_bottom = 142
-mouse_filter = 2
+offset_left = 260.0
+offset_top = 36.0
+offset_right = 368.0
+offset_bottom = 142.0
 texture = ExtResource("6_tex")
 patch_margin_left = 10
 patch_margin_top = 10
@@ -2023,124 +1869,111 @@ patch_margin_bottom = 10
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="KitMedallion" type="TextureRect" parent="Card"]
+[node name="KitMedallion" type="TextureRect" parent="Card" unique_id=1663612149]
 layout_mode = 0
-offset_left = 30
-offset_top = 6
-offset_right = 30
-offset_bottom = 6
+offset_left = 30.0
+offset_top = 6.0
+offset_right = 30.0
+offset_bottom = 6.0
 mouse_filter = 2
 texture = ExtResource("7_tex")
 
-[node name="Glyph" type="TextureRect" parent="Card"]
+[node name="Glyph" type="TextureRect" parent="Card" unique_id=614989608]
 layout_mode = 0
-offset_left = 38
-offset_top = 15
-offset_right = 70
-offset_bottom = 47
+offset_left = 38.0
+offset_top = 15.0
+offset_right = 70.0
+offset_bottom = 47.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Medallion" type="TextureRect" parent="Card"]
+[node name="Medallion" type="TextureRect" parent="Card" unique_id=560360755]
 layout_mode = 0
-offset_left = 30
-offset_top = 8
-offset_right = 78
-offset_bottom = 56
+offset_left = 30.0
+offset_top = 8.0
+offset_right = 78.0
+offset_bottom = 56.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Socket" type="TextureRect" parent="Card"]
+[node name="Socket" type="TextureRect" parent="Card" unique_id=737590986]
 layout_mode = 0
-offset_left = 35
-offset_top = 12
-offset_right = 35
-offset_bottom = 12
+offset_left = 35.0
+offset_top = 12.0
+offset_right = 35.0
+offset_bottom = 12.0
 mouse_filter = 2
 texture = ExtResource("8_tex")
 
-[node name="Icon" type="TextureRect" parent="Card/Socket"]
+[node name="Icon" type="TextureRect" parent="Card/Socket" unique_id=1140876834]
 layout_mode = 0
-offset_left = 11
-offset_top = 10
-offset_right = 27
-offset_bottom = 26
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 27.0
+offset_bottom = 26.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Name" type="Label" parent="Card"]
+[node name="Name" type="Label" parent="Card" unique_id=1436723825]
 layout_mode = 0
-offset_left = 0
-offset_top = 58
-offset_right = 108
-offset_bottom = 68
-mouse_filter = 2
+offset_top = 58.0
+offset_right = 108.0
+offset_bottom = 68.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8
 text = "BLACK KATANA"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+
+[node name="Status" type="Label" parent="Card" unique_id=59885489]
+layout_mode = 0
+offset_top = 67.0
+offset_right = 108.0
+offset_bottom = 77.0
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 8
-
-[node name="Status" type="Label" parent="Card"]
-layout_mode = 0
-offset_left = 0
-offset_top = 67
-offset_right = 108
-offset_bottom = 77
-mouse_filter = 2
 text = "EQUIPPED"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1.0)
-theme_override_fonts/font = SubResource("pixel")
+
+[node name="Divider" type="ColorRect" parent="Card" unique_id=956958708]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 77.0
+offset_right = 96.0
+offset_bottom = 78.0
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1)
+
+[node name="Line1" type="Label" parent="Card" unique_id=542446196]
+layout_mode = 0
+offset_top = 81.0
+offset_right = 108.0
+offset_bottom = 91.0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1)
+theme_override_fonts/font = SubResource("cinzel")
 theme_override_font_sizes/font_size = 8
-
-[node name="Divider" type="ColorRect" parent="Card"]
-layout_mode = 0
-offset_left = 12
-offset_top = 77
-offset_right = 96
-offset_bottom = 78
-mouse_filter = 2
-color = Color(0.2667, 0.2941, 0.2863, 1.0)
-
-[node name="Line1" type="Label" parent="Card"]
-layout_mode = 0
-offset_left = 0
-offset_top = 81
-offset_right = 108
-offset_bottom = 91
-mouse_filter = 2
 text = "IN YOUR HANDS"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+
+[node name="Line2" type="Label" parent="Card" unique_id=544606400]
+layout_mode = 0
+offset_top = 89.0
+offset_right = 108.0
+offset_bottom = 99.0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1)
 theme_override_fonts/font = SubResource("cinzel")
 theme_override_font_sizes/font_size = 8
-
-[node name="Line2" type="Label" parent="Card"]
-layout_mode = 0
-offset_left = 0
-offset_top = 89
-offset_right = 108
-offset_bottom = 99
-mouse_filter = 2
-text = ""
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
-theme_override_fonts/font = SubResource("cinzel")
-theme_override_font_sizes/font_size = 8
 
-[node name="Empty" type="Label" parent="Card"]
+[node name="Empty" type="Label" parent="Card" unique_id=2098352711]
 layout_mode = 0
-offset_left = 0
-offset_top = 44
-offset_right = 108
-offset_bottom = 54
-mouse_filter = 2
-text = "EMPTY"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+offset_left = 1.0
+offset_top = 26.0
+offset_right = 109.0
+offset_bottom = 37.0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 8
+text = "EMPTY"
+horizontal_alignment = 1
