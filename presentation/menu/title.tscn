@@ -1,7 +1,907 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=11 format=3]
 
-[ext_resource type="Script" path="res://presentation/menu/title.gd" id="1"]
+[ext_resource type="Script" path="res://presentation/menu/title.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Shader" path="res://presentation/menu/pixel_text.gdshader" id="3_sha"]
+[ext_resource type="Texture2D" path="res://presentation/menu/menu_background.jpg" id="4_tex"]
+[ext_resource type="Texture2D" path="res://presentation/menu/title_logo_pixel.png" id="5_tex"]
+[ext_resource type="Script" path="res://presentation/menu/title_text.gd" id="6_scr"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="7_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("7_fon")
+variation_opentype = {
+2003265652: 900.0
+}
+
+[sub_resource type="ViewportTexture" id="viewport_texture"]
+viewport_path = NodePath("TextViewport")
+
+[sub_resource type="ShaderMaterial" id="pixel_material"]
+shader = ExtResource("3_sha")
 
 [node name="Title" type="Node2D"]
 texture_filter = 1
-script = ExtResource("1")
+script = ExtResource("1_scr")
+
+[node name="Background" type="Sprite2D" parent="."]
+show_behind_parent = true
+texture_filter = 2
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("4_tex")
+centered = false
+
+[node name="Logo" type="Sprite2D" parent="."]
+show_behind_parent = true
+texture_filter = 1
+position = Vector2(97, 6)
+texture = ExtResource("5_tex")
+centered = false
+
+[node name="TextViewport" type="SubViewport" parent="."]
+transparent_bg = true
+disable_3d = true
+gui_disable_input = true
+canvas_item_default_texture_filter = 0
+size = Vector2i(384, 216)
+render_target_update_mode = 4
+
+[node name="TitleText" type="Node2D" parent="TextViewport"]
+script = ExtResource("6_scr")
+
+[node name="Screens" type="Control" parent="TextViewport"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 384
+offset_bottom = 216
+mouse_filter = 2
+
+[node name="Title" type="Control" parent="TextViewport/Screens"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 384
+offset_bottom = 216
+mouse_filter = 2
+
+[node name="Plate" type="ColorRect" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 128
+offset_top = 131
+offset_right = 256
+offset_bottom = 142
+mouse_filter = 2
+color = Color(0.1412, 0.2118, 0.3608, 1.0)
+
+[node name="PlateLine" type="ColorRect" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 128
+offset_top = 140
+offset_right = 256
+offset_bottom = 141
+mouse_filter = 2
+color = Color(0.9569, 0.9255, 0.8392, 1.0)
+
+[node name="Arrow" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 132
+offset_top = 130.4
+offset_right = 144
+offset_bottom = 146.4
+mouse_filter = 2
+text = ">"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Item1" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 130.4
+offset_right = 384
+offset_bottom = 146.4
+mouse_filter = 2
+text = "NEW GAME"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Item2" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 142.4
+offset_right = 384
+offset_bottom = 158.4
+mouse_filter = 2
+text = "CONTINUE"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Item3" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 154.4
+offset_right = 384
+offset_bottom = 170.4
+mouse_filter = 2
+text = "BOSS FIGHT"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Item4" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 166.4
+offset_right = 384
+offset_bottom = 182.4
+mouse_filter = 2
+text = "CONTROLS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Item5" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 178.4
+offset_right = 384
+offset_bottom = 194.4
+mouse_filter = 2
+text = "CREDITS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Item6" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 190.4
+offset_right = 384
+offset_bottom = 206.4
+mouse_filter = 2
+text = "QUIT"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="SaveNote" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 204.8
+offset_right = 384
+offset_bottom = 214.8
+mouse_filter = 2
+text = ""
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="FallbackTitle" type="Label" parent="TextViewport/Screens/Title"]
+layout_mode = 0
+offset_left = 0
+offset_top = 29.9
+offset_right = 384
+offset_bottom = 47.9
+mouse_filter = 2
+text = "ADVENTURE OF TOTOY"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+visible = false
+
+[node name="Controls" type="Control" parent="TextViewport/Screens"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 384
+offset_bottom = 216
+mouse_filter = 2
+
+[node name="Heading" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 0
+offset_top = 2.5
+offset_right = 384
+offset_bottom = 26.5
+mouse_filter = 2
+text = "CONTROLS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key1" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 31.2
+offset_right = 132
+offset_bottom = 43.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action1" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 31.2
+offset_right = 336
+offset_bottom = 43.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key2" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 41.2
+offset_right = 132
+offset_bottom = 53.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action2" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 41.2
+offset_right = 336
+offset_bottom = 53.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key3" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 51.2
+offset_right = 132
+offset_bottom = 63.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action3" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 51.2
+offset_right = 336
+offset_bottom = 63.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key4" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 61.2
+offset_right = 132
+offset_bottom = 73.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action4" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 61.2
+offset_right = 336
+offset_bottom = 73.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key5" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 71.2
+offset_right = 132
+offset_bottom = 83.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action5" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 71.2
+offset_right = 336
+offset_bottom = 83.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key6" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 81.2
+offset_right = 132
+offset_bottom = 93.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action6" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 81.2
+offset_right = 336
+offset_bottom = 93.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key7" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 91.2
+offset_right = 132
+offset_bottom = 103.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action7" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 91.2
+offset_right = 336
+offset_bottom = 103.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key8" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 101.2
+offset_right = 132
+offset_bottom = 113.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action8" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 101.2
+offset_right = 336
+offset_bottom = 113.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key9" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 111.2
+offset_right = 132
+offset_bottom = 123.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action9" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 111.2
+offset_right = 336
+offset_bottom = 123.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key10" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 121.2
+offset_right = 132
+offset_bottom = 133.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action10" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 121.2
+offset_right = 336
+offset_bottom = 133.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Key11" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 131.2
+offset_right = 132
+offset_bottom = 143.2
+mouse_filter = 2
+text = "WASD"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Action11" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 136
+offset_top = 131.2
+offset_right = 336
+offset_bottom = 143.2
+mouse_filter = 2
+text = "MOVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Footer1" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 145.2
+offset_right = 352
+offset_bottom = 157.2
+mouse_filter = 2
+text = "GOLD ATTACKS CAN BE PARRIED."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Footer2" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 155.2
+offset_right = 352
+offset_bottom = 167.2
+mouse_filter = 2
+text = "GOLD ATTACKS CAN BE PARRIED."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Back" type="Label" parent="TextViewport/Screens/Controls"]
+layout_mode = 0
+offset_left = 52
+offset_top = 197.2
+offset_right = 352
+offset_bottom = 209.2
+mouse_filter = 2
+text = "ESC OR ENTER: BACK"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Credits" type="Control" parent="TextViewport/Screens"]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 384
+offset_bottom = 216
+mouse_filter = 2
+
+[node name="Heading" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 0
+offset_top = 2.5
+offset_right = 384
+offset_bottom = 26.5
+mouse_filter = 2
+text = "CREDITS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line1" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 31.2
+offset_right = 352
+offset_bottom = 43.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line2" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 41.2
+offset_right = 352
+offset_bottom = 53.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line3" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 51.2
+offset_right = 352
+offset_bottom = 63.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line4" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 61.2
+offset_right = 352
+offset_bottom = 73.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line5" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 71.2
+offset_right = 352
+offset_bottom = 83.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line6" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 81.2
+offset_right = 352
+offset_bottom = 93.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line7" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 91.2
+offset_right = 352
+offset_bottom = 103.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line8" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 101.2
+offset_right = 352
+offset_bottom = 113.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line9" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 111.2
+offset_right = 352
+offset_bottom = 123.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line10" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 121.2
+offset_right = 352
+offset_bottom = 133.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line11" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 131.2
+offset_right = 352
+offset_bottom = 143.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line12" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 141.2
+offset_right = 352
+offset_bottom = 153.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Line13" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 151.2
+offset_right = 352
+offset_bottom = 163.2
+mouse_filter = 2
+text = "CREDIT LINE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.7765, 0.7490, 0.6667, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="Back" type="Label" parent="TextViewport/Screens/Credits"]
+layout_mode = 0
+offset_left = 52
+offset_top = 197.2
+offset_right = 352
+offset_bottom = 209.2
+mouse_filter = 2
+text = "ESC OR ENTER: BACK"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+vertical_alignment = 0
+
+[node name="TextDisplay" type="Sprite2D" parent="."]
+material = SubResource("pixel_material")
+texture_filter = 1
+texture = SubResource("viewport_texture")
+centered = false

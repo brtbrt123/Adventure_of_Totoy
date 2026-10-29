@@ -142,6 +142,23 @@ func run() -> void:
 	arena.hud.queue_redraw()
 	await frames(4)
 	await save("arena_result")
+	# the main menu
+	arena.queue_free()
+	await process_frame
+	var title: Node = (load("res://presentation/menu/title.tscn") as PackedScene).instantiate()
+	title.change_scene = func(_path: String) -> void: pass
+	root.add_child(title)
+	await frames(5)
+	await save("title_menu")
+	title.index = 3
+	await frames(3)
+	await save("title_menu_item4")
+	title.screen = &"controls"
+	await frames(3)
+	await save("title_controls")
+	title.screen = &"credits"
+	await frames(3)
+	await save("title_credits")
 	quit(0)
 
 const InputFrameClass := preload("res://core/input_frame.gd")
