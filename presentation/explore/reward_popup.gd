@@ -1,13 +1,24 @@
 extends "res://presentation/arena/hud.gd"
-## Receipt display only. The caller queues confirmed core rewards, never grants inventory here.
-const CARD: Rect2 = Rect2(262, 64, 118, 36)
+## Receipt display only. The caller queues confirmed core rewards, never grants inventory here. The card itself is the
+## editable scene presentation/ui/reward_card.tscn (open it in Godot to move or restyle it); this script only queues,
+## times and hands the scene the words.
+const RewardCard := preload("res://presentation/ui/reward_card.tscn")
 const DISPLAY_SECONDS: float = 3.4
+## The name's room inside the card, in game pixels (the card's Name label width).
+const NAME_WIDTH: float = 72.0
 var pending: Array[Dictionary] = []
 var receipt: Dictionary = {}
 var seconds_left: float = 0.0
 var blocked: bool = false
 var atlas: Texture2D
 var frames: Dictionary = {}
+var card: Control = null
+
+
+func _ready() -> void:
+	card = RewardCard.instantiate()
+	add_child(card)
+	_refresh()
 
 
 func enqueue(value: Dictionary) -> void:
@@ -31,28 +42,20 @@ func advance(delta: float) -> void:
 			receipt = pending.pop_front()
 			seconds_left = DISPLAY_SECONDS
 	visible = not receipt.is_empty()
-	queue_redraw()
+	_refresh()
 
 
-func _draw() -> void:
-	if receipt.is_empty() or colors.is_empty():
+func _refresh() -> void:
+	if card == null or receipt.is_empty():
 		return
-	UiPanel.draw_panel(self, CARD, &"info", colors)
-	var well: Rect2 = Rect2(CARD.position + Vector2(8, 6), Vector2(24, 24))
-	Kit.slot(self, well, &"normal")
-	var key: String = String(receipt.get("icon", ""))
-	var icon: Rect2 = Rect2(well.position + Vector2(4, 4), Vector2(16, 16))
-	if frames.has(key) and atlas != null:
-		var frame: Dictionary = frames[key]
-		draw_texture_rect_region(atlas, icon, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
-	var name: String = String(receipt["name"])
+	card.atlas = atlas
+	card.frames = frames
+	var text: String = String(receipt["name"])
 	var quantity: int = int(receipt.get("quantity", 1))
 	if quantity > 1:
-		name += " x%d" % quantity
-	var label: Rect2 = Rect2(CARD.position + Vector2(38, 6), Vector2(CARD.size.x - 48, 24))
-	outlined(Vector2(label.position.x, label.position.y + 1), "RECEIVED", colors["u"], colors["0"], 1, ui_font(), 6)
+		text += " x%d" % quantity
 	# Long item names shrink, preserving the complete name within the fixed card.
 	var size: int = 9
-	while size > 6 and text_width(name, 1, ui_font(), size) > label.size.x:
+	while size > 6 and text_width(text, 1, ui_font(), size) > NAME_WIDTH:
 		size -= 1
-	outlined(Vector2(label.position.x, label.position.y + 11), name, colors["1"], colors["0"], 1, ui_font(), size)
+	card.apply({"icon": String(receipt.get("icon", "")), "text": text, "size": size})

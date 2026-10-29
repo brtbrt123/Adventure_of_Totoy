@@ -1,0 +1,94 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/reward_card.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="4_tex"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="5_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="6_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("5_fon")
+variation_opentype = {2003265652: 900.0}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("6_fon")
+variation_opentype = {2003265652: 400.0}
+
+[node name="RewardCard" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+script = ExtResource("1_scr")
+
+[node name="Card" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 262
+offset_top = 64
+offset_right = 380
+offset_bottom = 100
+mouse_filter = 2
+texture = ExtResource("3_tex")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Well" type="NinePatchRect" parent="Card"]
+layout_mode = 0
+offset_left = 8
+offset_top = 6
+offset_right = 32
+offset_bottom = 30
+mouse_filter = 2
+texture = ExtResource("4_tex")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Icon" type="TextureRect" parent="Card"]
+layout_mode = 0
+offset_left = 12
+offset_top = 10
+offset_right = 28
+offset_bottom = 26
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Caption" type="Label" parent="Card"]
+layout_mode = 0
+offset_left = 38
+offset_top = 5
+offset_right = 110
+offset_bottom = 13
+mouse_filter = 2
+text = "RECEIVED"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="Name" type="Label" parent="Card"]
+layout_mode = 0
+offset_left = 38
+offset_top = 14
+offset_right = 110
+offset_bottom = 28
+mouse_filter = 2
+text = "BLACK KATANA"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2

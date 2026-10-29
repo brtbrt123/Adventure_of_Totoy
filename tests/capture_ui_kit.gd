@@ -77,6 +77,8 @@ func run() -> void:
 	scene.core.set_flag(&"seen_controls")
 	await frames(30)
 	await save("village_plain")
+	scene.conversation.controls_open = false
+	scene.reward_popup.blocked = false
 	scene.show_reward({"kind": "item", "name": "Herb", "quantity": 1, "icon": "hud_copper_herb"})
 	await frames(30)
 	await save("village_reward")
