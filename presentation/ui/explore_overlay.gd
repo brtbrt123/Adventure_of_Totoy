@@ -93,6 +93,9 @@ func _objective(text: String) -> void:
 	box.size.x = clampf(_width(label, text) + 34.0, 120.0, 300.0)
 
 
+var _toast_right: float = -1.0
+
+
 func _toast(toast: Dictionary) -> void:
 	var box: Control = _piece("Toast")
 	if box == null:
@@ -103,8 +106,11 @@ func _toast(toast: Dictionary) -> void:
 		return
 	label.text = String(toast.get("text", "")).to_upper()
 	var width: float = ceilf(_width(label, label.text)) + 58.0
+	# the ribbon grows to the left: its right edge and its height stay where you put them in the scene
+	if _toast_right < 0.0:
+		_toast_right = box.position.x + box.size.x
 	box.size.x = width
-	box.position.x = 380.0 - width
+	box.position.x = _toast_right - width
 	label.size.x = width
 	box.modulate.a = float(toast.get("alpha", 1.0))
 

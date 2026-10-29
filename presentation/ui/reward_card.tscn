@@ -22,8 +22,9 @@ script = ExtResource("1_scr")
 [node name="Card" type="NinePatchRect" parent="." unique_id=2072281198]
 layout_mode = 0
 offset_left = 265.0
+offset_top = 23.0
 offset_right = 383.0
-offset_bottom = 36.0
+offset_bottom = 59.0
 texture = ExtResource("3_tex")
 patch_margin_left = 10
 patch_margin_top = 10
