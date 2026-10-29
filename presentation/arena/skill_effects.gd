@@ -92,7 +92,7 @@ static func trail(from: Vector2, to: Vector2, age: int, colors: Dictionary) -> A
 
 
 ## Core attack objects own projectile position/lifetime, independently of player state.
-static func projectiles(snap: Snapshots.GameSnapshot) -> Array[Dictionary]:
+static func projectiles(snap: RefCounted) -> Array[Dictionary]:
 	var plans: Array[Dictionary] = []
 	for attack: Snapshots.SkillAttackSnapshot in snap.skill_attacks:
 		if attack.shape != &"projectile" or attack.skill_id != &"moon_cleave":

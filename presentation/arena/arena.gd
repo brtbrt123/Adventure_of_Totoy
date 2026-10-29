@@ -11,7 +11,6 @@ const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cut
 const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
 const ReapersCoilCutIn := preload("res://presentation/arena/reapers_coil_cutin.gd")
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
-const AspectEffects := preload("res://presentation/arena/aspect_effects.gd")
 const Aspects := preload("res://core/aspects.gd")
 ## Per-frame data of the scythe import (chain_origin of the Reaper's Coil whip/pull frames).
 const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
@@ -20,7 +19,6 @@ const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
 const Weapons := preload("res://core/weapons.gd")
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
-const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
 const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
 const GroundView := preload("res://presentation/arena/ground_view.gd")
@@ -70,13 +68,8 @@ var coil_hook_tick: int = -1
 var drag_started: Dictionary = {}
 ## Frame name -> where the chain leaves the fist (relative to the feet, facing right), from the scythe manifest.
 var chain_origins: Dictionary = {}
-## Spirit Lantern / Phantom Cut event effects in world coordinates ({"kind", "tick", "life", ...}), capped at
-## AspectEffects.MAX_LIVE. The lantern prop, its pool, the Phantom glow and the echo marker draw from the snapshot.
-var aspect_fx: Array[Dictionary] = []
 ## True between a Phantom echo's attack_hit and its damage_taken (the echo flashes the boss less than a real hit).
 var echo_hit_pending: bool = false
-## Frame name -> top row of its visible pixels (the Phantom marker floats over the head).
-var frame_tops: Dictionary = {}
 var profile: Object = null
 var new_best: bool = false
 ## Replaced by tests so going back to the title does not leave the scene they run in.
@@ -98,9 +91,6 @@ var slash_plan: Array[Dictionary] = []
 var rings: Array[Dictionary] = []
 var visual_tick: int = -1
 var skill_trails: Array[Dictionary] = []
-var released_skill_attacks: Dictionary = {}
-var current_skill_release: Dictionary = {}
-var projectile_textures: Dictionary = {}
 var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
@@ -230,6 +220,18 @@ func fx_playing() -> bool:
 
 func fx_cue(key: String, tick: int, strength: float = 1.0) -> void:
 	combat_audio.cue(key, tick, strength)
+
+
+func fx_snapshot() -> RefCounted:
+	return snapshot
+
+
+## The boss's core (the painted glow), else the position plus the boss's body offset.
+func fx_target_contact(target_id: int, fallback: Vector2) -> Vector2:
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.id == target_id:
+			return boss_core_position(actor)
+	return fallback + ScytheEffects.BOSS_BODY
 
 
 ## True while any weapon cut-in plays (the world does not step).
@@ -478,9 +480,6 @@ func _age_effects() -> void:
 	for i: int in range(coil_fx.size() - 1, -1, -1):
 		if cosmetic_tick - int(coil_fx[i]["tick"]) >= int(coil_fx[i]["life"]):
 			coil_fx.remove_at(i)
-	for i: int in range(aspect_fx.size() - 1, -1, -1):
-		if cosmetic_tick - int(aspect_fx[i]["tick"]) >= int(aspect_fx[i]["life"]):
-			aspect_fx.remove_at(i)
 	for id: int in flashes.keys():
 		flashes[id] = int(flashes[id]) - 1
 		if int(flashes[id]) <= 0:
@@ -560,14 +559,11 @@ func _on_event(event: GameEvent) -> void:
 			_sound_counter_window_opened(event)
 		&"counter_window_closed": _sound_counter_window_closed(event)
 		&"skill_started":
-			current_skill_release.clear()
+			on_hero_skill_event(event)
 			combat_audio.cue("skill_" + String(event.data["skill_id"]), event.tick)
 		&"skill_released":
-			var attack_id: int = int(event.data["attack_id"])
-			if released_skill_attacks.has(attack_id):
+			if not on_hero_skill_event(event):
 				return
-			released_skill_attacks[attack_id] = true
-			current_skill_release = event.data.duplicate()
 			combat_audio.cue("release_" + String(event.data["skill_id"]), event.tick)
 		&"dash_started":
 			_sound_dash_started(event)
@@ -734,44 +730,6 @@ func _coil_drag_trail() -> void:
 			_add_coil_fx({"kind": "dust", "tick": snapshot.tick, "at": (actor.position + Vector2(12 if toward_right else -12, 0)).round(), "left": toward_right, "life": ScytheEffects.sequence_length(ScytheEffects.DUST_TICKS)})
 		if tick % ScytheEffects.SCUFF_EVERY == 0:
 			_add_coil_fx({"kind": "scuff", "tick": snapshot.tick, "at": actor.position.round(), "left": toward_right, "life": ScytheEffects.sequence_length(ScytheEffects.SCUFF_TICKS)})
-
-## Spirit Lantern and Phantom Cut, from the core's events (the lantern, its pool and the Phantom glow draw from the
-## snapshot every frame). Sounds reuse the combat cues (no new audio).
-func _on_aspect_event(event: GameEvent) -> void:
-	var tick: int = event.tick
-	match event.type:
-		&"lantern_placed":
-			_dust(Vector2(event.data["position"]))
-			combat_audio.cue("deflect", tick, 0.45)
-		&"lantern_pulse":
-			var at: Vector2 = event.data["position"]
-			var scale_px: float = AspectEffects.pool_scale(float(event.data.get("radius", Tuning.SPIRIT_LANTERN_RADIUS)))
-			AspectEffects.add(aspect_fx, {"kind": "pool_pulse", "tick": tick, "at": at.round(), "scale": scale_px, "life": AspectEffects.sequence_length(AspectEffects.POOL_PULSE_TICKS)})
-			if bool(event.data.get("player_inside", false)):
-				AspectEffects.add(aspect_fx, {"kind": "motes", "tick": tick, "life": AspectEffects.sequence_length(AspectEffects.MOTES_TICKS)})
-				AspectEffects.add(aspect_fx, {"kind": "spark", "tick": tick + AspectEffects.SPARK_DELAY, "start": tick, "life": AspectEffects.SPARK_DELAY + AspectEffects.sequence_length(AspectEffects.SPARK_TICKS)})
-				combat_audio.cue("weapon_buff_end", tick, 0.35)
-		&"lantern_expired":
-			var at: Vector2 = event.data["position"]
-			AspectEffects.add(aspect_fx, {"kind": "fade", "tick": tick, "at": at.round(), "scale": AspectEffects.pool_scale(Tuning.SPIRIT_LANTERN_RADIUS), "life": AspectEffects.sequence_length(AspectEffects.FADE_TICKS)})
-		&"phantom_cut_started":
-			AspectEffects.add(aspect_fx, {"kind": "phantom_start", "tick": tick, "life": AspectEffects.sequence_length(AspectEffects.START_TICKS)})
-			combat_audio.cue("phantom_cut", tick, 0.55)
-		&"phantom_cut_ended":
-			AspectEffects.add(aspect_fx, {"kind": "phantom_end", "tick": tick, "life": AspectEffects.sequence_length(AspectEffects.END_TICKS)})
-			combat_audio.cue("weapon_buff_end", tick, 0.45)
-		&"phantom_echo":
-			var hero: Snapshots.EntitySnapshot = snapshot.player
-			var weapon: String = AspectEffects.weapon_key(StringName(event.data.get("weapon_id", hero.weapon_id)))
-			var swing: int = int(event.data.get("swing_combo_index", 1))
-			var ghost_at: Vector2 = (hero.position + Vector2(-AspectEffects.GHOST_OFFSET if facing_left else AspectEffects.GHOST_OFFSET, 0)).round()
-			AspectEffects.add(aspect_fx, {"kind": "echo", "tick": tick, "at": ghost_at, "left": facing_left, "weapon": weapon, "swing": swing, "life": AspectEffects.echo_life()})
-			var contact: Vector2 = Vector2(event.data.get("position", hero.position)) + ScytheEffects.BOSS_BODY
-			for actor: Snapshots.EntitySnapshot in snapshot.entities:
-				if actor.id == int(event.data.get("target_id", -1)):
-					contact = boss_core_position(actor)
-			AspectEffects.add(aspect_fx, {"kind": "echo_spark", "tick": tick + AspectEffects.ECHO_SPARK_DELAY, "at": contact.round(), "life": AspectEffects.ECHO_SPARK_DELAY + AspectEffects.sequence_length(AspectEffects.ECHO_SPARK_TICKS)})
-			combat_audio.cue("swing", tick, 0.45)
 
 func _draw() -> void:
 	if snapshot == null or colors.is_empty():
@@ -1117,118 +1075,6 @@ func _sound_game_result(_event: GameEvent) -> void:
 	combat_audio.set_music_active(false)
 
 
-## Effects follow current snapshot phases; cancelled skills leave no queued release.
-func skill_effect() -> Dictionary:
-	if snapshot.result != &"playing":
-		return {}
-	if snapshot.player.state != &"skill_windup" and current_skill_release.get("skill_id", &"") != snapshot.player.skill_id:
-		return {}
-	return SkillEffects.plan(snapshot.player)
-
-func _draw_skill_effect(shake_offset: Vector2 = Vector2.ZERO) -> void:
-	var effect: Dictionary = skill_effect()
-	if effect.is_empty():
-		return
-	var key: String = effect["key"]
-	if not frames.has(key):
-		push_warning("Missing skill effect: " + key)
-		return
-	var frame: Dictionary = frames[key]
-	var anchor: Vector2 = Vector2(frame["ax"], frame["ay"])
-	draw_set_transform(Vector2(effect["at"]) + shake_offset, float(effect["rotation"]))
-	var rect: Rect2 = Rect2(-anchor, Vector2(frame["w"], frame["h"]))
-	var region: Rect2 = Rect2(frame["x"], frame["y"], frame["w"], frame["h"])
-	draw_texture_rect_region(sprites, rect, region)
-	draw_set_transform(shake_offset)
-	CombatEffects.draw_plan(self, SkillEffects.accents(snapshot.player, colors))
-
-
-## Strong contact accents are driven by confirmed attack_hit events only.
-func _draw_skill_contacts() -> void:
-	for burst: Dictionary in hit_bursts:
-		if burst.get("skill_id", &"") != &"breaking_edge":
-			continue
-		var age: int = snapshot.tick + snapshot.result_ticks - int(burst["tick"])
-		if age < 0 or age >= 10:
-			continue
-		var at: Vector2 = burst["contact"]
-		var radius: float = 17.0 - age
-		var commands: Array[Dictionary] = []
-		for angle: float in [-0.75, 0.75]:
-			var axis: Vector2 = Vector2(burst["facing"]).rotated(angle) * radius
-			var cut: PackedVector2Array = PackedVector2Array([at - axis, at + axis])
-			CombatEffects.stroke(commands, cut, colors["0"], 5.0)
-			CombatEffects.stroke(commands, cut, colors["1"] if age < 3 else colors["x"], 2.0)
-		CombatEffects.draw_plan(self, commands)
-
-
-func skill_projectile_effects() -> Array[Dictionary]:
-	return SkillEffects.projectiles(snapshot)
-
-## Resize once into integer-pixel textures; width is supplied by the core snapshot.
-## Keep each frame's declared anchor when trimming its transparent padding.
-func _projectile_texture(key: String, diameter: int) -> Dictionary:
-	var cache_key: String = "%s:%d" % [key, diameter]
-	if projectile_textures.has(cache_key):
-		return projectile_textures[cache_key]
-	if not frames.has(key):
-		push_warning("Missing projectile effect: " + key)
-		return {}
-	var frame: Dictionary = frames[key]
-	var image: Image = sprites.get_image().get_region(Rect2i(frame["x"], frame["y"], frame["w"], frame["h"]))
-	var used: Rect2i = image.get_used_rect()
-	if not used.has_area():
-		return {}
-	image = image.get_region(used)
-	var ratio: float = float(diameter) / maxi(used.size.x, used.size.y)
-	var size: Vector2i = Vector2i(maxi(1, roundi(used.size.x * ratio)), maxi(1, roundi(used.size.y * ratio)))
-	image.resize(size.x, size.y, Image.INTERPOLATE_NEAREST)
-	var anchor: Vector2 = Vector2(roundf((float(frame["ax"]) - used.position.x) * float(size.x) / used.size.x), roundf((float(frame["ay"]) - used.position.y) * float(size.y) / used.size.y))
-	var entry: Dictionary = {"texture": ImageTexture.create_from_image(image), "anchor": anchor, "diameter": diameter}
-	projectile_textures[cache_key] = entry
-	return entry
-
-func _draw_skill_projectiles(shake_offset: Vector2) -> void:
-	for effect: Dictionary in skill_projectile_effects():
-		var entry: Dictionary = _projectile_texture(effect["key"], maxi(1, roundi(float(effect["width"]))))
-		if entry.is_empty():
-			continue
-		draw_set_transform(Vector2(effect["at"]).round() + shake_offset, float(effect["rotation"]))
-		# Large cosmetic aura; collision width remains entirely core-owned.
-		var diameter: int = maxi(1, roundi(float(effect["visual_width"])))
-		var wake: Dictionary = _projectile_texture(effect["key"], diameter)
-		var length: float = float(effect["trail_length"])
-		var age: int = int(effect["age"])
-		# Detached smaller crescents follow only the distance already travelled.
-		for echo: int in range(2, 0, -1):
-			var offset: float = float(echo * 14)
-			if length < offset:
-				continue
-			var remnant: Dictionary = _projectile_texture("fx_aspect2_moon_cleave_5", diameter - echo * 12)
-			if not remnant.is_empty():
-				draw_texture(remnant["texture"], Vector2(-offset, 0) - Vector2(remnant["anchor"]))
-		if length > 3.0:
-			for lane: int in [-1, 0, 1]:
-				var y: float = float(lane * 10)
-				draw_line(Vector2(-length, y), Vector2(-5, y * 0.4), colors["l"], 5.0, false)
-				draw_line(Vector2(-length + 3, y), Vector2(-5, y * 0.4), colors["o"], 2.0, false)
-		if not wake.is_empty():
-			draw_texture(wake["texture"], -Vector2(wake["anchor"]))
-		# Crisp orbiting fragments, deterministic from the attack's age.
-		for fragment: int in range(8):
-			var phase: int = posmod(age + fragment * 5, 18)
-			var side: float = -1.0 if fragment % 2 == 0 else 1.0
-			var at: Vector2 = Vector2(-float(phase * 2), side * (18.0 + float(posmod(fragment * 7 + age, 16))))
-			draw_line(at.round(), (at + Vector2(4, -side * 2)).round(), colors["p"] if phase < 9 else colors["v"], 2.0, false)
-		# A short release star belongs to the projectile, so it survives interruption.
-		if age < 5:
-			var radius: float = float(18 - age * 2)
-			for ray: int in range(4):
-				var axis: Vector2 = Vector2.from_angle(PI * 0.25 + ray * PI * 0.5)
-				draw_line((axis * 4).round(), (axis * radius).round(), colors["1"], 2.0, false)
-		draw_texture(entry["texture"], -Vector2(entry["anchor"]))
-		draw_set_transform(shake_offset)
-
 func weapon_buff_effect() -> Dictionary:
 	return WeaponBuffView.plan(snapshot)
 
@@ -1465,133 +1311,7 @@ func _draw_scythe(shake_offset: Vector2) -> void:
 
 # ---------------------------------------------------------------- Spirit Lantern / Phantom Cut (world space)
 
-## The light pools on the floor under every character: open with the lantern, then loop; the closing pool of a fading
-## lantern; the pulse rings (event effects, so the last pulse still shows when the lantern expires on its tick).
-func _draw_lantern_ground() -> void:
-	var tick: int = snapshot.tick
-	for lantern: Snapshots.LanternSnapshot in snapshot.lanterns:
-		var key: String = AspectEffects.pool_key(tick - lantern.placed_tick)
-		if key != "":
-			_draw_scaled(key, lantern.position.round(), AspectEffects.pool_scale(lantern.radius))
-	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
-	for effect: Dictionary in aspect_fx:
-		var age: int = cosmetic_tick - int(effect["tick"])
-		match String(effect["kind"]):
-			"fade":
-				var close: String = AspectEffects.pool_close_key(age)
-				if close != "":
-					_draw_scaled(close, effect["at"], float(effect["scale"]))
-			"pool_pulse":
-				var frame: int = AspectEffects.sequence_frame(AspectEffects.POOL_PULSE_TICKS, age)
-				if frame > 0:
-					_draw_scaled("fx_lantern_pool_pulse_%d" % frame, effect["at"], float(effect["scale"]))
-
-## A lantern sorts just in front of a body standing on the same ground row (it is placed at the hero's feet and would
-## otherwise vanish behind his legs); under a pixel, so the whole-pixel draw position does not move.
-const LANTERN_SORT_BIAS: Vector2 = Vector2(0, 0.4)
-
-## The lantern props (and fading ones) as y-sorted drawables: {"name", "at", "scale"} like the solid props.
-func lantern_drawables() -> Array[Dictionary]:
-	var items: Array[Dictionary] = []
-	for lantern: Snapshots.LanternSnapshot in snapshot.lanterns:
-		var key: String = AspectEffects.lantern_key(snapshot.tick - lantern.placed_tick, AspectEffects.since_pulse(lantern, snapshot.tick))
-		if frames.has(key):
-			items.append({"name": key, "at": lantern.position.round() + LANTERN_SORT_BIAS, "scale": Vector2.ONE})
-	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
-	for effect: Dictionary in aspect_fx:
-		if effect["kind"] == "fade":
-			var frame: int = AspectEffects.sequence_frame(AspectEffects.FADE_TICKS, cosmetic_tick - int(effect["tick"]))
-			if frame > 0:
-				items.append({"name": "fx_lantern_fade_%d" % frame, "at": Vector2(effect["at"]) + LANTERN_SORT_BIAS, "scale": Vector2.ONE})
-	return items
-
-## The Phantom Cut buff glow over the hero frame being drawn (manifest naming rule), same position and mirroring, by
-## its own anchor; nothing when that frame has no overlay (victory, coil poses, the Lightning set).
-func phantom_glow_key(actor: Snapshots.EntitySnapshot, hero_frame: String) -> String:
-	if actor.phantom_ticks_left <= 0 or snapshot.result != &"playing":
-		return ""
-	var key: String = AspectEffects.glow_key(ArenaAnimation.overlay_frame(hero_frame), AspectEffects.since_start(actor.phantom_ticks_left))
-	return key if frames.has(key) else ""
-
-func _draw_phantom_glow(actor: Snapshots.EntitySnapshot, hero_frame: String, at: Vector2, left: bool) -> void:
-	var key: String = phantom_glow_key(actor, hero_frame)
-	if key == "":
-		return
-	var f: Dictionary = frames[key]
-	draw_texture_rect_region(sprites, ArenaAnimation.destination(at, f, left), Rect2(f["x"], f["y"], f["w"], f["h"]))
-
-## Top of the visible pixels of a frame, relative to its anchor's feet row (negative = above the feet).
-func frame_top(key: String) -> float:
-	if not frames.has(key):
-		return -30.0
-	if not frame_tops.has(key):
-		var f: Dictionary = frames[key]
-		var used: Rect2i = sprites.get_image().get_region(Rect2i(int(f["x"]), int(f["y"]), int(f["w"]), int(f["h"]))).get_used_rect()
-		frame_tops[key] = float(used.position.y) - float(f.get("ay", f["h"]))
-	return float(frame_tops[key])
-
-## Where the echo-pending marker stands (its anchor is its bottom centre): over the head of the idle pose of the set,
-## so it does not bob with every swing frame.
-func phantom_marker_position() -> Vector2:
-	var hero: Snapshots.EntitySnapshot = snapshot.player
-	var top: float = frame_top(ArenaAnimation.hero_frame(ArenaAnimation.hero_set(hero), "idle", 1))
-	return hero.position.round() + Vector2(0, top - AspectEffects.MARKER_GAP)
-
-## Over everything standing: the Phantom start/end bursts and marker on the hero, the echo ghosts with their arcs, the
-## landing sparks on the boss, the lantern's heal motes and Edge sparks on the hero.
-func _draw_aspects_front() -> void:
-	if snapshot.result != &"playing" and aspect_fx.is_empty():
-		return
-	var hero: Snapshots.EntitySnapshot = snapshot.player
-	var feet: Vector2 = hero.position.round()
-	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
-	for effect: Dictionary in aspect_fx:
-		var age: int = cosmetic_tick - int(effect["tick"])
-		match String(effect["kind"]):
-			"echo":
-				var ghost: int = AspectEffects.sequence_frame(AspectEffects.GHOST_TICKS, age)
-				if ghost > 0:
-					_draw_anchored(AspectEffects.ghost_key(effect["weapon"], int(effect["swing"]), ghost), effect["at"], bool(effect["left"]))
-				var arc: int = AspectEffects.sequence_frame(AspectEffects.ARC_TICKS, age)
-				if arc > 0:
-					_draw_anchored(AspectEffects.arc_key(effect["weapon"], int(effect["swing"]), arc), effect["at"], bool(effect["left"]))
-			"echo_spark":
-				var frame: int = AspectEffects.sequence_frame(AspectEffects.ECHO_SPARK_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_phantom_spark_%d" % frame, effect["at"])
-			"phantom_start":
-				var frame: int = AspectEffects.sequence_frame(AspectEffects.START_TICKS, age)
-				if frame > 0:
-					_draw_anchored("fx_phantom_start_%d" % frame, feet, facing_left)
-			"phantom_end":
-				var frame: int = AspectEffects.sequence_frame(AspectEffects.END_TICKS, age)
-				if frame > 0:
-					_draw_anchored("fx_phantom_end_%d" % frame, feet, facing_left)
-			"motes":
-				var frame: int = AspectEffects.sequence_frame(AspectEffects.MOTES_TICKS, age)
-				if frame > 0:
-					_draw_anchored("fx_lantern_motes_%d" % frame, feet, facing_left)
-			"spark":
-				var frame: int = AspectEffects.sequence_frame(AspectEffects.SPARK_TICKS, age)
-				if frame > 0:
-					var chest: Vector2 = AspectEffects.CHEST
-					if facing_left:
-						chest.x = -chest.x
-					_draw_imported("fx_lantern_spark_%d" % frame, feet + chest)
-	if hero.phantom_pending_echoes > 0 and snapshot.result == &"playing":
-		_draw_imported(AspectEffects.marker_key(snapshot.tick), phantom_marker_position())
-
 
 # ---------------------------------------------------------------- Echo Step / Stone Ward / Sprint (world space)
 # Every draw below goes through a plan (an Array of {"key", "at", "left", ...}) so the tests can check exactly what is
 # drawn without a renderer. "left" mirrors a frame around its own anchor, like the hero frames.
-
-## The echo anchors as y-sorted drawables ({"name", "at", "scale"} like the lantern): the anchor loop, the countdown
-## for the last ticks; nothing during the placement burst.
-func echo_drawables() -> Array[Dictionary]:
-	var items: Array[Dictionary] = []
-	for echo: Snapshots.EchoSnapshot in snapshot.echoes:
-		var key: String = WardEchoSprintEffects.anchor_key(snapshot.tick - echo.placed_tick, echo.ticks_left)
-		if key != "" and frames.has(key):
-			items.append({"name": key, "at": echo.position.round() + LANTERN_SORT_BIAS, "scale": Vector2.ONE})
-	return items
