@@ -57,6 +57,8 @@ func _draw() -> void:
 		return
 	if fight_hud:
 		_draw_combat()
+	elif strip != null:
+		strip.visible = false
 	_draw_progression()
 	if toast_text != "" and toast_alpha > 0.0 and not bool(training.get("active", false)) and (combat==null or combat.objective.is_empty()):
 		var rect: Rect2 = toast_rect()
@@ -177,62 +179,52 @@ func combat_event(event: GameEvent) -> void:
 			task_tick=event.tick
 			task_message="Task complete +%d EXP" % int(event.data.get("exp",0))
 		GameEvent.ITEM_USED: item_flash_tick = event.tick
-## One item slot (kit frame, the game's own herb icon, count and key) or Aspect socket (kit diamond around the game's own
-## Aspect icon, key in the stem).
-func combat_slot(at: Vector2, key: String, value: Dictionary, item: bool) -> void:
-	var unlocked: bool = bool(value.get("unlocked", false))
-	if item:
-		var rect: Rect2 = Rect2(at, Vector2(26, 26))
-		Kit.slot(self, rect, &"normal" if unlocked else &"locked")
-		if unlocked and String(value.get("item", "")) == "herb":
-			ui("hud_copper_herb", Rect2(at + Vector2(5, 5), Vector2(16, 16)))
-		var badge: Rect2 = Rect2(at + Vector2(-2, 19), Vector2(9, 9))
-		UiPanel.key_badge(self, badge.position, colors)
-		lettering(badge.position + Vector2(4.5 - text_width(key, 1, stat_font(), 8) * 0.5, 1), key, colors["1" if unlocked else "g"], 1, stat_font(), 8)
-		if unlocked:
-			outlined(at + Vector2(18, 18), str(value.get("count", 0)), colors["1"], colors["0"], 1, ui_font(), 7)
+const HudStrip := preload("res://presentation/ui/hud_strip.tscn")
+## The bottom strip, level pillar and sockets are the editable scene presentation/ui/hud_strip.tscn (open it in Godot to
+## move or re-texture anything); this script only hands it numbers from the snapshot.
+var strip: Control = null
+
+
+func _ready() -> void:
+	strip = HudStrip.instantiate()
+	strip.visible = false
+	add_child(strip)
+
+
+func _sync_strip() -> void:
+	if strip == null:
 		return
-	var owned: bool = combat == null or combat.owned_aspects.has(StringName(value.get("aspect", &"")))
-	Kit.socket(self, at, not unlocked or not owned)
-	if unlocked and owned:
-		var icon: Rect2 = Kit.socket_icon_rect(at)
-		ui(aspect_icon(StringName(value.get("aspect", &""))), icon, Vector2(4, 4), Vector2(16, 16))
-		if not bool(value.get("usable", false)):
-			draw_rect(icon, Color(colors["0"], 0.6))
-	draw_socket_key(at, key, colors["1" if unlocked and owned else "g"])
+	strip.visible = fight_hud and combat != null and not colors.is_empty()
+	if not strip.visible:
+		return
+	strip.atlas = portrait_atlas
+	strip.frames = ui_frames
+	var items: Array = []
+	for i: int in 2:
+		items.append(combat.item_slots[i] if i < combat.item_slots.size() else {})
+	var aspects: Array = []
+	for i: int in 3:
+		var value: Dictionary = combat.aspect_slots[i] if i < combat.aspect_slots.size() else {}
+		aspects.append({"unlocked": bool(value.get("unlocked", false)), "owned": combat.owned_aspects.has(StringName(value.get("aspect", &""))), "usable": bool(value.get("usable", false)), "icon": aspect_icon(StringName(value.get("aspect", &"")))})
+	var dash_ready: float = float(maxi(0, dash_peak - combat.dash_cooldown_ticks)) / maxf(1.0, float(dash_peak)) if bool(combat.unlocked.get("dash", false)) else 0.0
+	strip.apply({
+		"armed": combat.armed, "weapon_glyph": "ui_weapon_totoy_blade_1",
+		"hp": combat.hero.hp, "max_hp": combat.hero.max_hp, "ghost": hp_ghost if hp_ghost >= 0.0 else combat.hero.hp,
+		"edge": -1.0,  # Edge is not in ExploreSnapshot: an unavailable track, never an invented value
+		"dash": dash_ready, "items": items, "aspects": aspects,
+		"level": combat.level, "exp": clampf(exp_fill, 0.0, 1.0), "exp_label": "MAX" if combat.exp_to_next == 0 else "EXP",
+		"defeated": combat.defeated,
+	})
 
 
 func _draw_combat() -> void:
 	if combat == null:return
-	var weapon: Vector2 = weapon_rect().position - Vector2(0, 2)
-	Kit.medallion(self, weapon)
-	if combat.armed:ui("ui_weapon_totoy_blade_1", Rect2(Kit.medallion_centre(weapon) - Vector2(16, 16), Vector2(32, 32)))
-	var hp: String = "%d / %d" % [combat.hero.hp, combat.hero.max_hp]
-	outlined(Vector2(STRIP_X + 2, HP_Y - 11), "HEALTH", colors["u"], colors["0"], 1, null, 7)
-	outlined(Vector2(STRIP_X + STRIP_W - 2 - text_width(hp, 1, ui_font(), 8), HP_Y - 12), hp, colors["1"], colors["0"], 1, ui_font(), 8)
-	Kit.bar(self, Vector2(STRIP_X, HP_Y), STRIP_W, [["fill_ghost", hp_ghost / maxf(1.0, float(combat.hero.max_hp))], ["fill_health", float(combat.hero.hp) / maxf(1.0, float(combat.hero.max_hp))]])
-	# Edge is not in ExploreSnapshot. Show an unavailable track, never invent a value.
-	outlined(Vector2(STRIP_X + 2, THIN_Y - 8), "EDGE  --", colors["g"], colors["0"], 1, null, 6)
-	Kit.bar(self, Vector2(STRIP_X, THIN_Y), 84, [], true)
-	outlined(Vector2(STRIP_X + 100, THIN_Y - 8), "DASH", colors["v"], colors["0"], 1, null, 6)
-	var dash_ready: float = float(maxi(0, dash_peak - combat.dash_cooldown_ticks)) / maxf(1.0, float(dash_peak)) if bool(combat.unlocked.get("dash", false)) else 0.0
-	Kit.bar(self, Vector2(STRIP_X + 98, THIN_Y), 38, [["fill_exp_thin", dash_ready]], true)
-	for i: int in 2:
-		combat_slot(Vector2(208 + i * 30, 184), str(i + 1), combat.item_slots[i] if i < combat.item_slots.size() else {}, true)
-	for i: int in 3:
-		combat_slot(aspect_rects()[i].position, ["Z", "X", "C"][i], combat.aspect_slots[i] if i < combat.aspect_slots.size() else {}, false)
-	# the level pillar: the number sits in its pennant, the violet EXP rises in the tube
+	_sync_strip()
 	var pillar: Vector2 = Vector2(4, 36)
-	Kit.pillar(self, pillar, 118.0, clampf(exp_fill, 0.0, 1.0), colors["v"], colors["p"])
-	var level: String = str(combat.level)
-	var level_size: int = 11 if level.length() < 2 else 8
-	centered(pillar.x + 10.5, pillar.y + 6, level, colors["1"], colors["0"], 1, stat_font(), 8)
-	centered(pillar.x + 10.5, pillar.y + 121, "MAX" if combat.exp_to_next == 0 else "EXP", colors["o"], colors["0"], 1, ui_font(), 6)
 	if feedback_active(combat.tick, exp_glow_tick, 24):UiPanel.outline(self, Rect2(pillar.x + 6, pillar.y + 29, 9, 78), colors["p"])
 	if feedback_active(combat.tick, item_flash_tick, 15):UiPanel.outline(self, Rect2(207, 183, 28, 28), colors["u"])
 	if combat.defeated:
 		draw_rect(Rect2(0, 164, 384, 52), Color(colors["0"], 0.6))
-		centered(192, 186, "DOWN", colors["o"], colors["0"], 1, ui_font(), 9)
 
 var task_message: String=""
 var task_tick: int=-1000
