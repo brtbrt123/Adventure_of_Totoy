@@ -1,0 +1,99 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/welcome_card.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/panel_large_ornate.png" id="3_tex"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="4_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="5_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("4_fon")
+variation_opentype = {2003265652: 900.0}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("5_fon")
+variation_opentype = {2003265652: 400.0}
+
+[node name="WelcomeCard" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+script = ExtResource("1_scr")
+
+[node name="Veil" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 384
+offset_bottom = 216
+mouse_filter = 2
+color = Color(0.1098, 0.0941, 0.1412, 0.55)
+
+[node name="Card" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 74
+offset_top = 62
+offset_right = 310
+offset_bottom = 154
+mouse_filter = 2
+texture = ExtResource("3_tex")
+patch_margin_left = 30
+patch_margin_top = 20
+patch_margin_right = 30
+patch_margin_bottom = 20
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 94
+offset_top = 74
+offset_right = 294
+offset_bottom = 92
+mouse_filter = 2
+text = "WELCOME TO LANTERNFEN"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 11
+
+[node name="Line1" type="Label" parent="."]
+layout_mode = 0
+offset_left = 94
+offset_top = 98
+offset_right = 294
+offset_bottom = 110
+mouse_filter = 2
+text = "You made it home."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Line2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 94
+offset_top = 110
+offset_right = 304
+offset_bottom = 122
+mouse_filter = 2
+text = "A familiar light still burns in the quiet."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Hint" type="Label" parent="."]
+layout_mode = 0
+offset_left = 94
+offset_top = 132
+offset_right = 294
+offset_bottom = 142
+mouse_filter = 2
+text = "E / Enter: continue"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7

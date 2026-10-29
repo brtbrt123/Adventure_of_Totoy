@@ -1,30 +1,22 @@
-[gd_scene format=3 uid="uid://chtfbyoj1c4on"]
+[gd_scene load_steps=10 format=3]
 
-[ext_resource type="Script" uid="uid://by6y0bgyathl4" path="res://presentation/ui/dialogue_box.gd" id="1_scr"]
-[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="2_fon"]
-[ext_resource type="FontFile" uid="uid://bxa12or38dv8m" path="res://presentation/fonts/Cinzel.ttf" id="3_fon"]
-[ext_resource type="Texture2D" uid="uid://cdq7gd4crhmma" path="res://art/reference/chapter1_characters_v2/portraits_v2.png" id="4_tex"]
-[ext_resource type="Texture2D" uid="uid://b4cgep61d047j" path="res://art/ui_kit/panel_large_ornate.png" id="5_tex"]
-[ext_resource type="Texture2D" uid="uid://bu7rys2wkil6j" path="res://art/ui_kit/slot_frame.png" id="6_tex"]
-[ext_resource type="Texture2D" uid="uid://b14vs4pn6scwu" path="res://art/ui_kit/name_ribbon.png" id="7_tex"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gqgxl"]
-atlas = ExtResource("4_tex")
-region = Rect2(1, 91, 88, 88)
+[ext_resource type="Script" path="res://presentation/ui/dialogue_box.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="2_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="3_fon"]
+[ext_resource type="Texture2D" path="res://art/reference/chapter1_characters_v2/portraits_v2.png" id="4_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/panel_large_ornate.png" id="5_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="6_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/name_ribbon.png" id="7_tex"]
 
 [sub_resource type="FontVariation" id="cinzel"]
 base_font = ExtResource("3_fon")
-variation_opentype = {
-2003265652: 900.0
-}
+variation_opentype = {2003265652: 900.0}
 
 [sub_resource type="FontVariation" id="pixel"]
 base_font = ExtResource("2_fon")
-variation_opentype = {
-2003265652: 400.0
-}
+variation_opentype = {2003265652: 400.0}
 
-[node name="DialogueBox" type="Control" unique_id=1918229748]
+[node name="DialogueBox" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 384.0
@@ -33,18 +25,22 @@ mouse_filter = 2
 script = ExtResource("1_scr")
 portrait_sheet = ExtResource("4_tex")
 
-[node name="Dialogue" type="Control" parent="." unique_id=913068076]
-anchors_preset = 0
-offset_right = 384.0
-offset_bottom = 216.0
-mouse_filter = 2
-
-[node name="Panel" type="NinePatchRect" parent="Dialogue" unique_id=1148798069]
+[node name="Dialogue" type="Control" parent="."]
 layout_mode = 0
-offset_left = 6.0
-offset_top = 146.0
-offset_right = 378.0
-offset_bottom = 212.0
+offset_left = 0
+offset_top = 0
+offset_right = 384
+offset_bottom = 216
+mouse_filter = 2
+visible = false
+
+[node name="Panel" type="NinePatchRect" parent="Dialogue"]
+layout_mode = 0
+offset_left = 6
+offset_top = 146
+offset_right = 378
+offset_bottom = 212
+mouse_filter = 2
 texture = ExtResource("5_tex")
 patch_margin_left = 30
 patch_margin_top = 20
@@ -53,12 +49,13 @@ patch_margin_bottom = 20
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="PortraitFrame" type="NinePatchRect" parent="Dialogue" unique_id=528352411]
+[node name="PortraitFrame" type="NinePatchRect" parent="Dialogue"]
 layout_mode = 0
-offset_left = 16.0
-offset_top = 154.0
-offset_right = 68.0
-offset_bottom = 206.0
+offset_left = 16
+offset_top = 154
+offset_right = 68
+offset_bottom = 206
+mouse_filter = 2
 texture = ExtResource("6_tex")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -67,143 +64,82 @@ patch_margin_bottom = 8
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Portrait" type="TextureRect" parent="Dialogue" unique_id=888854406]
+[node name="Portrait" type="TextureRect" parent="Dialogue"]
 layout_mode = 0
-offset_left = 20.0
-offset_top = 158.0
-offset_right = 64.0
-offset_bottom = 202.0
+offset_left = 20
+offset_top = 158
+offset_right = 64
+offset_bottom = 202
 mouse_filter = 2
-texture = SubResource("AtlasTexture_gqgxl")
 expand_mode = 1
+stretch_mode = 0
 
-[node name="Ribbon" type="NinePatchRect" parent="Dialogue" unique_id=1014774933]
+[node name="Ribbon" type="NinePatchRect" parent="Dialogue"]
 layout_mode = 0
-offset_left = 78.0
-offset_top = 138.0
-offset_right = 172.0
-offset_bottom = 154.0
+offset_left = 78
+offset_top = 138
+offset_right = 198
+offset_bottom = 154
+mouse_filter = 2
 texture = ExtResource("7_tex")
 patch_margin_left = 26
+patch_margin_top = 0
 patch_margin_right = 26
+patch_margin_bottom = 0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
-[node name="Speaker" type="Label" parent="Dialogue/Ribbon" unique_id=746127001]
+[node name="Speaker" type="Label" parent="Dialogue/Ribbon"]
 layout_mode = 0
-offset_top = 1.0
-offset_right = 94.0
-offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = SubResource("cinzel")
-theme_override_font_sizes/font_size = 10
+offset_left = 0
+offset_top = 1
+offset_right = 120
+offset_bottom = 15
+mouse_filter = 2
 text = "TOVAN"
 horizontal_alignment = 1
-
-[node name="Text" type="Label" parent="Dialogue" unique_id=1373679666]
-layout_mode = 0
-offset_left = 80.0
-offset_top = 158.0
-offset_right = 372.0
-offset_bottom = 194.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_constants/line_spacing = -3
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 9
-text = "Hold out your hands, Totoy. This is a Black Katana,
-and it is yours. It was always yours."
-
-[node name="HintNext" type="Label" parent="Dialogue" unique_id=206418497]
-layout_mode = 0
-offset_left = 80.0
-offset_top = 194.0
-offset_right = 280.0
-offset_bottom = 204.0
-theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 7
-text = "E / Enter: Next"
-
-[node name="HintSkip" type="Label" parent="Dialogue" unique_id=63395131]
-layout_mode = 0
-offset_left = 300.0
-offset_top = 194.0
-offset_right = 370.0
-offset_bottom = 204.0
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 7
-text = "Escape: skip"
-
-[node name="Controls" type="Control" parent="." unique_id=742373712]
-anchors_preset = 0
-offset_right = 384.0
-offset_bottom = 216.0
-mouse_filter = 2
-
-[node name="Veil" type="ColorRect" parent="Controls" unique_id=632701201]
-layout_mode = 0
-offset_right = 384.0
-offset_bottom = 216.0
-mouse_filter = 2
-color = Color(0.1098, 0.0941, 0.1412, 0.55)
-
-[node name="Card" type="NinePatchRect" parent="Controls" unique_id=1843228374]
-layout_mode = 0
-offset_left = 74.0
-offset_top = 62.0
-offset_right = 310.0
-offset_bottom = 154.0
-texture = ExtResource("5_tex")
-patch_margin_left = 30
-patch_margin_top = 20
-patch_margin_right = 30
-patch_margin_bottom = 20
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Title" type="Label" parent="Controls" unique_id=905874170]
-layout_mode = 0
-offset_left = 94.0
-offset_top = 74.0
-offset_right = 294.0
-offset_bottom = 92.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
 theme_override_fonts/font = SubResource("cinzel")
-theme_override_font_sizes/font_size = 11
-text = "WELCOME TO LANTERNFEN"
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
 
-[node name="Line1" type="Label" parent="Controls" unique_id=180394319]
+[node name="Text" type="Label" parent="Dialogue"]
 layout_mode = 0
-offset_left = 94.0
-offset_top = 98.0
-offset_right = 294.0
-offset_bottom = 110.0
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
+offset_left = 80
+offset_top = 158
+offset_right = 372
+offset_bottom = 194
+mouse_filter = 2
+text = "Hold out your hands."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 9
-text = "You made it home."
+theme_override_constants/line_spacing = -3
 
-[node name="Line2" type="Label" parent="Controls" unique_id=135258189]
+[node name="HintNext" type="Label" parent="Dialogue"]
 layout_mode = 0
-offset_left = 94.0
-offset_top = 110.0
-offset_right = 304.0
-offset_bottom = 122.0
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 9
-text = "A familiar light still burns in the quiet."
-
-[node name="Hint" type="Label" parent="Controls" unique_id=1946176465]
-layout_mode = 0
-offset_left = 94.0
-offset_top = 132.0
-offset_right = 294.0
-offset_bottom = 142.0
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
+offset_left = 80
+offset_top = 194
+offset_right = 280
+offset_bottom = 204
+mouse_filter = 2
+text = "E / Space: Next"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 7
-text = "Press any key"
+
+[node name="HintSkip" type="Label" parent="Dialogue"]
+layout_mode = 0
+offset_left = 300
+offset_top = 194
+offset_right = 370
+offset_bottom = 204
+mouse_filter = 2
+text = "Esc: skip"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7

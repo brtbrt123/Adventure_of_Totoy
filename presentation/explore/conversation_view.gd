@@ -4,6 +4,7 @@ extends "res://presentation/arena/hud.gd"
 ## out and hands the scene the words.
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const DialogueBox := preload("res://presentation/ui/dialogue_box.tscn")
+const WelcomeCard := preload("res://presentation/ui/welcome_card.tscn")
 const TEXT_WIDTH: float = 280.0
 const CHARACTERS_PER_SECOND: float = 38.0
 var dialogue: Dictionary = {}
@@ -16,6 +17,7 @@ var controls_open: bool = false:
 var portrait_frames: Dictionary = {}
 var portrait_sheet: Texture2D
 var box: Control = null
+var welcome: Control = null
 var _line_key: String = ""
 var blip: Callable = Callable()
 var typed_nonspaces: int = 0
@@ -29,6 +31,8 @@ func _ready() -> void:
 	box.portrait_sheet = portrait_sheet
 	box.portrait_frames = portrait_frames
 	add_child(box)
+	welcome = WelcomeCard.instantiate()
+	add_child(welcome)
 	_refresh()
 
 
@@ -84,7 +88,7 @@ func wrapped_lines(text: String) -> Array[String]:
 func _refresh() -> void:
 	if box == null:
 		return
-	box.show_controls(controls_open, "%s / %s: continue" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next")] if controls_open else "")
+	welcome.show_card(controls_open, "%s / %s: continue" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next")] if controls_open else "")
 	if controls_open or dialogue.is_empty():
 		box.show_line({})
 		return

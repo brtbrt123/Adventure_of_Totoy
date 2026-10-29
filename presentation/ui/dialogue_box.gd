@@ -1,6 +1,6 @@
 @tool
 extends Control
-## The conversation box and the first-visit controls card as a Godot scene (dialogue_box.tscn). Open the scene in the editor
+## The conversation box as a Godot scene (dialogue_box.tscn; the welcome card is its own scene, welcome_card.tscn). Open the scene in the editor
 ## to move, resize or re-texture anything; this script only fills in the words. It draws nothing and holds no rules:
 ## conversation_view.gd decides what is shown (the typed-out text, the speaker, the hints) and hands it to show_line().
 
@@ -15,8 +15,6 @@ var _portraits: Dictionary = {}
 @onready var text: Label = $Dialogue/Text
 @onready var hint_next: Label = $Dialogue/HintNext
 @onready var hint_skip: Label = $Dialogue/HintSkip
-@onready var controls: Control = $Controls
-@onready var controls_hint: Label = $Controls/Hint
 
 
 func _ready() -> void:
@@ -26,11 +24,9 @@ func _ready() -> void:
 		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/reference/chapter1_characters_v2/portraits_v2.json"))
 		portrait_frames = (data as Dictionary).get("frames", {}) if data is Dictionary else {}
 		show_line({"speaker": "Tovan", "portrait": "tovan", "shown_text": "Hold out your hands, Totoy. This is a Black Katana,\nand it is yours. It was always yours.", "next_hint": "E / Enter: Next", "skip_hint": "Escape: skip"})
-		show_controls(true, "E / Enter: continue")
 	else:
 		# in the game they stay hidden until conversation_view.gd shows them
 		line_box.visible = false
-		controls.visible = false
 
 
 func _portrait_texture(key: String) -> Texture2D:
@@ -63,8 +59,3 @@ func show_line(line: Dictionary) -> void:
 	hint_next.text = String(line.get("next_hint", ""))
 	hint_skip.text = String(line.get("skip_hint", ""))
 
-
-## The first-visit card: shown while `open`; `hint` is its key line.
-func show_controls(open: bool, hint: String = "") -> void:
-	controls.visible = open
-	controls_hint.text = hint
