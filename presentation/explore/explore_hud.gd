@@ -59,17 +59,7 @@ func _draw() -> void:
 		_draw_combat()
 	elif strip != null:
 		strip.visible = false
-	_draw_progression()
-	if toast_text != "" and toast_alpha > 0.0 and not bool(training.get("active", false)) and (combat==null or combat.objective.is_empty()):
-		var rect: Rect2 = toast_rect()
-		Kit.ribbon(self, rect, toast_alpha)
-		outlined(Vector2(rect.position.x + (rect.size.x - text_width(toast_text, 1, menu_font(), TOAST_SIZE)) * 0.5, rect.position.y + 2), toast_text, Color(colors["1"], toast_alpha), Color(colors["0"], toast_alpha), 1, menu_font(), TOAST_SIZE)
-	if hint_text != "" and fade_alpha <= 0.0:
-		var plate: Rect2 = hint_rect()
-		Kit.button(self, plate, &"normal")
-		outlined(plate.position + Vector2(6, 4), hint_text, colors["1"], colors["0"], 1, null, 7)
-	if bool(training.get("active", false)):
-		_draw_training_cards()
+	_sync_overlay()
 	if not debug_lines.is_empty():
 		var y: float = 24.0
 		draw_rect(Rect2(3, y - 2, 170, debug_lines.size() * 8 + 4), Color(colors["0"], 0.7))
@@ -80,38 +70,63 @@ func _draw() -> void:
 		draw_rect(Rect2(-4, -4, 392, 224), Color(colors["0"], clampf(fade_alpha, 0.0, 1.0)))
 
 
-## Same teal frame, corner gems, title face and body font as the controls/dialogue cards.
-func _draw_training_cards() -> void:
-	var dy: int=122  # keep the post, its warnings and the practice ring unobscured
+const ExploreOverlay := preload("res://presentation/ui/explore_overlay.tscn")
+var overlay: Control = null
+
+
+## Hands the road's messages (objective, ribbon, banner, chips, hint, tutorial cards) to the scene presentation/ui/explore_overlay.tscn.
+func _sync_overlay() -> void:
+	if overlay == null:
+		overlay = ExploreOverlay.instantiate()
+		add_child(overlay)
+	var data: Dictionary = {}
+	var training_on: bool = bool(training.get("active", false))
+	if combat != null:
+		if not combat.objective.is_empty():
+			data["objective"] = String(combat.objective.get("text", ""))
+		if level_banner_visible():
+			data["level_up"] = {"sub": "+%d stat points" % level_points}
+		if feedback_active(combat.tick, task_tick, 100):
+			data["task"] = task_message
+		if feedback_active(combat.tick, gate_tick, 160):
+			var rows: Array[String] = [""]
+			for word: String in gate_message.split(" "):
+				var candidate: String = rows[-1] + (" " if not rows[-1].is_empty() else "") + word
+				if text_width(candidate, 1, ui_font(), 8) > 330:
+					rows.append(word)
+				else:
+					rows[-1] = candidate
+			data["gate"] = rows.slice(0, 2)
+		var x0: int = 60 if fight_hud else 6
+		var y0: int = 152 if fight_hud else 190
+		var items: Array = []
+		for i: int in 3:
+			items.append({"unlocked": bool(combat.unlocked.get(["dash", "attack", "parry"][i], false)), "key": Bindings.action_label(["arena_dash", "arena_attack", "arena_parry"][i]).replace("Left click", "LMB")})
+		data["chips"] = {"x": x0, "y": y0, "items": items}
+		if feedback_active(combat.tick, locked_tick, 70):
+			data["locked"] = {"text": locked_message, "x": x0, "y": y0 - 11}
+		data["tab"] = {"text": "TAB" + (" !" if combat.stat_points_unspent > 0 else ""), "x": 6 if fight_hud else 160, "y": 176 if fight_hud else 198}
+	if toast_text != "" and toast_alpha > 0.0 and not training_on and (combat == null or combat.objective.is_empty()):
+		data["toast"] = {"text": toast_text, "alpha": toast_alpha}
+	if hint_text != "" and fade_alpha <= 0.0:
+		var plate: Rect2 = hint_rect()
+		data["hint"] = {"text": hint_text, "x": plate.position.x, "y": plate.position.y}
+	if training_on:
+		_sync_training(data)
+	overlay.apply(data)
+
+
+## The tutorial cards' words: the lesson card (title, detail, key) and the four-lesson checklist.
+func _sync_training(data: Dictionary) -> void:
 	var lesson: String = String(training.get("hint", ""))
 	var titles: Dictionary = {"dash": "Dash", "attack": "Attack", "parry": "Parry gold", "dodge": "Dodge red"}
 	var details: Dictionary = {"dash": "Dash through the marked ring.", "attack": "Hit the post: %d / %d" % [training.get("hits", 0), training.get("hits_needed", 3)], "parry": "Press just before the gold hit.", "dodge": "Dash through the red hit."}
 	var actions: Dictionary = {"dash": "arena_dash", "attack": "arena_attack", "parry": "arena_parry", "dodge": "arena_dash"}
 	var feedback: bool = not training_feedback.is_empty() and toast_alpha > 0.0
 	if titles.has(lesson) or (bool(training.get("done", false)) and feedback):
-		UiPanel.draw_panel(self, Rect2(6, 6+dy, 196, 34), &"info", colors)
-		lettering(Vector2(15, 13+dy), titles.get(lesson, "Training complete"), colors["u"], 1, menu_font(), 8)
-		lettering(Vector2(15, 26+dy), training_feedback if feedback else String(details.get(lesson, "All four lessons learned.")), colors["1"], 1, ui_font(), 8)
-		var key: String = Bindings.action_label(actions[lesson]) if actions.has(lesson) else "Done"
-		var width: float = text_width(key, 1, ui_font(), 8) + 10
-		var badge: Rect2 = Rect2(193 - width, 12+dy, width, 13)
-		Kit.button(self, badge, &"normal")
-		lettering(badge.position + Vector2(5, 4), key, colors["1"], 1, ui_font(), 8)
-	UiPanel.draw_panel(self, Rect2(244, 180, 134, 32), &"info", colors)
-	var checks: Dictionary = training.get("lessons", {})
-	var names: Array[String] = ["attack", "dash", "parry", "dodge"]
-	for i: int in names.size():
-		var name: String = names[i]
-		var done: bool = bool(checks.get(name, false))
-		var x: float = 254 + (i % 2) * 62
-		var y: float = 188 + (i / 2) * 11
-		var tone: Color = colors["u"] if done else (colors["1"] if name == lesson else colors["o"])
-		UiPanel.outline(self, Rect2(x, y, 5, 5), tone)
-		if done:
-			draw_polyline(PackedVector2Array([Vector2(x + 1, y + 2), Vector2(x + 2, y + 3), Vector2(x + 4, y)]), tone)
-		lettering(Vector2(x + 8, y), name, tone, 1, ui_font(), 8)
-		if name == lesson:
-			draw_rect(Rect2(x + 8, y + 7, 40, 1), colors["t"])
+		data["lesson"] = {"title": titles.get(lesson, "Training complete"), "detail": training_feedback if feedback else String(details.get(lesson, "All four lessons learned.")), "key": Bindings.action_label(actions[lesson]) if actions.has(lesson) else "Done"}
+	data["checklist"] = {"names": ["attack", "dash", "parry", "dodge"], "done": training.get("lessons", {}), "current": lesson}
+
 
 const ExploreCore := preload("res://core/explore_core.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -235,39 +250,3 @@ var level_points: int=0
 func locked_hint(text: String) -> void:
 	locked_message=text
 	locked_tick=combat.tick if combat!=null else 0
-func _draw_progression() -> void:
-	if combat==null:return
-	if not combat.objective.is_empty():
-		var objective: String = String(combat.objective.get("text",""))
-		var plate_w: float = clampf(text_width(objective,1,ui_font(),8)+34.0,120.0,300.0)
-		Kit.bar(self,Vector2(4,4),plate_w,[])
-		outlined(Vector2(18,8),objective,colors["1"],colors["0"],1,ui_font(),8)
-	if level_banner_visible():
-		UiPanel.draw_panel(self,Rect2(264,24,116,36),&"info",colors,false)
-		centered(322,31,"LEVEL UP",colors["p"],colors["0"],1,ui_font(),8)
-		centered(322,43,"+%d stat points" % level_points,colors["u"],colors["0"],1,ui_font(),7)
-	if feedback_active(combat.tick,task_tick,100):
-		outlined(Vector2(9,24),task_message,colors["u"],colors["0"],1,ui_font(),8)
-	if feedback_active(combat.tick,gate_tick,160):
-		UiPanel.draw_panel(self,Rect2(14,44,356,34),&"info",colors,false)
-		var words: PackedStringArray=gate_message.split(" ")
-		var rows: Array[String]=[""]
-		for word: String in words:
-			var candidate: String=rows[-1]+(" " if not rows[-1].is_empty() else "")+word
-			if text_width(candidate,1,ui_font(),8)>330:rows.append(word)
-			else:rows[-1]=candidate
-		for i: int in mini(2,rows.size()):outlined(Vector2(26,52+i*9),rows[i],colors["1"],colors["0"],1,ui_font(),8)
-	var x0: int=60 if fight_hud else 6
-	var y0: int=152 if fight_hud else 190
-	for i: int in 3:
-		var name: String=["dash","attack","parry"][i]
-		var unlocked: bool=bool(combat.unlocked.get(name,false))
-		var at: Vector2=Vector2(x0+i*38,y0)
-		var chip: Rect2=Rect2(at,Vector2(36,17))
-		Kit.button(self,chip,&"normal" if unlocked else &"locked")
-		var key: String=Bindings.action_label(["arena_dash","arena_attack","arena_parry"][i]).replace("Left click","LMB")
-		if not unlocked:Kit.put(self,"icon_padlock",at+Vector2(5,4))
-		var key_x: float=chip.position.x+(21.0 if not unlocked else 18.0)
-		outlined(Vector2(key_x-text_width(key,1,ui_font(),6)*0.5,at.y+6),key,colors["p" if unlocked else "g"],colors["0"],1,ui_font(),6)
-	if feedback_active(combat.tick,locked_tick,70):outlined(Vector2(x0,y0-11),locked_message,colors["o"],colors["0"],1,ui_font(),7)
-	outlined(Vector2(6,176) if fight_hud else Vector2(160,198),"TAB"+(" !" if combat.stat_points_unspent>0 else ""),colors["u"],colors["0"],1,ui_font(),7)

@@ -27,10 +27,9 @@ variation_opentype = {
 show_behind_parent = true
 layout_mode = 3
 anchors_preset = 0
-offset_left = -72.0
-offset_top = -5.0
-offset_right = 312.0
-offset_bottom = 211.0
+offset_left = -1.0
+offset_right = 383.0
+offset_bottom = 216.0
 mouse_filter = 2
 script = ExtResource("1_scr")
 
@@ -1744,10 +1743,9 @@ axis_stretch_vertical = 1
 [node name="Letter" type="Label" parent="Slot16/Equipped" unique_id=771380434]
 layout_mode = 1
 anchors_preset = -1
-offset_left = 1.0
-offset_top = 2.0
-offset_right = 10.0
-offset_bottom = 11.0
+anchor_bottom = 0.215
+offset_right = 9.0
+offset_bottom = 7.065
 theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6
@@ -1845,10 +1843,8 @@ axis_stretch_vertical = 1
 
 [node name="Letter" type="Label" parent="Slot17/Equipped" unique_id=27341664]
 layout_mode = 0
-offset_left = 1.0
-offset_top = 2.0
-offset_right = 10.0
-offset_bottom = 11.0
+offset_right = 9.0
+offset_bottom = 9.0
 theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_fonts/font = ExtResource("2_fon")
 theme_override_font_sizes/font_size = 6

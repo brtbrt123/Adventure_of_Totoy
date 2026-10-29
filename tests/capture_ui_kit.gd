@@ -77,6 +77,18 @@ func run() -> void:
 	scene.core.set_flag(&"seen_controls")
 	await frames(30)
 	await save("village_plain")
+	scene.set_physics_process(false)
+	scene.hud.training = {"active": true, "hint": "attack", "hits": 1, "hits_needed": 3, "lessons": {"dash": true}}
+	scene.hud.hint_text = "[E] TALK"
+	scene.hud.hint_at = Vector2(150, 70)
+	scene.hud.level_up_tick = scene.hud.combat.tick
+	scene.hud.level_points = 2
+	scene.hud.queue_redraw()
+	await frames(3)
+	await save("village_training")
+	scene.hud.training = {}
+	scene.hud.hint_text = ""
+	scene.set_physics_process(true)
 	scene.conversation.controls_open = false
 	scene.reward_popup.blocked = false
 	scene.show_reward({"kind": "item", "name": "Herb", "quantity": 1, "icon": "hud_copper_herb"})
