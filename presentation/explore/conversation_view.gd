@@ -1,14 +1,21 @@
 extends "res://presentation/arena/hud.gd"
-## Snapshot text only; reveal and consume presses here, conversation rules stay in core.
+## Snapshot text only; reveal and consume presses here, conversation rules stay in core. The box itself is the editable
+## scene presentation/ui/dialogue_box.tscn (open it in Godot to move or re-texture anything); this script types the text
+## out and hands the scene the words.
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
-const PANEL: Rect2 = Rect2(6, 146, 372, 66)
+const DialogueBox := preload("res://presentation/ui/dialogue_box.tscn")
 const TEXT_WIDTH: float = 280.0
 const CHARACTERS_PER_SECOND: float = 38.0
 var dialogue: Dictionary = {}
 var reveal: float = 0.0
-var controls_open: bool = false
+## The first-visit welcome card (explore_scene.gd sets it).
+var controls_open: bool = false:
+	set(value):
+		controls_open = value
+		_refresh()
 var portrait_frames: Dictionary = {}
 var portrait_sheet: Texture2D
+var box: Control = null
 var _line_key: String = ""
 var blip: Callable = Callable()
 var typed_nonspaces: int = 0
@@ -18,6 +25,11 @@ func _ready() -> void:
 	portrait_sheet = load("res://art/reference/chapter1_characters_v2/portraits_v2.png") as Texture2D
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://art/reference/chapter1_characters_v2/portraits_v2.json")) as Dictionary
 	portrait_frames = data.get("frames", {})
+	box = DialogueBox.instantiate()
+	box.portrait_sheet = portrait_sheet
+	box.portrait_frames = portrait_frames
+	add_child(box)
+	_refresh()
 
 
 func sync(value: Dictionary) -> void:
@@ -27,7 +39,7 @@ func sync(value: Dictionary) -> void:
 		typed_nonspaces = 0
 		_line_key = key
 	dialogue = value.duplicate()
-	queue_redraw()
+	_refresh()
 
 
 func tick() -> void:
@@ -38,7 +50,7 @@ func tick() -> void:
 			typed_nonspaces += 1
 			if typed_nonspaces % 3 == 0 and blip.is_valid():
 				blip.call()
-	queue_redraw()
+	_refresh()
 
 
 func full_text() -> String:
@@ -51,7 +63,7 @@ func complete() -> bool:
 
 func finish_typing() -> void:
 	reveal = full_text().length()
-	queue_redraw()
+	_refresh()
 
 
 func wrapped_lines(text: String) -> Array[String]:
@@ -68,38 +80,23 @@ func wrapped_lines(text: String) -> Array[String]:
 	return out
 
 
-func _draw() -> void:
-	if colors.is_empty():
+## Pushes the current words into the scene (the scene draws, this only says what).
+func _refresh() -> void:
+	if box == null:
 		return
-	if controls_open:
-		draw_rect(Rect2(0, 0, 384, 216), Color(colors["0"], 0.55))
-		UiPanel.draw_panel(self, Rect2(74, 62, 236, 92), &"info", colors)
-		lettering(Vector2(94, 80), "Welcome to Lanternfen", colors["1"], 1, menu_font(), 11)
-		lettering(Vector2(94, 105), "You made it home.", colors["p"], 1, ui_font(), 9)
-		lettering(Vector2(94, 117), "A familiar light still burns in the quiet.", colors["p"], 1, ui_font(), 9)
-		lettering(Vector2(94, 135), "%s / %s: continue" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next")], colors["u"])
+	box.show_controls(controls_open, "%s / %s: continue" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next")] if controls_open else "")
+	if controls_open or dialogue.is_empty():
+		box.show_line({})
 		return
-	if dialogue.is_empty():
-		return
-	UiPanel.draw_panel(self, PANEL, &"info", colors)
-	# the portrait (88 px art shown at 44) in a carved frame; the speaker's ribbon sits on the panel's top edge
-	var frame: Rect2 = Rect2(16, 154, 52, 52)
-	Kit.nine(self, "slot_frame", frame)
-	var portrait: String = "portrait_%s_neutral" % String(dialogue.get("portrait", ""))
-	if portrait_frames.has(portrait):
-		var data: Dictionary = portrait_frames[portrait]
-		draw_texture_rect_region(portrait_sheet, Rect2(frame.position + Vector2(4, 4), Vector2(44, 44)), Rect2(data["x"], data["y"], data["w"], data["h"]))
-	var speaker: String = String(dialogue.get("speaker", ""))
-	var ribbon_w: float = ceilf(text_width(speaker, 1, menu_font(), 10)) + 56.0
-	Kit.ribbon(self, Rect2(78, 138, ribbon_w, 16))
-	lettering(Vector2(78 + (ribbon_w - text_width(speaker, 1, menu_font(), 10)) * 0.5, 141), speaker, colors["1"], 1, menu_font(), 10)
 	var lines: Array[String] = wrapped_lines(full_text())
+	var shown: PackedStringArray = PackedStringArray()
 	var remaining: int = int(reveal)
-	for i: int in lines.size():
-		var shown: String = lines[i].substr(0, maxi(0, remaining))
-		# Draw case-preserving dialogue with the same real font as the HUD.
-		draw_string(ui_font(), Vector2(80, 169 + i * 11), shown, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, colors["1"])
-		remaining -= lines[i].length() + 1
-	var next: String = "Next" if complete() else "Reveal"
-	lettering(Vector2(80, 195), "%s / %s: %s" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next"), next], colors["p"])
-	lettering(Vector2(300, 195), "%s: skip" % Bindings.action_label("dialogue_skip"), colors["o"])
+	for line: String in lines:
+		shown.append(line.substr(0, maxi(0, remaining)))
+		remaining -= line.length() + 1
+	box.show_line({
+		"speaker": String(dialogue.get("speaker", "")), "portrait": String(dialogue.get("portrait", "")),
+		"shown_text": "\n".join(shown),
+		"next_hint": "%s / %s: %s" % [Bindings.action_label("explore_interact"), Bindings.action_label("dialogue_next"), "Next" if complete() else "Reveal"],
+		"skip_hint": "%s: skip" % Bindings.action_label("dialogue_skip"),
+	})

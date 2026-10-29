@@ -72,7 +72,15 @@ func run() -> void:
 	await save("village_reward")
 	scene.core.place_at(Vector2(176, 210))
 	await frames(10)
-	scene.core.interact_now() if scene.core.has_method("interact_now") else null
-	await frames(30)
-	await save("village_near_npc")
+	scene.set_physics_process(false)
+	scene.set_process(false)
+	scene.conversation.controls_open = false
+	scene.conversation.sync({"dialogue_id": "x", "index": 0, "count": 3, "speaker": "Tovan", "portrait": "tovan", "text": "Hold out your hands, Totoy. This is a Black Katana, and it is yours. It was always yours. Remember the colours: gold, parry. Red, dash."})
+	scene.conversation.finish_typing()
+	await frames(4)
+	await save("dialogue")
+	scene.conversation.sync({})
+	scene.conversation.controls_open = true
+	await frames(4)
+	await save("controls_card")
 	quit(0)
