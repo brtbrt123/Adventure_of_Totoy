@@ -28,6 +28,7 @@ const MenuQuests := preload("res://presentation/ui/menu_quests.tscn")
 const MenuItems := preload("res://presentation/ui/menu_items.tscn")
 const MenuArenaStatus := preload("res://presentation/ui/menu_arena_status.tscn")
 const MenuDescription := preload("res://presentation/ui/menu_description.tscn")
+const MenuPicker := preload("res://presentation/ui/menu_picker.tscn")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
 const TAB_STATS: int = 0
@@ -107,6 +108,7 @@ var quests_scene: Control = null
 var items_scene: Control = null
 var arena_status_scene: Control = null
 var description_scene: Control = null
+var picker_scene: Control = null
 var colors: Dictionary = {}
 var atlas: Texture2D
 var frames: Dictionary = {}
@@ -137,6 +139,9 @@ func _ready() -> void:
 	add_child(arena_status_scene)
 	description_scene = MenuDescription.instantiate()
 	add_child(description_scene)
+	picker_scene = MenuPicker.instantiate()
+	picker_scene.visible = false
+	add_child(picker_scene)
 
 
 func open() -> void:
@@ -850,6 +855,39 @@ func _sync_arena_status_scene() -> void:
 	arena_status_scene.apply({"whole_medallion": Hud.MEDALLIONS.get(equipped, ""), "weapon_name": WEAPON_NAMES.get(equipped, "WEAPON"), "sockets": sockets, "rows": rows})
 
 
+## The Aspect picker's rows, drawn by the scene menu_picker.tscn above everything else.
+func _sync_picker_scene() -> void:
+	picker_scene.visible = picker_open()
+	if not picker_open():
+		return
+	picker_scene.atlas = atlas
+	picker_scene.frames = frames
+	var title: String = "Aspect for slot " + SLOT_LETTERS[picker_slot - 1]
+	var title_color: Color = colors["1"]
+	var show_back: bool = true
+	if not picker_feedback.is_empty():
+		show_back = false
+		if bool(picker_feedback["ok"]):
+			title = "Equipped!"
+			title_color = colors["u"]
+		else:
+			title = "Not now  " + String(picker_feedback["reason"])
+			title_color = colors["q"]
+	var rows: Array = []
+	for index: int in range(Aspects.ALL.size()):
+		if not row_visible(index):
+			continue
+		var aspect: StringName = Aspects.ALL[index]
+		var slot: int = aspect_slot_of(aspect)
+		rows.append({"icon": Hud.aspect_icon(aspect), "name": Aspects.display_name(aspect), "cost": "%sE" % num(Aspects.edge_cost(aspect)), "owned": aspect_owned(aspect), "selected": index == picker_selection, "held": SLOT_LETTERS[slot - 1] if slot > 0 else ""})
+	var data: Dictionary = {"title": title, "title_color": title_color, "show_back": show_back, "rows": rows}
+	if picker_max_scroll() > 0:
+		var track: Rect2 = picker_bar_rect()
+		var thumb: Rect2 = picker_thumb_rect()
+		data["bar"] = {"thumb_y": thumb.position.y - track.position.y, "thumb_h": thumb.size.y, "up_on": picker_scroll > 0, "down_on": picker_scroll < picker_max_scroll()}
+	picker_scene.apply(data)
+
+
 ## The ITEMS tab's slots and detail card.
 func _sync_items_scene() -> void:
 	items_scene.atlas = atlas
@@ -909,6 +947,7 @@ func _sync_scenes() -> void:
 		return
 	shell.apply(tab, TAB_NAMES)
 	items_scene.visible = tab == TAB_INVENTORY
+	_sync_picker_scene()
 	arena_status_scene.visible = tab == TAB_STATS and progression == null
 	if arena_status_scene.visible:
 		_sync_arena_status_scene()
@@ -997,39 +1036,7 @@ func _draw_stats() -> void:
 ## The aspect picker over the stat list: a title (or the request's feedback), then one row per aspect: icon, name,
 ## Edge cost, and for a slotted one its key badge and a tick.
 func _draw_picker() -> void:
-	UiPanel.draw_panel(self, PICKER, &"info", colors)
-	var x0: float = PICKER.position.x + 10
-	var title_y: float = PICKER.position.y + 10
-	if picker_feedback.is_empty():
-		_text(Vector2(x0, title_y), "ASPECT FOR SLOT " + SLOT_LETTERS[picker_slot - 1], colors["1"])
-		_text(Vector2(PICKER.end.x - 10, title_y), "ESC: BACK", colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-	elif bool(picker_feedback["ok"]):
-		_text(Vector2(x0, title_y), "EQUIPPED!", colors["u"])
-	else:
-		_text(Vector2(x0, title_y), "NOT NOW  " + String(picker_feedback["reason"]), colors["q"])
-	draw_rect(Rect2(x0, title_y + 11, PICKER.size.x - 20, 1), colors["f"])
-	if picker_max_scroll() > 0:
-		_draw_picker_bar()
-	for index: int in range(Aspects.ALL.size()):
-		if not row_visible(index):
-			continue
-		var aspect: StringName = Aspects.ALL[index]
-		var row: Rect2 = picker_row_rect(index, picker_scroll)
-		var on: bool = index == picker_selection
-		if on:
-			draw_rect(row, colors["k"])
-			draw_rect(Rect2(row.position.x, row.end.y - 1, row.size.x, 1), colors["1"])
-		# the icon's inner 16x16 (the ring cropped) at native size
-		_ui(Hud.aspect_icon(aspect), Rect2(row.position + Vector2(2, 0), Vector2(16, 16)), Vector2(4, 4), Vector2(16, 16))
-		if not aspect_owned(aspect):
-			draw_rect(row,Color(colors["0"],0.72))
-			Kit.put(self,"icon_padlock",row.position+Vector2(6,3))
-		_text(Vector2(row.position.x + 22, row.position.y + 4), Aspects.display_name(aspect), colors["1"] if on and aspect_owned(aspect) else colors["g"])
-		_text(Vector2(row.end.x - 26, row.position.y + 4), "%sE" % num(Aspects.edge_cost(aspect)), colors["v"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-		var slot: int = aspect_slot_of(aspect)
-		if slot > 0 and aspect_owned(aspect):
-			_key_badge(Vector2(row.end.x - 22, row.position.y + 4), SLOT_LETTERS[slot - 1])
-			_tick(Vector2(row.end.x - 11, row.position.y + 5), colors["u"])
+	pass  # the scene menu_picker.tscn draws it
 
 
 ## The picker's scroll bar: a dark track along the rows, a thumb sized to the window, and a small arrow at each end
@@ -1044,20 +1051,6 @@ func picker_thumb_rect() -> Rect2:
 	var height: float = maxf(4.0, floorf(track.size.y * PICKER_VISIBLE_ROWS / total))
 	var top: float = track.position.y + roundf((track.size.y - height) * picker_scroll / maxi(1, picker_max_scroll()))
 	return Rect2(track.position.x, top, track.size.x, height)
-
-
-func _draw_picker_bar() -> void:
-	var track: Rect2 = picker_bar_rect()
-	draw_rect(track, colors["0"])
-	draw_rect(picker_thumb_rect(), colors["o"])
-	var cx: float = track.position.x + 1
-	var up: Color = colors["1"] if picker_scroll > 0 else colors["e"]
-	var down: Color = colors["1"] if picker_scroll < picker_max_scroll() else colors["e"]
-	# 3 px wide arrowheads just outside the track
-	draw_rect(Rect2(cx, track.position.y - 3, 1, 1), up)
-	draw_rect(Rect2(cx - 1, track.position.y - 2, 3, 1), up)
-	draw_rect(Rect2(cx - 1, track.end.y + 1, 3, 1), down)
-	draw_rect(Rect2(cx, track.end.y + 2, 1, 1), down)
 
 
 ## A 7x5 pixel check mark (top-left `at`).

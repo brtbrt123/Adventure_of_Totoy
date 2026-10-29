@@ -129,6 +129,19 @@ func run() -> void:
 	arena.character_menu.stats_selection = &"stat_damage"
 	await frames(4)
 	await save("arena_menu_status_row")
+	arena.character_menu.open_picker(1)
+	await frames(4)
+	await save("arena_picker")
+	arena.character_menu.close_picker()
+	arena.character_menu.close()
+	arena.snapshot.result = &"victory"
+	var result_lines: Array[String] = ["TIME 1:05.3", "BEST 0:59.1"]
+	arena.hud.result_lines = result_lines
+	arena.hud.result_hint = "ESC: TITLE"
+	arena.hud.snapshot = arena.snapshot
+	arena.hud.queue_redraw()
+	await frames(4)
+	await save("arena_result")
 	quit(0)
 
 const InputFrameClass := preload("res://core/input_frame.gd")

@@ -6,10 +6,15 @@ const Weapons := preload("res://core/weapons.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
 const Kit := preload("res://presentation/common/ui_kit.gd")
 const HudStrip := preload("res://presentation/ui/hud_strip.tscn")
+const BossPanel := preload("res://presentation/ui/boss_panel.tscn")
+const ResultPanel := preload("res://presentation/ui/result_panel.tscn")
 const Aspects := preload("res://core/aspects.gd")
 var snapshot: Snapshots.GameSnapshot
 ## The HUD strip (presentation/ui/hud_strip.tscn, the same scene the road uses), made when the fight HUD first draws.
 var arena_strip: Control = null
+## The boss panel and the result panel (presentation/ui/boss_panel.tscn, result_panel.tscn), made when first needed.
+var boss_panel_node: Control = null
+var result_node: Control = null
 var colors: Dictionary = {}
 var debug_enabled: bool = false
 # Extra result-screen lines (the arena fills them when progress is saved).
@@ -282,56 +287,54 @@ func _draw() -> void:
 	var h: Snapshots.HudSnapshot = snapshot.hud
 	_draw_profile(h)
 	_draw_skills(h)
-	if not snapshot.entities.is_empty() and not menu_open:
-		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
-		var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
-		if head_position.x < -12.0 or head_position.x > 396.0 or head_position.y < -24.0 or head_position.y > 236.0:
-			panel.position = Vector2(278.0, 3.0)  # the boss is off screen: its panel waits in the top right corner
-		ui("ui_boss", Rect2(panel.position + Vector2(0, 7), Vector2(104, 24)))
-		centered(panel.position.x + 52.0, panel.position.y, "MOSSBOUND COLOSSUS", colors["z"], colors["0"], 1, menu_font(), 7)
-		bar(panel.position + Vector2(8, 18), 88, h.boss_hp, h.boss_max_hp, colors["7"], 3, float(health_ghosts.get("boss", h.boss_hp)))
-		bar(panel.position + Vector2(20, 27), 64, h.boss_posture, h.boss_posture_max, colors["p"] if boss.state == &"posture_broken" else colors["v"], 2)
-		if h.counter_window_ticks_left > 0:
-			outlined(panel.position + Vector2(4, 33), "COUNTER - ATTACK", colors["p"], colors["0"])
-			bar(panel.position + Vector2(4, 41), 88, h.counter_window_ticks_left, counter_max, colors["o"], 2)
+	_sync_boss_panel(h)
 	if debug_enabled:
 		draw_rect(Rect2(5, 131, 175, 16), colors["0"])
 		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"], 1, stat_font())
 		lettering(Vector2(8, 141), "PLAYER " + String(snapshot.player.state), colors["p"], 1, stat_font())
-	if snapshot.result != &"playing":
-		_draw_result()
+	_sync_result()
 
 
 ## The DEFEAT / VICTORY panel in the shared frame (UiPanel) with a banner title in Cinzel; every line is kept
 ## (R TO RESTART, the saved TIME / BEST lines, ESC: TITLE when the game came from the title screen).
 static func result_panel_rect(line_count: int, has_hint: bool) -> Rect2:
-	var h: int = 44 + (line_count * 9 + 4 if line_count > 0 else 0) + (12 if has_hint else 0)
+	var h: int = 44 + (line_count * 10 + 4 if line_count > 0 else 0) + (12 if has_hint else 0)
 	return Rect2(96, 108 - h / 2, 192, h)
 
-func _draw_result() -> void:
-	var victory: bool = snapshot.result == &"victory"
-	var theme: StringName = &"victory" if victory else &"defeat"
-	var rect: Rect2 = result_panel_rect(result_lines.size(), result_hint != "")
-	var top: int = int(rect.position.y)
-	UiPanel.draw_panel(self, rect, theme, colors)
-	UiPanel.banner(self, 192, top - 7, 80, 16, theme, colors)
-	centered(192, top - 5, "VICTORY" if victory else "DEFEAT", colors["1"], colors["0"], 1, menu_font(), 10)
-	var hint_color: Color = colors["o"] if victory else colors["j"]
-	var y: int = top + 16
-	lettering(Vector2(192 - text_width("R TO RESTART") * 0.5, y), "R TO RESTART", hint_color)
-	y += 10
-	if not result_lines.is_empty():
-		draw_rect(Rect2(142, y - 2, 100, 1), colors["f"])
-		y += 2
-		for line: String in result_lines:
-			lettering(Vector2(192 - text_width(line, 1, stat_font()) * 0.5, y), line, colors["1"], 1, stat_font())
-			y += 9
-	if result_hint != "":
-		var t: Dictionary = UiPanel.theme(theme)
-		draw_rect(Rect2(156, y, 72, 1), colors[t["accent"]])
-		UiPanel.px(self, 192, y, colors[t["gem"]])
-		y += 4
-		lettering(Vector2(192 - text_width(result_hint) * 0.5, y), result_hint, hint_color)
+## The boss's name and bars: the scene boss_panel.tscn, moved to follow his head (parked top right when he is off screen).
+func _sync_boss_panel(h: Snapshots.HudSnapshot) -> void:
+	if boss_panel_node == null:
+		boss_panel_node = BossPanel.instantiate()
+		boss_panel_node.show_behind_parent = true
+		add_child(boss_panel_node)
+	var shown: bool = not snapshot.entities.is_empty() and not menu_open
+	boss_panel_node.visible = shown
+	if not shown:
+		return
+	var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
+	var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
+	if head_position.x < -12.0 or head_position.x > 396.0 or head_position.y < -24.0 or head_position.y > 236.0:
+		panel.position = Vector2(278.0, 3.0)  # the boss is off screen: its panel waits in the top right corner
+	boss_panel_node.atlas = portrait_atlas
+	boss_panel_node.frames = ui_frames
+	boss_panel_node.position = panel.position
+	boss_panel_node.apply({
+		"hp": h.boss_hp, "hp_max": h.boss_max_hp, "ghost": float(health_ghosts.get("boss", h.boss_hp)),
+		"posture": h.boss_posture, "posture_max": h.boss_posture_max, "broken": boss.state == &"posture_broken",
+		"counter_ticks": h.counter_window_ticks_left, "counter_max": counter_max,
+	})
+
+
+## The DEFEAT / VICTORY panel: the scene result_panel.tscn, centred, as tall as its lines need.
+func _sync_result() -> void:
+	if result_node == null:
+		result_node = ResultPanel.instantiate()
+		add_child(result_node)
+	result_node.visible = snapshot.result != &"playing"
+	if not result_node.visible:
+		return
+	var height: float = result_node.apply({"victory": snapshot.result == &"victory", "lines": result_lines, "hint": result_hint})
+	result_node.position = Vector2(96, 108 - int(height) / 2)
 
 ## The fight strip, bottom left (kit bars, 384x216 layout): HEALTH and its numbers over the health vial with its ghost
 ## segment, then the Edge and dash bars. All meter amounts are read directly from the HUD snapshot.

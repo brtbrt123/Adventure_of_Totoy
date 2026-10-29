@@ -418,7 +418,7 @@ func shared_frame() -> void:
 		before = UiPanel.drawn
 		arena.hud.queue_redraw()
 		await process_frame
-		check(UiPanel.drawn > before, "the %s panel does not use the shared frame" % result)
+		check(arena.hud.result_node != null and arena.hud.result_node.visible and arena.hud.result_node.get_node("Panel") is NinePatchRect, "the %s panel is not the result_panel.tscn scene" % result)
 		var rect: Rect2 = Hud.result_panel_rect(arena.hud.result_lines.size(), true)
 		check(rect.position.y - 8 >= 0 and rect.end.y <= 216, "%s panel off screen: %s" % [result, rect])
 		await save(String(result))

@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://bi2ys6f1o5u15" path="res://art/ui_kit/thin_bar_frame.png" id="8_tex"]
 [ext_resource type="Texture2D" uid="uid://v4ithi24ewgg" path="res://art/ui_kit/fill_edge_thin.png" id="9_tex"]
 [ext_resource type="Texture2D" uid="uid://bpmoto53glfxk" path="res://art/ui_kit/fill_exp_thin.png" id="10_tex"]
-[ext_resource type="Texture2D" uid="uid://bu7rys2wkil6j" path="res://art/ui_kit/slot_frame.png" id="11_tex"]
 [ext_resource type="Texture2D" uid="uid://d2a2guxdbvixr" path="res://art/ui_kit/aspect_socket_open.png" id="12_tex"]
 [ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="14_fon"]
 
@@ -72,9 +71,9 @@ axis_stretch_vertical = 1
 
 [node name="Name" type="Label" parent="NamePlate" unique_id=1985599529]
 layout_mode = 0
-offset_top = 1.0
+offset_top = 2.0
 offset_right = 44.0
-offset_bottom = 11.0
+offset_bottom = 12.0
 theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
 theme_override_constants/outline_size = 2
@@ -98,10 +97,10 @@ text = "HEALTH"
 
 [node name="HealthValue" type="Label" parent="." unique_id=1598255988]
 layout_mode = 0
-offset_left = 110.0
-offset_top = 170.0
-offset_right = 192.0
-offset_bottom = 181.0
+offset_left = 58.0
+offset_top = 173.0
+offset_right = 140.0
+offset_bottom = 184.0
 theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
 theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
 theme_override_constants/outline_size = 2
@@ -219,75 +218,6 @@ patch_margin_left = 1
 patch_margin_right = 2
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
-
-[node name="Status1" type="NinePatchRect" parent="." unique_id=1425140722]
-layout_mode = 0
-offset_left = 84.0
-offset_top = 146.0
-offset_right = 110.0
-offset_bottom = 172.0
-texture = ExtResource("11_tex")
-patch_margin_left = 8
-patch_margin_top = 8
-patch_margin_right = 8
-patch_margin_bottom = 8
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Icon" type="TextureRect" parent="Status1" unique_id=1216658329]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 22.0
-offset_bottom = 22.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="Status2" type="NinePatchRect" parent="." unique_id=1249035227]
-layout_mode = 0
-offset_left = 110.0
-offset_top = 146.0
-offset_right = 136.0
-offset_bottom = 172.0
-texture = ExtResource("11_tex")
-patch_margin_left = 8
-patch_margin_top = 8
-patch_margin_right = 8
-patch_margin_bottom = 8
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Icon" type="TextureRect" parent="Status2" unique_id=1668941623]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 22.0
-offset_bottom = 22.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="Status3" type="NinePatchRect" parent="." unique_id=230197223]
-layout_mode = 0
-offset_left = 136.0
-offset_top = 146.0
-offset_right = 162.0
-offset_bottom = 172.0
-texture = ExtResource("11_tex")
-patch_margin_left = 8
-patch_margin_top = 8
-patch_margin_right = 8
-patch_margin_bottom = 8
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Icon" type="TextureRect" parent="Status3" unique_id=798853519]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 22.0
-offset_bottom = 22.0
-mouse_filter = 2
-expand_mode = 1
 
 [node name="Socket1" type="TextureRect" parent="." unique_id=1632707594]
 layout_mode = 0

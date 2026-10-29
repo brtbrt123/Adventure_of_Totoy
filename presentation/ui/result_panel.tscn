@@ -1,0 +1,176 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/result_panel.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/name_ribbon.png" id="4_tex"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="5_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="6_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("5_fon")
+variation_opentype = {2003265652: 900.0}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("6_fon")
+variation_opentype = {2003265652: 400.0}
+
+[node name="ResultPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 288.0
+offset_bottom = 148.0
+mouse_filter = 2
+script = ExtResource("1_scr")
+offset_left = 96.0
+offset_top = 68.0
+
+[node name="Panel" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 0
+offset_right = 192
+offset_bottom = 80
+mouse_filter = 2
+texture = ExtResource("3_tex")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Banner" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 32
+offset_top = -7
+offset_right = 160
+offset_bottom = 9
+mouse_filter = 2
+texture = ExtResource("4_tex")
+patch_margin_left = 26
+patch_margin_top = 0
+patch_margin_right = 26
+patch_margin_bottom = 0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 32
+offset_top = -5
+offset_right = 160
+offset_bottom = 7
+mouse_filter = 2
+text = "VICTORY"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+theme_override_constants/outline_size = 2
+
+[node name="Restart" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 13
+offset_right = 192
+offset_bottom = 23
+mouse_filter = 2
+text = "R TO RESTART"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Rule" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 46
+offset_top = 27
+offset_right = 146
+offset_bottom = 28
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1.0)
+
+[node name="Line1" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 30
+offset_right = 192
+offset_bottom = 39
+mouse_filter = 2
+text = "TIME 1:00.0"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Line2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 40
+offset_right = 192
+offset_bottom = 49
+mouse_filter = 2
+text = "TIME 1:01.0"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Line3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 50
+offset_right = 192
+offset_bottom = 59
+mouse_filter = 2
+text = "TIME 1:02.0"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="Line4" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 60
+offset_right = 192
+offset_bottom = 69
+mouse_filter = 2
+text = "TIME 1:03.0"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
+
+[node name="HintRule" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 60
+offset_top = 50
+offset_right = 132
+offset_bottom = 51
+mouse_filter = 2
+color = Color(0.4157, 0.6588, 0.6039, 1.0)
+
+[node name="HintGem" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 96
+offset_top = 50
+offset_right = 97
+offset_bottom = 51
+mouse_filter = 2
+color = Color(0.8784, 0.9412, 0.9255, 1.0)
+
+[node name="Hint" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0
+offset_top = 54
+offset_right = 192
+offset_bottom = 63
+mouse_filter = 2
+text = "ESC: TITLE"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 9
