@@ -1,6 +1,5 @@
 extends "res://presentation/arena/hud.gd"
 ## Receipt display only. The caller queues confirmed core rewards, never grants inventory here.
-const Kit := preload("res://presentation/common/ui_kit.gd")
 const CARD: Rect2 = Rect2(262, 64, 118, 36)
 const DISPLAY_SECONDS: float = 3.4
 var pending: Array[Dictionary] = []

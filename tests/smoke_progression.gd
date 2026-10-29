@@ -93,7 +93,7 @@ func run() -> void:
 	expect(scene.snapshot.stat_points_unspent==4,"two points per level")
 	var max_hp: int=scene.snapshot.hero.max_hp
 	scene.open_menu()
-	scene.character_menu.click(Vector2(282,49))
+	scene.character_menu.click(scene.character_menu.progression_plus_rect(0).get_center())
 	scene.character_menu.close()
 	expect(scene.snapshot.hero.max_hp==max_hp+6 and scene.snapshot.stat_points_unspent==3,"spend intent changes authoritative health")
 	expect(Explore.SaveStore.load_profile().stats.get("vitality",0)==1,"spent stats saved")

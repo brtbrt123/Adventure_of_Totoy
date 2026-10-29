@@ -106,12 +106,12 @@ static func format_ticks(ticks: int) -> String:
 ## Text is a real font drawn at the window resolution (the project stretches the canvas, so a font size of 7
 ## "game pixels" is rendered with 28 screen pixels at the default 4x window): crisp at any size. The old
 ## 3x5 bitmap glyph table above is no longer used for drawing.
-const FONT_PATH: String = "res://presentation/fonts/PixelifySans.ttf"
-const FONT_SIZE: int = 9  # game pixels; the cap height is about 5-6 game pixels, like the old bitmap letters
-const FONT_WEIGHT: int = 400  # Pixelify Sans has a weight axis of 400-700
+const FONT_PATH: String = "res://presentation/fonts/Cinzel.ttf"
+const FONT_SIZE: int = 9  # game pixels; Cinzel cap height is about 6 game pixels
+const FONT_WEIGHT: int = 400  # Cinzel regular body weight
 static var _font: Font = null
 
-## Pixelify Sans (OFL, see presentation/fonts/README.md); Godot's built-in font if that file is missing.
+## Cinzel body text (OFL, see presentation/fonts/README.md), rendered at window resolution.
 static func ui_font() -> Font:
 	if _font == null:
 		var variation: FontVariation = FontVariation.new()
@@ -124,11 +124,9 @@ static func ui_font() -> Font:
 		_font = variation
 	return _font
 
-## Everything uses the pixel font, numbers included (the human's choice, 2026-10-19, knowing that in Pixelify Sans
-## a 5 looks like an S, a 0 like an O and a Z like a 2). `stat_font()` is kept as the name for number text so the
-## choice stays in one place. `size_px` overrides the size (in game pixels) where a number deserves to be bigger.
+## Original bitmap digits and input glyphs, installed with the approved kit (2026-10-29).
 static func stat_font() -> Font:
-	return ui_font()
+	return preload("res://art/ui_kit/pixel_keys.fnt")
 
 ## The menu face: Cinzel (OFL, see presentation/fonts/README.md), carved-looking capitals like the title logo.
 ## Falls back to the pixel font if the file is missing.
@@ -147,26 +145,48 @@ static func menu_font() -> Font:
 			_menu_font = ui_font()
 	return _menu_font
 
-## Cap height as a fraction of the font size (the pixel font's 5 of 9, Cinzel's capitals about 0.7 of the em).
+## Cap height as a fraction of the font size: six pixels on the bitmap font's eight-pixel em.
 static func _cap_ratio(face: Font) -> float:
-	return 0.70 if face == _menu_font and _menu_font != _font else 5.0 / 9.0
+	return 0.75 if face == stat_font() else 0.70
 
 static func _size_for(_font: Font, scale_px: int, size_px: int = 0) -> int:
+	if _font == stat_font():
+		return 8 * maxi(1, (size_px if size_px > 0 else FONT_SIZE * scale_px) / 8)
 	return size_px if size_px > 0 else FONT_SIZE * scale_px
+
+
+## Numerals and input labels keep the original square-pixel shapes (especially 5, Z and C).
+static func text_face(text: String) -> Font:
+	var value: String = text.to_upper()
+	if value in ["TAB", "SHIFT", "SPACE", "LMB", "RMB", "ENTER", "ESC", "Z", "X", "C", "+"]:
+		return stat_font()
+	var digit: bool = false
+	for ch: String in value:
+		if ch in "0123456789":
+			digit = true
+		elif ch not in " /+-%.,:XES":
+			return ui_font()
+	return stat_font() if digit else ui_font()
 
 ## Width of `text` in game pixels at a size multiplier (`font` defaults to the pixel font).
 static func text_width(text: String, scale_px: int = 1, font: Font = null, size_px: int = 0) -> float:
-	var face: Font = font if font != null else ui_font()
+	var face: Font = font if font != null else text_face(text)
+	if face == ui_font() and text_face(text) == stat_font():
+		face = stat_font()
 	return face.get_string_size(text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, _size_for(face, scale_px, size_px)).x
 
 ## `at` is the top-left of the letters, as with the old bitmap text.
 func lettering(at: Vector2, text: String, color: Color, scale_px: int = 1, font: Font = null, size_px: int = 0) -> void:
-	var face: Font = font if font != null else ui_font()
+	var face: Font = font if font != null else text_face(text)
+	if face == ui_font() and text_face(text) == stat_font():
+		face = stat_font()
 	var size: int = _size_for(face, scale_px, size_px)
 	draw_string(face, Vector2(at.x, at.y + _cap_ratio(face) * size), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
 
 func outlined(at: Vector2, text: String, color: Color, outline: Color, scale_px: int = 1, font: Font = null, size_px: int = 0) -> void:
-	var face: Font = font if font != null else ui_font()
+	var face: Font = font if font != null else text_face(text)
+	if face == ui_font() and text_face(text) == stat_font():
+		face = stat_font()
 	var size: int = _size_for(face, scale_px, size_px)
 	draw_string_outline(face, Vector2(at.x, at.y + _cap_ratio(face) * size), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, maxi(2, 2 * size / FONT_SIZE), outline)
 	lettering(at, text, color, scale_px, font, size_px)
@@ -265,7 +285,7 @@ func _draw() -> void:
 		if head_position.x < -12.0 or head_position.x > 396.0 or head_position.y < -24.0 or head_position.y > 236.0:
 			panel.position = Vector2(278.0, 3.0)  # the boss is off screen: its panel waits in the top right corner
 		ui("ui_boss", Rect2(panel.position + Vector2(0, 7), Vector2(104, 24)))
-		centered(panel.position.x + 52.0, panel.position.y, "MOSSBOUND COLOSSUS", colors["z"], colors["0"])
+		centered(panel.position.x + 52.0, panel.position.y, "MOSSBOUND COLOSSUS", colors["z"], colors["0"], 1, menu_font(), 7)
 		bar(panel.position + Vector2(8, 18), 88, h.boss_hp, h.boss_max_hp, colors["7"], 3, float(health_ghosts.get("boss", h.boss_hp)))
 		bar(panel.position + Vector2(20, 27), 64, h.boss_posture, h.boss_posture_max, colors["p"] if boss.state == &"posture_broken" else colors["v"], 2)
 		if h.counter_window_ticks_left > 0:

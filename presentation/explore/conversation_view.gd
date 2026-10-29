@@ -1,7 +1,6 @@
 extends "res://presentation/arena/hud.gd"
 ## Snapshot text only; reveal and consume presses here, conversation rules stay in core.
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
-const Kit := preload("res://presentation/common/ui_kit.gd")
 const PANEL: Rect2 = Rect2(6, 146, 372, 66)
 const TEXT_WIDTH: float = 280.0
 const CHARACTERS_PER_SECOND: float = 38.0

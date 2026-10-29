@@ -46,14 +46,18 @@ func _catalog() -> void:
 		_expect(arena.frames.has(icons[slot]), "medallion absent: " + icons[slot])
 		if arena.frames.has(icons[slot]):
 			var icon: Dictionary = arena.frames[icons[slot]]
-			_expect(Vector2(icon["w"], icon["h"]) == sockets[slot].size, "medallion must use native pixel size")
+			if slot < 3:
+				_expect(Vector2(icon["w"], icon["h"]) == Vector2(24, 24), "source Aspect icon is native 24px")
+				_expect(sockets[slot].size == Vector2(37, 40) and arena.hud.aspect_icon_rect(slot).size == Vector2(16, 16), "kit socket holds the 16px centre crop at native size")
+			else:
+				_expect(Vector2(icon["w"], icon["h"]) == sockets[slot].size, "weapon uses native pixel size")
 		_expect(Rect2(0, 0, 384, 216).encloses(sockets[slot]), "socket clipped by viewport")
 		for other: int in range(slot):
 			_expect(sockets[slot].get_center().distance_to(sockets[other].get_center()) >= (sockets[slot].size.x + sockets[other].size.x) * 0.5, "overlapping medallion frames")
-	_expect(sockets[3].size == sockets[0].size * 2, "weapon icon must be larger than Aspects")
+	_expect(sockets[3].size.x > sockets[0].size.x, "weapon icon must be larger than Aspects")
 	_expect(sockets[3].position.x < 54, "weapon stays left of the bottom meters")
 	for slot: int in range(3):
-		_expect(sockets[slot].position.y == 147 and sockets[slot].position.x >= 174, "Aspects align beside bottom meters")
+		_expect(sockets[slot].position.y == 172 and sockets[slot].position.x >= 268, "Aspects align beside bottom meters")
 
 	_expect(arena.frames.has("totoy_portrait"), "portrait absent from atlas")
 	_expect(arena.frames.has("ui_profile"), "profile frame absent from atlas")

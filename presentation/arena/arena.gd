@@ -183,10 +183,13 @@ func _ready() -> void:
 	_update_hud()
 	_begin_persistence()
 	cutin = BlackFormCutIn.new()
+	cutin.position = Vector2(32, 18)
 	$HUD.add_child(cutin)
 	lightning_cutin = LightningFormCutIn.new()
+	lightning_cutin.position = Vector2(32, 18)
 	$HUD.add_child(lightning_cutin)
 	coil_cutin = ReapersCoilCutIn.new()
+	coil_cutin.position = Vector2(32, 18)
 	$HUD.add_child(coil_cutin)
 	character_menu = CharacterMenu.new()
 	character_menu.equip_request = request_equip

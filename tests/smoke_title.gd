@@ -54,7 +54,7 @@ func _title_screen() -> void:
 	title.change_scene = func(path: String) -> void: changed_to.append(path)
 	_expect(title.screen == Title.SCREEN_TITLE and title.index == 0, "starts on the menu with NEW GAME selected")
 	_expect(Array(Title.ITEMS) == ["NEW GAME", "CONTINUE", "BOSS FIGHT", "CONTROLS", "CREDITS", "QUIT"], "the menu items")
-	_expect(Title.MENU_TOP + (Title.ITEMS.size() - 1) * Title.MENU_STEP + Title.MENU_STEP <= 178, "the last menu line fits the screen")
+	_expect(Title.MENU_TOP + (Title.ITEMS.size() - 1) * Title.MENU_STEP + Title.MENU_STEP <= 214, "the last menu line fits the screen")
 	title.move_selection(-1)
 	_expect(title.index == Title.ITEMS.size() - 1, "up from the first item wraps to the last")
 	title.move_selection(1)

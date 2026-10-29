@@ -11,7 +11,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[GAME_DESIGN]]: the human's design (do not rewrite)
 - [[architecture]]: the core/presentation interface, including "Layered scenes"
 - [[ROUTING]] and [[HARNESS]]: who builds what, checks and the review loop
-- Decisions: [[0001-stage1-setup-choices]], [[0002-totoy36-palette]], [[0003-core-test-runner-and-preload]], [[0004-sharp-ui-text]]
+- Decisions: [[0001-stage1-setup-choices]], [[0002-totoy36-palette]], [[0003-core-test-runner-and-preload]], [[0004-sharp-ui-text]], [[0005-384x216-fantasy-ui]]
 - The rules for agents live in `AGENTS.md` at the project root (not in the vault)
 
 ## Work in progress

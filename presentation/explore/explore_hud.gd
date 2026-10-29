@@ -111,7 +111,6 @@ func _draw_training_cards() -> void:
 		if name == lesson:
 			draw_rect(Rect2(x + 8, y + 7, 40, 1), colors["t"])
 
-const Kit := preload("res://presentation/common/ui_kit.gd")
 const ExploreCore := preload("res://core/explore_core.gd")
 const GameEvent := preload("res://core/game_event.gd")
 var combat: ExploreCore.ExploreSnapshot
@@ -123,9 +122,26 @@ var shown_level: int = 0
 var combat_scene: StringName = &""
 var dash_peak: int=1
 var dash_previous: int=0
+var hp_shown: float = -1.0
+var hp_ghost: float = -1.0
+var hp_delay: int = 0
+var hp_tick: int = -1
 func sync_combat(value: ExploreCore.ExploreSnapshot) -> void:
 	var changed: bool = combat_scene != value.scene_id or (combat != null and value.tick < combat.tick)
 	if changed:reset_combat_feedback()
+	var elapsed: int = maxi(0, value.tick - hp_tick)
+	var hp: float = float(value.hero.hp)
+	if changed or hp_shown < 0.0 or hp > hp_shown:
+		hp_ghost = hp
+		hp_delay = 0
+	elif hp < hp_shown:
+		hp_delay = 18
+	else:
+		hp_delay = maxi(0, hp_delay - elapsed)
+		if hp_delay == 0:
+			hp_ghost = move_toward(hp_ghost, hp, elapsed * maxf(1.0, value.hero.max_hp * 0.025))
+	hp_shown = hp
+	hp_tick = value.tick
 	if changed:
 		dash_peak=1
 		dash_previous=0
@@ -139,6 +155,8 @@ func sync_combat(value: ExploreCore.ExploreSnapshot) -> void:
 	else: exp_fill = move_toward(exp_fill,target,0.035)
 	shown_level = value.level
 func reset_combat_feedback() -> void:
+	hp_shown = -1.0
+	hp_tick = -1
 	exp_glow_tick = -1000
 	level_up_tick = -1000
 	item_flash_tick = -1000
@@ -170,7 +188,7 @@ func combat_slot(at: Vector2, key: String, value: Dictionary, item: bool) -> voi
 			ui("hud_copper_herb", Rect2(at + Vector2(5, 5), Vector2(16, 16)))
 		var badge: Rect2 = Rect2(at + Vector2(-2, 19), Vector2(9, 9))
 		UiPanel.key_badge(self, badge.position, colors)
-		lettering(badge.position + Vector2(4.5 - text_width(key, 1, ui_font(), 6) * 0.5, 2.5), key, colors["1" if unlocked else "g"], 1, ui_font(), 6)
+		lettering(badge.position + Vector2(4.5 - text_width(key, 1, stat_font(), 8) * 0.5, 1), key, colors["1" if unlocked else "g"], 1, stat_font(), 8)
 		if unlocked:
 			outlined(at + Vector2(18, 18), str(value.get("count", 0)), colors["1"], colors["0"], 1, ui_font(), 7)
 		return
@@ -192,7 +210,7 @@ func _draw_combat() -> void:
 	var hp: String = "%d / %d" % [combat.hero.hp, combat.hero.max_hp]
 	outlined(Vector2(STRIP_X + 2, HP_Y - 11), "HEALTH", colors["u"], colors["0"], 1, null, 7)
 	outlined(Vector2(STRIP_X + STRIP_W - 2 - text_width(hp, 1, ui_font(), 8), HP_Y - 12), hp, colors["1"], colors["0"], 1, ui_font(), 8)
-	Kit.bar(self, Vector2(STRIP_X, HP_Y), STRIP_W, [["fill_health", float(combat.hero.hp) / maxf(1.0, float(combat.hero.max_hp))]])
+	Kit.bar(self, Vector2(STRIP_X, HP_Y), STRIP_W, [["fill_ghost", hp_ghost / maxf(1.0, float(combat.hero.max_hp))], ["fill_health", float(combat.hero.hp) / maxf(1.0, float(combat.hero.max_hp))]])
 	# Edge is not in ExploreSnapshot. Show an unavailable track, never invent a value.
 	outlined(Vector2(STRIP_X + 2, THIN_Y - 8), "EDGE  --", colors["g"], colors["0"], 1, null, 6)
 	Kit.bar(self, Vector2(STRIP_X, THIN_Y), 84, [], true)
@@ -208,7 +226,7 @@ func _draw_combat() -> void:
 	Kit.pillar(self, pillar, 118.0, clampf(exp_fill, 0.0, 1.0), colors["v"], colors["p"])
 	var level: String = str(combat.level)
 	var level_size: int = 11 if level.length() < 2 else 8
-	centered(pillar.x + 10.5, pillar.y + 6, level, colors["1"], colors["0"], 1, ui_font(), level_size)
+	centered(pillar.x + 10.5, pillar.y + 6, level, colors["1"], colors["0"], 1, stat_font(), 8)
 	centered(pillar.x + 10.5, pillar.y + 121, "MAX" if combat.exp_to_next == 0 else "EXP", colors["o"], colors["0"], 1, ui_font(), 6)
 	if feedback_active(combat.tick, exp_glow_tick, 24):UiPanel.outline(self, Rect2(pillar.x + 6, pillar.y + 29, 9, 78), colors["p"])
 	if feedback_active(combat.tick, item_flash_tick, 15):UiPanel.outline(self, Rect2(207, 183, 28, 28), colors["u"])

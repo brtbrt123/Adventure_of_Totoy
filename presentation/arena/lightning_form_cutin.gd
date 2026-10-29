@@ -195,7 +195,7 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(SCALE, SCALE))
 	var dim: float = ramp(t, 0.0, 0.08) * (1.0 - ramp(t, 0.94, END_TIME))
 	if dim > 0.0:
-		draw_rect(Rect2(0, 0, 800, 450), Color(DIM, 0.66 * dim))
+		draw_rect(Rect2(-80, -45, 960, 540), Color(DIM, 0.66 * dim))
 	var off: float = banner_offset(t)
 	var poly: PackedVector2Array = banner_poly(off)
 	var rnd: RandomNumberGenerator = RandomNumberGenerator.new()

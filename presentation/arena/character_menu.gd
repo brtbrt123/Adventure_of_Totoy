@@ -24,12 +24,14 @@ const Kit := preload("res://presentation/common/ui_kit.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
 const TAB_STATS: int = 0
-const TAB_INVENTORY: int = 1
-const TAB_NAMES: Array[String] = ["STATS", "INVENTORY"]
+const TAB_ASPECTS: int = 1
+const TAB_INVENTORY: int = 2
+const TAB_QUESTS: int = 3
+const TAB_NAMES: Array[String] = ["STATUS", "ASPECTS", "ITEMS", "QUESTS"]
 ## Tab plates on the panel's top edge (x, width), kit tabs.
-const TAB_SPECS: Array[Vector2i] = [Vector2i(14, 62), Vector2i(80, 86)]
+const TAB_SPECS: Array[Vector2i] = [Vector2i(14, 58), Vector2i(76, 60), Vector2i(140, 52), Vector2i(196, 58)]
 const PANEL: Rect2 = Rect2(6, 24, 372, 176)
-const DESC: Rect2 = Rect2(40, 150, 304, 42)
+const DESC: Rect2 = Rect2(40, 149, 304, 46)
 const VEIL_ALPHA: float = 0.62
 const FOOTER: String = "TAB/ESC: CLOSE    Q/E: SWITCH TAB"
 ## STATS layout (384x216, kit frames)
@@ -200,6 +202,8 @@ func switch_tab(delta: int) -> void:
 
 func set_tab(index: int) -> void:
 	tab = clampi(index, 0, TAB_NAMES.size() - 1)
+	if tab == TAB_ASPECTS and stats_selection not in ASPECT_KEYS:
+		stats_selection = ASPECT_KEYS[0]
 	hover_key = &""
 	feedback = {}
 	close_picker()
@@ -210,6 +214,11 @@ func set_tab(index: int) -> void:
 
 ## Every selectable item of the STATS tab with its rect: the weapon slot, the three Aspect slots, the stat rows.
 func stats_items() -> Array[Dictionary]:
+	if tab == TAB_ASPECTS:
+		var sockets: Array[Dictionary] = []
+		for i: int in 3:
+			sockets.append({"key": ASPECT_KEYS[i], "rect": aspects_tab_rect(i)})
+		return sockets
 	if progression!=null:return progression_items()
 	var items: Array[Dictionary] = [{"key": &"weapon", "rect": WEAPON_SLOT}]
 	for i: int in range(3):
@@ -237,6 +246,8 @@ static func tab_rect(index: int) -> Rect2:
 
 ## Arrow keys: on STATS the nearest item in that direction (spatial), on INVENTORY the grid neighbour (clamped).
 func move_selection(direction: Vector2i) -> void:
+	if tab == TAB_QUESTS:
+		return
 	hover_key = &""
 	feedback = {}
 	if picker_open():
@@ -291,7 +302,7 @@ func hover_at(pos: Vector2) -> void:
 					picker_feedback = {}
 				picker_selection = index
 		return
-	if tab == TAB_STATS:
+	if tab == TAB_STATS or tab == TAB_ASPECTS:
 		for item: Dictionary in stats_items():
 			if Rect2(item["rect"]).has_point(pos):
 				hover_key = item["key"]
@@ -319,7 +330,7 @@ func click(pos: Vector2) -> void:
 		if not PICKER.has_point(pos):
 			close_picker()  # a click outside closes the picker and does nothing else
 		return
-	if tab == TAB_STATS:
+	if tab == TAB_STATS or tab == TAB_ASPECTS:
 		for item: Dictionary in stats_items():
 			if Rect2(item["rect"]).has_point(pos):
 				stats_selection = item["key"]
@@ -337,6 +348,8 @@ func click(pos: Vector2) -> void:
 
 ## ENTER: on INVENTORY equip the selected weapon through the core; on STATS pin the selection (first press: weapon).
 func accept() -> void:
+	if tab == TAB_QUESTS:
+		return
 	if progression!=null and not picker_open() and tab==TAB_STATS:
 		if String(stats_selection).begins_with("stat_"):
 			if stat_request.is_valid():stat_request.call(StringName(String(stats_selection).trim_prefix("stat_")))
@@ -350,7 +363,7 @@ func accept() -> void:
 	if picker_open():
 		_equip_aspect(Aspects.ALL[picker_selection])
 		return
-	if tab == TAB_STATS:
+	if tab == TAB_STATS or tab == TAB_ASPECTS:
 		if stats_selection == &"":
 			stats_selection = &"weapon"
 		elif stats_selection in ASPECT_KEYS:
@@ -742,7 +755,8 @@ static func stat_rows(equipped: StringName) -> Array[Array]:
 # --- drawing ---------------------------------------------------------------------------------------------------------
 
 func _text(at: Vector2, text: String, color: Color, face: Font = null, size: int = Hud.FONT_SIZE, align: int = HORIZONTAL_ALIGNMENT_LEFT) -> float:
-	var font: Font = face if face != null else Hud.ui_font()
+	var font: Font = face if face != null else Hud.text_face(text)
+	size = Hud._size_for(font, 1, size)
 	var width: float = Hud.text_width(text, 1, font, size)
 	var x: float = at.x
 	if align == HORIZONTAL_ALIGNMENT_CENTER:
@@ -785,9 +799,14 @@ func _draw() -> void:
 	if tab == TAB_STATS:
 		if progression!=null:_draw_progression_stats()
 		else:_draw_stats()
-	else:
+	elif tab == TAB_INVENTORY:
 		_draw_inventory()
-	if progression==null or tab!=TAB_STATS:_draw_description(description_key())
+	elif tab == TAB_ASPECTS:
+		_draw_aspects_tab()
+	else:
+		_draw_quests_tab()
+	if tab == TAB_INVENTORY or (tab == TAB_STATS and progression == null):
+		_draw_description(description_key())
 
 
 func _draw_tabs() -> void:
@@ -795,8 +814,7 @@ func _draw_tabs() -> void:
 		var rect: Rect2 = tab_rect(index)
 		Kit.tab(self, rect, index == tab)
 		_text(Vector2(rect.get_center().x, rect.position.y + 4), TAB_NAMES[index], colors["1"] if index == tab else colors["i"], Hud.menu_font(), 9, HORIZONTAL_ALIGNMENT_CENTER)
-	var name_width: float = _text(Vector2(368, 11), "TOTOY", colors["j"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(Vector2(368 - name_width - 6, 12), "WAYKEEPER", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(Vector2(368, 11), "TOTOY", colors["j"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 ## The weapon's socket art: the katana's kit medallion around its blade glyph (48x52), or the dagger's / scythe's whole
@@ -1084,10 +1102,61 @@ func _draw_description(key: StringName) -> void:
 	_text(Vector2(DESC.end.x - 10, DESC.position.y + 8), entry[1], colors["u"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
 	for i: int in range(lines.size()):
 		if not String(lines[i]).is_empty():
-			_text(Vector2(x0, DESC.position.y + 18 + i * 8), lines[i], colors["o"] if i == 2 else colors["j"], null, 7)
+			_text(Vector2(x0, DESC.position.y + 17 + i * 8), lines[i], colors["o"] if i == 2 else colors["j"], null, 7)
 
 func aspect_owned(aspect: StringName) -> bool:
 	return progression==null or progression.owned_aspects.has(aspect)
+
+
+static func aspects_tab_rect(index: int) -> Rect2:
+	return Rect2(30 + index * 48, 55, 37, 40)
+
+
+func _draw_aspects_tab() -> void:
+	_text(Vector2(26, 37), "ASPECT SOCKETS", colors["u"], Hud.menu_font(), 9)
+	for i: int in 3:
+		var rect: Rect2 = aspects_tab_rect(i)
+		var aspect: StringName = slot_aspect(i + 1)
+		var unlocked: bool = progression == null or (i < progression.aspect_slots.size() and bool(progression.aspect_slots[i].get("unlocked", false)))
+		Kit.socket(self, rect.position, not unlocked or not aspect_owned(aspect))
+		if unlocked and aspect_owned(aspect):
+			_ui(Hud.aspect_icon(aspect), Kit.socket_icon_rect(rect.position), Vector2(4, 4), Vector2(16, 16))
+		var at: Vector2 = Kit.socket_key(rect.position)
+		_text(Vector2(at.x, at.y - 3), SLOT_LETTERS[i], colors["1" if unlocked else "g"], Hud.stat_font(), 8, HORIZONTAL_ALIGNMENT_CENTER)
+		if stats_selection == ASPECT_KEYS[i]:
+			_brackets(rect)
+	_text(Vector2(26, 108), "Select a socket, then choose an Aspect.", colors["i"], null, 7)
+	_text(Vector2(26, 123), "Locked sockets open as your story advances.", colors["i"], null, 7)
+	var selected: int = maxi(0, ASPECT_KEYS.find(stats_selection))
+	var id: StringName = slot_aspect(selected + 1)
+	var detail: Rect2 = Rect2(22, 142, 340, 48)
+	Kit.panel(self, detail)
+	_text(Vector2(34, 151), Aspects.display_name(id) if aspect_owned(id) else "LOCKED ASPECT", colors["1"], Hud.menu_font(), 10)
+	if aspect_owned(id):
+		_text(Vector2(34, 168), "%s Edge   Cooldown %s s" % [num(Aspects.edge_cost(id)), secs(Aspects.cooldown(id))], colors["u"], null, 8)
+	if not stats_notice.is_empty():
+		_text(Vector2(26, 132), stats_notice, colors["o"], null, 7)
+	if picker_open():
+		_draw_picker()
+
+
+func _draw_quests_tab() -> void:
+	_text(Vector2(30, 44), "CURRENT OBJECTIVE", colors["u"], Hud.menu_font(), 11)
+	var card: Rect2 = Rect2(24, 66, 336, 106)
+	Kit.panel(self, card)
+	var objective: String = String(progression.objective.get("text", "Your village tasks are complete.")) if progression != null else "Defeat the Mossbound Colossus."
+	var y: float = 82.0
+	var line: String = ""
+	for word: String in objective.split(" "):
+		var candidate: String = word if line.is_empty() else line + " " + word
+		if Hud.text_width(candidate, 1, Hud.ui_font(), 10) > 300.0:
+			_text(Vector2(38, y), line, colors["1"], null, 10)
+			y += 15.0
+			line = word
+		else:
+			line = candidate
+	_text(Vector2(38, y), line, colors["1"], null, 10)
+	_text(Vector2(38, 150), "Follow the objective marker on the road.", colors["i"], null, 8)
 static func progression_aspect_rect(i: int) -> Rect2:return Rect2(28+i*46,150,37,40)
 static func progression_row_rect(i: int) -> Rect2:return Rect2(20,56+i*30,298,28)
 static func progression_plus_rect(i: int) -> Rect2:return Rect2(292,61+i*30,18,18)

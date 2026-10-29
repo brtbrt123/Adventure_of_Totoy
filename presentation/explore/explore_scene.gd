@@ -811,6 +811,7 @@ func _update_hud() -> void:
 	hud.explore_max_hp = snapshot.hero.max_hp
 	hud.herb_count = int(snapshot.inventory.get("herb",0))
 	hud.fight_hud = not snapshot.encounters.is_empty() and not character_menu.is_open and snapshot.dialogue.is_empty()
+	hud.visible = not character_menu.is_open
 	hud.portrait_atlas = sprites
 	hud.ui_frames = frames
 	hud.colors = colors

@@ -140,6 +140,9 @@ static func bar(canvas: CanvasItem, at: Vector2, width: float, fills: Array, thi
 		if amount >= float(b[0] + b[2]):
 			var strip_height: float = size_of(part).y
 			nine(canvas, part, Rect2(inside.position + Vector2(0, floorf((inside.size.y - strip_height) * 0.5)), Vector2(amount, strip_height)))
+		elif amount > 0.0 and tex(part) != null:
+			var strip_height: float = size_of(part).y
+			canvas.draw_texture_rect_region(tex(part), Rect2(inside.position + Vector2(0, floorf((inside.size.y - strip_height) * 0.5)), Vector2(amount, strip_height)), Rect2(0, 0, amount, strip_height))
 	return inside
 
 

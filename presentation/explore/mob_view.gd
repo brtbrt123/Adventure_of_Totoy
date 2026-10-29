@@ -3,6 +3,7 @@ extends RefCounted
 const Snapshots := preload("res://core/snapshots.gd")
 const Tuning := preload("res://core/tuning.gd")
 const WHITE := preload("res://art/build/sprites_white.png")
+const Kit := preload("res://presentation/common/ui_kit.gd")
 const STATES: Dictionary = {
  "mossling": {"idle":["idle",4,12,true], "alert":["spawn",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["attack_tell",3,1,false], "strike":["attack_lunge",3,3,false], "recover":["attack_recover",3,8,false], "crash":["attack_recover",3,8,true], "stagger":["attack_recover",3,8,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]},
  "boar": {"idle":["idle",4,14,true], "alert":["idle",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["charge_tell",4,1,false], "strike":["charge_run",4,2,true], "recover":["crash_stun",3,9,false], "crash":["crash_stun",3,9,true], "stagger":["crash_stun",3,9,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]}}
@@ -30,9 +31,7 @@ static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary, he
 	if int(mob["hp"]) < int(mob["max_hp"]) or at.distance_to(hero_at)<72.0:
 		if mob.has("level"):
 			draw_level(canvas, top + Vector2(-7,-7), int(mob["level"]), colors)
-		var frame_data: Dictionary = frames["hud_copper_mob"]
-		canvas.draw_texture_rect_region(atlas,Rect2(top+Vector2(-16,0),Vector2(32,8)),Rect2(frame_data["x"],frame_data["y"],frame_data["w"],frame_data["h"]))
-		canvas.draw_rect(Rect2(top+Vector2(-14,3),Vector2(floori(28.0*float(mob["hp"])/int(mob["max_hp"])),2)),colors["A"])
+		Kit.bar(canvas, top + Vector2(-16, 0), 32, [["fill_health_thin", float(mob["hp"]) / maxi(1, int(mob["max_hp"]))]], true)
 	if bool(mob["exposed"]):
 		canvas.draw_polyline(PackedVector2Array([top+Vector2(0,-8),top+Vector2(3,-5),top+Vector2(0,-2),top+Vector2(-3,-5),top+Vector2(0,-8)]),colors["u"],1.0)
 	if mob["state"] == &"alert":
