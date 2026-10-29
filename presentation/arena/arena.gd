@@ -105,7 +105,6 @@ var trails: Array[Dictionary] = []
 var flashes: Dictionary = {}
 var debug_enabled: bool = false
 var gold_sprites: Texture2D
-var white_sprites: Texture2D
 var hurt_blink: bool = false
 var previous_player_state: StringName = &""
 var reactions: Dictionary = {}
@@ -900,28 +899,13 @@ func prepare_visuals() -> void:
 		var was_left: bool = facing_left
 		if ((moved and hero.state != &"dead") or attack_started or coiling or warding or hero.state.begins_with("skill_")) and absf(hero.facing.x) > 0.3:
 			facing_left = hero.facing.x < 0.0
-		hero_moving = moved and hero.state != &"dead"
-		# Sprint afterimages: one sample per tick of where the hero was drawn on the previous tick.
-		if hero.sprint_ticks_left > 0 and snapshot.result == &"playing":
-			if visual_tick >= 0 and selected_frames.has(hero.id):
-				sprint_trail.append({"at": previous_player_position.round(), "frame": String(selected_frames[hero.id]), "left": was_left})
-				while sprint_trail.size() > WardEchoSprintEffects.TRAIL_CAP:
-					sprint_trail.pop_front()
-		else:
-			sprint_trail.clear()
-		for i: int in range(dash_ghosts.size() - 1, -1, -1):
-			dash_ghosts[i]["life"] -= 1
-			if int(dash_ghosts[i]["life"]) <= 0:
-				dash_ghosts.remove_at(i)
 		var gale_travel: bool = hero.skill_id == &"gale_cut" and previous_skill_id == &"gale_cut" and moved and (hero.state == &"skill_active" or (previous_player_state == &"skill_active" and hero.state == &"skill_recovery"))
 		if gale_travel:
 			skill_trails.append({"from": previous_player_position, "to": hero.position, "tick": snapshot.tick})
-		if (hero.state == &"dash" and previous_player_state == &"dash") or gale_travel:
-			dash_ghosts.append({"position": previous_player_position, "left": facing_left, "life": 6})
-			if dash_ghosts.size() > 3:
-				dash_ghosts.pop_front()
+		# the shared part: afterimages, dust and the Sprint trail (previous_player_position is updated inside)
+		_motion_seen = visual_tick >= 0 and selected_frames.has(hero.id)
+		track_hero_motion(moved, previous_player_state, was_left, gale_travel)
 		_coil_drag_trail()
-		previous_player_position = hero.position
 		previous_player_state = hero.state
 		previous_combo_index = hero.combo_index
 		previous_skill_id = hero.skill_id
@@ -951,13 +935,6 @@ func prepare_visuals() -> void:
 		for i: int in range(rings.size() - 1, -1, -1):
 			if snapshot.tick - int(rings[i]["start_tick"]) >= 12:
 				rings.remove_at(i)
-		var player: Snapshots.EntitySnapshot = snapshot.player
-		if player.state == &"dash" and player.state_ticks == 0:
-			_dust(player.position)
-		if player.state == &"walk":
-			var cadence: int = int(ArenaAnimation.PLAYER["walk"][1])
-			if player.state_ticks % (cadence * 2) == 0:
-				_dust(player.position)
 		for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 			if tell.attack == &"red_charge" and snapshot.tick >= tell.hit_tick and snapshot.tick <= tell.end_tick:
 				for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -1041,19 +1018,24 @@ func _draw_actor(actor: Snapshots.EntitySnapshot, silhouette_only: bool = false)
 		_draw_buff_aura(actor, true)
 		_draw_spin_ring(actor, true)
 
+func fx_hero_frame() -> String:
+	return String(selected_frames.get(snapshot.player.id, ""))
+
+
+func fx_black_form() -> bool:
+	return black_form_look(snapshot.player)
+
+
+func fx_dark_sprites() -> Texture2D:
+	return empowered_sprites
+
+
+func fx_black_ghost(at: Vector2, left: bool) -> void:
+	_draw_buff_frame("fx_black_aura_back_%d" % (posmod(snapshot.tick / 5, 6) + 1), at, 1, left)
+
+
 func _draw_dash() -> void:
-	var frame: Dictionary = frames.get(ArenaAnimation.hero_frame(ArenaAnimation.hero_set(snapshot.player), "dash", 1), frames.get("hero2_dash_right_1", {}))
-	if frame.is_empty():
-		return
-	for ghost: Dictionary in dash_ghosts:
-		var fade: float = float(ghost["life"]) / 6.0
-		if black_form_look(snapshot.player):
-			draw_texture_rect_region(empowered_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
-			_draw_buff_frame("fx_black_aura_back_%d" % (posmod(snapshot.tick / 5, 6) + 1), ghost["position"], 1, bool(ghost["left"]))
-		else:
-			draw_texture_rect_region(white_sprites, ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(colors["o"], fade * 0.55))
-	if snapshot.player.state == &"dash":
-		_draw_imported("fx_dash_%d" % (mini(5, snapshot.player.state_ticks / 2) + 1), snapshot.player.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
+	draw_dash_fx()
 
 func boss_core_position(actor: Snapshots.EntitySnapshot) -> Vector2:
 	var key: String = String(selected_frames.get(actor.id, ""))

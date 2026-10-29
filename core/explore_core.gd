@@ -545,6 +545,7 @@ func snapshot() -> ExploreSnapshot:
 	hero.attack_speed_mult = player.swing_speed_mult if String(player.state).begins_with("attack_") else player.attack_speed_mult()
 	hero.move_speed_mult = player.move_speed_mult()
 	hero.equipped_aspects = player.equipped_aspects.duplicate()
+	hero.sprint_ticks_left = player.sprint_ticks_left
 	snap.hero = hero
 	snap.dash_cooldown_ticks = player.dash_cooldown
 	for npc: Dictionary in def.get("npcs", []):

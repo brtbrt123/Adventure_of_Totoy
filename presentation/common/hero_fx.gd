@@ -147,6 +147,78 @@ func draw_hero_screen_flashes(view_origin: Vector2, view_size: Vector2) -> void:
 			draw_rect(Rect2(view_origin, view_size), Color(flash["color"], float(strengths[age])))
 
 
+## Which frame the hero is drawn with this tick (the Sprint afterimages copy it).
+func fx_hero_frame() -> String:
+	return ""
+
+
+## The Black Form look (a dark hero): the dash afterimages use `fx_dark_sprites()` instead of white ones.
+func fx_black_form() -> bool:
+	return false
+
+
+func fx_dark_sprites() -> Texture2D:
+	return sprites
+
+
+## Extra picture behind a dash afterimage in the Black Form look (the fight draws its dark aura there).
+func fx_black_ghost(_position: Vector2, _left: bool) -> void:
+	pass
+
+
+## The hero's movement for this fresh tick: dash afterimages, footstep and dash dust, the Sprint trail. `was_left` is
+## the facing before this tick; `gale` adds an afterimage for a skill that travels (the fight's Gale Cut).
+func track_hero_motion(moved: bool, previous_state: StringName, was_left: bool, gale: bool = false) -> void:
+	var hero: Snapshots.EntitySnapshot = fx_hero()
+	hero_moving = moved and hero.state != &"dead"
+	if hero.sprint_ticks_left > 0 and fx_playing():
+		if _motion_seen and fx_hero_frame() != "":
+			sprint_trail.append({"at": previous_player_position.round(), "frame": fx_hero_frame(), "left": was_left})
+			while sprint_trail.size() > WardEchoSprintEffects.TRAIL_CAP:
+				sprint_trail.pop_front()
+	else:
+		sprint_trail.clear()
+	for i: int in range(dash_ghosts.size() - 1, -1, -1):
+		dash_ghosts[i]["life"] -= 1
+		if int(dash_ghosts[i]["life"]) <= 0:
+			dash_ghosts.remove_at(i)
+	if (hero.state == &"dash" and previous_state == &"dash") or gale:
+		dash_ghosts.append({"position": previous_player_position, "left": facing_left, "life": 6})
+		if dash_ghosts.size() > 3:
+			dash_ghosts.pop_front()
+	if hero.state == &"dash" and hero.state_ticks == 0:
+		_dust(hero.position)
+	if hero.state == &"walk":
+		var cadence: int = int(ArenaAnimation.PLAYER["walk"][1])
+		if hero.state_ticks % (cadence * 2) == 0:
+			_dust(hero.position)
+	_motion_seen = true
+	previous_player_position = hero.position
+
+
+var _motion_seen: bool = false
+var white_sprites: Texture2D
+
+
+## The dash afterimages and the dash streak at the hero's feet (under the actors' effects, over the floor).
+func draw_dash_fx() -> void:
+	var hero: Snapshots.EntitySnapshot = fx_hero()
+	var frame: Dictionary = frames.get(ArenaAnimation.hero_frame(ArenaAnimation.hero_set(hero), "dash", 1), frames.get("hero2_dash_right_1", {}))
+	if frame.is_empty():
+		return
+	for ghost: Dictionary in dash_ghosts:
+		var fade: float = float(ghost["life"]) / 6.0
+		var rect: Rect2 = ArenaAnimation.destination(ghost["position"], frame, bool(ghost["left"]))
+		var source: Rect2 = Rect2(frame["x"], frame["y"], frame["w"], frame["h"])
+		if fx_black_form():
+			draw_texture_rect_region(fx_dark_sprites(), rect, source)
+			fx_black_ghost(ghost["position"], bool(ghost["left"]))
+		elif white_sprites != null:
+			draw_texture_rect_region(white_sprites, rect, source, Color(colors["o"], fade * 0.55))
+	if hero.state == &"dash":
+		_draw_imported("fx_dash_%d" % (mini(5, hero.state_ticks / 2) + 1), hero.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
+
+
 # --- moved here from the arena (unchanged apart from the fx_* hooks) ---
 
 func _burst(at: Vector2, count: int, color: Color, speed: float) -> void:

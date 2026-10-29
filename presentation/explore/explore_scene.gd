@@ -116,6 +116,8 @@ func _ready() -> void:
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
 	sprites = load("res://art/build/sprites.png") as Texture2D
+	if ResourceLoader.exists("res://art/build/sprites_white.png"):
+		white_sprites = load("res://art/build/sprites_white.png") as Texture2D
 	var manifest: Dictionary = _read_json(NPC_MANIFEST)
 	var states: Dictionary = manifest.get("states", {})
 	for npc_name: String in states:
@@ -192,6 +194,14 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	core.set_loadout(profile.weapon_id,profile.equipped_aspects)
 	snapshot = core.snapshot()
 	practice_effects.clear()
+	particles.clear()
+	hit_bursts.clear()
+	parry_impacts.clear()
+	dash_ghosts.clear()
+	sprint_trail.clear()
+	wes_fx.clear()
+	_motion_seen = false
+	previous_player_position = snapshot.hero.position
 	hero_hit_tick = -1000
 	world_cues.clear()
 	encounter_effects.clear()
@@ -315,6 +325,7 @@ func advance(intent: InputFrame) -> void:
 		bubbles[id] = int(bubbles[id]) - 1
 		if int(bubbles[id]) <= 0:
 			bubbles.erase(id)
+	age_hero_fx()
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
@@ -384,11 +395,21 @@ func _on_event(event: GameEvent) -> void:
 			hero_hit_tick = snapshot.tick
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": snapshot.hero.position + Vector2(0,-14), "perfect": false})
 		GameEvent.ATTACK_HIT:
-			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": Vector2(event.data["position"])+Vector2(0,-8), "perfect": event.data.get("kind", &"") == &"counter", "counter": event.data.get("kind", &"") == &"counter"})
+			# the hero's swing: the same burst, sparks and shake as in the fight (presentation/common/hero_fx.gd)
+			var counter: bool = event.data.get("kind", &"") == &"counter"
+			var finisher: bool = int(event.data.get("combo_index", 0)) >= snapshot.hero.combo_max and snapshot.hero.combo_max > 0
+			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -12), counter, finisher)
 		GameEvent.MOB_STAGGERED:
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": false})
-		GameEvent.TRAINING_POST_HIT, GameEvent.PARRY_SUCCEEDED:
+		GameEvent.TRAINING_POST_HIT:
+			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": false})
+			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -8), false, false)
+		GameEvent.PARRY_SUCCEEDED:
+			# kept for the brief parry pose; the picture, sparks and shake come from the shared layer
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": event.data.get("quality", &"") == &"perfect"})
+			on_hero_parry(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -8), event.data.get("quality", &"") == &"perfect")
+		&"sprint_started", &"sprint_ended", &"echo_placed", &"echo_recall", &"echo_expired", &"ward_raised", &"ward_blocked", &"ward_released":
+			_on_ward_echo_sprint(event)
 		GameEvent.TRAINING_HERO_HIT:
 			practice_message("TRY AGAIN")
 		GameEvent.TRAINING_DODGED:
@@ -547,10 +568,33 @@ func _update_camera() -> void:
 	camera.force_update_scroll()
 
 
+var _previous_hero_state: StringName = &""
+
+
+## The hooks of presentation/common/hero_fx.gd.
+func fx_hero() -> Snapshots.EntitySnapshot:
+	return snapshot.hero
+
+
+func fx_tick() -> int:
+	return snapshot.tick
+
+
+func fx_hero_frame() -> String:
+	return hero_frame
+
+
+func fx_cue(key: String, tick: int, strength: float = 1.0) -> void:
+	practice_view.audio.cue(key, tick, strength)
+
+
 func _choose_frames() -> void:
 	var hero: Snapshots.EntitySnapshot = snapshot.hero
+	var was_left: bool = facing_left
 	if absf(hero.facing.x) > 0.3:
 		facing_left = hero.facing.x < 0.0
+	track_hero_motion(not hero.position.is_equal_approx(previous_player_position), _previous_hero_state, was_left)
+	_previous_hero_state = hero.state
 	previous_hero_position = hero.position
 	hero_frame = hero_frame_for(hero, snapshot.armed)
 	if snapshot.armed and snapshot.tick - hero_hit_tick >= 0 and snapshot.tick - hero_hit_tick < 8:
@@ -631,6 +675,7 @@ func drawables() -> Array[Dictionary]:
 func _draw() -> void:
 	if snapshot == null or colors.is_empty():
 		return
+	draw_set_transform(shake_offset())
 	draw_rect(Rect2(Vector2(-8, -8), snapshot.size + Vector2(16, 16)), colors["2"])
 	var ground: Texture2D = ground_texture(snapshot.scene_id)
 	if ground != null:
@@ -643,6 +688,8 @@ func _draw() -> void:
 		draw_texture_rect_region(sprites,Rect2((at-Vector2.ONE*diameter/2).round(),Vector2.ONE*diameter),Rect2(f["x"]+6,f["y"]+6,28,28))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
+	_draw_ward_echo_ground()
+	draw_dash_fx()
 	var items: Array[Dictionary] = drawables()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		# All shadows lie on the floor, never on a lower-sorted prop or actor.
@@ -654,15 +701,17 @@ func _draw() -> void:
 				ActorShadow.draw(self, item["at"], item["shadow"], shadow_strength())
 	for item: Dictionary in items:
 		_draw_item(item)
-	if snapshot.hero.state == &"dash":
-		_draw_imported("fx_dash_%d" % (mini(5, snapshot.hero.state_ticks / 2) + 1), snapshot.hero.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
+	_draw_ward_echo_front(shake_offset())
 	for item: Dictionary in items:
 		if item["kind"] == &"npc" and bubbles.has(item["id"]):
 			_draw_bubble(Vector2(item["at"]) - Vector2(0, float(item["height"]) + 6.0))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		if TelegraphView.warning_visible(tell, snapshot.tick):
 			TelegraphView.draw_marker(self, tell, colors["x"] if tell.kind == &"gold" else colors["z"], colors["0"])
+	draw_hero_impacts()
 	for effect: Dictionary in practice_effects:
+		if effect["type"] in [GameEvent.PARRY_SUCCEEDED, GameEvent.TRAINING_POST_HIT]:
+			continue  # drawn by the shared layer
 		var age: int = snapshot.tick - int(effect["tick"])
 		var plan: Array[Dictionary] = CombatEffects.parry_impact(effect["at"], age, effect["perfect"], colors) if effect["type"] == GameEvent.PARRY_SUCCEEDED else CombatEffects.hit_impact(effect["at"], age, false, colors)
 		CombatEffects.draw_plan(self, plan)
@@ -678,6 +727,8 @@ func _draw() -> void:
 			draw_arc(at,4.0+age*0.5,0.0,TAU,16,color,1.0)
 	if debug_enabled:
 		_draw_debug()
+	draw_set_transform(Vector2.ZERO)
+	draw_hero_screen_flashes(view_origin, VIEW_SIZE)
 
 
 func hero_hit_flash() -> bool:
@@ -711,9 +762,13 @@ func _draw_item(item: Dictionary) -> void:
 		draw_rect(Rect2(at - Vector2(6, 24), Vector2(12, 24)), colors["g"])
 		return
 	var frame: Dictionary = frames[key]
+	if item["kind"] == &"hero":
+		_draw_sprint_back(snapshot.hero, at, bool(item["left"]))
 	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
 	var sheet: Texture2D = MobView.WHITE if white else sprites
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
+	if item["kind"] == &"hero":
+		_draw_hero_aspect_overlays(snapshot.hero, key, at, bool(item["left"]))
 
 
 func _draw_actor_cast(item: Dictionary) -> void:
@@ -722,7 +777,7 @@ func _draw_actor_cast(item: Dictionary) -> void:
 	var frame: Dictionary = frames[item["frame"]]
 	draw_set_transform_matrix(EnvironmentLight.actor_transform(item["at"], frame, bool(item["left"])))
 	draw_texture_rect_region(sprites, Rect2(Vector2.ZERO, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(0, 0, 0, EnvironmentLight.ACTOR_SHADOW_ALPHA))
-	draw_set_transform_matrix(Transform2D.IDENTITY)
+	draw_set_transform(shake_offset())
 
 
 func shadow_strength() -> float:
