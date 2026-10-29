@@ -114,6 +114,7 @@ func apply(data: Dictionary) -> void:
 		var item: TextureRect = slot.get_node("Icon")
 		item.visible = unlocked and String(value.get("item", "")) == "herb"
 		item.texture = icon("hud_copper_herb")
+		slot.get_node("Key/Letter").text = str(i + 1)  # the two slots share one scene, so the digit is set here
 		slot.get_node("Key/Letter").modulate = Color.WHITE if unlocked else Color(1, 1, 1, 0.45)
 	var aspects: Array = data.get("aspects", [])
 	for i: int in range(3):
@@ -126,8 +127,7 @@ func apply(data: Dictionary) -> void:
 		glyph.texture = icon(String(value.get("icon", "")), Rect2(4, 4, 16, 16))
 		glyph.modulate = Color.WHITE if bool(value.get("usable", false)) else Color(1, 1, 1, 0.45)
 		socket.get_node("Key").modulate = Color.WHITE if open else Color(1, 1, 1, 0.45)
-		if value.has("key"):
-			socket.get_node("Key").text = String(value["key"])
+		socket.get_node("Key").text = String(value["key"]) if value.has("key") else "ZXC"[i]  # the sockets share one scene
 		var cost: Label = socket.get_node("Cost")
 		cost.visible = value.has("cost")
 		if value.has("cost"):

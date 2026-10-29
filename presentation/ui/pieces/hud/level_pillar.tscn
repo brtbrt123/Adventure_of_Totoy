@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://bptfi7si38xis" path="res://art/ui_kit/level_pillar.png" id="16_tex"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="2_fon"]
+[ext_resource type="FontFile" uid="uid://bpdmvxnu2ubib" path="res://art/ui_kit/pixel_keys.fnt" id="3_fon"]
+
+[node name="LevelPillar" type="TextureRect"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 21
+offset_bottom = 118
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Frame" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_right = 21.0
+offset_bottom = 118.0
+texture = ExtResource("16_tex")
+patch_margin_top = 28
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Fill" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 30.0
+offset_right = 14.0
+offset_bottom = 106.0
+mouse_filter = 2
+color = Color(0.5412, 0.4353, 0.6588, 1)
+
+[node name="Level" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 5.0
+offset_right = 22.0
+offset_bottom = 19.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("3_fon")
+theme_override_font_sizes/font_size = 8
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExpLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = -4.0
+offset_top = 117.0
+offset_right = 25.0
+offset_bottom = 125.0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
+text = "EXP"
+horizontal_alignment = 1
+vertical_alignment = 1

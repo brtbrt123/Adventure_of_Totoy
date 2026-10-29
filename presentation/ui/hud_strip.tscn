@@ -3,21 +3,16 @@
 [ext_resource type="Script" uid="uid://d3jonrortce38" path="res://presentation/ui/hud_strip.gd" id="1_scr"]
 [ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="2_fon"]
 [ext_resource type="FontFile" uid="uid://bpdmvxnu2ubib" path="res://art/ui_kit/pixel_keys.fnt" id="3_fon"]
-[ext_resource type="Texture2D" uid="uid://ldwvoh6kfrav" path="res://art/ui_kit/weapon_medallion.png" id="4_tex"]
-[ext_resource type="Texture2D" uid="uid://b7cjht10qtx7j" path="res://art/ui_kit/button_normal.png" id="5_tex"]
-[ext_resource type="Texture2D" uid="uid://dtmwjrhnvo3w7" path="res://art/ui_kit/health_bar_frame.png" id="6_tex"]
-[ext_resource type="Texture2D" uid="uid://cta1x16uvxsai" path="res://art/ui_kit/fill_ghost.png" id="7_tex"]
-[ext_resource type="Texture2D" uid="uid://bdxlqy42i6spx" path="res://art/ui_kit/fill_health.png" id="8_tex"]
-[ext_resource type="Texture2D" uid="uid://bi2ys6f1o5u15" path="res://art/ui_kit/thin_bar_frame.png" id="9_tex"]
-[ext_resource type="Texture2D" uid="uid://v4ithi24ewgg" path="res://art/ui_kit/fill_edge_thin.png" id="10_tex"]
-[ext_resource type="Texture2D" uid="uid://bpmoto53glfxk" path="res://art/ui_kit/fill_exp_thin.png" id="11_tex"]
-[ext_resource type="Texture2D" uid="uid://bu7rys2wkil6j" path="res://art/ui_kit/slot_frame.png" id="12_tex"]
-[ext_resource type="Texture2D" uid="uid://c5lajp7rr5id5" path="res://art/ui_kit/icon_padlock.png" id="13_tex"]
-[ext_resource type="Texture2D" uid="uid://cy8vdqlmn87kd" path="res://art/ui_kit/key_badge.png" id="14_tex"]
-[ext_resource type="Texture2D" uid="uid://c3ivgeunpa2a7" path="res://art/ui_kit/aspect_socket_locked.png" id="15_tex"]
-[ext_resource type="Texture2D" uid="uid://bptfi7si38xis" path="res://art/ui_kit/level_pillar.png" id="16_tex"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/weapon_medallion.tscn" id="piece_weapon_medallion"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/weapon_name_plate.tscn" id="piece_weapon_name_plate"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/health_bar.tscn" id="piece_health_bar"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/edge_bar.tscn" id="piece_edge_bar"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/dash_bar.tscn" id="piece_dash_bar"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/item_slot.tscn" id="piece_item_slot"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/aspect_socket.tscn" id="piece_aspect_socket"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/level_pillar.tscn" id="piece_level_pillar"]
 
-[node name="HudStrip" type="Control" unique_id=495120984]
+[node name="HudStrip" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 384.0
@@ -25,23 +20,12 @@ offset_bottom = 216.0
 mouse_filter = 2
 script = ExtResource("1_scr")
 
-[node name="Medallion" type="TextureRect" parent="." unique_id=1243150385]
+[node name="Medallion" parent="." instance=ExtResource("piece_weapon_medallion")]
 layout_mode = 0
 offset_left = 4.0
 offset_top = 162.0
-mouse_filter = 2
-texture = ExtResource("4_tex")
 
-[node name="WeaponGlyph" type="TextureRect" parent="Medallion" unique_id=480470819]
-layout_mode = 0
-offset_left = 8.0
-offset_top = 9.0
-offset_right = 40.0
-offset_bottom = 41.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="WholeMedallion" type="TextureRect" parent="." unique_id=1559983044]
+[node name="WholeMedallion" type="TextureRect" parent="."]
 layout_mode = 0
 offset_left = 4.0
 offset_top = 164.0
@@ -50,35 +34,14 @@ offset_bottom = 212.0
 mouse_filter = 2
 expand_mode = 1
 
-[node name="NamePlate" type="NinePatchRect" parent="." unique_id=1679885046]
+[node name="NamePlate" parent="." instance=ExtResource("piece_weapon_name_plate")]
 layout_mode = 0
 offset_left = 6.0
 offset_top = 203.0
 offset_right = 50.0
 offset_bottom = 215.0
-texture = ExtResource("5_tex")
-patch_margin_left = 6
-patch_margin_top = 6
-patch_margin_right = 6
-patch_margin_bottom = 6
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
 
-[node name="Name" type="Label" parent="NamePlate" unique_id=1567808400]
-layout_mode = 0
-offset_top = 1.0
-offset_right = 44.0
-offset_bottom = 11.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
-text = "BLACK"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HealthLabel" type="Label" parent="." unique_id=369008933]
+[node name="HealthLabel" type="Label" parent="."]
 layout_mode = 0
 offset_left = 58.0
 offset_top = 174.0
@@ -92,7 +55,7 @@ theme_override_font_sizes/font_size = 7
 text = "HEALTH"
 vertical_alignment = 1
 
-[node name="HealthValue" type="Label" parent="." unique_id=1293088270]
+[node name="HealthValue" type="Label" parent="."]
 layout_mode = 0
 offset_left = 63.0
 offset_top = 172.0
@@ -107,43 +70,14 @@ text = "110 / 110"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="HealthBar" type="NinePatchRect" parent="." unique_id=885542543]
+[node name="HealthBar" parent="." instance=ExtResource("piece_health_bar")]
 layout_mode = 0
 offset_left = 58.0
 offset_top = 182.0
 offset_right = 194.0
 offset_bottom = 196.0
-texture = ExtResource("6_tex")
-patch_margin_left = 14
-patch_margin_right = 13
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
 
-[node name="Ghost" type="NinePatchRect" parent="HealthBar" unique_id=562355794]
-layout_mode = 0
-offset_left = 11.0
-offset_top = 3.0
-offset_right = 125.0
-offset_bottom = 11.0
-texture = ExtResource("7_tex")
-patch_margin_left = 2
-patch_margin_right = 4
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Fill" type="NinePatchRect" parent="HealthBar" unique_id=677389195]
-layout_mode = 0
-offset_left = 11.0
-offset_top = 3.0
-offset_right = 125.0
-offset_bottom = 11.0
-texture = ExtResource("8_tex")
-patch_margin_left = 2
-patch_margin_right = 4
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="EdgeLabel" type="Label" parent="." unique_id=1098558646]
+[node name="EdgeLabel" type="Label" parent="."]
 layout_mode = 0
 offset_left = 59.0
 offset_top = 196.0
@@ -157,31 +91,14 @@ theme_override_font_sizes/font_size = 6
 text = "EDGE  --"
 vertical_alignment = 1
 
-[node name="EdgeBar" type="NinePatchRect" parent="." unique_id=17518830]
+[node name="EdgeBar" parent="." instance=ExtResource("piece_edge_bar")]
 layout_mode = 0
 offset_left = 58.0
 offset_top = 203.0
 offset_right = 142.0
 offset_bottom = 212.0
-texture = ExtResource("9_tex")
-patch_margin_left = 4
-patch_margin_right = 4
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
 
-[node name="Fill" type="NinePatchRect" parent="EdgeBar" unique_id=1733181251]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 2.0
-offset_right = 81.0
-offset_bottom = 7.0
-texture = ExtResource("10_tex")
-patch_margin_left = 1
-patch_margin_right = 2
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="DashLabel" type="Label" parent="." unique_id=1710848957]
+[node name="DashLabel" type="Label" parent="."]
 layout_mode = 0
 offset_left = 157.0
 offset_top = 196.0
@@ -195,361 +112,50 @@ theme_override_font_sizes/font_size = 6
 text = "DASH"
 vertical_alignment = 1
 
-[node name="DashBar" type="NinePatchRect" parent="." unique_id=1173858484]
+[node name="DashBar" parent="." instance=ExtResource("piece_dash_bar")]
 layout_mode = 0
 offset_left = 156.0
 offset_top = 203.0
 offset_right = 194.0
 offset_bottom = 212.0
-texture = ExtResource("9_tex")
-patch_margin_left = 4
-patch_margin_right = 4
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
 
-[node name="Fill" type="NinePatchRect" parent="DashBar" unique_id=436117772]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 2.0
-offset_right = 35.0
-offset_bottom = 7.0
-texture = ExtResource("11_tex")
-patch_margin_left = 1
-patch_margin_right = 2
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="ItemSlot1" type="NinePatchRect" parent="." unique_id=1252560919]
+[node name="ItemSlot1" parent="." instance=ExtResource("piece_item_slot")]
 layout_mode = 0
 offset_left = 208.0
 offset_top = 184.0
 offset_right = 234.0
 offset_bottom = 210.0
-texture = ExtResource("12_tex")
-patch_margin_left = 8
-patch_margin_top = 8
-patch_margin_right = 8
-patch_margin_bottom = 8
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
 
-[node name="Locked" type="TextureRect" parent="ItemSlot1" unique_id=168003079]
-layout_mode = 0
-offset_left = 9.0
-offset_top = 8.0
-mouse_filter = 2
-texture = ExtResource("13_tex")
-
-[node name="Icon" type="TextureRect" parent="ItemSlot1" unique_id=1245848166]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 21.0
-offset_bottom = 21.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="Count" type="Label" parent="ItemSlot1" unique_id=1465393801]
-layout_mode = 0
-offset_left = 9.0
-offset_top = 14.0
-offset_right = 21.0
-offset_bottom = 24.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 7
-text = "0"
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Key" type="NinePatchRect" parent="ItemSlot1" unique_id=2050685770]
-layout_mode = 0
-offset_left = -2.0
-offset_top = 19.0
-offset_right = 7.0
-offset_bottom = 28.0
-texture = ExtResource("14_tex")
-patch_margin_left = 4
-patch_margin_top = 4
-patch_margin_right = 4
-patch_margin_bottom = 4
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Letter" type="Label" parent="ItemSlot1/Key" unique_id=451229197]
-layout_mode = 0
-offset_top = 1.0
-offset_right = 9.0
-offset_bottom = 10.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 6
-text = "1"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ItemSlot2" type="NinePatchRect" parent="." unique_id=1792356527]
+[node name="ItemSlot2" parent="." instance=ExtResource("piece_item_slot")]
 layout_mode = 0
 offset_left = 238.0
 offset_top = 184.0
 offset_right = 264.0
 offset_bottom = 210.0
-texture = ExtResource("12_tex")
-patch_margin_left = 8
-patch_margin_top = 8
-patch_margin_right = 8
-patch_margin_bottom = 8
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
 
-[node name="Locked" type="TextureRect" parent="ItemSlot2" unique_id=2060760188]
-layout_mode = 0
-offset_left = 9.0
-offset_top = 8.0
-mouse_filter = 2
-texture = ExtResource("13_tex")
-
-[node name="Icon" type="TextureRect" parent="ItemSlot2" unique_id=1088215573]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 21.0
-offset_bottom = 21.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="Count" type="Label" parent="ItemSlot2" unique_id=1122512205]
-layout_mode = 0
-offset_left = 9.0
-offset_top = 14.0
-offset_right = 21.0
-offset_bottom = 24.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 7
-text = "0"
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Key" type="NinePatchRect" parent="ItemSlot2" unique_id=2108954159]
-layout_mode = 0
-offset_left = -2.0
-offset_top = 19.0
-offset_right = 7.0
-offset_bottom = 28.0
-texture = ExtResource("14_tex")
-patch_margin_left = 4
-patch_margin_top = 4
-patch_margin_right = 4
-patch_margin_bottom = 4
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Letter" type="Label" parent="ItemSlot2/Key" unique_id=1098738206]
-layout_mode = 0
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 10.0
-offset_bottom = 10.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 6
-text = "2"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Socket1" type="TextureRect" parent="." unique_id=718685796]
+[node name="Socket1" parent="." instance=ExtResource("piece_aspect_socket")]
 layout_mode = 0
 offset_left = 268.0
 offset_top = 172.0
-mouse_filter = 2
-texture = ExtResource("15_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket1" unique_id=1402109479]
-layout_mode = 0
-offset_left = 11.0
-offset_top = 10.0
-offset_right = 27.0
-offset_bottom = 26.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="Key" type="Label" parent="Socket1" unique_id=589007060]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 31.0
-offset_right = 33.0
-offset_bottom = 41.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 8
-text = "Z"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Cost" type="Label" parent="Socket1" unique_id=1495340618]
-layout_mode = 0
-offset_left = -3.0
-offset_top = -9.0
-offset_right = 42.0
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 7
-text = "20E"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Socket2" type="TextureRect" parent="." unique_id=1580065516]
+[node name="Socket2" parent="." instance=ExtResource("piece_aspect_socket")]
 layout_mode = 0
 offset_left = 306.0
 offset_top = 172.0
-mouse_filter = 2
-texture = ExtResource("15_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket2" unique_id=1169010516]
-layout_mode = 0
-offset_left = 11.0
-offset_top = 10.0
-offset_right = 27.0
-offset_bottom = 26.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="Key" type="Label" parent="Socket2" unique_id=1180318251]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 31.0
-offset_right = 33.0
-offset_bottom = 41.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 8
-text = "X"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Cost" type="Label" parent="Socket2" unique_id=1583649659]
-layout_mode = 0
-offset_left = -4.0
-offset_top = -9.0
-offset_right = 41.0
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 7
-text = "20E"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Socket3" type="TextureRect" parent="." unique_id=1247066237]
+[node name="Socket3" parent="." instance=ExtResource("piece_aspect_socket")]
 layout_mode = 0
 offset_left = 344.0
 offset_top = 172.0
-mouse_filter = 2
-texture = ExtResource("15_tex")
 
-[node name="Icon" type="TextureRect" parent="Socket3" unique_id=733713778]
-layout_mode = 0
-offset_left = 11.0
-offset_top = 10.0
-offset_right = 27.0
-offset_bottom = 26.0
-mouse_filter = 2
-expand_mode = 1
-
-[node name="Key" type="Label" parent="Socket3" unique_id=892377205]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 31.0
-offset_right = 33.0
-offset_bottom = 41.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 8
-text = "C"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Cost" type="Label" parent="Socket3" unique_id=1402513843]
-layout_mode = 0
-offset_left = -4.0
-offset_top = -9.0
-offset_right = 41.0
-theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 7
-text = "20E"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LevelPillar" type="TextureRect" parent="." unique_id=117668386]
+[node name="LevelPillar" parent="." instance=ExtResource("piece_level_pillar")]
 layout_mode = 0
 offset_left = 4.0
 offset_top = 36.0
 offset_right = 25.0
 offset_bottom = 154.0
-mouse_filter = 2
-expand_mode = 1
 
-[node name="Frame" type="NinePatchRect" parent="LevelPillar" unique_id=1560962934]
-layout_mode = 0
-offset_right = 21.0
-offset_bottom = 118.0
-texture = ExtResource("16_tex")
-patch_margin_top = 28
-patch_margin_bottom = 10
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Fill" type="ColorRect" parent="LevelPillar" unique_id=1151700269]
-layout_mode = 0
-offset_left = 7.0
-offset_top = 30.0
-offset_right = 14.0
-offset_bottom = 106.0
-mouse_filter = 2
-color = Color(0.5412, 0.4353, 0.6588, 1)
-
-[node name="Level" type="Label" parent="LevelPillar" unique_id=328810930]
-layout_mode = 0
-offset_left = 1.0
-offset_top = 5.0
-offset_right = 22.0
-offset_bottom = 19.0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("3_fon")
-theme_override_font_sizes/font_size = 8
-text = "1"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ExpLabel" type="Label" parent="LevelPillar" unique_id=1014650399]
-layout_mode = 0
-offset_left = -4.0
-offset_top = 117.0
-offset_right = 25.0
-offset_bottom = 125.0
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/font = ExtResource("2_fon")
-theme_override_font_sizes/font_size = 6
-text = "EXP"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Down" type="Label" parent="." unique_id=1403935856]
+[node name="Down" type="Label" parent="."]
 visible = false
 layout_mode = 0
 offset_top = 178.0
