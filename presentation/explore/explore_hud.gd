@@ -106,7 +106,7 @@ func _sync_overlay() -> void:
 		if feedback_active(combat.tick, locked_tick, 70):
 			data["locked"] = {"text": locked_message, "x": x0, "y": y0 - 11}
 		data["tab"] = {"text": "TAB" + (" !" if combat.stat_points_unspent > 0 else ""), "x": 6 if fight_hud else 160, "y": 176 if fight_hud else 198}
-	if toast_text != "" and toast_alpha > 0.0 and not training_on and (combat == null or combat.objective.is_empty()):
+	if toast_text != "" and toast_alpha > 0.0 and not training_on:
 		data["toast"] = {"text": toast_text, "alpha": toast_alpha}
 	if hint_text != "" and fade_alpha <= 0.0:
 		var plate: Rect2 = hint_rect()
