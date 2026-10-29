@@ -17,7 +17,14 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if not Engine.is_editor_hint():
 		for group: String in GROUPS:
-			get_node(group).visible = false
+			var node: CanvasItem = get_node_or_null(group) as CanvasItem  # a piece you deleted in the editor is simply skipped
+			if node != null:
+				node.visible = false
+
+
+## A piece of the scene, or null when it was deleted in the editor (every piece is optional).
+func _piece(path: String) -> Control:
+	return get_node_or_null(path) as Control
 
 
 func _width(label: Label, text: String) -> float:
@@ -36,116 +43,165 @@ func apply(d: Dictionary) -> void:
 	_objective(String(d.get("objective", "")))
 	_toast(d.get("toast", {}))
 	var level_up: Dictionary = d.get("level_up", {})
-	$LevelUp.visible = not level_up.is_empty()
-	if not level_up.is_empty():
-		$LevelUp/Sub.text = String(level_up.get("sub", "")).to_upper()
+	var banner: Control = _piece("LevelUp")
+	if banner != null:
+		banner.visible = not level_up.is_empty()
+		if not level_up.is_empty() and banner.get_node_or_null("Sub") != null:
+			banner.get_node("Sub").text = String(level_up.get("sub", "")).to_upper()
 	var task: String = String(d.get("task", ""))
-	$Task.visible = not task.is_empty()
-	$Task.text = task.to_upper()
+	var task_label: Label = _piece("Task") as Label
+	if task_label != null:
+		task_label.visible = not task.is_empty()
+		task_label.text = task.to_upper()
 	var gate: Array = d.get("gate", [])
-	$Gate.visible = not gate.is_empty()
-	for i: int in range(2):
-		$Gate.get_node("Line%d" % (i + 1)).text = String(gate[i]).to_upper() if i < gate.size() else ""
+	var gate_box: Control = _piece("Gate")
+	if gate_box != null:
+		gate_box.visible = not gate.is_empty()
+		for i: int in range(2):
+			var line: Label = gate_box.get_node_or_null("Line%d" % (i + 1)) as Label
+			if line != null:
+				line.text = String(gate[i]).to_upper() if i < gate.size() else ""
 	_chips(d.get("chips", {}))
 	var locked: Dictionary = d.get("locked", {})
-	$LockedMsg.visible = not locked.is_empty()
-	if not locked.is_empty():
-		$LockedMsg.text = String(locked.get("text", "")).to_upper()
-		$LockedMsg.position = Vector2(float(locked.get("x", 0.0)), float(locked.get("y", 0.0)))
+	var locked_label: Label = _piece("LockedMsg") as Label
+	if locked_label != null:
+		locked_label.visible = not locked.is_empty()
+		if not locked.is_empty():
+			locked_label.text = String(locked.get("text", "")).to_upper()
+			locked_label.position = Vector2(float(locked.get("x", 0.0)), float(locked.get("y", 0.0)))
 	var tab: Dictionary = d.get("tab", {})
-	$TabHint.visible = not tab.is_empty()
-	if not tab.is_empty():
-		$TabHint.text = String(tab.get("text", "")).to_upper()
-		$TabHint.position = Vector2(float(tab.get("x", 0.0)), float(tab.get("y", 0.0)))
+	var tab_label: Label = _piece("TabHint") as Label
+	if tab_label != null:
+		tab_label.visible = not tab.is_empty()
+		if not tab.is_empty():
+			tab_label.text = String(tab.get("text", "")).to_upper()
+			tab_label.position = Vector2(float(tab.get("x", 0.0)), float(tab.get("y", 0.0)))
 	_hint(d.get("hint", {}))
 	_lesson(d.get("lesson", {}))
 	_checklist(d.get("checklist", {}))
 
 
 func _objective(text: String) -> void:
-	$Objective.visible = not text.is_empty()
-	if text.is_empty():
+	var box: Control = _piece("Objective")
+	if box == null:
 		return
-	var label: Label = $Objective/Text
+	box.visible = not text.is_empty()
+	var label: Label = box.get_node_or_null("Text") as Label
+	if text.is_empty() or label == null:
+		return
 	label.text = text.to_upper()
-	$Objective.size.x = clampf(_width(label, text) + 34.0, 120.0, 300.0)
+	box.size.x = clampf(_width(label, text) + 34.0, 120.0, 300.0)
 
 
 func _toast(toast: Dictionary) -> void:
-	$Toast.visible = not toast.is_empty()
-	if toast.is_empty():
+	var box: Control = _piece("Toast")
+	if box == null:
 		return
-	var label: Label = $Toast/Text
+	box.visible = not toast.is_empty()
+	var label: Label = box.get_node_or_null("Text") as Label
+	if toast.is_empty() or label == null:
+		return
 	label.text = String(toast.get("text", "")).to_upper()
 	var width: float = ceilf(_width(label, label.text)) + 58.0
-	$Toast.size.x = width
-	$Toast.position.x = 380.0 - width
+	box.size.x = width
+	box.position.x = 380.0 - width
 	label.size.x = width
-	$Toast.modulate.a = float(toast.get("alpha", 1.0))
+	box.modulate.a = float(toast.get("alpha", 1.0))
 
 
 func _chips(chips: Dictionary) -> void:
-	$Chips.visible = not chips.is_empty()
+	var box: Control = _piece("Chips")
+	if box == null:
+		return
+	box.visible = not chips.is_empty()
 	if chips.is_empty():
 		return
-	$Chips.position = Vector2(float(chips.get("x", 0.0)), float(chips.get("y", 0.0)))
+	box.position = Vector2(float(chips.get("x", 0.0)), float(chips.get("y", 0.0)))
 	var items: Array = chips.get("items", [])
 	for i: int in range(3):
-		var chip: NinePatchRect = $Chips.get_node("Chip%d" % (i + 1))
+		var chip: NinePatchRect = box.get_node_or_null("Chip%d" % (i + 1)) as NinePatchRect
+		if chip == null:
+			continue
 		var item: Dictionary = items[i] if i < items.size() else {}
 		var unlocked: bool = bool(item.get("unlocked", false))
 		chip.texture = load("res://art/ui_kit/button_normal.png" if unlocked else "res://art/ui_kit/button_locked.png")
-		chip.get_node("Lock").visible = not unlocked
-		var key: Label = chip.get_node("Key")
-		key.text = String(item.get("key", "")).to_upper()
-		key.position.x = 4.0 if not unlocked else 0.0
-		key.add_theme_color_override("font_color", Color("e0f0ec") if unlocked else Color("5a625e"))
+		var lock: Control = chip.get_node_or_null("Lock") as Control
+		if lock != null:
+			lock.visible = not unlocked
+		var key: Label = chip.get_node_or_null("Key") as Label
+		if key != null:
+			key.text = String(item.get("key", "")).to_upper()
+			key.position.x = 4.0 if not unlocked else 0.0
+			key.add_theme_color_override("font_color", Color("e0f0ec") if unlocked else Color("5a625e"))
 
 
 func _hint(hint: Dictionary) -> void:
-	$Hint.visible = not hint.is_empty()
-	if hint.is_empty():
+	var box: Control = _piece("Hint")
+	if box == null:
 		return
-	var label: Label = $Hint/Text
+	box.visible = not hint.is_empty()
+	var label: Label = box.get_node_or_null("Text") as Label
+	if hint.is_empty() or label == null:
+		return
 	label.text = String(hint.get("text", "")).to_upper()
 	var width: float = ceilf(_width(label, label.text)) + 12.0
-	$Hint.size.x = width
+	box.size.x = width
 	label.size.x = width
-	$Hint.position = Vector2(float(hint.get("x", 0.0)), float(hint.get("y", 0.0)))
+	box.position = Vector2(float(hint.get("x", 0.0)), float(hint.get("y", 0.0)))
 
 
 func _lesson(lesson: Dictionary) -> void:
-	$Lesson.visible = not lesson.is_empty()
+	var box: Control = _piece("Lesson")
+	if box == null:
+		return
+	box.visible = not lesson.is_empty()
 	if lesson.is_empty():
 		return
-	$Lesson/Title.text = String(lesson.get("title", "")).to_upper()
-	$Lesson/Detail.text = String(lesson.get("detail", "")).to_upper()
+	for pair: Array in [["Title", "title"], ["Detail", "detail"]]:
+		var label: Label = box.get_node_or_null(pair[0]) as Label
+		if label != null:
+			label.text = String(lesson.get(pair[1], "")).to_upper()
 	var key: String = String(lesson.get("key", ""))
-	$Lesson/KeyButton.visible = not key.is_empty()
-	if not key.is_empty():
-		var label: Label = $Lesson/KeyButton/Text
-		label.text = key.to_upper()
-		var width: float = ceilf(_width(label, key)) + 10.0
-		$Lesson/KeyButton.size.x = width
-		label.size.x = width
-		$Lesson/KeyButton.position.x = 187.0 - width
+	var button: Control = box.get_node_or_null("KeyButton") as Control
+	if button == null:
+		return
+	button.visible = not key.is_empty()
+	var key_label: Label = button.get_node_or_null("Text") as Label
+	if not key.is_empty() and key_label != null:
+		key_label.text = key.to_upper()
+		var width: float = ceilf(_width(key_label, key)) + 10.0
+		button.size.x = width
+		key_label.size.x = width
+		button.position.x = 187.0 - width
 
 
 func _checklist(checklist: Dictionary) -> void:
-	$Checklist.visible = not checklist.is_empty()
+	var box: Control = _piece("Checklist")
+	if box == null:
+		return
+	box.visible = not checklist.is_empty()
 	if checklist.is_empty():
 		return
 	var names: Array = checklist.get("names", [])
 	var done: Dictionary = checklist.get("done", {})
 	var current: String = String(checklist.get("current", ""))
 	for i: int in range(4):
-		var item: Control = $Checklist.get_node("Item%d" % (i + 1))
+		var item: Control = box.get_node_or_null("Item%d" % (i + 1)) as Control
+		if item == null:
+			continue
 		var name: String = String(names[i]) if i < names.size() else ""
 		var finished: bool = bool(done.get(name, false))
 		var tone: Color = Color("6aa89a") if finished else (Color("f4ecd6") if name == current else Color("a7cde0"))
-		var label: Label = item.get_node("Name")
-		label.text = name.to_upper()
-		label.add_theme_color_override("font_color", tone)
-		item.get_node("Box").color = tone
-		item.get_node("Hole").visible = not finished
-		item.get_node("Underline").visible = name == current
+		var label: Label = item.get_node_or_null("Name") as Label
+		if label != null:
+			label.text = name.to_upper()
+			label.add_theme_color_override("font_color", tone)
+		var square: ColorRect = item.get_node_or_null("Box") as ColorRect
+		if square != null:
+			square.color = tone
+		var hole: Control = item.get_node_or_null("Hole") as Control
+		if hole != null:
+			hole.visible = not finished
+		var underline: Control = item.get_node_or_null("Underline") as Control
+		if underline != null:
+			underline.visible = name == current

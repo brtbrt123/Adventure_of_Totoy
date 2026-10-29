@@ -1,195 +1,185 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://co1retic61jhf"]
 
-[ext_resource type="Script" path="res://presentation/ui/boss_panel.gd" id="1_scr"]
-[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
-[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="3_fon"]
-[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="4_fon"]
+[ext_resource type="Script" uid="uid://cecqof62t2li8" path="res://presentation/ui/boss_panel.gd" id="1_scr"]
+[ext_resource type="FontFile" uid="uid://bxa12or38dv8m" path="res://presentation/fonts/Cinzel.ttf" id="3_fon"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="4_fon"]
 
 [sub_resource type="FontVariation" id="cinzel"]
 base_font = ExtResource("3_fon")
-variation_opentype = {2003265652: 900.0}
+variation_opentype = {
+2003265652: 900.0
+}
 
 [sub_resource type="FontVariation" id="pixel"]
 base_font = ExtResource("4_fon")
-variation_opentype = {2003265652: 400.0}
+variation_opentype = {
+2003265652: 400.0
+}
 
-[node name="BossPanel" type="Control"]
+[node name="BossPanel" type="Control" unique_id=1958616663]
+show_behind_parent = true
 layout_mode = 3
 anchors_preset = 0
 offset_right = 104.0
 offset_bottom = 47.0
 mouse_filter = 2
-show_behind_parent = true
 script = ExtResource("1_scr")
 
-[node name="Art" type="TextureRect" parent="."]
+[node name="Art" type="TextureRect" parent="." unique_id=1618510007]
 layout_mode = 0
-offset_left = 0
-offset_top = 7
-offset_right = 104
-offset_bottom = 31
+offset_top = 7.0
+offset_right = 104.0
+offset_bottom = 31.0
 mouse_filter = 2
 expand_mode = 1
-stretch_mode = 0
 
-[node name="Name" type="Label" parent="."]
+[node name="Name" type="Label" parent="." unique_id=1664574840]
 layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 104
-offset_bottom = 9
-mouse_filter = 2
-text = "MOSSBOUND COLOSSUS"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.8784, 0.2745, 0.2471, 1.0)
+offset_right = 104.0
+offset_bottom = 9.0
+theme_override_colors/font_color = Color(0.8784, 0.2745, 0.2471, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = SubResource("cinzel")
 theme_override_font_sizes/font_size = 7
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
+text = "MOSSBOUND COLOSSUS"
+horizontal_alignment = 1
+
+[node name="Health" type="Control" parent="." unique_id=1544622292]
+anchors_preset = 0
+offset_right = 104.0
+offset_bottom = 47.0
+mouse_filter = 2
+
+[node name="Frame" type="ColorRect" parent="Health" unique_id=161175525]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 17.0
+offset_right = 97.0
+offset_bottom = 22.0
+mouse_filter = 2
+color = Color(0.1098, 0.0941, 0.1412, 1)
+
+[node name="Back" type="ColorRect" parent="Health" unique_id=1603214185]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 18.0
+offset_right = 96.0
+offset_bottom = 21.0
+mouse_filter = 2
+color = Color(0.1843, 0.1961, 0.1922, 1)
+
+[node name="Ghost" type="ColorRect" parent="Health" unique_id=1571450184]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 18.0
+offset_right = 68.0
+offset_bottom = 21.0
+mouse_filter = 2
+color = Color(0.7765, 0.749, 0.6667, 1)
+
+[node name="Fill" type="ColorRect" parent="Health" unique_id=1505090618]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 18.0
+offset_right = 52.0
+offset_bottom = 21.0
+mouse_filter = 2
+color = Color(0.7608, 0.7961, 0.4863, 1)
+
+[node name="Top" type="ColorRect" parent="Health" unique_id=1166972599]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 18.0
+offset_right = 52.0
+offset_bottom = 19.0
+mouse_filter = 2
+color = Color(0.7765, 0.749, 0.6667, 1)
+
+[node name="Bottom" type="ColorRect" parent="Health" unique_id=1787795796]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 20.0
+offset_right = 52.0
+offset_bottom = 21.0
+mouse_filter = 2
+color = Color(0.2667, 0.2941, 0.2863, 1)
+
+[node name="Posture" type="Control" parent="." unique_id=1918610875]
+anchors_preset = 0
+offset_right = 104.0
+offset_bottom = 47.0
+mouse_filter = 2
+
+[node name="Frame" type="ColorRect" parent="Posture" unique_id=533246980]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 26.0
+offset_right = 85.0
+offset_bottom = 30.0
+mouse_filter = 2
+color = Color(0.1098, 0.0941, 0.1412, 1)
+
+[node name="Back" type="ColorRect" parent="Posture" unique_id=417208557]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 27.0
+offset_right = 84.0
+offset_bottom = 29.0
+mouse_filter = 2
+color = Color(0.1843, 0.1961, 0.1922, 1)
+
+[node name="Fill" type="ColorRect" parent="Posture" unique_id=844284720]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 27.0
+offset_right = 52.0
+offset_bottom = 29.0
+mouse_filter = 2
+color = Color(0.5412, 0.4353, 0.6588, 1)
+
+[node name="Counter" type="Control" parent="." unique_id=2062014383]
+anchors_preset = 0
+offset_right = 104.0
+offset_bottom = 47.0
+mouse_filter = 2
+
+[node name="Text" type="Label" parent="Counter" unique_id=875896086]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 30.0
+offset_right = 104.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
 theme_override_constants/outline_size = 2
-
-[node name="Health" type="Control" parent="."]
-layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 104
-offset_bottom = 47
-mouse_filter = 2
-
-[node name="Frame" type="ColorRect" parent="Health"]
-layout_mode = 0
-offset_left = 7
-offset_top = 17
-offset_right = 97
-offset_bottom = 22
-mouse_filter = 2
-color = Color(0.1098, 0.0941, 0.1412, 1.0)
-
-[node name="Back" type="ColorRect" parent="Health"]
-layout_mode = 0
-offset_left = 8
-offset_top = 18
-offset_right = 96
-offset_bottom = 21
-mouse_filter = 2
-color = Color(0.1843, 0.1961, 0.1922, 1.0)
-
-[node name="Ghost" type="ColorRect" parent="Health"]
-layout_mode = 0
-offset_left = 8
-offset_top = 18
-offset_right = 68
-offset_bottom = 21
-mouse_filter = 2
-color = Color(0.7765, 0.7490, 0.6667, 1.0)
-
-[node name="Fill" type="ColorRect" parent="Health"]
-layout_mode = 0
-offset_left = 8
-offset_top = 18
-offset_right = 52
-offset_bottom = 21
-mouse_filter = 2
-color = Color(0.7608, 0.7961, 0.4863, 1.0)
-
-[node name="Top" type="ColorRect" parent="Health"]
-layout_mode = 0
-offset_left = 8
-offset_top = 18
-offset_right = 52
-offset_bottom = 19
-mouse_filter = 2
-color = Color(0.7765, 0.7490, 0.6667, 1.0)
-
-[node name="Bottom" type="ColorRect" parent="Health"]
-layout_mode = 0
-offset_left = 8
-offset_top = 20
-offset_right = 52
-offset_bottom = 21
-mouse_filter = 2
-color = Color(0.2667, 0.2941, 0.2863, 1.0)
-
-[node name="Posture" type="Control" parent="."]
-layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 104
-offset_bottom = 47
-mouse_filter = 2
-
-[node name="Frame" type="ColorRect" parent="Posture"]
-layout_mode = 0
-offset_left = 19
-offset_top = 26
-offset_right = 85
-offset_bottom = 30
-mouse_filter = 2
-color = Color(0.1098, 0.0941, 0.1412, 1.0)
-
-[node name="Back" type="ColorRect" parent="Posture"]
-layout_mode = 0
-offset_left = 20
-offset_top = 27
-offset_right = 84
-offset_bottom = 29
-mouse_filter = 2
-color = Color(0.1843, 0.1961, 0.1922, 1.0)
-
-[node name="Fill" type="ColorRect" parent="Posture"]
-layout_mode = 0
-offset_left = 20
-offset_top = 27
-offset_right = 52
-offset_bottom = 29
-mouse_filter = 2
-color = Color(0.5412, 0.4353, 0.6588, 1.0)
-
-[node name="Counter" type="Control" parent="."]
-layout_mode = 0
-offset_left = 0
-offset_top = 0
-offset_right = 104
-offset_bottom = 47
-mouse_filter = 2
-
-[node name="Text" type="Label" parent="Counter"]
-layout_mode = 0
-offset_left = 4
-offset_top = 33
-offset_right = 104
-offset_bottom = 42
-mouse_filter = 2
-text = "COUNTER - ATTACK"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1.0)
 theme_override_fonts/font = SubResource("pixel")
 theme_override_font_sizes/font_size = 9
-theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1.0)
-theme_override_constants/outline_size = 2
+text = "COUNTER - ATTACK"
 
-[node name="Frame" type="ColorRect" parent="Counter"]
+[node name="Frame" type="ColorRect" parent="Counter" unique_id=324022843]
 layout_mode = 0
-offset_left = 3
-offset_top = 40
-offset_right = 93
-offset_bottom = 44
+offset_left = 3.0
+offset_top = 40.0
+offset_right = 93.0
+offset_bottom = 44.0
 mouse_filter = 2
-color = Color(0.1098, 0.0941, 0.1412, 1.0)
+color = Color(0.1098, 0.0941, 0.1412, 1)
 
-[node name="Back" type="ColorRect" parent="Counter"]
+[node name="Back" type="ColorRect" parent="Counter" unique_id=586623531]
 layout_mode = 0
-offset_left = 4
-offset_top = 41
-offset_right = 92
-offset_bottom = 43
+offset_left = 4.0
+offset_top = 41.0
+offset_right = 92.0
+offset_bottom = 43.0
 mouse_filter = 2
-color = Color(0.1843, 0.1961, 0.1922, 1.0)
+color = Color(0.1843, 0.1961, 0.1922, 1)
 
-[node name="Fill" type="ColorRect" parent="Counter"]
+[node name="Fill" type="ColorRect" parent="Counter" unique_id=1116453016]
 layout_mode = 0
-offset_left = 4
-offset_top = 41
-offset_right = 64
-offset_bottom = 43
+offset_left = 4.0
+offset_top = 41.0
+offset_right = 64.0
+offset_bottom = 43.0
 mouse_filter = 2
-color = Color(0.6549, 0.8039, 0.8784, 1.0)
+color = Color(0.6549, 0.8039, 0.8784, 1)

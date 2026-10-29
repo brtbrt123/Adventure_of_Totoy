@@ -82,10 +82,13 @@ func apply(data: Dictionary) -> void:
 		weapon_glyph.visible = bool(data.get("armed", true))
 	var status: Array = data.get("status", [])
 	for i: int in range(3):
-		var slot_node: Control = get_node("Status%d" % (i + 1))
+		var slot_node: Control = get_node_or_null("Status%d" % (i + 1)) as Control  # optional: delete the slots you do not want
+		if slot_node == null:
+			continue
 		slot_node.visible = i < status.size()
-		if i < status.size():
-			slot_node.get_node("Icon").texture = icon(String(status[i]))
+		var status_icon: TextureRect = slot_node.get_node_or_null("Icon") as TextureRect
+		if i < status.size() and status_icon != null:
+			status_icon.texture = icon(String(status[i]))
 	if data.has("hp"):
 		var max_hp: float = maxf(1.0, float(data.get("max_hp", 1)))
 		health_value.text = "%d / %d" % [int(data["hp"]), int(max_hp)]
