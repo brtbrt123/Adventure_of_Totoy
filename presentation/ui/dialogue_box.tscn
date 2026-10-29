@@ -32,7 +32,6 @@ offset_top = 0
 offset_right = 384
 offset_bottom = 216
 mouse_filter = 2
-visible = false
 
 [node name="Panel" type="NinePatchRect" parent="Dialogue"]
 layout_mode = 0
@@ -151,7 +150,6 @@ offset_top = 0
 offset_right = 384
 offset_bottom = 216
 mouse_filter = 2
-visible = false
 
 [node name="Veil" type="ColorRect" parent="Controls"]
 layout_mode = 0

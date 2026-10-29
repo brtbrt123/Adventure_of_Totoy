@@ -1,3 +1,4 @@
+@tool
 extends Control
 ## The conversation box and the first-visit controls card as a Godot scene (dialogue_box.tscn). Open the scene in the editor
 ## to move, resize or re-texture anything; this script only fills in the words. It draws nothing and holds no rules:
@@ -20,6 +21,16 @@ var _portraits: Dictionary = {}
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if Engine.is_editor_hint():
+		# in the editor both parts are shown with a sample line, so you can see and move everything
+		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/reference/chapter1_characters_v2/portraits_v2.json"))
+		portrait_frames = (data as Dictionary).get("frames", {}) if data is Dictionary else {}
+		show_line({"speaker": "Tovan", "portrait": "tovan", "shown_text": "Hold out your hands, Totoy. This is a Black Katana,\nand it is yours. It was always yours.", "next_hint": "E / Enter: Next", "skip_hint": "Escape: skip"})
+		show_controls(true, "E / Enter: continue")
+	else:
+		# in the game they stay hidden until conversation_view.gd shows them
+		line_box.visible = false
+		controls.visible = false
 
 
 func _portrait_texture(key: String) -> Texture2D:
