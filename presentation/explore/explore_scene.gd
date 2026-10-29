@@ -1,18 +1,14 @@
-extends Node2D
+extends "res://presentation/common/hero_fx.gd"
 ## Chapter 1 layered-ground/prop renderer. Core owns movement, collisions, transitions and rewards.
 ## F2/1 village, F3/2 forest, F4/3 glade, F5/4 arena; F7/5, F8/6 and F10/8 remain layered aliases; F11/9 woodland.
 ## The arena uses its own renderer. Save migration stays in core/SaveProfile.
 const ExploreCore := preload("res://core/explore_core.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
 const InputFrame := preload("res://core/input_frame.gd")
-const GameEvent := preload("res://core/game_event.gd")
 const GameCore := preload("res://core/game_core.gd")
-const Snapshots := preload("res://core/snapshots.gd")
-const Tuning := preload("res://core/tuning.gd")
 const SaveStore := preload("res://core/save_store.gd")
 const SaveProfile := preload("res://core/save_profile.gd")
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
-const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CharacterMenu := preload("res://presentation/arena/character_menu.gd")
 const ExploreHud := preload("res://presentation/explore/explore_hud.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
@@ -28,7 +24,6 @@ const PracticeView := preload("res://presentation/explore/practice_view.gd")
 var practice_view: PracticeView
 const ConversationView := preload("res://presentation/explore/conversation_view.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
-const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 var conversation: ConversationView
 var practice_effects: Array[Dictionary] = []
 var hero_hit_tick: int = -1000
@@ -77,16 +72,12 @@ const DEBUG_SCENES: Dictionary = {"debug_scene_woodland": &"woodland_layered", "
 
 var core: ExploreCore
 var snapshot: ExploreCore.ExploreSnapshot
-var colors: Dictionary = {}
-var frames: Dictionary = {}
-var sprites: Texture2D
 var grounds: Dictionary = {}
 var prop_placements: Array[Dictionary] = []
 var lighting_enabled: bool = true
 var npc_idle_ticks: Dictionary = {}
 var camera: Camera2D
 var view_origin: Vector2 = Vector2.ZERO
-var facing_left: bool = false
 var previous_hero_position: Vector2 = Vector2.INF
 var hero_frame: String = ""
 var npc_frames: Dictionary = {}  # npc id -> frame name drawn this tick
@@ -748,18 +739,6 @@ func _refresh_props() -> void:
 
 func _update_lighting() -> void:
 	material = EnvironmentLight.make_material(snapshot.scene_id, snapshot.size, prop_placements) if lighting_enabled and EnvironmentLight.supports(snapshot.scene_id) else null
-
-
-func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE) -> void:
-	if not frames.has(key):
-		return
-	var frame: Dictionary = frames[key]
-	var anchor: Vector2 = Vector2(frame.get("ax", float(frame["w"]) / 2), frame.get("ay", float(frame["h"]) / 2))
-	var extent: Vector2 = Vector2(frame["w"], frame["h"])
-	var origin: Vector2 = at - anchor * size_scale.abs()
-	if size_scale.x < 0:
-		origin.x = at.x - (extent.x - anchor.x) * absf(size_scale.x)
-	draw_texture_rect_region(sprites, Rect2(origin.round(), extent * size_scale), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
 
 
 ## The placeholder speech bubble "..." (cream, ink edge, a tail) with its bottom centre at `tip`.
