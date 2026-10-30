@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "body_pngs": 60,
+  "fx_pngs": 100,
+  "gifs": {
+    "all_attacks.gif": {
+      "decoded_frames": 56,
+      "duration_ms": 6000,
+      "exact_integer_scale": 4
+    },
+    "all_body_animations.gif": {
+      "decoded_frames": 57,
+      "duration_ms": 16800,
+      "exact_integer_scale": 4
+    },
+    "all_effects.gif": {
+      "decoded_frames": 99,
+      "duration_ms": 15300,
+      "exact_integer_scale": 4
+    },
+    "cleave.gif": {
+      "decoded_frames": 17,
+      "duration_ms": 1900,
+      "exact_integer_scale": 4
+    },
+    "cleave_lash_chain.gif": {
+      "decoded_frames": 34,
+      "duration_ms": 2950,
+      "exact_integer_scale": 4
+    },
+    "cleave_parry_exposed.gif": {
+      "decoded_frames": 35,
+      "duration_ms": 2700,
+      "exact_integer_scale": 4
+    },
+    "defeat.gif": {
+      "decoded_frames": 13,
+      "duration_ms": 2000,
+      "exact_integer_scale": 4
+    },
+    "guard_break_exposed.gif": {
+      "decoded_frames": 36,
+      "duration_ms": 2900,
+      "exact_integer_scale": 4
+    },
+    "idle_wake_walk.gif": {
+      "decoded_frames": 42,
+      "duration_ms": 4200,
+      "exact_integer_scale": 4
+    },
+    "lash.gif": {
+      "decoded_frames": 19,
+      "duration_ms": 1950,
+      "exact_integer_scale": 4
+    },
+    "ring.gif": {
+      "decoded_frames": 20,
+      "duration_ms": 2150,
+      "exact_integer_scale": 4
+    }
+  }
+}
