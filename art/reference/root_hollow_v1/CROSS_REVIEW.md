@@ -1,3 +1,5 @@
+Resolved by Claude ad118e0f: corpse-spark finding now passes regression. See presentation/review/root_hollow_final/REVIEW.md for current PASS and remaining visual limitations. Historical finding follows.
+
 # Cross-review of Claude's presentation/art changes (2026-10-30)
 
 Result: FAIL (one P2 cosmetic correctness finding). Ground proposal approval remains independent.

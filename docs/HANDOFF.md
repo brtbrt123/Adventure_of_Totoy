@@ -2,7 +2,7 @@
 
 > **Mob idles (2026-10-30):** approved Mossling hopping and Boar grazing are installed globally in mob_view.gd, with60 new sprites. Idle selection uses simulation tick (dormant state_ticks stays zero),6 ticks/frame and per-mob phase; alert/combat unchanged. Full harness passes; live GIF and rebuild instructions in art/reference/mob_idle_review_v1/.
 
-> **Root Hollow (2026-10-30):** owner approved the no-cave art. Ground and12 independent prop sprites/24 shadow masks are prepared; static engine preview in art/reference/root_hollow_v1/props_engine_review.png. Live new prop placement is NOT collision-registered. Claude must follow [[CLAUDE_TASK_root_hollow_prop_registration]] before replacing blockout data. Pending art/shadow catalogues stay separate to keep definition-matching tests green. Existing lamp pools + common moon shadows only; per-lamp occlusion unfinished.
+> **Root Hollow (2026-10-30):** Claude registered live colliders/placements/gate in ad118e0f; Codex finished Root Hollow-only exposure, teal pools and nearest-practical projected cast shadows. Ancient/root-wall canopy y-sort is preserved. Live gate/depth/route/warning captures and PASS cross-review: presentation/review/root_hollow_final/REVIEW.md. Full harness passes. Local shadows use a soft parallel-ray mask approximation, not physical volumetric occlusion; owner judges appearance.
 
 > **Weapon paths (2026-10-29):** approved trails, glow and particles use the shared `hero_fx.gd` base in both arena and exploration. Future hero renderers must call `draw_hero_back`; see [[WEAPON_PATHS]]. The third katana cut was corrected to travel forward over the head.
 

@@ -1,4 +1,5 @@
 extends "res://presentation/common/hero_fx.gd"
+const LocalPropShadows := preload("res://presentation/common/local_prop_shadows.gd")
 ## Chapter 1 layered-ground/prop renderer. Core owns movement, collisions, transitions and rewards.
 ## F2/1 village, F3/2 forest, F4/3 glade, F5/4 arena; F7/5, F8/6 and F10/8 remain layered aliases; F11/9 woodland.
 ## The arena uses its own renderer. Save migration stays in core/SaveProfile.
@@ -814,6 +815,8 @@ func _draw() -> void:
 		_draw_imported(prop["name"], prop["at"], prop["scale"])
 	var items: Array[Dictionary] = drawables()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
+		if snapshot.scene_id == &"root_hollow_layered" and lighting_enabled:
+			LocalPropShadows.draw(self, items, prop_placements, sprites, shake_offset())
 		# All shadows lie on the floor, never on a lower-sorted prop or actor.
 		for item: Dictionary in items:
 			if item["kind"] == &"prop":

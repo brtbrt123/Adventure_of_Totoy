@@ -21,7 +21,7 @@ static func make_material(scene: StringName, size: Vector2, placements: Array[Di
 	result.set_shader_parameter("actor_shadow_alpha", ACTOR_SHADOW_ALPHA)
 	result.set_shader_parameter("world_size", size)
 	result.set_shader_parameter("shaft_slope", SHADOW_PROJECTION.x / SHADOW_PROJECTION.y)
-	result.set_shader_parameter("strength", 1.0)
+	result.set_shader_parameter("strength", 0.82 if scene == &"root_hollow_layered" else 1.0)
 	result.set_shader_parameter("light_colour", Vector3(0.64, 0.77, 1.0) if scene == &"village_layered" else Vector3(0.60, 0.79, 1.0))
 	var practicals: Dictionary = lamp_plan(placements)
 	if scene in [&"glade_layered"]:
