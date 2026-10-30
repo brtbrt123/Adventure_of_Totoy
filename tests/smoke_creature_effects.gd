@@ -73,6 +73,13 @@ func run() -> void:
 	boss["state"] = &"strike"
 	fx.sync(v)
 	check(fx.tells[900].size == 147.0, "larger core cone kept exactly")
+	cone.direction = Vector2.LEFT
+	cone.half_angle = 0.95
+	var far: float = 0.0
+	for mark: Dictionary in FX.slam_marks(cone, 20):
+		far = maxf(far, Vector2(mark["at"]).distance_to(cone.center))
+		check(Vector2(mark["at"]).distance_to(cone.center) <= cone.size + 0.01, "slam marks stay inside the hit cone")
+	check(absf(far - cone.size) < 0.5, "slam marks reach the cone's real edge (%s of %s)" % [far, cone.size])
 	v.tick = 42
 	boss["state"] = &"stagger"
 	fx.sync(v)
@@ -80,6 +87,7 @@ func run() -> void:
 	v.tick = 43
 	boss["state"] = &"idle"
 	boss["hp"] = 105
+	boss["regen_active"] = true  # pulses follow the core's summon regeneration only
 	fx.sync(v)
 	check(fx.heals.size() == 1, "healing pulse comes from real HP increase")
 	fx.sync(v)
@@ -92,6 +100,24 @@ func run() -> void:
 	var cast: Dictionary = {"id":201,"type":&"stag","state":&"windup","state_ticks":50,"attack_id":&"stag_summon","cast_start_tick":10,"cast_release_tick":110}
 	check(MobView.frame(cast, v.telegraphs, 60) == "stag_chant_right_15", "chant follows non-damaging core cast progress")
 	check(v.telegraphs.is_empty(), "chant pose never manufactures a damage warning")
+	# Orbs: drawn while the core reports them, popped where they were when they vanish; moths that appear get a reveal.
+	var o: FX = FX.new()
+	var w: Explore.ExploreSnapshot = Explore.ExploreSnapshot.new()
+	w.scene_id = &"glade_layered"
+	w.tick = 1
+	w.mob_projectiles.append({"id": 7, "owner_id": 501, "visual": &"glowmoth_orb", "position": Vector2(10, 10), "direction": Vector2.LEFT, "radius": 4.0, "fired_tick": 1})
+	w.mobs.append({"id": 501, "type": &"glowmoth", "position": Vector2(30, 10), "facing": Vector2.LEFT, "state": &"chase", "state_ticks": 0, "hp": 20, "summoner_id": 201})
+	o.sync(w)
+	check(o.orbs.size() == 1 and o.reveals.size() == 1, "an orb in flight and a summoned moth's reveal")
+	w.tick = 2
+	w.mob_projectiles.clear()
+	o.sync(w)
+	check(o.orbs.is_empty() and o.pops.size() == 1 and Vector2(o.pops[0]["at"]) == Vector2(10, 10), "a vanished orb pops where it was")
+	check(o.reveals.size() == 1, "a moth is revealed once")
+	for key: String in ["fx_glowmoth_orb_1", "fx_glowmoth_orb_pop_4", "fx_ch1_moth_trail_4", "fx_ch1_moth_shadow_1", "woodland_fx_heal_6"]:
+		check(frames.has(key), "registered effect " + key)
+	var release: Dictionary = {"id":201,"type":&"stag","state":&"recover","state_ticks":2,"attack_id":&"stag_summon","cast_start_tick":10,"cast_release_tick":100}
+	check(MobView.frame(release, v.telegraphs, 112) == "stag_summon_right_3", "release frames continue from the release tick into recover")
 	if failures == 0:
 		print("CREATURE FX OK")
 	quit(1 if failures else 0)

@@ -1,3 +1,7 @@
+## Thornback effects finished and the Glowmoth orb (2026-10-31, Claude, owner-approved crossing of the split)
+
+Fixed the flat-line slam warning (snapshot lacked the cone angle), made the Glowmoth orb a real projectile (core, events, snapshot, 8 tests), and finished the creature effects: slam shock, cracks and rubble reach the real 145 px edge, visible healing links and heal pulses, orb, trail and pop, moth reveal, readable moth bars, chant release frames. Core 554 pass, 51 of 54 smokes pass headless (3 need a window). Details: docs/CROSS_REVIEW_thornback_v3.md (Follow-up). Captures: docs/previews/thornback_v3_real/ (not committed). Look and feel are the owner's call.
+
 ## Thornback balance v3 core mechanics and cross-review (2026-10-31, Claude)
 
 Slam reach 125, charge 6.6 px/tick over 24 ticks, eight root bursts (eight telegraphs, deterministic valid sites, an escape rule), the chant that calls exactly five Glowmoths, and the 2 percent per second summon regeneration (per Stag, never per moth) are in the core, with new events mob_summon_started, mob_summoned, mob_healed and mob view fields summoner_id, regen_active, live_summons, cast_start_tick, cast_release_tick. tests/core/test_stag_v3.gd (22), core suite 546 pass, three smokes pass. Cross-review of Codex 8ae4d9df: PASS with four small comments, see docs/CROSS_REVIEW_thornback_v3.md. Not verified: real renderer captures, the feel of eight roots, all numbers (first guesses).

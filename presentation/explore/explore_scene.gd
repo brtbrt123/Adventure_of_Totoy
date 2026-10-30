@@ -858,6 +858,7 @@ func _draw() -> void:
 		draw_arc(snapshot.training["center"], 10.0 + float(snapshot.training["since_hit"]) * 0.5, 0, TAU, 24, colors["1"], 1.0)
 	for mob: Dictionary in snapshot.mobs:
 		MobView.decorate(self, mob, colors, snapshot.hero.position, frames, sprites)
+	creature_effects.draw_overlay(self, snapshot, frames, sprites, colors)
 	for cue: Dictionary in world_cues:
 		var age: int = snapshot.tick-int(cue["tick"])
 		var at: Vector2 = cue["at"]

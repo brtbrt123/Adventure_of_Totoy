@@ -428,12 +428,15 @@ const MOBS: Dictionary = {
 			"width": 24.0, "damage": 20, "recover": 40, "cooldown": 90, "interrupt": false, "crash": 70},
 	},
 	# The Glowmoth: the Stag's summoned moth (core/mob_field.gd _summon). It never starts an encounter and pays no EXP, drop or flag; it is removed
-	# when the Stag falls or the encounter resets. Its dart is a short red line that does not move it (the real projectile is a later step).
+	# when the Stag falls or the encounter resets. Its ORB is a real projectile: the windup warns with a red lane exactly as wide as the orb's
+	# hit (2 x radius), then the orb flies along it at `speed` px/tick until it hits the hero, a prop, or travels `reach`; a dash's
+	# invulnerability lets it pass through. The moth's death removes its orb.
 	&"glowmoth": {
 		"level": 2, "exp": 0, "drop": {"item": &"herb", "chance": 0.0}, "hp": 20, "radius": 5.0, "speed": 0.9, "aggro": 999.0, "tether": 600.0, "hold": 70.0, "wait": 90.0,
 		"summoned": true,
-		"attack": {"id": &"moth_dart", "kind": &"red", "shape": &"line", "stationary": true, "reach": 110.0, "start_min": 30.0, "start_max": 120.0, "windup": 40, "strike_ticks": 6,
-			"strike_speed": 0.0, "width": 10.0, "damage": 6, "recover": 40, "cooldown": 90, "interrupt": true, "crash": 0},
+		"attack": {"id": &"moth_orb", "kind": &"red", "shape": &"line", "stationary": true, "reach": 140.0, "start_min": 30.0, "start_max": 120.0, "windup": 40, "strike_ticks": 8,
+			"strike_speed": 0.0, "width": 8.0, "damage": 6, "recover": 40, "cooldown": 100, "interrupt": true, "crash": 0,
+			"projectile": {"visual": &"glowmoth_orb", "speed": 2.4, "radius": 4.0}},
 	},
 	# The Runebound Warden (the Hollow Trial's hard mob, docs/PLAN_hollow_trial.md). Its rune GUARDS it: hits do only `guard` x damage until a
 	# parried gold attack stuns it (then it is exposed like any stunned mob). Rune Cleave is gold (parry it); an unparried Cleave chains into

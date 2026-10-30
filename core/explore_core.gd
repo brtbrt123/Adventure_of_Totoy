@@ -100,6 +100,9 @@ class ExploreSnapshot:
 	## warnings are in `telegraphs`.
 	var mobs: Array[Dictionary] = []
 	var encounters: Array[Dictionary] = []
+	## Mob projectiles in flight (the Glowmoth orb, core/mob_field.gd projectile_views): [{id, owner_id, visual, position, direction,
+	## radius, fired_tick}]. Their hit is the circle `radius` around `position`; the windup's red lane already warned of the path.
+	var mob_projectiles: Array[Dictionary] = []
 	## What the hero carries: {item id: count} (herbs from mobs). Presentation saves it (SaveProfile.inventory) on item_received and item_used.
 	var inventory: Dictionary = {}
 	## Hero level (1..Tuning.LEVEL_MAX), EXP earned inside this level, and what this level needs (0 at the top level), plus the total EXP the
@@ -616,6 +619,7 @@ func snapshot() -> ExploreSnapshot:
 	if mobs != null:
 		snap.mobs = mobs.mob_views(tick)
 		snap.encounters = mobs.encounter_views()
+		snap.mob_projectiles = mobs.projectile_views()
 		snap.telegraphs.append_array(mobs.telegraph_snapshots())
 	snap.inventory = inventory.duplicate()
 	snap.objective = _objective_view()

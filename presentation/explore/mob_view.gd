@@ -19,7 +19,7 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 		elif mob["state"] in [&"chase", &"return"]:pose=["amble",12,5,true]
 		elif mob.get("attack_id", &"") == &"stag_roots" and mob["state"] == &"windup":pose=["phase2_roar",6,1,false]
 		elif mob.get("attack_id", &"") == &"stag_summon":
-			if mob["state"] in [&"windup", &"chant"]:pose=["chant",28,3,false]
+			if mob["state"] == &"windup":pose=["chant",28,3,false]
 			elif mob["state"] in [&"strike", &"recover"]:pose=["summon",10,6,false]
 	if mob["type"]==&"stag" and mob.get("attack_id", &"") == &"stag_charge":
 		if mob["state"]==&"windup":pose=["charge_tell",5,1,false]
@@ -33,8 +33,11 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 			if tell.owner_id == mob["id"]:
 				n = floori(float(tick-tell.start_tick) / maxi(1,tell.hit_tick-tell.start_tick) * int(pose[1]))
 	# A non-damaging summon needs cast progress from core, never an invented damage warning.
-	if mob.get("attack_id", &"") == &"stag_summon" and mob["state"] in [&"windup", &"chant"] and mob.has("cast_start_tick") and mob.has("cast_release_tick"):
+	if mob.get("attack_id", &"") == &"stag_summon" and mob["state"] == &"windup" and mob.has("cast_start_tick") and mob.has("cast_release_tick"):
 		n = floori(float(tick - int(mob["cast_start_tick"])) / maxi(1, int(mob["cast_release_tick"]) - int(mob["cast_start_tick"])) * int(pose[1]))
+	# The release frames run on from the release tick through strike AND recover (state_ticks restarts between them).
+	if mob.get("attack_id", &"") == &"stag_summon" and mob["state"] in [&"strike", &"recover"] and int(mob.get("cast_release_tick", -1)) >= 0:
+		n = (tick - int(mob["cast_release_tick"])) / int(pose[2])
 	if mob["type"]==&"boar" and mob["state"]==&"windup" and n>=2:
 		n=2+posmod(int(mob["state_ticks"])/4,2)
 	if mob["state"] == &"dead":
@@ -46,9 +49,10 @@ static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary, he
 	if mob["state"] == &"dead": return
 	var at: Vector2 = mob["position"]
 	var boss: bool = bool(mob.get("boss", false))
-	var top: Vector2 = (at-Vector2(0,60 if boss else (31 if mob["type"] == &"boar" else 25))).round()
+	# A Glowmoth floats: its bar sits over its wings (sprite top ~29 px), not across them.
+	var top: Vector2 = (at-Vector2(0,60 if boss else (31 if mob["type"] == &"boar" else (36 if mob["type"] == &"glowmoth" else 25)))).round()
 	if int(mob["hp"]) < int(mob["max_hp"]) or at.distance_to(hero_at)<72.0:
-		if mob.has("level"):
+		if mob.has("level") and int(mob.get("summoner_id", 0)) == 0:  # a summoned moth shows only its bar (five labels stacked are noise)
 			draw_level(canvas, top + Vector2(-7,-7), int(mob["level"]), colors)
 		var bar_width: int = 56 if boss else 32
 		Kit.bar(canvas, top + Vector2(-bar_width / 2, 0), bar_width, [["fill_health_thin", float(mob["hp"]) / maxi(1, int(mob["max_hp"]))]], true)

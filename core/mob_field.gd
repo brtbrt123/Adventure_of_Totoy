@@ -58,6 +58,8 @@ var scene_id: StringName = &""
 var encounters: Array[Encounter] = []
 var _next_telegraph: int = 1000
 var _next_summoned_id: int = 5000
+var projectiles: Array[Dictionary] = []  # orbs in flight (see _fire)
+var _next_projectile: int = 1
 var _swing_serial: int = 0
 var _was_swinging: bool = false
 
@@ -177,6 +179,7 @@ func resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 				_step_mob(core, enc, mob, _count_attackers(enc), events)
 		_separate(core, enc)
 		_regen(core, enc, events)
+	_step_projectiles(core, events)
 
 
 func _count_attackers(enc: Encounter) -> int:
@@ -185,6 +188,80 @@ func _count_attackers(enc: Encounter) -> int:
 		if mob.is_attacking():
 			n += 1
 	return n
+
+
+## ---- mob projectiles (the Glowmoth orb) ------------------------------------------------------------------------------------
+
+## The release of a projectile attack: the orb leaves the mob along the locked aim, the warning lane is done.
+func _fire(core: RefCounted, enc: Encounter, mob: Mob, atk: Dictionary, events: Array[GameEvent]) -> void:
+	var spec: Dictionary = atk["projectile"]
+	var orb: Dictionary = {
+		"id": _next_projectile, "owner_id": mob.id, "encounter_id": enc.id, "visual": StringName(spec["visual"]), "position": mob.position,
+		"direction": mob.attack_dir, "speed": float(spec["speed"]), "radius": float(spec["radius"]), "range": float(atk["reach"]),
+		"travelled": 0.0, "damage": int(atk["damage"]), "fired_tick": core.tick,
+	}
+	_next_projectile += 1
+	projectiles.append(orb)
+	mob.clear_telegraph()
+	mob.attack_done = true
+	events.append(GameEvent.new(GameEvent.MOB_PROJECTILE_FIRED, core.tick, {
+		"scene": scene_id, "projectile_id": orb["id"], "owner_id": mob.id, "visual": orb["visual"], "position": orb["position"],
+		"direction": orb["direction"], "speed": orb["speed"], "radius": orb["radius"],
+	}))
+
+
+## Moves every orb one tick (in steps no longer than its radius, so it cannot skip the hero or a thin prop) and ends it on a hit,
+## a prop or its full range. A hero who is invulnerable (a dash) is passed through.
+func _step_projectiles(core: RefCounted, events: Array[GameEvent]) -> void:
+	var player: PlayerState = core.player
+	for i: int in range(projectiles.size() - 1, -1, -1):
+		var orb: Dictionary = projectiles[i]
+		var radius: float = float(orb["radius"])
+		var speed: float = float(orb["speed"])
+		var steps: int = maxi(1, ceili(speed / maxf(1.0, radius)))
+		var reason: StringName = &""
+		for s: int in steps:
+			var at: Vector2 = Vector2(orb["position"]) + Vector2(orb["direction"]) * (speed / steps)
+			orb["position"] = at
+			orb["travelled"] = float(orb["travelled"]) + speed / steps
+			if at.distance_to(player.position) <= radius + Tuning.PLAYER_RADIUS:
+				var warded: bool = player.state == PlayerState.STATE_WARD  # Stone Ward stores the blow and stops the orb
+				if player.take_damage(int(orb["damage"]), core.tick, events, int(orb["owner_id"])) or warded:
+					reason = &"hit"
+					break
+			if not Collision.fits(core.obstacles, at, radius):
+				reason = &"prop"
+				break
+			if float(orb["travelled"]) >= float(orb["range"]):
+				reason = &"range"
+				break
+		if reason != &"":
+			_end_projectile(core.tick, i, reason, events)
+
+
+func _end_projectile(tick: int, index: int, reason: StringName, events: Array[GameEvent]) -> void:
+	var orb: Dictionary = projectiles[index]
+	projectiles.remove_at(index)
+	events.append(GameEvent.new(GameEvent.MOB_PROJECTILE_ENDED, tick, {
+		"scene": scene_id, "projectile_id": orb["id"], "owner_id": orb["owner_id"], "visual": orb["visual"], "position": orb["position"], "reason": reason,
+	}))
+
+
+## Ends the orbs of one mob (it died) or of a whole encounter (it reset or cleared).
+func _end_projectiles_of(tick: int, owner_id: int, encounter_id: StringName, reason: StringName, events: Array[GameEvent]) -> void:
+	for i: int in range(projectiles.size() - 1, -1, -1):
+		var orb: Dictionary = projectiles[i]
+		if (owner_id != 0 and int(orb["owner_id"]) == owner_id) or (encounter_id != &"" and orb["encounter_id"] == encounter_id):
+			_end_projectile(tick, i, reason, events)
+
+
+## The orbs in flight for presentation: [{id, owner_id, visual, position, direction, radius, fired_tick}].
+func projectile_views() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for orb: Dictionary in projectiles:
+		out.append({"id": orb["id"], "owner_id": orb["owner_id"], "visual": orb["visual"], "position": orb["position"], "direction": orb["direction"],
+			"radius": orb["radius"], "fired_tick": orb["fired_tick"]})
+	return out
 
 
 ## The mobs of the encounter that are alive and were not summoned (they decide when it is cleared).
@@ -484,6 +561,7 @@ func reset_all(tick: int, reason: StringName, events: Array[GameEvent]) -> void:
 
 func reset_encounter(enc: Encounter, tick: int, reason: StringName, events: Array[GameEvent]) -> void:
 	var was_touched: bool = enc.touched
+	_end_projectiles_of(tick, 0, enc.id, &"reset", events)
 	_despawn_all_summons(enc)
 	for mob: Mob in enc.mobs:
 		if not mob.killed:
@@ -574,10 +652,14 @@ func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent])
 	mob.clear_telegraph()
 	mob.set_state(&"dead")
 	events.append(GameEvent.new(GameEvent.MOB_DEFEATED, core.tick, {"scene": scene_id, "mob_id": mob.id, "type": mob.type, "encounter_id": enc.id, "position": mob.position}))
+	_end_projectiles_of(core.tick, mob.id, &"", &"owner", events)
 	if mob.is_summoned():  # a called moth pays nothing and is not remembered
 		return
 	mob.killed = true
-	if mob.stats().has("summon"):  # the caster fell: its moths go with it
+	if mob.stats().has("summon"):  # the caster fell: its moths (and their orbs) go with it
+		for moth: Mob in enc.mobs:
+			if moth.summoner_id == mob.id:
+				_end_projectiles_of(core.tick, moth.id, &"", &"owner", events)
 		_despawn_summons(enc, mob)
 	var flag: StringName = kill_flag(enc, mob)
 	if core._grant_flag(flag, events):  # the first time only
@@ -593,6 +675,7 @@ func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent])
 
 func _clear(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
 	enc.state = CLEARED
+	_end_projectiles_of(core.tick, 0, enc.id, &"reset", events)
 	_despawn_all_summons(enc)
 	core._grant_flag(enc.flag, events)
 	events.append(GameEvent.new(GameEvent.ENCOUNTER_CLEARED, core.tick, {"scene": scene_id, "encounter_id": enc.id, "reward_id": StringName(str(enc.reward.get("reward_id", "")))}))
@@ -622,6 +705,8 @@ func _step_mob(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, event
 				mob.strike_left = int(atk["strike_ticks"])
 				if atk.has("summon"):
 					_summon(core, enc, mob, events)
+				elif atk.has("projectile"):
+					_fire(core, enc, mob, atk, events)
 		&"strike":
 			_strike(core, mob, events)
 		&"recover":
@@ -734,7 +819,7 @@ func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void
 
 func _strike(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 	var atk: Dictionary = mob.attack_stats()
-	if atk.has("summon"):  # the release frames: nothing to dodge
+	if atk.has("summon") or atk.has("projectile"):  # the release frames: the chant or the orb already left
 		mob.strike_left -= 1
 		if mob.strike_left <= 0:
 			mob.cooldown = int(atk["cooldown"])
