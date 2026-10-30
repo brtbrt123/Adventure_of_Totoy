@@ -100,6 +100,10 @@ var missing_frames: Dictionary = {}
 ## The katana's Black Form cut-in (drawn on the HUD layer). While it plays the road does not step the core.
 const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
 var cutin: BlackFormCutIn
+const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cutin.gd")
+const ReapersCoilCutIn := preload("res://presentation/arena/reapers_coil_cutin.gd")
+var lightning_cutin: LightningFormCutIn
+var coil_cutin: ReapersCoilCutIn
 var intro_arrival_ticks: int = 0
 var transitions: int = 0  # scene changes done (tests)
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
@@ -123,6 +127,13 @@ func _ready() -> void:
 	cutin = BlackFormCutIn.new()
 	cutin.position = Vector2(32, 18)
 	$HUD.add_child(cutin)
+	lightning_cutin = LightningFormCutIn.new()
+	lightning_cutin.position = Vector2(32, 18)
+	$HUD.add_child(lightning_cutin)
+	coil_cutin = ReapersCoilCutIn.new()
+	coil_cutin.position = Vector2(32, 18)
+	$HUD.add_child(coil_cutin)
+	_load_chain_origins()
 	var manifest: Dictionary = _read_json(NPC_MANIFEST)
 	var states: Dictionary = manifest.get("states", {})
 	for npc_name: String in states:
@@ -208,8 +219,13 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	aspect_fx.clear()
 	buff_events.clear()
 	buff_transition.clear()
-	if cutin != null:
-		cutin.stop()
+	for playing: Node in [cutin, lightning_cutin, coil_cutin]:
+		if playing != null:
+			playing.stop()
+	lightning_fx.clear()
+	coil_fx.clear()
+	coil_hook_tick = -1
+	drag_started.clear()
 	hero_hidden_until = -1
 	_motion_seen = false
 	previous_player_position = snapshot.hero.position
@@ -252,9 +268,19 @@ func _save_progress(scene: StringName, checkpoint: StringName) -> void:
 		SaveStore.save(profile)
 
 
+## True while any weapon cut-in plays (the road does not step).
+func cutin_playing() -> bool:
+	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active)
+
+
 func _physics_process(delta: float) -> void:
-	if cutin != null and cutin.active:
-		cutin.advance(delta)
+	if cutin_playing():
+		if cutin.active:
+			cutin.advance(delta)
+		if lightning_cutin.active:
+			lightning_cutin.advance(delta)
+		if coil_cutin.active:
+			coil_cutin.advance(delta)
 		return
 	if snapshot != null and snapshot.defeated:
 		advance(InputFrame.new())
@@ -414,7 +440,11 @@ func _on_event(event: GameEvent) -> void:
 				return  # a Phantom echo is not a swing: its own light effects come from phantom_echo
 			var counter: bool = event.data.get("kind", &"") == &"counter"
 			var finisher: bool = (int(event.data.get("combo_index", 0)) >= snapshot.hero.combo_max and snapshot.hero.combo_max > 0) or event.data.get("skill_id", &"") == &"moon_cleave" or bool(event.data.get("ward_release", false))
+			if bool(event.data.get("lightning_strike", false)):
+				return  # the sky strike draws its own burst (lightning_strike)
 			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -12), counter, finisher, event.data.get("skill_id", event.data.get("aspect_id", &"")))
+			if snapshot.hero.weapon_form == Weapons.FORM_LIGHTNING:
+				_add_lightning_fx({"kind": "spark", "tick": event.tick, "at": Vector2(event.data["position"]) + Vector2(0, -12), "life": LightningEffects.sequence_length(LightningEffects.SPARK_TICKS)})
 		GameEvent.MOB_STAGGERED:
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": false})
 		GameEvent.TRAINING_POST_HIT:
@@ -429,9 +459,23 @@ func _on_event(event: GameEvent) -> void:
 		&"weapon_buff_started", &"weapon_buff_ended":
 			var buff: Dictionary = on_hero_weapon_buff(event)
 			if not buff.is_empty():
-				if buff["started"] and cutin != null:
-					cutin.start()
+				if buff["started"]:
+					if buff["form"] == Weapons.FORM_LIGHTNING and lightning_cutin != null:
+						lightning_cutin.start()
+					elif buff["form"] == Weapons.FORM_REAPER_COIL and coil_cutin != null:
+						coil_cutin.start()
+					elif cutin != null:
+						cutin.start()
 				practice_view.audio.cue("weapon_buff_start" if buff["started"] else "weapon_buff_end", event.tick)
+		&"lightning_blink":
+			_on_lightning_blink(event)
+		&"lightning_strike":
+			_on_lightning_strike(event)
+		&"reaper_coil_started", &"reaper_coil_hooked", &"reaper_coil_missed", &"reaper_coil_drag", &"reaper_coil_spin", &"reaper_coil_ended":
+			_on_reaper_coil(event)
+		&"lightning_barrage_ended":
+			if event.data.get("reason", &"") == &"complete":
+				_burst(snapshot.hero.position - Vector2(0, 12), 8, colors["o"], 0.7)
 		&"skill_started":
 			on_hero_skill_event(event)
 			practice_view.audio.cue("skill_" + String(event.data["skill_id"]), event.tick)
@@ -618,6 +662,35 @@ func fx_snapshot() -> RefCounted:
 	return snapshot
 
 
+func fx_view_origin() -> Vector2:
+	return view_origin
+
+
+func fx_target_position(target_id: int, fallback: Vector2) -> Vector2:
+	for mob: Dictionary in snapshot.mobs:
+		if int(mob["id"]) == target_id:
+			return mob["position"]
+	return fallback
+
+
+## The mobs held by the chain: [{id, position}].
+func fx_dragged() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for mob: Dictionary in snapshot.mobs:
+		if bool(mob.get("dragged", false)):
+			out.append({"id": mob["id"], "position": mob["position"]})
+	return out
+
+
+## Where a connecting spin hit lands: every mob within the spin radius.
+func fx_spin_contacts(event: GameEvent) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for mob: Dictionary in snapshot.mobs:
+		if Vector2(event.data["position"]).distance_to(mob["position"]) - float(mob["radius"]) <= float(event.data.get("radius", Tuning.REAPER_COIL_SPIN_RADIUS)):
+			out.append(Vector2(mob["position"]) + Vector2(0, -14))
+	return out
+
+
 ## A mob's body: a little above its feet.
 func fx_target_contact(_target_id: int, fallback: Vector2) -> Vector2:
 	return fallback + Vector2(0, -14)
@@ -727,6 +800,8 @@ func _draw() -> void:
 		draw_texture_rect_region(sprites,Rect2((at-Vector2.ONE*diameter/2).round(),Vector2.ONE*diameter),Rect2(f["x"]+6,f["y"]+6,28,28))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
+	_draw_lightning_ground()
+	_draw_coil_ground()
 	_draw_lantern_ground()
 	_draw_ward_echo_ground()
 	draw_dash_fx()
@@ -757,6 +832,8 @@ func _draw() -> void:
 	_draw_skill_contacts()
 	_draw_buff_slash(shake_offset())
 	_draw_buff_transition()
+	_draw_lightning(shake_offset())
+	_draw_scythe(shake_offset())
 	for effect: Dictionary in practice_effects:
 		if effect["type"] in [GameEvent.PARRY_SUCCEEDED, GameEvent.TRAINING_POST_HIT]:
 			continue  # drawn by the shared layer
@@ -814,12 +891,14 @@ func _draw_item(item: Dictionary) -> void:
 		return  # an Echo Step arrival's first frame: only the echo flares
 	if item["kind"] == &"hero":
 		draw_hero_back(snapshot.hero, key, at, bool(item["left"]))
+		_draw_spin_ring(snapshot.hero, false)
 	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
 	var sheet: Texture2D = MobView.WHITE if white else (empowered_sprites if item["kind"] == &"hero" and empowered_sprites != null and black_form_look(snapshot.hero) else sprites)
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
 	if item["kind"] == &"hero":
 		_draw_phantom_glow(snapshot.hero, key, at, bool(item["left"]))
 		_draw_buff_aura(snapshot.hero, true)
+		_draw_spin_ring(snapshot.hero, true)
 		_draw_hero_aspect_overlays(snapshot.hero, key, at, bool(item["left"]))
 
 

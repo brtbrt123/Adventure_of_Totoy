@@ -94,6 +94,47 @@ func run() -> void:
 	check(not form.weapon_buff_effect().is_empty(), "the aura plan exists")
 	form.queue_free()
 	await process_frame
+	# Lightning Form and Reaper's Coil: a clump of mobs in front of the hero takes them together
+	for weapon: StringName in [&"dual_dagger", &"chain_scythe"]:
+		Engine.set_meta(Explore.START_META, {"scene": Explore.SceneDefs.WOODLAND_LAYERED})
+		var clump: Explore = load("res://presentation/explore/explore_scene.tscn").instantiate()
+		root.add_child(clump)
+		clump.set_physics_process(false)
+		clump.fade_phase = &""
+		await process_frame
+		var flags3: Array[StringName] = [&"received_first_sword", &"debug_all_unlocked"]
+		clump.core.set_story_flags(flags3)
+		clump.core.set_loadout(weapon, loadout(Aspects.SPRINT))
+		clump.core.player.edge = 100.0
+		var mobs: Array = clump.core.mobs.encounters[0].mobs
+		clump.core.player.position = mobs[0].position + Vector2(-70, 0)
+		clump.core.player.facing = Vector2.RIGHT
+		mobs[1].position = mobs[0].position + Vector2(8, 14)
+		mobs[2].position = mobs[0].position + Vector2(8, -14)
+		clump.snapshot = clump.core.snapshot()
+		clump.previous_player_position = clump.snapshot.hero.position
+		var fx_seen: int = 0
+		var cut_seen: bool = false
+		for i: int in 140:
+			var f: InputFrame = InputFrame.new()
+			f.weapon_active_pressed = i == 0
+			clump.advance(f)
+			clump.fade_phase = &""
+			cut_seen = cut_seen or clump.cutin_playing()
+			fx_seen = maxi(fx_seen, clump.lightning_fx.size() + clump.coil_fx.size())
+			clump._update_camera()
+			clump.queue_redraw()
+			if i % 35 == 0:
+				await process_frame
+		check(cut_seen, "%s: its cut-in played" % weapon)
+		check(fx_seen > 0, "%s: its effects were made" % weapon)
+		var hurt: int = 0
+		for m: Object in mobs:
+			if m.hp < m.max_hp or not m.is_alive():
+				hurt += 1
+		check(hurt >= 2, "%s: the clump took damage together (%d)" % [weapon, hurt])
+		clump.queue_free()
+		await process_frame
 	if failures == 0:
 		print("ROAD ASPECTS OK")
 	quit(1 if failures else 0)

@@ -8,14 +8,8 @@ const CombatAudio := preload("res://presentation/arena/combat_audio.gd")
 const SaveStore := preload("res://core/save_store.gd")
 const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
 const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cutin.gd")
-const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
 const ReapersCoilCutIn := preload("res://presentation/arena/reapers_coil_cutin.gd")
-const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const Aspects := preload("res://core/aspects.gd")
-## Per-frame data of the scythe import (chain_origin of the Reaper's Coil whip/pull frames).
-const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
-## Height above the ground plane where the Reaper's Coil chain flies and bites (the hand is at about this height).
-const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
 const HeadAnchors := preload("res://presentation/arena/head_anchors.gd")
@@ -49,19 +43,8 @@ var persist: bool = false
 var cutin: BlackFormCutIn
 ## The Lightning Form cut-in (Dual Dagger right click); freezes the world the same way.
 var lightning_cutin: LightningFormCutIn
-## Lightning effects from core events, in world coordinates: {"kind", "tick", ...}; aged by the cosmetic tick.
-var lightning_fx: Array[Dictionary] = []
 ## The Reaper's Coil cut-in (Chain Scythe right click); freezes the world the same way.
 var coil_cutin: ReapersCoilCutIn
-## Chain Scythe / Reaper's Coil event effects in world coordinates ({"kind", "tick", "life", ...}), capped at
-## ScytheEffects.MAX_LIVE. The chain, flying head, ring halves, pull streaks and dizzy stars are drawn from the snapshot.
-var coil_fx: Array[Dictionary] = []
-## Tick of the latest reaper_coil_hooked (the chain flashes spectral on it).
-var coil_hook_tick: int = -1
-## Boss id -> the tick its current drag began (paces the dust puffs and scuff decals).
-var drag_started: Dictionary = {}
-## Frame name -> where the chain leaves the fist (relative to the feet, facing right), from the scythe manifest.
-var chain_origins: Dictionary = {}
 ## True between a Phantom echo's attack_hit and its damage_taken (the echo flashes the boss less than a real hit).
 var echo_hit_pending: bool = false
 var profile: Object = null
@@ -220,6 +203,50 @@ func fx_snapshot() -> RefCounted:
 	return snapshot
 
 
+func fx_body_offset() -> Vector2:
+	return LightningEffects.BOSS_BODY
+
+
+func fx_view_origin() -> Vector2:
+	return view_origin
+
+
+func fx_target_position(target_id: int, fallback: Vector2) -> Vector2:
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.id == target_id:
+			return actor.position
+	return fallback
+
+
+## The bosses held by the chain: [{id, position}].
+func fx_dragged() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.dragged:
+			out.append({"id": actor.id, "position": actor.position})
+	return out
+
+
+## Where a connecting spin hit lands: the boss's core.
+func fx_spin_contacts(_event: GameEvent) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		out.append(boss_core_position(actor))
+	return out
+
+
+## The dizzy stars over a staggered boss's head.
+func fx_draw_coil_stars() -> void:
+	for actor: Snapshots.EntitySnapshot in snapshot.entities:
+		if actor.dragged or not (actor.state == &"staggered" and actor.stagger_ticks_left > 0):
+			continue
+		var key: String = String(selected_frames.get(actor.id, ""))
+		var head: Vector2 = actor.position + Vector2(0, -44)
+		if frames.has(key) and head_anchors.has(key):
+			head = HeadAnchors.world(actor.position, frames[key], head_anchors[key], ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {})))
+		_draw_imported("fx_chain_stars_%d" % ScytheEffects.stars_frame(snapshot.tick), (head + Vector2(0, -2)).round())
+
+
 ## The boss's core (the painted glow), else the position plus the boss's body offset.
 func fx_target_contact(target_id: int, fallback: Vector2) -> Vector2:
 	for actor: Snapshots.EntitySnapshot in snapshot.entities:
@@ -231,13 +258,6 @@ func fx_target_contact(target_id: int, fallback: Vector2) -> Vector2:
 ## True while any weapon cut-in plays (the world does not step).
 func cutin_playing() -> bool:
 	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active)
-
-func _load_chain_origins() -> void:
-	var sprites_data: Dictionary = _read_json(SCYTHE_MANIFEST).get("sprites", {})
-	for group: String in sprites_data:
-		var origins: Array = Dictionary(sprites_data[group]).get("chain_origin", [])
-		for index: int in range(origins.size()):
-			chain_origins["%s_%d" % [group, index + 1]] = Vector2(float(origins[index][0]), float(origins[index][1]))
 
 func _read_json(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -468,12 +488,6 @@ func _age_effects() -> void:
 	if not snapshot.player.invulnerable:
 		hurt_blink = false
 	age_hero_fx()
-	for i: int in range(lightning_fx.size() - 1, -1, -1):
-		if cosmetic_tick - int(lightning_fx[i]["tick"]) >= int(lightning_fx[i]["life"]):
-			lightning_fx.remove_at(i)
-	for i: int in range(coil_fx.size() - 1, -1, -1):
-		if cosmetic_tick - int(coil_fx[i]["tick"]) >= int(coil_fx[i]["life"]):
-			coil_fx.remove_at(i)
 	for id: int in flashes.keys():
 		flashes[id] = int(flashes[id]) - 1
 		if int(flashes[id]) <= 0:
@@ -600,122 +614,12 @@ func _is_finisher(event: GameEvent) -> bool:
 		return false
 	return int(event.data["combo_index"]) >= Weapons.combo_max(StringName(event.data.get("weapon_id", snapshot.player.weapon_id)))
 
-func _add_lightning_fx(effect: Dictionary) -> void:
-	lightning_fx.append(effect)
-
-## Lightning Form blink: the player snapshot already stands at `to`. Departure burst and afterimage at `from`, a
-## chain bolt from `from` to `to`, an arrival burst, then the cut through the boss once the swing's windup is over.
-func _on_lightning_blink(event: GameEvent) -> void:
-	var from: Vector2 = event.data["from"]
-	var to: Vector2 = event.data["to"]
-	var side: int = int(event.data.get("direction_index", 0))
-	var target: Vector2 = to - Weapons.blink_direction(side) * Tuning.LIGHTNING_BLINK_DISTANCE
-	for actor: Snapshots.EntitySnapshot in snapshot.entities:
-		if actor.id == int(event.data.get("target_id", -1)):
-			target = actor.position
-	var windup: int = Tuning.LIGHTNING_BARRAGE_HIT_DELAY_TICKS  # a barrage slash lands this many ticks after its blink
-	var tick: int = event.tick
-	var depart_left: bool = from.x > to.x if absf(from.x - to.x) > 2.0 else facing_left
-	_add_lightning_fx({"kind": "depart", "tick": tick, "at": from, "life": LightningEffects.sequence_length(LightningEffects.DEPART_TICKS)})
-	_add_lightning_fx({"kind": "afterimage", "tick": tick, "at": from, "left": depart_left, "life": LightningEffects.sequence_length(LightningEffects.AFTERIMAGE_TICKS)})
-	if not event.data.has("barrage_slash"):  # barrage blinks cross the boss: their midpoint is the boss itself
-		_add_lightning_fx({"kind": "afterimage", "tick": tick, "at": from.lerp(to, 0.5), "left": depart_left, "flicker": true, "life": LightningEffects.sequence_length(LightningEffects.AFTERIMAGE_TICKS)})
-	_add_lightning_fx({"kind": "chain", "tick": tick, "from": from + LightningEffects.CHEST, "to": to + LightningEffects.CHEST, "life": LightningEffects.CHAIN_TICKS})
-	_add_lightning_fx({"kind": "arrive", "tick": tick, "at": to, "life": LightningEffects.sequence_length(LightningEffects.BLINK_TICKS)})
-	_add_lightning_fx({"kind": "cut", "tick": tick + windup, "at": (target + LightningEffects.BOSS_BODY).round(), "direction": LightningEffects.cut_direction(side, to, target), "life": LightningEffects.sequence_length(LightningEffects.CUT_TICKS)})
-	shake_left = maxi(shake_left, 2)
-	_flash(tick, colors["p"], [0.14])
-	combat_audio.cue("lightning_blink", tick, 0.6)
-
-## Dual Dagger finisher: a bolt from the sky onto the boss (the event position), white flash, shake, scorch decal.
-## The boss's own hit flash and hurt pose come from its damage_taken event as for any hit.
-func _on_lightning_strike(event: GameEvent) -> void:
-	var at: Vector2 = event.data["position"]
-	var tick: int = event.tick
-	_add_lightning_fx({"kind": "ground", "tick": tick, "at": at, "life": LightningEffects.sequence_length(LightningEffects.GROUND_TICKS)})
-	_add_lightning_fx({"kind": "strike", "tick": tick, "at": at, "life": LightningEffects.sequence_length(LightningEffects.STRIKE_TICKS)})
-	_add_lightning_fx({"kind": "spark", "tick": tick + 2, "at": at + LightningEffects.BOSS_BODY, "life": 2 + LightningEffects.sequence_length(LightningEffects.SPARK_TICKS)})
-	hit_bursts.append({"position": at, "contact": at + LightningEffects.BOSS_BODY, "tick": tick, "counter": event.data.get("kind", &"normal") == &"counter", "finisher": true, "skill_id": &"", "facing": snapshot.player.facing})
-	var strengths: Array[float] = []
-	for age: int in range(4):
-		strengths.append(LightningEffects.strike_flash(age))
-	_flash(tick, colors["p"], strengths)
-	shake_left = maxi(shake_left, 8)
-	_burst(at + LightningEffects.BOSS_BODY, 18, colors["1"], 1.6)
-	combat_audio.cue("lightning_crack", tick)
-
-func _add_coil_fx(effect: Dictionary) -> void:
-	ScytheEffects.add(coil_fx, effect)
-
 ## The boss snapshot with this id (or the first entity).
 func _entity(id: int) -> Snapshots.EntitySnapshot:
 	for actor: Snapshots.EntitySnapshot in snapshot.entities:
 		if actor.id == id:
 			return actor
 	return snapshot.entities[0] if not snapshot.entities.is_empty() else null
-
-## Reaper's Coil, from the core's events only (the chain itself is drawn from the snapshot every frame):
-## throw: a whoosh; hooked: a clink at the bite with shake and flash; missed: a poof where the hook lands (the hero is
-## then pulled there); drag end: the stagger burst on the golem's chest; spin: a whoosh per pass, sparks and a flash
-## when it connects; end: a small burst. Sounds reuse the combat cues (no new audio).
-func _on_reaper_coil(event: GameEvent) -> void:
-	var tick: int = event.tick
-	match event.type:
-		&"reaper_coil_started":
-			combat_audio.cue("chain_coil", tick, 1.0)
-		&"reaper_coil_hooked":
-			coil_hook_tick = tick
-			var bite: Vector2 = Vector2(event.data["to"]) + CHAIN_HEIGHT
-			_add_coil_fx({"kind": "hook", "tick": tick, "at": bite.round(), "life": ScytheEffects.sequence_length(ScytheEffects.HOOK_TICKS)})
-			_burst(bite, 10, colors["u"], 1.0)
-			shake_left = maxi(shake_left, 3)
-			_flash(tick, colors["p"], [0.16, 0.06])
-			combat_audio.cue("deflect", tick, 0.9)
-			combat_audio.cue("dash", tick, 0.7)
-		&"reaper_coil_missed":
-			var anchor: Vector2 = event.data["to"]
-			_add_coil_fx({"kind": "land", "tick": tick, "at": anchor.round(), "life": ScytheEffects.sequence_length(ScytheEffects.LAND_TICKS)})
-			if event.data.get("blocked_by", &"range") != &"range":
-				_add_coil_fx({"kind": "spark", "tick": tick, "at": (anchor + CHAIN_HEIGHT).round(), "life": ScytheEffects.sequence_length(ScytheEffects.SPARK_TICKS)})
-			_dust(anchor)
-			shake_left = maxi(shake_left, 1)
-			combat_audio.cue("deflect", tick, 0.5)
-			combat_audio.cue("dash", tick, 0.7)
-		&"reaper_coil_drag":
-			var boss: Snapshots.EntitySnapshot = _entity(int(event.data.get("target_id", -1)))
-			var chest: Vector2 = boss_core_position(boss) if boss != null else Vector2(event.data["to"]) + ScytheEffects.BOSS_BODY
-			_add_coil_fx({"kind": "stagger", "tick": tick, "at": chest.round(), "life": ScytheEffects.sequence_length(ScytheEffects.STAGGER_TICKS)})
-			_burst(chest, 14, colors["p"], 1.2)
-			shake_left = maxi(shake_left, 5)
-			combat_audio.cue("posture_break", tick)
-		&"reaper_coil_spin":
-			var connects: bool = bool(event.data.get("connects", false))
-			combat_audio.cue("swing", tick, 1.0 if connects else 0.7)
-			if connects:
-				for actor: Snapshots.EntitySnapshot in snapshot.entities:
-					var contact: Vector2 = boss_core_position(actor)
-					_add_coil_fx({"kind": "spark", "tick": tick, "at": contact.round(), "life": ScytheEffects.sequence_length(ScytheEffects.SPARK_TICKS)})
-				shake_left = maxi(shake_left, 2)
-				_flash(tick, colors["p"], [0.12])
-		&"reaper_coil_ended":
-			if event.data.get("reason", &"") in [&"complete", &"missed"]:
-				_burst(snapshot.player.position - Vector2(0, 12), 6, colors["u"], 0.6)
-
-## Per fresh tick while the boss is dragged: dust puffs at its leading foot and scuff decals where it slid.
-func _coil_drag_trail() -> void:
-	var hero: Snapshots.EntitySnapshot = snapshot.player
-	for actor: Snapshots.EntitySnapshot in snapshot.entities:
-		if not actor.dragged:
-			drag_started.erase(actor.id)
-			continue
-		if not drag_started.has(actor.id):
-			drag_started[actor.id] = snapshot.tick
-		var toward_right: bool = hero.position.x > actor.position.x
-		var tick: int = snapshot.tick - int(drag_started[actor.id])  # from the hook tick: a short drag still leaves marks
-		if tick % ScytheEffects.DUST_EVERY == 0:
-			_add_coil_fx({"kind": "dust", "tick": snapshot.tick, "at": (actor.position + Vector2(12 if toward_right else -12, 0)).round(), "left": toward_right, "life": ScytheEffects.sequence_length(ScytheEffects.DUST_TICKS)})
-		if tick % ScytheEffects.SCUFF_EVERY == 0:
-			_add_coil_fx({"kind": "scuff", "tick": snapshot.tick, "at": actor.position.round(), "left": toward_right, "life": ScytheEffects.sequence_length(ScytheEffects.SCUFF_TICKS)})
 
 func _draw() -> void:
 	if snapshot == null or colors.is_empty():
@@ -1048,167 +952,7 @@ func _sound_game_result(_event: GameEvent) -> void:
 	combat_audio.set_music_active(false)
 
 
-## Scorch decals of sky strikes, on the floor under everything standing.
-func _draw_lightning_ground() -> void:
-	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
-	for effect: Dictionary in lightning_fx:
-		if effect["kind"] == "ground":
-			var frame: int = LightningEffects.sequence_frame(LightningEffects.GROUND_TICKS, cosmetic_tick - int(effect["tick"]))
-			if frame > 0:
-				_draw_imported("fx_lightning_ground_%d" % frame, effect["at"], Vector2(2, 2))
-
-## Blink bursts, afterimages, chain bolts, the cut through the boss, sparks and the sky strike (world space).
-func _draw_lightning(shake_offset: Vector2) -> void:
-	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
-	for effect: Dictionary in lightning_fx:
-		var age: int = cosmetic_tick - int(effect["tick"])
-		match String(effect["kind"]):
-			"afterimage":
-				var frame: int = LightningEffects.sequence_frame(LightningEffects.AFTERIMAGE_TICKS, age)
-				if frame > 0 and not (bool(effect.get("flicker", false)) and age % 2 == 1):
-					var key: String = "fx_lightning_afterimage_%d" % frame
-					if frames.has(key):
-						var f: Dictionary = frames[key]
-						draw_texture_rect_region(sprites, ArenaAnimation.destination(effect["at"], f, bool(effect["left"])), Rect2(f["x"], f["y"], f["w"], f["h"]))
-			"chain":
-				var from: Vector2 = effect["from"]
-				var to: Vector2 = effect["to"]
-				var angle: float = (to - from).angle()
-				var segments: Array[Dictionary] = LightningEffects.chain_segments(from, to)
-				for index: int in range(segments.size()):
-					var frame: int = LightningEffects.chain_frame(age, index)
-					var key: String = "fx_lightning_chain_%d" % frame
-					if frame == 0 or not frames.has(key):
-						continue
-					var f: Dictionary = frames[key]
-					var length: float = float(segments[index]["length"])
-					draw_set_transform(from.round() + shake_offset, angle)
-					draw_texture_rect_region(sprites, Rect2(Vector2(float(segments[index]["offset"]), -float(f["ay"])), Vector2(length, f["h"])), Rect2(f["x"], f["y"], length, f["h"]))
-					draw_set_transform(shake_offset)
-			"depart":
-				var frame: int = LightningEffects.sequence_frame(LightningEffects.DEPART_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_lightning_blink_%d" % frame, effect["at"])
-			"arrive":
-				var frame: int = LightningEffects.sequence_frame(LightningEffects.BLINK_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_lightning_blink_%d" % frame, effect["at"])
-			"cut":
-				var frame: int = LightningEffects.sequence_frame(LightningEffects.CUT_TICKS, age)
-				if frame > 0:
-					_draw_imported(LightningEffects.cut_key(int(effect["direction"]), frame), effect["at"])
-			"spark":
-				var frame: int = LightningEffects.sequence_frame(LightningEffects.SPARK_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_lightning_spark_%d" % frame, effect["at"])
-			"strike":
-				var frame: int = LightningEffects.sequence_frame(LightningEffects.STRIKE_TICKS, age)
-				if frame > 0:
-					var at: Vector2 = effect["at"]
-					var scale_px: int = LightningEffects.strike_scale(at.y - view_origin.y)
-					_draw_imported("fx_lightning_strike_%d" % frame, at, Vector2(scale_px, scale_px))
-
-
 # ---------------------------------------------------------------- Chain Scythe / Reaper's Coil (world space)
-
-## The spin ring around the hero: the back half before the sprite, the front half after it.
-func _draw_spin_ring(actor: Snapshots.EntitySnapshot, front: bool) -> void:
-	if actor.state != PlayerState.STATE_REAPER_COIL or actor.reaper_coil_phase != PlayerState.COIL_SPIN:
-		return
-	var ring: int = ScytheEffects.ring_phase(actor.reaper_coil_phase_tick)
-	if ring > 0:
-		_draw_anchored("fx_scythe_spin_%s_%d" % ["front" if front else "back", ring], actor.position, facing_left)
-
-## Where the chain leaves the fist this frame (world), from the frame's chain_origin (mirrored when facing left).
-func chain_hand() -> Vector2:
-	var hero: Snapshots.EntitySnapshot = snapshot.player
-	var origin: Vector2 = chain_origins.get(String(selected_frames.get(hero.id, "")), ScytheEffects.DEFAULT_HAND)
-	if facing_left:
-		origin.x = -origin.x
-	return hero.position.round() + origin
-
-## Where the chain ends (world): the flying tip or the bite on the golem at chain height, the anchor on the ground.
-func chain_tip() -> Vector2:
-	var hero: Snapshots.EntitySnapshot = snapshot.player
-	var tip: Vector2 = hero.reaper_coil_target.round()
-	return tip if hero.reaper_coil_phase == PlayerState.COIL_PULL else tip + CHAIN_HEIGHT
-
-## The swing arc of a scythe swing in progress (empty when none), anchored at the hero's feet.
-func scythe_arc_effect() -> Dictionary:
-	if snapshot.result != &"playing":
-		return {}
-	var key: String = ScytheEffects.arc_key(snapshot.player)
-	if key.is_empty() or not String(selected_frames.get(snapshot.player.id, "")).begins_with(ArenaAnimation.SET_SCYTHE + "_attack"):
-		return {}
-	return {"key": key, "at": snapshot.player.position.round(), "left": facing_left}
-
-## Scuff decals of the drag, on the floor under everything standing.
-func _draw_coil_ground() -> void:
-	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
-	for effect: Dictionary in coil_fx:
-		if effect["kind"] == "scuff":
-			var frame: int = ScytheEffects.sequence_frame(ScytheEffects.SCUFF_TICKS, cosmetic_tick - int(effect["tick"]))
-			if frame > 0:
-				_draw_imported("fx_chain_scuff_%d" % frame, effect["at"], Vector2(-1 if bool(effect["left"]) else 1, 1))
-
-## Swing arcs, the chain with its flying head, the pull streaks on a dragged golem, dizzy stars over a stunned one, and
-## the event sequences (clink, poof, stagger burst, sparks, dust).
-func _draw_scythe(shake_offset: Vector2) -> void:
-	# Regular swing trails are drawn by shared draw_hero_back in both the arena and exploration.
-	# Keep only the skill's chain/hook/spin effects here, avoiding an extra arena-only arc over the shared trail.
-	var hero: Snapshots.EntitySnapshot = snapshot.player
-	var cosmetic_tick: int = snapshot.tick + snapshot.result_ticks
-	for actor: Snapshots.EntitySnapshot in snapshot.entities:
-		if actor.dragged:
-			_draw_imported("fx_chain_pull_%d" % ScytheEffects.pull_frame(snapshot.tick), actor.position.round(), Vector2(-1 if hero.position.x > actor.position.x else 1, 1))
-		elif actor.state == &"staggered" and actor.stagger_ticks_left > 0:
-			var key: String = String(selected_frames.get(actor.id, ""))
-			var head: Vector2 = actor.position + Vector2(0, -44)
-			if frames.has(key) and head_anchors.has(key):
-				head = HeadAnchors.world(actor.position, frames[key], head_anchors[key], ArenaAnimation.boss_mirrored(actor, snapshot, last_attacks.get(actor.id, {})))
-			_draw_imported("fx_chain_stars_%d" % ScytheEffects.stars_frame(snapshot.tick), (head + Vector2(0, -2)).round())
-	if ScytheEffects.chain_visible(hero):
-		var from: Vector2 = chain_hand()
-		var to: Vector2 = chain_tip()
-		var line: Vector2 = to - from
-		var segments: Array[Dictionary] = ScytheEffects.chain_segments(line.length())
-		for index: int in range(segments.size()):
-			var key: String = "fx_chain_link_%d" % ScytheEffects.link_frame(index, segments.size(), snapshot.tick, hero.reaper_coil_phase, snapshot.tick == coil_hook_tick)
-			if not frames.has(key):
-				continue
-			var f: Dictionary = frames[key]
-			var length: float = float(segments[index]["length"])
-			draw_set_transform(from + shake_offset, line.angle())
-			draw_texture_rect_region(sprites, Rect2(Vector2(float(segments[index]["offset"]), -float(f["ay"])), Vector2(length, f["h"])), Rect2(f["x"], f["y"], length, f["h"]))
-			draw_set_transform(shake_offset)
-		# the scythe at the chain's end: tumbling while it flies, biting along the chain once it holds
-		var frame: int = posmod(snapshot.tick, 8) + 1 if hero.reaper_coil_phase == PlayerState.COIL_HOOK else ScytheEffects.flying_frame(line)
-		if line.length() > 2.0:
-			_draw_imported("fx_scythe_flying_%d" % frame, to)
-	for effect: Dictionary in coil_fx:
-		var age: int = cosmetic_tick - int(effect["tick"])
-		match String(effect["kind"]):
-			"hook":
-				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.HOOK_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_chain_hook_%d" % frame, effect["at"])
-			"land":
-				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.LAND_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_chain_land_%d" % frame, effect["at"])
-			"stagger":
-				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.STAGGER_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_chain_stagger_%d" % frame, effect["at"])
-			"spark":
-				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.SPARK_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_chain_hook_%d" % (frame + 3), effect["at"])
-			"dust":
-				var frame: int = ScytheEffects.sequence_frame(ScytheEffects.DUST_TICKS, age)
-				if frame > 0:
-					_draw_imported("fx_chain_dust_%d" % frame, effect["at"], Vector2(-1 if bool(effect["left"]) else 1, 1))
-
 
 # ---------------------------------------------------------------- Spirit Lantern / Phantom Cut (world space)
 

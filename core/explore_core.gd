@@ -559,6 +559,17 @@ func snapshot() -> ExploreSnapshot:
 	hero.weapon_buff_active = player.is_buff_active()
 	hero.weapon_buff_ticks_left = player.buff_ticks
 	hero.weapon_form = player.active_form()
+	hero.lightning_blink_index = player.last_blink_direction
+	hero.lightning_blink_tick = player.last_blink_tick
+	hero.lightning_blink_from = player.last_blink_from
+	hero.lightning_blink_to = player.last_blink_to
+	hero.lightning_barrage_slash = player.barrage_slash if player.barrage_running else 0
+	hero.lightning_barrage_slash_tick = player.barrage_slash_tick if player.barrage_running else -1
+	hero.reaper_coil_phase = player.coil_phase if player.coil_running else &""
+	hero.reaper_coil_phase_tick = player.coil_phase_tick if player.coil_running else 0
+	hero.reaper_coil_from = player.position if player.coil_running else Vector2.ZERO
+	hero.reaper_coil_target = player.coil_target if player.coil_running else Vector2.ZERO
+	hero.reaper_coil_spin_hit = player.coil_spin_hit if player.coil_running else 0
 	hero.phantom_ticks_left = player.phantom_ticks_left
 	hero.phantom_pending_echoes = skills.phantom_echoes.size()
 	hero.echo_invuln_ticks = player.echo_invuln_ticks()
