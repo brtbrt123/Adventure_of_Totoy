@@ -43,6 +43,10 @@ var _next_requested: bool = false
 var _skip_requested: bool = false
 var _exit_start_alpha: float = 0.0
 var _caption_lines: Array[String] = []
+## The layout you set in intro.tscn: the script only grows or shrinks things from it (the card upward, the hint strip from its right edge).
+var _card_base: Rect2 = Rect2()
+var _caption_margin: Vector2 = Vector2.ZERO
+var _plate_right: float = 0.0
 var _voice_exit_levels: Array[float] = []
 @onready var picture: TextureRect = $Picture
 @onready var card: NinePatchRect = $CaptionCard
@@ -54,6 +58,7 @@ var _voice_exit_levels: Array[float] = []
 
 
 func _ready() -> void:
+	_remember_layout()
 	Bindings.register()
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var palette: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json")) as Dictionary
@@ -249,9 +254,11 @@ func wrapped_lines(text: String) -> Array[String]:
 	return rows
 
 
+## The caption card for the lines now shown: the card you placed in intro.tscn, grown upward (its bottom edge stays) when there are
+## more lines than its height holds.
 func caption_rect() -> Rect2:
-	var height: int = maxi(32, _caption_lines.size() * 8 + 10)
-	return Rect2(5, 211 - height, 374, height)
+	var height: float = maxf(_card_base.size.y, float(_caption_lines.size() * 8 + 10))
+	return Rect2(_card_base.position.x, _card_base.end.y - height, _card_base.size.x, height)
 
 
 ## An overscan crop always maps one source pixel to one game pixel. Smooth fractional zoom
@@ -275,6 +282,12 @@ func _draw() -> void:
 	pass  # the arena HUD's drawing is not wanted here; everything on this screen is a node
 
 
+func _remember_layout() -> void:
+	_card_base = Rect2(card.position, card.size)
+	_caption_margin = card.size - caption.size
+	_plate_right = hint_plate.position.x + hint_plate.size.x
+
+
 func _sync() -> void:
 	if picture == null or colors.is_empty():
 		return
@@ -287,7 +300,6 @@ func _sync() -> void:
 		picture.texture = crop
 	else:
 		picture.texture = panel
-	picture.position = PANEL_ORIGIN
 	var card_rect: Rect2 = caption_rect()
 	card.position = card_rect.position
 	card.size = card_rect.size
@@ -296,16 +308,14 @@ func _sync() -> void:
 	for line: String in _caption_lines:
 		shown.append(line.substr(0, maxi(0, remaining)))
 		remaining -= line.length() + 1
-	caption.text = "
-".join(shown)
-	caption.size = card_rect.size - Vector2(18, 6)
+	caption.text = "\n".join(shown)
+	caption.size = card_rect.size - _caption_margin
 	var hint_text: String = ("%s: %s   %s: Skip" % [Bindings.action_label("dialogue_next"), "Next" if complete() else "Reveal", Bindings.action_label("dialogue_skip")]).to_upper()
 	hint.text = hint_text
 	var width: float = ceilf(hint.get_theme_font("font").get_string_size(hint_text, HORIZONTAL_ALIGNMENT_LEFT, -1, hint.get_theme_font_size("font_size")).x)
-	hint_plate.position = Vector2(377 - width, 4)
-	hint_plate.size = Vector2(width + 3, 10)
-	hint.position = Vector2(1, -1)
-	hint.size = Vector2(width + 1, 12)
+	hint_plate.size.x = width + 3.0
+	hint_plate.position.x = _plate_right - hint_plate.size.x
+	hint.size.x = width + 1.0
 	flash.visible = effect == "flash" and beat_ticks < 6 and fade_phase == &""
 	flash.color = Color(colors["p"], (1.0 - float(beat_ticks) / 6.0) * 0.5)
 	var alpha: float = fade_alpha()
