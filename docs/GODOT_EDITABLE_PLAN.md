@@ -66,3 +66,16 @@ Owner request: **convert all tiles, props, scenes (maps), animations, effects, U
 ## Starting prompt for the next session
 
 > Read docs/GODOT_EDITABLE_PLAN.md and docs/STATUS.md first. Start phase 0: answer the four decisions with me, then build the spike (one prop scene and one map round-tripped through the baker with identical JSON). Report what you ran and what you could not verify. Do not merge to main.
+
+## Where things stand at the end of 2026-10-30 (read this before the migration)
+
+**Pushed on `agent/codex/progression`, nothing merged to main.** All tests green at the last full run (Python 85, core 515, every smoke that can run without a window).
+
+- **Chapter 1 route is complete and playable:** village -> woodland -> forest -> **Root Hollow** -> glade -> arena, with the Hollow's village shortcut. Overview image: `art/reference/chapter1_map_overview.png`.
+- **Root Hollow:** Claude registered the real props and colliders (`data/props/prop_defs_root_hollow.json`) and a flag-keyed barrier state (`"when": "flag:cleared_hollow_center"`); Codex added lighting, shadows and depth checks (`60d9729a`). The owner still has to judge the look in play.
+- **Done this session:** every Aspect and the three weapon actives on the road (multi-target Lightning Form and Reaper's Coil, `core/explore_skills.gd`), shared hero effects (`presentation/common/hero_fx.gd`), forest mobs, the Thornback Stag, Root Hollow, UI as scenes (34 `.tscn`), the intro cutscene as a scene.
+- **Open gameplay items (not part of the migration):** Glowmoth (art only, no core behaviour), Edda's binding scene and the Stag's freed pose, the Colossus entrance cutscene, the beacon ending on the restored arena ground (`art/reference/beacon_epilogue/`, not wired), credits, balance and a full playtest. Damage numbers against mobs, the Stag and the multi-target falloff are first guesses.
+- **Owner's uncommitted scene edits** (edited in the Godot editor, not on the branch): `presentation/cutscene/intro.tscn`, `presentation/ui/dialogue_box.tscn`, `presentation/ui/explore_overlay.tscn`, `presentation/ui/pieces/hud/aspect_socket.tscn`, `presentation/ui/pieces/overlay/scene_ribbon.tscn`, `presentation/ui/welcome_card.tscn`. Ask before committing them; scripts must keep honouring those layouts (the intro, the toast ribbon and the reward card were fixed so they do; the pieces the game positions by design are listed in the answer given on 2026-10-30: the `E` hint, fight chips, TAB reminder, locked message, title selection plate).
+- **Shared working copy:** Claude and Codex edit the same folder. A `build_art.py` run by one side can briefly delete files under `art/build/sprites/` while the other runs tests (it caused false Python failures once): do not run the Python tests while the other agent builds art. `docs/STATUS.md`, `docs/INDEX.md` and `docs/architecture.md` often carry the other agent's uncommitted edits: commit only your own hunk.
+- **Role split stays** (owner decision 4B): Claude does generators, baker, round-trip tests, core/data; Codex wires presentation. Cross-reviews are in `art/reference/root_hollow_v1/CROSS_REVIEW.md` style.
+
