@@ -3,7 +3,7 @@ extends RefCounted
 const Fireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const SHADER := preload("res://presentation/common/overhead_light.gdshader")
 const SHADOW_PROJECTION: Vector2 = Vector2(0.30, 0.25)
-const MAX_LIGHTS: int = 16
+const MAX_LIGHTS: int = 32
 const PROP_SHADOW_ALPHA: float = 0.30
 const ACTOR_SHADOW_ALPHA: float = 0.20
 static var _sockets: Dictionary = {}
@@ -42,6 +42,7 @@ static func lamp_plan(placements: Array[Dictionary]) -> Dictionary:
 	var points: PackedVector4Array = PackedVector4Array()
 	var colours: PackedVector3Array = PackedVector3Array()
 	var core_colours: PackedVector3Array = PackedVector3Array()
+	var owners: PackedStringArray = PackedStringArray()
 	var dropped: int = 0
 	for placement: Dictionary in placements:
 		var sockets: Array = _sockets.get(String(placement["type"]), [])
@@ -60,15 +61,17 @@ static func lamp_plan(placements: Array[Dictionary]) -> Dictionary:
 			var rgb: Array = socket.get("colour", [1.0, 0.79, 0.52])
 			var core_rgb: Array = socket.get("core_colour", [1.05, 0.98, 0.88])
 			for entry: int in 2:
+				owners.append(String(placement.get("id", "")))
 				colours.append(Vector3(rgb[0], rgb[1], rgb[2]))
 				core_colours.append(Vector3(core_rgb[0], core_rgb[1], core_rgb[2]))
 	var count: int = points.size()
 	points.resize(MAX_LIGHTS)
+	owners.resize(MAX_LIGHTS)
 	colours.resize(MAX_LIGHTS)
 	core_colours.resize(MAX_LIGHTS)
 	if dropped > 0:
 		push_warning("Environment light budget: dropped %d fixture(s), limit %d entries" % [dropped, MAX_LIGHTS])
-	return {"points": points, "count": count, "colours": colours, "core_colours": core_colours, "dropped": dropped}
+	return {"points": points, "count": count, "colours": colours, "core_colours": core_colours, "dropped": dropped, "owners":owners}
 
 
 ## Projects the current animated actor silhouette onto the same ground plane.

@@ -446,18 +446,6 @@
    "y": 165
   },
   {
-   "id": "hollow_prop_9",
-   "type": "woodland_lantern",
-   "x": 25,
-   "y": 110
-  },
-  {
-   "id": "hollow_prop_10",
-   "type": "woodland_lantern",
-   "x": 185,
-   "y": 145
-  },
-  {
    "id": "hollow_prop_11",
    "type": "root_hollow_rune_stones",
    "x": 590,
@@ -530,6 +518,34 @@
    "y": 36,
    "when": "flag:cleared_hollow_center",
    "on_type": "root_hollow_barrier_open"
+  },
+  {
+   "id": "hollow_marked_lamp_1",
+   "type": "woodland_lantern",
+   "x": 187,
+   "y": 62,
+   "flip": false
+  },
+  {
+   "id": "hollow_marked_lamp_2",
+   "type": "woodland_lantern",
+   "x": 199,
+   "y": 180,
+   "flip": true
+  },
+  {
+   "id": "hollow_marked_lamp_3",
+   "type": "woodland_lantern",
+   "x": 455,
+   "y": 138,
+   "flip": false
+  },
+  {
+   "id": "hollow_marked_lamp_4",
+   "type": "woodland_lantern",
+   "x": 391,
+   "y": 279,
+   "flip": true
   }
  ]
 }

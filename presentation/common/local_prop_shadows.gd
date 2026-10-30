@@ -1,10 +1,11 @@
 extends RefCounted
 ## Presentation-only: shear the existing guarded silhouette mask away from the nearest local light.
 const Light := preload("res://presentation/common/environment_light.gd")
-static func plan(at: Vector2, lights: PackedVector4Array, count: int) -> Dictionary:
+static func plan(at: Vector2, lights: PackedVector4Array, count: int, ignore_owner: String = "", owners: PackedStringArray = PackedStringArray()) -> Dictionary:
 	var nearest: float = INF
 	var away: Vector2 = Vector2.ZERO
 	for i: int in count:
+		if ignore_owner != "" and owners.size() > i and owners[i] == ignore_owner: continue
 		var lamp: Vector4 = lights[i]
 		if lamp.w >= 0.0: continue # ground footprint of each practical
 		var delta: Vector2 = at - Vector2(lamp.x,lamp.y)
@@ -26,7 +27,7 @@ static func draw(canvas: CanvasItem, props: Array[Dictionary], placements: Array
 		if prop["kind"] != &"prop" or float(prop.get("shadow_radius",0)) <= 0: continue
 		var frame: Dictionary = prop.get("cast_frame",{})
 		if frame.is_empty(): continue
-		var projection: Dictionary = plan(prop.get("shadow_at",prop["at"]),lights["points"],int(lights["count"]))
+		var projection: Dictionary = plan(prop.get("shadow_at",prop["at"]),lights["points"],int(lights["count"]),String(prop["id"]),lights["owners"])
 		if projection.is_empty(): continue
 		canvas.draw_set_transform_matrix(Transform2D(projection["x"],projection["y"],projection["at"]+offset))
 		canvas.draw_texture_rect_region(atlas,Rect2(Vector2(-frame["ax"],-frame["ay"]),Vector2(frame["w"],frame["h"])),Rect2(frame["x"],frame["y"],frame["w"],frame["h"]),Color(0,0,0,Light.PROP_SHADOW_ALPHA))

@@ -1,3 +1,5 @@
+Latest revision: owner-marked four-lamp placement and shared rune-stone glow; see LAMP_REVISION.md. Captures in this folder are refreshed. The original finish review below predates this explicitly authorized props-array edit.
+
 # Root Hollow final presentation check
 
 Claude presentation/art cross-review: **PASS** for the requested ad118e0f changes. Flag states are passed from the read-only snapshot; FLAG_SET refreshes placements/material, and the actual event hook swaps the gate sprite. Art catalogue additions retain native anchors and matching closed/open dimensions. Corpse-spark filter excludes state_ticks>1 but keeps a fresh killing-blow contact; focused regression confirms both cases. No additional blocking finding in the requested diff. This is not a claim about fun, balance or owner art approval.

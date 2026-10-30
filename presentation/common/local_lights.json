@@ -66,7 +66,17 @@
       "halo_radius": 35.0,
       "energy": 1.35,
       "pool_radius": 48.0,
-      "pool_energy": 0.7
+      "pool_energy": 0.7,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
     }
   ],
   "glade_stone_2": [
@@ -78,7 +88,17 @@
       "halo_radius": 35.0,
       "energy": 1.35,
       "pool_radius": 48.0,
-      "pool_energy": 0.7
+      "pool_energy": 0.7,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
     }
   ],
   "glade_stone_3": [
@@ -90,7 +110,17 @@
       "halo_radius": 35.0,
       "energy": 1.35,
       "pool_radius": 48.0,
-      "pool_energy": 0.7
+      "pool_energy": 0.7,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
     }
   ],
   "glade_stone_4": [
@@ -102,7 +132,17 @@
       "halo_radius": 35.0,
       "energy": 1.35,
       "pool_radius": 48.0,
-      "pool_energy": 0.7
+      "pool_energy": 0.7,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
     }
   ],
   "glade_stone_5": [
@@ -114,7 +154,17 @@
       "halo_radius": 35.0,
       "energy": 1.35,
       "pool_radius": 48.0,
-      "pool_energy": 0.7
+      "pool_energy": 0.7,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
     }
   ],
   "forest_pedestal_lit": [
@@ -123,10 +173,10 @@
         10.3,
         19.1
       ],
-      "halo_radius": 30.0,
-      "energy": 1.1,
-      "pool_radius": 40.0,
-      "pool_energy": 0.55,
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
       "colour": [
         0.48,
         0.94,
@@ -145,10 +195,10 @@
         27.8,
         25.5
       ],
-      "halo_radius": 30.0,
-      "energy": 1.1,
-      "pool_radius": 40.0,
-      "pool_energy": 0.55,
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
       "colour": [
         0.48,
         0.94,
@@ -295,41 +345,81 @@
         24,
         17
       ],
-      "halo_radius": 22.0,
-      "energy": 0.7,
-      "pool_radius": 38.0,
-      "pool_energy": 0.6,
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
       "colour": [
-        0.42,
-        0.83,
-        0.76
+        0.48,
+        0.94,
+        0.86
       ],
       "core_colour": [
         0.8,
         1.0,
-        0.94
+        1.0
       ]
     }
   ],
   "root_hollow_rune_stones": [
     {
       "pixel": [
-        32,
-        18
+        12,
+        27
       ],
-      "halo_radius": 22.0,
-      "energy": 0.7,
-      "pool_radius": 38.0,
-      "pool_energy": 0.6,
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
       "colour": [
-        0.42,
-        0.83,
-        0.76
+        0.48,
+        0.94,
+        0.86
       ],
       "core_colour": [
         0.8,
         1.0,
-        0.94
+        1.0
+      ]
+    },
+    {
+      "pixel": [
+        32,
+        16
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "pixel": [
+        53,
+        28
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
       ]
     }
   ],
