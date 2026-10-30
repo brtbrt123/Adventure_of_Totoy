@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_bucket.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_bucket_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_bucket_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 6, 20, 26)
+
+[node name="village_bucket" type="Node2D"]
+metadata/w = 20
+metadata/h = 26
+metadata/base_width = 16
+metadata/solid = false
+metadata/image = "village_bucket.png"
+metadata/note = "bucket: decor"
+metadata/locked = true
+metadata/src_bbox = [769, 794, 870, 927]
+metadata/contact_shadow = {"core": [[2, 22, 2], [17, 22, 2], [2, 23, 3], [16, 23, 3], [2, 24, 5], [14, 24, 5], [3, 25, 15], [4, 26, 13], [6, 27, 9]], "edge": [[4, 22, 1], [19, 22, 1], [5, 23, 1], [19, 23, 1], [7, 24, 1], [19, 24, 1], [2, 25, 1], [18, 25, 2], [2, 26, 2], [17, 26, 3], [3, 27, 3], [15, 27, 4], [4, 28, 14], [6, 29, 10]], "size": [20, 26]}
+metadata/flip_offset = Vector2(-10.0, -26)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-10.0, -26)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-12, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-12, -4)

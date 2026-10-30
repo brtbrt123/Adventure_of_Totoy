@@ -1,0 +1,68 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_rubble.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_rubble_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_rubble_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 3, 40, 21)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 6
+
+[node name="village_rubble" type="Node2D"]
+metadata/w = 40
+metadata/h = 21
+metadata/base_width = 28
+metadata/solid = true
+metadata/image = "village_rubble.png"
+metadata/note = "grey rubble pile"
+metadata/locked = true
+metadata/src_bbox = [83, 638, 287, 743]
+metadata/contact_shadow = {"core": [[20, 16, 2], [28, 16, 4], [39, 16, 2], [19, 17, 16], [37, 17, 4], [9, 18, 3], [18, 18, 23], [9, 19, 6], [16, 19, 13], [31, 19, 9], [9, 20, 11], [34, 20, 4], [11, 21, 8], [14, 22, 3]], "edge": [[22, 16, 1], [32, 16, 1], [41, 16, 1], [35, 17, 1], [41, 17, 1], [12, 18, 1], [41, 18, 1], [15, 19, 1], [29, 19, 2], [40, 19, 2], [20, 20, 14], [38, 20, 4], [9, 21, 2], [19, 21, 11], [31, 21, 10], [9, 22, 5], [17, 22, 4], [34, 22, 5], [11, 23, 9], [14, 24, 4]], "size": [40, 21]}
+metadata/flip_offset = Vector2(-17.0, -21)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-23.0, -21)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-25, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-20, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-14, -5)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-3, -5)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(8, -5)
+shape = SubResource("CircleShape2D_3")

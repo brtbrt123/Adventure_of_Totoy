@@ -1,0 +1,60 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_stone_2.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_stone_2_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_stone_2_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 5.5
+
+[node name="glade_stone_2" type="Node2D"]
+metadata/w = 50
+metadata/h = 57
+metadata/base_width = 45
+metadata/solid = true
+metadata/image = "glade_stone_2.png"
+metadata/note = "standing stone"
+metadata/locked = true
+metadata/contact_shadow = {"core": [[47, 47, 4], [6, 48, 2], [41, 48, 3], [47, 48, 4], [2, 49, 6], [40, 49, 11], [2, 50, 6], [20, 50, 2], [40, 50, 8], [2, 51, 10], [19, 51, 4], [40, 51, 2], [43, 51, 5], [7, 52, 5], [14, 52, 9], [36, 52, 5], [45, 52, 2], [7, 53, 16], [36, 53, 5], [11, 54, 9], [27, 54, 3], [34, 54, 7], [11, 55, 4], [17, 55, 2], [22, 55, 15], [12, 56, 2], [22, 56, 15], [22, 57, 6], [29, 57, 6], [24, 58, 2]], "edge": [[51, 47, 1], [8, 48, 1], [44, 48, 1], [51, 48, 1], [8, 49, 1], [51, 49, 1], [8, 50, 1], [22, 50, 1], [48, 50, 4], [12, 51, 1], [23, 51, 1], [42, 51, 1], [48, 51, 4], [2, 52, 5], [12, 52, 1], [23, 52, 1], [41, 52, 4], [47, 52, 2], [2, 53, 5], [23, 53, 1], [41, 53, 8], [7, 54, 4], [20, 54, 4], [30, 54, 1], [41, 54, 1], [45, 54, 3], [7, 55, 4], [15, 55, 2], [19, 55, 3], [37, 55, 5], [11, 56, 1], [14, 56, 7], [37, 56, 5], [11, 57, 5], [17, 57, 3], [28, 57, 1], [35, 57, 3], [12, 58, 3], [22, 58, 2], [26, 58, 12], [22, 59, 14], [24, 60, 3]], "size": [50, 57]}
+metadata/flip_offset = Vector2(-32, -57)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-24, -57)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-24, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-28, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-5, -7)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(5, -7)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Light1" type="Marker2D" parent="."]
+position = Vector2(2.1999999999999993, -33.4)
+metadata/socket = {"pixel": [26.2, 23.6], "halo_radius": 35.0, "energy": 1.35, "pool_radius": 48.0, "pool_energy": 0.7, "colour": [0.48, 0.94, 0.86], "core_colour": [0.8, 1.0, 1.0]}

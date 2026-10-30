@@ -1,0 +1,70 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_thorns.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_thorns_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_thorns_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 8
+
+[node name="glade_thorns" type="Node2D"]
+metadata/w = 70
+metadata/h = 51
+metadata/base_width = 60
+metadata/solid = true
+metadata/image = "glade_thorns.png"
+metadata/note = "thorn bush: solid"
+metadata/locked = true
+metadata/contact_shadow = {"core": [[9, 43, 2], [6, 44, 5], [50, 44, 3], [61, 44, 2], [6, 45, 5], [19, 45, 2], [22, 45, 4], [41, 45, 6], [50, 45, 3], [60, 45, 7], [6, 46, 4], [13, 46, 4], [19, 46, 7], [29, 46, 2], [36, 46, 2], [41, 46, 13], [59, 46, 8], [10, 47, 7], [19, 47, 13], [36, 47, 15], [52, 47, 2], [59, 47, 8], [10, 48, 13], [25, 48, 8], [35, 48, 7], [43, 48, 2], [46, 48, 5], [52, 48, 3], [59, 48, 2], [10, 49, 4], [16, 49, 4], [25, 49, 17], [48, 49, 2], [53, 49, 4], [16, 50, 4], [31, 50, 6], [39, 50, 2], [53, 50, 7], [17, 51, 2], [32, 51, 4], [54, 51, 6], [33, 52, 2], [56, 52, 4]], "edge": [[11, 43, 1], [11, 44, 1], [53, 44, 1], [63, 44, 1], [11, 45, 1], [21, 45, 1], [26, 45, 1], [47, 45, 1], [53, 45, 1], [67, 45, 1], [10, 46, 2], [17, 46, 1], [26, 46, 1], [31, 46, 1], [38, 46, 1], [54, 46, 1], [67, 46, 1], [6, 47, 4], [17, 47, 1], [32, 47, 1], [51, 47, 1], [54, 47, 1], [67, 47, 1], [6, 48, 4], [23, 48, 2], [33, 48, 1], [42, 48, 1], [45, 48, 1], [51, 48, 1], [55, 48, 1], [61, 48, 7], [14, 49, 2], [20, 49, 5], [42, 49, 6], [50, 49, 3], [57, 49, 1], [59, 49, 9], [10, 50, 6], [20, 50, 4], [25, 50, 6], [37, 50, 2], [41, 50, 12], [60, 50, 2], [10, 51, 5], [16, 51, 1], [19, 51, 2], [25, 51, 7], [36, 51, 7], [48, 51, 3], [53, 51, 1], [60, 51, 1], [16, 52, 5], [31, 52, 2], [35, 52, 3], [39, 52, 3], [53, 52, 3], [60, 52, 1], [17, 53, 3], [32, 53, 5], [54, 53, 7], [33, 54, 3], [56, 54, 5]], "size": [70, 51]}
+metadata/flip_offset = Vector2(-36, -51)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-36, -51)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-35, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-34, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-22, -7)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-9, -7)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(4, -7)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(17, -7)
+shape = SubResource("CircleShape2D_4")

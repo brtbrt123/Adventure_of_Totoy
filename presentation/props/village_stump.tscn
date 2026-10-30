@@ -1,0 +1,68 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_stump.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_stump_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_stump_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 4, 39, 28)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 6.5
+
+[node name="village_stump" type="Node2D"]
+metadata/w = 39
+metadata/h = 28
+metadata/base_width = 35
+metadata/solid = true
+metadata/image = "village_stump.png"
+metadata/note = "stump"
+metadata/locked = true
+metadata/src_bbox = [723, 444, 924, 587]
+metadata/contact_shadow = {"core": [[10, 23, 4], [18, 23, 3], [34, 23, 4], [9, 24, 13], [28, 24, 2], [34, 24, 6], [4, 25, 2], [7, 25, 17], [28, 25, 5], [34, 25, 6], [4, 26, 7], [13, 26, 6], [20, 26, 5], [28, 26, 5], [37, 26, 3], [4, 27, 6], [21, 27, 12], [5, 28, 3], [23, 28, 6], [24, 29, 5]], "edge": [[14, 23, 1], [21, 23, 1], [38, 23, 1], [22, 24, 1], [30, 24, 1], [40, 24, 1], [6, 25, 1], [24, 25, 1], [33, 25, 1], [40, 25, 1], [11, 26, 2], [19, 26, 1], [25, 26, 1], [33, 26, 4], [40, 26, 1], [10, 27, 11], [33, 27, 8], [4, 28, 1], [8, 28, 4], [13, 28, 10], [29, 28, 5], [37, 28, 4], [4, 29, 7], [21, 29, 3], [29, 29, 5], [5, 30, 4], [23, 30, 7], [24, 31, 6]], "size": [39, 28]}
+metadata/flip_offset = Vector2(-17.5, -28)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-21.5, -28)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-24, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-21, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-7, -6)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0, -6)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(8, -6)
+shape = SubResource("CircleShape2D_3")

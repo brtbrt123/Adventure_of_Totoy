@@ -1,0 +1,219 @@
+[gd_scene load_steps=25 format=3]
+
+[ext_resource type="Texture2D" path="res://presentation/forest/glade_layered_ground.png" id="ground"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stone_1.tscn" id="p_glade_stone_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stone_2.tscn" id="p_glade_stone_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stone_3.tscn" id="p_glade_stone_3"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stone_4.tscn" id="p_glade_stone_4"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stone_5.tscn" id="p_glade_stone_5"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rock_1.tscn" id="p_glade_rock_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rock_2.tscn" id="p_glade_rock_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rock_3.tscn" id="p_glade_rock_3"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_tree.tscn" id="p_glade_tree"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stump.tscn" id="p_glade_stump"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_thorns.tscn" id="p_glade_thorns"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_bush_1.tscn" id="p_glade_bush_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_fern_1.tscn" id="p_glade_fern_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_arch.tscn" id="p_glade_arch"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_antler.tscn" id="p_glade_antler"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rocks_small.tscn" id="p_glade_rocks_small"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_mushrooms.tscn" id="p_glade_mushrooms"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_fern_2.tscn" id="p_glade_fern_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_bush_2.tscn" id="p_glade_bush_2"]
+
+[sub_resource type="RectangleShape2D" id="Exit_1"]
+size = Vector2(8, 30)
+
+[sub_resource type="RectangleShape2D" id="Exit_2"]
+size = Vector2(56, 10)
+
+[sub_resource type="RectangleShape2D" id="FightArea"]
+size = Vector2(210, 140)
+
+[sub_resource type="RectangleShape2D" id="Zone_1"]
+size = Vector2(210, 140)
+
+[node name="glade_layered" type="Node2D"]
+metadata/version = 1
+metadata/title = "STAG GLADE"
+metadata/size = [560, 336]
+metadata/boundary_radius = 25
+metadata/boundary_spacing = 17
+metadata/default_entry = "entrance"
+
+[node name="Ground" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("ground")
+centered = false
+
+[node name="Walkable" type="Polygon2D" parent="."]
+color = Color(0.25, 0.85, 0.45, 0.22)
+polygon = PackedVector2Array(0, 296, 22, 290, 40, 270, 26, 258, 16, 244, 18, 222, 22, 190, 26, 150, 30, 110, 56, 80, 96, 56, 150, 40, 220, 28, 300, 24, 380, 24, 420, 40, 440, 44, 462, 22, 480, 0, 548, 0, 536, 40, 526, 90, 528, 150, 524, 200, 520, 250, 500, 290, 470, 318, 440, 332, 410, 332, 380, 326, 330, 326, 260, 324, 200, 322, 150, 326, 110, 332, 60, 326, 0, 336)
+
+[node name="Entries" type="Node2D" parent="."]
+
+[node name="entrance" type="Marker2D" parent="Entries"]
+position = Vector2(24, 318)
+
+[node name="Exits" type="Node2D" parent="."]
+
+[node name="to_forest" type="Area2D" parent="Exits"]
+position = Vector2(0, 306)
+metadata/target_scene = "root_hollow_layered"
+metadata/target_entry = "glade_side"
+
+[node name="Rect" type="CollisionShape2D" parent="Exits/to_forest"]
+position = Vector2(4.0, 15.0)
+shape = SubResource("Exit_1")
+
+[node name="to_arena" type="Area2D" parent="Exits"]
+position = Vector2(488, 0)
+metadata/target_scene = "arena"
+metadata/target_entry = "start"
+metadata/requires_flag = "cleared_stag_glade"
+metadata/blocked_text = "The root arch holds fast. The Stag still guards it."
+
+[node name="Rect" type="CollisionShape2D" parent="Exits/to_arena"]
+position = Vector2(28.0, 5.0)
+shape = SubResource("Exit_2")
+
+[node name="Checkpoints" type="Node2D" parent="."]
+
+[node name="glade_layered_entrance" type="Marker2D" parent="Checkpoints"]
+position = Vector2(42, 312)
+
+[node name="StagStart" type="Marker2D" parent="."]
+position = Vector2(420, 165)
+metadata/stag_radius = 20
+
+[node name="FightArea" type="Area2D" parent="."]
+
+[node name="Rect" type="CollisionShape2D" parent="FightArea"]
+position = Vector2(273.0, 197.0)
+shape = SubResource("FightArea")
+
+[node name="Encounters" type="Node2D" parent="."]
+
+[node name="stag_glade" type="Node2D" parent="Encounters"]
+metadata/title = "THORNBACK STAG"
+metadata/leash = 330
+metadata/reward = {"reward_id": "stag_glade_herbs", "kind": "item", "item": "herb", "name": "Herb", "quantity": 3}
+
+[node name="Zone" type="Area2D" parent="Encounters/stag_glade"]
+
+[node name="Rect" type="CollisionShape2D" parent="Encounters/stag_glade/Zone"]
+position = Vector2(273.0, 197.0)
+shape = SubResource("Zone_1")
+
+[node name="stag_1" type="Marker2D" parent="Encounters/stag_glade"]
+position = Vector2(420, 165)
+metadata/mob = "stag"
+
+[node name="Props" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="glade_stone_1" parent="Props" instance=ExtResource("p_glade_stone_1")]
+position = Vector2(170, 140)
+metadata/flip = false
+metadata/shadow_radius = 14.4
+
+[node name="glade_stone_2" parent="Props" instance=ExtResource("p_glade_stone_2")]
+position = Vector2(255, 95)
+metadata/flip = false
+metadata/shadow_radius = 13.5
+
+[node name="glade_stone_3" parent="Props" instance=ExtResource("p_glade_stone_3")]
+position = Vector2(360, 125)
+metadata/flip = false
+metadata/shadow_radius = 12.3
+
+[node name="glade_stone_4" parent="Props" instance=ExtResource("p_glade_stone_4")]
+position = Vector2(390, 245)
+metadata/flip = false
+metadata/shadow_radius = 14.1
+
+[node name="glade_stone_5" parent="Props" instance=ExtResource("p_glade_stone_5")]
+position = Vector2(185, 265)
+metadata/flip = false
+metadata/shadow_radius = 12.9
+
+[node name="glade_rock_1" parent="Props" instance=ExtResource("p_glade_rock_1")]
+position = Vector2(110, 175)
+metadata/flip = false
+metadata/shadow_radius = 6.0
+
+[node name="glade_rock_2" parent="Props" instance=ExtResource("p_glade_rock_2")]
+position = Vector2(455, 225)
+metadata/flip = false
+metadata/shadow_radius = 12.6
+
+[node name="glade_rock_3" parent="Props" instance=ExtResource("p_glade_rock_3")]
+position = Vector2(420, 280)
+metadata/flip = false
+metadata/shadow_radius = 3.6
+
+[node name="glade_tree" parent="Props" instance=ExtResource("p_glade_tree")]
+position = Vector2(72, 135)
+metadata/flip = false
+metadata/shadow_radius = 22
+
+[node name="glade_stump" parent="Props" instance=ExtResource("p_glade_stump")]
+position = Vector2(92, 245)
+metadata/flip = false
+metadata/shadow_radius = 9.9
+
+[node name="glade_thorns" parent="Props" instance=ExtResource("p_glade_thorns")]
+position = Vector2(490, 290)
+metadata/flip = false
+metadata/shadow_radius = 18.0
+
+[node name="glade_bush_1" parent="Props" instance=ExtResource("p_glade_bush_1")]
+position = Vector2(490, 155)
+metadata/flip = false
+metadata/shadow_radius = 12.6
+
+[node name="glade_fern_1" parent="Props" instance=ExtResource("p_glade_fern_1")]
+position = Vector2(330, 318)
+metadata/flip = false
+metadata/shadow_radius = 16.5
+
+[node name="glade_arch" parent="Props" instance=ExtResource("p_glade_arch")]
+position = Vector2(492, 62)
+metadata/flip = false
+metadata/shadow_radius = 22
+
+[node name="glade_antler" parent="Props" instance=ExtResource("p_glade_antler")]
+position = Vector2(488, 188)
+metadata/flip = false
+metadata/shadow_radius = 2.7
+
+[node name="glade_rocks_small" parent="Props" instance=ExtResource("p_glade_rocks_small")]
+position = Vector2(265, 300)
+metadata/flip = false
+metadata/shadow_radius = 12.6
+
+[node name="glade_mushrooms" parent="Props" instance=ExtResource("p_glade_mushrooms")]
+position = Vector2(420, 325)
+metadata/flip = false
+metadata/shadow_radius = 10.5
+
+[node name="glade_fern_2" parent="Props" instance=ExtResource("p_glade_fern_2")]
+position = Vector2(28, 245)
+metadata/flip = false
+metadata/shadow_radius = 16.2
+
+[node name="glade_bush_2" parent="Props" instance=ExtResource("p_glade_bush_2")]
+position = Vector2(305, 50)
+metadata/flip = false
+metadata/shadow_radius = 10.2
+
+[node name="arch_bush_left" parent="Props" instance=ExtResource("p_glade_bush_1")]
+position = Vector2(440, 62)
+scale = Vector2(-1, 1)
+metadata/flip = true
+metadata/shadow_radius = 12.6
+
+[node name="arch_bush_right" parent="Props" instance=ExtResource("p_glade_bush_1")]
+position = Vector2(540, 62)
+metadata/flip = false
+metadata/shadow_radius = 12.6

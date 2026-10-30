@@ -79,3 +79,10 @@ Owner request: **convert all tiles, props, scenes (maps), animations, effects, U
 - **Shared working copy:** Claude and Codex edit the same folder. A `build_art.py` run by one side can briefly delete files under `art/build/sprites/` while the other runs tests (it caused false Python failures once): do not run the Python tests while the other agent builds art. `docs/STATUS.md`, `docs/INDEX.md` and `docs/architecture.md` often carry the other agent's uncommitted edits: commit only your own hunk.
 - **Role split stays** (owner decision 4B): Claude does generators, baker, round-trip tests, core/data; Codex wires presentation. Cross-reviews are in `art/reference/root_hollow_v1/CROSS_REVIEW.md` style.
 
+
+## Progress (Claude, 2026-10-30)
+
+- **Phase 0 done (spike).** Design: Python generators write the `.tscn` text (deterministic, keeps `22` vs `6.0` number spelling, keeps editor values), a headless Godot baker (`tools/godot/bake_lib.gd`, `bake_props.gd`, `bake_maps.gd`) reads the scenes through `PackedScene` and writes the JSON. Result: all five `data/scenes/*_props.json` come back **byte for byte** from their generated scenes; the three `prop_defs*.json` come back value for value (whole numbers return as integers). `presentation/maps/glade_layered.tscn` is the spike map (the other four: `python tools/godot/generate_map_scenes.py`, phase 2).
+- **Phase 1 Claude side done.** `presentation/props/<type>.tscn` for all **100** types (the main catalogue has 76, woodland and Root Hollow add 24), generator `tools/godot/generate_prop_scenes.py`, round-trip tests in `tests/test_godot_scenes.py` (7). Codex wiring and the props gallery: `docs/CODEX_TASK_prop_scenes.md`.
+- Rule kept: generators never overwrite a position, offset, size or radius found in an existing scene (`--reset` is the only way to drop editor values); tested.
+- Not verified: how the scenes look in the editor (no window in this session), and that the renderer output stays pixel-identical (that is the wiring step).

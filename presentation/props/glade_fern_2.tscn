@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_fern_2.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_fern_2_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_fern_2_flipped_1.png" id="cast_flipped"]
+
+[node name="glade_fern_2" type="Node2D"]
+metadata/w = 54
+metadata/h = 30
+metadata/base_width = 54
+metadata/solid = false
+metadata/image = "glade_fern_2.png"
+metadata/note = "fern: decor"
+metadata/locked = true
+metadata/contact_shadow = {"core": [[2, 25, 2], [38, 25, 2], [51, 25, 3], [0, 26, 4], [38, 26, 4], [51, 26, 4], [0, 27, 4], [16, 27, 4], [23, 27, 3], [28, 27, 2], [33, 27, 3], [38, 27, 6], [51, 27, 4], [0, 28, 3], [11, 28, 10], [22, 28, 24], [53, 28, 2], [11, 29, 28], [41, 29, 5], [11, 30, 6], [19, 30, 5], [25, 30, 9], [35, 30, 4], [43, 30, 3], [12, 31, 2], [20, 31, 3], [26, 31, 2], [31, 31, 2]], "edge": [[4, 25, 1], [40, 25, 1], [54, 25, 1], [4, 26, 1], [42, 26, 1], [55, 26, 1], [4, 27, 1], [20, 27, 1], [26, 27, 1], [30, 27, 1], [36, 27, 1], [44, 27, 1], [55, 27, 1], [3, 28, 2], [21, 28, 1], [46, 28, 1], [51, 28, 2], [55, 28, 1], [0, 29, 5], [39, 29, 2], [46, 29, 1], [51, 29, 5], [0, 30, 4], [17, 30, 2], [24, 30, 1], [34, 30, 1], [39, 30, 4], [46, 30, 1], [53, 30, 3], [11, 31, 1], [14, 31, 6], [23, 31, 3], [28, 31, 3], [33, 31, 7], [41, 31, 6], [11, 32, 7], [19, 32, 21], [43, 32, 4], [12, 33, 3], [20, 33, 4], [26, 33, 3], [31, 33, 3]], "size": [54, 30]}
+metadata/flip_offset = Vector2(-29, -30)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-27, -30)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-31, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-31, -4)

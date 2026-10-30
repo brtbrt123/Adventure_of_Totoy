@@ -1,0 +1,57 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/woodland_lantern.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_woodland_lantern_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_woodland_lantern_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 5, 30, 59)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 3.5
+
+[node name="woodland_lantern" type="Node2D"]
+metadata/w = 30
+metadata/h = 59
+metadata/base_width = 16
+metadata/solid = true
+metadata/image = "woodland_lantern.png"
+metadata/note = "lantern post: one small circle at its foot (the pole stands right of the sprite centre) (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+metadata/locked = true
+metadata/contact_shadow = {"size": [30, 59], "core": [[8, 53, 1], [10, 53, 2], [8, 54, 4], [9, 55, 1], [15, 55, 1], [22, 55, 8], [12, 56, 5], [18, 56, 1], [22, 56, 8], [12, 57, 3], [16, 57, 3], [21, 57, 1], [17, 58, 1], [19, 58, 3], [19, 59, 2]], "edge": [[7, 53, 1], [9, 53, 1], [12, 53, 1], [7, 54, 1], [12, 54, 1], [8, 55, 1], [10, 55, 2], [14, 55, 1], [16, 55, 1], [21, 55, 1], [30, 55, 1], [9, 56, 1], [11, 56, 1], [17, 56, 1], [19, 56, 1], [21, 56, 1], [30, 56, 1], [11, 57, 1], [15, 57, 1], [19, 57, 2], [22, 57, 8], [12, 58, 3], [16, 58, 1], [18, 58, 1], [22, 58, 1], [17, 59, 2], [21, 59, 1], [19, 60, 2]]}
+metadata/flip_offset = Vector2(-15, -59)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-15, -59)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-10, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-19, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(4.5, -3)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Light1" type="Marker2D" parent="."]
+position = Vector2(-3, -37)
+metadata/socket = {"pixel": [12, 22], "halo_radius": 25.0, "energy": 1.05, "pool_radius": 40.0, "pool_energy": 0.6, "colour": [1.0, 0.79, 0.52], "core_colour": [1.05, 0.98, 0.88]}

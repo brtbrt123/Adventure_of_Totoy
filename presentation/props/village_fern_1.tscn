@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_fern_1.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_fern_1_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_fern_1_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 1, 46, 31)
+
+[node name="village_fern_1" type="Node2D"]
+metadata/w = 46
+metadata/h = 31
+metadata/base_width = 33
+metadata/solid = false
+metadata/image = "village_fern_1.png"
+metadata/note = "fern: decor"
+metadata/locked = true
+metadata/src_bbox = [1344, 610, 1577, 769]
+metadata/contact_shadow = {"core": [[13, 25, 5], [28, 25, 4], [13, 26, 5], [28, 26, 4], [9, 27, 13], [24, 27, 11], [8, 28, 8], [17, 28, 20], [8, 29, 6], [17, 29, 12], [31, 29, 9], [6, 30, 4], [17, 30, 2], [21, 30, 4], [27, 30, 2], [34, 30, 6], [6, 31, 3], [22, 31, 2], [36, 31, 4], [6, 32, 3], [37, 32, 2]], "edge": [[18, 25, 1], [32, 25, 1], [18, 26, 1], [32, 26, 1], [22, 27, 1], [35, 27, 1], [16, 28, 1], [37, 28, 1], [14, 29, 3], [29, 29, 2], [40, 29, 1], [10, 30, 7], [19, 30, 2], [25, 30, 2], [29, 30, 5], [40, 30, 1], [9, 31, 6], [17, 31, 5], [24, 31, 6], [31, 31, 5], [40, 31, 1], [9, 32, 2], [17, 32, 3], [21, 32, 5], [27, 32, 3], [34, 32, 3], [39, 32, 2], [6, 33, 4], [22, 33, 3], [36, 33, 5], [6, 34, 4], [37, 34, 3]], "size": [46, 31]}
+metadata/flip_offset = Vector2(-23.5, -31)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-22.5, -31)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-23, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-25, -4)

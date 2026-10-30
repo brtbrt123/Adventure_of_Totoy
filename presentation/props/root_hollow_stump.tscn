@@ -1,0 +1,67 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/root_hollow_stump.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_root_hollow_stump_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_root_hollow_stump_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 2, 48, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 8
+
+[node name="root_hollow_stump" type="Node2D"]
+metadata/w = 48
+metadata/h = 30
+metadata/base_width = 40
+metadata/solid = true
+metadata/image = "root_hollow_stump.png"
+metadata/note = "big hollow stump"
+metadata/locked = true
+metadata/contact_shadow = {"size": [48, 30], "core": [[6, 23, 1], [32, 23, 1], [39, 23, 2], [3, 24, 5], [31, 24, 3], [39, 24, 5], [0, 25, 6], [7, 25, 1], [31, 25, 1], [33, 25, 3], [37, 25, 2], [41, 25, 7], [0, 26, 3], [8, 26, 2], [14, 26, 1], [20, 26, 4], [34, 26, 5], [44, 26, 4], [8, 27, 2], [13, 27, 2], [20, 27, 4], [25, 27, 3], [36, 27, 1], [10, 28, 4], [17, 28, 3], [24, 28, 7], [10, 29, 3], [15, 29, 5], [24, 29, 1], [28, 29, 3], [15, 30, 2]], "edge": [[5, 23, 1], [7, 23, 1], [31, 23, 1], [33, 23, 1], [38, 23, 1], [41, 23, 1], [2, 24, 1], [8, 24, 1], [30, 24, 1], [34, 24, 1], [38, 24, 1], [44, 24, 1], [-1, 25, 1], [6, 25, 1], [8, 25, 1], [30, 25, 1], [32, 25, 1], [36, 25, 1], [39, 25, 2], [48, 25, 1], [-1, 26, 1], [3, 26, 3], [7, 26, 1], [10, 26, 1], [13, 26, 1], [15, 26, 1], [19, 26, 1], [24, 26, 1], [31, 26, 1], [33, 26, 1], [39, 26, 1], [41, 26, 3], [48, 26, 1], [0, 27, 3], [7, 27, 1], [10, 27, 1], [12, 27, 1], [15, 27, 1], [19, 27, 1], [24, 27, 1], [28, 27, 1], [34, 27, 2], [37, 27, 2], [44, 27, 4], [8, 28, 2], [14, 28, 1], [16, 28, 1], [20, 28, 4], [31, 28, 1], [36, 28, 1], [9, 29, 1], [13, 29, 2], [20, 29, 1], [23, 29, 1], [25, 29, 3], [31, 29, 1], [10, 30, 3], [14, 30, 1], [17, 30, 3], [24, 30, 1], [28, 30, 3], [15, 31, 2]]}
+metadata/flip_offset = Vector2(-24, -30)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-24, -30)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-27, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-27, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-12.0, -6)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0.0, -6)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(12.0, -6)
+shape = SubResource("CircleShape2D_3")

@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/woodland_sign.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_woodland_sign_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_woodland_sign_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 0, 40, 56)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 4
+
+[node name="woodland_sign" type="Node2D"]
+metadata/w = 40
+metadata/h = 56
+metadata/base_width = 10
+metadata/solid = true
+metadata/image = "woodland_sign.png"
+metadata/note = "wooden sign: one small circle at the post (woodland approach, 2026-10-28; colliders read from the sprite base rows)"
+metadata/locked = true
+metadata/contact_shadow = {"size": [40, 56], "core": [[33, 46, 2], [8, 47, 2], [33, 47, 2], [7, 48, 3], [7, 49, 1], [10, 49, 1], [10, 50, 4], [11, 51, 3], [29, 51, 3], [22, 52, 1], [29, 52, 4], [21, 53, 6], [32, 53, 1], [16, 54, 2], [20, 54, 2], [23, 54, 5], [14, 55, 7], [27, 55, 2], [14, 56, 2], [18, 56, 2], [28, 56, 1]], "edge": [[32, 46, 1], [35, 46, 1], [7, 47, 1], [10, 47, 1], [32, 47, 1], [35, 47, 1], [6, 48, 1], [10, 48, 1], [33, 48, 2], [6, 49, 1], [8, 49, 2], [11, 49, 1], [7, 50, 1], [9, 50, 1], [14, 50, 1], [10, 51, 1], [14, 51, 1], [28, 51, 1], [32, 51, 1], [11, 52, 3], [21, 52, 1], [23, 52, 1], [28, 52, 1], [33, 52, 1], [20, 53, 1], [27, 53, 1], [29, 53, 3], [33, 53, 1], [15, 54, 1], [18, 54, 2], [22, 54, 1], [28, 54, 1], [32, 54, 1], [13, 55, 1], [21, 55, 1], [23, 55, 4], [29, 55, 1], [13, 56, 1], [16, 56, 2], [20, 56, 1], [27, 56, 1], [29, 56, 1], [14, 57, 2], [18, 57, 2], [28, 57, 1]]}
+metadata/flip_offset = Vector2(-20, -56)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-20, -56)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-15, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-17, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(1, -3)
+shape = SubResource("CircleShape2D_1")

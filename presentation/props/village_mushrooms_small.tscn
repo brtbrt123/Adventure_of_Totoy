@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_mushrooms_small.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_mushrooms_small_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_mushrooms_small_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 3, 25, 21)
+
+[node name="village_mushrooms_small" type="Node2D"]
+metadata/w = 25
+metadata/h = 21
+metadata/base_width = 18
+metadata/solid = false
+metadata/image = "village_mushrooms_small.png"
+metadata/note = "mushrooms: decor"
+metadata/locked = true
+metadata/src_bbox = [1401, 810, 1529, 917]
+metadata/contact_shadow = {"core": [[20, 17, 4], [2, 18, 5], [15, 18, 3], [20, 18, 4], [2, 19, 10], [14, 19, 10], [2, 20, 19], [6, 21, 10], [17, 21, 4], [11, 22, 4]], "edge": [[24, 17, 1], [7, 18, 1], [18, 18, 1], [24, 18, 1], [12, 19, 1], [24, 19, 1], [21, 20, 4], [2, 21, 4], [16, 21, 1], [21, 21, 4], [2, 22, 9], [15, 22, 7], [6, 23, 16], [11, 24, 5]], "size": [25, 21]}
+metadata/flip_offset = Vector2(-14.0, -21)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-11.0, -21)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-13, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-16, -4)

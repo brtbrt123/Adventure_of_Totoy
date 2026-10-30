@@ -1,0 +1,84 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_antler.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_antler_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_antler_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 3
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 3
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6"]
+radius = 3
+
+[node name="glade_antler" type="Node2D"]
+metadata/w = 39
+metadata/h = 28
+metadata/base_width = 34
+metadata/solid = true
+metadata/image = "glade_antler.png"
+metadata/note = "Solid shed antlers moved to the clearing edge; bone footprint only."
+metadata/locked = true
+metadata/contact_shadow = {"core": [[29, 23, 2], [29, 24, 3], [29, 25, 3], [38, 25, 2], [30, 26, 3], [37, 26, 3], [31, 27, 9], [31, 28, 8], [32, 29, 6]], "edge": [[31, 23, 1], [32, 24, 1], [32, 25, 1], [40, 25, 1], [29, 26, 1], [33, 26, 1], [40, 26, 1], [29, 27, 2], [40, 27, 1], [30, 28, 1], [39, 28, 2], [31, 29, 1], [38, 29, 3], [31, 30, 9], [32, 31, 7]], "size": [39, 28]}
+metadata/flip_offset = Vector2(-6, -28)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-34, -28)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-32, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-9, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-25, -13)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-16, -9)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-7, -5)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-30, -23)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-18, -21)
+shape = SubResource("CircleShape2D_5")
+
+[node name="Circle6" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-9, -15)
+shape = SubResource("CircleShape2D_6")

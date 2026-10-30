@@ -1,0 +1,61 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_crate_b.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_crate_b_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_crate_b_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 1, 30, 31)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6
+
+[node name="village_crate_b" type="Node2D"]
+metadata/w = 30
+metadata/h = 31
+metadata/base_width = 26
+metadata/solid = true
+metadata/image = "village_crate_b.png"
+metadata/note = "crate"
+metadata/locked = true
+metadata/src_bbox = [1371, 251, 1526, 408]
+metadata/contact_shadow = {"core": [[26, 25, 2], [0, 26, 6], [24, 26, 4], [0, 27, 11], [22, 27, 6], [0, 28, 14], [21, 28, 6], [5, 29, 14], [20, 29, 5], [10, 30, 13], [13, 31, 9], [18, 32, 3]], "edge": [[28, 25, 1], [6, 26, 1], [28, 26, 1], [11, 27, 1], [28, 27, 1], [14, 28, 1], [27, 28, 2], [0, 29, 5], [19, 29, 1], [25, 29, 4], [0, 30, 10], [23, 30, 5], [5, 31, 8], [22, 31, 4], [10, 32, 8], [21, 32, 3], [13, 33, 10], [18, 34, 4]], "size": [30, 31]}
+metadata/flip_offset = Vector2(-17.0, -31)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-13.0, -31)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-16, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-19, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-6, -5)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(6, -5)
+shape = SubResource("CircleShape2D_2")

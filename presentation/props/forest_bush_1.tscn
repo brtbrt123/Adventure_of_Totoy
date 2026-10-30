@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/forest_bush_1.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_bush_1_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_bush_1_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 0, 54, 40)
+
+[node name="forest_bush_1" type="Node2D"]
+metadata/w = 54
+metadata/h = 40
+metadata/base_width = 44
+metadata/solid = false
+metadata/image = "forest_bush_1.png"
+metadata/note = "bush: decor (walk through)"
+metadata/locked = true
+metadata/src_bbox = [29, 862, 213, 999]
+metadata/contact_shadow = {"size": [54, 40], "core": [[0, 30, 1], [4, 30, 1], [0, 31, 5], [49, 31, 2], [1, 32, 3], [49, 32, 5], [8, 33, 1], [51, 33, 3], [5, 34, 5], [43, 34, 3], [48, 34, 1], [5, 35, 3], [9, 35, 1], [14, 35, 2], [43, 35, 6], [10, 36, 1], [12, 36, 4], [21, 36, 1], [32, 36, 1], [38, 36, 3], [46, 36, 2], [10, 37, 4], [20, 37, 3], [27, 37, 3], [32, 37, 2], [38, 37, 5], [11, 38, 1], [16, 38, 5], [22, 38, 2], [26, 38, 6], [33, 38, 5], [41, 38, 2], [16, 39, 4], [23, 39, 4], [30, 39, 2], [34, 39, 4], [24, 40, 2]], "edge": [[-1, 30, 1], [1, 30, 1], [3, 30, 1], [5, 30, 1], [-1, 31, 1], [5, 31, 1], [48, 31, 1], [51, 31, 1], [0, 32, 1], [4, 32, 1], [48, 32, 1], [54, 32, 1], [1, 33, 3], [7, 33, 1], [9, 33, 1], [49, 33, 2], [54, 33, 1], [4, 34, 1], [10, 34, 1], [42, 34, 1], [46, 34, 2], [49, 34, 1], [51, 34, 3], [4, 35, 1], [8, 35, 1], [10, 35, 1], [13, 35, 1], [16, 35, 1], [42, 35, 1], [49, 35, 1], [5, 36, 3], [9, 36, 1], [11, 36, 1], [16, 36, 1], [20, 36, 1], [22, 36, 1], [31, 36, 1], [33, 36, 1], [37, 36, 1], [41, 36, 1], [43, 36, 3], [48, 36, 1], [9, 37, 1], [14, 37, 2], [19, 37, 1], [23, 37, 1], [26, 37, 1], [30, 37, 2], [34, 37, 1], [37, 37, 1], [43, 37, 1], [46, 37, 2], [10, 38, 1], [12, 38, 2], [15, 38, 1], [21, 38, 1], [24, 38, 2], [32, 38, 1], [38, 38, 3], [43, 38, 1], [11, 39, 1], [15, 39, 1], [20, 39, 1], [22, 39, 1], [27, 39, 3], [32, 39, 2], [38, 39, 1], [41, 39, 2], [16, 40, 4], [23, 40, 1], [26, 40, 1], [30, 40, 2], [34, 40, 4], [24, 41, 2]]}
+metadata/flip_offset = Vector2(-27.0, -40)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-27.0, -40)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-29, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-29, -4)

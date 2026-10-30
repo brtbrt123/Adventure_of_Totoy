@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_barrel_a.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_barrel_a_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_barrel_a_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 4, 23, 28)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 8
+
+[node name="village_barrel_a" type="Node2D"]
+metadata/w = 23
+metadata/h = 28
+metadata/base_width = 19
+metadata/solid = true
+metadata/image = "village_barrel_a.png"
+metadata/note = "barrel"
+metadata/locked = true
+metadata/src_bbox = [1394, 55, 1511, 200]
+metadata/contact_shadow = {"core": [[2, 24, 2], [20, 24, 2], [2, 25, 3], [19, 25, 3], [2, 26, 5], [17, 26, 5], [3, 27, 18], [4, 28, 16], [6, 29, 12]], "edge": [[4, 24, 1], [22, 24, 1], [5, 25, 1], [22, 25, 1], [7, 26, 1], [22, 26, 1], [2, 27, 1], [21, 27, 2], [2, 28, 2], [20, 28, 3], [3, 29, 3], [18, 29, 4], [4, 30, 17], [6, 31, 13]], "size": [23, 28]}
+metadata/flip_offset = Vector2(-11.5, -28)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-11.5, -28)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-14, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-13, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0, -5)
+shape = SubResource("CircleShape2D_1")

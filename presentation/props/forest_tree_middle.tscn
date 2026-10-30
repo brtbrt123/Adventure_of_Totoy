@@ -1,0 +1,103 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/forest_tree_middle.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_tree_middle_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_tree_middle_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 7, 95, 113)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 4
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6"]
+radius = 4
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7"]
+radius = 4
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8"]
+radius = 4
+
+[node name="forest_tree_middle" type="Node2D"]
+metadata/w = 95
+metadata/h = 113
+metadata/base_width = 45
+metadata/solid = true
+metadata/image = "forest_tree_middle.png"
+metadata/note = "Trunk base and exposed ground roots; canopy remains walk-behind."
+metadata/locked = true
+metadata/src_bbox = [766, 317, 1088, 700]
+metadata/contact_shadow = {"size": [95, 113], "core": [[13, 96, 1], [11, 97, 3], [9, 98, 4], [24, 98, 1], [9, 99, 2], [21, 99, 4], [85, 99, 2], [17, 100, 7], [85, 100, 4], [14, 101, 7], [87, 101, 5], [14, 102, 3], [30, 102, 1], [89, 102, 5], [28, 103, 3], [78, 103, 5], [92, 103, 2], [25, 104, 5], [31, 104, 2], [78, 104, 7], [25, 105, 3], [31, 105, 2], [50, 105, 1], [62, 105, 2], [83, 105, 2], [37, 106, 3], [45, 106, 1], [50, 106, 3], [62, 106, 5], [33, 107, 1], [36, 107, 5], [43, 107, 4], [51, 107, 4], [64, 107, 6], [33, 108, 4], [40, 108, 5], [46, 108, 2], [53, 108, 2], [67, 108, 4], [34, 109, 2], [41, 109, 2], [47, 109, 3], [58, 109, 1], [70, 109, 1], [48, 110, 2], [55, 110, 1], [57, 110, 3], [71, 110, 1], [55, 111, 3], [59, 111, 3], [71, 111, 4], [56, 112, 1], [60, 112, 2], [72, 112, 6], [75, 113, 3]], "edge": [[12, 96, 1], [14, 96, 1], [10, 97, 1], [14, 97, 1], [8, 98, 1], [13, 98, 1], [23, 98, 1], [25, 98, 1], [8, 99, 1], [11, 99, 2], [20, 99, 1], [25, 99, 1], [84, 99, 1], [87, 99, 1], [9, 100, 2], [16, 100, 1], [24, 100, 1], [84, 100, 1], [89, 100, 1], [13, 101, 1], [21, 101, 3], [85, 101, 2], [92, 101, 1], [13, 102, 1], [17, 102, 4], [29, 102, 1], [31, 102, 1], [87, 102, 2], [94, 102, 1], [14, 103, 3], [27, 103, 1], [31, 103, 1], [77, 103, 1], [83, 103, 1], [89, 103, 3], [94, 103, 1], [24, 104, 1], [30, 104, 1], [33, 104, 1], [77, 104, 1], [85, 104, 1], [92, 104, 2], [24, 105, 1], [28, 105, 3], [33, 105, 1], [49, 105, 1], [51, 105, 1], [61, 105, 1], [64, 105, 1], [78, 105, 5], [85, 105, 1], [25, 106, 3], [31, 106, 2], [36, 106, 1], [40, 106, 1], [44, 106, 1], [46, 106, 1], [49, 106, 1], [53, 106, 1], [61, 106, 1], [67, 106, 1], [83, 106, 2], [32, 107, 1], [34, 107, 2], [41, 107, 2], [47, 107, 1], [50, 107, 1], [55, 107, 1], [62, 107, 2], [70, 107, 1], [32, 108, 1], [37, 108, 3], [45, 108, 1], [48, 108, 1], [51, 108, 2], [55, 108, 1], [64, 108, 3], [71, 108, 1], [33, 109, 1], [36, 109, 1], [40, 109, 1], [43, 109, 2], [46, 109, 1], [50, 109, 1], [53, 109, 2], [57, 109, 1], [59, 109, 1], [67, 109, 3], [71, 109, 1], [34, 110, 2], [41, 110, 2], [47, 110, 1], [50, 110, 1], [54, 110, 1], [56, 110, 1], [60, 110, 1], [70, 110, 1], [72, 110, 1], [48, 111, 2], [54, 111, 1], [58, 111, 1], [62, 111, 1], [70, 111, 1], [75, 111, 1], [55, 112, 1], [57, 112, 1], [59, 112, 1], [62, 112, 1], [71, 112, 1], [78, 112, 1], [56, 113, 1], [60, 113, 2], [72, 113, 3], [78, 113, 1], [75, 114, 3]]}
+metadata/flip_offset = Vector2(-39.5, -113)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-55.5, -113)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-47, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-40, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-15, -5)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-5, -4)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(5, -4)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(15, -5)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-25, -7)
+shape = SubResource("CircleShape2D_5")
+
+[node name="Circle6" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(24, -7)
+shape = SubResource("CircleShape2D_6")
+
+[node name="Circle7" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-9, -9)
+shape = SubResource("CircleShape2D_7")
+
+[node name="Circle8" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(6, -9)
+shape = SubResource("CircleShape2D_8")
