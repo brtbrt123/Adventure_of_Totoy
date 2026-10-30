@@ -1,3 +1,7 @@
+## Smaller blade cursor (2026-10-30, Codex)
+
+Reduced approved cursor from 48x48 to 40x40 OS pixels by shortening the native blade, preserving crisp 2x pixels and tip hotspot (4,4). Art validate/build/preview and cursor smoke passed.
+
 ## Global blade cursor (2026-10-30, Codex)
 
 Owner requested a blade mouse pointer. Added original Totoy36/hard-alpha 24x24 sprite source, crisp 48x48 OS cursor and tip hotspot (4,4) through global display settings, covering gameplay and menus. Art validation/build/preview and Godot cursor load/hotspot smoke passed. Preview in art/reference/blade_cursor/preview.png; owner appearance judgement pending. Graphify unavailable in this environment.
