@@ -121,7 +121,7 @@ func test_the_scene_graph_is_consistent() -> void:
 			var target: Dictionary = SceneDefs.get_def(exit["target_scene"])
 			assert_true(target["entries"].has(exit["target_entry"]), "%s -> %s has no entry %s" % [exit["id"], exit["target_scene"], exit["target_entry"]])
 			targeted[exit["target_scene"]] = true
-	for scene_id: StringName in [SceneDefs.WOODLAND_LAYERED, SceneDefs.FOREST_LAYERED, SceneDefs.GLADE_LAYERED, SceneDefs.ARENA, SceneDefs.VILLAGE_LAYERED]:
+	for scene_id: StringName in [SceneDefs.WOODLAND_LAYERED, SceneDefs.FOREST_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.GLADE_LAYERED, SceneDefs.ARENA, SceneDefs.VILLAGE_LAYERED]:
 		assert_true(targeted.has(scene_id), "%s is reachable from another scene" % scene_id)
 	# the graph of the brief
 	assert_eq(_exit(SceneDefs.VILLAGE_LAYERED, &"to_forest")["target_scene"], SceneDefs.WOODLAND_LAYERED)
@@ -129,8 +129,11 @@ func test_the_scene_graph_is_consistent() -> void:
 	assert_eq(_exit(SceneDefs.WOODLAND_LAYERED, &"to_forest")["target_scene"], SceneDefs.FOREST_LAYERED)
 	assert_eq(_exit(SceneDefs.FOREST_LAYERED, &"to_village")["target_scene"], SceneDefs.WOODLAND_LAYERED)
 	assert_eq(_exit(SceneDefs.FOREST_LAYERED, &"to_village")["target_entry"], &"east")
-	assert_eq(_exit(SceneDefs.FOREST_LAYERED, &"to_glade")["target_entry"], &"entrance")
-	assert_eq(_exit(SceneDefs.GLADE_LAYERED, &"to_forest")["target_entry"], &"north")
+	assert_eq(_exit(SceneDefs.FOREST_LAYERED, &"to_glade")["target_scene"], SceneDefs.ROOT_HOLLOW_LAYERED, "the root gate leads into Root Hollow")
+	assert_eq(_exit(SceneDefs.FOREST_LAYERED, &"to_glade")["target_entry"], &"forest_side")
+	assert_eq(_exit(SceneDefs.ROOT_HOLLOW_LAYERED, &"to_glade")["target_entry"], &"entrance")
+	assert_eq(_exit(SceneDefs.GLADE_LAYERED, &"to_forest")["target_scene"], SceneDefs.ROOT_HOLLOW_LAYERED, "the glade leads back into Root Hollow")
+	assert_eq(_exit(SceneDefs.GLADE_LAYERED, &"to_forest")["target_entry"], &"glade_side")
 	assert_eq(_exit(SceneDefs.GLADE_LAYERED, &"to_arena")["target_scene"], SceneDefs.ARENA)
 	# every two-way pair: the return entry is next to the exit it came through
 	var north: Vector2 = SceneDefs.get_def(SceneDefs.FOREST_LAYERED)["entries"][&"north"]

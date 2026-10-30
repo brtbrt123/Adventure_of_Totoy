@@ -175,8 +175,8 @@
     8,
     30
    ],
-   "target_scene": "forest_layered",
-   "target_entry": "north"
+   "target_scene": "root_hollow_layered",
+   "target_entry": "glade_side"
   },
   {
    "id": "to_arena",

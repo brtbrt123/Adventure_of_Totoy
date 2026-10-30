@@ -201,9 +201,9 @@ func run() -> void:
 		scene.advance(bot.next_input(scene.snapshot.hero.position))
 		if scene.fade_phase != &"":
 			break
-	expect(scene.pending_scene == &"glade_layered", "Walked through gate to glade exit")
+	expect(scene.pending_scene == &"root_hollow_layered", "Walked through gate to the Root Hollow exit")
 	finish_fade()
-	expect(scene.snapshot.scene_id == &"glade_layered", "Exit completes transition")
+	expect(scene.snapshot.scene_id == &"root_hollow_layered", "Exit completes transition")
 	expect(InputMap.has_action("debug_scene_forest_layered"), "Forest debug binding")
 	scene.jump_to(Explore.DEBUG_SCENES["debug_scene_forest_layered"])
 	finish_fade()

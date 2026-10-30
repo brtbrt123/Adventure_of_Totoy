@@ -11,8 +11,11 @@ extends RefCounted
 ##   woodland_layered  west exit                          -> village_layered  "return"
 ##   woodland_layered  east exit                          -> forest_layered   "village_side"
 ##   forest_layered    west exit                          -> woodland_layered "east"
-##   forest_layered    north exit behind the root gate    -> glade_layered    "entrance"   (gate closed = solid)
-##   glade_layered     bottom-left entrance               -> forest_layered   "north"
+##   forest_layered    north exit behind the root gate    -> root_hollow_layered "forest_side"   (gate closed = solid)
+##   root_hollow_layered west exit                        -> forest_layered   "north"
+##   root_hollow_layered east exit                        -> glade_layered    "entrance"
+##   root_hollow_layered north shortcut (once the hollow is cleared) -> village_layered "return"
+##   glade_layered     bottom-left entrance               -> root_hollow_layered "glade_side"
 ##   glade_layered     root arch                          -> arena            "start"      (the Colossus fight)
 ##   arena             no exits (the fight's victory screen returns to the title)
 ##
@@ -32,14 +35,16 @@ const GLADE_LAYERED: StringName = &"glade_layered"
 const VILLAGE_LAYERED: StringName = &"village_layered"
 const FOREST_LAYERED: StringName = &"forest_layered"
 const WOODLAND_LAYERED: StringName = &"woodland_layered"
-const LAYERED: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, GLADE_LAYERED]
+const ROOT_HOLLOW_LAYERED: StringName = &"root_hollow_layered"
+const LAYERED: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, GLADE_LAYERED]
 ## Every scene the game knows, in route order (the layered chapter, then the arena).
-const ALL: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, GLADE_LAYERED, ARENA]
+const ALL: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, GLADE_LAYERED, ARENA]
 const LAYERED_PATHS: Dictionary = {
 	GLADE_LAYERED: "res://data/scenes/glade_layered_props.json",
 	VILLAGE_LAYERED: "res://data/scenes/village_layered_props.json",
 	FOREST_LAYERED: "res://data/scenes/forest_layered_props.json",
 	WOODLAND_LAYERED: "res://data/scenes/woodland_layered_props.json",
+	ROOT_HOLLOW_LAYERED: "res://data/scenes/root_hollow_layered_props.json",
 }
 
 ## Where a new game starts.

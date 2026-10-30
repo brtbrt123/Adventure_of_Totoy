@@ -13,6 +13,7 @@ const GROUNDS: Dictionary = {
 	&"glade_layered": "res://presentation/forest/glade_layered_ground.png",
 	&"forest_layered": "res://presentation/forest/forest_layered_ground.png",
 	&"woodland_layered": "res://presentation/forest/woodland_approach_ground.png",
+	&"root_hollow_layered": "res://presentation/forest/root_hollow_layered_ground.png",
 }
 ## Scenes whose converted ground Codex has not delivered yet (only the path is checked until then).
 const PENDING_GROUNDS: Array[StringName] = [&"forest_layered"]

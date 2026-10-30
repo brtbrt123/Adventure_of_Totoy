@@ -1,0 +1,725 @@
+{
+ "version": 1,
+ "scene": "root_hollow_layered",
+ "name": "ROOT HOLLOW",
+ "size": [
+  640,
+  400
+ ],
+ "ground": "res://presentation/forest/root_hollow_layered_ground.png",
+ "outline": [
+  [
+   40,
+   0
+  ],
+  [
+   72,
+   0
+  ],
+  [
+   79,
+   26
+  ],
+  [
+   85,
+   36
+  ],
+  [
+   137,
+   36
+  ],
+  [
+   164,
+   44
+  ],
+  [
+   185,
+   56
+  ],
+  [
+   201,
+   72
+  ],
+  [
+   209,
+   89
+  ],
+  [
+   210,
+   106
+  ],
+  [
+   204,
+   122
+  ],
+  [
+   238,
+   143
+  ],
+  [
+   260,
+   132
+  ],
+  [
+   287,
+   124
+  ],
+  [
+   344,
+   120
+  ],
+  [
+   385,
+   127
+  ],
+  [
+   430,
+   148
+  ],
+  [
+   489,
+   112
+  ],
+  [
+   556,
+   79
+  ],
+  [
+   640,
+   80
+  ],
+  [
+   640,
+   121
+  ],
+  [
+   564,
+   121
+  ],
+  [
+   458,
+   178
+  ],
+  [
+   464,
+   194
+  ],
+  [
+   465,
+   213
+  ],
+  [
+   461,
+   228
+  ],
+  [
+   450,
+   246
+  ],
+  [
+   479,
+   245
+  ],
+  [
+   510,
+   254
+  ],
+  [
+   529,
+   272
+  ],
+  [
+   532,
+   290
+  ],
+  [
+   525,
+   304
+  ],
+  [
+   510,
+   316
+  ],
+  [
+   479,
+   325
+  ],
+  [
+   449,
+   323
+  ],
+  [
+   407,
+   359
+  ],
+  [
+   296,
+   382
+  ],
+  [
+   203,
+   369
+  ],
+  [
+   150,
+   330
+  ],
+  [
+   74,
+   345
+  ],
+  [
+   0,
+   345
+  ],
+  [
+   0,
+   300
+  ],
+  [
+   65,
+   300
+  ],
+  [
+   139,
+   286
+  ],
+  [
+   211,
+   247
+  ],
+  [
+   199,
+   228
+  ],
+  [
+   195,
+   213
+  ],
+  [
+   197,
+   190
+  ],
+  [
+   210,
+   167
+  ],
+  [
+   207,
+   164
+  ],
+  [
+   179,
+   148
+  ],
+  [
+   159,
+   158
+  ],
+  [
+   137,
+   164
+  ],
+  [
+   83,
+   164
+  ],
+  [
+   44,
+   150
+  ],
+  [
+   19,
+   128
+  ],
+  [
+   10,
+   106
+  ],
+  [
+   13,
+   83
+  ],
+  [
+   30,
+   60
+  ],
+  [
+   54,
+   45
+  ],
+  [
+   47,
+   31
+  ]
+ ],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "prop_margin": 40,
+ "entries": {
+  "forest_side": [
+   24,
+   322
+  ],
+  "glade_side": [
+   616,
+   100
+  ],
+  "shortcut": [
+   54,
+   24
+  ]
+ },
+ "default_entry": "forest_side",
+ "exits": [
+  {
+   "id": "to_forest",
+   "rect": [
+    0,
+    300,
+    7,
+    44
+   ],
+   "target_scene": "forest_layered",
+   "target_entry": "north"
+  },
+  {
+   "id": "to_glade",
+   "rect": [
+    633,
+    82,
+    7,
+    36
+   ],
+   "target_scene": "glade_layered",
+   "target_entry": "entrance"
+  },
+  {
+   "id": "shortcut",
+   "rect": [
+    36,
+    0,
+    36,
+    7
+   ],
+   "target_scene": "village_layered",
+   "target_entry": "return",
+   "requires_flag": "cleared_hollow_center",
+   "blocked_text": "A knot of roots seals the shortcut. Clear the hollow first."
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "root_hollow_layered_entrance",
+   "position": [
+    36,
+    322
+   ]
+  },
+  {
+   "id": "root_hollow_layered_east",
+   "position": [
+    600,
+    102
+   ]
+  }
+ ],
+ "npcs": [],
+ "objects": [],
+ "encounters": [
+  {
+   "id": "hollow_center",
+   "name": "ROOT HOLLOW",
+   "rect": [
+    240,
+    150,
+    180,
+    112
+   ],
+   "leash": 190,
+   "mobs": [
+    {
+     "type": "boar",
+     "x": 276,
+     "y": 176
+    },
+    {
+     "type": "boar",
+     "x": 396,
+     "y": 240
+    },
+    {
+     "type": "mossling",
+     "x": 330,
+     "y": 214
+    },
+    {
+     "type": "mossling",
+     "x": 352,
+     "y": 170
+    }
+   ]
+  },
+  {
+   "id": "hollow_shrine",
+   "name": "OVERGROWN SHRINE",
+   "rect": [
+    48,
+    66,
+    124,
+    76
+   ],
+   "leash": 130,
+   "reward": {
+    "reward_id": "hollow_shrine_herbs",
+    "kind": "item",
+    "item": "herb",
+    "name": "Herb",
+    "quantity": 2
+   },
+   "mobs": [
+    {
+     "type": "mossling",
+     "x": 96,
+     "y": 116
+    },
+    {
+     "type": "mossling",
+     "x": 138,
+     "y": 92
+    },
+    {
+     "type": "mossling",
+     "x": 146,
+     "y": 124
+    }
+   ]
+  }
+ ],
+ "props": [
+  {
+   "id": "prop_000",
+   "type": "woodland_tree_slender",
+   "x": 406,
+   "y": 78
+  },
+  {
+   "id": "prop_001",
+   "type": "woodland_tree_slender",
+   "x": 252,
+   "y": 92
+  },
+  {
+   "id": "prop_002",
+   "type": "woodland_tree_broad",
+   "x": 98,
+   "y": 204
+  },
+  {
+   "id": "prop_003",
+   "type": "woodland_tree_broad",
+   "x": 84,
+   "y": 400
+  },
+  {
+   "id": "prop_004",
+   "type": "woodland_tree_slender",
+   "x": 350,
+   "y": 92
+  },
+  {
+   "id": "prop_005",
+   "type": "woodland_tree_slender",
+   "x": 462,
+   "y": 358
+  },
+  {
+   "id": "prop_006",
+   "type": "woodland_tree_slender",
+   "x": 294,
+   "y": 330
+  },
+  {
+   "id": "prop_007",
+   "type": "woodland_tree_broad",
+   "x": 420,
+   "y": 400
+  },
+  {
+   "id": "prop_008",
+   "type": "woodland_tree_slender",
+   "x": 574,
+   "y": 330
+  },
+  {
+   "id": "prop_009",
+   "type": "woodland_tree_slender",
+   "x": 224,
+   "y": 22
+  },
+  {
+   "id": "prop_010",
+   "type": "woodland_tree_slender",
+   "x": 532,
+   "y": 218
+  },
+  {
+   "id": "prop_011",
+   "type": "woodland_tree_slender",
+   "x": 588,
+   "y": 260
+  },
+  {
+   "id": "prop_012",
+   "type": "woodland_tree_slender",
+   "x": 140,
+   "y": 190
+  },
+  {
+   "id": "prop_013",
+   "type": "woodland_tree_slender",
+   "x": 378,
+   "y": 316
+  },
+  {
+   "id": "prop_014",
+   "type": "woodland_tree_broad",
+   "x": 518,
+   "y": 176
+  },
+  {
+   "id": "prop_015",
+   "type": "woodland_tree_broad",
+   "x": 168,
+   "y": 400
+  },
+  {
+   "id": "prop_016",
+   "type": "woodland_tree_broad",
+   "x": 140,
+   "y": 246
+  },
+  {
+   "id": "prop_017",
+   "type": "woodland_tree_broad",
+   "x": 574,
+   "y": 22
+  },
+  {
+   "id": "prop_018",
+   "type": "woodland_tree_broad",
+   "x": 504,
+   "y": 36
+  },
+  {
+   "id": "prop_019",
+   "type": "woodland_tree_broad",
+   "x": 42,
+   "y": 260
+  },
+  {
+   "id": "prop_020",
+   "type": "woodland_tree_broad",
+   "x": 14,
+   "y": 190
+  },
+  {
+   "id": "prop_021",
+   "type": "woodland_tree_broad",
+   "x": 126,
+   "y": 386
+  },
+  {
+   "id": "prop_022",
+   "type": "woodland_tree_broad",
+   "x": 308,
+   "y": 92
+  },
+  {
+   "id": "prop_023",
+   "type": "woodland_tree_slender",
+   "x": 252,
+   "y": 288
+  },
+  {
+   "id": "prop_024",
+   "type": "woodland_tree_broad",
+   "x": 616,
+   "y": 162
+  },
+  {
+   "id": "prop_025",
+   "type": "woodland_tree_slender",
+   "x": 504,
+   "y": 344
+  },
+  {
+   "id": "prop_026",
+   "type": "woodland_tree_slender",
+   "x": 28,
+   "y": 386
+  },
+  {
+   "id": "prop_027",
+   "type": "woodland_tree_slender",
+   "x": 210,
+   "y": 400
+  },
+  {
+   "id": "prop_028",
+   "type": "woodland_tree_broad",
+   "x": 0,
+   "y": 36
+  },
+  {
+   "id": "prop_029",
+   "type": "woodland_tree_broad",
+   "x": 0,
+   "y": 148
+  },
+  {
+   "id": "prop_030",
+   "type": "woodland_tree_broad",
+   "x": 574,
+   "y": 148
+  },
+  {
+   "id": "prop_031",
+   "type": "woodland_tree_broad",
+   "x": 462,
+   "y": 78
+  },
+  {
+   "id": "prop_032",
+   "type": "woodland_tree_slender",
+   "x": 112,
+   "y": 8
+  },
+  {
+   "id": "prop_033",
+   "type": "woodland_tree_slender",
+   "x": 350,
+   "y": 400
+  },
+  {
+   "id": "prop_034",
+   "type": "woodland_tree_slender",
+   "x": 98,
+   "y": 260
+  },
+  {
+   "id": "prop_035",
+   "type": "woodland_tree_broad",
+   "x": 182,
+   "y": 22
+  },
+  {
+   "id": "prop_036",
+   "type": "woodland_tree_broad",
+   "x": 0,
+   "y": 246
+  },
+  {
+   "id": "prop_037",
+   "type": "woodland_tree_slender",
+   "x": 224,
+   "y": 330
+  },
+  {
+   "id": "prop_038",
+   "type": "woodland_tree_broad",
+   "x": 616,
+   "y": 22
+  },
+  {
+   "id": "prop_039",
+   "type": "woodland_tree_slender",
+   "x": 504,
+   "y": 78
+  },
+  {
+   "id": "prop_040",
+   "type": "woodland_tree_slender",
+   "x": 252,
+   "y": 400
+  },
+  {
+   "id": "prop_041",
+   "type": "woodland_tree_slender",
+   "x": 336,
+   "y": 316
+  },
+  {
+   "id": "prop_042",
+   "type": "woodland_tree_broad",
+   "x": 56,
+   "y": 218
+  },
+  {
+   "id": "prop_043",
+   "type": "woodland_tree_broad",
+   "x": 490,
+   "y": 218
+  },
+  {
+   "id": "prop_044",
+   "type": "forest_standing_stone",
+   "x": 108,
+   "y": 92
+  },
+  {
+   "id": "prop_045",
+   "type": "woodland_lantern",
+   "x": 62,
+   "y": 118
+  },
+  {
+   "id": "prop_046",
+   "type": "woodland_lantern",
+   "x": 150,
+   "y": 72
+  },
+  {
+   "id": "prop_047",
+   "type": "woodland_sign",
+   "x": 238,
+   "y": 160
+  },
+  {
+   "id": "prop_048",
+   "type": "woodland_rocks",
+   "x": 520,
+   "y": 316
+  },
+  {
+   "id": "prop_049",
+   "type": "woodland_rocks",
+   "x": 410,
+   "y": 366
+  },
+  {
+   "id": "prop_050",
+   "type": "woodland_bush",
+   "x": 170,
+   "y": 190
+  },
+  {
+   "id": "prop_051",
+   "type": "woodland_bush",
+   "x": 292,
+   "y": 350
+  },
+  {
+   "id": "prop_052",
+   "type": "woodland_bush",
+   "x": 560,
+   "y": 150
+  },
+  {
+   "id": "prop_053",
+   "type": "woodland_bush",
+   "x": 80,
+   "y": 240
+  }
+ ]
+}

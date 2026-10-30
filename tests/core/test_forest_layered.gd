@@ -144,7 +144,7 @@ func test_the_scene_def_has_the_puzzle_and_the_route() -> void:
 	var targets: Array = []
 	for e: Dictionary in def["exits"]:
 		targets.append("%s>%s/%s" % [e["id"], e["target_scene"], e["target_entry"]])
-	assert_eq(targets, ["to_village>woodland_layered/east", "to_glade>glade_layered/entrance"], "west back to the woodland, north to the glade")
+	assert_eq(targets, ["to_village>woodland_layered/east", "to_glade>root_hollow_layered/forest_side"], "west back to the woodland, north into Root Hollow")
 	assert_eq(SceneDefs.scene_of_checkpoint(&"forest_layered_puzzle"), SCENE, "the checkpoints belong to the scene")
 
 

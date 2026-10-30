@@ -46,6 +46,7 @@ const GROUNDS: Dictionary = {
 ## Per-scene ambient multiplied onto the actors (not the ground) so the sprites sit in the dusk paintings.
 const AMBIENT: Dictionary = {
 	&"woodland_layered": Color(0.9, 0.94, 0.88),
+	&"root_hollow_layered": Color(0.88, 0.93, 0.87),
 	&"arena": Color(1, 1, 1),
 	&"village_layered": Color(0.93, 0.89, 0.84),
 	&"glade_layered": Color(0.88, 0.95, 0.94),
@@ -68,7 +69,7 @@ const HINTS: Dictionary = {&"npc": "[E] TALK", &"chest": "[E] OPEN", &"sign": "[
 const HINT_OVERRIDES: Dictionary = {&"root_gate": "[E] LOOK"}
 ## The hint floats this far above an object's feet (people: their height + 8).
 const OBJECT_HINT_HEIGHT: float = 30.0
-const DEBUG_SCENES: Dictionary = {"debug_scene_woodland": &"woodland_layered", "debug_scene_village": &"village_layered", "debug_scene_forest": &"forest_layered", "debug_scene_glade": &"glade_layered", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered"}
+const DEBUG_SCENES: Dictionary = {"debug_scene_woodland": &"woodland_layered", "debug_scene_hollow": &"root_hollow_layered", "debug_scene_village": &"village_layered", "debug_scene_forest": &"forest_layered", "debug_scene_glade": &"glade_layered", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered"}
 
 var core: ExploreCore
 var snapshot: ExploreCore.ExploreSnapshot

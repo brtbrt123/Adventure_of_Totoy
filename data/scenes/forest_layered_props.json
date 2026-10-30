@@ -158,8 +158,8 @@
     44,
     9
    ],
-   "target_scene": "glade_layered",
-   "target_entry": "entrance"
+   "target_scene": "root_hollow_layered",
+   "target_entry": "forest_side"
   }
  ],
  "checkpoints": [
