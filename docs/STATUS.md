@@ -1,3 +1,6 @@
+## Forest route has its mobs (2026-10-30, Claude)
+`data/scenes/forest_layered_props.json` now has two encounters: `forest_mossling_trail` (3 Mosslings, x 136-190) and `forest_boar_bend` (2 Boars, x 268-285) before the lantern puzzle; the lantern puzzle, root gate, chest and exits are unchanged. Same rules as the Woodland Approach (`core/mob_field.gd`, `Tuning.MOBS`), so every hero skill works on them. Positions are a first guess for the owner to review: the two packs wake each other if the hero stands between them, and the second checkpoint (332,148) is inside the boars' wake radius (it is only reached by walking through them). Glowmoths are not built (no core behaviour yet; art only). Tests: `tests/core/test_forest_mobs.gd`, `tests/smoke_forest_mobs.gd`.
+
 ## Small hand cursor only for menus (2026-10-30, Codex)
 
 Replaced blade pointer with original 16x16 hand at crisp 2x (32x32 OS pixels), fingertip hotspot (10,2). Global presentation autoload shows it on title/menu screens and when the shared TAB character menu is open; hides during gameplay and cutscenes. Group lookup covers both arena and exploration and always processes while paused. Art validate/build/preview, texture load and title/TAB/gameplay policy checks passed. Headless backend does not expose actual OS cursor visibility; policy checked directly. Graphify unavailable.

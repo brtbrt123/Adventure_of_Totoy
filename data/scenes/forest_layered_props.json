@@ -247,6 +247,59 @@
    "pedestal_east"
   ]
  },
+ "encounters": [
+  {
+   "id": "forest_mossling_trail",
+   "name": "MOSSLING TRAIL",
+   "rect": [
+    112,
+    100,
+    150,
+    100
+   ],
+   "leash": 170,
+   "mobs": [
+    {
+     "type": "mossling",
+     "x": 136,
+     "y": 126
+    },
+    {
+     "type": "mossling",
+     "x": 164,
+     "y": 144
+    },
+    {
+     "type": "mossling",
+     "x": 190,
+     "y": 124
+    }
+   ]
+  },
+  {
+   "id": "forest_boar_bend",
+   "name": "BOAR BEND",
+   "rect": [
+    230,
+    110,
+    130,
+    90
+   ],
+   "leash": 170,
+   "mobs": [
+    {
+     "type": "boar",
+     "x": 268,
+     "y": 140
+    },
+    {
+     "type": "boar",
+     "x": 285,
+     "y": 193
+    }
+   ]
+  }
+ ],
  "props": [
   {
    "id": "tree_left",
@@ -465,7 +518,7 @@
   {
    "id": "mushrooms",
    "type": "forest_mushrooms",
-   "x": 286,
+   "x": 285,
    "y": 108,
    "flip": false,
    "shadow_radius": 7
