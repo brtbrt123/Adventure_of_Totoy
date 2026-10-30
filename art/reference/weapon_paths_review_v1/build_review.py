@@ -115,9 +115,16 @@ def trail(weapon: str, previous: list[dict], current: list[dict], age: int = 0, 
     d = ImageDraw.Draw(im)
     cfg = WEAPONS[weapon]
     for hand, after in enumerate(current):
-        if not after["lead"]:
+        if not after["lead"] and weapon != "daggers":
             continue
-        pts = swept_points(previous[hand], after, clockwise)
+        if weapon == "katana":
+            pts = swept_points(previous[hand], after, clockwise)
+        else:
+            # Follow the traced tip displacement between authored poses. Rotating around a moving
+            # grip invents an arc absent from the source, especially for scythe thrusts.
+            a, b = previous[hand]["tip"], after["tip"]
+            pts = [(ANCHOR[0] + mix(a[0], b[0], i / 40),
+                    ANCHOR[1] + mix(a[1], b[1], i / 40)) for i in range(41)]
         for i in range(1, len(pts)):
             t = i / (len(pts) - 1)
             # Taper toward the oldest part of the trace. It remains a short path close to the blade.
@@ -174,7 +181,7 @@ def build(weapon: str) -> tuple[list[Image.Image], list[Image.Image], list[dict]
     for swing in range(1, cfg["swings"] + 1):
         anchors = [geometry(weapon, swing, n) for n in range(1, 7)]
         records.append({"swing": swing, "blade_geometry_feet_relative": anchors,
-                        "sweep_direction": "clockwise_overhead" if weapon == "katana" and swing == 3 else "shortest"})
+                        "sweep_direction": "clockwise_overhead" if weapon == "katana" and swing == 3 else ("traced_tip_segment" if weapon != "katana" else "shortest")})
         peak = None
         early = None
         for n in range(1, 7):

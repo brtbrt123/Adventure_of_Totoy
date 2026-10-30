@@ -48,6 +48,40 @@ def main() -> None:
     kp = swatches.quantize(colors=256)
     close_indexed = [frame.quantize(palette=kp, dither=Image.Dither.NONE) for frame in katana]
     close_indexed[0].save(OUT / "katana_alignment_v2.gif", save_all=True, append_images=close_indexed[1:], duration=40, loop=0, disposal=2, optimize=True)
+    katana = []
+    large_font = ImageFont.truetype(str(ROOT / "presentation/fonts/Cinzel.ttf"), 22)
+    for tick in range(90):
+        close = Image.new("RGB", (1056, 424), (28, 24, 36))
+        d = ImageDraw.Draw(close)
+        for col, scene in enumerate(("arena", "road")):
+            image = Image.open(RAW / f"arena_{scene}_dual_dagger_right_{tick:03}.png").convert("RGB")
+            zoom = image.crop((48, 48, 312, 240)).resize((528, 384), Image.Resampling.NEAREST)
+            close.paste(zoom, (col * 528, 40))
+            d.text((col * 528 + 16, 6), "Dual Daggers - " + ("arena" if scene == "arena" else "woodland"), font=large_font, fill=(244, 236, 214))
+        katana.append(close)
+    swatches = Image.new("RGB", (1056, 424 * 4))
+    for row, index in enumerate((0, 8, 48, 50)):
+        swatches.paste(katana[index], (0, row * 424))
+    kp = swatches.quantize(colors=256)
+    close_indexed = [frame.quantize(palette=kp, dither=Image.Dither.NONE) for frame in katana]
+    close_indexed[0].save(OUT / "daggers_alignment.gif", save_all=True, append_images=close_indexed[1:], duration=40, loop=0, disposal=2, optimize=True)
+    katana = []
+    large_font = ImageFont.truetype(str(ROOT / "presentation/fonts/Cinzel.ttf"), 22)
+    for tick in range(90):
+        close = Image.new("RGB", (1056, 424), (28, 24, 36))
+        d = ImageDraw.Draw(close)
+        for col, scene in enumerate(("arena", "road")):
+            image = Image.open(RAW / f"arena_{scene}_chain_scythe_right_{tick:03}.png").convert("RGB")
+            zoom = image.crop((48, 48, 312, 240)).resize((528, 384), Image.Resampling.NEAREST)
+            close.paste(zoom, (col * 528, 40))
+            d.text((col * 528 + 16, 6), "Chain Scythe - " + ("arena" if scene == "arena" else "woodland"), font=large_font, fill=(244, 236, 214))
+        katana.append(close)
+    swatches = Image.new("RGB", (1056, 424 * 4))
+    for row, index in enumerate((0, 8, 48, 50)):
+        swatches.paste(katana[index], (0, row * 424))
+    kp = swatches.quantize(colors=256)
+    close_indexed = [frame.quantize(palette=kp, dither=Image.Dither.NONE) for frame in katana]
+    close_indexed[0].save(OUT / "scythe_alignment.gif", save_all=True, append_images=close_indexed[1:], duration=40, loop=0, disposal=2, optimize=True)
     print("Saved live 6-panel glow/particle GIF (slowed 2.4x for review), no runtime pixels resized")
 
 

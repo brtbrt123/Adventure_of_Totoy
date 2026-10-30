@@ -413,7 +413,7 @@
             }
           ]
         ],
-        "sweep_direction": "shortest"
+        "sweep_direction": "traced_tip_segment"
       },
       {
         "swing": 2,
@@ -563,7 +563,7 @@
             }
           ]
         ],
-        "sweep_direction": "shortest"
+        "sweep_direction": "traced_tip_segment"
       },
       {
         "swing": 3,
@@ -713,7 +713,7 @@
             }
           ]
         ],
-        "sweep_direction": "shortest"
+        "sweep_direction": "traced_tip_segment"
       },
       {
         "swing": 4,
@@ -863,7 +863,7 @@
             }
           ]
         ],
-        "sweep_direction": "shortest"
+        "sweep_direction": "traced_tip_segment"
       }
     ],
     "scythe": [
@@ -949,7 +949,7 @@
             }
           ]
         ],
-        "sweep_direction": "shortest"
+        "sweep_direction": "traced_tip_segment"
       },
       {
         "swing": 2,
@@ -1033,7 +1033,7 @@
             }
           ]
         ],
-        "sweep_direction": "shortest"
+        "sweep_direction": "traced_tip_segment"
       },
       {
         "swing": 3,
@@ -1117,7 +1117,7 @@
             }
           ]
         ],
-        "sweep_direction": "shortest"
+        "sweep_direction": "traced_tip_segment"
       }
     ]
   }

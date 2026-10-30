@@ -1,3 +1,7 @@
+## Blade-trace alignment correction (2026-10-30, Codex)
+
+Dagger and scythe regular trails now follow straight traced blade-tip displacement between authored poses instead of an invented rotation about moving grips. Both dagger tips emit paths; katana overhead fix preserved. Rebuilt sources, atlas and contact sheets; palette validation and shared-weapon Godot smoke passed. Review trace diagnostics distinguish discrete measured positions from unknown in-between motion. Runtime scene captures refreshed for owner judgement.
+
 ## Shared weapon trails integrated (2026-10-29, Codex)
 
 Owner approved runtime integration for all three weapons and requested glow and particles. Arena and exploration now use the same hero FX entry point, pose-based trail selection, additive halo and capped blade-edge particles. No boss dependency or core changes. Corrected the third katana swing to follow its forward overhead rotation after owner feedback. Forty palette/hard-alpha sprite sources, regenerated atlas/contact sheets, original review assets and real runtime previews are included. Full harness passed all suites, including 479 core tests and the new weapon-path regression. Live capture checks passed all three weapons, both facings and both scenes, including third swings. See WEAPON_PATHS.md and art/reference/weapon_paths_review_v1/ingame/katana_alignment_v2.gif. No generation credits used. Claude cross-review and owner visual judgement remain pending; no merge. Graphify unavailable (No module named graphify).
