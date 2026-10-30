@@ -53,3 +53,6 @@ graphify-out/
 
 # spare sound candidates (listening folder, not part of the game)
 data/audio_candidates/
+
+# Temporary actual-renderer idle animation frames
+art/build/arena_mob_idle_motion/

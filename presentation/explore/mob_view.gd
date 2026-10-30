@@ -5,9 +5,9 @@ const Tuning := preload("res://core/tuning.gd")
 const WHITE := preload("res://art/build/sprites_white.png")
 const Kit := preload("res://presentation/common/ui_kit.gd")
 const STATES: Dictionary = {
- "mossling": {"idle":["idle",4,12,true], "alert":["spawn",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["attack_tell",3,1,false], "strike":["attack_lunge",3,3,false], "recover":["attack_recover",3,8,false], "crash":["attack_recover",3,8,true], "stagger":["attack_recover",3,8,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]},
+ "mossling": {"idle":["play_idle",24,6,true], "alert":["spawn",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["attack_tell",3,1,false], "strike":["attack_lunge",3,3,false], "recover":["attack_recover",3,8,false], "crash":["attack_recover",3,8,true], "stagger":["attack_recover",3,8,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]},
  "stag": {"idle":["idle",4,14,true], "alert":["idle",4,6,false], "chase":["walk",6,6,true], "return":["walk",6,6,true], "windup":["slam_raise",4,1,false], "strike":["slam_strike",3,2,false], "recover":["slam_recover",4,8,false], "crash":["charge_crash",3,10,true], "stagger":["stagger",4,10,true], "hurt":["hurt",3,4,false], "roar":["phase2_roar",6,9,false], "dead":["death",8,9,false]},
- "boar": {"idle":["idle",4,14,true], "alert":["idle",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["charge_tell",4,1,false], "strike":["charge_run",4,2,true], "recover":["crash_stun",3,9,false], "crash":["crash_stun",3,9,true], "stagger":["crash_stun",3,9,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]}}
+ "boar": {"idle":["graze_idle",36,6,true], "alert":["idle",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["charge_tell",4,1,false], "strike":["charge_run",4,2,true], "recover":["crash_stun",3,9,false], "crash":["crash_stun",3,9,true], "stagger":["crash_stun",3,9,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]}}
 static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> String:
 	var table: Dictionary = STATES[String(mob["type"])]
 	var pose: Array = table.get(String(mob["state"]), table["idle"])
@@ -16,7 +16,10 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 	if mob["type"]==&"stag" and mob.get("attack_id", &"") == &"stag_charge":
 		if mob["state"]==&"windup":pose=["charge_tell",5,1,false]
 		elif mob["state"]==&"strike":pose=["charge_run",4,3,true]
-	var n: int = int(mob["state_ticks"]) / int(pose[2])
+	# Dormant encounters leave idle state_ticks at zero. Use the simulation clock so they animate
+	# before aggro, freeze with pause and stop immediately when core reports another state.
+	var clock: int = tick + int(mob["id"]) * 17 if mob["state"] == &"idle" and mob["type"] in [&"mossling", &"boar"] else int(mob["state_ticks"])
+	var n: int = clock / int(pose[2])
 	if mob["state"] == &"windup":
 		for tell: Snapshots.TelegraphSnapshot in tells:
 			if tell.owner_id == mob["id"]:

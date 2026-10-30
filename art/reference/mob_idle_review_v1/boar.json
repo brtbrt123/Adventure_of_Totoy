@@ -1,0 +1,195 @@
+{
+  "review_only": true,
+  "cell": [
+    64,
+    48
+  ],
+  "anchor": [
+    32,
+    40
+  ],
+  "frame_ms": 100,
+  "loop_ms": 3600,
+  "poses": [
+    {
+      "head_degrees": 0,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 0,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 5,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 12,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 22,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 32,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 40,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 43,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 42,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 46,
+      "jaw": 1,
+      "grazing": true
+    },
+    {
+      "head_degrees": 42,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 46,
+      "jaw": 1,
+      "grazing": true
+    },
+    {
+      "head_degrees": 43,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 45,
+      "jaw": 1,
+      "grazing": true
+    },
+    {
+      "head_degrees": 42,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 44,
+      "jaw": 1,
+      "grazing": true
+    },
+    {
+      "head_degrees": 40,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 34,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 26,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 20,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 20,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 21,
+      "jaw": 1,
+      "grazing": false
+    },
+    {
+      "head_degrees": 20,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 21,
+      "jaw": 1,
+      "grazing": false
+    },
+    {
+      "head_degrees": 28,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 36,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 43,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 45,
+      "jaw": 1,
+      "grazing": true
+    },
+    {
+      "head_degrees": 41,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 45,
+      "jaw": 1,
+      "grazing": true
+    },
+    {
+      "head_degrees": 38,
+      "jaw": 0,
+      "grazing": true
+    },
+    {
+      "head_degrees": 29,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 18,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 8,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 0,
+      "jaw": 0,
+      "grazing": false
+    },
+    {
+      "head_degrees": 0,
+      "jaw": 0,
+      "grazing": false
+    }
+  ]
+}
