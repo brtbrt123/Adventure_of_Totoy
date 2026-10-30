@@ -1,0 +1,1 @@
+Original pixel blade cursor. Source: art/src/ui_blade_cursor.txt. Runtime image uses 2x nearest-neighbour (48x48 OS pixels), hard alpha, Totoy36 only. Hotspot (4,4) at the blade tip. Global default cursor through project settings.

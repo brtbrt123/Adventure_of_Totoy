@@ -1,3 +1,7 @@
+## Global blade cursor (2026-10-30, Codex)
+
+Owner requested a blade mouse pointer. Added original Totoy36/hard-alpha 24x24 sprite source, crisp 48x48 OS cursor and tip hotspot (4,4) through global display settings, covering gameplay and menus. Art validation/build/preview and Godot cursor load/hotspot smoke passed. Preview in art/reference/blade_cursor/preview.png; owner appearance judgement pending. Graphify unavailable in this environment.
+
 ## Blade-trace alignment correction (2026-10-30, Codex)
 
 Dagger and scythe regular trails now follow straight traced blade-tip displacement between authored poses instead of an invented rotation about moving grips. Both dagger tips emit paths; katana overhead fix preserved. Rebuilt sources, atlas and contact sheets; palette validation and shared-weapon Godot smoke passed. Review trace diagnostics distinguish discrete measured positions from unknown in-between motion. Runtime scene captures refreshed for owner judgement.
