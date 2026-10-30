@@ -172,7 +172,7 @@ func resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 			continue
 		_leash(core, enc, events)
 		for mob: Mob in enc.mobs:
-			if mob.is_alive() and mob.state != &"idle":
+			if mob.is_alive() and mob.state != &"idle" and not mob.dragged:
 				_step_mob(core, enc, mob, _count_attackers(enc), events)
 		_separate(core, enc)
 

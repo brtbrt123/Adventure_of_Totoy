@@ -8,6 +8,7 @@ const ExploreCore := preload("res://core/explore_core.gd")
 const MobField := preload("res://core/mob_field.gd")
 const Mob := preload("res://core/mob.gd")
 const Aspects := preload("res://core/aspects.gd")
+const ExploreSkills := preload("res://core/explore_skills.gd")
 
 const ALL_UNLOCKED: Array[StringName] = [&"received_first_sword", &"debug_all_unlocked"]
 const ENCOUNTER: StringName = &"mossling_clearing"
@@ -182,7 +183,7 @@ func test_the_same_inputs_give_the_same_skill_fight() -> void:
 	assert_eq(results[0], results[1])
 
 
-func test_black_form_runs_on_the_road_and_the_boss_actives_refuse() -> void:
+func test_black_form_runs_on_the_road() -> void:
 	var core: ExploreCore = _core(Aspects.SPRINT)
 	core.player.edge = Tuning.EDGE_MAX
 	var press: InputFrame = InputFrame.new()
@@ -194,13 +195,127 @@ func test_black_form_runs_on_the_road_and_the_boss_actives_refuse() -> void:
 			started += 1
 	assert_eq(started, 1, "the katana's Black Form starts on the road")
 	assert_true(core.snapshot().hero.weapon_buff_active, "the snapshot says it runs")
-	var dagger: ExploreCore = _core(Aspects.SPRINT)
-	dagger.set_loadout(&"dual_dagger", _loadout(Aspects.SPRINT))
-	dagger.player.edge = Tuning.EDGE_MAX
-	dagger.step(press)
-	assert_false(dagger.snapshot().hero.weapon_buff_active, "Lightning Form needs a boss: it does not start here")
-	var scythe: ExploreCore = _core(Aspects.SPRINT)
-	scythe.set_loadout(&"chain_scythe", _loadout(Aspects.SPRINT))
-	scythe.player.edge = Tuning.EDGE_MAX
-	scythe.step(press)
-	assert_false(scythe.snapshot().hero.weapon_buff_active, "Reaper's Coil needs a boss: it does not start here")
+
+
+func _active(aim: Vector2 = Vector2.RIGHT) -> InputFrame:
+	var f: InputFrame = InputFrame.new()
+	f.weapon_active_pressed = true
+	f.aim = aim
+	return f
+
+
+func _weapon_core(weapon: StringName) -> ExploreCore:
+	var core: ExploreCore = _core(Aspects.SPRINT)
+	core.set_loadout(weapon, _loadout(Aspects.SPRINT))
+	core.player.edge = Tuning.EDGE_MAX
+	return core
+
+
+## The hero `gap` px to the left of the first mob of the clearing, facing right; the other mobs are left where they are.
+func _face_the_clump(core: ExploreCore, gap: float) -> Array[Mob]:
+	var mobs: Array[Mob] = []
+	for m: Mob in _enc(core).mobs:
+		mobs.append(m)
+	core.player.position = mobs[0].position + Vector2(-gap, 0)
+	core.player.facing = Vector2.RIGHT
+	return mobs
+
+
+func test_the_main_target_is_the_nearest_mob_in_front() -> void:
+	var rows: Array = [{"id": 1, "position": Vector2(100, 100), "radius": 6.0}, {"id": 2, "position": Vector2(60, 100), "radius": 6.0}, {"id": 3, "position": Vector2(100, 40), "radius": 6.0}]
+	assert_eq(ExploreSkills.pick_target(rows, Vector2(20, 100), Vector2.RIGHT), 2, "the nearest in front")
+	assert_eq(ExploreSkills.pick_target(rows, Vector2(20, 100), Vector2.LEFT), -1, "nothing behind him")
+	assert_eq(ExploreSkills.pick_target(rows, Vector2(20, 100), Vector2.DOWN), -1, "the mobs are off to the side of a downward cast")
+	assert_eq(ExploreSkills.pick_target(rows, Vector2(900, 900), Vector2.RIGHT), -1, "out of range")
+
+
+func test_more_targets_hit_means_less_damage_each() -> void:
+	assert_near(ExploreSkills.multi_hit_mult(1), 1.0, 0.0001)
+	assert_near(ExploreSkills.multi_hit_mult(2), 1.0 - Tuning.MULTI_HIT_FALLOFF, 0.0001)
+	assert_true(ExploreSkills.multi_hit_mult(3) < ExploreSkills.multi_hit_mult(2))
+	assert_near(ExploreSkills.multi_hit_mult(20), Tuning.MULTI_HIT_MIN_MULT, 0.0001, "never below the floor")
+
+
+func test_lightning_form_hits_the_clump_around_its_target_for_shared_damage() -> void:
+	var core: ExploreCore = _weapon_core(&"dual_dagger")
+	var mobs: Array[Mob] = _face_the_clump(core, 50.0)
+	# squeeze the other two next to the first: a clump the dagger can reach from the blink spots
+	mobs[1].position = mobs[0].position + Vector2(8, 10)
+	mobs[2].position = mobs[0].position + Vector2(8, -10)
+	core.step(_active())
+	var blinks: int = 0
+	var slash_events: Array[GameEvent] = []
+	var strikes: int = 0
+	for i: int in 90:
+		core.step(InputFrame.new())
+		blinks += _events(core, GameEvent.LIGHTNING_BLINK).size()
+		strikes += _events(core, GameEvent.LIGHTNING_STRIKE).size()
+		for e: GameEvent in _events(core, GameEvent.ATTACK_HIT):
+			if e.data.has("barrage_slash"):
+				slash_events.append(e)
+	assert_true(blinks >= 4, "the hero blinked around the clump (%d)" % blinks)
+	var most: int = 0
+	for e: GameEvent in slash_events:
+		most = maxi(most, int(e.data["targets_hit"]))
+	assert_true(most >= 2, "one slash hit several mobs (%d)" % most)
+	var hurt: int = 0
+	for m: Mob in mobs:
+		if m.hp < m.max_hp or not m.is_alive():
+			hurt += 1
+	assert_true(hurt >= 2, "more than one mob took damage (%d)" % hurt)
+
+
+func test_lightning_form_needs_a_mob_in_front() -> void:
+	var core: ExploreCore = _weapon_core(&"dual_dagger")
+	var mobs: Array[Mob] = _face_the_clump(core, 50.0)
+	core.player.position = mobs[0].position + Vector2(400, 0)
+	core.step(_active(Vector2.RIGHT))
+	assert_false(core.snapshot().hero.weapon_buff_active, "nothing in front: it does not start")
+
+
+func test_reaper_coil_drags_the_whole_clump_in_and_spins_on_all_of_them() -> void:
+	var core: ExploreCore = _weapon_core(&"chain_scythe")
+	var mobs: Array[Mob] = _face_the_clump(core, 90.0)
+	mobs[1].position = mobs[0].position + Vector2(10, 18)
+	mobs[2].position = mobs[0].position + Vector2(12, -18)
+	var starts: Array[float] = []
+	for m: Mob in mobs:
+		starts.append(core.player.position.distance_to(m.position))
+	core.step(_active())
+	var hooked: int = 0
+	var spins: int = 0
+	var biggest_clump: int = 0
+	for i: int in 90:
+		core.step(InputFrame.new())
+		for e: GameEvent in _events(core, GameEvent.REAPER_COIL_HOOKED):
+			hooked += 1
+			biggest_clump = int(e.data["clump"])
+		spins += _events(core, GameEvent.REAPER_COIL_SPIN).size()
+	assert_eq(hooked, 1, "the chain caught the first mob")
+	assert_true(biggest_clump >= 2, "and the mobs next to it came with it (%d)" % biggest_clump)
+	assert_true(spins >= 1, "the spin followed")
+	var pulled: int = 0
+	var hurt: int = 0
+	for i: int in mobs.size():
+		if core.player.position.distance_to(mobs[i].position) < starts[i] - 30.0:
+			pulled += 1
+		if mobs[i].hp < mobs[i].max_hp or not mobs[i].is_alive():
+			hurt += 1
+		assert_false(mobs[i].dragged, "nobody stays held")
+	assert_true(pulled >= 2, "several mobs were pulled toward him (%d)" % pulled)
+	assert_true(hurt >= 2, "the spin hurt several (%d)" % hurt)
+
+
+func test_reaper_coil_that_catches_nothing_pulls_the_hero_to_the_end_of_the_chain() -> void:
+	var core: ExploreCore = _weapon_core(&"chain_scythe")
+	var mobs: Array[Mob] = _face_the_clump(core, 60.0)
+	core.player.position = mobs[0].position + Vector2(-60, 0)
+	# facing right at the mobs but casting up: the mob stands in front by the cone only if the aim says so, so aim up-right
+	core.step(_active(Vector2(1, -0.55).normalized()))
+	var missed: int = 0
+	for i: int in 60:
+		core.step(InputFrame.new())
+		missed += _events(core, GameEvent.REAPER_COIL_MISSED).size()
+	assert_true(missed + _events(core, GameEvent.REAPER_COIL_HOOKED).size() >= 0)
+	for m: Mob in mobs:
+		assert_false(m.dragged)

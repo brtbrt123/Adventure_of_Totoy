@@ -413,6 +413,15 @@ const MOB_ALERT_TICKS: int = 24  # the pause when the pack wakes
 const MOB_HURT_TICKS: int = 10  # a hit that did not cancel anything staggers the mob's walk this long
 const MOB_STAGGER_TICKS: int = 90  # a mob whose lunge was parried is stunned and exposed this long
 const MOB_EXPOSED_MULT: float = 3.0  # damage multiplier on an exposed mob (parried or crashed)
+
+# Lightning Form and Reaper's Coil on the road (several mobs at once). The main target is the nearest mob in front of the hero (within
+# ROAD_TARGET_RANGE px and the cone whose cosine is ROAD_TARGET_CONE_DOT, the aim direction); mobs within CLUMP_RADIUS px of the hooked mob
+# are dragged in with it. A cast that hits `n` mobs gives each 1 - MULTI_HIT_FALLOFF * (n - 1) of its damage (never below MULTI_HIT_MIN_MULT).
+const ROAD_TARGET_RANGE: float = 220.0
+const ROAD_TARGET_CONE_DOT: float = 0.5
+const CLUMP_RADIUS: float = 44.0
+const MULTI_HIT_FALLOFF: float = 0.2
+const MULTI_HIT_MIN_MULT: float = 0.4
 const MOB_DEATH_TICKS: int = 40  # a defeated mob stays in the snapshot (state dead) this long
 const MOB_RETURN_SPEED_MULT: float = 1.6  # a mob walking home
 const MOB_LEASH_GRACE_TICKS: int = 60  # the hero outside the encounter's leash this long: the mobs give up and walk home

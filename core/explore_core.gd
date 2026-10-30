@@ -499,7 +499,7 @@ func step(input: InputFrame) -> void:
 		if _aspect_usable(input.skill_pressed):
 			frame.skill_pressed = input.skill_pressed
 	var before: Vector2 = player.position
-	skills.before_player(self)
+	skills.before_player(self, frame)
 	player.step(frame, tick, events)
 	player.position = _clamp(Collision.move_resolved(obstacles, before, player.position, Tuning.PLAYER_RADIUS))
 	skills.after_move(self, before, events)
