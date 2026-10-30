@@ -46,7 +46,7 @@ func test_the_stag_is_the_glades_one_mob() -> void:
 	var stag: Mob = _stag(core)
 	assert_eq(stag.type, &"stag")
 	assert_eq(stag.radius, 20.0, "it keeps the Colossus's body size")
-	assert_eq(stag.attacks().size(), 3, "slam, charge and roots")
+	assert_eq(stag.attacks().size(), 4, "slam, charge, roots and the summoning chant")
 	assert_true(bool(core.snapshot().mobs[0]["boss"]), "the snapshot marks it as the boss")
 
 

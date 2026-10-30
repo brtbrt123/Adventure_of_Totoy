@@ -29,6 +29,14 @@ var dragged: bool = false  # held by Reaper's Coil: the field leaves it alone un
 var phase: int = 1  # the Stag's second phase (roots) starts after it roars
 var attack_index: int = 0  # which attack a many-attack mob tries next
 var current_attack: Dictionary = {}  # the attack row in progress (many-attack mobs); empty = the type's one attack
+var extra_telegraphs: Array[Telegraph] = []  # the other warnings of a many-site attack (the Stag's eight roots); `telegraph` is the first
+var summoner_id: int = 0  # the Stag that summoned this mob (0 = a regular mob)
+var regen_acc: float = 0.0  # fractional health owed by the summon regeneration
+var regen_ticks: int = 0  # ticks the regeneration has run without a break (it reports once a second)
+var regen_pending: int = 0  # health healed since the last mob_healed event
+var cast_start: int = -1  # absolute tick the chant began (-1 = not casting)
+var cast_release: int = -1  # absolute tick the chant releases
+var summon_ready_tick: int = -1  # the next tick a summon may begin (-1 = not set yet)
 var chain_next: StringName = &""  # the attack an unparried Cleave follows with (Warden), tried before the rotation
 var killed: bool = false  # felled for good (story flag killed_<encounter>_<n>): a reset never revives it
 
@@ -68,6 +76,26 @@ func is_exposed() -> bool:
 	return state == &"crash" or state == &"stagger"
 
 
+## True for a mob a Stag called (it counts for nothing: no EXP, drop, flag, and not for clearing the encounter).
+func is_summoned() -> bool:
+	return summoner_id != 0
+
+
+## Drops the running warning (and the extra ones of a many-site attack).
+func clear_telegraph() -> void:
+	telegraph = null
+	extra_telegraphs.clear()
+
+
+## Every running warning of this mob, the first one first.
+func all_telegraphs() -> Array[Telegraph]:
+	var out: Array[Telegraph] = []
+	if telegraph != null:
+		out.append(telegraph)
+		out.append_array(extra_telegraphs)
+	return out
+
+
 ## Wearing a guard (the Warden's rune): hits do Tuning.MOBS[type].guard x damage. Gone while it is stunned.
 func is_guarded() -> bool:
 	return is_alive() and Tuning.MOBS[type].has("guard") and not is_exposed()
@@ -91,7 +119,7 @@ func reset() -> void:
 	state = &"idle"
 	state_ticks = 0
 	cooldown = 0
-	telegraph = null
+	clear_telegraph()
 	strike_left = 0
 	attack_done = false
 	last_swing = -1
@@ -100,3 +128,9 @@ func reset() -> void:
 	attack_index = 0
 	current_attack = {}
 	chain_next = &""
+	regen_acc = 0.0
+	regen_ticks = 0
+	regen_pending = 0
+	cast_start = -1
+	cast_release = -1
+	summon_ready_tick = -1

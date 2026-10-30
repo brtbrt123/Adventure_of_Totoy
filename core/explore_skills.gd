@@ -611,7 +611,7 @@ func _coil_hook(core: RefCounted, events: Array[GameEvent]) -> void:
 		for other: Dictionary in core.mobs.living():
 			if other["mob"].id == mob.id or other["mob"].position.distance_to(mob.position) <= Tuning.CLUMP_RADIUS:
 				var held: RefCounted = other["mob"]
-				held.telegraph = null
+				held.clear_telegraph()
 				held.dragged = true
 				held.set_state(&"hurt")
 				_dragged.append(held.id)

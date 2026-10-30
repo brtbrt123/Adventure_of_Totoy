@@ -1,3 +1,7 @@
+## Thornback balance v3 core mechanics and cross-review (2026-10-31, Claude)
+
+Slam reach 125, charge 6.6 px/tick over 24 ticks, eight root bursts (eight telegraphs, deterministic valid sites, an escape rule), the chant that calls exactly five Glowmoths, and the 2 percent per second summon regeneration (per Stag, never per moth) are in the core, with new events mob_summon_started, mob_summoned, mob_healed and mob view fields summoner_id, regen_active, live_summons, cast_start_tick, cast_release_tick. tests/core/test_stag_v3.gd (22), core suite 546 pass, three smokes pass. Cross-review of Codex 8ae4d9df: PASS with four small comments, see docs/CROSS_REVIEW_thornback_v3.md. Not verified: real renderer captures, the feel of eight roots, all numbers (first guesses).
+
 ## Godot-editable migration, phases 0 and 1 (2026-10-30, Claude)
 
 Python generators write editable scenes, a headless Godot baker writes the core JSON back: all five data/scenes/*_props.json round-trip byte for byte, the three prop_defs files value for value (tests/test_godot_scenes.py, 7 tests). presentation/props/ has 100 prop scenes (colliders as visible circles, cast-shadow masks, light sockets); presentation/maps/glade_layered.tscn is the spike map; neither is used by the renderer yet. Codex task: docs/CODEX_TASK_prop_scenes.md. Details in docs/GODOT_EDITABLE_PLAN.md (Progress). Not verified: the look in the editor, pixel parity of a renderer wired to them.

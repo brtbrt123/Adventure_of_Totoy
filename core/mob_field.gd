@@ -57,6 +57,7 @@ class Encounter:
 var scene_id: StringName = &""
 var encounters: Array[Encounter] = []
 var _next_telegraph: int = 1000
+var _next_summoned_id: int = 5000
 var _swing_serial: int = 0
 var _was_swinging: bool = false
 
@@ -175,6 +176,7 @@ func resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 			if mob.is_alive() and mob.state != &"idle" and not mob.dragged:
 				_step_mob(core, enc, mob, _count_attackers(enc), events)
 		_separate(core, enc)
+		_regen(core, enc, events)
 
 
 func _count_attackers(enc: Encounter) -> int:
@@ -183,6 +185,246 @@ func _count_attackers(enc: Encounter) -> int:
 		if mob.is_attacking():
 			n += 1
 	return n
+
+
+## The mobs of the encounter that are alive and were not summoned (they decide when it is cleared).
+func _alive_regular(enc: Encounter) -> Array[Mob]:
+	var out: Array[Mob] = []
+	for mob: Mob in enc.mobs:
+		if mob.is_alive() and not mob.is_summoned():
+			out.append(mob)
+	return out
+
+
+func _regular_total(enc: Encounter) -> int:
+	var n: int = 0
+	for mob: Mob in enc.mobs:
+		if not mob.is_summoned():
+			n += 1
+	return n
+
+
+func _encounter_of(mob: Mob) -> Encounter:
+	for enc: Encounter in encounters:
+		if enc.id == mob.encounter_id:
+			return enc
+	return null
+
+
+## Living mobs `caster` summoned.
+func live_summons(enc: Encounter, caster: Mob) -> int:
+	var n: int = 0
+	for mob: Mob in enc.mobs:
+		if mob.summoner_id == caster.id and mob.is_alive():
+			n += 1
+	return n
+
+
+func _despawn_summons(enc: Encounter, caster: Mob) -> void:
+	for i: int in range(enc.mobs.size() - 1, -1, -1):
+		if enc.mobs[i].summoner_id == caster.id:
+			enc.mobs.remove_at(i)
+
+
+func _despawn_all_summons(enc: Encounter) -> void:
+	for i: int in range(enc.mobs.size() - 1, -1, -1):
+		if enc.mobs[i].is_summoned():
+			enc.mobs.remove_at(i)
+
+
+## True when `mob` (a caster) may chant now: none of its moths lives and the lockout since its last cast is over (the first one a little
+## after the fight began).
+func _summon_ready(core: RefCounted, enc: Encounter, mob: Mob) -> bool:
+	var cfg: Dictionary = mob.stats()["summon"]
+	if mob.summon_ready_tick < 0:
+		mob.summon_ready_tick = core.tick + int(cfg["first_ready"])
+	return core.tick >= mob.summon_ready_tick and live_summons(enc, mob) == 0
+
+
+## The chant: the horns glow for the windup, no warning area (nothing here hurts). cast_start/cast_release are absolute ticks.
+func _begin_chant(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[GameEvent]) -> void:
+	mob.attack_dir = _toward(mob.position, core.player.position, mob.facing)
+	mob.facing = mob.attack_dir
+	mob.attack_done = true
+	mob.cast_start = core.tick
+	mob.cast_release = core.tick + int(atk["windup"])
+	mob.set_state(&"windup")
+	events.append(GameEvent.new(GameEvent.MOB_SUMMON_STARTED, core.tick, {
+		"scene": scene_id, "mob_id": mob.id, "attack": StringName(atk["id"]), "cast_start_tick": mob.cast_start, "cast_release_tick": mob.cast_release,
+	}))
+
+
+## The release: exactly `count` moths at valid places around the caster (free ground, not on the hero, not at an exit), awake and staggered.
+func _summon(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent]) -> void:
+	var cfg: Dictionary = mob.stats()["summon"]
+	var positions: Array[Vector2] = _summon_positions(core, mob, int(cfg["count"]), cfg)
+	var ids: Array[int] = []
+	for i: int in positions.size():
+		var moth: Mob = Mob.new()
+		moth.setup(_next_summoned_id, StringName(cfg["type"]), enc.id, positions[i], 100 + i)
+		_next_summoned_id += 1
+		moth.summoner_id = mob.id
+		moth.state = &"chase"
+		moth.cooldown = Tuning.MOB_FIRST_COOLDOWN + Tuning.MOB_COOLDOWN_STAGGER * i
+		moth.facing = _toward(positions[i], core.player.position, Vector2.LEFT)
+		enc.mobs.append(moth)
+		ids.append(moth.id)
+	mob.summon_ready_tick = core.tick + int(cfg["lockout"])
+	events.append(GameEvent.new(GameEvent.MOB_SUMMONED, core.tick, {"scene": scene_id, "mob_id": mob.id, "summoned_ids": ids, "positions": positions.duplicate()}))
+
+
+# ---- deterministic placement (the same tick and mob give the same places; no random generator is used) ----------------------------
+
+static func _lcg(state: int) -> int:
+	return (state * 1103515245 + 12345) & 0x7fffffff
+
+
+static func _unit(state: int) -> float:
+	return float((state >> 8) % 10000) / 10000.0
+
+
+## A spot a burst or a moth may use: inside the world, clear of props and the walkable edge, away from the exits.
+func _spot_ok(core: RefCounted, p: Vector2, clearance: float) -> bool:
+	var size: Vector2 = core.def.get("size", Vector2(100000, 100000))
+	if not Rect2(Vector2.ZERO, size).grow(-12.0).has_point(p):
+		return false
+	if not Collision.fits(core.obstacles, p, clearance):
+		return false
+	for row: Variant in core.def.get("exits", []):
+		var exit_row: Dictionary = row
+		if (exit_row["rect"] as Rect2).grow(40.0).has_point(p):
+			return false
+	return true
+
+
+## True when the hero standing at `from` can reach, within `reach` px, a free spot that none of the bursts (circles of `radius`) covers.
+func _has_escape(core: RefCounted, from: Vector2, sites: Array[Vector2], radius: float, reach: float) -> bool:
+	var margin: float = radius + Tuning.PLAYER_RADIUS + 2.0
+	var r: float = margin
+	while r <= reach:
+		for k: int in 16:
+			var q: Vector2 = from + Vector2.RIGHT.rotated(float(k) * TAU / 16.0) * r
+			if not _spot_ok(core, q, Tuning.PLAYER_RADIUS):
+				continue
+			var clear: bool = true
+			for s: Vector2 in sites:
+				if q.distance_to(s) <= margin:
+					clear = false
+					break
+			if clear:
+				return true
+		r += 4.0
+	return false
+
+
+## The `sites` centres of a many-burst attack: the first where the hero stands (target lock, as the single burst always did), the others at
+## valid, mutually distinct spots over the fight floor and a margin around it, rejecting any spot that would leave the hero no way out.
+func _root_sites(core: RefCounted, mob: Mob, atk: Dictionary) -> Array[Vector2]:
+	var enc: Encounter = _encounter_of(mob)
+	var radius: float = float(atk["reach"])
+	var spacing: float = float(atk.get("site_spacing", 40.0))
+	var reach: float = float(atk.get("escape_reach", 70.0))
+	var hero: Vector2 = core.player.position
+	var sites: Array[Vector2] = [hero]
+	var area: Rect2 = enc.rect.grow(60.0)
+	var state: int = _lcg(mob.id * 7919 + core.tick * 104729 + 17)
+	var tries: int = 0
+	while sites.size() < int(atk["sites"]) and tries < 600:
+		tries += 1
+		state = _lcg(state)
+		var x: float = area.position.x + _unit(state) * area.size.x
+		state = _lcg(state)
+		var y: float = area.position.y + _unit(state) * area.size.y
+		var p: Vector2 = Vector2(roundf(x), roundf(y))
+		if not _spot_ok(core, p, radius * 0.5):
+			continue
+		var distinct: bool = true
+		for s: Vector2 in sites:
+			if s.distance_to(p) < spacing:
+				distinct = false
+				break
+		if not distinct:
+			continue
+		var trial: Array[Vector2] = sites.duplicate()
+		trial.append(p)
+		if not _has_escape(core, hero, trial, radius, reach):
+			continue
+		sites.append(p)
+	return sites
+
+
+## `count` places for summoned moths on a ring around `caster`, never on the hero or at an exit, apart from each other; the ring widens when the
+## first pass finds too few, so the number is always exact.
+func _summon_positions(core: RefCounted, caster: Mob, count: int, cfg: Dictionary) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	var state: int = _lcg(caster.id * 6151 + core.tick * 31337 + 5)
+	var widen: float = 0.0
+	var tries: int = 0
+	while out.size() < count and tries < 4000:
+		tries += 1
+		if tries % 400 == 0:
+			widen += 30.0
+		state = _lcg(state)
+		var angle: float = _unit(state) * TAU
+		state = _lcg(state)
+		var dist: float = float(cfg["ring_min"]) + _unit(state) * (float(cfg["ring_max"]) + widen - float(cfg["ring_min"]))
+		var p: Vector2 = (caster.position + Vector2.RIGHT.rotated(angle) * dist).round()
+		if not _spot_ok(core, p, 8.0):
+			continue
+		if p.distance_to(core.player.position) < 28.0:
+			continue
+		var apart: bool = true
+		for q: Vector2 in out:
+			if q.distance_to(p) < 20.0:
+				apart = false
+				break
+		if apart:
+			out.append(p)
+	while out.size() < count:  # unreachable on any real map; keeps "exactly five" even so
+		out.append(caster.position + Vector2(float(out.size()) * 12.0, 0.0))
+	return out
+
+
+# ---- the Stag's regeneration -------------------------------------------------------------------------------------------------
+
+## While any moth this caster called lives, the caster heals `regen_per_second` of its maximum health each second IN TOTAL (never per moth),
+## accumulating the fraction; it reports the healed amount once a second and when it stops. Dead casters do not heal.
+func _regen(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
+	for mob: Mob in enc.mobs:
+		if not mob.stats().has("summon"):
+			continue
+		var live: int = live_summons(enc, mob)
+		var active: bool = live > 0 and mob.is_alive()
+		if active:
+			if mob.hp < mob.max_hp:
+				mob.regen_acc += float(mob.max_hp) * float(mob.stats()["summon"]["regen_per_second"]) * Tuning.TICK_DT
+				var whole: int = mini(int(mob.regen_acc), mob.max_hp - mob.hp)
+				if whole > 0:
+					mob.hp += whole
+					mob.regen_acc -= float(whole)
+					mob.regen_pending += whole
+			else:
+				mob.regen_acc = 0.0
+			mob.regen_ticks += 1
+			if mob.regen_ticks % 60 == 0:
+				_report_regen(core, mob, live, events)
+		elif mob.regen_ticks > 0 or mob.regen_pending > 0:
+			_report_regen(core, mob, live, events)
+			mob.regen_ticks = 0
+			mob.regen_acc = 0.0
+
+
+func _report_regen(core: RefCounted, mob: Mob, live: int, events: Array[GameEvent]) -> void:
+	if mob.regen_pending > 0:
+		events.append(GameEvent.new(GameEvent.MOB_HEALED, core.tick, {
+			"scene": scene_id, "mob_id": mob.id, "amount": mob.regen_pending, "hp": mob.hp, "live_summons": live, "source": &"summons",
+		}))
+	mob.regen_pending = 0
+
+
+## True when `mob` regenerates now: it is alive and at least one moth of its own lives.
+func regen_active(enc: Encounter, mob: Mob) -> bool:
+	return mob.stats().has("summon") and mob.is_alive() and live_summons(enc, mob) > 0
 
 
 ## True when another mob of `mob`'s type is winding up or striking (a `solo_attack` type attacks one at a time).
@@ -208,7 +450,7 @@ func _wake(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
 	events.append(GameEvent.new(GameEvent.ENCOUNTER_STARTED, core.tick, {"scene": scene_id, "encounter_id": enc.id}))
 	var hero: Vector2 = core.player.position
 	for mob: Mob in _alive(enc):
-		mob.telegraph = null
+		mob.clear_telegraph()
 		mob.cooldown = Tuning.MOB_FIRST_COOLDOWN + Tuning.MOB_COOLDOWN_STAGGER * mob.slot
 		mob.facing = _toward(mob.position, hero, mob.facing)
 		mob.set_state(&"alert")
@@ -228,7 +470,7 @@ func _leash(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
 func _give_up(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
 	enc.state = DORMANT
 	for mob: Mob in _alive(enc):
-		mob.telegraph = null
+		mob.clear_telegraph()
 		mob.set_state(&"return")
 		events.append(GameEvent.new(GameEvent.MOB_LEASHED, core.tick, {"scene": scene_id, "mob_id": mob.id, "encounter_id": enc.id}))
 
@@ -242,6 +484,7 @@ func reset_all(tick: int, reason: StringName, events: Array[GameEvent]) -> void:
 
 func reset_encounter(enc: Encounter, tick: int, reason: StringName, events: Array[GameEvent]) -> void:
 	var was_touched: bool = enc.touched
+	_despawn_all_summons(enc)
 	for mob: Mob in enc.mobs:
 		if not mob.killed:
 			mob.reset()
@@ -318,7 +561,7 @@ func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dic
 	elif mob.phase == 1 and mob.stats().has("phase2_hp") and float(mob.hp) <= float(mob.max_hp) * float(mob.stats()["phase2_hp"]):
 		_begin_phase_two(core, mob, events)
 	elif mob.state == &"windup" and bool(mob.attack_stats()["interrupt"]):
-		mob.telegraph = null
+		mob.clear_telegraph()
 		mob.cooldown = int(mob.attack_stats()["cooldown"])
 		mob.set_state(&"hurt")
 	elif mob.state in [&"alert", &"chase", &"recover", &"hurt", &"return"]:
@@ -328,10 +571,14 @@ func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dic
 
 func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent]) -> void:
 	mob.hp = 0
-	mob.telegraph = null
+	mob.clear_telegraph()
 	mob.set_state(&"dead")
 	events.append(GameEvent.new(GameEvent.MOB_DEFEATED, core.tick, {"scene": scene_id, "mob_id": mob.id, "type": mob.type, "encounter_id": enc.id, "position": mob.position}))
+	if mob.is_summoned():  # a called moth pays nothing and is not remembered
+		return
 	mob.killed = true
+	if mob.stats().has("summon"):  # the caster fell: its moths go with it
+		_despawn_summons(enc, mob)
 	var flag: StringName = kill_flag(enc, mob)
 	if core._grant_flag(flag, events):  # the first time only
 		var stats: Dictionary = mob.stats()
@@ -340,12 +587,13 @@ func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent])
 		if drop_roll(mob.id) < float(drop["chance"]):
 			events.append(GameEvent.new(GameEvent.MOB_DROPPED, core.tick, {"scene": scene_id, "mob_id": mob.id, "item_id": drop["item"], "position": mob.position}))
 			core.give_item({"reward_id": "%s_drop" % flag, "kind": "item", "item": drop["item"], "name": String(drop["item"]).capitalize(), "quantity": 1}, enc.id, events)
-	if _alive(enc).is_empty():
+	if _alive_regular(enc).is_empty():
 		_clear(core, enc, events)
 
 
 func _clear(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
 	enc.state = CLEARED
+	_despawn_all_summons(enc)
 	core._grant_flag(enc.flag, events)
 	events.append(GameEvent.new(GameEvent.ENCOUNTER_CLEARED, core.tick, {"scene": scene_id, "encounter_id": enc.id, "reward_id": StringName(str(enc.reward.get("reward_id", "")))}))
 	if not enc.reward.is_empty():
@@ -372,6 +620,8 @@ func _step_mob(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, event
 			if mob.state_ticks >= int(atk["windup"]):
 				mob.set_state(&"strike")
 				mob.strike_left = int(atk["strike_ticks"])
+				if atk.has("summon"):
+					_summon(core, enc, mob, events)
 		&"strike":
 			_strike(core, mob, events)
 		&"recover":
@@ -402,7 +652,7 @@ func _chase(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, events: 
 	var dist: float = to_hero.length()
 	mob.facing = _toward(mob.position, player.position, mob.facing)
 	if mob.cooldown <= 0 and attackers < Tuning.MOB_MAX_ATTACKERS and not (bool(mob.stats().get("solo_attack", false)) and _type_attacking(enc, mob)):
-		var chosen: Dictionary = _pick_attack(mob, dist)
+		var chosen: Dictionary = _pick_attack(core, enc, mob, dist)
 		if not chosen.is_empty():
 			mob.current_attack = chosen if not mob.attacks().is_empty() else {}
 			_begin_attack(core, mob, events)
@@ -417,6 +667,11 @@ func _chase(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, events: 
 
 func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 	var atk: Dictionary = mob.attack_stats()
+	if atk.has("summon"):
+		_begin_chant(core, mob, atk, events)
+		return
+	mob.cast_start = -1
+	mob.cast_release = -1
 	var dir: Vector2 = _toward(mob.position, core.player.position, mob.facing)
 	mob.attack_dir = dir
 	var shape: StringName = StringName(atk.get("shape", &"line"))
@@ -449,14 +704,42 @@ func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void
 	t.hit_tick = core.tick + int(atk["windup"])
 	t.end_tick = t.hit_tick + int(atk["strike_ticks"])
 	mob.telegraph = t
+	var ids: Array[int] = [t.id]
+	if atk.has("sites"):  # many separate bursts (the Stag's eight roots): each site gets its own warning, all committed together
+		var sites: Array[Vector2] = _root_sites(core, mob, atk)
+		t.center = sites[0]
+		for i: int in range(1, sites.size()):
+			var more: Telegraph = Telegraph.new()
+			more.id = _next_telegraph
+			_next_telegraph += 1
+			more.owner_id = t.owner_id
+			more.attack = t.attack
+			more.kind = t.kind
+			more.shape = t.shape
+			more.center = sites[i]
+			more.muzzle = t.muzzle
+			more.direction = t.direction
+			more.size = t.size
+			more.damage = t.damage
+			more.start_tick = t.start_tick
+			more.hit_tick = t.hit_tick
+			more.end_tick = t.end_tick
+			mob.extra_telegraphs.append(more)
+			ids.append(more.id)
 	events.append(GameEvent.new(GameEvent.ATTACK_TELEGRAPHED, core.tick, {
-		"telegraph_id": t.id, "owner_id": mob.id, "kind": t.kind, "attack": t.attack, "scene": scene_id, "mob_id": mob.id,
+		"telegraph_id": t.id, "telegraph_ids": ids, "sites": ids.size(), "owner_id": mob.id, "kind": t.kind, "attack": t.attack, "scene": scene_id, "mob_id": mob.id,
 		"hit_tick": t.hit_tick, "end_tick": t.end_tick,
 	}))
 
 
 func _strike(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 	var atk: Dictionary = mob.attack_stats()
+	if atk.has("summon"):  # the release frames: nothing to dodge
+		mob.strike_left -= 1
+		if mob.strike_left <= 0:
+			mob.cooldown = int(atk["cooldown"])
+			mob.set_state(&"recover")
+		return
 	if StringName(atk.get("shape", &"line")) != Telegraph.SHAPE_LINE or bool(atk.get("stationary", false)):
 		_strike_area(core, mob, atk, events)
 		return
@@ -469,12 +752,12 @@ func _strike(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 		_land(core, mob, atk, events)
 	var crash: int = int(atk["crash"])
 	if mob.state == &"strike" and crash > 0 and mob.position.distance_to(before) < speed * 0.5:
-		mob.telegraph = null
+		mob.clear_telegraph()
 		mob.cooldown = int(atk["cooldown"])
 		mob.set_state(&"crash")
 		events.append(GameEvent.new(GameEvent.MOB_STAGGERED, core.tick, {"scene": scene_id, "mob_id": mob.id, "reason": &"crash", "position": mob.position}))
 	elif mob.state == &"strike" and mob.strike_left <= 0:
-		mob.telegraph = null
+		mob.clear_telegraph()
 		mob.cooldown = int(atk["cooldown"])
 		mob.set_state(&"recover")
 
@@ -482,11 +765,14 @@ func _strike(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 ## A cone or a burst: the mob stands still; whatever the warning covers is hit for the whole strike window (once).
 func _strike_area(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[GameEvent]) -> void:
 	mob.strike_left -= 1
-	var t: Telegraph = mob.telegraph
-	if not mob.attack_done and t != null and t.overlaps_circle(core.player.position, Tuning.PLAYER_RADIUS):
+	var covered: bool = false
+	for warning: Telegraph in mob.all_telegraphs():
+		if warning.overlaps_circle(core.player.position, Tuning.PLAYER_RADIUS):
+			covered = true
+	if not mob.attack_done and covered:
 		_land(core, mob, atk, events)
 	if mob.state == &"strike" and mob.strike_left <= 0:
-		mob.telegraph = null
+		mob.clear_telegraph()
 		mob.cooldown = int(atk["cooldown"])
 		if atk.has("chain"):  # not parried (a parry left the strike state): the next attack follows quickly
 			mob.chain_next = StringName(atk["chain"]["id"])
@@ -496,7 +782,7 @@ func _strike_area(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[Gam
 
 ## The attack a many-attack mob starts from `dist` away: the next one in its rotation that fits the distance and its phase; for a one-attack
 ## mob its own row when the distance fits. {} when none fits yet.
-func _pick_attack(mob: Mob, dist: float) -> Dictionary:
+func _pick_attack(core: RefCounted, enc: Encounter, mob: Mob, dist: float) -> Dictionary:
 	var rows: Array = mob.attacks()
 	if mob.chain_next != &"":
 		var wanted: StringName = mob.chain_next
@@ -511,6 +797,8 @@ func _pick_attack(mob: Mob, dist: float) -> Dictionary:
 		var row: Dictionary = rows[(mob.attack_index + offset) % rows.size()]
 		if int(row.get("phase", 1)) > mob.phase:
 			continue
+		if row.has("summon") and not _summon_ready(core, enc, mob):
+			continue
 		if dist >= float(row["start_min"]) and dist <= float(row["start_max"]):
 			mob.attack_index = (mob.attack_index + offset + 1) % rows.size()
 			return row
@@ -520,7 +808,7 @@ func _pick_attack(mob: Mob, dist: float) -> Dictionary:
 ## The Stag at half health: it stops attacking, roars, and the roots join its attacks.
 func _begin_phase_two(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 	mob.phase = 2
-	mob.telegraph = null
+	mob.clear_telegraph()
 	mob.cooldown = int(mob.stats().get("roar_ticks", 48)) + 20
 	mob.set_state(&"roar")
 	events.append(GameEvent.new(GameEvent.BOSS_PHASE_CHANGED, core.tick, {"entity_id": mob.id, "phase": 2, "scene": scene_id, "position": mob.position}))
@@ -539,7 +827,7 @@ func _land(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[GameEvent]
 		}))
 		player.on_parry_success(mob.position - player.position)
 		player.position = Collision.push_out(core.obstacles, player.position, Tuning.PLAYER_RADIUS)
-		mob.telegraph = null
+		mob.clear_telegraph()
 		mob.chain_next = &""
 		mob.cooldown = int(atk["cooldown"])
 		mob.set_state(&"stagger")
@@ -602,6 +890,8 @@ func mob_views(tick: int) -> Array[Dictionary]:
 				"id": mob.id, "type": mob.type, "visual_id": mob.type, "level": int(mob.stats()["level"]), "encounter_id": enc.id, "position": mob.position, "facing": mob.facing,
 				"state": mob.state, "state_ticks": mob.state_ticks, "hp": mob.hp, "max_hp": mob.max_hp, "radius": mob.radius,
 				"exposed": mob.is_exposed(), "guarded": mob.is_guarded(), "dragged": mob.dragged, "boss": bool(mob.stats().get("boss", false)), "phase": mob.phase, "attack_id": mob.attack_stats()["id"], "attack": mob.telegraph.attack if mob.telegraph != null else &"", "since_hit": tick - mob.last_hit_tick,
+				"summoner_id": mob.summoner_id, "regen_active": regen_active(enc, mob), "live_summons": live_summons(enc, mob) if mob.stats().has("summon") else 0,
+				"cast_start_tick": mob.cast_start, "cast_release_tick": mob.cast_release,
 			})
 	return out
 
@@ -610,10 +900,10 @@ func mob_views(tick: int) -> Array[Dictionary]:
 func encounter_views() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for enc: Encounter in encounters:
-		var alive: int = _alive(enc).size()
+		var alive: int = _alive_regular(enc).size()
 		out.append({
 			"id": enc.id, "name": enc.label, "state": enc.state, "rect": enc.rect, "anchor": enc.anchor, "leash": enc.leash,
-			"alive": alive, "total": enc.mobs.size(), "reward_id": StringName(str(enc.reward.get("reward_id", ""))),
+			"alive": alive, "total": _regular_total(enc), "reward_id": StringName(str(enc.reward.get("reward_id", ""))),
 		})
 	return out
 
@@ -623,22 +913,20 @@ func telegraph_snapshots() -> Array[Snapshots.TelegraphSnapshot]:
 	var out: Array[Snapshots.TelegraphSnapshot] = []
 	for enc: Encounter in encounters:
 		for mob: Mob in enc.mobs:
-			var t: Telegraph = mob.telegraph
-			if t == null:
-				continue
-			var s: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
-			s.id = t.id
-			s.owner_id = t.owner_id
-			s.attack = t.attack
-			s.kind = t.kind
-			s.shape = t.shape
-			s.center = t.center
-			s.muzzle = t.muzzle
-			s.direction = t.direction
-			s.size = t.size
-			s.width = t.width
-			s.start_tick = t.start_tick
-			s.hit_tick = t.hit_tick
-			s.end_tick = t.end_tick
-			out.append(s)
+			for t: Telegraph in mob.all_telegraphs():
+				var s: Snapshots.TelegraphSnapshot = Snapshots.TelegraphSnapshot.new()
+				s.id = t.id
+				s.owner_id = t.owner_id
+				s.attack = t.attack
+				s.kind = t.kind
+				s.shape = t.shape
+				s.center = t.center
+				s.muzzle = t.muzzle
+				s.direction = t.direction
+				s.size = t.size
+				s.width = t.width
+				s.start_tick = t.start_tick
+				s.hit_tick = t.hit_tick
+				s.end_tick = t.end_tick
+				out.append(s)
 	return out

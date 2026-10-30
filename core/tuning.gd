@@ -407,13 +407,17 @@ const MOBS: Dictionary = {
 	&"stag": {
 		"level": 3, "exp": 60, "drop": {"item": &"herb", "chance": 1.0}, "hp": 260, "radius": 20.0, "speed": 0.6, "aggro": 130.0, "tether": 320.0, "hold": 30.0, "wait": 90.0,
 		"boss": true, "phase2_hp": 0.5, "roar_ticks": 54,
+		"summon": {"type": &"glowmoth", "count": 5, "ring_min": 44.0, "ring_max": 100.0, "regen_per_second": 0.02, "lockout": 900, "first_ready": 300},
 		"attacks": [
-			{"id": &"stag_slam", "kind": &"gold", "shape": &"cone", "reach": 50.0, "half_angle": 0.95, "start_min": 0.0, "start_max": 62.0, "windup": 54, "strike_ticks": 6,
+			{"id": &"stag_slam", "kind": &"gold", "shape": &"cone", "reach": 125.0, "half_angle": 0.95, "start_min": 0.0, "start_max": 62.0, "windup": 54, "strike_ticks": 6,
 				"strike_speed": 0.0, "width": 0.0, "damage": 18, "recover": 48, "cooldown": 46, "interrupt": false, "crash": 0, "phase": 1},
-			{"id": &"stag_charge", "kind": &"red", "shape": &"line", "start_min": 84.0, "start_max": 210.0, "windup": 56, "strike_ticks": 36, "strike_speed": 4.4,
+			{"id": &"stag_charge", "kind": &"red", "shape": &"line", "start_min": 84.0, "start_max": 210.0, "windup": 56, "strike_ticks": 24, "strike_speed": 6.6,
 				"width": 30.0, "damage": 24, "recover": 40, "cooldown": 56, "interrupt": false, "crash": 80, "phase": 1},
 			{"id": &"stag_roots", "kind": &"red", "shape": &"circle", "reach": 34.0, "start_min": 0.0, "start_max": 230.0, "windup": 50, "strike_ticks": 5,
-				"strike_speed": 0.0, "width": 0.0, "damage": 16, "recover": 40, "cooldown": 40, "interrupt": false, "crash": 0, "phase": 2},
+				"strike_speed": 0.0, "width": 0.0, "damage": 16, "recover": 40, "cooldown": 40, "interrupt": false, "crash": 0, "phase": 2,
+				"sites": 8, "site_spacing": 40.0, "escape_reach": 70.0},
+			{"id": &"stag_summon", "kind": &"none", "shape": &"none", "summon": true, "start_min": 0.0, "start_max": 400.0, "windup": 90, "strike_ticks": 10,
+				"strike_speed": 0.0, "width": 0.0, "damage": 0, "recover": 50, "cooldown": 60, "interrupt": false, "crash": 0, "phase": 1},
 		],
 		"attack": {"id": &"stag_slam", "kind": &"gold", "start_min": 0.0, "start_max": 62.0, "windup": 54, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 18,
 			"recover": 48, "cooldown": 46, "interrupt": false, "crash": 0},
@@ -422,6 +426,14 @@ const MOBS: Dictionary = {
 		"level": 2, "exp": 25, "drop": {"item": &"herb", "chance": 0.6}, "hp": 70, "radius": 9.0, "speed": 0.55, "aggro": 110.0, "tether": 260.0, "hold": 100.0, "wait": 110.0,
 		"attack": {"id": &"charge", "kind": &"red", "start_min": 24.0, "start_max": 140.0, "windup": 50, "strike_ticks": 38, "strike_speed": 3.4,
 			"width": 24.0, "damage": 20, "recover": 40, "cooldown": 90, "interrupt": false, "crash": 70},
+	},
+	# The Glowmoth: the Stag's summoned moth (core/mob_field.gd _summon). It never starts an encounter and pays no EXP, drop or flag; it is removed
+	# when the Stag falls or the encounter resets. Its dart is a short red line that does not move it (the real projectile is a later step).
+	&"glowmoth": {
+		"level": 2, "exp": 0, "drop": {"item": &"herb", "chance": 0.0}, "hp": 20, "radius": 5.0, "speed": 0.9, "aggro": 999.0, "tether": 600.0, "hold": 70.0, "wait": 90.0,
+		"summoned": true,
+		"attack": {"id": &"moth_dart", "kind": &"red", "shape": &"line", "stationary": true, "reach": 110.0, "start_min": 30.0, "start_max": 120.0, "windup": 40, "strike_ticks": 6,
+			"strike_speed": 0.0, "width": 10.0, "damage": 6, "recover": 40, "cooldown": 90, "interrupt": true, "crash": 0},
 	},
 	# The Runebound Warden (the Hollow Trial's hard mob, docs/PLAN_hollow_trial.md). Its rune GUARDS it: hits do only `guard` x damage until a
 	# parried gold attack stuns it (then it is exposed like any stunned mob). Rune Cleave is gold (parry it); an unparried Cleave chains into
