@@ -32,7 +32,13 @@ Names: `warden_<state>_right_<n>` (n from 1), right-facing only, mirrored at run
 | `hurt` (a hit while exposed) | `hurt` | 2 | |
 | `dead` | `death` | 6-8 | rune fades out, the body falls apart into roots and moss |
 
-**Interface gaps for Claude** (tell me, do not work around them): the mob snapshot must expose (a) which attack is winding up or striking (`attack` id: `warden_cleave`, `warden_lash`, `warden_ring`), (b) `guarded` (bool) and (c) a `guard_hit` moment (an event). Claude will add them to the snapshot and `docs/architecture.md`; until then build against those names and list in your notes anything else you need.
+**Interface (done in the core, `core/mob_field.gd`, numbers in `Tuning.MOBS[&"warden"]`):**
+- Mob view (`ExploreSnapshot` mobs, from `MobField.mob_views`): `type` `warden`, `state` (`idle`, `alert`, `chase`, `windup`, `strike`, `recover`, `stagger`, `hurt`, `return`, `dead`), `state_ticks`, `exposed` (true while stunned), **`guarded`** (true while the rune guard is up, false when exposed or dead) and **`attack`** (while an attack winds up or strikes: `warden_cleave`, `warden_lash` or `warden_ring`; empty otherwise; `attack_id` is the attack in progress or next).
+- The state is `stagger` after a parried Cleave (that is your `exposed` frame set; the stun lasts `Tuning.MOB_STAGGER_TICKS` = 90 ticks, then the guard returns).
+- Guard-hit moment: the `attack_hit` event (target_id = the mob) carries **`guarded: true`** when the hit was reduced by the guard (damage 0.4x); an exposed hit has `kind` `counter` and no `guarded` key.
+- Telegraph shapes: Cleave `cone` (gold, reach 46 + radius), Lash `line` (red, 150 long, 20 wide, the Warden does not move), Ring `circle` (red, reach 48, centred on the Warden itself, not on the hero). Windups: Cleave 40, Lash 44, Ring 56 ticks; strikes 6, 8 and 5 ticks.
+- Chain: an unparried Cleave is followed by the Lash 12 ticks after its recovery starts, so a Lash can start right as the recover frames end; a parried Cleave ends the chain. Only one Warden winds up or strikes at a time.
+Tell Claude if you need anything else in the snapshot; do not work around it.
 
 ## 3. Effects (presentation only, no rules)
 

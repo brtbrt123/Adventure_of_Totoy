@@ -29,6 +29,7 @@ var dragged: bool = false  # held by Reaper's Coil: the field leaves it alone un
 var phase: int = 1  # the Stag's second phase (roots) starts after it roars
 var attack_index: int = 0  # which attack a many-attack mob tries next
 var current_attack: Dictionary = {}  # the attack row in progress (many-attack mobs); empty = the type's one attack
+var chain_next: StringName = &""  # the attack an unparried Cleave follows with (Warden), tried before the rotation
 var killed: bool = false  # felled for good (story flag killed_<encounter>_<n>): a reset never revives it
 
 
@@ -67,6 +68,11 @@ func is_exposed() -> bool:
 	return state == &"crash" or state == &"stagger"
 
 
+## Wearing a guard (the Warden's rune): hits do Tuning.MOBS[type].guard x damage. Gone while it is stunned.
+func is_guarded() -> bool:
+	return is_alive() and Tuning.MOBS[type].has("guard") and not is_exposed()
+
+
 ## In the middle of an attack (windup or strike): counts against MOB_MAX_ATTACKERS.
 func is_attacking() -> bool:
 	return state == &"windup" or state == &"strike"
@@ -93,3 +99,4 @@ func reset() -> void:
 	phase = 1
 	attack_index = 0
 	current_attack = {}
+	chain_next = &""

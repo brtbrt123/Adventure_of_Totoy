@@ -423,6 +423,24 @@ const MOBS: Dictionary = {
 		"attack": {"id": &"charge", "kind": &"red", "start_min": 24.0, "start_max": 140.0, "windup": 50, "strike_ticks": 38, "strike_speed": 3.4,
 			"width": 24.0, "damage": 20, "recover": 40, "cooldown": 90, "interrupt": false, "crash": 70},
 	},
+	# The Runebound Warden (the Hollow Trial's hard mob, docs/PLAN_hollow_trial.md). Its rune GUARDS it: hits do only `guard` x damage until a
+	# parried gold attack stuns it (then it is exposed like any stunned mob). Rune Cleave is gold (parry it); an unparried Cleave chains into
+	# Root Lash `chain.delay` ticks later. Root Lash is a red line that does not move the Warden (`stationary`), Spore Ring a red burst around
+	# the Warden itself (`centered`): dash out of both. Only one Warden attacks at a time (`solo_attack`).
+	&"warden": {
+		"level": 3, "exp": 45, "drop": {"item": &"herb", "chance": 0.8}, "hp": 140, "radius": 11.0, "speed": 0.5, "aggro": 120.0, "tether": 300.0, "hold": 28.0, "wait": 90.0,
+		"guard": 0.4, "solo_attack": true,
+		"attacks": [
+			{"id": &"warden_cleave", "kind": &"gold", "shape": &"cone", "reach": 46.0, "half_angle": 0.9, "start_min": 0.0, "start_max": 56.0, "windup": 40, "strike_ticks": 6,
+				"strike_speed": 0.0, "width": 0.0, "damage": 20, "recover": 44, "cooldown": 40, "interrupt": false, "crash": 0, "chain": {"id": &"warden_lash", "delay": 12}},
+			{"id": &"warden_lash", "kind": &"red", "shape": &"line", "stationary": true, "reach": 150.0, "start_min": 40.0, "start_max": 160.0, "windup": 44, "strike_ticks": 8,
+				"strike_speed": 0.0, "width": 20.0, "damage": 18, "recover": 40, "cooldown": 50, "interrupt": false, "crash": 0},
+			{"id": &"warden_ring", "kind": &"red", "shape": &"circle", "centered": true, "reach": 48.0, "start_min": 0.0, "start_max": 40.0, "windup": 56, "strike_ticks": 5,
+				"strike_speed": 0.0, "width": 0.0, "damage": 22, "recover": 44, "cooldown": 60, "interrupt": false, "crash": 0},
+		],
+		"attack": {"id": &"warden_cleave", "kind": &"gold", "start_min": 0.0, "start_max": 56.0, "windup": 40, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 20,
+			"recover": 44, "cooldown": 40, "interrupt": false, "crash": 0},
+	},
 }
 const MOB_MAX_ATTACKERS: int = 2  # mobs of one encounter that may wind up or strike at the same time
 const MOB_FIRST_COOLDOWN: int = 30  # a woken mob waits this long, plus MOB_COOLDOWN_STAGGER x its place, before its first attack

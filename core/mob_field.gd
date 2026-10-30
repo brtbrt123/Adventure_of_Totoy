@@ -185,6 +185,14 @@ func _count_attackers(enc: Encounter) -> int:
 	return n
 
 
+## True when another mob of `mob`'s type is winding up or striking (a `solo_attack` type attacks one at a time).
+func _type_attacking(enc: Encounter, mob: Mob) -> bool:
+	for other: Mob in enc.mobs:
+		if other != mob and other.type == mob.type and other.is_attacking():
+			return true
+	return false
+
+
 func _alive(enc: Encounter) -> Array[Mob]:
 	var out: Array[Mob] = []
 	for mob: Mob in enc.mobs:
@@ -289,7 +297,9 @@ func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dic
 	if enc.state == DORMANT:
 		_wake(core, enc, events)
 	var exposed: bool = mob.is_exposed()
-	var damage: int = maxi(1, roundi(base * (Tuning.MOB_EXPOSED_MULT if exposed else 1.0)))
+	var guarded: bool = mob.is_guarded()
+	var multiplier: float = Tuning.MOB_EXPOSED_MULT if exposed else (float(mob.stats()["guard"]) if guarded else 1.0)
+	var damage: int = maxi(1, roundi(base * multiplier))
 	mob.hp = maxi(0, mob.hp - damage)
 	mob.last_hit_tick = core.tick
 	enc.touched = true
@@ -297,6 +307,8 @@ func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dic
 		"attacker_id": player.id, "target_id": mob.id, "damage": damage, "kind": &"counter" if exposed else &"normal",
 		"position": mob.position,
 	}
+	if guarded:
+		data["guarded"] = true  # a reduced hit on a guarded mob (presentation: the guard-hit spark and sound)
 	data.merge(extra)
 	events.append(GameEvent.new(GameEvent.ATTACK_HIT, core.tick, data))
 	if mob.hp <= 0:
@@ -389,7 +401,7 @@ func _chase(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, events: 
 	var to_hero: Vector2 = player.position - mob.position
 	var dist: float = to_hero.length()
 	mob.facing = _toward(mob.position, player.position, mob.facing)
-	if mob.cooldown <= 0 and attackers < Tuning.MOB_MAX_ATTACKERS:
+	if mob.cooldown <= 0 and attackers < Tuning.MOB_MAX_ATTACKERS and not (bool(mob.stats().get("solo_attack", false)) and _type_attacking(enc, mob)):
 		var chosen: Dictionary = _pick_attack(mob, dist)
 		if not chosen.is_empty():
 			mob.current_attack = chosen if not mob.attacks().is_empty() else {}
@@ -426,11 +438,11 @@ func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void
 			t.size = float(atk["reach"]) + mob.radius
 			t.half_angle = float(atk["half_angle"])
 		Telegraph.SHAPE_CIRCLE:
-			t.center = core.player.position  # the burst lands where the hero stood when it began
+			t.center = mob.position if bool(atk.get("centered", false)) else core.player.position  # the burst lands where the hero stood when it began (or around the mob)
 			t.muzzle = mob.position
 			t.size = float(atk["reach"])
 		_:
-			t.size = float(atk["strike_speed"]) * float(atk["strike_ticks"]) + mob.radius
+			t.size = float(atk["reach"]) if bool(atk.get("stationary", false)) else float(atk["strike_speed"]) * float(atk["strike_ticks"]) + mob.radius
 			t.width = float(atk["width"])
 	t.damage = int(atk["damage"])
 	t.start_tick = core.tick
@@ -445,7 +457,7 @@ func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void
 
 func _strike(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 	var atk: Dictionary = mob.attack_stats()
-	if StringName(atk.get("shape", &"line")) != Telegraph.SHAPE_LINE:
+	if StringName(atk.get("shape", &"line")) != Telegraph.SHAPE_LINE or bool(atk.get("stationary", false)):
 		_strike_area(core, mob, atk, events)
 		return
 	var speed: float = float(atk["strike_speed"])
@@ -476,6 +488,9 @@ func _strike_area(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[Gam
 	if mob.state == &"strike" and mob.strike_left <= 0:
 		mob.telegraph = null
 		mob.cooldown = int(atk["cooldown"])
+		if atk.has("chain"):  # not parried (a parry left the strike state): the next attack follows quickly
+			mob.chain_next = StringName(atk["chain"]["id"])
+			mob.cooldown = int(atk["chain"]["delay"])
 		mob.set_state(&"recover")
 
 
@@ -483,6 +498,12 @@ func _strike_area(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[Gam
 ## mob its own row when the distance fits. {} when none fits yet.
 func _pick_attack(mob: Mob, dist: float) -> Dictionary:
 	var rows: Array = mob.attacks()
+	if mob.chain_next != &"":
+		var wanted: StringName = mob.chain_next
+		mob.chain_next = &""
+		for row: Dictionary in rows:
+			if StringName(row["id"]) == wanted:
+				return row
 	if rows.is_empty():
 		var one: Dictionary = mob.attack_stats()
 		return one if dist >= float(one["start_min"]) and dist <= float(one["start_max"]) else {}
@@ -519,6 +540,7 @@ func _land(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[GameEvent]
 		player.on_parry_success(mob.position - player.position)
 		player.position = Collision.push_out(core.obstacles, player.position, Tuning.PLAYER_RADIUS)
 		mob.telegraph = null
+		mob.chain_next = &""
 		mob.cooldown = int(atk["cooldown"])
 		mob.set_state(&"stagger")
 		events.append(GameEvent.new(GameEvent.MOB_STAGGERED, core.tick, {"scene": scene_id, "mob_id": mob.id, "reason": &"parry", "position": mob.position}))
@@ -579,7 +601,7 @@ func mob_views(tick: int) -> Array[Dictionary]:
 			out.append({
 				"id": mob.id, "type": mob.type, "visual_id": mob.type, "level": int(mob.stats()["level"]), "encounter_id": enc.id, "position": mob.position, "facing": mob.facing,
 				"state": mob.state, "state_ticks": mob.state_ticks, "hp": mob.hp, "max_hp": mob.max_hp, "radius": mob.radius,
-				"exposed": mob.is_exposed(), "dragged": mob.dragged, "boss": bool(mob.stats().get("boss", false)), "phase": mob.phase, "attack_id": mob.attack_stats()["id"], "attack": mob.telegraph.attack if mob.telegraph != null else &"", "since_hit": tick - mob.last_hit_tick,
+				"exposed": mob.is_exposed(), "guarded": mob.is_guarded(), "dragged": mob.dragged, "boss": bool(mob.stats().get("boss", false)), "phase": mob.phase, "attack_id": mob.attack_stats()["id"], "attack": mob.telegraph.attack if mob.telegraph != null else &"", "since_hit": tick - mob.last_hit_tick,
 			})
 	return out
 
