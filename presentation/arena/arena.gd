@@ -271,7 +271,7 @@ func _physics_process(delta: float) -> void:
 	elif snapshot.result != &"playing" and persist and Input.is_action_just_pressed("menu_back"):
 		change_scene.call(TITLE_SCENE)
 	# Node-local mouse coordinates already account for viewport scaling and canvas transforms.
-	var intent: InputFrame = Bindings.read_frame(snapshot.player.position, get_local_mouse_position())
+	var intent: InputFrame = Bindings.read_frame(snapshot.player.position, Bindings.world_mouse(self))
 	advance(intent)
 
 ## One core step with `intent`, then everything presentation derives from it (camera, effects, events, HUD).

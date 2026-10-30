@@ -80,9 +80,11 @@ static func _button(action: String, button: int) -> void:
 	event.button_index = button
 	InputMap.action_add_event(action, event)
 
-## Attacks, skills and the weapon active go where the character is heading (the movement direction), or the way he already
-## faces when standing still. The mouse is not used for aiming; the parameters stay so callers need not change.
-static func read_frame(_player_position: Vector2 = Vector2.ZERO, _mouse_position: Vector2 = Vector2.ZERO) -> InputFrame:
+## Attacks, skills and the weapon active aim at the mouse: the direction from the hero to the cursor, both in world space, read
+## on the press tick (the hero's facing follows it for that action only; walking does not turn him toward the cursor).
+## Without a usable cursor (`mouse_position` left at INF, the cursor outside the window, or the cursor on the hero) they go
+## where the character is heading, else the way he already faces when standing still (no aim).
+static func read_frame(player_position: Vector2 = Vector2.ZERO, mouse_position: Vector2 = Vector2.INF) -> InputFrame:
 	var frame: InputFrame = InputFrame.new()
 	frame.move = Input.get_vector("arena_left", "arena_right", "arena_up", "arena_down")
 	frame.weapon_active_pressed = Input.is_action_just_pressed("arena_weapon_active")
@@ -92,8 +94,12 @@ static func read_frame(_player_position: Vector2 = Vector2.ZERO, _mouse_position
 			frame.skill_pressed = slot
 			break
 	# the core reads the aim on the press tick; no aim means "keep facing" (the last heading)
-	if (frame.attack_pressed or frame.skill_pressed > 0 or frame.weapon_active_pressed) and frame.move.length_squared() > 0.0001:
-		frame.aim = frame.move.normalized()
+	if frame.attack_pressed or frame.skill_pressed > 0 or frame.weapon_active_pressed:
+		var to_mouse: Vector2 = mouse_position - player_position
+		if mouse_position.is_finite() and to_mouse.length_squared() > 1.0:
+			frame.aim = to_mouse.normalized()
+		elif frame.move.length_squared() > 0.0001:
+			frame.aim = frame.move.normalized()
 	frame.use_item_slot = 1 if Input.is_action_just_pressed("explore_item_1") else (2 if Input.is_action_just_pressed("explore_item_2") else 0)
 	frame.attack_held = Input.is_action_pressed("arena_attack")
 	frame.parry_pressed = Input.is_action_just_pressed("arena_parry")
@@ -110,3 +116,11 @@ static func action_label(action: String) -> String:
 		if event is InputEventMouseButton:
 			return "Left click" if (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT else "Right click"
 	return "Unbound"
+
+
+## The mouse cursor in world space for `canvas` (a node drawn under the scene's camera), or INF while it is outside the window.
+static func world_mouse(canvas: CanvasItem) -> Vector2:
+	var viewport: Viewport = canvas.get_viewport()
+	if viewport == null or not viewport.get_visible_rect().has_point(viewport.get_mouse_position()):
+		return Vector2.INF
+	return canvas.get_global_mouse_position()

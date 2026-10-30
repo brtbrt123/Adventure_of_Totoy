@@ -48,7 +48,7 @@ func _inputs() -> void:
 		Input.action_press(action)
 		var frame: InputFrame = Bindings.read_frame(Vector2(40, 30), Vector2(100, 30))
 		_expect(frame.skill_pressed == slot, "skill press " + str(slot))
-		_expect(frame.aim == Vector2.ZERO, "no mouse aim, the skill keeps the facing " + str(slot))
+		_expect(frame.aim.is_equal_approx(Vector2.RIGHT), "the skill aims at the mouse " + str(slot))
 		await process_frame
 		await process_frame
 		_expect(Bindings.read_frame().skill_pressed == 0, "held skill repeats " + str(slot))
