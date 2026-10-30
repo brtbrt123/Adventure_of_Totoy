@@ -1,3 +1,5 @@
+Owner approved the ground/no-cave visual direction on2026-10-30 ("i approved vmake that"). Historical ground review notes below. New sprites and collision handoff are described in IMPLEMENTATION.md.
+
 # Root Hollow ground approval package (2026-10-30)
 
 Step 1 only. Ground proposal is temporarily installed at presentation/forest/root_hollow_layered_ground.png so the real renderer and the F12 debug-jump handler can show it. No core/, data/, outline, props or lighting tuning changed. Props remain unapproved blockout assets and are hidden in the capture fixture only. Do not start the 12-prop sheet before owner approval.

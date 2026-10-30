@@ -1,5 +1,7 @@
 # HANDOFF: Adventure of Totoy (rewritten 2026-10-22 for the next session)
 
+> **Root Hollow (2026-10-30):** owner approved the no-cave art. Ground and12 independent prop sprites/24 shadow masks are prepared; static engine preview in art/reference/root_hollow_v1/props_engine_review.png. Live new prop placement is NOT collision-registered. Claude must follow [[CLAUDE_TASK_root_hollow_prop_registration]] before replacing blockout data. Pending art/shadow catalogues stay separate to keep definition-matching tests green. Existing lamp pools + common moon shadows only; per-lamp occlusion unfinished.
+
 > **Weapon paths (2026-10-29):** approved trails, glow and particles use the shared `hero_fx.gd` base in both arena and exploration. Future hero renderers must call `draw_hero_back`; see [[WEAPON_PATHS]]. The third katana cut was corrected to travel forward over the head.
 
 > **UI update (2026-10-29):** owner approved switching the base view to 384x216 and installing the SpriteCook bronze/teal kit with existing game icons. See decision [[0005-384x216-fantasy-ui]], newest STATUS and live captures in `presentation/review/ui_kit_live/`.

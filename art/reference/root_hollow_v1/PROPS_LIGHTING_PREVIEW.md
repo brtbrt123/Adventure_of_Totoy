@@ -1,3 +1,5 @@
+Current status: owner approved props_lighting_concept_v2_no_cave.png. Separate sprites have now been made; see IMPLEMENTATION.md. New collision registration and live placement remain pending Claude. Original concept notes below are historical.
+
 # Sparse Root Hollow props and lighting concept
 
 Owner requested sparse trees, bushes, roots, rune stones / lamps, light spill and cast shadows, preview before integration. Built-in imagegen composite proposal; reference ground plus existing tree, lantern and rune stone sprites attached. This image is a concept, NOT a renderer capture, prop sheet, collision-approved map or runtime asset. Existing ground, scene data and renderer remain unchanged. No tests rerun for this reference-only image; previous ground harness passed.
