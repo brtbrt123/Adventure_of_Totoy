@@ -400,6 +400,24 @@ const MOBS: Dictionary = {
 		"attack": {"id": &"lunge", "kind": &"gold", "start_min": 14.0, "start_max": 50.0, "windup": 36, "strike_ticks": 10, "strike_speed": 5.2,
 			"width": 18.0, "damage": 12, "recover": 36, "cooldown": 70, "interrupt": true, "crash": 0},
 	},
+	# The Thornback Stag, the glade's mini-boss: one mob with three attacks. SLAM is gold (parry it: the Stag is stunned and exposed), CHARGE is
+	# red (dash across the lane; a charge into a prop crashes it), and ROOTS (phase two only, when it falls to PHASE2_HP of its health and
+	# roars) is red too: a burst under where the hero stood. Each attack row: kind, shape (line, cone or circle), the distance band the Stag
+	# starts it from, windup (the warning), strike_ticks (the dangerous window or the run), damage, recover and cooldown.
+	&"stag": {
+		"level": 3, "exp": 60, "drop": {"item": &"herb", "chance": 1.0}, "hp": 260, "radius": 20.0, "speed": 0.6, "aggro": 130.0, "tether": 320.0, "hold": 30.0, "wait": 90.0,
+		"boss": true, "phase2_hp": 0.5, "roar_ticks": 54,
+		"attacks": [
+			{"id": &"stag_slam", "kind": &"gold", "shape": &"cone", "reach": 50.0, "half_angle": 0.95, "start_min": 0.0, "start_max": 62.0, "windup": 54, "strike_ticks": 6,
+				"strike_speed": 0.0, "width": 0.0, "damage": 18, "recover": 48, "cooldown": 46, "interrupt": false, "crash": 0, "phase": 1},
+			{"id": &"stag_charge", "kind": &"red", "shape": &"line", "start_min": 84.0, "start_max": 210.0, "windup": 56, "strike_ticks": 36, "strike_speed": 4.4,
+				"width": 30.0, "damage": 24, "recover": 40, "cooldown": 56, "interrupt": false, "crash": 80, "phase": 1},
+			{"id": &"stag_roots", "kind": &"red", "shape": &"circle", "reach": 34.0, "start_min": 0.0, "start_max": 230.0, "windup": 50, "strike_ticks": 5,
+				"strike_speed": 0.0, "width": 0.0, "damage": 16, "recover": 40, "cooldown": 40, "interrupt": false, "crash": 0, "phase": 2},
+		],
+		"attack": {"id": &"stag_slam", "kind": &"gold", "start_min": 0.0, "start_max": 62.0, "windup": 54, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 18,
+			"recover": 48, "cooldown": 46, "interrupt": false, "crash": 0},
+	},
 	&"boar": {
 		"level": 2, "exp": 25, "drop": {"item": &"herb", "chance": 0.6}, "hp": 70, "radius": 9.0, "speed": 0.55, "aggro": 110.0, "tether": 260.0, "hold": 100.0, "wait": 110.0,
 		"attack": {"id": &"charge", "kind": &"red", "start_min": 24.0, "start_max": 140.0, "windup": 50, "strike_ticks": 38, "strike_speed": 3.4,

@@ -303,6 +303,8 @@ func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dic
 		_kill(core, enc, mob, events)
 		if enc.state == CLEARED:
 			return true
+	elif mob.phase == 1 and mob.stats().has("phase2_hp") and float(mob.hp) <= float(mob.max_hp) * float(mob.stats()["phase2_hp"]):
+		_begin_phase_two(core, mob, events)
 	elif mob.state == &"windup" and bool(mob.attack_stats()["interrupt"]):
 		mob.telegraph = null
 		mob.cooldown = int(mob.attack_stats()["cooldown"])
@@ -372,6 +374,9 @@ func _step_mob(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, event
 		&"hurt":
 			if mob.state_ticks >= Tuning.MOB_HURT_TICKS:
 				mob.set_state(&"chase")
+		&"roar":
+			if mob.state_ticks >= int(mob.stats().get("roar_ticks", 48)):
+				mob.set_state(&"chase")
 		&"return":
 			_walk_home(core, mob)
 	if mob.state == &"chase" and mob.position.distance_to(mob.home) > float(mob.stats()["tether"]):
@@ -381,13 +386,15 @@ func _step_mob(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, event
 
 func _chase(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, events: Array[GameEvent]) -> void:
 	var player: PlayerState = core.player
-	var atk: Dictionary = mob.attack_stats()
 	var to_hero: Vector2 = player.position - mob.position
 	var dist: float = to_hero.length()
 	mob.facing = _toward(mob.position, player.position, mob.facing)
-	if mob.cooldown <= 0 and dist >= float(atk["start_min"]) and dist <= float(atk["start_max"]) and attackers < Tuning.MOB_MAX_ATTACKERS:
-		_begin_attack(core, mob, events)
-		return
+	if mob.cooldown <= 0 and attackers < Tuning.MOB_MAX_ATTACKERS:
+		var chosen: Dictionary = _pick_attack(mob, dist)
+		if not chosen.is_empty():
+			mob.current_attack = chosen if not mob.attacks().is_empty() else {}
+			_begin_attack(core, mob, events)
+			return
 	var stats: Dictionary = mob.stats()
 	var hold: float = float(stats["hold"])
 	if attackers >= Tuning.MOB_MAX_ATTACKERS:
@@ -400,6 +407,7 @@ func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void
 	var atk: Dictionary = mob.attack_stats()
 	var dir: Vector2 = _toward(mob.position, core.player.position, mob.facing)
 	mob.attack_dir = dir
+	var shape: StringName = StringName(atk.get("shape", &"line"))
 	mob.facing = dir
 	mob.attack_done = false
 	mob.set_state(&"windup")
@@ -409,12 +417,21 @@ func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void
 	t.owner_id = mob.id
 	t.attack = StringName(atk["id"])
 	t.kind = StringName(atk["kind"])
-	t.shape = Telegraph.SHAPE_LINE
+	t.shape = shape
 	t.center = mob.position
 	t.muzzle = mob.position
 	t.direction = dir
-	t.size = float(atk["strike_speed"]) * float(atk["strike_ticks"]) + mob.radius
-	t.width = float(atk["width"])
+	match shape:
+		Telegraph.SHAPE_CONE:
+			t.size = float(atk["reach"]) + mob.radius
+			t.half_angle = float(atk["half_angle"])
+		Telegraph.SHAPE_CIRCLE:
+			t.center = core.player.position  # the burst lands where the hero stood when it began
+			t.muzzle = mob.position
+			t.size = float(atk["reach"])
+		_:
+			t.size = float(atk["strike_speed"]) * float(atk["strike_ticks"]) + mob.radius
+			t.width = float(atk["width"])
 	t.damage = int(atk["damage"])
 	t.start_tick = core.tick
 	t.hit_tick = core.tick + int(atk["windup"])
@@ -428,6 +445,9 @@ func _begin_attack(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void
 
 func _strike(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 	var atk: Dictionary = mob.attack_stats()
+	if StringName(atk.get("shape", &"line")) != Telegraph.SHAPE_LINE:
+		_strike_area(core, mob, atk, events)
+		return
 	var speed: float = float(atk["strike_speed"])
 	var before: Vector2 = mob.position
 	mob.position = Collision.move_resolved(core.obstacles, before, before + mob.attack_dir * speed, mob.radius)
@@ -445,6 +465,44 @@ func _strike(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
 		mob.telegraph = null
 		mob.cooldown = int(atk["cooldown"])
 		mob.set_state(&"recover")
+
+
+## A cone or a burst: the mob stands still; whatever the warning covers is hit for the whole strike window (once).
+func _strike_area(core: RefCounted, mob: Mob, atk: Dictionary, events: Array[GameEvent]) -> void:
+	mob.strike_left -= 1
+	var t: Telegraph = mob.telegraph
+	if not mob.attack_done and t != null and t.overlaps_circle(core.player.position, Tuning.PLAYER_RADIUS):
+		_land(core, mob, atk, events)
+	if mob.state == &"strike" and mob.strike_left <= 0:
+		mob.telegraph = null
+		mob.cooldown = int(atk["cooldown"])
+		mob.set_state(&"recover")
+
+
+## The attack a many-attack mob starts from `dist` away: the next one in its rotation that fits the distance and its phase; for a one-attack
+## mob its own row when the distance fits. {} when none fits yet.
+func _pick_attack(mob: Mob, dist: float) -> Dictionary:
+	var rows: Array = mob.attacks()
+	if rows.is_empty():
+		var one: Dictionary = mob.attack_stats()
+		return one if dist >= float(one["start_min"]) and dist <= float(one["start_max"]) else {}
+	for offset: int in rows.size():
+		var row: Dictionary = rows[(mob.attack_index + offset) % rows.size()]
+		if int(row.get("phase", 1)) > mob.phase:
+			continue
+		if dist >= float(row["start_min"]) and dist <= float(row["start_max"]):
+			mob.attack_index = (mob.attack_index + offset + 1) % rows.size()
+			return row
+	return {}
+
+
+## The Stag at half health: it stops attacking, roars, and the roots join its attacks.
+func _begin_phase_two(core: RefCounted, mob: Mob, events: Array[GameEvent]) -> void:
+	mob.phase = 2
+	mob.telegraph = null
+	mob.cooldown = int(mob.stats().get("roar_ticks", 48)) + 20
+	mob.set_state(&"roar")
+	events.append(GameEvent.new(GameEvent.BOSS_PHASE_CHANGED, core.tick, {"entity_id": mob.id, "phase": 2, "scene": scene_id, "position": mob.position}))
 
 
 ## The strike reached the hero: a gold lunge met by the parry window is parried, anything else wounds him unless he is invulnerable.
@@ -521,7 +579,7 @@ func mob_views(tick: int) -> Array[Dictionary]:
 			out.append({
 				"id": mob.id, "type": mob.type, "visual_id": mob.type, "level": int(mob.stats()["level"]), "encounter_id": enc.id, "position": mob.position, "facing": mob.facing,
 				"state": mob.state, "state_ticks": mob.state_ticks, "hp": mob.hp, "max_hp": mob.max_hp, "radius": mob.radius,
-				"exposed": mob.is_exposed(), "dragged": mob.dragged, "attack": mob.telegraph.attack if mob.telegraph != null else &"", "since_hit": tick - mob.last_hit_tick,
+				"exposed": mob.is_exposed(), "dragged": mob.dragged, "boss": bool(mob.stats().get("boss", false)), "phase": mob.phase, "attack": mob.telegraph.attack if mob.telegraph != null else &"", "since_hit": tick - mob.last_hit_tick,
 			})
 	return out
 

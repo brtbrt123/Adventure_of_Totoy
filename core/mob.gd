@@ -26,6 +26,9 @@ var attack_done: bool = false  # the strike already hit the hero (or was parried
 var last_hit_tick: int = -1000  # the tick the hero's blow last landed (hit flash)
 var last_swing: int = -1  # the swing serial of the last blow taken (one hit per swing)
 var dragged: bool = false  # held by Reaper's Coil: the field leaves it alone until the coil lets go
+var phase: int = 1  # the Stag's second phase (roots) starts after it roars
+var attack_index: int = 0  # which attack a many-attack mob tries next
+var current_attack: Dictionary = {}  # the attack row in progress (many-attack mobs); empty = the type's one attack
 var killed: bool = false  # felled for good (story flag killed_<encounter>_<n>): a reset never revives it
 
 
@@ -47,7 +50,12 @@ func stats() -> Dictionary:
 
 
 func attack_stats() -> Dictionary:
-	return Tuning.MOBS[type]["attack"]
+	return current_attack if not current_attack.is_empty() else Tuning.MOBS[type]["attack"]
+
+
+## The attack rows of a mob with several (the Stag); empty for the others.
+func attacks() -> Array:
+	return Tuning.MOBS[type].get("attacks", [])
 
 
 func is_alive() -> bool:
@@ -82,3 +90,6 @@ func reset() -> void:
 	attack_done = false
 	last_swing = -1
 	dragged = false
+	phase = 1
+	attack_index = 0
+	current_attack = {}

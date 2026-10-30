@@ -823,6 +823,11 @@ func _check_exits(events: Array[GameEvent]) -> void:
 				_blocked_told[exit["id"]] = true
 				events.append(GameEvent.new(GameEvent.EXIT_BLOCKED, tick, {"scene": scene_id, "exit_id": exit["id"], "text": QuestBook.blocked_text(quests)}))
 			continue
+		if exit.has("requires_flag") and not (story_flags.has(QuestBook.DEBUG_FLAG) or story_flags.has(exit["requires_flag"])):
+			if not _blocked_told.has(exit["id"]):
+				_blocked_told[exit["id"]] = true
+				events.append(GameEvent.new(GameEvent.EXIT_BLOCKED, tick, {"scene": scene_id, "exit_id": exit["id"], "text": String(exit.get("blocked_text", ""))}))
+			continue
 		exit_fired[exit["id"]] = true
 		exiting = true
 		pending_exit = {"exit_id": exit["id"], "target_scene": exit["target_scene"], "target_entry": exit["target_entry"]}

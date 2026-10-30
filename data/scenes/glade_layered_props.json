@@ -187,7 +187,9 @@
     10
    ],
    "target_scene": "arena",
-   "target_entry": "start"
+   "target_entry": "start",
+   "requires_flag": "cleared_stag_glade",
+   "blocked_text": "The root arch holds fast. The Stag still guards it."
   }
  ],
  "checkpoints": [
@@ -209,6 +211,33 @@
   127,
   210,
   140
+ ],
+ "encounters": [
+  {
+   "id": "stag_glade",
+   "name": "THORNBACK STAG",
+   "rect": [
+    168,
+    127,
+    210,
+    140
+   ],
+   "leash": 330,
+   "reward": {
+    "reward_id": "stag_glade_herbs",
+    "kind": "item",
+    "item": "herb",
+    "name": "Herb",
+    "quantity": 3
+   },
+   "mobs": [
+    {
+     "type": "stag",
+     "x": 420,
+     "y": 165
+    }
+   ]
+  }
  ],
  "props": [
   {

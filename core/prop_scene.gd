@@ -157,6 +157,9 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 			"target_entry": StringName(str(e["target_entry"]))}
 		if e.has("gate"):  # "road": closed until the village sequence is done (core/quest_book.gd)
 			exit_row["gate"] = StringName(str(e["gate"]))
+		if e.has("requires_flag"):  # closed until this story flag is set (the glade's root arch: cleared_stag_glade)
+			exit_row["requires_flag"] = StringName(str(e["requires_flag"]))
+			exit_row["blocked_text"] = str(e.get("blocked_text", ""))
 		exits.append(exit_row)
 	var checkpoints: Array = []
 	for row: Variant in scene.get("checkpoints", []):
