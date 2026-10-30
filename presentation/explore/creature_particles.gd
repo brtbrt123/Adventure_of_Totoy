@@ -48,12 +48,11 @@ const LAYERS: Dictionary = {
 	],
 	# a heal pulse: green motes rising off the Stag's body
 	"heal": [
-		{"n": 18, "shape": "mote", "life": [30, 46], "speed": [0.1, 0.35], "drag": 0.02, "up": 0.45, "g": -0.004, "size": [2, 2], "cols": ["6", "5"], "flutter": 1.2},
-		{"n": 8, "shape": "mote", "life": [24, 36], "speed": [0.1, 0.3], "drag": 0.02, "up": 0.35, "g": -0.003, "size": [2, 2], "cols": ["6", "5"], "flutter": 1.0},
+		{"n": 6, "shape": "mote", "life": [30, 46], "speed": [0.1, 0.3], "drag": 0.02, "up": 0.45, "g": -0.004, "size": [2, 2], "cols": ["6", "5"], "flutter": 1.2},
 	],
 	# the steady glow while the regeneration runs (a few motes every few ticks)
 	"mist": [
-		{"n": 4, "shape": "mote", "life": [26, 38], "speed": [0.05, 0.2], "drag": 0.02, "up": 0.3, "g": -0.003, "size": [2, 2], "cols": ["6", "5"], "flutter": 1.0},
+		{"n": 1, "shape": "mote", "life": [26, 38], "speed": [0.05, 0.2], "drag": 0.02, "up": 0.3, "g": -0.003, "size": [2, 2], "cols": ["6", "5"], "flutter": 1.0},
 	],
 	# an orb in flight sheds sparks; an orb's end throws a few more
 	"orb_trail": [
@@ -117,7 +116,9 @@ static func _spawn(burst: Dictionary, li: int, i: int) -> Dictionary:
 			var start: Vector2 = Vector2.from_angle(u * TAU) * lerpf(26.0, 38.0, v)
 			return {"origin": at + start, "heading": -start.normalized(), "delay": 0}
 		"heal", "mist":
-			return {"origin": at + Vector2((u - 0.5) * 34.0, -v * 34.0), "heading": Vector2.from_angle(-PI / 2.0 + (u - 0.5) * 1.2), "delay": int(v * 6.0)}
+			# beside the body (not over it), so the Stag stays readable while it heals
+			var side: float = -1.0 if u < 0.5 else 1.0
+			return {"origin": at + Vector2(side * lerpf(18.0, 28.0, rand(s, i, li * 7 + 9)), -lerpf(6.0, 34.0, v)), "heading": Vector2.from_angle(-PI / 2.0 + side * 0.3), "delay": int(v * 6.0)}
 		"orb_trail":
 			return {"origin": at + Vector2((u - 0.5) * 4.0, (v - 0.5) * 4.0), "heading": Vector2.from_angle(u * TAU), "delay": 0}
 	return {"origin": at, "heading": dir, "delay": 0}

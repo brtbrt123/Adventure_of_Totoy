@@ -61,9 +61,12 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 		if mob["state"] == &"crash" and old.get("state", &"") != &"crash":
 			trails.append({"at": at + Vector2(mob["facing"]) * 14, "tick": view.tick, "crash": true})
 			emit("crash", at + Vector2(mob["facing"]) * 18, view.tick, {"dir": Vector2(mob["facing"])})
-		if not old.is_empty() and int(mob["hp"]) > int(old["hp"]) and bool(mob.get("regen_active", false)):
+		# The core heals a whole point every few ticks; show one pulse a second at most, so the Stag stays visible.
+		var last_heal: int = int(old.get("heal_tick", -1000))
+		if not old.is_empty() and int(mob["hp"]) > int(old["hp"]) and bool(mob.get("regen_active", false)) and view.tick - last_heal >= 60:
 			heals.append({"id": id, "tick": view.tick, "amount": int(mob["hp"]) - int(old["hp"])})
 			emit("heal", at, view.tick)
+			last_heal = view.tick
 		var was: StringName = old.get("state", &"")
 		if mob["state"] == &"roar" and was != &"roar":
 			emit("roar", at - Vector2(0, 8), view.tick)
@@ -72,9 +75,9 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 				emit("chant", horns(mob), view.tick)
 			elif mob["state"] == &"strike" and was == &"windup":
 				emit("release", horns(mob), view.tick)
-		if bool(mob.get("regen_active", false)) and view.tick % 10 == 0:
+		if bool(mob.get("regen_active", false)) and view.tick % 20 == 0:
 			emit("mist", at, view.tick)
-		previous[id] = {"at": at, "state": mob["state"], "hp": mob["hp"], "trail_tick": old.get("trail_tick", view.tick - 3)}
+		previous[id] = {"at": at, "state": mob["state"], "hp": mob["hp"], "trail_tick": old.get("trail_tick", view.tick - 3), "heal_tick": last_heal}
 	var current: Dictionary = {}
 	for tell: Snapshots.TelegraphSnapshot in view.telegraphs:
 		if alive.has(tell.owner_id) and tell.attack in [&"stag_slam", &"stag_roots"]:

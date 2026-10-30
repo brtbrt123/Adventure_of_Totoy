@@ -31,16 +31,16 @@ static func halo_plan(bursts: Array[Dictionary], tick: int, heals: Array[Diction
 		for p: Dictionary in Particles.points(burst, tick):
 			var at: Vector2 = Vector2(p["at"]).round() + Vector2(0.5, 0.5)
 			var pulse: float = 0.75 + 0.25 * sin(float(tick + int(p["age"]) * 3) * 0.3)
-			out.append({"at": at, "radius": 5.0, "colour": Color(GREEN, 0.22 * pulse)})
-			out.append({"at": at, "radius": 2.5, "colour": Color(LIGHT, 0.45 * pulse)})
+			out.append({"at": at, "radius": 3.5, "colour": Color(GREEN, 0.16 * pulse)})
+			out.append({"at": at, "radius": 1.5, "colour": Color(LIGHT, 0.35 * pulse)})
 	for heal: Dictionary in heals:
 		for mob: Dictionary in mobs:
 			if int(mob["id"]) != int(heal["id"]) or mob["state"] == &"dead":
 				continue
 			var age: int = tick - int(heal["tick"])
 			var at: Vector2 = (Vector2(mob["position"]) + Vector2(10, -72 - age / 2)).round() + Vector2(0.5, 0.5)
-			out.append({"at": at, "radius": 7.0, "colour": Color(GREEN, 0.25)})
-			out.append({"at": at, "radius": 3.5, "colour": Color(LIGHT, 0.4)})
+			out.append({"at": at, "radius": 5.0, "colour": Color(GREEN, 0.18)})
+			out.append({"at": at, "radius": 2.5, "colour": Color(LIGHT, 0.3)})
 	return out
 
 
