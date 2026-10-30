@@ -21,6 +21,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[CLAUDE_TASK_village_playtest_polish]]: roomier training yard, Tovan first sword/unarmed state and reward event; Codex presentation ready
 - [[LAYERED_SCENE_PILOT]]: floor painting plus separate props; prompts for the images
 - [[CODEX_TASK_layered_pilot]]: Codex's side of the pilot
+- [[CODEX_TASK_root_hollow]]: the real art for Root Hollow (ground painting and new props), Codex's task
 - [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, who does what)
 
 ## Art references
