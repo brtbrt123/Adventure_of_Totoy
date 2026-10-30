@@ -1,5 +1,7 @@
 # HANDOFF: Adventure of Totoy (rewritten 2026-10-22 for the next session)
 
+> **Thornback visuals (2026-10-30):** approved creature poses and richer FX are now installed globally in Explore; full harness PASS. Core still needs the larger/faster attacks,8 eruptions,5 real Glowmoths and2% healing. Claude: read [[CLAUDE_TASK_thornback_balance_v3]]. Live captures and limits: art/reference/thornback_fx_review_v3/LIVE_INTEGRATION.md. Synthetic future-rule captures are NOT proof of implemented gameplay.
+
 > **Mob idles (2026-10-30):** approved Mossling hopping and Boar grazing are installed globally in mob_view.gd, with60 new sprites. Idle selection uses simulation tick (dormant state_ticks stays zero),6 ticks/frame and per-mob phase; alert/combat unchanged. Full harness passes; live GIF and rebuild instructions in art/reference/mob_idle_review_v1/.
 
 > **Root Hollow (2026-10-30):** Claude registered live colliders/placements/gate in ad118e0f; Codex finished Root Hollow-only exposure, teal pools and nearest-practical projected cast shadows. Ancient/root-wall canopy y-sort is preserved. Live gate/depth/route/warning captures and PASS cross-review: presentation/review/root_hollow_final/REVIEW.md. Full harness passes. Local shadows use a soft parallel-ray mask approximation, not physical volumetric occlusion; owner judges appearance.

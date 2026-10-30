@@ -1,0 +1,319 @@
+{
+  "review_only": true,
+  "fps": 20,
+  "frame_ms": 50,
+  "native_right_facing": true,
+  "clips": {
+    "glowmoth_idle": {
+      "frames": 96,
+      "duration_ms": 4800,
+      "native_stage": [
+        128,
+        80
+      ],
+      "notes": "New calm loop; no world movement or gameplay changes."
+    },
+    "glowmoth_move": {
+      "frames": 72,
+      "duration_ms": 3600,
+      "native_stage": [
+        128,
+        80
+      ],
+      "notes": "Translation/mirroring is review choreography; AI paths and speed unchanged."
+    },
+    "stag_idle": {
+      "frames": 96,
+      "duration_ms": 4800,
+      "native_stage": [
+        224,
+        112
+      ],
+      "notes": "New calm loop; no world movement or gameplay changes."
+    },
+    "stag_move": {
+      "frames": 72,
+      "duration_ms": 3600,
+      "native_stage": [
+        224,
+        112
+      ],
+      "notes": "Translation/mirroring is review choreography; AI paths and speed unchanged."
+    },
+    "glowmoth_attack": {
+      "frames": 72,
+      "duration_ms": 3600,
+      "native_stage": [
+        128,
+        80
+      ],
+      "notes": "Proposed ranged-orb visuals and review timings ONLY. No Glowmoth combat implementation exists yet. Totoy is a scale marker."
+    },
+    "stag_attacks": {
+      "frames": 142,
+      "duration_ms": 7100,
+      "native_stage": [
+        320,
+        160
+      ],
+      "notes": "Attack phase lengths match current core54/6/48,56/36/40,50/5/40 ticks. Roots art preview reuses roar gesture; charge includes an optional obstacle-crash ending, not a new rule. Hit geometry and targets stay core-owned."
+    }
+  },
+  "fx_anchors": {
+    "fx_ch1_leaf_puff": [
+      12,
+      16
+    ],
+    "fx_ch1_boar_dust": [
+      28,
+      14
+    ],
+    "fx_ch1_boar_crash": [
+      20,
+      30
+    ],
+    "fx_ch1_moth_trail": [
+      24,
+      4
+    ],
+    "fx_ch1_moth_shadow": [
+      8,
+      4
+    ],
+    "fx_ch1_root_spike": [
+      12,
+      36
+    ],
+    "fx_ch1_stag_slam_rubble": [
+      24,
+      22
+    ],
+    "fx_ch1_purify_sparkle": [
+      24,
+      40
+    ],
+    "fx_glowmoth_orb": [
+      8,
+      8
+    ],
+    "fx_glowmoth_orb_pop": [
+      8,
+      8
+    ],
+    "fx_stag_spirit_root": [
+      12,
+      36
+    ]
+  },
+  "sources": {
+    "glowmoth_idle": {
+      "frames": 24,
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "glowmoth_move": {
+      "frames": 12,
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        29
+      ]
+    },
+    "stag_idle": {
+      "frames": 24,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_move": {
+      "frames": 12,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "glowmoth_shot_tell": {
+      "frames": 4,
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        8,
+        23
+      ]
+    },
+    "glowmoth_shot_release": {
+      "frames": 2,
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        8,
+        23
+      ]
+    },
+    "glowmoth_hurt": {
+      "frames": 2,
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        8,
+        23
+      ]
+    },
+    "glowmoth_death": {
+      "frames": 4,
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        8,
+        23
+      ]
+    },
+    "stag_slam_raise": {
+      "frames": 4,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_slam_strike": {
+      "frames": 3,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_slam_recover": {
+      "frames": 4,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_charge_tell": {
+      "frames": 5,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_charge_run": {
+      "frames": 4,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_charge_crash": {
+      "frames": 3,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_phase2_roar": {
+      "frames": 6,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_hurt": {
+      "frames": 3,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_stagger": {
+      "frames": 4,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_death": {
+      "frames": 8,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    },
+    "stag_freed": {
+      "frames": 4,
+      "size": [
+        96,
+        64
+      ],
+      "anchor": [
+        36,
+        62
+      ]
+    }
+  }
+}

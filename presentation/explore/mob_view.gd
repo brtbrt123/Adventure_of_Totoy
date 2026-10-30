@@ -5,6 +5,7 @@ const Tuning := preload("res://core/tuning.gd")
 const WHITE := preload("res://art/build/sprites_white.png")
 const Kit := preload("res://presentation/common/ui_kit.gd")
 const STATES: Dictionary = {
+ "glowmoth": {"idle":["idle",24,2,true], "alert":["idle",24,2,true], "chase":["move",12,2,true], "return":["move",12,2,true], "windup":["shot_tell",4,1,false], "strike":["shot_release",2,4,false], "recover":["idle",24,2,true], "hurt":["hurt",2,5,false], "dead":["death",4,8,false]},
  "mossling": {"idle":["play_idle",24,6,true], "alert":["spawn",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["attack_tell",3,1,false], "strike":["attack_lunge",3,3,false], "recover":["attack_recover",3,8,false], "crash":["attack_recover",3,8,true], "stagger":["attack_recover",3,8,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]},
  "stag": {"idle":["idle",4,14,true], "alert":["idle",4,6,false], "chase":["walk",6,6,true], "return":["walk",6,6,true], "windup":["slam_raise",4,1,false], "strike":["slam_strike",3,2,false], "recover":["slam_recover",4,8,false], "crash":["charge_crash",3,10,true], "stagger":["stagger",4,10,true], "hurt":["hurt",3,4,false], "roar":["phase2_roar",6,9,false], "dead":["death",8,9,false]},
  "boar": {"idle":["graze_idle",36,6,true], "alert":["idle",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["charge_tell",4,1,false], "strike":["charge_run",4,2,true], "recover":["crash_stun",3,9,false], "crash":["crash_stun",3,9,true], "stagger":["crash_stun",3,9,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]}}
@@ -13,17 +14,27 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 	var pose: Array = table.get(String(mob["state"]), table["idle"])
 	if mob["type"]==&"mossling" and mob["state"]==&"stagger":pose=["hurt",2,6,true]
 	if mob["type"]==&"boar" and mob["state"]==&"recover":pose=["charge_tell",4,6,false]
+	if mob["type"] == &"stag":
+		if mob["state"] == &"idle":pose=["breathe",24,6,true]
+		elif mob["state"] in [&"chase", &"return"]:pose=["amble",12,5,true]
+		elif mob.get("attack_id", &"") == &"stag_roots" and mob["state"] == &"windup":pose=["phase2_roar",6,1,false]
+		elif mob.get("attack_id", &"") == &"stag_summon":
+			if mob["state"] in [&"windup", &"chant"]:pose=["chant",28,3,false]
+			elif mob["state"] in [&"strike", &"recover"]:pose=["summon",10,6,false]
 	if mob["type"]==&"stag" and mob.get("attack_id", &"") == &"stag_charge":
 		if mob["state"]==&"windup":pose=["charge_tell",5,1,false]
 		elif mob["state"]==&"strike":pose=["charge_run",4,3,true]
 	# Dormant encounters leave idle state_ticks at zero. Use the simulation clock so they animate
 	# before aggro, freeze with pause and stop immediately when core reports another state.
-	var clock: int = tick + int(mob["id"]) * 17 if mob["state"] == &"idle" and mob["type"] in [&"mossling", &"boar"] else int(mob["state_ticks"])
+	var clock: int = tick + int(mob["id"]) * 17 if mob["state"] == &"idle" else int(mob["state_ticks"])
 	var n: int = clock / int(pose[2])
 	if mob["state"] == &"windup":
 		for tell: Snapshots.TelegraphSnapshot in tells:
 			if tell.owner_id == mob["id"]:
 				n = floori(float(tick-tell.start_tick) / maxi(1,tell.hit_tick-tell.start_tick) * int(pose[1]))
+	# A non-damaging summon needs cast progress from core, never an invented damage warning.
+	if mob.get("attack_id", &"") == &"stag_summon" and mob["state"] in [&"windup", &"chant"] and mob.has("cast_start_tick") and mob.has("cast_release_tick"):
+		n = floori(float(tick - int(mob["cast_start_tick"])) / maxi(1, int(mob["cast_release_tick"]) - int(mob["cast_start_tick"])) * int(pose[1]))
 	if mob["type"]==&"boar" and mob["state"]==&"windup" and n>=2:
 		n=2+posmod(int(mob["state_ticks"])/4,2)
 	if mob["state"] == &"dead":

@@ -15,6 +15,8 @@ const ExploreHud := preload("res://presentation/explore/explore_hud.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const PropScene := preload("res://core/prop_scene.gd")
 const MobView := preload("res://presentation/explore/mob_view.gd")
+const CreatureEffects := preload("res://presentation/explore/creature_effects.gd")
+var creature_effects: CreatureEffects = CreatureEffects.new()
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
@@ -234,6 +236,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	hero_hit_tick = -1000
 	world_cues.clear()
 	encounter_effects.clear()
+	creature_effects.clear()
 	progression_view.clear()
 	defeat_started_tick = -1
 	practice_view.enter_scene(scene)
@@ -252,6 +255,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
+	creature_effects.sync(snapshot)
 	progression_view.sync(snapshot, colors, frames, sprites)
 	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
@@ -371,6 +375,7 @@ func advance(intent: InputFrame) -> void:
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
+	creature_effects.sync(snapshot)
 	progression_view.sync(snapshot, colors, frames, sprites)
 	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
@@ -810,6 +815,7 @@ func _draw() -> void:
 	_draw_coil_ground()
 	_draw_lantern_ground()
 	_draw_ward_echo_ground()
+	creature_effects.draw_ground(self, snapshot, frames, sprites, colors)
 	draw_dash_fx()
 	for prop: Dictionary in lantern_drawables() + echo_drawables():
 		_draw_imported(prop["name"], prop["at"], prop["scale"])
@@ -903,6 +909,8 @@ func _draw_item(item: Dictionary) -> void:
 	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
 	var sheet: Texture2D = MobView.WHITE if white else (empowered_sprites if item["kind"] == &"hero" and empowered_sprites != null and black_form_look(snapshot.hero) else sprites)
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
+	if item["kind"] == &"mob":
+		creature_effects.draw_actor(self, item["mob"], key, snapshot.tick, frames, sprites, colors)
 	if item["kind"] == &"hero":
 		_draw_phantom_glow(snapshot.hero, key, at, bool(item["left"]))
 		_draw_buff_aura(snapshot.hero, true)
