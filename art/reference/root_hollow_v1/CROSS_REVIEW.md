@@ -1,0 +1,9 @@
+# Cross-review of Claude's presentation/art changes (2026-10-30)
+
+Result: FAIL (one P2 cosmetic correctness finding). Ground proposal approval remains independent.
+
+- P2: presentation/explore/explore_scene.gd:687-691, fx_spin_contacts. When a Reaper's Coil spin connects with any living mob, the presentation scans every snapshot mob within radius, including mobs already dead before this spin. Those corpses receive connection sparks as though hit. The core chooses rows from living() (core/explore_skills.gd, read only), so these are false hit indicators. Confirmed with review_spin_contacts.gd: a previously dead mob contributes one false contact. Repro: leave a dead mob inside the spin radius alongside a live target; fx_spin_contacts returns both positions. Prefer passing the actual affected target IDs from core events; coordinate interface change with Claude. Merely excluding all zero-HP targets after a hit can suppress a valid killing-blow spark, so a naive state filter is insufficient. No core edits made.
+
+Reviewed: shared Lightning/Coil event hooks and lifecycle in hero_fx.gd (32ccc46c); mob_view.gd Stag state/charge selection and boss plate (5800be65); 58 stag_* sources/PNGs/atlas frames; Root Hollow ground/ambient/firefly/F12 registrations (6eed08f4). No additional blocking issue found in those reviewed portions. Stag audit checks 58 source dimensions, PNG/atlas byte equality, valid anchors, hard alpha and palette. Existing smoke_stag_glade, smoke_road_aspects and smoke_root_hollow are included in full harness.
+
+Cannot judge: whether combat is fun or balanced, owner approval of Stag art or Root Hollow mood, animation feel from every facing in extended manual play, or final prop collisions/shadows/depth before the new props exist. Floor image approval belongs to owner. This review does not approve changes to core/ or data/.

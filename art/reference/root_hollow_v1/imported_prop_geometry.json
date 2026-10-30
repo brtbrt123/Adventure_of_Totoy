@@ -1,0 +1,197 @@
+{
+  "status": "PROPOSAL: Claude must register actual collision geometry before placement",
+  "props": {
+    "root_hollow_tree_ancient": {
+      "size": [
+        141,
+        136
+      ],
+      "anchor": [
+        70,
+        136
+      ],
+      "suggested_base_size": [
+        48,
+        24
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_tree_rootwall": {
+      "size": [
+        86,
+        124
+      ],
+      "anchor": [
+        43,
+        124
+      ],
+      "suggested_base_size": [
+        30,
+        18
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_roots": {
+      "size": [
+        48,
+        28
+      ],
+      "anchor": [
+        24,
+        28
+      ],
+      "suggested_base_size": [
+        32,
+        14
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_barrier_closed": {
+      "size": [
+        80,
+        48
+      ],
+      "anchor": [
+        40,
+        48
+      ],
+      "suggested_base_size": [
+        76,
+        18
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_barrier_open": {
+      "size": [
+        80,
+        48
+      ],
+      "anchor": [
+        40,
+        48
+      ],
+      "suggested_base_size": [
+        0,
+        0
+      ],
+      "suggested_solid": false,
+      "collision_registered": false
+    },
+    "root_hollow_shrine": {
+      "size": [
+        48,
+        42
+      ],
+      "anchor": [
+        24,
+        42
+      ],
+      "suggested_base_size": [
+        32,
+        18
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_rune_stones": {
+      "size": [
+        64,
+        44
+      ],
+      "anchor": [
+        32,
+        44
+      ],
+      "suggested_base_size": [
+        50,
+        18
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_boulder": {
+      "size": [
+        56,
+        40
+      ],
+      "anchor": [
+        28,
+        40
+      ],
+      "suggested_base_size": [
+        44,
+        20
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_stump": {
+      "size": [
+        48,
+        30
+      ],
+      "anchor": [
+        24,
+        30
+      ],
+      "suggested_base_size": [
+        40,
+        20
+      ],
+      "suggested_solid": true,
+      "collision_registered": false
+    },
+    "root_hollow_mushrooms": {
+      "size": [
+        31,
+        24
+      ],
+      "anchor": [
+        15,
+        24
+      ],
+      "suggested_base_size": [
+        0,
+        0
+      ],
+      "suggested_solid": false,
+      "collision_registered": false
+    },
+    "root_hollow_branches": {
+      "size": [
+        44,
+        21
+      ],
+      "anchor": [
+        22,
+        21
+      ],
+      "suggested_base_size": [
+        0,
+        0
+      ],
+      "suggested_solid": false,
+      "collision_registered": false
+    },
+    "root_hollow_antlers": {
+      "size": [
+        29,
+        20
+      ],
+      "anchor": [
+        14,
+        20
+      ],
+      "suggested_base_size": [
+        0,
+        0
+      ],
+      "suggested_solid": false,
+      "collision_registered": false
+    }
+  }
+}

@@ -38,7 +38,17 @@ Owner request: **convert all tiles, props, scenes (maps), animations, effects, U
 5. **UI leftovers and cut-ins**: arena rings and tooltip, selection brackets, the three cut-ins as timeline scenes; UI gallery.
 6. **Pipeline and docs**: `build_art.py` emits the resources, AGENTS.md/architecture.md/HARNESS.md updated, the library scene, a "how to edit X in Godot" guide for the owner, full harness green.
 
-## Decisions the owner must make first
+## Decisions made by the owner (2026-10-30)
+
+1. **Maps:** the `.tscn` is the source of truth, the baker writes the JSON the core reads. **Yes.**
+2. **Art source:** the text-grid pipeline stays, `build_art.py` also writes the Godot resources. **Yes.**
+3. **Order:** props, maps, characters/mobs/NPCs/boss, effects, UI leftovers and cut-ins, pipeline and docs (the order above). **Yes.**
+4. **Who does it: option B, the split stays.**
+   - **Claude** (`tools/`, `core/`, `data/`, `harness/`, `docs/architecture.md`): the generators (`tools/godot/generate_prop_scenes.gd`, the SpriteFrames and effect-scene generators), the map baker (`tools/godot/bake_maps.gd`), the JSON-to-`.tscn` converters, the round-trip tests (current JSON -> scene -> baked JSON must be identical), the `build_art.py` additions that write Godot resources, and any `core/` or `data/` change. Claude does not edit `presentation/` or `art/` assets by hand in this migration.
+   - **Codex** (`presentation/`, `art/`, UI, effects, presentation tests): takes the generated scenes and resources into the renderer (instance prop and map scenes instead of `props_layer.gd` and `draw_*` calls, play SpriteFrames by animation name, spawn effect scenes from events), builds the galleries and the library scene, keeps captures matching today's look, and ports the smoke tests that inspect plans and arrays.
+   - Each phase is a hand-off: Claude pushes the generator, its output and the round-trip test, then writes the phase's Codex task note in `docs/` (what to wire, what must look identical); Codex wires it and reports; Claude cross-reviews the interface. Nothing merges to main.
+
+## Decisions that were open (answered above)
 
 1. **Source of truth for maps:** `.tscn` + baker (recommended) vs keeping the JSON as the source and only generating read-only `.tscn` for viewing. Recommended because "edit in Godot" is the goal.
 2. **Art source:** keep the text-grid pipeline and generate Godot resources from it (recommended: nothing in the art workflow changes), or move to PNG-first.

@@ -288,5 +288,71 @@
         0.88
       ]
     }
+  ],
+  "root_hollow_shrine": [
+    {
+      "pixel": [
+        24,
+        17
+      ],
+      "halo_radius": 18.0,
+      "energy": 0.7,
+      "pool_radius": 30.0,
+      "pool_energy": 0.38,
+      "colour": [
+        0.42,
+        0.83,
+        0.76
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        0.94
+      ]
+    }
+  ],
+  "root_hollow_rune_stones": [
+    {
+      "pixel": [
+        32,
+        18
+      ],
+      "halo_radius": 18.0,
+      "energy": 0.7,
+      "pool_radius": 30.0,
+      "pool_energy": 0.38,
+      "colour": [
+        0.42,
+        0.83,
+        0.76
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        0.94
+      ]
+    }
+  ],
+  "root_hollow_mushrooms": [
+    {
+      "pixel": [
+        15,
+        10
+      ],
+      "halo_radius": 18.0,
+      "energy": 0.7,
+      "pool_radius": 30.0,
+      "pool_energy": 0.38,
+      "colour": [
+        0.42,
+        0.83,
+        0.76
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        0.94
+      ]
+    }
   ]
 }
