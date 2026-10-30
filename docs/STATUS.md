@@ -1,3 +1,7 @@
+## Small hand cursor only for menus (2026-10-30, Codex)
+
+Replaced blade pointer with original 16x16 hand at crisp 2x (32x32 OS pixels), fingertip hotspot (10,2). Global presentation autoload shows it on title/menu screens and when the shared TAB character menu is open; hides during gameplay and cutscenes. Group lookup covers both arena and exploration and always processes while paused. Art validate/build/preview, texture load and title/TAB/gameplay policy checks passed. Headless backend does not expose actual OS cursor visibility; policy checked directly. Graphify unavailable.
+
 ## Smaller blade cursor (2026-10-30, Codex)
 
 Reduced approved cursor from 48x48 to 40x40 OS pixels by shortening the native blade, preserving crisp 2x pixels and tip hotspot (4,4). Art validate/build/preview and cursor smoke passed.

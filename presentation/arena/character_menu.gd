@@ -1170,3 +1170,7 @@ func _draw_progression_stats() -> void:
 	if stats_selection == &"respec":
 		_brackets(respec_rect())
 	if picker_open():_draw_picker()
+
+
+func _enter_tree() -> void:
+	add_to_group(&"mouse_cursor_menus")
