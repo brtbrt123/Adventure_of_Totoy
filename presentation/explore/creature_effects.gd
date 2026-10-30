@@ -3,6 +3,7 @@ extends RefCounted
 const ExploreCore := preload("res://core/explore_core.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+const Particles := preload("res://presentation/explore/creature_particles.gd")
 const SLAM_TICKS: int = 26  # how long the slam's ground effects last after the hit tick
 var tells: Dictionary = {}
 var previous: Dictionary = {}
@@ -12,6 +13,9 @@ var orbs: Dictionary = {}  # id -> {at, dir, path: [Vector2]} of the orbs seen l
 var pops: Array[Dictionary] = []  # orbs that ended: {at, tick}
 var reveals: Array[Dictionary] = []  # moths that just appeared: {at, tick}
 var seen_moths: Dictionary = {}
+var bursts: Array[Dictionary] = []  # particle bursts (creature_particles.gd), each a pure function of the tick
+var fired: Dictionary = {}  # telegraph ids whose hit already threw particles
+var _burst_serial: int = 0
 var scene_id: StringName = &""
 var last_tick: int = -1
 
@@ -24,6 +28,9 @@ func clear() -> void:
 	pops.clear()
 	reveals.clear()
 	seen_moths.clear()
+	bursts.clear()
+	fired.clear()
+	_burst_serial = 0
 	last_tick = -1
 	scene_id = &""
 
@@ -39,6 +46,7 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 		if mob["type"] == &"glowmoth" and int(mob.get("summoner_id", 0)) != 0 and mob["state"] != &"dead" and not seen_moths.has(int(mob["id"])):
 			seen_moths[int(mob["id"])] = true
 			reveals.append({"at": mob["position"], "tick": view.tick})
+			emit("reveal", Vector2(mob["position"]) - Vector2(0, 10), view.tick)
 		if mob["type"] != &"stag" or mob["state"] == &"dead":
 			continue
 		var id: int = int(mob["id"])
@@ -48,11 +56,24 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 		if mob.get("attack_id", &"") == &"stag_charge" and mob["state"] == &"strike" and not old.is_empty():
 			if at.distance_to(old["at"]) > 0.5 and view.tick - int(old["trail_tick"]) >= 3:
 				trails.append({"at": at - Vector2(mob["facing"]) * 14, "tick": view.tick, "crash": false})
+				emit("kick", at - Vector2(mob["facing"]) * 14, view.tick, {"dir": -Vector2(mob["facing"])})
 				old["trail_tick"] = view.tick
 		if mob["state"] == &"crash" and old.get("state", &"") != &"crash":
 			trails.append({"at": at + Vector2(mob["facing"]) * 14, "tick": view.tick, "crash": true})
+			emit("crash", at + Vector2(mob["facing"]) * 18, view.tick, {"dir": Vector2(mob["facing"])})
 		if not old.is_empty() and int(mob["hp"]) > int(old["hp"]) and bool(mob.get("regen_active", false)):
 			heals.append({"id": id, "tick": view.tick, "amount": int(mob["hp"]) - int(old["hp"])})
+			emit("heal", at, view.tick)
+		var was: StringName = old.get("state", &"")
+		if mob["state"] == &"roar" and was != &"roar":
+			emit("roar", at - Vector2(0, 8), view.tick)
+		if mob.get("attack_id", &"") == &"stag_summon":
+			if mob["state"] == &"windup" and view.tick % 5 == 0:
+				emit("chant", horns(mob), view.tick)
+			elif mob["state"] == &"strike" and was == &"windup":
+				emit("release", horns(mob), view.tick)
+		if bool(mob.get("regen_active", false)) and view.tick % 10 == 0:
+			emit("mist", at, view.tick)
 		previous[id] = {"at": at, "state": mob["state"], "hp": mob["hp"], "trail_tick": old.get("trail_tick", view.tick - 3)}
 	var current: Dictionary = {}
 	for tell: Snapshots.TelegraphSnapshot in view.telegraphs:
@@ -64,6 +85,17 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 		var owner: Dictionary = alive.get(tell.owner_id, {})
 		if owner.is_empty() or owner["state"] not in [&"windup", &"strike", &"recover"] or view.tick - tell.hit_tick >= 34 or (view.tick < tell.hit_tick and not current.has(id)):
 			tells.erase(id)
+	for id: int in tells:
+		var tell: Snapshots.TelegraphSnapshot = tells[id]
+		if view.tick >= tell.hit_tick and not fired.has(id):
+			fired[id] = view.tick
+			if tell.attack == &"stag_slam":
+				emit("slam", tell.center, tell.hit_tick, {"dir": tell.direction, "half_angle": tell.half_angle, "size": tell.size})
+			else:
+				emit("roots", tell.center, tell.hit_tick)
+	for id: int in fired.keys():
+		if view.tick - int(fired[id]) > 120:
+			fired.erase(id)
 	for id: int in previous.keys():
 		if not alive.has(id):
 			previous.erase(id)
@@ -79,13 +111,34 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 	for oid: int in orbs:
 		if not flying.has(oid):
 			pops.append({"at": orbs[oid]["at"], "tick": view.tick})
+			emit("pop", orbs[oid]["at"], view.tick)
+	for oid: int in flying:
+		if view.tick % 3 == 0:
+			emit("orb_trail", flying[oid]["at"], view.tick)
 	orbs = flying
 	trails = trails.filter(func(e: Dictionary) -> bool: return view.tick - int(e["tick"]) < 24)
 	heals = heals.filter(func(e: Dictionary) -> bool: return view.tick - int(e["tick"]) < 30)
 	pops = pops.filter(func(e: Dictionary) -> bool: return view.tick - int(e["tick"]) < 16)
 	reveals = reveals.filter(func(e: Dictionary) -> bool: return view.tick - int(e["tick"]) < 24)
+	bursts = bursts.filter(func(b: Dictionary) -> bool: return view.tick - int(b["tick"]) < Particles.max_life(String(b["kind"])))
+	if bursts.size() > 96:
+		bursts = bursts.slice(bursts.size() - 96)
 	if trails.size() > 80:
 		trails = trails.slice(trails.size() - 80)
+
+## Starts a particle burst (see creature_particles.gd for the kinds).
+func emit(kind: String, at: Vector2, tick: int, extra: Dictionary = {}) -> void:
+	_burst_serial += 1
+	var burst: Dictionary = {"kind": kind, "at": at, "tick": tick, "seed": tick * 131 + _burst_serial * 7919}
+	burst.merge(extra)
+	bursts.append(burst)
+
+
+## The horn tips of the Stag, where the chant gathers and the release flies from.
+static func horns(mob: Dictionary) -> Vector2:
+	var facing: float = Vector2(mob["facing"]).x
+	return Vector2(mob["position"]) + Vector2(18.0 * (-1.0 if facing < 0.0 else 1.0), -46.0)
+
 
 static func sprite(canvas: CanvasItem, key: String, at: Vector2, frames: Dictionary, atlas: Texture2D, left: bool = false) -> void:
 	if not frames.has(key):
@@ -213,6 +266,7 @@ static func draw_links(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, co
 
 ## Drawn over actors and HP bars: healing links, orbs with their trail, orb pops, moth reveals and the Stag's heal pulses.
 func draw_overlay(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
+	Particles.draw(canvas, bursts, view.tick, colors)
 	draw_links(canvas, view, colors)
 	for orb: Dictionary in orbs.values():
 		var path: Array = orb["path"]

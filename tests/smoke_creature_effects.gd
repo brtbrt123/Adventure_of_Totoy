@@ -4,6 +4,8 @@ const FX := preload("res://presentation/explore/creature_effects.gd")
 const MobView := preload("res://presentation/explore/mob_view.gd")
 const Explore := preload("res://core/explore_core.gd")
 const Snapshots := preload("res://core/snapshots.gd")
+const Particles := preload("res://presentation/explore/creature_particles.gd")
+const CreatureGlow := preload("res://presentation/explore/creature_glow.gd")
 var failures: int = 0
 
 func _init() -> void:
@@ -118,6 +120,22 @@ func run() -> void:
 		check(frames.has(key), "registered effect " + key)
 	var release: Dictionary = {"id":201,"type":&"stag","state":&"recover","state_ticks":2,"attack_id":&"stag_summon","cast_start_tick":10,"cast_release_tick":100}
 	check(MobView.frame(release, v.telegraphs, 112) == "stag_summon_right_3", "release frames continue from the release tick into recover")
+	# Particles: every kind draws, is deterministic and ends; the slam's start inside the cone the core hit.
+	for kind: String in ["slam", "roots", "kick", "crash", "roar", "chant", "release", "heal", "mist", "orb_trail", "pop", "reveal"]:
+		var burst: Dictionary = {"kind": kind, "at": Vector2(100, 100), "tick": 0, "seed": 4242, "dir": Vector2.LEFT, "half_angle": 0.95, "size": 145.0}
+		var first: Array[Dictionary] = Particles.points(burst, 6)
+		check(not first.is_empty(), "particles of " + kind)
+		check(var_to_str(first) == var_to_str(Particles.points(burst, 6)), "deterministic " + kind)
+		check(Particles.points(burst, Particles.max_life(kind) + 20).is_empty(), "particles of %s end" % kind)
+	var slam_burst: Dictionary = {"kind": "slam", "at": Vector2.ZERO, "tick": 0, "seed": 7, "dir": Vector2.LEFT, "half_angle": 0.95, "size": 145.0}
+	for li: int in Particles.LAYERS["slam"].size():
+		for i: int in int(Particles.LAYERS["slam"][li]["n"]):
+			var p0: Vector2 = Particles._spawn(slam_burst, li, i)["origin"]
+			check(p0.length() <= 145.01 and absf(Vector2.LEFT.angle_to(p0)) <= 0.95 + 0.001, "slam particles start inside the hit cone")
+	var heal_burst: Array[Dictionary] = [{"kind": "heal", "at": Vector2(50, 50), "tick": 0, "seed": 11}]
+	check(not CreatureGlow.halo_plan(heal_burst, 8, [], []).is_empty(), "healing particles glow")
+	var dust_burst: Array[Dictionary] = [{"kind": "slam", "at": Vector2(50, 50), "tick": 0, "seed": 11, "dir": Vector2.LEFT, "half_angle": 0.9, "size": 100.0}]
+	check(CreatureGlow.halo_plan(dust_burst, 8, [], []).is_empty(), "only healing glows")
 	if failures == 0:
 		print("CREATURE FX OK")
 	quit(1 if failures else 0)

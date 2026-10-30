@@ -16,7 +16,9 @@ const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const PropScene := preload("res://core/prop_scene.gd")
 const MobView := preload("res://presentation/explore/mob_view.gd")
 const CreatureEffects := preload("res://presentation/explore/creature_effects.gd")
+const CreatureGlow := preload("res://presentation/explore/creature_glow.gd")
 var creature_effects: CreatureEffects = CreatureEffects.new()
+var creature_glow: CreatureGlow
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
@@ -122,6 +124,8 @@ func _ready() -> void:
 	add_child(encounter_effects)
 	practice_view = PracticeView.new()
 	add_child(practice_view)
+	creature_glow = CreatureGlow.new()  # the healing particles' additive glow, over the world and under the HUD
+	add_child(creature_glow)
 	var palette: Dictionary = _read_json("res://art/palette.json")
 	for entry: Dictionary in palette.get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
