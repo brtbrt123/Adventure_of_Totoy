@@ -8,7 +8,7 @@ import artlib
 PALETTE=artlib.load_palette(); SYMBOLS={rgb:s for s,rgb in PALETTE.by_symbol.items()}
 def main():
     manifest={}
-    for mob,base,prefix in [('mossling','creature_mossling_v1','creature_mossling'),('boar','creature_thornback_boar_v1','creature_thornback_boar')]:
+    for mob,base,prefix in [('mossling','creature_mossling_v1','creature_mossling'),('boar','creature_thornback_boar_v1','creature_thornback_boar'),('stag','creature_thornback_stag_v1','creature_thornback_stag')]:
         path=Path(__file__).parent/(base+'.png');image=Image.open(path).convert('RGBA');meta=json.loads(path.with_suffix('.json').read_text())
         for name,frame in meta['frames'].items():
             state_n=name.removeprefix(prefix+'_');state,n=state_n.rsplit('_',1);key=mob+'_'+state+'_right_'+n
