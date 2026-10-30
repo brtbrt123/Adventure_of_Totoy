@@ -1,6 +1,8 @@
-# HANDOFF: Adventure of Totoy (rewritten 2026-10-22 for the next session)
+# HANDOFF: Adventure of Totoy (current checkpoint 2026-10-31)
 
-> **Thornback visuals (2026-10-30):** approved creature poses and richer FX are now installed globally in Explore; full harness PASS. Core still needs the larger/faster attacks,8 eruptions,5 real Glowmoths and2% healing. Claude: read [[CLAUDE_TASK_thornback_balance_v3]]. Live captures and limits: art/reference/thornback_fx_review_v3/LIVE_INTEGRATION.md. Synthetic future-rule captures are NOT proof of implemented gameplay.
+> **START HERE for the new Codex chat (2026-10-31):** read [[CODEX_NEXT_SESSION_warden]]. Current branch is `agent/codex/progression`. Active work: Warden review, with the latest full-cone Cleave correction in `art/reference/warden_cleave_range_v4/`. 60 body frames,120 FX frames,11 preview GIFs; asset/geometry audits pass. Warden is not installed; latest look approval is pending. Preserve the dirty worktree.
+
+> **Thornback / Glowmoth update (2026-10-31):** Claude has finished the core mechanics, real orb projectile and presentation/particle follow-ups. Older "core still needs" entries are obsolete. Read [[CROSS_REVIEW_thornback_v3]] and newest STATUS. Most recent healing polish is `13ba25a4`: fewer motes, placed beside the Stag, once-per-second pulse and smaller glow. Preserve it when touching shared creature FX.
 
 > **Mob idles (2026-10-30):** approved Mossling hopping and Boar grazing are installed globally in mob_view.gd, with60 new sprites. Idle selection uses simulation tick (dormant state_ticks stays zero),6 ticks/frame and per-mob phase; alert/combat unchanged. Full harness passes; live GIF and rebuild instructions in art/reference/mob_idle_review_v1/.
 
@@ -20,7 +22,7 @@ Read this first, then `AGENTS.md` (the rules), then `docs/CHAPTER1_PLAN.md` (wha
 
 ## What this project is
 
-A 2D top-down pixel-art action game in **Godot 4.7.2** (typed GDScript), 320x180 base resolution, private Windows build and portfolio piece. Design: `docs/GAME_DESIGN.md` (the human's document, do not rewrite it). Combat language: **gold heavy attacks can be parried, red attacks must be dodged**. Currently playable: a walkable Chapter 1 slice (village Lanternfen, forest route, Stag glade) and the **Mossbound Colossus** arena fight, with three weapons and eight aspects.
+A 2D top-down pixel-art action game in **Godot 4.7.2** (typed GDScript), 384x216 base resolution, private Windows build and portfolio piece. Design: `docs/GAME_DESIGN.md` (the human's document, do not rewrite it). Combat language: **gold heavy attacks can be parried, red attacks must be dodged**. Currently playable: a walkable Chapter 1 slice (village Lanternfen, forest route, Stag glade) and the **Mossbound Colossus** arena fight, with three weapons and eight aspects.
 
 ## Rules of the road (from the human)
 
@@ -31,7 +33,7 @@ A 2D top-down pixel-art action game in **Godot 4.7.2** (typed GDScript), 320x180
   - **Occluder/collision cleanup:** Claude = collider data and layout tests; Codex = occluder art and drawing.
   - Codex starts without memory: it reads `AGENTS.md`, this file, `docs/CHAPTER1_PLAN.md`, `docs/STATUS.md`, `docs/architecture.md`.
 - **Plain commit messages: NO Co-Authored-By / Claude attribution lines** (the human does not want "claude" as a GitHub contributor; history was rewritten once to strip them).
-- Work branch: `agent/game/chapter1-dev` (renamed from `agent/art/gemini-import`). After every commit, push it to `origin` (https://github.com/brtbrt123/Adventure_of_Totoy, public). No force-push or history rewrite without asking.
+- Current work branch: `agent/codex/progression` (older branches named elsewhere below are historical). After every commit, push it to `origin` (https://github.com/brtbrt123/Adventure_of_Totoy, public). No force-push or history rewrite without asking.
 - Short answers, honest reports (what ran, what passed, what was not verified). Show art to the human first and get approval before wiring it in. Ask before downloading files (name, source, licence, size).
 - Do not stop a long test run: `python harness/checks/run_tests.py --worktree .` takes several minutes; run it in the background.
 
