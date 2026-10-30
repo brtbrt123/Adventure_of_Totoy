@@ -409,7 +409,7 @@ const MOBS: Dictionary = {
 		"boss": true, "phase2_hp": 0.5, "roar_ticks": 54,
 		"summon": {"type": &"glowmoth", "count": 5, "ring_min": 44.0, "ring_max": 100.0, "regen_per_second": 0.02, "lockout": 900, "first_ready": 300},
 		"attacks": [
-			{"id": &"stag_slam", "kind": &"gold", "shape": &"cone", "reach": 125.0, "half_angle": 0.95, "start_min": 0.0, "start_max": 62.0, "windup": 54, "strike_ticks": 6,
+			{"id": &"stag_slam", "kind": &"gold", "shape": &"cone", "reach": 125.0, "half_angle": 0.95, "start_min": 0.0, "start_max": 125.0, "windup": 54, "strike_ticks": 6,
 				"strike_speed": 0.0, "width": 0.0, "damage": 18, "recover": 48, "cooldown": 46, "interrupt": false, "crash": 0, "phase": 1},
 			{"id": &"stag_charge", "kind": &"red", "shape": &"line", "start_min": 84.0, "start_max": 210.0, "windup": 56, "strike_ticks": 24, "strike_speed": 6.6,
 				"width": 30.0, "damage": 24, "recover": 40, "cooldown": 56, "interrupt": false, "crash": 80, "phase": 1},
@@ -419,7 +419,7 @@ const MOBS: Dictionary = {
 			{"id": &"stag_summon", "kind": &"none", "shape": &"none", "summon": true, "start_min": 0.0, "start_max": 400.0, "windup": 90, "strike_ticks": 10,
 				"strike_speed": 0.0, "width": 0.0, "damage": 0, "recover": 50, "cooldown": 60, "interrupt": false, "crash": 0, "phase": 1},
 		],
-		"attack": {"id": &"stag_slam", "kind": &"gold", "start_min": 0.0, "start_max": 62.0, "windup": 54, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 18,
+		"attack": {"id": &"stag_slam", "kind": &"gold", "start_min": 0.0, "start_max": 125.0, "windup": 54, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 18,
 			"recover": 48, "cooldown": 46, "interrupt": false, "crash": 0},
 	},
 	&"boar": {

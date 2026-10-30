@@ -59,6 +59,7 @@ func test_close_up_it_slams_with_a_gold_cone_and_far_away_it_charges_with_a_red_
 	assert_eq(stag.telegraph.shape, Telegraph.SHAPE_CONE, "drawn as a cone")
 	var far: ExploreCore = _core()
 	var other: Mob = _stag(far)
+	other.attack_index = 1  # a Stag that has just slammed tries the charge next (the slam also fits up to 125 px now)
 	far.player.position = other.position + Vector2(-120, 0)
 	var charge: GameEvent = _until_event(far, GameEvent.ATTACK_TELEGRAPHED, 160)
 	assert_true(charge != null and charge.data["attack"] == &"stag_charge" and charge.data["kind"] == &"red", "a red charge from afar")
