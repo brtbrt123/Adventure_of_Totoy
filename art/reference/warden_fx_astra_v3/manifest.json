@@ -1,0 +1,1967 @@
+{
+  "review_only": true,
+  "body_anchor": [
+    20,
+    44
+  ],
+  "body_cell": [
+    48,
+    48
+  ],
+  "states": {
+    "idle": 6,
+    "wake": 4,
+    "walk": 6,
+    "cleave_tell": 5,
+    "cleave_strike": 3,
+    "lash_tell": 5,
+    "lash_strike": 3,
+    "ring_tell": 5,
+    "ring_strike": 3,
+    "recover": 4,
+    "guard_hit": 2,
+    "exposed": 4,
+    "hurt": 2,
+    "death": 8
+  },
+  "body_frames": 60,
+  "fx_frames": 114,
+  "fx_families": {
+    "rune_glow": 6,
+    "idle_spores": 6,
+    "wake_flare": 4,
+    "arrival": 6,
+    "guard_hit": 4,
+    "guard_break": 8,
+    "exposed_dust": 6,
+    "cleave_arc": 6,
+    "lash_creep": 5,
+    "lash_strike": 6,
+    "lash_splinters": 6,
+    "ring_charge": 6,
+    "ring_burst": 8,
+    "scorch": 6,
+    "death_flash": 4,
+    "death_debris": 8,
+    "hit_burst": 5,
+    "cleave_contact": 6,
+    "ring_afterglow": 8
+  },
+  "fx_assets": {
+    "fx_warden_rune_glow_1": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        3,
+        20
+      ]
+    },
+    "fx_warden_rune_glow_2": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        3,
+        22
+      ]
+    },
+    "fx_warden_rune_glow_3": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        20
+      ]
+    },
+    "fx_warden_rune_glow_4": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        22
+      ]
+    },
+    "fx_warden_rune_glow_5": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        3,
+        21
+      ]
+    },
+    "fx_warden_rune_glow_6": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        3,
+        21
+      ]
+    },
+    "fx_warden_idle_spores_1": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        13,
+        23
+      ]
+    },
+    "fx_warden_idle_spores_2": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        12,
+        25
+      ]
+    },
+    "fx_warden_idle_spores_3": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        11,
+        27
+      ]
+    },
+    "fx_warden_idle_spores_4": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        12,
+        19
+      ]
+    },
+    "fx_warden_idle_spores_5": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        13,
+        21
+      ]
+    },
+    "fx_warden_idle_spores_6": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        15,
+        23
+      ]
+    },
+    "fx_warden_wake_flare_1": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        11,
+        21
+      ]
+    },
+    "fx_warden_wake_flare_2": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        11,
+        22
+      ]
+    },
+    "fx_warden_wake_flare_3": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        11,
+        20
+      ]
+    },
+    "fx_warden_wake_flare_4": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        11,
+        22
+      ]
+    },
+    "fx_warden_arrival_1": {
+      "size": [
+        32,
+        40
+      ],
+      "anchor": [
+        16,
+        31
+      ]
+    },
+    "fx_warden_arrival_2": {
+      "size": [
+        32,
+        40
+      ],
+      "anchor": [
+        16,
+        31
+      ]
+    },
+    "fx_warden_arrival_3": {
+      "size": [
+        40,
+        24
+      ],
+      "anchor": [
+        16,
+        19
+      ]
+    },
+    "fx_warden_arrival_4": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        9,
+        31
+      ]
+    },
+    "fx_warden_arrival_5": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        13,
+        31
+      ]
+    },
+    "fx_warden_arrival_6": {
+      "size": [
+        24,
+        8
+      ],
+      "anchor": [
+        8,
+        2
+      ]
+    },
+    "fx_warden_guard_hit_1": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        22
+      ]
+    },
+    "fx_warden_guard_hit_2": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        22
+      ]
+    },
+    "fx_warden_guard_hit_3": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        22
+      ]
+    },
+    "fx_warden_guard_hit_4": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        0,
+        16
+      ]
+    },
+    "fx_warden_guard_break_1": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        3,
+        25
+      ]
+    },
+    "fx_warden_guard_break_2": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        4,
+        26
+      ]
+    },
+    "fx_warden_guard_break_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        6,
+        25
+      ]
+    },
+    "fx_warden_guard_break_4": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        7,
+        26
+      ]
+    },
+    "fx_warden_guard_break_5": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        8,
+        27
+      ]
+    },
+    "fx_warden_guard_break_6": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        9,
+        25
+      ]
+    },
+    "fx_warden_guard_break_7": {
+      "size": [
+        40,
+        32
+      ],
+      "anchor": [
+        11,
+        25
+      ]
+    },
+    "fx_warden_guard_break_8": {
+      "size": [
+        32,
+        16
+      ],
+      "anchor": [
+        3,
+        9
+      ]
+    },
+    "fx_warden_exposed_dust_1": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        10,
+        22
+      ]
+    },
+    "fx_warden_exposed_dust_2": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        10,
+        20
+      ]
+    },
+    "fx_warden_exposed_dust_3": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        10,
+        18
+      ]
+    },
+    "fx_warden_exposed_dust_4": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        11,
+        16
+      ]
+    },
+    "fx_warden_exposed_dust_5": {
+      "size": [
+        24,
+        16
+      ],
+      "anchor": [
+        11,
+        14
+      ]
+    },
+    "fx_warden_exposed_dust_6": {
+      "size": [
+        24,
+        16
+      ],
+      "anchor": [
+        11,
+        12
+      ]
+    },
+    "fx_warden_cleave_arc_1": {
+      "size": [
+        16,
+        40
+      ],
+      "anchor": [
+        0,
+        36
+      ]
+    },
+    "fx_warden_cleave_arc_2": {
+      "size": [
+        16,
+        40
+      ],
+      "anchor": [
+        0,
+        36
+      ]
+    },
+    "fx_warden_cleave_arc_3": {
+      "size": [
+        32,
+        40
+      ],
+      "anchor": [
+        0,
+        34
+      ]
+    },
+    "fx_warden_cleave_arc_4": {
+      "size": [
+        32,
+        40
+      ],
+      "anchor": [
+        0,
+        34
+      ]
+    },
+    "fx_warden_cleave_arc_5": {
+      "size": [
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        13
+      ]
+    },
+    "fx_warden_cleave_arc_6": {
+      "size": [
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        13
+      ]
+    },
+    "fx_warden_lash_creep_1": {
+      "size": [
+        8,
+        8
+      ],
+      "anchor": [
+        4,
+        4
+      ]
+    },
+    "fx_warden_lash_creep_2": {
+      "size": [
+        40,
+        16
+      ],
+      "anchor": [
+        0,
+        4
+      ]
+    },
+    "fx_warden_lash_creep_3": {
+      "size": [
+        80,
+        16
+      ],
+      "anchor": [
+        0,
+        4
+      ]
+    },
+    "fx_warden_lash_creep_4": {
+      "size": [
+        112,
+        16
+      ],
+      "anchor": [
+        0,
+        4
+      ]
+    },
+    "fx_warden_lash_creep_5": {
+      "size": [
+        160,
+        16
+      ],
+      "anchor": [
+        0,
+        4
+      ]
+    },
+    "fx_warden_lash_strike_1": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        18
+      ]
+    },
+    "fx_warden_lash_strike_2": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        18
+      ]
+    },
+    "fx_warden_lash_strike_3": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        18
+      ]
+    },
+    "fx_warden_lash_strike_4": {
+      "size": [
+        152,
+        32
+      ],
+      "anchor": [
+        0,
+        29
+      ]
+    },
+    "fx_warden_lash_strike_5": {
+      "size": [
+        152,
+        32
+      ],
+      "anchor": [
+        0,
+        29
+      ]
+    },
+    "fx_warden_lash_strike_6": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_lash_splinters_1": {
+      "size": [
+        144,
+        8
+      ],
+      "anchor": [
+        0,
+        4
+      ]
+    },
+    "fx_warden_lash_splinters_2": {
+      "size": [
+        144,
+        16
+      ],
+      "anchor": [
+        0,
+        8
+      ]
+    },
+    "fx_warden_lash_splinters_3": {
+      "size": [
+        144,
+        16
+      ],
+      "anchor": [
+        0,
+        10
+      ]
+    },
+    "fx_warden_lash_splinters_4": {
+      "size": [
+        144,
+        16
+      ],
+      "anchor": [
+        0,
+        10
+      ]
+    },
+    "fx_warden_lash_splinters_5": {
+      "size": [
+        144,
+        8
+      ],
+      "anchor": [
+        0,
+        6
+      ]
+    },
+    "fx_warden_lash_splinters_6": {
+      "size": [
+        144,
+        8
+      ],
+      "anchor": [
+        0,
+        2
+      ]
+    },
+    "fx_warden_ring_charge_1": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        13,
+        13
+      ]
+    },
+    "fx_warden_ring_charge_2": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        19,
+        19
+      ]
+    },
+    "fx_warden_ring_charge_3": {
+      "size": [
+        56,
+        56
+      ],
+      "anchor": [
+        26,
+        26
+      ]
+    },
+    "fx_warden_ring_charge_4": {
+      "size": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        32
+      ]
+    },
+    "fx_warden_ring_charge_5": {
+      "size": [
+        80,
+        80
+      ],
+      "anchor": [
+        38,
+        38
+      ]
+    },
+    "fx_warden_ring_charge_6": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        44,
+        44
+      ]
+    },
+    "fx_warden_ring_burst_1": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        47
+      ]
+    },
+    "fx_warden_ring_burst_2": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        47
+      ]
+    },
+    "fx_warden_ring_burst_3": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        47
+      ]
+    },
+    "fx_warden_ring_burst_4": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        47
+      ]
+    },
+    "fx_warden_ring_burst_5": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        47
+      ]
+    },
+    "fx_warden_ring_burst_6": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        47
+      ]
+    },
+    "fx_warden_ring_burst_7": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        45
+      ]
+    },
+    "fx_warden_ring_burst_8": {
+      "size": [
+        96,
+        96
+      ],
+      "anchor": [
+        47,
+        45
+      ]
+    },
+    "fx_warden_scorch_1": {
+      "size": [
+        80,
+        80
+      ],
+      "anchor": [
+        42,
+        37
+      ]
+    },
+    "fx_warden_scorch_2": {
+      "size": [
+        80,
+        80
+      ],
+      "anchor": [
+        42,
+        37
+      ]
+    },
+    "fx_warden_scorch_3": {
+      "size": [
+        72,
+        80
+      ],
+      "anchor": [
+        34,
+        37
+      ]
+    },
+    "fx_warden_scorch_4": {
+      "size": [
+        72,
+        72
+      ],
+      "anchor": [
+        34,
+        37
+      ]
+    },
+    "fx_warden_scorch_5": {
+      "size": [
+        56,
+        72
+      ],
+      "anchor": [
+        34,
+        37
+      ]
+    },
+    "fx_warden_scorch_6": {
+      "size": [
+        56,
+        40
+      ],
+      "anchor": [
+        34,
+        15
+      ]
+    },
+    "fx_warden_death_flash_1": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        3,
+        25
+      ]
+    },
+    "fx_warden_death_flash_2": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        4,
+        26
+      ]
+    },
+    "fx_warden_death_flash_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        6,
+        25
+      ]
+    },
+    "fx_warden_death_flash_4": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        1,
+        17
+      ]
+    },
+    "fx_warden_death_debris_1": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        10,
+        18
+      ]
+    },
+    "fx_warden_death_debris_2": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        11,
+        19
+      ]
+    },
+    "fx_warden_death_debris_3": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        11,
+        19
+      ]
+    },
+    "fx_warden_death_debris_4": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        12,
+        17
+      ]
+    },
+    "fx_warden_death_debris_5": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        13,
+        15
+      ]
+    },
+    "fx_warden_death_debris_6": {
+      "size": [
+        32,
+        16
+      ],
+      "anchor": [
+        14,
+        12
+      ]
+    },
+    "fx_warden_death_debris_7": {
+      "size": [
+        32,
+        16
+      ],
+      "anchor": [
+        15,
+        7
+      ]
+    },
+    "fx_warden_death_debris_8": {
+      "size": [
+        40,
+        8
+      ],
+      "anchor": [
+        16,
+        4
+      ]
+    },
+    "fx_warden_hit_burst_1": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        22
+      ]
+    },
+    "fx_warden_hit_burst_2": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        22
+      ]
+    },
+    "fx_warden_hit_burst_3": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        2,
+        22
+      ]
+    },
+    "fx_warden_hit_burst_4": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        3,
+        23
+      ]
+    },
+    "fx_warden_hit_burst_5": {
+      "size": [
+        24,
+        16
+      ],
+      "anchor": [
+        0,
+        15
+      ]
+    },
+    "fx_warden_cleave_contact_1": {
+      "size": [
+        32,
+        8
+      ],
+      "anchor": [
+        0,
+        3
+      ]
+    },
+    "fx_warden_cleave_contact_2": {
+      "size": [
+        32,
+        8
+      ],
+      "anchor": [
+        0,
+        6
+      ]
+    },
+    "fx_warden_cleave_contact_3": {
+      "size": [
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        8
+      ]
+    },
+    "fx_warden_cleave_contact_4": {
+      "size": [
+        32,
+        16
+      ],
+      "anchor": [
+        0,
+        8
+      ]
+    },
+    "fx_warden_cleave_contact_5": {
+      "size": [
+        32,
+        8
+      ],
+      "anchor": [
+        0,
+        5
+      ]
+    },
+    "fx_warden_cleave_contact_6": {
+      "size": [
+        32,
+        8
+      ],
+      "anchor": [
+        0,
+        3
+      ]
+    },
+    "fx_warden_ring_afterglow_1": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        44,
+        43
+      ]
+    },
+    "fx_warden_ring_afterglow_2": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        44,
+        43
+      ]
+    },
+    "fx_warden_ring_afterglow_3": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        44,
+        43
+      ]
+    },
+    "fx_warden_ring_afterglow_4": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        44,
+        44
+      ]
+    },
+    "fx_warden_ring_afterglow_5": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        44,
+        44
+      ]
+    },
+    "fx_warden_ring_afterglow_6": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        44,
+        44
+      ]
+    },
+    "fx_warden_ring_afterglow_7": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        43,
+        44
+      ]
+    },
+    "fx_warden_ring_afterglow_8": {
+      "size": [
+        88,
+        88
+      ],
+      "anchor": [
+        43,
+        44
+      ]
+    }
+  },
+  "preview_canvas": [
+    256,
+    176
+  ],
+  "preview_mob_feet": [
+    66,
+    108
+  ],
+  "simulation_hz": 60,
+  "preview_sample_ticks": 3,
+  "gif_frame_ms": 50,
+  "core_attack_timings": {
+    "cleave": [
+      40,
+      6,
+      44
+    ],
+    "lash": [
+      44,
+      8,
+      40
+    ],
+    "ring": [
+      56,
+      5,
+      44
+    ]
+  },
+  "warning_geometry": {
+    "cleave": {
+      "radius": 57,
+      "half_angle": 0.9
+    },
+    "lash": {
+      "length": 150,
+      "width": 20
+    },
+    "ring": {
+      "radius": 48
+    }
+  },
+  "chain_delay_ticks": 12,
+  "exposed_ticks": 90,
+  "blade_trace": {
+    "pivot": [
+      26,
+      25
+    ],
+    "hook_tip": [
+      37,
+      35
+    ],
+    "cleave_angles": [
+      -105,
+      -15,
+      18
+    ],
+    "lash_angles": [
+      -28,
+      -72,
+      -35
+    ]
+  },
+  "protected_design_hashes": {
+    "defeat.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "exposed.png": "fd21598816c207d14642cb7d9198b21125d654e3af325f7883736dba3cdce78c",
+    "guarded.png": "fdcfdf37f9ac31a122cc463465f82e5260e16cee3af7e769f2438192e798bf52",
+    "idle.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "root_lash.png": "241e7e6aee70a29c931ea1e2a225485e8b9c2d9604297b9765e6f2aa56df79fd",
+    "rune_cleave.png": "5edfa798a2f433e9a4a3913dc92dce69a9ed2bca6132dbd42aaf905db2f49936",
+    "spore_ring.png": "0e133b79abd09511638564d9507bf62fc0ea418eea2c22b62cb3e40a12b36803"
+  },
+  "validation": "PASS:114 compact reconstructions;60 byte-identical body copies;V1/V2 source hashes;Totoy36;hard alpha;no reserved FX colors;11 unchanged clip durations. Parent independent audit pending.",
+  "runtime_installed": false,
+  "generated_with": "Astra V3 visibility correction; V2 helpers safely reused; opaque pale attack cores with dark backing",
+  "composition": "FX below opaque body, then original warning overlay last; body anchor20,44",
+  "body_file_hashes": {
+    "body\\cleave_strike\\warden_cleave_strike_right_1.png": "240e2f19c5423e59f31f8608b3216b3a12028669a8ca24285535138e6b5df2dd",
+    "body\\cleave_strike\\warden_cleave_strike_right_2.png": "8f009cc57fd0ae040706adb18dac8a60189364ea8092ccc546350b671902fcf4",
+    "body\\cleave_strike\\warden_cleave_strike_right_3.png": "55c93a0aeddfc137648f6b3657efccf684ab423319775095c3f96ccd883217de",
+    "body\\cleave_tell\\warden_cleave_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\cleave_tell\\warden_cleave_tell_right_2.png": "e5c6b5e68aa6722d5b793d1e4b07f553c55eb2a5a23effcbb21ec244f61993cb",
+    "body\\cleave_tell\\warden_cleave_tell_right_3.png": "9704651c016e877cdefe4ccae557a521abc2467b32000f5f28faf97e51ef6f24",
+    "body\\cleave_tell\\warden_cleave_tell_right_4.png": "bafc60e6eb41a3561ce2d0286185f530f8f63321a217b141744124c6479503c5",
+    "body\\cleave_tell\\warden_cleave_tell_right_5.png": "221e32d7eb49aaaa7b4b8da6f1f8d4db5e32d3900c5afb0e2f03c61b139ba0b7",
+    "body\\death\\warden_death_right_1.png": "f6f4bb6e15fc385a381149a95d8b5ab36abe326ddb061f102cf2eb4ee4e9d852",
+    "body\\death\\warden_death_right_2.png": "7c2a99aa435520194f503ed8078ba326a9820ac784449429f49635e1ddb517b8",
+    "body\\death\\warden_death_right_3.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "body\\death\\warden_death_right_4.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "body\\death\\warden_death_right_5.png": "3d6537684533f88dece17db01b0408198038a1b6a6382c24eca4accedf3fff36",
+    "body\\death\\warden_death_right_6.png": "660dd15844a002c76927ee3b2b1c72097e6bcbd8ad42e19a8746ce24bdc663ff",
+    "body\\death\\warden_death_right_7.png": "b7b54650ecd9057313558d516037e1423819ef397d46432ba17980264ccb1ab7",
+    "body\\death\\warden_death_right_8.png": "32af38e7f9f591ce93476b1649111e82a40fdc4d1a836725b824a7a2e2e03f9f",
+    "body\\exposed\\warden_exposed_right_1.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "body\\exposed\\warden_exposed_right_2.png": "b73b3828f41437bdbf63c33ac989e73d6026028c7632df09a41dbd1638cfa19b",
+    "body\\exposed\\warden_exposed_right_3.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "body\\exposed\\warden_exposed_right_4.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "body\\guard_hit\\warden_guard_hit_right_1.png": "ca26472100b8325c12bfce520bb042c6e4d218015c9d331d7afd800ab4c8dab7",
+    "body\\guard_hit\\warden_guard_hit_right_2.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\hurt\\warden_hurt_right_1.png": "5ab0cd902057775cd86cab6976783cbd33f2ff3b7fd8b66e9087e5b555661341",
+    "body\\hurt\\warden_hurt_right_2.png": "3b5fbacafa534c6ef74dc18091b19c66522f23fdacd8a69547396c8d498d6c13",
+    "body\\idle\\warden_idle_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\idle\\warden_idle_right_2.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\idle\\warden_idle_right_3.png": "b13adea23fd7d2b105cf53a7a4b73bb72dfce3e9a43ce9a0a6bac3cd3853a943",
+    "body\\idle\\warden_idle_right_4.png": "776d063fe1ba85a0b2c6aebaaa89a6a7408f66802e4d0b2d7c74bcc6e65aed86",
+    "body\\idle\\warden_idle_right_5.png": "1bb516bc49c796138e204a355ef0f809737d8a17b2cc89af2ddf29764e58ba83",
+    "body\\idle\\warden_idle_right_6.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\lash_strike\\warden_lash_strike_right_1.png": "e5c6b5e68aa6722d5b793d1e4b07f553c55eb2a5a23effcbb21ec244f61993cb",
+    "body\\lash_strike\\warden_lash_strike_right_2.png": "aae968bb71c1404373404c8efeeb2f82e1987b175dd3d6cb47821e27c5822c22",
+    "body\\lash_strike\\warden_lash_strike_right_3.png": "2fde6f10809e987986909c4cb0b8caa09669b5eeb19bcc81bc7cab137bbe912f",
+    "body\\lash_tell\\warden_lash_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\lash_tell\\warden_lash_tell_right_2.png": "06f923fc6d096e4675f86c76bc15bb97c7d93b2b8ba3651a30c85a30dd94f7ad",
+    "body\\lash_tell\\warden_lash_tell_right_3.png": "d8f2c423d5e3af4a1c88229b3908aab8323723dcc50abc5695e5d87931cd823c",
+    "body\\lash_tell\\warden_lash_tell_right_4.png": "c97fa3cf9bb8985a5ae5692145550783d4d2ac81f3eb6b81c08328f4d1cb9dee",
+    "body\\lash_tell\\warden_lash_tell_right_5.png": "e0860d130b4537830233fe5ff5648320962e4e250cb70fef20ce70ad0a63feb8",
+    "body\\recover\\warden_recover_right_1.png": "1ddb2e64e5609abb518247e870c1ef1cd732efef18f1b1222c23d31ad123f21b",
+    "body\\recover\\warden_recover_right_2.png": "db9464c993592b8a8633d68211daf5738006181cfd1791e9b79dbcb72f69123c",
+    "body\\recover\\warden_recover_right_3.png": "60f379da77405568d795d14902f57b2ed6df71e338b91ea6135ad9b34d890872",
+    "body\\recover\\warden_recover_right_4.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\ring_strike\\warden_ring_strike_right_1.png": "bfbae6c14467f43b435afc2916cec6e4033b724feb75d2dece9bf5818b638e8a",
+    "body\\ring_strike\\warden_ring_strike_right_2.png": "0b131511b88991a454dff7a3fa439d0f543fb53a95c4f7520724da9e8a9c68ba",
+    "body\\ring_strike\\warden_ring_strike_right_3.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\ring_tell\\warden_ring_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\ring_tell\\warden_ring_tell_right_2.png": "863fb98366897fb75526cee1efd84e0ba7431efd90458a500135b9e7ef177d9f",
+    "body\\ring_tell\\warden_ring_tell_right_3.png": "e54bd72b11febbb048979fbf32e3f33ee2d727b5c375d528ad0d2ff037791786",
+    "body\\ring_tell\\warden_ring_tell_right_4.png": "46f0f47112d8d89b40ebe1e5dd9712b40be56627c9bf272eb0e18fe700c482da",
+    "body\\ring_tell\\warden_ring_tell_right_5.png": "00ca378509d63a11cd3d965acd31d8ebd21af9c4a267319d1962374188026c95",
+    "body\\wake\\warden_wake_right_1.png": "1278feaa15139a3240d30d9baa7b191cd0807c9cd7a71bb9e70e90d00d56efbf",
+    "body\\wake\\warden_wake_right_2.png": "dca987f676383500c81eceda83ddf111747b4fe64fe61d4ada289df4674b5492",
+    "body\\wake\\warden_wake_right_3.png": "240d81886d9e19491ae83eea4a77dc4733b94bdb519107770dae6c1a4389f700",
+    "body\\wake\\warden_wake_right_4.png": "e1fd22ff751a59054b980789f5d0072c2b6bead3e8f09c8c6e61b5fb412842e5",
+    "body\\walk\\warden_walk_right_1.png": "f1d7e1baa73fb6e939e7ea42d1ee104c75d73a6e9169c7568111c3770ca608b6",
+    "body\\walk\\warden_walk_right_2.png": "48da36cb354b3806296dcea3ef306771453b0f833ac0a0fd782dac41c79a7d6a",
+    "body\\walk\\warden_walk_right_3.png": "ee8ba4ea8a169266701247da1b6a1c6bab30a7210188adfecaa550c664befe98",
+    "body\\walk\\warden_walk_right_4.png": "63158d482ad73ce7449a0c172fac2fe15907627d3bc3fb2a30bc2d6f7af15f59",
+    "body\\walk\\warden_walk_right_5.png": "e2127de58bbbed963cc17d8b107b94a506336761831495f0e5e35534c50da450",
+    "body\\walk\\warden_walk_right_6.png": "121254fd0d050077fdab71c3dc8f2cedbf2fbebcc8f45c1b2a86f1785277fb1c"
+  },
+  "baseline_source_hashes": {
+    "frames\\defeat.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "frames\\exposed.png": "fd21598816c207d14642cb7d9198b21125d654e3af325f7883736dba3cdce78c",
+    "frames\\guarded.png": "fdcfdf37f9ac31a122cc463465f82e5260e16cee3af7e769f2438192e798bf52",
+    "frames\\idle.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "frames\\root_lash.png": "241e7e6aee70a29c931ea1e2a225485e8b9c2d9604297b9765e6f2aa56df79fd",
+    "frames\\rune_cleave.png": "5edfa798a2f433e9a4a3913dc92dce69a9ed2bca6132dbd42aaf905db2f49936",
+    "frames\\spore_ring.png": "0e133b79abd09511638564d9507bf62fc0ea418eea2c22b62cb3e40a12b36803",
+    "animation_review\\all_attacks.gif": "09fca5740e142e9651ed7817c9fe9713684f9d4162bb62f619587f65b2f08a36",
+    "animation_review\\all_body_animations.gif": "25dca6e00922c2e20fd32c241d59dd6b54cea2b4f6360d6249295f74325411df",
+    "animation_review\\all_effects.gif": "3352ad64ae481b994164c0213cb1a137ea2baff062685636ebf01641c6f87bea",
+    "animation_review\\body\\cleave_strike\\warden_cleave_strike_right_1.png": "240e2f19c5423e59f31f8608b3216b3a12028669a8ca24285535138e6b5df2dd",
+    "animation_review\\body\\cleave_strike\\warden_cleave_strike_right_2.png": "8f009cc57fd0ae040706adb18dac8a60189364ea8092ccc546350b671902fcf4",
+    "animation_review\\body\\cleave_strike\\warden_cleave_strike_right_3.png": "55c93a0aeddfc137648f6b3657efccf684ab423319775095c3f96ccd883217de",
+    "animation_review\\body\\cleave_tell\\warden_cleave_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\cleave_tell\\warden_cleave_tell_right_2.png": "e5c6b5e68aa6722d5b793d1e4b07f553c55eb2a5a23effcbb21ec244f61993cb",
+    "animation_review\\body\\cleave_tell\\warden_cleave_tell_right_3.png": "9704651c016e877cdefe4ccae557a521abc2467b32000f5f28faf97e51ef6f24",
+    "animation_review\\body\\cleave_tell\\warden_cleave_tell_right_4.png": "bafc60e6eb41a3561ce2d0286185f530f8f63321a217b141744124c6479503c5",
+    "animation_review\\body\\cleave_tell\\warden_cleave_tell_right_5.png": "221e32d7eb49aaaa7b4b8da6f1f8d4db5e32d3900c5afb0e2f03c61b139ba0b7",
+    "animation_review\\body\\death\\warden_death_right_1.png": "f6f4bb6e15fc385a381149a95d8b5ab36abe326ddb061f102cf2eb4ee4e9d852",
+    "animation_review\\body\\death\\warden_death_right_2.png": "7c2a99aa435520194f503ed8078ba326a9820ac784449429f49635e1ddb517b8",
+    "animation_review\\body\\death\\warden_death_right_3.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "animation_review\\body\\death\\warden_death_right_4.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "animation_review\\body\\death\\warden_death_right_5.png": "3d6537684533f88dece17db01b0408198038a1b6a6382c24eca4accedf3fff36",
+    "animation_review\\body\\death\\warden_death_right_6.png": "660dd15844a002c76927ee3b2b1c72097e6bcbd8ad42e19a8746ce24bdc663ff",
+    "animation_review\\body\\death\\warden_death_right_7.png": "b7b54650ecd9057313558d516037e1423819ef397d46432ba17980264ccb1ab7",
+    "animation_review\\body\\death\\warden_death_right_8.png": "32af38e7f9f591ce93476b1649111e82a40fdc4d1a836725b824a7a2e2e03f9f",
+    "animation_review\\body\\exposed\\warden_exposed_right_1.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "animation_review\\body\\exposed\\warden_exposed_right_2.png": "b73b3828f41437bdbf63c33ac989e73d6026028c7632df09a41dbd1638cfa19b",
+    "animation_review\\body\\exposed\\warden_exposed_right_3.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "animation_review\\body\\exposed\\warden_exposed_right_4.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "animation_review\\body\\guard_hit\\warden_guard_hit_right_1.png": "ca26472100b8325c12bfce520bb042c6e4d218015c9d331d7afd800ab4c8dab7",
+    "animation_review\\body\\guard_hit\\warden_guard_hit_right_2.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\hurt\\warden_hurt_right_1.png": "5ab0cd902057775cd86cab6976783cbd33f2ff3b7fd8b66e9087e5b555661341",
+    "animation_review\\body\\hurt\\warden_hurt_right_2.png": "3b5fbacafa534c6ef74dc18091b19c66522f23fdacd8a69547396c8d498d6c13",
+    "animation_review\\body\\idle\\warden_idle_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\idle\\warden_idle_right_2.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\idle\\warden_idle_right_3.png": "b13adea23fd7d2b105cf53a7a4b73bb72dfce3e9a43ce9a0a6bac3cd3853a943",
+    "animation_review\\body\\idle\\warden_idle_right_4.png": "776d063fe1ba85a0b2c6aebaaa89a6a7408f66802e4d0b2d7c74bcc6e65aed86",
+    "animation_review\\body\\idle\\warden_idle_right_5.png": "1bb516bc49c796138e204a355ef0f809737d8a17b2cc89af2ddf29764e58ba83",
+    "animation_review\\body\\idle\\warden_idle_right_6.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\lash_strike\\warden_lash_strike_right_1.png": "e5c6b5e68aa6722d5b793d1e4b07f553c55eb2a5a23effcbb21ec244f61993cb",
+    "animation_review\\body\\lash_strike\\warden_lash_strike_right_2.png": "aae968bb71c1404373404c8efeeb2f82e1987b175dd3d6cb47821e27c5822c22",
+    "animation_review\\body\\lash_strike\\warden_lash_strike_right_3.png": "2fde6f10809e987986909c4cb0b8caa09669b5eeb19bcc81bc7cab137bbe912f",
+    "animation_review\\body\\lash_tell\\warden_lash_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\lash_tell\\warden_lash_tell_right_2.png": "06f923fc6d096e4675f86c76bc15bb97c7d93b2b8ba3651a30c85a30dd94f7ad",
+    "animation_review\\body\\lash_tell\\warden_lash_tell_right_3.png": "d8f2c423d5e3af4a1c88229b3908aab8323723dcc50abc5695e5d87931cd823c",
+    "animation_review\\body\\lash_tell\\warden_lash_tell_right_4.png": "c97fa3cf9bb8985a5ae5692145550783d4d2ac81f3eb6b81c08328f4d1cb9dee",
+    "animation_review\\body\\lash_tell\\warden_lash_tell_right_5.png": "e0860d130b4537830233fe5ff5648320962e4e250cb70fef20ce70ad0a63feb8",
+    "animation_review\\body\\recover\\warden_recover_right_1.png": "1ddb2e64e5609abb518247e870c1ef1cd732efef18f1b1222c23d31ad123f21b",
+    "animation_review\\body\\recover\\warden_recover_right_2.png": "db9464c993592b8a8633d68211daf5738006181cfd1791e9b79dbcb72f69123c",
+    "animation_review\\body\\recover\\warden_recover_right_3.png": "60f379da77405568d795d14902f57b2ed6df71e338b91ea6135ad9b34d890872",
+    "animation_review\\body\\recover\\warden_recover_right_4.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\ring_strike\\warden_ring_strike_right_1.png": "bfbae6c14467f43b435afc2916cec6e4033b724feb75d2dece9bf5818b638e8a",
+    "animation_review\\body\\ring_strike\\warden_ring_strike_right_2.png": "0b131511b88991a454dff7a3fa439d0f543fb53a95c4f7520724da9e8a9c68ba",
+    "animation_review\\body\\ring_strike\\warden_ring_strike_right_3.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\ring_tell\\warden_ring_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "animation_review\\body\\ring_tell\\warden_ring_tell_right_2.png": "863fb98366897fb75526cee1efd84e0ba7431efd90458a500135b9e7ef177d9f",
+    "animation_review\\body\\ring_tell\\warden_ring_tell_right_3.png": "e54bd72b11febbb048979fbf32e3f33ee2d727b5c375d528ad0d2ff037791786",
+    "animation_review\\body\\ring_tell\\warden_ring_tell_right_4.png": "46f0f47112d8d89b40ebe1e5dd9712b40be56627c9bf272eb0e18fe700c482da",
+    "animation_review\\body\\ring_tell\\warden_ring_tell_right_5.png": "00ca378509d63a11cd3d965acd31d8ebd21af9c4a267319d1962374188026c95",
+    "animation_review\\body\\wake\\warden_wake_right_1.png": "1278feaa15139a3240d30d9baa7b191cd0807c9cd7a71bb9e70e90d00d56efbf",
+    "animation_review\\body\\wake\\warden_wake_right_2.png": "dca987f676383500c81eceda83ddf111747b4fe64fe61d4ada289df4674b5492",
+    "animation_review\\body\\wake\\warden_wake_right_3.png": "240d81886d9e19491ae83eea4a77dc4733b94bdb519107770dae6c1a4389f700",
+    "animation_review\\body\\wake\\warden_wake_right_4.png": "e1fd22ff751a59054b980789f5d0072c2b6bead3e8f09c8c6e61b5fb412842e5",
+    "animation_review\\body\\walk\\warden_walk_right_1.png": "f1d7e1baa73fb6e939e7ea42d1ee104c75d73a6e9169c7568111c3770ca608b6",
+    "animation_review\\body\\walk\\warden_walk_right_2.png": "48da36cb354b3806296dcea3ef306771453b0f833ac0a0fd782dac41c79a7d6a",
+    "animation_review\\body\\walk\\warden_walk_right_3.png": "ee8ba4ea8a169266701247da1b6a1c6bab30a7210188adfecaa550c664befe98",
+    "animation_review\\body\\walk\\warden_walk_right_4.png": "63158d482ad73ce7449a0c172fac2fe15907627d3bc3fb2a30bc2d6f7af15f59",
+    "animation_review\\body\\walk\\warden_walk_right_5.png": "e2127de58bbbed963cc17d8b107b94a506336761831495f0e5e35534c50da450",
+    "animation_review\\body\\walk\\warden_walk_right_6.png": "121254fd0d050077fdab71c3dc8f2cedbf2fbebcc8f45c1b2a86f1785277fb1c",
+    "animation_review\\cleave.gif": "f197b7da7cc805070d86a1d302f1beb800396d65e1da7dc37effc0069b0605a5",
+    "animation_review\\cleave_lash_chain.gif": "9bb5b7a85c2a7f2ff7163e7a5c5fdeacee6a57a30c1a990699a13486c2e417a0",
+    "animation_review\\cleave_parry_exposed.gif": "8eb0f3048228b2324f3717bc2a39b3b37b8936e9d00554f80d77027fb55b787f",
+    "animation_review\\contact_sheet_body_overview_1.png": "5a5f8d9bfc90fe71a25deb04c246471356a3a29adb9ca5f60fa0a843b900c764",
+    "animation_review\\contact_sheet_body_overview_2.png": "081d64628bb38f9fff34b6d836fc844fadae9f1b9e7d6d0dc5521af21053391d",
+    "animation_review\\contact_sheet_cleave_strike.png": "401bb9ca9fa8b4fb696e00d902086860d6f3befbbaba1d52a9322def691e98d3",
+    "animation_review\\contact_sheet_cleave_tell.png": "957868e04aca0acb428bc81862a060ae2ef6b0274acec55916cac2af94f7a6e0",
+    "animation_review\\contact_sheet_death.png": "119cfeaa795628c7bf2ad817c8818c2f40f25cfc15d55ad49057b3cf23644ca5",
+    "animation_review\\contact_sheet_exposed.png": "4646b5a61d5afb93a8e9590571c8d2e4477107a91d94974d07f96fa255df57e8",
+    "animation_review\\contact_sheet_guard_hit.png": "7a110c3081061cdd0ccc14648804f66f1bb8b88eed8746e317096398bf24f321",
+    "animation_review\\contact_sheet_hurt.png": "73d80c2f1558b52c031054664fee29b73c426f8abf15b938dff47e4856c543ac",
+    "animation_review\\contact_sheet_idle.png": "961892e42354f2cd347acd98c8c14bf177e40b522b0ab21965edbd4b0e3ec525",
+    "animation_review\\contact_sheet_lash_strike.png": "67f0995260b86a9bc0ebecb28e8a6359c670f0114d99d9f6f3cf21c8bd1f6a90",
+    "animation_review\\contact_sheet_lash_tell.png": "9ad3fb22e4dde8fc4980edf60901b584076bb750ac67d5dc9df6b4f34de26c48",
+    "animation_review\\contact_sheet_motion_check.png": "465d979a12b3d145244d7a8c42c0d72f400824d2ab9615d5c1967d28c1c6b3e3",
+    "animation_review\\contact_sheet_recover.png": "e5f1edd3cdd8f25a4a2729add6eeae95ef453e467694ee2f15dc291bec9b53ac",
+    "animation_review\\contact_sheet_ring_strike.png": "a04a4113a0e73adfc8285c1b861e50409721cb3150f20ee8eb7606137dbfa05a",
+    "animation_review\\contact_sheet_ring_tell.png": "f77a2f227148cf2027644e85d81bd2021b58a1d33230987b1ac5033efd5bcca8",
+    "animation_review\\contact_sheet_wake.png": "18c270e1f96534a315b44c51aac6f1c4bdab0b79380a00425c03b4e034d62350",
+    "animation_review\\contact_sheet_walk.png": "bfc8b5b7d291579936ee4155e5d66413a5656e3968785463adf6285a7e6bd6bb",
+    "animation_review\\defeat.gif": "2c2567800145b97b6b1328c9e31f70f65b50a8503c9418f7a746e64ae178bc77",
+    "animation_review\\export_audit.json": "1978fd64a7ac95737f162bb914afa3c30317c551a72e5e0f85aab7be05ee6a1d",
+    "animation_review\\fx\\arrival\\fx_warden_arrival_1.png": "28df226a62c5e57e8ebf349cb3834fae68676157cb08df675bd8e85f277c5ac9",
+    "animation_review\\fx\\arrival\\fx_warden_arrival_2.png": "75eb78181811ab0d7e618c923bbaaabb52fa430258a37b5dd502f9eb721b3e88",
+    "animation_review\\fx\\arrival\\fx_warden_arrival_3.png": "104be9ead0c2e9cbde15a74610a8b3f0ef9ac9873a671150653a089c8911c853",
+    "animation_review\\fx\\arrival\\fx_warden_arrival_4.png": "8b1a1b2e91bf088053c3723bb88b32fe67df6d973fcb2a27e2ece4b6b44f36e3",
+    "animation_review\\fx\\arrival\\fx_warden_arrival_5.png": "f8a51b115b4ba287df6f540cbe705119f9c3c490f013dea06bd7e0fb6c97912d",
+    "animation_review\\fx\\arrival\\fx_warden_arrival_6.png": "936f9993ce8abd8cf4ff7e27243b12f241797725fd4fb475384104266c3a5298",
+    "animation_review\\fx\\cleave_arc\\fx_warden_cleave_arc_1.png": "3ea71325c33dc981077db477f7eb7930b8ec0a5049371a0e9a7165b434f101cd",
+    "animation_review\\fx\\cleave_arc\\fx_warden_cleave_arc_2.png": "722939de87bcb4eec104d366adf65dc0975a6e7dccd348b7517948ff863eab8e",
+    "animation_review\\fx\\cleave_arc\\fx_warden_cleave_arc_3.png": "18dd343015de38d83db701e5a47370d53612bb4adc1247a41a93f218b9e95885",
+    "animation_review\\fx\\cleave_arc\\fx_warden_cleave_arc_4.png": "e5394e3186bb1cea4bd2cd9f096d091c065b6e7bce44d79a93f05dfd8deabb0e",
+    "animation_review\\fx\\cleave_arc\\fx_warden_cleave_arc_5.png": "4a21de879e4db62cb6469a32c2f388966de824fc5e0017f7d0aa1119e19d6752",
+    "animation_review\\fx\\cleave_arc\\fx_warden_cleave_arc_6.png": "81d8614c58ca22c7ce0fd89d2c56c972ad316b126c98a3562f3d3301ab7eb73e",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_1.png": "9f108aa87f49cda44815fafd27e04996666db4a1a74a092ab252e7d4bf412060",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_2.png": "e6009da8c690bcb1d6f0062c9e5820cf1ec18cd3bc750df2c69e78adb92a1cd3",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_3.png": "2b47fbff4e8764ee06cfa89a5c964539710af6cedd71f3a4c20afde3df93e61c",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_4.png": "877fb6f8edc84f123a1b188c30ba926c23b6ae6484d28f4b28bd6628ee074c9a",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_5.png": "044fb8995c86209f3d8ac5187851842ce57502a53da97987b696815beb789b6f",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_6.png": "cdbe1182b2a914a93372874e33819be596aaacbe2ed2dcd48643e522e5377fcf",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_7.png": "42d224fe99b9e8de1372082bad2eb4e9a262dcddfb665cfc9bb70d214b750124",
+    "animation_review\\fx\\death_debris\\fx_warden_death_debris_8.png": "3dfef4b720c965ed625781742bc6c40cfac7feed93ae147176b8090a5f5e6832",
+    "animation_review\\fx\\death_flash\\fx_warden_death_flash_1.png": "ad69a40c83412819b6715814d98c1a7a113122d5c9d804082dbe0c2634395b83",
+    "animation_review\\fx\\death_flash\\fx_warden_death_flash_2.png": "ec2bfc971cb5d726a315cbf3cb79855c2ccf75e174424ed1a740a4879a7bccc0",
+    "animation_review\\fx\\death_flash\\fx_warden_death_flash_3.png": "49e890d86a08cec40c6683a0181fa279bc87623703a6e9203fd3d089da530472",
+    "animation_review\\fx\\death_flash\\fx_warden_death_flash_4.png": "e0f89dc98bc3cd5e36fe43afbf3d9ce142f69be881931e0a9733700e0df30628",
+    "animation_review\\fx\\exposed_dust\\fx_warden_exposed_dust_1.png": "9f108aa87f49cda44815fafd27e04996666db4a1a74a092ab252e7d4bf412060",
+    "animation_review\\fx\\exposed_dust\\fx_warden_exposed_dust_2.png": "e6009da8c690bcb1d6f0062c9e5820cf1ec18cd3bc750df2c69e78adb92a1cd3",
+    "animation_review\\fx\\exposed_dust\\fx_warden_exposed_dust_3.png": "2b47fbff4e8764ee06cfa89a5c964539710af6cedd71f3a4c20afde3df93e61c",
+    "animation_review\\fx\\exposed_dust\\fx_warden_exposed_dust_4.png": "877fb6f8edc84f123a1b188c30ba926c23b6ae6484d28f4b28bd6628ee074c9a",
+    "animation_review\\fx\\exposed_dust\\fx_warden_exposed_dust_5.png": "044fb8995c86209f3d8ac5187851842ce57502a53da97987b696815beb789b6f",
+    "animation_review\\fx\\exposed_dust\\fx_warden_exposed_dust_6.png": "cdbe1182b2a914a93372874e33819be596aaacbe2ed2dcd48643e522e5377fcf",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_1.png": "f3644ac6e13f6a828824fd7b611e4077cdd8cfb547601a66f4c065c96da9e820",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_2.png": "520d5d8155306a3d9c4c4879386586d9a53faa0050d8d46a5dd4ed94ac3c4bb3",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_3.png": "91093be0fec62b317e63a86c7b2b1459a9e7698b618e18f50686063e58145eda",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_4.png": "a6cf4606291e6d5b6d82d28b75498a4fe69ebc9d1395fa5d7105c679dcdedff2",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_5.png": "f3b92e9365d51170328862448aed0b3ecc972975fc8bcda53fec7ae034da2a69",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_6.png": "6f4a80a11fba7d282d24161a79f4647dd107e8606d22ccf1da25dfccd1b38254",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_7.png": "0aca8843513950a463088eca13651c3d6df01cb561310ee61f2bc4312a483215",
+    "animation_review\\fx\\guard_break\\fx_warden_guard_break_8.png": "342b4039ea2f7b28579bb060f1e814927c1c4eb315832b7d3261e28f74cec242",
+    "animation_review\\fx\\guard_hit\\fx_warden_guard_hit_1.png": "f3644ac6e13f6a828824fd7b611e4077cdd8cfb547601a66f4c065c96da9e820",
+    "animation_review\\fx\\guard_hit\\fx_warden_guard_hit_2.png": "520d5d8155306a3d9c4c4879386586d9a53faa0050d8d46a5dd4ed94ac3c4bb3",
+    "animation_review\\fx\\guard_hit\\fx_warden_guard_hit_3.png": "9fdf61f8cdc551f180a4cf90bcf297441d82aa0cf8c32c938a5275b89e5f1317",
+    "animation_review\\fx\\guard_hit\\fx_warden_guard_hit_4.png": "39b061930187b25a20f6f99d6d405e63053524bdf8fca0a79b9a376efe0581bf",
+    "animation_review\\fx\\hit_burst\\fx_warden_hit_burst_1.png": "532646ceed95f1ea3d6ea1cae1ebd48882cdf517f25c921eef3e7b1cf3ed0321",
+    "animation_review\\fx\\hit_burst\\fx_warden_hit_burst_2.png": "c476481f46566bbf463513428e958462482c18dee022a092a9aa4015f0f90c8b",
+    "animation_review\\fx\\hit_burst\\fx_warden_hit_burst_3.png": "5e06b081b02172828b756b42931ea0a1cab0070fa9e1a4488d91e3cb4df7c18b",
+    "animation_review\\fx\\hit_burst\\fx_warden_hit_burst_4.png": "959e6c691c242303ce5e4761c2ea9638d1215ef917bdd822a06173b5f99936d6",
+    "animation_review\\fx\\hit_burst\\fx_warden_hit_burst_5.png": "5f7d0c300bb9417331bfaf49af64c07edbc526cf82e85d35a03cc06ef73ff767",
+    "animation_review\\fx\\idle_spores\\fx_warden_idle_spores_1.png": "62b46f55fa72abbd07e3f5e952a5c9f34bc0071312552a67459bca7a8765a84e",
+    "animation_review\\fx\\idle_spores\\fx_warden_idle_spores_2.png": "15aa6d84b991f0ab2e500fecb74b4e8533c4b6ccc31f5ba31a2328ea2129de44",
+    "animation_review\\fx\\idle_spores\\fx_warden_idle_spores_3.png": "b33ad539bfe104c662bc6ef31d793f77bedb8fc09f1dba684f29d05554bd782f",
+    "animation_review\\fx\\idle_spores\\fx_warden_idle_spores_4.png": "1698a22789028e059025fdd9ec8f0d9a63d30570d84fb49aadc38daa82c245e0",
+    "animation_review\\fx\\idle_spores\\fx_warden_idle_spores_5.png": "80e16ef30edd6d54adb54b4d580c7794a7d24d423e58959e11a8deb186c7393c",
+    "animation_review\\fx\\idle_spores\\fx_warden_idle_spores_6.png": "3f6ad5f0096db18a2331bae525d32b57ffb5b4409394348bbda9ee0fff517480",
+    "animation_review\\fx\\lash_creep\\fx_warden_lash_creep_1.png": "e0f89dc98bc3cd5e36fe43afbf3d9ce142f69be881931e0a9733700e0df30628",
+    "animation_review\\fx\\lash_creep\\fx_warden_lash_creep_2.png": "7f2c12cc341a39cf6cf7a44e01cd782bbbfa1e736ff586a508054d5b3073acc8",
+    "animation_review\\fx\\lash_creep\\fx_warden_lash_creep_3.png": "993f0e332cc9a243152f787ac2481bcc65f0bc87243857d4dd47f9f15b32c6f2",
+    "animation_review\\fx\\lash_creep\\fx_warden_lash_creep_4.png": "7450550d765d812b294a99f8e54b3ec76524c700c33ede185da3c4bbd164cd7f",
+    "animation_review\\fx\\lash_creep\\fx_warden_lash_creep_5.png": "b44c07529fcef83b4c8f6729f49b6d0f9700cf6d623f1ab6aa5c083ee4b4efd4",
+    "animation_review\\fx\\lash_splinters\\fx_warden_lash_splinters_1.png": "2b2206646d48a4d5ba7ae3eb9ea7d7d8bc1d0bddf5b94f4b141ad56389c1ee03",
+    "animation_review\\fx\\lash_splinters\\fx_warden_lash_splinters_2.png": "8e00f62f981a052371d722eaa0dbb77af18ef4fba24f2e0313e90e1fea131548",
+    "animation_review\\fx\\lash_splinters\\fx_warden_lash_splinters_3.png": "b155bf632fc9d50935ad1b7f18331534939c69dd6188ffe1dd7e390f5bebbc27",
+    "animation_review\\fx\\lash_splinters\\fx_warden_lash_splinters_4.png": "f293b051005bc1459cf584a4ca1402c6ec3ac63e7035407c0055b838d06a22a2",
+    "animation_review\\fx\\lash_splinters\\fx_warden_lash_splinters_5.png": "b5d3e9d31671d9a6d6df23b685ad46e6d194337aa514de6c3f8796843dd6e7c2",
+    "animation_review\\fx\\lash_splinters\\fx_warden_lash_splinters_6.png": "c2f11fa07a5a202780cc860aae3c1dcf3ee7ce17dbc3923b6650369fb0becb35",
+    "animation_review\\fx\\lash_strike\\fx_warden_lash_strike_1.png": "50b2c9a26f329fd4c72d5f3a5968aad48f9ad749f86ed23c5319e28ff2fa680e",
+    "animation_review\\fx\\lash_strike\\fx_warden_lash_strike_2.png": "6510ad98c960d801778e6a1ecbc1a25c19d7bf26bc1a9e9d01ae2124bf41278b",
+    "animation_review\\fx\\lash_strike\\fx_warden_lash_strike_3.png": "06445a67e79db7d814e33ea48219416e225906b63c577284164a81b07a573df0",
+    "animation_review\\fx\\lash_strike\\fx_warden_lash_strike_4.png": "d96acad8c9e329afd9f762ce4a6696f25eae13392878bdcd24f80ea647382583",
+    "animation_review\\fx\\lash_strike\\fx_warden_lash_strike_5.png": "cb2b82fcde3dca5d19c07b6752951e58bfda9808091f9afd3b1a8b7c199c6cec",
+    "animation_review\\fx\\lash_strike\\fx_warden_lash_strike_6.png": "17732d1aa3fa06a2ff0bafae4d12c310ba4a204f649542d1bbb150babcf356c0",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_1.png": "ce021a38e344b7afcf72b1d0f602843530658cee914eca22e63a8dbdb2254d3d",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_2.png": "f4f6187e0a19f917fee975b3374ed99bd9918c62e54643677153625c7332b1c2",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_3.png": "ee03831d4a572c8a9c92887a4d02a6e0aa18ab3a2dd2e68c99dcdd297ebc5620",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_4.png": "afa87a3d1b22a9ca21ec840cbcd13309c3467822a6be100e3a3765e43065a05b",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_5.png": "dc6db18bfa92715f927fdd92069d0f3e84deffb8562adfc0133a7d044ae860ca",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_6.png": "4fda1c906873be9b84800dcef9e10770abcc6805d23f94a2c49f395ac197ac8a",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_7.png": "9232a81df94640c4c1d1b1991a2e91c3b41a620d03d0f27b0358795906421121",
+    "animation_review\\fx\\ring_burst\\fx_warden_ring_burst_8.png": "1bfab53a6f92e7ca535f0978b5f89633522affbb5e31479c393be4892f0f48c5",
+    "animation_review\\fx\\ring_charge\\fx_warden_ring_charge_1.png": "ce021a38e344b7afcf72b1d0f602843530658cee914eca22e63a8dbdb2254d3d",
+    "animation_review\\fx\\ring_charge\\fx_warden_ring_charge_2.png": "a9cd77c20565ab8c8ba360b678602568fb1e2ef79d143b14ecf313299731100c",
+    "animation_review\\fx\\ring_charge\\fx_warden_ring_charge_3.png": "59ddb8e8694c1d5425bd50931ed3c4c2ceb7e8f6707cafcb67e706aab7913ba9",
+    "animation_review\\fx\\ring_charge\\fx_warden_ring_charge_4.png": "e67e5493ac1f2a2eeed9794867116bae11ac32c3b3e4e0402e27c516012d480f",
+    "animation_review\\fx\\ring_charge\\fx_warden_ring_charge_5.png": "5642efc74353e74820face77e084b1f7bbf2e6f7cea05e40f5cf9fcbcd6a9a64",
+    "animation_review\\fx\\ring_charge\\fx_warden_ring_charge_6.png": "02abc5512bc12eb776a5b1280b34fea220379739d1c9f9d537ad8077ffb9e260",
+    "animation_review\\fx\\rune_glow\\fx_warden_rune_glow_1.png": "a669f11c87980692a9472c9dfb05995b933462045dedba1071a0abbd4e46f5b2",
+    "animation_review\\fx\\rune_glow\\fx_warden_rune_glow_2.png": "223c1a2689121e225dab96cbd1abde6f9e65ffc127ee557f3986461fa585e8ef",
+    "animation_review\\fx\\rune_glow\\fx_warden_rune_glow_3.png": "f9cdf06d00c104b5e3c850fce5b3d4167c67653157c9a0559a3d42f56665d3d4",
+    "animation_review\\fx\\rune_glow\\fx_warden_rune_glow_4.png": "6229c66195f6305bbec2f675b282bc11bacbd409769e36e884108dc1003d02ce",
+    "animation_review\\fx\\rune_glow\\fx_warden_rune_glow_5.png": "29294c74239063048979bffb62643609c7c932646153500c21b84c2e56aae3f2",
+    "animation_review\\fx\\rune_glow\\fx_warden_rune_glow_6.png": "ef2ab0da6c69cfd0f9f9efb1950887fa37fd6127dc7b2a9120dfe9bef079b03e",
+    "animation_review\\fx\\scorch\\fx_warden_scorch_1.png": "35004f112dc3e131e826bf7f1deb94182d64eea1d30c00aba2a9678520a1ede9",
+    "animation_review\\fx\\scorch\\fx_warden_scorch_2.png": "ee3ce5e5e0ad299230e11dcc1681a6a0689942eb7b6eeae475cf4f0ee570506f",
+    "animation_review\\fx\\scorch\\fx_warden_scorch_3.png": "5c487640934f812e09c5526c25b85fc12ff7b7bdd8e4605ce82641fb5d9f3b01",
+    "animation_review\\fx\\scorch\\fx_warden_scorch_4.png": "37dafcb67e16c65069d90739efbf5b8531647ce5cdea8933010a1f602870dc12",
+    "animation_review\\fx\\scorch\\fx_warden_scorch_5.png": "4e90b380aaf67cb32f72d18b9647d183e7bd5226fe44d8cbbe31b04e2500b285",
+    "animation_review\\fx\\scorch\\fx_warden_scorch_6.png": "89ee9205d0d396354f2fdf4092f80d26190a5d77144e1e1cf0fda8c49b934376",
+    "animation_review\\fx\\wake_flare\\fx_warden_wake_flare_1.png": "f3644ac6e13f6a828824fd7b611e4077cdd8cfb547601a66f4c065c96da9e820",
+    "animation_review\\fx\\wake_flare\\fx_warden_wake_flare_2.png": "520d5d8155306a3d9c4c4879386586d9a53faa0050d8d46a5dd4ed94ac3c4bb3",
+    "animation_review\\fx\\wake_flare\\fx_warden_wake_flare_3.png": "9fdf61f8cdc551f180a4cf90bcf297441d82aa0cf8c32c938a5275b89e5f1317",
+    "animation_review\\fx\\wake_flare\\fx_warden_wake_flare_4.png": "39b061930187b25a20f6f99d6d405e63053524bdf8fca0a79b9a376efe0581bf",
+    "animation_review\\guard_break_exposed.gif": "ec5e39b0624d77b971cb0685c3db7d96b6237be63ffc885ac9d3f65bdde1d0ff",
+    "animation_review\\idle_wake_walk.gif": "8690ed1c8f02c4fc84b352be82836cc01fc2f727bde5104654372f281838ce1f",
+    "animation_review\\lash.gif": "fa24be7fc758ff3d530d4155726a873a2716878e64f45d5d1197324d5e93e4ff",
+    "animation_review\\manifest.json": "d48878fc82ebf43e2e20d9e36ecbd7df9470a7c373815a7f3b20d82d6ee141cf",
+    "animation_review\\ring.gif": "6633087a606ef25b8d70b83a7a71cef67ed7ca9daef614606412c624f37a31c7"
+  },
+  "attachment": {
+    "rune_glow": "rune centroid offset",
+    "wake_flare": "rune centroid offset",
+    "guard_hit": "rune centroid offset",
+    "hit_burst": "rune centroid offset",
+    "other": "feet"
+  },
+  "registration": {
+    "cleave_pose_by_fx": [
+      0,
+      0,
+      1,
+      1,
+      2,
+      2
+    ],
+    "lash_pose_by_fx": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      2
+    ],
+    "hook_native": [
+      37,
+      35
+    ],
+    "pivot_native": [
+      26,
+      25
+    ],
+    "lash_end_offset": [
+      148,
+      -1
+    ]
+  },
+  "graphify": "Query attempted: No module named graphify. No graph writes allowed in this task.",
+  "attack_visibility": {
+    "cleave": "5px dark silhouette;3px pale arc;2px bright edge;active-only contact flash",
+    "lash": "7px dark silhouette;3px pale live core;2px white highlight;braided root edges",
+    "ring": "radius<=48;short boundary flash;3px pale clusters with5px dark backing;recovery uses separate subdued family"
+  },
+  "v2_protected_file_hashes": {
+    "all_attacks.gif": "47b04bd63c39c6dd1ac82cc26b86b08332754196ec6014f0cea29cad9704dd92",
+    "all_body_animations.gif": "25dca6e00922c2e20fd32c241d59dd6b54cea2b4f6360d6249295f74325411df",
+    "all_effects.gif": "54afe3dd3f1f48ff7597b1abac4476cc8ab7867c24237a1eeba7b0fbde12f185",
+    "build_checks.json": "b26a5003896c71f0c87841ccf2a1cb992583dd8a0ec9efb0b2077f0c3766b351",
+    "build_review.py": "9be344f7dc25431c7786e6ce74fb97def5ef602365b25f3d96d1df0ba31b3a98",
+    "cleave.gif": "4ce3a64aec560b086674831bf05ad92c149225596c2b7df51aca0ee805d24fca",
+    "cleave_lash_chain.gif": "2b34fb5ed75b807b9e5b278ffd80a3966e48b6c5403c6938e366d86458613a51",
+    "cleave_parry_exposed.gif": "7e17fe97da76d843d2f9c5a3f35fb58b20524e4fbb8b4011b4be7e986f942c7c",
+    "contact_sheet_before_after.png": "0dafc0960aec69b394bd86b608eb48b49f0e8c05203727969a25f8cc067134fd",
+    "contact_sheet_before_after.png.import": "f9468444804848041f701191c58b473577cc83f08d2cb205e6796c0cafe35fdf",
+    "contact_sheet_cleave_strike.png": "401bb9ca9fa8b4fb696e00d902086860d6f3befbbaba1d52a9322def691e98d3",
+    "contact_sheet_cleave_strike.png.import": "05d548f1beeb006470451e4f167828188502860ceba22b5f41414f3edb2ac7d5",
+    "contact_sheet_cleave_tell.png": "957868e04aca0acb428bc81862a060ae2ef6b0274acec55916cac2af94f7a6e0",
+    "contact_sheet_cleave_tell.png.import": "974a8191b11e1dfd5d77842f6b79173858c755ed3e82dc28904c5da465d08d66",
+    "contact_sheet_death.png": "119cfeaa795628c7bf2ad817c8818c2f40f25cfc15d55ad49057b3cf23644ca5",
+    "contact_sheet_death.png.import": "189860b8f1e6432ee0351cdf8afcd7ba8cc3f129a3ff3cd2a05fc08531b3e4f9",
+    "contact_sheet_exposed.png": "4646b5a61d5afb93a8e9590571c8d2e4477107a91d94974d07f96fa255df57e8",
+    "contact_sheet_exposed.png.import": "8aa5161960e8fb92cb95121cbb83a0cd6a472b902125c263614b4b9df590cf26",
+    "contact_sheet_first_render.png": "23d73b3ddd9b4e0c04c4e4ea2f8537bdb34db1b677e5d7c3dc2a62e504188848",
+    "contact_sheet_first_render.png.import": "0545680d82a0936e5294732ebc47616270b0b2be11ca3124aaa2c51612cc5efb",
+    "contact_sheet_fx_families.png": "d1ca396cb2a4e48a920e44bcd0c21861c836be11cc3f0eeb24446a4e95723d35",
+    "contact_sheet_fx_families.png.import": "196bafdb3b7c8fc8c703932f709b7cd1ffa4d29669f96361c6367051b217031e",
+    "contact_sheet_guard_hit.png": "7a110c3081061cdd0ccc14648804f66f1bb8b88eed8746e317096398bf24f321",
+    "contact_sheet_guard_hit.png.import": "50153beb99fb31e9e94fc59e7bef998164af8aad3bbb7d55ab52a33e4bbb5358",
+    "contact_sheet_hurt.png": "73d80c2f1558b52c031054664fee29b73c426f8abf15b938dff47e4856c543ac",
+    "contact_sheet_hurt.png.import": "6b7b907ea1b820abe02699bda6628d76be0c235d6fc0d135d46e974941223d87",
+    "contact_sheet_idle.png": "961892e42354f2cd347acd98c8c14bf177e40b522b0ab21965edbd4b0e3ec525",
+    "contact_sheet_idle.png.import": "a6f1a4e6d7c5ac35fa84b0993b0c1ee6952320093520bdc2379e977333bf93e4",
+    "contact_sheet_impact_detail_1.png": "1ef0d75cc7378892767c6fb9455b3834cf0d71e338076bb08a6b22213a875a80",
+    "contact_sheet_impact_detail_1.png.import": "ca73184f3810c41512803ea7a9557eddb653b62308a4e8e6c24c9320110322d8",
+    "contact_sheet_impact_detail_2.png": "7ddbcc168a6781efe0083fb7834e1bb7232d41fc7f30a5814fcb755be1ab651a",
+    "contact_sheet_impact_detail_2.png.import": "81db00fc40d866d58ac82206198b2ef4b58144b04182e451bf099851f6c0662c",
+    "contact_sheet_lash_strike.png": "67f0995260b86a9bc0ebecb28e8a6359c670f0114d99d9f6f3cf21c8bd1f6a90",
+    "contact_sheet_lash_strike.png.import": "d8c7410c9ca41bd634d84d5ac75d0a53afd289d00e928196faa2c82626ad0eb4",
+    "contact_sheet_lash_tell.png": "9ad3fb22e4dde8fc4980edf60901b584076bb750ac67d5dc9df6b4f34de26c48",
+    "contact_sheet_lash_tell.png.import": "034476e417d72118448cc665b86a2f47bb28addd15edbdacc199437610c9e773",
+    "contact_sheet_motion_all_attacks.png": "c7e44caf75fad263cbb0ec9e03f0066e3351bf095f4684ef8b025f22c2064048",
+    "contact_sheet_motion_all_attacks.png.import": "4932d92cfeb09317c8994d486d0e855b165dd974797ddefd16e6e1d7dbca0fde",
+    "contact_sheet_motion_defeat.png": "dadea48a20bf97ea51198d827853e6234315b313e05a1aee10a802a2352fcceb",
+    "contact_sheet_motion_defeat.png.import": "3ae1f62331811cd56a7c342363b7f344c75d22b8c376c8a2f0909d9feaacc6b7",
+    "contact_sheet_motion_guard_break_exposed.png": "82d36993e3d4b579440e998a9f7fe3e8a6356e5d31976f148d55955f00cb80e7",
+    "contact_sheet_motion_guard_break_exposed.png.import": "39eec178f00a7401b5fe4bae836d6624e2c16fa5241a676eced0a5a21f57666c",
+    "contact_sheet_recover.png": "e5f1edd3cdd8f25a4a2729add6eeae95ef453e467694ee2f15dc291bec9b53ac",
+    "contact_sheet_recover.png.import": "997d6bbdb2a85fd240c36ee01e331ee8bc73a274b519bd73e0483b353aa01086",
+    "contact_sheet_ring_strike.png": "a04a4113a0e73adfc8285c1b861e50409721cb3150f20ee8eb7606137dbfa05a",
+    "contact_sheet_ring_strike.png.import": "b130a83a39d40e90569794d8b85345383f11c27c569685bc7dedb9d5d1bb09bc",
+    "contact_sheet_ring_tell.png": "f77a2f227148cf2027644e85d81bd2021b58a1d33230987b1ac5033efd5bcca8",
+    "contact_sheet_ring_tell.png.import": "bcbb4809d7785443768a4ce3fa81e5117631015dd640c957f088b765ea4679ba",
+    "contact_sheet_wake.png": "18c270e1f96534a315b44c51aac6f1c4bdab0b79380a00425c03b4e034d62350",
+    "contact_sheet_wake.png.import": "c97da0448ae77d35da67e9534c4b9060bcfa33487e22a95542c0ed213ecbe05a",
+    "contact_sheet_walk.png": "bfc8b5b7d291579936ee4155e5d66413a5656e3968785463adf6285a7e6bd6bb",
+    "contact_sheet_walk.png.import": "6a2947c7cbe76202aed4226b0ff3427f72ca5a027bc0fbe23130619517c73a7d",
+    "defeat.gif": "a1cf63811ca56d40ac86af7706ac6ea29df41c4a1435022bc8f88a4f4dae28bf",
+    "guard_break_exposed.gif": "3799a79eba6746cb033410bf6f1c26fc7b47194e4d136b26ac96fe2226cbbc0b",
+    "idle_wake_walk.gif": "12c0da52e6d1f3d86d60f81bb6ed2c66a19f07673c0b51223dac45d9f9f32274",
+    "lash.gif": "4d2c053787102c923c1f8353e384eae03ce892f537d8f9d0268dc77924afb525",
+    "make_detail_proof.py": "d9915c023080869706c782fb19ff81f1257c9cffbc977e67bc1407760fbafa19",
+    "manifest.json": "26afef55f2715b30a1c17a4699ce7a8c78e9e28b929ec2647c9acb2f9485de2e",
+    "README.md": "7aa97849535a7f340734c3fcd6f85b6b881f72660fd339c31ff75158eae8f6f6",
+    "ring.gif": "693ee1265a17cee58849864e29bc8e05ccbdbf9d0b751f1ca627310b8232a4fb",
+    "timeline.json": "3552587a1b6a3d8fdf09c792ede6be6202a2a7b719153fbbb4f4d2f708863956",
+    "fx\\arrival\\fx_warden_arrival_1.png": "5605197fdea8519d3bcaba16eb273398c9ce412cf337f824d4dee3a218062a2e",
+    "fx\\arrival\\fx_warden_arrival_1.png.import": "3a98a85dd655674380b7d507b21a182d3ade38450bfcfef216809ad76304c299",
+    "fx\\arrival\\fx_warden_arrival_2.png": "c4fb3e5e2f8bdf8be9e9dac60c05d3e0e2184a6e113a0dca1c6ff6cf85132d4b",
+    "fx\\arrival\\fx_warden_arrival_2.png.import": "1ccdf486330002c7f3c1ea76a8130c2516d81dfc34ac643a981dcd14ab247035",
+    "fx\\arrival\\fx_warden_arrival_3.png": "3a396b8fd53af3ee348cda93c41ad830964054cde9fd9e6c40b7f79566248a28",
+    "fx\\arrival\\fx_warden_arrival_3.png.import": "2d5e5cb4185b47e9aa90f46a1530cb60de88e0f6f83421996c4de084c8b52562",
+    "fx\\arrival\\fx_warden_arrival_4.png": "1f0da060d3fbfab371033dab48fce47eac99d540e933429792261de6d9ff550c",
+    "fx\\arrival\\fx_warden_arrival_4.png.import": "52de55fc1120dc6eceea0d1e2fff8c54e0a8eccab83fe2629ec0a9071df34b99",
+    "fx\\arrival\\fx_warden_arrival_5.png": "ce9dceb4435e0360914e9821b34a37d943434a39d60c97168ac6dab6f6d770db",
+    "fx\\arrival\\fx_warden_arrival_5.png.import": "128b76bc9229cf400d02aa6b0cacf056aac6a03332a6e56c46a5f50bcac6439e",
+    "fx\\arrival\\fx_warden_arrival_6.png": "8f04b9fbea9bcda6c9d07b57eb3e37aa48ac5fa2bcc580cc60a6fcb33e8286a3",
+    "fx\\arrival\\fx_warden_arrival_6.png.import": "c5318b1e4b8638a54f6b3b5a17ab0a678b9f300bf9954d097ff430676a31621a",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_1.png": "9a2a2526148f92f09ecf3d11dc7a05b796bcaa458f62f0599996a803ba5138e7",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_1.png.import": "abc78afc2e573fc6bf0505274269d06e5480c2d1fbccbe0b7c7dfe18a3126c8e",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_2.png": "9a2a2526148f92f09ecf3d11dc7a05b796bcaa458f62f0599996a803ba5138e7",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_2.png.import": "ea0bd3a8eea5aa9427b5db61f684968b3aeadc16a705b680f0724c2a048e1c8f",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_3.png": "82a759cd69ed11a28a44eb625502b66360aa238e71c762757444c6bb359b5576",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_3.png.import": "4f375daa390d16a9c0080c507fd62f0d638448d67a5c7284ec6913fd39aead06",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_4.png": "82a759cd69ed11a28a44eb625502b66360aa238e71c762757444c6bb359b5576",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_4.png.import": "7cac239a0fde930a815c00f62190e291f43282939a85063d664b85fbf114765e",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_5.png": "1cf9c7c8446123aacb99dc12b2204daaec7e8083c3e0200b6de5521d38be78a1",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_5.png.import": "ad6718f8445b41282e3948921936e7c995c4ed4194ceea22dd2c0a68a4fbb1f7",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_6.png": "e0d69a6fe745ca5c1aefaf155e2ab8449711646091d076497c98771c23325c22",
+    "fx\\cleave_arc\\fx_warden_cleave_arc_6.png.import": "d2103267ef28dab3d7449eba3e8b5a3cedb68f7b9a5fc7dbcf528990c5f0aa10",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_1.png": "ec355e32b8599f5c1001d4cbbf2d4bb0c79c8cfb1ad700543e56f22dea023e45",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_1.png.import": "6e493c8b717b022aaf93929723542087f5e4b0398e8cb1533788a668f11ed3ac",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_2.png": "30e5db42435a41a15d9e37f49b04b1f485b6c7a0e3c3d38f8cd8116b878d6140",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_2.png.import": "1b7b5d998c910c945fd32b95c7ab845819046bb2dcdc593136ca1f599536f2e7",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_3.png": "32eaba3a25f806f34c130feb46ed988e5adbe304f54065d3522e759d93735a24",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_3.png.import": "00bcc3d2e16f67aac07b7688493c0ad952387ed2d87cf73d414ade33a4500e49",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_4.png": "10ea8e60d07c751da6abd1ea76b4cbd6a6cff25e1c662276239531042ec1fd59",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_4.png.import": "758ed6dae69759279d3a39f8ae86d6ba9a540235e8f190b38ff12295bafc9428",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_5.png": "a32bb347d0a15bd3f5bc6e50db237f94a2bfc433a5802bfa7ff42e7d60da9edb",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_5.png.import": "de77ad3855d0f7b5a9122e046d9b82867897c113fc9929d65f0b32a7e6082a13",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_6.png": "705524b5ad58ee72383015339690371f15a324b2cf80abe9b313198e091f5674",
+    "fx\\cleave_contact\\fx_warden_cleave_contact_6.png.import": "585eabaaa808e61a5c41349efae4c7a81e407ad9daec6f399dd9bd03a12e0e8f",
+    "fx\\death_debris\\fx_warden_death_debris_1.png": "1e55b801482ac2d075bf4f8e62f2e142cd857780c278a25ecf831c31fe71ea0a",
+    "fx\\death_debris\\fx_warden_death_debris_1.png.import": "db0a42d585e69bc20a4201ea705db20711b5779cbbad8267e9f76d0eca91769a",
+    "fx\\death_debris\\fx_warden_death_debris_2.png": "c8d129ecebf38813b26dcedc6415ace83a8f22e9c8b1ab537a726d8206a7d585",
+    "fx\\death_debris\\fx_warden_death_debris_2.png.import": "34e360f9d5ed51fe03b8f44b68d2532860cfe39ff65d11aff23ddc6c9a80e044",
+    "fx\\death_debris\\fx_warden_death_debris_3.png": "9c52e0908f814e59cdf1901adcd3551689a96f11d148a2f044070fdf4471efd3",
+    "fx\\death_debris\\fx_warden_death_debris_3.png.import": "a34fb88272f122aed1dc75fa3d0ab07aa3af8a49098585b0b0b915965792f598",
+    "fx\\death_debris\\fx_warden_death_debris_4.png": "9657932f73624cd3edf057154609ac1bae26fbd0b7663ed6d57892f3032d1ea7",
+    "fx\\death_debris\\fx_warden_death_debris_4.png.import": "8e0733f143b4dd07b2da8d8cc3d20d504222faa3ae11d88b2091053b5a0d607a",
+    "fx\\death_debris\\fx_warden_death_debris_5.png": "90f9d2f94b26ea1327f2308694a9f57dca7d70a031ae8e432d0db203385890fc",
+    "fx\\death_debris\\fx_warden_death_debris_5.png.import": "1e75380a0efe81ac7607869e74c5049141c5ea4fd3c1a9f35547f0e8fe8401a9",
+    "fx\\death_debris\\fx_warden_death_debris_6.png": "24cf0f49446c051234bcbd848da1a5cc2e650318dcd9c8752c2b58023cc4167d",
+    "fx\\death_debris\\fx_warden_death_debris_6.png.import": "dd055862e7bd72967d013c583c30e7d15857cd988bbde17c3040f6bf316ef8de",
+    "fx\\death_debris\\fx_warden_death_debris_7.png": "741d20a3bfa110e054f919010726683298d133dbd3b5c754edec5b7727231595",
+    "fx\\death_debris\\fx_warden_death_debris_7.png.import": "1a638b6e4b94f1e5e44ec7c2a3453d671980d2f05e9171c00b9ec2033644c358",
+    "fx\\death_debris\\fx_warden_death_debris_8.png": "af724a1b66011ae10af73822988ccbd3f644fb0e22e147ff89cf11ad956605da",
+    "fx\\death_debris\\fx_warden_death_debris_8.png.import": "e6627f3155f654df67d89f4e4e60057052859c58004f64c92e25dca2ed402725",
+    "fx\\death_flash\\fx_warden_death_flash_1.png": "577638a47920a2f32de72bd6d2e171b29e0453e18fef6d1f90f66450b644fe22",
+    "fx\\death_flash\\fx_warden_death_flash_1.png.import": "e302d1f6cc3fedd3bf7503a8d3e1adc846d4a97945a3ae0eae04b6cf40f0b014",
+    "fx\\death_flash\\fx_warden_death_flash_2.png": "1c999e5bf0356d891ff8bf60bf8e51e91bfddb1756b11c0c217cf10573f8801c",
+    "fx\\death_flash\\fx_warden_death_flash_2.png.import": "1012528b7ba9164ed0088078a0fd2addecefd97bf560c54756c47f0a43df7d19",
+    "fx\\death_flash\\fx_warden_death_flash_3.png": "dfc450702f8ac05f72b5d16060460a70b0289ca1ef7ab062f03a6c30736ec313",
+    "fx\\death_flash\\fx_warden_death_flash_3.png.import": "1670d6b386cbc64fb26be75e5a75f07ac3d0cf7b45d8e7daf0595b077c4dc490",
+    "fx\\death_flash\\fx_warden_death_flash_4.png": "b3f277b5e3ffe2d771ad06ed1a932d82003a6850764fe4598681bdfc62cd0755",
+    "fx\\death_flash\\fx_warden_death_flash_4.png.import": "b4c93013f0168b0b9e5f1a631bcd07e1b49292685a24f15eb4d7d9fdb3ec145a",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_1.png": "312a81448bff567cc1a9e6215a55f30510c61e82d4b9a83cb9ddf6b5dd781c49",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_1.png.import": "b5c043c000b49e13307701b0e0d73d19c7bee0bf0193e9f07815bc3516e5bbbd",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_2.png": "b55ff247be984eba63e01cc3cd45c0b62a42533e4e19b8d52862c72d61efc4b4",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_2.png.import": "39346a3c492499e6dc62dc93e577ff3a542edf885310624c3cee3656d0c9a628",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_3.png": "2ff9181546011ed362c8fdc76bb4a6a8c5a748b6f01a686b5d1ef390431f20b4",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_3.png.import": "c1ceb504d9bb6381c636395bd28672539e278fc2ba6bab820691093937dc418e",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_4.png": "2882e06b304fc5b06ea78cecb322eb8d7322b43f4ad9d5d667edbeb9d15efa9c",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_4.png.import": "d572738745794fc6eae4eed9adf454130c5001477ba4b4d5d56c6bd1731e87dc",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_5.png": "fdde3ca72b9fb0d64c9fcd11c6c3fd20a0a6fa74c7fa61ddd4952ab7dc812938",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_5.png.import": "48ad6de30cc2ae67d8660ffb28735817faca30e30d505e953255847f491804e9",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_6.png": "a0ba8e30a91050aa2442027f8a25609e0899c7f0a93bad4b0b4b9f93bce8119d",
+    "fx\\exposed_dust\\fx_warden_exposed_dust_6.png.import": "d85ce5bbb7ee30dcb90e7f441690cd083ea1c75a066396a4e916483598beaa24",
+    "fx\\guard_break\\fx_warden_guard_break_1.png": "4b653fb4df4e5b274dbd12158c24b3095b9837b13a69edb37916bc846f688a07",
+    "fx\\guard_break\\fx_warden_guard_break_1.png.import": "e81606375e2bb692071d12a55f3e82186251105c20736d3b9088efce1cf8fe77",
+    "fx\\guard_break\\fx_warden_guard_break_2.png": "0e700ff8f3ff033ef61eacfb5ecc946ddd52e7ee9981b16f4198092253a8b3d4",
+    "fx\\guard_break\\fx_warden_guard_break_2.png.import": "80475aa9e0563ab66df37170a8fbaa01898397e8b60c2f522c4c0da30f9bee7b",
+    "fx\\guard_break\\fx_warden_guard_break_3.png": "dfc450702f8ac05f72b5d16060460a70b0289ca1ef7ab062f03a6c30736ec313",
+    "fx\\guard_break\\fx_warden_guard_break_3.png.import": "c10208afb37da9c1dcd76626c77b9cc7ed6eea335e081e41faa45bca442722bd",
+    "fx\\guard_break\\fx_warden_guard_break_4.png": "3ab1c3f60d3e4800ebaa1878096a84268cd14b6eccdaa651b887a599eb766c7d",
+    "fx\\guard_break\\fx_warden_guard_break_4.png.import": "c803aeca4180580e484acea1c419af5f57eeb18daff06d33da8b948ba13b1f15",
+    "fx\\guard_break\\fx_warden_guard_break_5.png": "0fbdcb0963ef6577062c7c89a88431b7050fac852fb8907d81b01f5bc45ab8b8",
+    "fx\\guard_break\\fx_warden_guard_break_5.png.import": "ebef5aedc51b19302e4bd0ff9bdf8a8b678edb11d4249faea87ff7352ebded0c",
+    "fx\\guard_break\\fx_warden_guard_break_6.png": "7f92b33a140d70cd2511604f24c8a038ab776c10ceae6eb6e496a4567b5681d1",
+    "fx\\guard_break\\fx_warden_guard_break_6.png.import": "91f5322400d322710479fa429db21d2108b2af8d29d61dae9cae053835d34df0",
+    "fx\\guard_break\\fx_warden_guard_break_7.png": "c5481ba0fff6b5e906bd2d8e93efbc302daa813b9a1864f8beb1d79a218763f2",
+    "fx\\guard_break\\fx_warden_guard_break_7.png.import": "96e5f2a5409561790e626ed221de882a25c786e1028a6428a492b5f1a4707a6d",
+    "fx\\guard_break\\fx_warden_guard_break_8.png": "2f60e2688ee85e70024e1fdb92243094dc698621228540360929a8f7b9eb1a3c",
+    "fx\\guard_break\\fx_warden_guard_break_8.png.import": "cd7c9cb84ac2b7f2be881f337207069c2ba9dfd822b1993b2133708bbfa3c9e6",
+    "fx\\guard_hit\\fx_warden_guard_hit_1.png": "3c45563ef30e5907ab2b769631cbe399c931b05a6597793bdc93a5503ec758cb",
+    "fx\\guard_hit\\fx_warden_guard_hit_1.png.import": "7a7e7aee503e5690235d18f9cd8c2738b37e0c31508178a489f6fc0aab94d20e",
+    "fx\\guard_hit\\fx_warden_guard_hit_2.png": "538db0ff988e5b3f4ae31274d177e545ef2b9f66d244086eee49055f8f023482",
+    "fx\\guard_hit\\fx_warden_guard_hit_2.png.import": "1503dfb96831d02d5cc67a30de21c3e0aab119de32f71618acec27cb3b222984",
+    "fx\\guard_hit\\fx_warden_guard_hit_3.png": "ea22fcab5308022c3e2368c267c3d91829d7b9156b7babaca0b483ecbb4fcf5d",
+    "fx\\guard_hit\\fx_warden_guard_hit_3.png.import": "8efa492448e35bd1d55a88eb0fd7c91d1e7c50583f2b35b8884d5f03d1555a92",
+    "fx\\guard_hit\\fx_warden_guard_hit_4.png": "2b9e420f0478d83da14d0d95d0818a1ab7a5216a86b1cc15f5cf5441c65dce8c",
+    "fx\\guard_hit\\fx_warden_guard_hit_4.png.import": "0e9fdbbd15332a437536df92ad49fec195fce46ba471cb19999f84e7850a36b9",
+    "fx\\hit_burst\\fx_warden_hit_burst_1.png": "3c45563ef30e5907ab2b769631cbe399c931b05a6597793bdc93a5503ec758cb",
+    "fx\\hit_burst\\fx_warden_hit_burst_1.png.import": "ca7748b04bb269b6c0fafb03e6c7bdb207677ae424c8a7b586b8582d66486cf2",
+    "fx\\hit_burst\\fx_warden_hit_burst_2.png": "538db0ff988e5b3f4ae31274d177e545ef2b9f66d244086eee49055f8f023482",
+    "fx\\hit_burst\\fx_warden_hit_burst_2.png.import": "e4aa86db4b51d99382b734696dc58e7e211ce48291b08dbf091adf7842cafe56",
+    "fx\\hit_burst\\fx_warden_hit_burst_3.png": "ea22fcab5308022c3e2368c267c3d91829d7b9156b7babaca0b483ecbb4fcf5d",
+    "fx\\hit_burst\\fx_warden_hit_burst_3.png.import": "4628926aad4983afb2561f19ad9052789b9351ea354ff52c1c35ef1d361a6b12",
+    "fx\\hit_burst\\fx_warden_hit_burst_4.png": "4f7f510b2b9c79914130d1c33c4f7594c024aa7ad70fed70d2985f6488dc8f28",
+    "fx\\hit_burst\\fx_warden_hit_burst_4.png.import": "b9634188c584fb7c92ef48165d518d9ff084984a0e441617151c1219ceb6c886",
+    "fx\\hit_burst\\fx_warden_hit_burst_5.png": "ccb2935095f579af98578d12ae6f5c23f35cefe2aab47bf2260992845ef6c04a",
+    "fx\\hit_burst\\fx_warden_hit_burst_5.png.import": "a20554995174631c062eefe8635fbd53184f3b000fae8f46f28bfd217e5287af",
+    "fx\\idle_spores\\fx_warden_idle_spores_1.png": "f972d1c637e214652ca62d2f4d7ff5b62a550680614119b25b3494b2893c565f",
+    "fx\\idle_spores\\fx_warden_idle_spores_1.png.import": "1137748e828db3f71def23350fb0992d73de9fa3e1f9f610e5bee5444b1da5d9",
+    "fx\\idle_spores\\fx_warden_idle_spores_2.png": "3984f586607a41a57a0af5fba4389d734d52bf55fcfdedc768f422b00132465e",
+    "fx\\idle_spores\\fx_warden_idle_spores_2.png.import": "eb2be2a127279d41b79f5d764d5dad4d7cd8890915239e31f47ae1a8bcdeeb0c",
+    "fx\\idle_spores\\fx_warden_idle_spores_3.png": "24bf36557c794cce11aad56eacfbf912cb6ffc8e44f5322da9f2c619f53dd8b5",
+    "fx\\idle_spores\\fx_warden_idle_spores_3.png.import": "2383b139b693d6a38005bb04688306050c38a0d6d424b3aa2f8a152eba9aa3e9",
+    "fx\\idle_spores\\fx_warden_idle_spores_4.png": "96904416b18a0bba5ee6e067c9c28e45dbae19218df8563db2a1a0166d923723",
+    "fx\\idle_spores\\fx_warden_idle_spores_4.png.import": "6173b5f78cb19009d775ec1b365cc59cd780c31969b220d1169b80e93e7297d8",
+    "fx\\idle_spores\\fx_warden_idle_spores_5.png": "72f88164f2489f492e6b91baa3c62ce21eeaf674da93b38b9414580c7e2660a0",
+    "fx\\idle_spores\\fx_warden_idle_spores_5.png.import": "67ee1d3525c6ff3b3f6b3f80e2da4da98765f628838ddfaf143320a4b158bac5",
+    "fx\\idle_spores\\fx_warden_idle_spores_6.png": "ead4fd052dc2734652a7a706f7682c3e4165edce35b9ba2532d9646674b7fa5a",
+    "fx\\idle_spores\\fx_warden_idle_spores_6.png.import": "2ece0f9f990b2d3a19d341aa0b5d17b633f194e3570fbcb2f40dd2a94eb910f7",
+    "fx\\lash_creep\\fx_warden_lash_creep_1.png": "e0f89dc98bc3cd5e36fe43afbf3d9ce142f69be881931e0a9733700e0df30628",
+    "fx\\lash_creep\\fx_warden_lash_creep_1.png.import": "4ba8b44ec3f4245194bbc9e61720cdd13029c151064060ceabc123ab3aa97697",
+    "fx\\lash_creep\\fx_warden_lash_creep_2.png": "efa8bc706c49136255781dd9bd9161162d17136991a5fb8cc471e846b96e639e",
+    "fx\\lash_creep\\fx_warden_lash_creep_2.png.import": "44f400d84482406e189385da304acc8aedc37af2bfb6692299bfed4fb280db94",
+    "fx\\lash_creep\\fx_warden_lash_creep_3.png": "d868870215ceaec632efb0e92ec0c0e9c2923625ca231b0ee9ae094cbe1ad13e",
+    "fx\\lash_creep\\fx_warden_lash_creep_3.png.import": "211f5300b4f7aab2b38af46eaca6cfb372663f1e956d3e649c95a1f286400ec9",
+    "fx\\lash_creep\\fx_warden_lash_creep_4.png": "d6f8442b83a6c3120e241c95a0b6cbdbe05f95c7fee0a1fa9c097ae0fa979e97",
+    "fx\\lash_creep\\fx_warden_lash_creep_4.png.import": "7b9e3b17712cd0deaf82e3137401ab68932bfd1753c326c07efe5182529957cd",
+    "fx\\lash_creep\\fx_warden_lash_creep_5.png": "18c182817ab63f41d29fc67bd7b1eff540136d3f375ba65691f7d5ea9487ff15",
+    "fx\\lash_creep\\fx_warden_lash_creep_5.png.import": "1bf00284b979f25a6d76974bcc6f28ddd37808d30defa8a86d18b3b8e8c780fc",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_1.png": "6df3538bf98b5d9a44e93829d4ce7cfeab70b2a29bf26f5492727458ac12b82b",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_1.png.import": "dcec84ca077f0681e62d32c51ac99218780366a00fd963337a618a1f5f24e131",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_2.png": "2321828ebbe59f5f88a86ed3d1737422ea0d296e370f4701f7c708cbdf537016",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_2.png.import": "20a4c654a18854118a075a82fc51676c9cf68e951fbe72b7f6017638e2eec22a",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_3.png": "0dd912115e18fedfacef0135b19895667a1226343e364f402f17045952a36b84",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_3.png.import": "f17ab0cbf9f0ac0d2e918666d41bdd5780bb087936d7e39c7f3d16f11b46e6ba",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_4.png": "b2b5f4b07660ae853cf0acbbbaccf354675586cf26d12842e1889c44d9b632d9",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_4.png.import": "79184594996b135e1abb27f6f0b6d0244be723343a4569009099c36c96299fa0",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_5.png": "9518ad68292e678ff14ef52ce6903e45dc95f8e73d171688d47d05c57864c3b9",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_5.png.import": "58eb70bf528ea64e7ec091772e89ff082b0971b7400f6e5661fedb1ebf893efa",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_6.png": "afe8b45dda1589855ea80b0ce1750ef58e0d782a88c1eef6ded2181ad8a9cc3b",
+    "fx\\lash_splinters\\fx_warden_lash_splinters_6.png.import": "f22f6e5ba4098b3b1d108843a1a8bcd6cc473bcda716f86a6ad9884116b10d94",
+    "fx\\lash_strike\\fx_warden_lash_strike_1.png": "f0c07bade63878f18480d12075e4361b48f816c6269701f616d57bd4c20c473e",
+    "fx\\lash_strike\\fx_warden_lash_strike_1.png.import": "977ce0603755ff2a4306d466d148e66872ef2394b7764aeaebf4e3c9069b5c1a",
+    "fx\\lash_strike\\fx_warden_lash_strike_2.png": "ea174e349656bfbfcdff5a69ede251caf2a253af0efe956c84ed606443bd29cb",
+    "fx\\lash_strike\\fx_warden_lash_strike_2.png.import": "27356de469d0f4cfc87134886cd6d4efac80c9d59297fa59cbb939c1c17beeb8",
+    "fx\\lash_strike\\fx_warden_lash_strike_3.png": "b9851525231378c057883676fcfe1f2eb119b874fb82252244bb131344cdc7f4",
+    "fx\\lash_strike\\fx_warden_lash_strike_3.png.import": "f98236615d3678453b3c97488c3f217d3ab3a6350e637394d761b12e67468292",
+    "fx\\lash_strike\\fx_warden_lash_strike_4.png": "58d7864b6da67ebdd67d92ca6caf24bacd5966fc1218ee3af931dfe45ca5cdb2",
+    "fx\\lash_strike\\fx_warden_lash_strike_4.png.import": "14da56dccf11bc58c4c7e80fc90fb64b3e606c63f9de14e6064324686fb9683a",
+    "fx\\lash_strike\\fx_warden_lash_strike_5.png": "cd14e5e2f037f459ac547c565f624bd4f2e57b7d51d7321883cf64af5aaf4536",
+    "fx\\lash_strike\\fx_warden_lash_strike_5.png.import": "05b17cfac1ad519efe5f54859b754ffe1f0f8456edba128e6315a44954cafdec",
+    "fx\\lash_strike\\fx_warden_lash_strike_6.png": "c24cb5caca86851e266c28af2315c91a39ae06af102b905eeb67f7f99ba56448",
+    "fx\\lash_strike\\fx_warden_lash_strike_6.png.import": "1de7e39079494bc0986c3768683c5516dd94963d42733c21f9bb863de4f87627",
+    "fx\\ring_burst\\fx_warden_ring_burst_1.png": "dc1e3a9d2d0d6281bc898c21be24a6f54c479864a45fb122cf7ef9c5e819bc61",
+    "fx\\ring_burst\\fx_warden_ring_burst_1.png.import": "86ac90fa319f05158fb32dac095b2c57ac6c29793edc8fef04e946f7cd5aee09",
+    "fx\\ring_burst\\fx_warden_ring_burst_2.png": "a10c9b22fca4bea1b5c678dcb77a774a61fe43b7137542665aa402aa70b6ba5b",
+    "fx\\ring_burst\\fx_warden_ring_burst_2.png.import": "a8bdab265a905cbe27443a0d69fba56c6096d81b032f7b2372ca0c88f3c3972d",
+    "fx\\ring_burst\\fx_warden_ring_burst_3.png": "d3080c301751c94cdf8ced77400e8516eb778fe6f6e30dd49afda2d0040a3ddc",
+    "fx\\ring_burst\\fx_warden_ring_burst_3.png.import": "f1ed49482988babe1eba0b955b0a1ed87ea55d7af90a87dc95c449d0414ab83f",
+    "fx\\ring_burst\\fx_warden_ring_burst_4.png": "998eb8451245339abb0ecd93dc8a8c8a03b27aeb215d20d9b08499d84113b897",
+    "fx\\ring_burst\\fx_warden_ring_burst_4.png.import": "eb857dbaef65cdea1656009f80d4698efe0f865f2123cacffbd47ebc87d0418a",
+    "fx\\ring_burst\\fx_warden_ring_burst_5.png": "3020a885342ec48b77ac6f628c32208d67be57c604fbeda3c62e30451743886b",
+    "fx\\ring_burst\\fx_warden_ring_burst_5.png.import": "7877ee33c573520c31f6c0bc087762a450b5b3450afb4a4b1c349d8617dffea2",
+    "fx\\ring_burst\\fx_warden_ring_burst_6.png": "b62a5de0e785041b77e5fd07e3a6bffa6f4e02c85b2570d778b63dead9e60a33",
+    "fx\\ring_burst\\fx_warden_ring_burst_6.png.import": "1c32c06c36d9db9a816caed7de6159fb3f5612f402d5452b3b80e02d2f7a7f39",
+    "fx\\ring_burst\\fx_warden_ring_burst_7.png": "55f6417033a2400303a4bff8d326dc90b6a98be679b74588feba715aa6716388",
+    "fx\\ring_burst\\fx_warden_ring_burst_7.png.import": "10213bf5df3d34fccafc2b5cf3fb14f400fc4ff996ffb6e7976439f4fae3b674",
+    "fx\\ring_burst\\fx_warden_ring_burst_8.png": "8eef3f4e1dc75979dd4f81c6ee2db7fc76f8b2fc2659844f729bff0db6cb46e3",
+    "fx\\ring_burst\\fx_warden_ring_burst_8.png.import": "3b6746937bcac93e390b9272a6a5ed9d50634f8e48ac1ba4889edb0107d2f4eb",
+    "fx\\ring_charge\\fx_warden_ring_charge_1.png": "db5d84f4bc9c48e538208bc7cd77c3f4ed78323f518ae427291cd3bd5d2183cb",
+    "fx\\ring_charge\\fx_warden_ring_charge_1.png.import": "59149fc2dd03fb517c9877d248a8ee672cbebee240a975ffd92b4435bb615ad0",
+    "fx\\ring_charge\\fx_warden_ring_charge_2.png": "b439692d483734a7afb8dcfc6ca581719d1d6e1d20537c19527b3e05bd2aa8af",
+    "fx\\ring_charge\\fx_warden_ring_charge_2.png.import": "22069b97e278f8b45ca1ce89d45701a742a9c87f270c72f0647b99eb5855b951",
+    "fx\\ring_charge\\fx_warden_ring_charge_3.png": "0ee533665cae70252c1ad54fe745e63225b6638fa82b40617d9e386ab7e49f57",
+    "fx\\ring_charge\\fx_warden_ring_charge_3.png.import": "af6a186eb63505a8c8f06cecb42179c6125e4de6ceacbd01e9be7d18e60b0a44",
+    "fx\\ring_charge\\fx_warden_ring_charge_4.png": "ee37af755ecac3a930e4b540951063261b0156ba050bc4978d23fd13f9ade7c3",
+    "fx\\ring_charge\\fx_warden_ring_charge_4.png.import": "ce46ae3068c8e752e5d751542259eb51c5aaad5d9fd3739d3d3034950467b390",
+    "fx\\ring_charge\\fx_warden_ring_charge_5.png": "26ced7cb7879ed66e5dfeeec4708c9dbebe9ea6abe9243c6360d7115fcc77a94",
+    "fx\\ring_charge\\fx_warden_ring_charge_5.png.import": "e37ac3699c74385629c85f3cc905dbb52d8bc0a2e1765301245d2817337473a4",
+    "fx\\ring_charge\\fx_warden_ring_charge_6.png": "8eb0c6376b95106d4ad5dc91def066dbcf0ef39eb21d74e5a5c90ec1533ea11f",
+    "fx\\ring_charge\\fx_warden_ring_charge_6.png.import": "f944af7225d6175b95bb12fc62b5235c9c98fc9478032bdc6451a2fa10aa0e4d",
+    "fx\\rune_glow\\fx_warden_rune_glow_1.png": "f5e7afd4053742686f9db629c8fe8fb88077c133b9d76e59c8c85a22e4632c84",
+    "fx\\rune_glow\\fx_warden_rune_glow_1.png.import": "9e3c96fad6f5cbb98fc76d31f275456a26a48f7b7caad46ff9a1a87c8feb3154",
+    "fx\\rune_glow\\fx_warden_rune_glow_2.png": "a4c3271483eae5507e9bb8803bf59afeafcebaba6d89cbd8479a278f6c5843ed",
+    "fx\\rune_glow\\fx_warden_rune_glow_2.png.import": "81764baf6c72080be376d4e796952ad3737eef3c31f0fb651589f37630d9e5ce",
+    "fx\\rune_glow\\fx_warden_rune_glow_3.png": "9468ed272e70477cddab0a3ea6e15aef46d377c534d3cde61f5228576c599dba",
+    "fx\\rune_glow\\fx_warden_rune_glow_3.png.import": "3a45fbea46ef81c9bd9cf9e38d190a14c6e40c8b90db91c23dcf88cbf2833b9e",
+    "fx\\rune_glow\\fx_warden_rune_glow_4.png": "acabb86e086ee8484c80fb629be941b8df209c6f456ced78fb3a7c9d5f7ef24c",
+    "fx\\rune_glow\\fx_warden_rune_glow_4.png.import": "5cb76234db6bd59b1f99decda9febbf3e968ce2962bd54e9e9c42f749c7750a1",
+    "fx\\rune_glow\\fx_warden_rune_glow_5.png": "39e66ec0831672409fd13fcb672571e25c1c08677945ca3ee27aff27e817aa4e",
+    "fx\\rune_glow\\fx_warden_rune_glow_5.png.import": "ccc9bd8e076004dfd0e9af2e8a4d1a41b12ed087663c92ea15ec68158167cc83",
+    "fx\\rune_glow\\fx_warden_rune_glow_6.png": "9131c7fb63cfcccaeb879f52740e32ce3d73e458fa70f2157fd88df209e31619",
+    "fx\\rune_glow\\fx_warden_rune_glow_6.png.import": "b16cbaceadced8b86e285b6438095178e3b397a118aa38c40816ea77625b967b",
+    "fx\\scorch\\fx_warden_scorch_1.png": "fdb3ed35b8c3bbacbd3ef9b2fcc06f13c36668727b9e9b9affff5a8e7ba3acdf",
+    "fx\\scorch\\fx_warden_scorch_1.png.import": "2a8fd1288e63791fc1b0d4eac0cf5f8482e5ec946141e5b753829555e9ca36dc",
+    "fx\\scorch\\fx_warden_scorch_2.png": "a1f96d9623481ae847c6b288c724558dbf333072070b2d393a3af7d98c57bef2",
+    "fx\\scorch\\fx_warden_scorch_2.png.import": "90a8747d21b79b95f1d788e79b35122a682864a6c781c8844ea2c87ef86353ce",
+    "fx\\scorch\\fx_warden_scorch_3.png": "5190ed14154e87231eddaf91a1e8a5337aaf5d223ff2f943595d33d78d45a415",
+    "fx\\scorch\\fx_warden_scorch_3.png.import": "4da92966c570e44a0d627e0d2969b0c5a9da3c0f7d1de2be1b2a320ac2fe39d4",
+    "fx\\scorch\\fx_warden_scorch_4.png": "03a2e813487effeae6b10042bb664ec806a50bf0045e2107c66867928a20d112",
+    "fx\\scorch\\fx_warden_scorch_4.png.import": "9df50e5a2aba2b15e685e7b1a9b6f7c39e3ccb3ae968c40efd8026e4b5ad0046",
+    "fx\\scorch\\fx_warden_scorch_5.png": "786681cb422a8ac2444a45b17ff76d4c6e3830c2cb22c9f319061250c4dc18ea",
+    "fx\\scorch\\fx_warden_scorch_5.png.import": "bdcfe399227152a9cb774cfc70632fa689620ce4623c34511bf245a3786c215e",
+    "fx\\scorch\\fx_warden_scorch_6.png": "86da5e88d73dde59094a71048fdcf2b526eef1d4eb5eba284fe677cd45eefa6a",
+    "fx\\scorch\\fx_warden_scorch_6.png.import": "c581b919aefedfc6b03e629251cf70f68fcf7b48431ac25f5c60f2684e258e08",
+    "fx\\wake_flare\\fx_warden_wake_flare_1.png": "2961eafeb335b4b1816622d6b1655bb960c0dd444e1e659b75474fa0a36706cc",
+    "fx\\wake_flare\\fx_warden_wake_flare_1.png.import": "1e44227bd47c56bf40e265a97e7bc499f7b3af3120fb96d6c00d3ec93222a042",
+    "fx\\wake_flare\\fx_warden_wake_flare_2.png": "e6d2ee71b5391773d7e0c0ea93f98098e58056e1344d37714bea7609c13cf14b",
+    "fx\\wake_flare\\fx_warden_wake_flare_2.png.import": "de082cbf5e9ce0629bf817540bd48c635c7feb0574d4705d0a600202b7ef91de",
+    "fx\\wake_flare\\fx_warden_wake_flare_3.png": "f0aa70f9031bd79fa846c7cf1cd8f667ada0047546289d544456da2b61cc0c7d",
+    "fx\\wake_flare\\fx_warden_wake_flare_3.png.import": "cc5b02e9790f64fe4d6ed1a80a6fa0a9c815cf4e71184e0c7dec091c9028069b",
+    "fx\\wake_flare\\fx_warden_wake_flare_4.png": "fe73745efd1f03a52fbc1bb861ae119559b0dac0ca89f53ba0f22409306254dc",
+    "fx\\wake_flare\\fx_warden_wake_flare_4.png.import": "137c546159f06553d3b33ea5a010ae4c5e634dc7764abbff2e25e54e6045551b",
+    "body\\cleave_strike\\warden_cleave_strike_right_1.png": "240e2f19c5423e59f31f8608b3216b3a12028669a8ca24285535138e6b5df2dd",
+    "body\\cleave_strike\\warden_cleave_strike_right_1.png.import": "bda2a2b526e873b939206ee404b5a1433b15302ec835e283ad8d57282e7dede6",
+    "body\\cleave_strike\\warden_cleave_strike_right_2.png": "8f009cc57fd0ae040706adb18dac8a60189364ea8092ccc546350b671902fcf4",
+    "body\\cleave_strike\\warden_cleave_strike_right_2.png.import": "7da0263c903b38a95dd1ee9cc13294d20592af414396957349a1f9673641e8a9",
+    "body\\cleave_strike\\warden_cleave_strike_right_3.png": "55c93a0aeddfc137648f6b3657efccf684ab423319775095c3f96ccd883217de",
+    "body\\cleave_strike\\warden_cleave_strike_right_3.png.import": "ef51f3764a817fd8fe7c8c32f79fad36039456ecb40c5dbb4f50c8275a8a1fac",
+    "body\\cleave_tell\\warden_cleave_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\cleave_tell\\warden_cleave_tell_right_1.png.import": "df084a87c7e57e9e9005c284b21bd115d335faaad8daa43ab6104acf8a94fac4",
+    "body\\cleave_tell\\warden_cleave_tell_right_2.png": "e5c6b5e68aa6722d5b793d1e4b07f553c55eb2a5a23effcbb21ec244f61993cb",
+    "body\\cleave_tell\\warden_cleave_tell_right_2.png.import": "8deb85e730d18207b4943551a9e2eae5ff485d04076ff718fe701e523b2935eb",
+    "body\\cleave_tell\\warden_cleave_tell_right_3.png": "9704651c016e877cdefe4ccae557a521abc2467b32000f5f28faf97e51ef6f24",
+    "body\\cleave_tell\\warden_cleave_tell_right_3.png.import": "5d9de180516a49af5c6b6b75d57c3cbae5d12c5152547686c5446fdbe65745bd",
+    "body\\cleave_tell\\warden_cleave_tell_right_4.png": "bafc60e6eb41a3561ce2d0286185f530f8f63321a217b141744124c6479503c5",
+    "body\\cleave_tell\\warden_cleave_tell_right_4.png.import": "a29fc570e67b957b6e4b716bd38129a3f41ed5f69ec8c6ffa0ad245f2bf3424a",
+    "body\\cleave_tell\\warden_cleave_tell_right_5.png": "221e32d7eb49aaaa7b4b8da6f1f8d4db5e32d3900c5afb0e2f03c61b139ba0b7",
+    "body\\cleave_tell\\warden_cleave_tell_right_5.png.import": "8408c9d636986aa37a5b8f63446c8b51624b44955c5b5d9f0dea3d2cdad909ad",
+    "body\\death\\warden_death_right_1.png": "f6f4bb6e15fc385a381149a95d8b5ab36abe326ddb061f102cf2eb4ee4e9d852",
+    "body\\death\\warden_death_right_1.png.import": "0a1f07864e7175984e76552c0e9ab8123e367358260c5438b32430e1bcb24284",
+    "body\\death\\warden_death_right_2.png": "7c2a99aa435520194f503ed8078ba326a9820ac784449429f49635e1ddb517b8",
+    "body\\death\\warden_death_right_2.png.import": "7449d2bbf2eb49c264eebdf3c8c45e9648ee691d90cc6a3e07c797a9c0a29e79",
+    "body\\death\\warden_death_right_3.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "body\\death\\warden_death_right_3.png.import": "056b76aea4f009f483461089587498bdcd8fdebcde78bd1e111d60858aee2597",
+    "body\\death\\warden_death_right_4.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "body\\death\\warden_death_right_4.png.import": "086ede73e8bfe96208b63592e8bb5e96f78240265b88174a8c120568ea6f9fe8",
+    "body\\death\\warden_death_right_5.png": "3d6537684533f88dece17db01b0408198038a1b6a6382c24eca4accedf3fff36",
+    "body\\death\\warden_death_right_5.png.import": "5cb8f3daeaf89f3f37c9dfd01bfa79fc42291ca22bccef1f82dbb361a20f5822",
+    "body\\death\\warden_death_right_6.png": "660dd15844a002c76927ee3b2b1c72097e6bcbd8ad42e19a8746ce24bdc663ff",
+    "body\\death\\warden_death_right_6.png.import": "5c196fba9de140c370c0869ef2b7333cbc95ddba96871d51d449dad33d845085",
+    "body\\death\\warden_death_right_7.png": "b7b54650ecd9057313558d516037e1423819ef397d46432ba17980264ccb1ab7",
+    "body\\death\\warden_death_right_7.png.import": "0264fdf4ab23cfa73bd27d68c656970987ab497cfb2134483108f156208c75e2",
+    "body\\death\\warden_death_right_8.png": "32af38e7f9f591ce93476b1649111e82a40fdc4d1a836725b824a7a2e2e03f9f",
+    "body\\death\\warden_death_right_8.png.import": "37251308ec048cac14b390447f62b22b469940eaffbf11639b0b1350e525de7a",
+    "body\\exposed\\warden_exposed_right_1.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "body\\exposed\\warden_exposed_right_1.png.import": "5cb6195cd6200da18b8d6eeec1952cb5a5f5b4e7e946bf4cff7e8376994b6e2c",
+    "body\\exposed\\warden_exposed_right_2.png": "b73b3828f41437bdbf63c33ac989e73d6026028c7632df09a41dbd1638cfa19b",
+    "body\\exposed\\warden_exposed_right_2.png.import": "b642f4235e0cb6da90e25e26f9a5635e00a9a91a664fe05cb08e7374d708526f",
+    "body\\exposed\\warden_exposed_right_3.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "body\\exposed\\warden_exposed_right_3.png.import": "9888a492b9b548fe12ecd829f88977f45a0e738cdbe00e7c010a2045026d7c59",
+    "body\\exposed\\warden_exposed_right_4.png": "17070d9bf629bdb32b6a5b8bcca327013470c30434e66b78897e9d12583a42fa",
+    "body\\exposed\\warden_exposed_right_4.png.import": "7c1eb1e2bb1faf138bd18f924c559db859e406284dd3bb0ebe239f7db6ef6302",
+    "body\\guard_hit\\warden_guard_hit_right_1.png": "ca26472100b8325c12bfce520bb042c6e4d218015c9d331d7afd800ab4c8dab7",
+    "body\\guard_hit\\warden_guard_hit_right_1.png.import": "a7e5df8dae1ebc9f8d3b85897fba8f493c248c4657a6e961b6ba0d212df0e474",
+    "body\\guard_hit\\warden_guard_hit_right_2.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\guard_hit\\warden_guard_hit_right_2.png.import": "9decabc928bd663ab24a630a3739fbe9630453f0b1b4314779ddad242de56138",
+    "body\\hurt\\warden_hurt_right_1.png": "5ab0cd902057775cd86cab6976783cbd33f2ff3b7fd8b66e9087e5b555661341",
+    "body\\hurt\\warden_hurt_right_1.png.import": "5a85699124579484f5247726d9a9974192ded5cbc53d28387b3f728697f59449",
+    "body\\hurt\\warden_hurt_right_2.png": "3b5fbacafa534c6ef74dc18091b19c66522f23fdacd8a69547396c8d498d6c13",
+    "body\\hurt\\warden_hurt_right_2.png.import": "cc8b423e11b00b932a4937ce3a011a5899b170e4649dc02d5386fcf6e0c9c963",
+    "body\\idle\\warden_idle_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\idle\\warden_idle_right_1.png.import": "01ad1fbc84a590dc38faa2f0815d3e74e75cb6de8095ac06da8fd5b722e46f22",
+    "body\\idle\\warden_idle_right_2.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\idle\\warden_idle_right_2.png.import": "efe73ce52c79e234bf9830a412f502936a927229ea9e46863b05b848ce17efe5",
+    "body\\idle\\warden_idle_right_3.png": "b13adea23fd7d2b105cf53a7a4b73bb72dfce3e9a43ce9a0a6bac3cd3853a943",
+    "body\\idle\\warden_idle_right_3.png.import": "71a8a5084733971627bc01e2daad0619089418f3f99e7e0fc48785fe487a9e32",
+    "body\\idle\\warden_idle_right_4.png": "776d063fe1ba85a0b2c6aebaaa89a6a7408f66802e4d0b2d7c74bcc6e65aed86",
+    "body\\idle\\warden_idle_right_4.png.import": "ac2aeb09ee37f2b5ec8f2e01b4b3f2ecb8b7b653e7191a09cee7b51f35949d77",
+    "body\\idle\\warden_idle_right_5.png": "1bb516bc49c796138e204a355ef0f809737d8a17b2cc89af2ddf29764e58ba83",
+    "body\\idle\\warden_idle_right_5.png.import": "1caefd9396499ee16c987131ef30753f1a716e958296ac4981f6f46fb1157f32",
+    "body\\idle\\warden_idle_right_6.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\idle\\warden_idle_right_6.png.import": "752e2c79734776ee8eec11084066b61f1eea819877162e9f19f8f94155811a53",
+    "body\\lash_strike\\warden_lash_strike_right_1.png": "e5c6b5e68aa6722d5b793d1e4b07f553c55eb2a5a23effcbb21ec244f61993cb",
+    "body\\lash_strike\\warden_lash_strike_right_1.png.import": "85e2093ac200b88ee8ac125c6063e9841e6e95c195e02471802fcee234c41051",
+    "body\\lash_strike\\warden_lash_strike_right_2.png": "aae968bb71c1404373404c8efeeb2f82e1987b175dd3d6cb47821e27c5822c22",
+    "body\\lash_strike\\warden_lash_strike_right_2.png.import": "9340e2bff77138ee902b87e3871cd5ff53fe64289629f54445cbd3638c7b1b65",
+    "body\\lash_strike\\warden_lash_strike_right_3.png": "2fde6f10809e987986909c4cb0b8caa09669b5eeb19bcc81bc7cab137bbe912f",
+    "body\\lash_strike\\warden_lash_strike_right_3.png.import": "2357aa97a01a0507b06ec6a63804ba7de9dd4923b3ae2c12c8eae62c8e18a1c4",
+    "body\\lash_tell\\warden_lash_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\lash_tell\\warden_lash_tell_right_1.png.import": "f68a6e3a69b6117c4f7630384c222b35a526504d37eed40790f92c5eac13c55f",
+    "body\\lash_tell\\warden_lash_tell_right_2.png": "06f923fc6d096e4675f86c76bc15bb97c7d93b2b8ba3651a30c85a30dd94f7ad",
+    "body\\lash_tell\\warden_lash_tell_right_2.png.import": "91763994e9c7a2d2a48f52ec72c89fdb613cea56edf4e943a96fd4f4ec709798",
+    "body\\lash_tell\\warden_lash_tell_right_3.png": "d8f2c423d5e3af4a1c88229b3908aab8323723dcc50abc5695e5d87931cd823c",
+    "body\\lash_tell\\warden_lash_tell_right_3.png.import": "d92220ff49c726f91feaba5a1c6ce80cdfd02aaafc14c2e2f08d418b5c793f15",
+    "body\\lash_tell\\warden_lash_tell_right_4.png": "c97fa3cf9bb8985a5ae5692145550783d4d2ac81f3eb6b81c08328f4d1cb9dee",
+    "body\\lash_tell\\warden_lash_tell_right_4.png.import": "49b7be727c79818a5e6a7338b031858ea0cb2033a19c85735938f5fd844008b6",
+    "body\\lash_tell\\warden_lash_tell_right_5.png": "e0860d130b4537830233fe5ff5648320962e4e250cb70fef20ce70ad0a63feb8",
+    "body\\lash_tell\\warden_lash_tell_right_5.png.import": "de83d630319653029f093f01c6c8c8857123ac1229ec9b1ebae97b8ff555f569",
+    "body\\recover\\warden_recover_right_1.png": "1ddb2e64e5609abb518247e870c1ef1cd732efef18f1b1222c23d31ad123f21b",
+    "body\\recover\\warden_recover_right_1.png.import": "11524a5eb20fc2089e710f9014baa931dfb3f4afc039268faadf4d146ebd9945",
+    "body\\recover\\warden_recover_right_2.png": "db9464c993592b8a8633d68211daf5738006181cfd1791e9b79dbcb72f69123c",
+    "body\\recover\\warden_recover_right_2.png.import": "61e7cd8d4570cef8dfbf26211d53e4bdcf6288b3e18c1bff3fdc2289f8a2e7e1",
+    "body\\recover\\warden_recover_right_3.png": "60f379da77405568d795d14902f57b2ed6df71e338b91ea6135ad9b34d890872",
+    "body\\recover\\warden_recover_right_3.png.import": "0d44ac1f2de0f9b8bb5f73efe56b4aa425364bb685c1b51b3616577dccda70a3",
+    "body\\recover\\warden_recover_right_4.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\recover\\warden_recover_right_4.png.import": "2358e19248da097b76247dc5eaf27620a30b8f6258a55962248ad3afd6dae3ef",
+    "body\\ring_strike\\warden_ring_strike_right_1.png": "bfbae6c14467f43b435afc2916cec6e4033b724feb75d2dece9bf5818b638e8a",
+    "body\\ring_strike\\warden_ring_strike_right_1.png.import": "db1c36dc1156a8f1241e33b3149bd5de95d1798f553c5ebff612fb4dea0cd38b",
+    "body\\ring_strike\\warden_ring_strike_right_2.png": "0b131511b88991a454dff7a3fa439d0f543fb53a95c4f7520724da9e8a9c68ba",
+    "body\\ring_strike\\warden_ring_strike_right_2.png.import": "23cbf59892e6da70843a1633aea5d53988cc453facfc5abb044345b1e08837df",
+    "body\\ring_strike\\warden_ring_strike_right_3.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\ring_strike\\warden_ring_strike_right_3.png.import": "0ddb2ba40236962cf92a4c3fdc313fa7e19b882c53b87db39ddefca60e81040a",
+    "body\\ring_tell\\warden_ring_tell_right_1.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "body\\ring_tell\\warden_ring_tell_right_1.png.import": "017607a70d7b6c31bb25c5af43eb207b58f090295478a6bd7369257a7d831b23",
+    "body\\ring_tell\\warden_ring_tell_right_2.png": "863fb98366897fb75526cee1efd84e0ba7431efd90458a500135b9e7ef177d9f",
+    "body\\ring_tell\\warden_ring_tell_right_2.png.import": "d9d17a42120d043045d37bfb62f6b1015e15460aa6ed3d640978776666901ee1",
+    "body\\ring_tell\\warden_ring_tell_right_3.png": "e54bd72b11febbb048979fbf32e3f33ee2d727b5c375d528ad0d2ff037791786",
+    "body\\ring_tell\\warden_ring_tell_right_3.png.import": "a52baa28c8151e2a08413aa55657122169749f4e961c4d6f804bd8df524c9e98",
+    "body\\ring_tell\\warden_ring_tell_right_4.png": "46f0f47112d8d89b40ebe1e5dd9712b40be56627c9bf272eb0e18fe700c482da",
+    "body\\ring_tell\\warden_ring_tell_right_4.png.import": "05bde3a0b82ac195fd2f6702b94a9ba8b9ec1e85ab17760eac1fb72e41e24142",
+    "body\\ring_tell\\warden_ring_tell_right_5.png": "00ca378509d63a11cd3d965acd31d8ebd21af9c4a267319d1962374188026c95",
+    "body\\ring_tell\\warden_ring_tell_right_5.png.import": "e8d090601bff3b5c495a88923f825253a18da0a11560772cf0bdc55b8de7d241",
+    "body\\wake\\warden_wake_right_1.png": "1278feaa15139a3240d30d9baa7b191cd0807c9cd7a71bb9e70e90d00d56efbf",
+    "body\\wake\\warden_wake_right_1.png.import": "304e397bfc66d137386eb4a5c09fb456ac2b104fe5b45f18bc5f414044bd6ec0",
+    "body\\wake\\warden_wake_right_2.png": "dca987f676383500c81eceda83ddf111747b4fe64fe61d4ada289df4674b5492",
+    "body\\wake\\warden_wake_right_2.png.import": "fa130af484abb151e430aca4ee9259a29c64f943281175de720679d0076318b2",
+    "body\\wake\\warden_wake_right_3.png": "240d81886d9e19491ae83eea4a77dc4733b94bdb519107770dae6c1a4389f700",
+    "body\\wake\\warden_wake_right_3.png.import": "9e3c007e316b4f5d19d7bab408d861a429358d2f1ad099f55971c718bfea6152",
+    "body\\wake\\warden_wake_right_4.png": "e1fd22ff751a59054b980789f5d0072c2b6bead3e8f09c8c6e61b5fb412842e5",
+    "body\\wake\\warden_wake_right_4.png.import": "64ffa3bd887af612f4666f9a58b09fd6f7496f88ddb3534814004a5847b53f51",
+    "body\\walk\\warden_walk_right_1.png": "f1d7e1baa73fb6e939e7ea42d1ee104c75d73a6e9169c7568111c3770ca608b6",
+    "body\\walk\\warden_walk_right_1.png.import": "750ce25797277a6115c7d985e573c2ae456fa0456ca23913119a186855ff63ba",
+    "body\\walk\\warden_walk_right_2.png": "48da36cb354b3806296dcea3ef306771453b0f833ac0a0fd782dac41c79a7d6a",
+    "body\\walk\\warden_walk_right_2.png.import": "d06e073d412c396fde704e27d1d88527d2cbe50d74d2e61f91ae7e1d61592a6e",
+    "body\\walk\\warden_walk_right_3.png": "ee8ba4ea8a169266701247da1b6a1c6bab30a7210188adfecaa550c664befe98",
+    "body\\walk\\warden_walk_right_3.png.import": "14377c632c70d2972496f0b1fb081838370b6dcc9f36e9e1db32dbe5e00ae297",
+    "body\\walk\\warden_walk_right_4.png": "63158d482ad73ce7449a0c172fac2fe15907627d3bc3fb2a30bc2d6f7af15f59",
+    "body\\walk\\warden_walk_right_4.png.import": "d9b84cb4ddde2356507c0e0433cf10f34ffbccae2d7f6857c46234a39e872993",
+    "body\\walk\\warden_walk_right_5.png": "e2127de58bbbed963cc17d8b107b94a506336761831495f0e5e35534c50da450",
+    "body\\walk\\warden_walk_right_5.png.import": "46c03d153859edaa8f6311b7a5143ea5fcb9d5bf6679c409e266a4f3a9411e01",
+    "body\\walk\\warden_walk_right_6.png": "121254fd0d050077fdab71c3dc8f2cedbf2fbebcc8f45c1b2a86f1785277fb1c",
+    "body\\walk\\warden_walk_right_6.png.import": "5d577da6a0e0a1aa7991cce3318025d53afbb01370ff9d7fb5cd8ced1390b1df"
+  }
+}

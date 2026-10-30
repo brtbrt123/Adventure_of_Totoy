@@ -1,0 +1,30 @@
+{
+  "result": "PASS",
+  "original_fx_material_changed": 99,
+  "unchanged_fx": [
+    "fx_warden_lash_creep_1"
+  ],
+  "byte_identical_bodies": 60,
+  "compact_reconstructions": 106,
+  "clip_duration_ms": {
+    "all_attacks.gif": 6000,
+    "all_body_animations.gif": 16800,
+    "all_effects.gif": 15300,
+    "cleave.gif": 1900,
+    "cleave_lash_chain.gif": 2950,
+    "cleave_parry_exposed.gif": 2700,
+    "defeat.gif": 2000,
+    "guard_break_exposed.gif": 2900,
+    "idle_wake_walk.gif": 4200,
+    "lash.gif": 1950,
+    "ring.gif": 2150
+  },
+  "parent_independent_warning_scale_roi_audit": "pending parent run",
+  "visual_inspection": [
+    "contact_sheet_before_after.png",
+    "contact_sheet_motion_all_attacks.png",
+    "contact_sheet_motion_guard_break_exposed.png",
+    "contact_sheet_impact_detail_1.png",
+    "contact_sheet_impact_detail_2.png"
+  ]
+}

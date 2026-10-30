@@ -1,0 +1,84 @@
+{
+  "status": "PASS",
+  "baseline_files_unchanged": 206,
+  "gif_comparisons": {
+    "all_attacks.gif": {
+      "duration_ms": 6000,
+      "warning_pixels_preserved": 12844,
+      "changed_pixel_samples": 21478
+    },
+    "all_body_animations.gif": {
+      "duration_ms": 16800,
+      "warning_pixels_preserved": 0,
+      "changed_pixel_samples": 0
+    },
+    "all_effects.gif": {
+      "duration_ms": 15300,
+      "warning_pixels_preserved": 0,
+      "changed_pixel_samples": 93052
+    },
+    "cleave.gif": {
+      "duration_ms": 1900,
+      "warning_pixels_preserved": 2576,
+      "changed_pixel_samples": 939
+    },
+    "cleave_lash_chain.gif": {
+      "duration_ms": 2950,
+      "warning_pixels_preserved": 7676,
+      "changed_pixel_samples": 9620
+    },
+    "cleave_parry_exposed.gif": {
+      "duration_ms": 2700,
+      "warning_pixels_preserved": 2576,
+      "changed_pixel_samples": 1649
+    },
+    "defeat.gif": {
+      "duration_ms": 2000,
+      "warning_pixels_preserved": 0,
+      "changed_pixel_samples": 1903
+    },
+    "guard_break_exposed.gif": {
+      "duration_ms": 2900,
+      "warning_pixels_preserved": 0,
+      "changed_pixel_samples": 1851
+    },
+    "idle_wake_walk.gif": {
+      "duration_ms": 4200,
+      "warning_pixels_preserved": 0,
+      "changed_pixel_samples": 3452
+    },
+    "lash.gif": {
+      "duration_ms": 1950,
+      "warning_pixels_preserved": 5100,
+      "changed_pixel_samples": 8681
+    },
+    "ring.gif": {
+      "duration_ms": 2150,
+      "warning_pixels_preserved": 5168,
+      "changed_pixel_samples": 11858
+    }
+  },
+  "native_body_frames": 60,
+  "native_fx_frames": 114,
+  "changed_native_frames_by_family": {
+    "arrival": 6,
+    "cleave_arc": 6,
+    "death_debris": 8,
+    "death_flash": 4,
+    "exposed_dust": 6,
+    "guard_break": 8,
+    "guard_hit": 4,
+    "hit_burst": 5,
+    "idle_spores": 6,
+    "lash_creep": 4,
+    "lash_splinters": 6,
+    "lash_strike": 6,
+    "ring_burst": 8,
+    "ring_charge": 6,
+    "rune_glow": 6,
+    "scorch": 6,
+    "wake_flare": 4
+  },
+  "exposed_chest_stays_dark": true,
+  "review_folder": "art/reference/warden_fx_astra_v3"
+}

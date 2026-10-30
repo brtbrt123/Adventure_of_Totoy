@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "body_frames": 60,
+  "fx_frames": 114,
+  "gifs": {
+    "idle_wake_walk.gif": {
+      "expanded_frames": 84,
+      "duration_ms": 4200
+    },
+    "cleave.gif": {
+      "expanded_frames": 38,
+      "duration_ms": 1900
+    },
+    "lash.gif": {
+      "expanded_frames": 39,
+      "duration_ms": 1950
+    },
+    "ring.gif": {
+      "expanded_frames": 43,
+      "duration_ms": 2150
+    },
+    "all_attacks.gif": {
+      "expanded_frames": 120,
+      "duration_ms": 6000
+    },
+    "guard_break_exposed.gif": {
+      "expanded_frames": 58,
+      "duration_ms": 2900
+    },
+    "cleave_lash_chain.gif": {
+      "expanded_frames": 59,
+      "duration_ms": 2950
+    },
+    "cleave_parry_exposed.gif": {
+      "expanded_frames": 54,
+      "duration_ms": 2700
+    },
+    "defeat.gif": {
+      "expanded_frames": 40,
+      "duration_ms": 2000
+    },
+    "all_body_animations.gif": {
+      "expanded_frames": 336,
+      "duration_ms": 16800
+    },
+    "all_effects.gif": {
+      "expanded_frames": 306,
+      "duration_ms": 15300
+    }
+  },
+  "source_v2_files_unchanged": 393,
+  "warning_overlay": "pending parent independent audit",
+  "native_visibility": "Artist inspected original-size contact_sheet_attacks_native.png and first_native_strikes.png, plus3x moving-Lash and5x Cleave-contact proofs;Ring-recovery native comparison confirms flash ends. Owner approval pending."
+}
