@@ -35,8 +35,8 @@ func _rect(row: Dictionary) -> Rect2:
 	return Rect2(float(r[0]), float(r[1]), float(r[2]), float(r[3]))
 
 
-func _flood(from_entry: StringName) -> LayoutFlood:
-	var flood: LayoutFlood = LayoutFlood.new(_def["size"], SceneDefs.build_obstacles(SCENE), HERO)
+func _flood(from_entry: StringName, flags: Array = []) -> LayoutFlood:
+	var flood: LayoutFlood = LayoutFlood.new(_def["size"], SceneDefs.build_obstacles(SCENE, false, [], flags), HERO)
 	flood.flood(_def["entries"][from_entry])
 	return flood
 
@@ -90,12 +90,59 @@ func test_entries_and_checkpoints_are_free_and_far_from_every_mob() -> void:
 
 
 func test_every_end_reaches_every_other_and_the_loop_and_the_fork_are_open() -> void:
-	for entry: StringName in [&"forest_side", &"glade_side", &"shortcut"]:
+	var cleared: Array = [&"cleared_hollow_center"]
+	for entry: StringName in [&"forest_side", &"glade_side"]:
 		var flood: LayoutFlood = _flood(entry)
-		for other: StringName in [&"forest_side", &"glade_side", &"shortcut"]:
-			assert_true(flood.reaches(_def["entries"][other]), "%s reaches %s" % [entry, other])
+		assert_true(flood.reaches(_def["entries"][&"forest_side"]) and flood.reaches(_def["entries"][&"glade_side"]), "%s reaches both ends of the way" % entry)
 		assert_true(flood.reaches(Vector2(470, 285)), "the south pocket is reachable from %s" % entry)
 		assert_true(flood.reaches(Vector2(110, 100)), "the shrine is reachable from %s" % entry)
+		assert_true(flood.reaches(Vector2(62, 45)), "the foot of the shortcut is reachable from %s" % entry)
+		assert_false(flood.reaches(_def["entries"][&"shortcut"]), "the root-knot barrier seals the shortcut from %s while the hollow is alive" % entry)
+	for entry: StringName in [&"forest_side", &"glade_side", &"shortcut"]:
+		var open: LayoutFlood = _flood(entry, cleared)
+		for other: StringName in [&"forest_side", &"glade_side", &"shortcut"]:
+			assert_true(open.reaches(_def["entries"][other]), "once cleared, %s reaches %s" % [entry, other])
+	var sealed: LayoutFlood = _flood(&"shortcut")
+	assert_false(sealed.reaches(_def["entries"][&"forest_side"]), "and the village side cannot walk in while it is shut")
+
+
+func test_the_barrier_is_two_states_of_one_prop_and_the_open_one_leaves_the_gap() -> void:
+	var closed: Array[Obstacle] = SceneDefs.build_obstacles(SCENE)
+	var open: Array[Obstacle] = SceneDefs.build_obstacles(SCENE, false, [], [&"cleared_hollow_center"])
+	assert_true(open.size() < closed.size(), "opening removes the blocking row")
+	assert_eq(closed.size() - open.size(), 5, "the closed row has 9 circles, the open one keeps 4 side roots")
+	var types: Dictionary = _defs["props"]
+	assert_eq(types["root_hollow_barrier_closed"]["anchor"], types["root_hollow_barrier_open"]["anchor"], "the same anchor")
+	assert_eq([types["root_hollow_barrier_closed"]["w"], types["root_hollow_barrier_closed"]["h"]], [types["root_hollow_barrier_open"]["w"], types["root_hollow_barrier_open"]["h"]], "the same canvas")
+	var states: Dictionary = {"gate_open": false, "lit": [], "flags": [&"cleared_hollow_center"]}
+	var shown: Array = []
+	for placement: Dictionary in PropScene.placements(_scene, _defs, states):
+		shown.append(String(placement.get("type", "")))
+	assert_true(shown.has("root_hollow_barrier_open") and not shown.has("root_hollow_barrier_closed"), "the open sprite replaces the closed one")
+
+
+func test_the_core_opens_the_barrier_when_the_central_fight_is_cleared() -> void:
+	var core: ExploreCore = ExploreCore.new(SCENE)
+	core.set_story_flags([&"received_first_sword"] as Array[StringName])
+	var before: int = core.obstacles.size()
+	var events: Array[GameEvent] = []
+	core._grant_flag(&"cleared_hollow_center", events)
+	assert_eq(before - core.obstacles.size(), 5, "the colliders changed on the tick the flag was set")
+
+
+func test_the_boar_lane_and_every_exit_stay_clear_of_the_new_props() -> void:
+	var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(SCENE)
+	var lane_y: float = 206.0
+	var x: float = 246.0
+	while x <= 414.0:
+		assert_true(Collision.fits(obstacles, Vector2(x, lane_y), HERO + 6.0), "the boar lane is free at %.0f,%.0f" % [x, lane_y])
+		x += 6.0
+	var opened: Array[Obstacle] = SceneDefs.build_obstacles(SCENE, false, [], [&"cleared_hollow_center"])
+	for exit: Dictionary in _def["exits"]:
+		var rect: Rect2 = exit["rect"]
+		var centre: Vector2 = rect.get_center()
+		var inward: Vector2 = (Vector2(320, 200) - centre).normalized()
+		assert_true(Collision.fits(opened, centre + inward * 12.0, HERO), "%s opens onto free ground" % exit["id"])
 
 
 func test_the_centre_and_the_shrine_are_mostly_open_ground() -> void:
@@ -163,7 +210,7 @@ func test_the_village_shortcut_opens_when_the_hollow_is_cleared() -> void:
 	for e: Dictionary in _def["exits"]:
 		if e["id"] == &"shortcut":
 			rect = e["rect"]
-	core.player.position = rect.get_center() + Vector2(0, 30)
+	core.player.position = Vector2(62, 22)
 	core.step(InputFrame.new())
 	core.player.position = rect.get_center()
 	var blocked: bool = false
@@ -172,7 +219,7 @@ func test_the_village_shortcut_opens_when_the_hollow_is_cleared() -> void:
 		blocked = blocked or event.type == GameEvent.EXIT_BLOCKED
 	assert_true(blocked and not core.exiting, "shut with a message while the hollow is alive")
 	core.set_story_flags([&"received_first_sword", &"cleared_hollow_center"] as Array[StringName])
-	core.player.position = rect.get_center() + Vector2(0, 30)
+	core.player.position = Vector2(62, 22)
 	core.step(InputFrame.new())
 	core.player.position = rect.get_center()
 	core.step(InputFrame.new())

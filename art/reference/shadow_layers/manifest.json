@@ -4495,6 +4495,618 @@
           "blur_padding": 4
         }
       }
+    },
+    "root_hollow_tree_ancient": {
+      "object": "root_hollow_tree_ancient",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_tree_ancient.png",
+      "object_size": [
+        141,
+        136
+      ],
+      "object_anchor": [
+        70,
+        136
+      ],
+      "object_rgba_sha256": "8bdd5fa93cb9af7885d1c2cf862e1519c01f3cb9f78b66015054cd6b45973af7",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_tree_ancient_1",
+          "size": [
+            168,
+            48
+          ],
+          "anchor": [
+            68,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -63,
+            0,
+            94,
+            35
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_tree_ancient_flipped_1",
+          "size": [
+            168,
+            48
+          ],
+          "anchor": [
+            64,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -59,
+            0,
+            93,
+            35
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_tree_rootwall": {
+      "object": "root_hollow_tree_rootwall",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_tree_rootwall.png",
+      "object_size": [
+        86,
+        124
+      ],
+      "object_anchor": [
+        43,
+        124
+      ],
+      "object_rgba_sha256": "f34090e0d2676ad6a4f39dfc6e7b3e902fe0cbbdfa32ea8bffbed27da5305bb4",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_tree_rootwall_1",
+          "size": [
+            104,
+            40
+          ],
+          "anchor": [
+            32,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            68,
+            32
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_tree_rootwall_flipped_1",
+          "size": [
+            104,
+            40
+          ],
+          "anchor": [
+            28,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -24,
+            0,
+            70,
+            32
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_roots": {
+      "object": "root_hollow_roots",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_roots.png",
+      "object_size": [
+        48,
+        28
+      ],
+      "object_anchor": [
+        24,
+        28
+      ],
+      "object_rgba_sha256": "9631e6abec47e0fc2cb5a541e19eaf1c3052a06c8361f739318c98f116092907",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_roots_1",
+          "size": [
+            64,
+            16
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            28,
+            8
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_roots_flipped_1",
+          "size": [
+            64,
+            16
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            27,
+            8
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_barrier_closed": {
+      "object": "root_hollow_barrier_closed",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_barrier_closed.png",
+      "object_size": [
+        80,
+        48
+      ],
+      "object_anchor": [
+        40,
+        48
+      ],
+      "object_rgba_sha256": "f15a62567994d7784b57b735f767f3527818274921f336ff048dde5a30c8ff15",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_barrier_closed_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            37,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -33,
+            0,
+            38,
+            12
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_barrier_closed_flipped_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            37,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -33,
+            0,
+            38,
+            12
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_barrier_open": {
+      "object": "root_hollow_barrier_open",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_barrier_open.png",
+      "object_size": [
+        80,
+        48
+      ],
+      "object_anchor": [
+        40,
+        48
+      ],
+      "object_rgba_sha256": "c985066ad06c68f899ae4ee680bf124156f098cdba768c634a420a52882f6b19",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_barrier_open_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            39,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -35,
+            0,
+            39,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_barrier_open_flipped_1",
+          "size": [
+            88,
+            24
+          ],
+          "anchor": [
+            39,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -35,
+            0,
+            39,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_shrine": {
+      "object": "root_hollow_shrine",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_shrine.png",
+      "object_size": [
+        48,
+        42
+      ],
+      "object_anchor": [
+        24,
+        42
+      ],
+      "object_rgba_sha256": "7e1ea33b8bff714f5f622efb9b13c24d73e1c7acb8aad89d4d8e441daea7358c",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_shrine_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            28,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_shrine_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            26,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -22,
+            0,
+            29,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_rune_stones": {
+      "object": "root_hollow_rune_stones",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_rune_stones.png",
+      "object_size": [
+        64,
+        44
+      ],
+      "object_anchor": [
+        32,
+        44
+      ],
+      "object_rgba_sha256": "54312655d6b0a2b3c61a23cd38291172f1e22902ff31a3024249fbaece83e077",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_rune_stones_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            34,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -29,
+            0,
+            37,
+            12
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_rune_stones_flipped_1",
+          "size": [
+            80,
+            24
+          ],
+          "anchor": [
+            33,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -29,
+            0,
+            37,
+            12
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_boulder": {
+      "object": "root_hollow_boulder",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_boulder.png",
+      "object_size": [
+        56,
+        40
+      ],
+      "object_anchor": [
+        28,
+        40
+      ],
+      "object_rgba_sha256": "0ac74cae2491021fc37614a38b2937ba4c72a045b5643f8f1ee951c3c44febaf",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_boulder_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            30,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -25,
+            0,
+            31,
+            11
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_boulder_flipped_1",
+          "size": [
+            72,
+            24
+          ],
+          "anchor": [
+            31,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -27,
+            0,
+            33,
+            11
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_stump": {
+      "object": "root_hollow_stump",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_stump.png",
+      "object_size": [
+        48,
+        30
+      ],
+      "object_anchor": [
+        24,
+        30
+      ],
+      "object_rgba_sha256": "f7640600d4980c333b55c84d5144e9aad58695e764a0e9f9595f8e804b2ac15e",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_stump_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            26,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_stump_flipped_1",
+          "size": [
+            64,
+            24
+          ],
+          "anchor": [
+            27,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -23,
+            0,
+            27,
+            9
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_mushrooms": {
+      "object": "root_hollow_mushrooms",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_mushrooms.png",
+      "object_size": [
+        31,
+        24
+      ],
+      "object_anchor": [
+        15,
+        24
+      ],
+      "object_rgba_sha256": "bfb6c2138efd078ea1e8f995369b1303664b58cd554b92a432ba5bb57ece159b",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_mushrooms_1",
+          "size": [
+            48,
+            16
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -13,
+            0,
+            20,
+            7
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_mushrooms_flipped_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            18,
+            7
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_branches": {
+      "object": "root_hollow_branches",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_branches.png",
+      "object_size": [
+        44,
+        21
+      ],
+      "object_anchor": [
+        22,
+        21
+      ],
+      "object_rgba_sha256": "285659351d10451f0587017744f8eca3683f1b8017ff9e5a7363984c14a03f73",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_branches_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -21,
+            0,
+            25,
+            6
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_branches_flipped_1",
+          "size": [
+            56,
+            16
+          ],
+          "anchor": [
+            25,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -20,
+            0,
+            24,
+            6
+          ],
+          "blur_padding": 4
+        }
+      }
+    },
+    "root_hollow_antlers": {
+      "object": "root_hollow_antlers",
+      "object_source": "art/reference/root_hollow_v1/props/root_hollow_antlers.png",
+      "object_size": [
+        29,
+        20
+      ],
+      "object_anchor": [
+        14,
+        20
+      ],
+      "object_rgba_sha256": "2c4407dea1f9bd67512a98e15fe4542db17bf2616606189dd39da0d93848e95e",
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_root_hollow_antlers_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            16,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -12,
+            0,
+            18,
+            6
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_root_hollow_antlers_flipped_1",
+          "size": [
+            40,
+            16
+          ],
+          "anchor": [
+            18,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -14,
+            0,
+            18,
+            6
+          ],
+          "blur_padding": 4
+        }
+      }
     }
   }
 }

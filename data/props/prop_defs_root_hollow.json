@@ -1,0 +1,381 @@
+{
+ "version": 1,
+ "note": "Root Hollow props (2026-10-30). Anchors and sprite sizes are Codex's imported geometry (art/reference/root_hollow_v1/imported_prop_geometry.json); the colliders are Claude's registration (circles relative to the anchor), tested in tests/core/test_root_hollow.gd.",
+ "props": {
+  "root_hollow_tree_ancient": {
+   "w": 141,
+   "h": 136,
+   "anchor": [
+    70,
+    136
+   ],
+   "base_width": 48,
+   "solid": true,
+   "colliders": [
+    [
+     -18.0,
+     -7,
+     9
+    ],
+    [
+     -6.0,
+     -7,
+     9
+    ],
+    [
+     6.0,
+     -7,
+     9
+    ],
+    [
+     18.0,
+     -7,
+     9
+    ]
+   ],
+   "image": "root_hollow_tree_ancient.png",
+   "locked": true,
+   "note": "the landmark: a SOLID ancient tree, no cave, no tunnel; four circles across the trunk base (48 px), the canopy stays walk-behind"
+  },
+  "root_hollow_tree_rootwall": {
+   "w": 86,
+   "h": 124,
+   "anchor": [
+    43,
+    124
+   ],
+   "base_width": 30,
+   "solid": true,
+   "colliders": [
+    [
+     -8.0,
+     -5,
+     7
+    ],
+    [
+     0.0,
+     -5,
+     7
+    ],
+    [
+     8.0,
+     -5,
+     7
+    ]
+   ],
+   "image": "root_hollow_tree_rootwall.png",
+   "locked": true,
+   "note": "root-wall tree: the trunk base (30 px)"
+  },
+  "root_hollow_roots": {
+   "w": 48,
+   "h": 28,
+   "anchor": [
+    24,
+    28
+   ],
+   "base_width": 32,
+   "solid": true,
+   "colliders": [
+    [
+     -10.0,
+     -4,
+     6
+    ],
+    [
+     0.0,
+     -4,
+     6
+    ],
+    [
+     10.0,
+     -4,
+     6
+    ]
+   ],
+   "image": "root_hollow_roots.png",
+   "locked": true,
+   "note": "twisted root clump: solid, so keep it off the trails"
+  },
+  "root_hollow_barrier_closed": {
+   "w": 80,
+   "h": 48,
+   "anchor": [
+    40,
+    48
+   ],
+   "base_width": 76,
+   "solid": true,
+   "colliders": [
+    [
+     -34.0,
+     -5,
+     7
+    ],
+    [
+     -25.5,
+     -5,
+     7
+    ],
+    [
+     -17.0,
+     -5,
+     7
+    ],
+    [
+     -8.5,
+     -5,
+     7
+    ],
+    [
+     0.0,
+     -5,
+     7
+    ],
+    [
+     8.5,
+     -5,
+     7
+    ],
+    [
+     17.0,
+     -5,
+     7
+    ],
+    [
+     25.5,
+     -5,
+     7
+    ],
+    [
+     34.0,
+     -5,
+     7
+    ]
+   ],
+   "image": "root_hollow_barrier_closed.png",
+   "locked": true,
+   "note": "root-knot barrier CLOSED: a continuous row across the shortcut trail (spacing 8.5 < the hero's 12)",
+   "state_pair": [
+    "root_hollow_barrier_closed",
+    "root_hollow_barrier_open"
+   ]
+  },
+  "root_hollow_barrier_open": {
+   "w": 80,
+   "h": 48,
+   "anchor": [
+    40,
+    48
+   ],
+   "base_width": 76,
+   "solid": true,
+   "colliders": [
+    [
+     -34.0,
+     -5,
+     7
+    ],
+    [
+     -27.0,
+     -5,
+     7
+    ],
+    [
+     27.0,
+     -5,
+     7
+    ],
+    [
+     34.0,
+     -5,
+     7
+    ]
+   ],
+   "image": "root_hollow_barrier_open.png",
+   "locked": true,
+   "note": "root-knot barrier OPEN (cleared_hollow_center): only the two side roots; the 40 px gap between them is free. Same canvas and anchor as the closed one",
+   "state_pair": [
+    "root_hollow_barrier_closed",
+    "root_hollow_barrier_open"
+   ]
+  },
+  "root_hollow_shrine": {
+   "w": 48,
+   "h": 42,
+   "anchor": [
+    24,
+    42
+   ],
+   "base_width": 32,
+   "solid": true,
+   "colliders": [
+    [
+     -10.0,
+     -6,
+     7
+    ],
+    [
+     0.0,
+     -6,
+     7
+    ],
+    [
+     10.0,
+     -6,
+     7
+    ]
+   ],
+   "image": "root_hollow_shrine.png",
+   "locked": true,
+   "note": "shrine altar slab"
+  },
+  "root_hollow_rune_stones": {
+   "w": 64,
+   "h": 44,
+   "anchor": [
+    32,
+    44
+   ],
+   "base_width": 50,
+   "solid": true,
+   "colliders": [
+    [
+     -22.0,
+     -5,
+     6
+    ],
+    [
+     -11.0,
+     -5,
+     6
+    ],
+    [
+     0.0,
+     -5,
+     6
+    ],
+    [
+     11.0,
+     -5,
+     6
+    ],
+    [
+     22.0,
+     -5,
+     6
+    ]
+   ],
+   "image": "root_hollow_rune_stones.png",
+   "locked": true,
+   "note": "broken rune stone circle"
+  },
+  "root_hollow_boulder": {
+   "w": 56,
+   "h": 40,
+   "anchor": [
+    28,
+    40
+   ],
+   "base_width": 44,
+   "solid": true,
+   "colliders": [
+    [
+     -14.0,
+     -6,
+     8
+    ],
+    [
+     -5.0,
+     -6,
+     8
+    ],
+    [
+     5.0,
+     -6,
+     8
+    ],
+    [
+     14.0,
+     -6,
+     8
+    ]
+   ],
+   "image": "root_hollow_boulder.png",
+   "locked": true,
+   "note": "mossy boulder with roots"
+  },
+  "root_hollow_stump": {
+   "w": 48,
+   "h": 30,
+   "anchor": [
+    24,
+    30
+   ],
+   "base_width": 40,
+   "solid": true,
+   "colliders": [
+    [
+     -12.0,
+     -6,
+     8
+    ],
+    [
+     0.0,
+     -6,
+     8
+    ],
+    [
+     12.0,
+     -6,
+     8
+    ]
+   ],
+   "image": "root_hollow_stump.png",
+   "locked": true,
+   "note": "big hollow stump"
+  },
+  "root_hollow_mushrooms": {
+   "w": 31,
+   "h": 24,
+   "anchor": [
+    15,
+    24
+   ],
+   "base_width": 31,
+   "solid": false,
+   "colliders": [],
+   "image": "root_hollow_mushrooms.png",
+   "locked": true,
+   "note": "glow mushroom ring: decor, walkable"
+  },
+  "root_hollow_branches": {
+   "w": 44,
+   "h": 21,
+   "anchor": [
+    22,
+    21
+   ],
+   "base_width": 44,
+   "solid": false,
+   "colliders": [],
+   "image": "root_hollow_branches.png",
+   "locked": true,
+   "note": "fallen branch pile: decor, walkable"
+  },
+  "root_hollow_antlers": {
+   "w": 29,
+   "h": 20,
+   "anchor": [
+    14,
+    20
+   ],
+   "base_width": 29,
+   "solid": false,
+   "colliders": [],
+   "image": "root_hollow_antlers.png",
+   "locked": true,
+   "note": "antler remains: decor, walkable"
+  }
+ }
+}

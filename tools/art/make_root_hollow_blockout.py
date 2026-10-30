@@ -9,7 +9,8 @@ presentation/forest/root_hollow_layered_ground.png later; the scene data keeps w
     python tools/art/make_root_hollow_blockout.py                 # the ground only
     python tools/art/make_root_hollow_blockout.py --write-scene   # also (over)write data/scenes/root_hollow_layered_props.json
 
---write-scene replaces hand edits of the JSON: run it once, then edit the JSON.
+--write-scene replaces hand edits of the JSON: run it once, then edit the JSON. Since the real props were registered (2026-10-30)
+the scene file is maintained by hand: --write-scene refuses unless you also pass --force.
 """
 import argparse
 import json
@@ -261,11 +262,14 @@ def write_scene(outline: list[list[int]]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--write-scene", action="store_true")
+    parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     paint_ground()
     outline = outline_for_scene(np.asarray(walk_mask()) > 127)
     print("ground written; outline has", len(outline), "points")
     if args.write_scene:
+        if not args.force:
+            raise SystemExit("the scene file is maintained by hand now (real props registered): pass --force to overwrite it")
         write_scene(outline)
         print("scene data written to", SCENE)
 

@@ -425,6 +425,8 @@ func _on_event(event: GameEvent) -> void:
 			var icons: Dictionary = {&"sprint": "ui_aspect_sprint_1", &"herb": "hud_copper_herb", &"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
 			show_reward({"kind": event.data["kind"], "name": event.data["name"], "quantity": event.data["quantity"], "icon": icons.get(StringName(event.data["item_id"]), "")})
 		GameEvent.FLAG_SET, GameEvent.DIALOGUE_ENDED:
+			if event.type == GameEvent.FLAG_SET:
+				_refresh_props()  # a prop may change state with a story flag (Root Hollow's root-knot barrier opens on cleared_hollow_center)
 			_save_progress(core.scene_id, core.last_checkpoint)
 			if event.type == GameEvent.FLAG_SET:
 				var flag: String = String(event.data.get("flag", ""))
@@ -687,6 +689,8 @@ func fx_dragged() -> Array[Dictionary]:
 func fx_spin_contacts(event: GameEvent) -> Array[Vector2]:
 	var out: Array[Vector2] = []
 	for mob: Dictionary in snapshot.mobs:
+		if mob["state"] == &"dead" and int(mob["state_ticks"]) > 1:
+			continue  # already down before this spin (one felled by it has state_ticks 1): no false hit sparks
 		if Vector2(event.data["position"]).distance_to(mob["position"]) - float(mob["radius"]) <= float(event.data.get("radius", Tuning.REAPER_COIL_SPIN_RADIUS)):
 			out.append(Vector2(mob["position"]) + Vector2(0, -14))
 	return out
@@ -920,7 +924,7 @@ func shadow_strength() -> float:
 func _refresh_props() -> void:
 	prop_placements.clear()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
-		prop_placements = PropScene.placements(SceneDefs.layered_data(snapshot.scene_id), PropScene.load_defs(), {"gate_open": snapshot.gate_open, "lit": snapshot.lit_switches})
+		prop_placements = PropScene.placements(SceneDefs.layered_data(snapshot.scene_id), PropScene.load_defs(), {"gate_open": snapshot.gate_open, "lit": snapshot.lit_switches, "flags": snapshot.story_flags})
 	_update_lighting()
 
 

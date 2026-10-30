@@ -23,9 +23,9 @@ extends RefCounted
 ##      mobs [{type, x, y}]}] (the mobs of a scene, core/mob_field.gd), "prop_margin" (props may stand this far outside the
 ##      world: trees hanging over the edge), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
 ##
-##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>",
-##     "on_type": "<type>"}. `states` = {"gate_open": bool, "lit": [switch ids]} (ExploreCore owns it; ExploreSnapshot
-##     exposes it). The two types of a pair share w, h and anchor (tools/art/normalize_state_pairs.py; validate() checks
+##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>" | "flag:<story flag>",
+##     "on_type": "<type>"}. `states` = {"gate_open": bool, "lit": [switch ids], "flags": [story flags]} (ExploreCore owns it;
+##     ExploreSnapshot exposes it; "flag:cleared_hollow_center" is how Root Hollow's root-knot barrier opens). The two types of a pair share w, h and anchor (tools/art/normalize_state_pairs.py; validate() checks
 ##     it), each has its own colliders: a closed root gate is solid across its doorway, the open one only at its trunks.
 ##
 ## No sprites are loaded here (the core stays headless): sizes and colliders are numbers in the files.
@@ -34,7 +34,7 @@ const SceneBounds := preload("res://core/scene_bounds.gd")
 
 const DEFS_PATH: String = "res://data/props/prop_defs.json"
 ## Catalogues of later areas, merged into the main one by load_defs() (a type in the main file wins).
-const EXTRA_DEFS_PATHS: Array[String] = ["res://data/props/prop_defs_woodland.json"]
+const EXTRA_DEFS_PATHS: Array[String] = ["res://data/props/prop_defs_woodland.json", "res://data/props/prop_defs_root_hollow.json"]
 
 
 ## Reads a JSON file into a Dictionary; empty when it is missing or not an object (callers validate()).
@@ -61,13 +61,16 @@ static func load_scene(path: String) -> Dictionary:
 	return read_json(path)
 
 
-## True when the state `when` ("gate_open" or "lit:<switch id>") holds in `states`.
+## True when the state `when` ("gate_open", "lit:<switch id>" or "flag:<story flag>") holds in `states`.
 static func state_holds(when: String, states: Dictionary) -> bool:
 	if when == "gate_open":
 		return bool(states.get("gate_open", false))
 	if when.begins_with("lit:"):
 		var lit: Array = states.get("lit", [])
 		return lit.has(when.substr(4)) or lit.has(StringName(when.substr(4)))
+	if when.begins_with("flag:"):
+		var flags: Array = states.get("flags", [])
+		return flags.has(when.substr(5)) or flags.has(StringName(when.substr(5)))
 	return false
 
 
@@ -278,8 +281,8 @@ static func validate(scene: Dictionary, defs: Dictionary) -> PackedStringArray:
 static func _validate_state_row(id: String, row: Dictionary, types: Dictionary, scene: Dictionary) -> PackedStringArray:
 	var errors: PackedStringArray = PackedStringArray()
 	var when: String = str(row.get("when", ""))
-	if when != "gate_open" and not when.begins_with("lit:"):
-		errors.append("prop %s: unknown state '%s' (gate_open or lit:<switch>)" % [id, when])
+	if when != "gate_open" and not when.begins_with("lit:") and not when.begins_with("flag:"):
+		errors.append("prop %s: unknown state '%s' (gate_open, lit:<switch> or flag:<story flag>)" % [id, when])
 	elif when.begins_with("lit:") and not scene.get("puzzle", {}).get("switches", []).has(when.substr(4)):
 		errors.append("prop %s: '%s' is not a puzzle switch of the scene" % [id, when.substr(4)])
 	var base: Dictionary = types.get(row.get("type", ""), {})

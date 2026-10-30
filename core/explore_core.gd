@@ -160,6 +160,7 @@ var interact_target: Dictionary = {}
 var npc_facing_left: Dictionary = {}  # npc id -> bool
 var training: TrainingYard = null  # the scene's practice post, if it has one
 var skills: ExploreSkills = ExploreSkills.new()
+var _uses_flag_states: bool = false
 var mobs: MobField = null  # the scene's encounters, if it has any
 var quests: Dictionary = QuestBook.default_book()  # the village sequence
 var inventory: Dictionary = {}  # item id -> count
@@ -184,7 +185,8 @@ func _init(p_scene_id: StringName = SceneDefs.START_SCENE, entry: StringName = &
 	gate_open = p_gate_open
 	if gate_open:  # an opened gate was opened by lighting every switch (the save keeps only the gate)
 		lit_switches.append_array(_puzzle_switches())
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches)
+	_uses_flag_states = _scene_uses_flag_states()
+	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
 	entry_id = entry if def["entries"].has(entry) else StringName(def["default_entry"])
 	place_at(def["entries"][entry_id])
 	for npc: Dictionary in def["npcs"]:
@@ -225,7 +227,7 @@ func set_gate_open(open: bool) -> void:
 	lit_switches.clear()
 	if open:  # an open gate means every switch is lit
 		lit_switches.append_array(_puzzle_switches())
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches)
+	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
 	player.position = _clamp(player.position)
 	_queued.append(GameEvent.new(GameEvent.GATE_CHANGED, tick, {"scene": scene_id, "gate_open": gate_open}))
 
@@ -243,6 +245,7 @@ func set_story_flags(flags: Array[StringName]) -> void:
 		story_flags.append(flag)  # the step he is on has already unlocked what it teaches
 	if mobs != null:
 		mobs.sync_flags(story_flags)  # a cleared encounter stays cleared
+	_rebuild_flag_obstacles()
 
 
 ## A save from before the village sequence had these steps: whatever he finished then counts now, so nothing is locked behind a task
@@ -440,7 +443,22 @@ func _grant_flag(flag: StringName, events: Array[GameEvent]) -> bool:
 
 
 ## A new story flag was set (and announced): pay the village step it completes, then unlock what the next step teaches.
+## True when this scene shows a prop in another state while a story flag is set (Root Hollow's root-knot barrier).
+func _scene_uses_flag_states() -> bool:
+	for row: Variant in SceneDefs.layered_data(scene_id).get("props", []):
+		if (row as Dictionary).has("when") and str((row as Dictionary)["when"]).begins_with("flag:"):
+			return true
+	return false
+
+
+## The colliders again for the story flags now set (a barrier that opens when its fight is cleared).
+func _rebuild_flag_obstacles() -> void:
+	if _uses_flag_states:
+		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
+
+
 func _flag_added(flag: StringName, events: Array[GameEvent]) -> void:
+	_rebuild_flag_obstacles()
 	for step: Dictionary in QuestBook.steps_done_by(quests, flag):
 		_pay_step(step, events)
 	for unlock: StringName in QuestBook.missing_unlocks(quests, story_flags):
@@ -782,7 +800,7 @@ func _use_switch(target: StringName, events: Array[GameEvent]) -> void:
 	if all_lit:
 		set_gate_open(true)  # rebuilds the colliders and queues gate_changed for the next step
 	else:
-		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches)
+		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
 
 
 ## True when the hero's body (PLAYER_RADIUS) touches `rect`.

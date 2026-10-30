@@ -108,12 +108,12 @@ static func layered_data(scene_id: StringName) -> Dictionary:
 	return PropScene.load_scene(LAYERED_PATHS[scene_id])
 
 
-## The solid colliders of a scene: a layered scene builds the types its stateful props show for `gate_open` and the `lit`
-## switch ids, plus a small circle on every NPC (drawn as sprites); the arena its layout's.
-static func build_obstacles(scene_id: StringName, gate_open: bool = false, lit: Array = []) -> Array[Obstacle]:
+## The solid colliders of a scene: a layered scene builds the types its stateful props show for `gate_open`, the `lit`
+## switch ids and the story `flags`, plus a small circle on every NPC (drawn as sprites); the arena its layout's.
+static func build_obstacles(scene_id: StringName, gate_open: bool = false, lit: Array = [], flags: Array = []) -> Array[Obstacle]:
 	var list: Array[Obstacle] = []
 	if scene_id in LAYERED:
-		list = PropScene.build(layered_data(scene_id), PropScene.load_defs(), {"gate_open": gate_open, "lit": lit})
+		list = PropScene.build(layered_data(scene_id), PropScene.load_defs(), {"gate_open": gate_open, "lit": lit, "flags": flags})
 		for npc: Dictionary in get_def(scene_id)["npcs"]:
 			SceneBounds.add(list, npc["position"], NPC_RADIUS, npc["position"])
 		return list
