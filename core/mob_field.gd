@@ -925,6 +925,8 @@ func telegraph_snapshots() -> Array[Snapshots.TelegraphSnapshot]:
 				s.direction = t.direction
 				s.size = t.size
 				s.width = t.width
+				s.half_angle = t.half_angle  # a cone is drawn from this: without it the warning is a flat line
+				s.inner_size = t.inner_size
 				s.start_tick = t.start_tick
 				s.hit_tick = t.hit_tick
 				s.end_tick = t.end_tick

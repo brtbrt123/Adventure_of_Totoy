@@ -70,6 +70,7 @@ func test_the_slam_cone_reaches_125_and_the_warning_is_the_hit_area() -> void:
 	assert_true(told != null and told.data["attack"] == &"stag_slam", "a slam")
 	assert_near(stag.telegraph.size, 125.0 + stag.radius, 0.001, "the warning is reach plus the Stag's body")
 	assert_near(core.mobs.telegraph_snapshots()[0].size, 125.0 + stag.radius, 0.001, "and the snapshot says the same")
+	assert_near(core.mobs.telegraph_snapshots()[0].half_angle, 0.95, 0.001, "the snapshot carries the cone angle, so presentation draws a wedge, not a line")
 
 
 func test_the_slam_hits_exactly_inside_the_warning_across_facing_angles() -> void:
