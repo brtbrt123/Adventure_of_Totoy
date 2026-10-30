@@ -302,7 +302,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("menu_back"):
 		change_scene.call(TITLE_SCENE)
 		return
-	var frame: InputFrame = Bindings.read_frame(snapshot.hero.position, Bindings.world_mouse(self))
+	var frame: InputFrame = Bindings.read_frame()
 	frame.interact_pressed = Input.is_action_just_pressed("explore_interact")
 	advance(frame)
 
