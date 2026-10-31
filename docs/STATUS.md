@@ -1,3 +1,14 @@
+## Creature particles drawn as pixel art (2026-10-31, Claude, done while Codex is out)
+
+Owner: "improve the particles, leaves and dust" (done in code, not by an image generator). presentation/explore/creature_particles.gd draws every particle as a small pixel-art shape shaded with the neighbouring steps of its own palette ramp:
+- dust and smoke: lumpy cloud puffs (side lobes, two bumps on top, a darker underside, a lit top) that break into wisps late in life; warm dust colours instead of the pale stone that read blue-grey at night;
+- leaves: 4 x 4 leaves that tumble through four turns, with a dark rim so green leaves show on grass;
+- grit and clods: irregular, by size;
+- sparks: twinkle (dot, cross, star);
+- heal motes: pulse;
+- new: grass blades flicked up by the slam, the Warden's stagger and the roots.
+The motion (positions, lives, deterministic bursts) is unchanged. Smokes, both trial checks pass; comparison in presentation/review/warden_v2/particles_compare.png. Look is the owner's call.
+
 ## Runebound Warden attack effects from Gemini (2026-10-31, Claude, done while Codex is out)
 
 The owner had Gemini draw the Warden's attack effects from a prompt with the real hit sizes. tools/art/import_warden_fx.py imports the 8 sheets (art/reference/warden_fx_gemini/*.jpg): it finds the cells, keys out the magenta and the pink glow, snaps to Totoy 36 (gold only on the Cleave, red only on the dodge attacks), scales each sheet to its hit size and anchors each frame where it attaches. Result: 44 frames fx_warden2_* (contact sheet beside the sources). In game (presentation/explore/warden_effects.gd):

@@ -10,15 +10,17 @@ extends RefCounted
 const LAYERS: Dictionary = {
 	# the slam: smoke rolls out, dust kicks up, leaves are blown off the floor, all over the cone the core hit
 	"slam": [
-		{"n": 16, "shape": "smoke", "life": [36, 52], "speed": [0.3, 0.7], "drag": 0.05, "up": 0.15, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["j", "i", "d"]},
+		{"n": 16, "shape": "smoke", "life": [36, 52], "speed": [0.3, 0.7], "drag": 0.05, "up": 0.15, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["d", "c", "b"]},
 		{"n": 40, "shape": "dot", "life": [16, 30], "speed": [1.0, 2.2], "drag": 0.08, "up": 0.6, "g": 0.06, "size": [2, 4], "cols": ["j", "d", "c"]},
 		{"n": 26, "shape": "leaf", "life": [40, 60], "speed": [1.0, 2.0], "drag": 0.04, "up": 0.5, "g": 0.02, "size": [2, 2], "cols": ["7", "6", "6", "d"], "flutter": 2.0},
+		{"n": 10, "shape": "blade", "life": [18, 30], "speed": [0.8, 1.6], "drag": 0.06, "up": 0.9, "g": 0.1, "size": [1, 1], "cols": ["5", "4", "6"]},
 	],
 	# a root bursting out of the ground: clods thrown up and falling back, spirit sparks rising
 	"roots": [
 		{"n": 14, "shape": "dot", "life": [18, 28], "speed": [0.8, 1.8], "drag": 0.03, "up": 1.2, "g": 0.12, "size": [2, 3], "cols": ["d", "c", "b"]},
 		{"n": 8, "shape": "spark", "life": [20, 34], "speed": [0.2, 0.6], "drag": 0.04, "up": 0.5, "g": -0.01, "size": [1, 1], "cols": ["o", "p", "u"]},
 		{"n": 5, "shape": "leaf", "life": [26, 40], "speed": [0.6, 1.2], "drag": 0.04, "up": 0.9, "g": 0.05, "size": [2, 2], "cols": ["7", "6"], "flutter": 1.5},
+		{"n": 3, "shape": "blade", "life": [16, 26], "speed": [0.5, 1.1], "drag": 0.05, "up": 1.0, "g": 0.1, "size": [1, 1], "cols": ["5", "4"]},
 	],
 	# the charge: hooves kick dust and a leaf or two behind the Stag
 	"kick": [
@@ -27,7 +29,7 @@ const LAYERS: Dictionary = {
 	],
 	# the charge stopped by a prop: a burst of smoke, debris and leaves in front of it
 	"crash": [
-		{"n": 12, "shape": "smoke", "life": [30, 44], "speed": [0.3, 0.8], "drag": 0.06, "up": 0.2, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["j", "i", "d"]},
+		{"n": 12, "shape": "smoke", "life": [30, 44], "speed": [0.3, 0.8], "drag": 0.06, "up": 0.2, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["d", "c", "b"]},
 		{"n": 24, "shape": "dot", "life": [14, 26], "speed": [1.0, 2.0], "drag": 0.07, "up": 0.8, "g": 0.08, "size": [2, 3], "cols": ["j", "d", "c", "i"]},
 		{"n": 8, "shape": "leaf", "life": [36, 52], "speed": [0.8, 1.6], "drag": 0.04, "up": 0.7, "g": 0.02, "size": [2, 2], "cols": ["7", "6", "6", "d"], "flutter": 2.0},
 	],
@@ -35,7 +37,7 @@ const LAYERS: Dictionary = {
 	"roar": [
 		{"n": 32, "shape": "leaf", "life": [40, 58], "speed": [1.4, 2.4], "drag": 0.04, "up": 0.3, "g": 0.01, "size": [2, 2], "cols": ["7", "6", "6", "d"], "flutter": 2.0},
 		{"n": 30, "shape": "dot", "life": [16, 28], "speed": [1.2, 2.2], "drag": 0.07, "up": 0.3, "g": 0.03, "size": [2, 4], "cols": ["j", "d", "c"]},
-		{"n": 10, "shape": "smoke", "life": [30, 44], "speed": [0.4, 0.8], "drag": 0.06, "up": 0.1, "g": -0.002, "size": [2, 4], "grow": 0.1, "cols": ["j", "i", "d"]},
+		{"n": 10, "shape": "smoke", "life": [30, 44], "speed": [0.4, 0.8], "drag": 0.06, "up": 0.1, "g": -0.002, "size": [2, 4], "grow": 0.1, "cols": ["d", "c", "b"]},
 	],
 	# the chant: motes drawn in from around the horns (emitted every few ticks while it lasts)
 	"chant": [
@@ -67,16 +69,17 @@ const LAYERS: Dictionary = {
 		{"n": 5, "shape": "smoke", "life": [20, 30], "speed": [0.25, 0.55], "drag": 0.07, "up": 0.04, "g": -0.002, "size": [1, 2], "grow": 0.06, "cols": ["c", "b", "a"]},
 		{"n": 9, "shape": "dot", "life": [10, 18], "speed": [0.6, 1.3], "drag": 0.08, "up": 0.5, "g": 0.09, "size": [1, 2], "cols": ["c", "b", "d"]},
 		{"n": 1, "shape": "leaf", "life": [24, 34], "speed": [0.4, 0.8], "drag": 0.04, "up": 0.6, "g": 0.03, "size": [2, 2], "cols": ["6", "7"], "flutter": 1.5},
+		{"n": 2, "shape": "blade", "life": [14, 22], "speed": [0.5, 1.0], "drag": 0.06, "up": 0.8, "g": 0.1, "size": [1, 1], "cols": ["5", "4"]},
 	],
 	# the Cleave's blade tearing through the cone: clods, grass and leaves thrown out along the swept arc (the real hit edge)
 	"gouge": [
 		{"n": 26, "shape": "dot", "life": [14, 26], "speed": [0.8, 1.8], "drag": 0.07, "up": 0.7, "g": 0.09, "size": [2, 3], "cols": ["d", "c", "b", "9"]},
 		{"n": 10, "shape": "leaf", "life": [30, 46], "speed": [0.8, 1.6], "drag": 0.04, "up": 0.6, "g": 0.02, "size": [2, 2], "cols": ["7", "6", "6", "d"], "flutter": 2.0},
-		{"n": 8, "shape": "smoke", "life": [26, 38], "speed": [0.2, 0.5], "drag": 0.06, "up": 0.1, "g": -0.003, "size": [2, 3], "grow": 0.1, "cols": ["j", "i", "d"]},
+		{"n": 8, "shape": "smoke", "life": [26, 38], "speed": [0.2, 0.5], "drag": 0.06, "up": 0.1, "g": -0.003, "size": [2, 3], "grow": 0.1, "cols": ["d", "c", "b"]},
 	],
 	# the Spore Ring's shock: dust rolls outward from the ring's real edge, grit flies, teal spores rise
 	"quake": [
-		{"n": 18, "shape": "smoke", "life": [30, 44], "speed": [0.3, 0.7], "drag": 0.06, "up": 0.1, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["j", "i", "d"]},
+		{"n": 18, "shape": "smoke", "life": [30, 44], "speed": [0.3, 0.7], "drag": 0.06, "up": 0.1, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["d", "c", "b"]},
 		{"n": 30, "shape": "dot", "life": [14, 26], "speed": [0.9, 1.9], "drag": 0.08, "up": 0.7, "g": 0.09, "size": [2, 3], "cols": ["d", "c", "j"]},
 		{"n": 16, "shape": "spark", "life": [24, 40], "speed": [0.2, 0.6], "drag": 0.04, "up": 0.6, "g": -0.008, "size": [1, 1], "cols": ["o", "p", "u"]},
 	],
@@ -195,38 +198,126 @@ static func points(burst: Dictionary, tick: int) -> Array[Dictionary]:
 				continue
 			var cols: Array = layer["cols"]
 			var col: String = cols[mini(cols.size() - 1, int(frac * cols.size()))] if layer["shape"] == "smoke" else cols[int(rand(s, i, li * 7 + 8) * cols.size()) % cols.size()]
-			out.append({"at": at, "size": size, "col": col, "shape": layer["shape"], "age": age, "flip": int(rand(s, i, 99) * 2.0)})
+			out.append({"at": at, "size": size, "col": col, "shape": layer["shape"], "age": age, "frac": frac, "flip": int(rand(s, i, 99) * 2.0)})
 	return out
+
+
+## Totoy 36 ramps, dark to light: a particle shades itself with the neighbouring steps of its own colour.
+const RAMPS: Array[String] = ["089abcd", "efghij1", "234567", "klmnop", "tuop"]
+## A tumbling leaf, 4 x 4 px, four turns (face up, edge on, face down, edge on the other way): B its colour, L a step lighter,
+## D two steps darker (its vein and edge: a leaf stays readable on a dark floor).
+const LEAF_TURNS: Array = [["..LB", ".LBB", "BBD.", "D..."], ["...B", "..BD", ".BD.", "D..."], ["BD..", "DBB.", ".DBB", "...D"], ["B...", "DB..", ".DB.", "..DB"]]
+## Clods and grit by size (1-4 px): lit from the top left, a dark underside.
+const CLODS: Array = [["B"], ["LB", "BD"], [".LB", "LBB", "BDD"], [".LB.", "LBBB", "BBBD", ".DD."]]
+## A grass blade flicked up, two bends.
+const BLADES: Array = [[".L", "B.", "B."], ["L.", ".B", ".B"]]
+
+
+static func _step(symbol: String, by: int) -> String:
+	for ramp: String in RAMPS:
+		var i: int = ramp.find(symbol)
+		if i >= 0:
+			return ramp[clampi(i + by, 0, ramp.length() - 1)]
+	return symbol
+
+
+## A pixel pattern (rows of B/L/D, "." empty) at `at`, mirrored when `flip`, in the shades of `symbol`. With an `outline` colour it
+## first gets a 1 px rim in it (a green leaf on green grass needs one to be seen).
+static func _pattern(canvas: CanvasItem, rows: Array, at: Vector2, symbol: String, colors: Dictionary, flip: bool, dark_by: int = 1, outline: Color = Color(0, 0, 0, 0)) -> void:
+	var shades: Dictionary = {"B": colors.get(symbol, Color.WHITE), "L": colors.get(_step(symbol, 1), Color.WHITE), "D": colors.get(_step(symbol, -dark_by), Color.BLACK)}
+	var w: int = String(rows[0]).length()
+	var origin: Vector2 = at - Vector2(w / 2, rows.size() / 2)
+	if outline.a > 0.0:
+		for y: int in rows.size():
+			var line: String = rows[y]
+			for x: int in w:
+				if (line[w - 1 - x] if flip else line[x]) != ".":
+					canvas.draw_rect(Rect2(origin + Vector2(x - 1, y - 1), Vector2(3, 3)), outline)
+	for y: int in rows.size():
+		var row: String = rows[y]
+		for x: int in w:
+			var c: String = row[w - 1 - x] if flip else row[x]
+			if c != ".":
+				canvas.draw_rect(Rect2(origin + Vector2(x, y), Vector2.ONE), shades[c])
+
+
+## A hard-edged pixel disc (whole-pixel row spans, no smoothing).
+static func _disc(canvas: CanvasItem, centre: Vector2, radius: float, colour: Color) -> void:
+	var c: Vector2 = centre.round()
+	if radius < 0.8:
+		canvas.draw_rect(Rect2(c, Vector2.ONE), colour)
+		return
+	var rows: int = int(ceil(radius - 0.2))
+	for dy: int in range(-rows, rows + 1):
+		var half: int = int(floor(sqrt(maxf(0.0, radius * radius - float(dy * dy))) + 0.3))
+		canvas.draw_rect(Rect2(c + Vector2(-half, dy), Vector2(half * 2 + 1, 1)), colour)
+
+
+## A puff of dust or smoke: a lumpy cloud (a body and two side lobes) with a darker underside and a lighter top; late in its life it
+## breaks into three wisps that drift apart, then shrinks away (hard pixels only).
+static func _puff(canvas: CanvasItem, at: Vector2, size: float, symbol: String, frac: float, seed_flip: int, colors: Dictionary) -> void:
+	var base: Color = colors.get(symbol, Color.WHITE)
+	var dark: Color = colors.get(_step(symbol, -1), base)
+	var light: Color = colors.get(_step(symbol, 1), base)
+	var r: float = clampf(roundf(size), 1.0, 6.0)  # its lobes reach 1.4 r: a puff stays under ~17 px
+	var side: float = -1.0 if seed_flip == 1 else 1.0
+	# a cloud: wide low lobes at the sides, two bumps on top, a flat-ish bottom
+	var lobes: Array[Vector2] = [Vector2(-0.85 * side, 0.2), Vector2(0.85 * side, 0.25), Vector2(-0.3 * side, -0.45), Vector2(0.4 * side, -0.35)]
+	var sizes: Array[float] = [0.6, 0.55, 0.55, 0.5]
+	if frac < 0.72:
+		for k: int in lobes.size():
+			_disc(canvas, at + lobes[k] * r + Vector2(0, 1), r * sizes[k], dark)
+		_disc(canvas, at + Vector2(0, 1), r * 0.8, dark)
+		for k: int in lobes.size():
+			_disc(canvas, at + lobes[k] * r, r * sizes[k], base)
+		_disc(canvas, at, r * 0.8, base)
+		_disc(canvas, at + lobes[2] * r + Vector2(-0.1, -0.15) * r, maxf(0.5, r * 0.3), light)
+	else:
+		var apart: float = 1.0 + (frac - 0.72) * 3.0
+		for k: int in [0, 1, 3]:
+			_disc(canvas, at + lobes[k] * r * apart + Vector2(0, 1), r * 0.4, dark)
+			_disc(canvas, at + lobes[k] * r * apart, r * 0.4, base)
 
 
 static func draw(canvas: CanvasItem, bursts: Array[Dictionary], tick: int, colors: Dictionary) -> void:
 	for burst: Dictionary in bursts:
 		for p: Dictionary in points(burst, tick):
 			var at: Vector2 = Vector2(p["at"]).round()
-			var colour: Color = colors.get(p["col"], Color.WHITE)
+			var symbol: String = p["col"]
+			var colour: Color = colors.get(symbol, Color.WHITE)
 			var size: float = float(p["size"])
+			var age: int = int(p["age"])
+			var flip: bool = int(p["flip"]) == 1
 			match String(p["shape"]):
 				"smoke":
-					canvas.draw_circle(at, maxf(1.0, roundf(size)), colour)
+					_puff(canvas, at, size, symbol, float(p["frac"]), int(p["flip"]), colors)
 				"leaf":
-					# a small leaf (3x2, a darker vein edge) that turns over as it tumbles
-					var turned: bool = ((int(p["age"]) / 5) + int(p["flip"])) % 2 == 0
-					var body: Vector2 = Vector2(3, 2) if turned else Vector2(2, 3)
-					canvas.draw_rect(Rect2(at - Vector2.ONE, body + Vector2(2, 2)), colors["3"])  # dark-green edge: green survives the night light
-					canvas.draw_rect(Rect2(at, body), colour)
+					# tumbles through its four turns (faster while it is thrown, slower as it drifts down)
+					var turn: int = posmod(age / (3 if age < 12 else 5) + int(p["flip"]), 4)
+					_pattern(canvas, LEAF_TURNS[turn], at, symbol, colors, flip, 2, colors["2"])
+				"blade":
+					_pattern(canvas, BLADES[posmod(age / 6 + int(p["flip"]), 2)], at, symbol, colors, flip, 1, colors["2"])
 				"mote":
-					# a healing sparkle: a dark-green edged cross with a light green heart, so it stays green under the night light
+					# a healing sparkle: a dark-green edged cross with a light green heart that pulses, so it stays green under the night light
+					var big: bool = (age / 6) % 2 == 0
 					canvas.draw_rect(Rect2(at + Vector2(-2, -1), Vector2(5, 3)), colors["3"])
 					canvas.draw_rect(Rect2(at + Vector2(-1, -2), Vector2(3, 5)), colors["3"])
 					canvas.draw_rect(Rect2(at + Vector2(-1, 0), Vector2(3, 1)), colour)
 					canvas.draw_rect(Rect2(at + Vector2(0, -1), Vector2(1, 3)), colour)
-					canvas.draw_rect(Rect2(at, Vector2.ONE), colors["7"])
+					canvas.draw_rect(Rect2(at, Vector2.ONE), colors["7"] if big else colour)
 				"spark":
-					canvas.draw_rect(Rect2(at, Vector2.ONE), colour)
-					if int(p["age"]) < 4:  # a fresh spark flashes as a tiny cross
+					# twinkles: a dot, a cross, a star with a bright heart, a cross again (fresh sparks start as a star)
+					var phase: int = 2 if age < 3 else posmod(age / 2 + int(p["flip"]) * 3, 6)
+					var heart: Color = colors.get(_step(symbol, 1), colour)
+					if phase in [1, 3]:
 						canvas.draw_rect(Rect2(at + Vector2(-1, 0), Vector2(3, 1)), colour)
 						canvas.draw_rect(Rect2(at + Vector2(0, -1), Vector2(1, 3)), colour)
+					elif phase == 2:
+						canvas.draw_rect(Rect2(at + Vector2(-2, 0), Vector2(5, 1)), colour)
+						canvas.draw_rect(Rect2(at + Vector2(0, -2), Vector2(1, 5)), colour)
+						canvas.draw_rect(Rect2(at, Vector2.ONE), heart)
+						continue
+					canvas.draw_rect(Rect2(at, Vector2.ONE), heart if phase != 0 else colour)
 				_:
-					var side: float = maxf(1.0, roundf(size))
-					canvas.draw_rect(Rect2(at + Vector2(0, 1), Vector2(side, side)), colors["9"])  # a darker underside so dust reads on the grass
-					canvas.draw_rect(Rect2(at, Vector2(side, side)), colour)
+					# a clod of dirt or grit, lit from the top left, by its size
+					_pattern(canvas, CLODS[clampi(int(roundf(size)) - 1, 0, 3)], at, symbol, colors, flip)
