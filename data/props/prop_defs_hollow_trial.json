@@ -81,10 +81,10 @@
   },
   "hollow_trial_chest_closed": {
    "w": 40,
-   "h": 40,
+   "h": 64,
    "anchor": [
     20,
-    40
+    64
    ],
    "base_width": 0,
    "solid": false,
@@ -95,14 +95,14 @@
     "hollow_trial_chest_closed",
     "hollow_trial_chest_open"
    ],
-   "note": "the chest ON TOP of the altar (owner 2026-10-31): not solid (the altar holds the body); its art still needs re-canvasing to 40x64, anchor (20, 64), so it rests on the altar's top face"
+   "note": "the chest ON TOP of the altar (owner 2026-10-31): not solid (the altar holds the body); 40x64 canvas, anchor (20, 64) at the altar's base line, the chest resting on the altar's top face"
   },
   "hollow_trial_chest_open": {
    "w": 40,
-   "h": 40,
+   "h": 64,
    "anchor": [
     20,
-    40
+    64
    ],
    "base_width": 0,
    "solid": false,
@@ -113,7 +113,7 @@
     "hollow_trial_chest_closed",
     "hollow_trial_chest_open"
    ],
-   "note": "the chest ON TOP of the altar (owner 2026-10-31): not solid (the altar holds the body); its art still needs re-canvasing to 40x64, anchor (20, 64), so it rests on the altar's top face"
+   "note": "the chest ON TOP of the altar (owner 2026-10-31): not solid (the altar holds the body); 40x64 canvas, anchor (20, 64) at the altar's base line, the chest resting on the altar's top face"
   },
   "hollow_trial_rune_rock_1": {
    "w": 40,
