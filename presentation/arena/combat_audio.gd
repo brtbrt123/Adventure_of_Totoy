@@ -2,6 +2,26 @@ extends Node
 ## Mixed owner/CC0 sources: provenance and unconfirmed owner licences in presentation/audio/sources.json.
 ## Event results choose the cue; audio never decides hits.
 const GameEvent := preload("res://core/game_event.gd")
+const Snapshots := preload("res://core/snapshots.gd")
+const WARDEN_CUES: Dictionary = {
+	"wake": preload("res://presentation/audio/warden_wake.wav"),
+	"step": preload("res://presentation/audio/warden_step.wav"),
+	"step_2": preload("res://presentation/audio/warden_step_2.wav"),
+	"cleave_tell": preload("res://presentation/audio/warden_cleave_tell.wav"),
+	"cleave_strike": preload("res://presentation/audio/warden_cleave_strike.wav"),
+	"lash_tell": preload("res://presentation/audio/warden_lash_tell.wav"),
+	"lash_strike": preload("res://presentation/audio/warden_lash_strike.wav"),
+	"ring_tell": preload("res://presentation/audio/warden_ring_tell.wav"),
+	"ring_strike": preload("res://presentation/audio/warden_ring_strike.wav"),
+	"guard_hit": preload("res://presentation/audio/warden_guard_hit.wav"),
+	"guard_hit_2": preload("res://presentation/audio/warden_guard_hit_2.wav"),
+	"guard_break": preload("res://presentation/audio/warden_guard_break.wav"),
+	"death": preload("res://presentation/audio/warden_death.wav")}
+var warden_voices: Array[AudioStreamPlayer] = []
+var warden_strikes: Dictionary = {}
+var warden_walk: Dictionary = {}
+var warden_scene: StringName = &""
+var warden_tick: int = -1
 const CUES: Dictionary = {
 	"electric_shock": preload("res://presentation/audio/owner/electric_shock_short.wav"),
 	"lightning_blink": preload("res://presentation/audio/owner/lightning_blink.wav"),
@@ -71,6 +91,10 @@ var music_active: bool = false
 var duck_remaining: float = 0.0
 
 func _ready() -> void:
+	for i: int in 2:
+		var voice: AudioStreamPlayer = AudioStreamPlayer.new()
+		add_child(voice)
+		warden_voices.append(voice)
 	barrage_hum = AudioStreamPlayer.new()
 	barrage_hum.stream = BARRAGE_HUM
 	barrage_hum.volume_db = -25.0
@@ -127,6 +151,7 @@ func cue(key: String, tick: int, strength: float = 1.0) -> void:
 	voice.play()
 
 func reset() -> void:
+	clear_wardens()
 	stop_barrage()
 	music_active = false
 	duck_remaining = 0.0
@@ -174,3 +199,92 @@ func stop_barrage() -> void:
 	hum_active = false
 	if barrage_hum != null:
 		barrage_hum.stop()
+
+func clear_wardens() -> void:
+	warden_strikes.clear()
+	warden_walk.clear()
+	warden_scene = &""
+	warden_tick = -1
+	for voice: AudioStreamPlayer in warden_voices:
+		voice.stop()
+		voice.stream = null
+
+func warden_cue(key: String, tick: int, quiet: bool = false) -> void:
+	if not WARDEN_CUES.has(key) or int(last_ticks.get("warden_" + key, -1000)) == tick:
+		return
+	last_ticks["warden_" + key] = tick
+	played["warden_" + key] = int(played.get("warden_" + key, 0)) + 1
+	if DisplayServer.get_name() == "headless":
+		return
+	var busy: int = 0
+	for voice: AudioStreamPlayer in warden_voices:
+		if voice.playing:
+			busy += 1
+	for voice: AudioStreamPlayer in warden_voices:
+		if not voice.playing:
+			voice.stream = WARDEN_CUES[key]
+			voice.volume_db = -25.0 if quiet else (-22.0 if busy > 0 else -18.0)
+			voice.play()
+			return
+	# Both foley voices occupied: a strike/break replaces the oldest low-priority cue.
+	if key.ends_with("strike") or key in ["guard_break", "death"]:
+		var voice: AudioStreamPlayer = warden_voices[0]
+		voice.stop()
+		voice.stream = WARDEN_CUES[key]
+		voice.volume_db = -22.0
+		voice.play()
+
+func handle_warden_event(event: GameEvent, mob_type: String) -> bool:
+	var attack: String = String(event.data.get("attack", ""))
+	if event.type == &"attack_telegraphed" and attack.begins_with("warden_"):
+		cue("gold_warning" if event.data.get("kind", &"") == &"gold" else "red_warning", event.tick, 0.8)
+		duck_remaining = 0.3
+		warden_cue(attack.trim_prefix("warden_") + "_tell", event.tick)
+		return true
+	if mob_type != "warden":
+		return false
+	match event.type:
+		&"mob_alerted": warden_cue("wake", event.tick)
+		&"attack_hit":
+			if bool(event.data.get("guarded", false)):
+				warden_cue("guard_hit_2" if int(played.get("warden_guard_hit", 0)) > int(played.get("warden_guard_hit_2", 0)) else "guard_hit", event.tick)
+			else:
+				cue("counter_hit", event.tick, 0.65)
+		&"mob_staggered":
+			if event.data.get("reason", &"") == &"parry":
+				warden_cue("guard_break", event.tick)
+		&"mob_defeated": warden_cue("death", event.tick)
+		_: return false
+	return true
+
+## Snapshot-confirmed strike timing. Interrupted/parried windups never play a delayed strike.
+func sync_wardens(mobs: Array[Dictionary], tells: Array[Snapshots.TelegraphSnapshot], tick: int, scene: StringName) -> void:
+	if scene != warden_scene or tick < warden_tick:
+		clear_wardens()
+	if tick == warden_tick:
+		return
+	warden_scene = scene
+	warden_tick = tick
+	var alive: Dictionary = {}
+	for mob: Dictionary in mobs:
+		if mob["type"] != &"warden" or mob["state"] == &"dead":
+			continue
+		var id: int = int(mob["id"])
+		alive[id] = mob
+		if mob["state"] in [&"chase", &"return"]:
+			var step: int = int(mob["state_ticks"]) / 42
+			if warden_walk.has(id) and int(warden_walk[id]) != step:
+				warden_cue("step" if step % 2 == 0 else "step_2", tick, true)
+			warden_walk[id] = step
+		else:
+			warden_walk.erase(id)
+	for tell: Snapshots.TelegraphSnapshot in tells:
+		if alive.has(tell.owner_id) and alive[tell.owner_id]["state"] == &"strike" and tick >= tell.hit_tick and tick < tell.end_tick and not warden_strikes.has(tell.id):
+			warden_strikes[tell.id] = tell.end_tick
+			warden_cue(String(tell.attack).trim_prefix("warden_") + "_strike", tick)
+	for id: int in warden_strikes.keys():
+		if tick > int(warden_strikes[id]) + 60:
+			warden_strikes.erase(id)
+	for id: int in warden_walk.keys():
+		if not alive.has(id):
+			warden_walk.erase(id)

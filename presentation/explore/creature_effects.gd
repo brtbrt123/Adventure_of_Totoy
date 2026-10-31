@@ -4,6 +4,8 @@ const ExploreCore := preload("res://core/explore_core.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const Particles := preload("res://presentation/explore/creature_particles.gd")
+const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
+var warden: WardenEffects = WardenEffects.new()
 const SLAM_TICKS: int = 26  # how long the slam's ground effects last after the hit tick
 var tells: Dictionary = {}
 var previous: Dictionary = {}
@@ -20,6 +22,7 @@ var scene_id: StringName = &""
 var last_tick: int = -1
 
 func clear() -> void:
+	warden.clear()
 	tells.clear()
 	previous.clear()
 	trails.clear()
@@ -41,6 +44,7 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 		return
 	scene_id = view.scene_id
 	last_tick = view.tick
+	warden.sync(view)
 	var alive: Dictionary = {}
 	for mob: Dictionary in view.mobs:
 		if mob["type"] == &"glowmoth" and int(mob.get("summoner_id", 0)) != 0 and mob["state"] != &"dead" and not seen_moths.has(int(mob["id"])):
@@ -221,6 +225,7 @@ static func draw_slam_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapsho
 		canvas.draw_polyline(rim, colors["j"] if age < 14 else colors["h"], 1.0, false)
 
 func draw_ground(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
+	warden.draw_ground(canvas, view.tick, colors)
 	for plan: Dictionary in ground_plans(view):
 		sprite(canvas, plan["frame"], plan["at"], frames, atlas)
 	for id: int in tells:
@@ -305,6 +310,9 @@ func draw_overlay(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames:
 				sprite(canvas, "woodland_fx_heal_%d" % mini(6, age / 3 + 1), at - Vector2(0, 22), frames, atlas)
 
 func draw_actor(canvas: CanvasItem, mob: Dictionary, key: String, tick: int, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
+	if mob["type"] == &"warden":
+		warden.draw_actor(canvas, mob, key, tick, frames, atlas)
+		return
 	if mob["state"] == &"dead":
 		return
 	var at: Vector2 = mob["position"]

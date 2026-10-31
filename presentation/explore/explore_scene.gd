@@ -388,6 +388,11 @@ func advance(intent: InputFrame) -> void:
 
 
 func _on_event(event: GameEvent) -> void:
+	creature_effects.warden.sync(snapshot)
+	creature_effects.warden.handle_event(event, snapshot)
+	# Events can announce a newly spawned Warden before the HUD's next refresh.
+	for mob: Dictionary in snapshot.mobs:
+		practice_view.audio.mob_types[int(mob["id"])] = String(mob["type"])
 	hud.combat_event(event)
 	encounter_effects.handle_event(event, snapshot)
 	practice_view.audio.handle_event(event, snapshot.scene_id)
@@ -782,7 +787,7 @@ func drawables() -> Array[Dictionary]:
 		out.append({"kind": &"npc", "id": npc["id"], "at": npc["position"], "frame": String(npc_frames.get(npc["id"], "")), "left": bool(npc["facing_left"]), "shadow": HERO_SHADOW_RADIUS * height / HERO_HEIGHT, "tint": tint, "height": height})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
 	for mob: Dictionary in snapshot.mobs:
-		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick), "left": Vector2(mob["facing"]).x < 0.0, "shadow": float(mob["radius"]), "tint": tint, "height": 30.0, "mob": mob})
+		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": 22.0 if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 95.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		var props: Array[Dictionary]=PropsLayer.drawables(prop_placements,frames,_visible_world_rect().grow(8))
@@ -912,9 +917,13 @@ func _draw_item(item: Dictionary) -> void:
 		draw_hero_back(snapshot.hero, key, at, bool(item["left"]))
 		_draw_spin_ring(snapshot.hero, false)
 	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
+	if item["kind"] == &"mob" and item["mob"]["type"] == &"warden" and bool(item["mob"].get("guarded", false)):
+		white = false  # a reduced guard hit flashes the rune/sparks, preserving readable bark and stone
 	var sheet: Texture2D = MobView.WHITE if white else (empowered_sprites if item["kind"] == &"hero" and empowered_sprites != null and black_form_look(snapshot.hero) else sprites)
+	if item["kind"] == &"mob" and item["mob"]["type"] == &"warden":
+		creature_effects.draw_actor(self, item["mob"], key, snapshot.tick, frames, sprites, colors)
 	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
-	if item["kind"] == &"mob":
+	if item["kind"] == &"mob" and item["mob"]["type"] != &"warden":
 		creature_effects.draw_actor(self, item["mob"], key, snapshot.tick, frames, sprites, colors)
 	if item["kind"] == &"hero":
 		_draw_phantom_glow(snapshot.hero, key, at, bool(item["left"]))
@@ -993,6 +1002,7 @@ func _update_hud() -> void:
 	hud.sync_combat(snapshot)
 	practice_view.audio.mob_types.clear()
 	for mob: Dictionary in snapshot.mobs: practice_view.audio.mob_types[int(mob["id"])] = String(mob["type"])
+	practice_view.audio.sync_wardens(snapshot.mobs, snapshot.telegraphs, snapshot.tick, snapshot.scene_id)
 	hud.explore_hp = snapshot.hero.hp
 	hud.explore_max_hp = snapshot.hero.max_hp
 	hud.herb_count = int(snapshot.inventory.get("herb",0))

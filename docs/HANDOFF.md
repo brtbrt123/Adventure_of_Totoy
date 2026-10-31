@@ -1,6 +1,6 @@
 # HANDOFF: Adventure of Totoy (current checkpoint 2026-10-31)
 
-> **START HERE for the new Codex chat (2026-10-31):** read [[CODEX_NEXT_SESSION_warden]]. Current branch is `agent/codex/progression`. Active work: Warden review, with the latest full-cone Cleave correction in `art/reference/warden_cleave_range_v4/`. 60 body frames,120 FX frames,11 preview GIFs; asset/geometry audits pass. Warden is not installed; latest look approval is pending. Preserve the dirty worktree.
+> **START HERE for the new Codex chat (2026-10-31):** read [[WARDEN_INTEGRATION]] and [[CODEX_NEXT_SESSION_warden]]. Owner authorized wiring after requesting a 2.5x body. Warden now has60 installed enlarged poses,75 attached FX, actual-core-geometry floor effects and13 recorded sound cues. Runtime review media is in `presentation/review/warden/`. See the integration note for final test status. Claude cross-review remains pending because its OAuth session expired. Trial room/waves/rewards remain separate. Branch `agent/codex/progression`; preserve the dirty worktree and never merge main.
 
 > **Thornback / Glowmoth update (2026-10-31):** Claude has finished the core mechanics, real orb projectile and presentation/particle follow-ups. Older "core still needs" entries are obsolete. Read [[CROSS_REVIEW_thornback_v3]] and newest STATUS. Most recent healing polish is `13ba25a4`: fewer motes, placed beside the Stag, once-per-second pulse and smaller glow. Preserve it when touching shared creature FX.
 

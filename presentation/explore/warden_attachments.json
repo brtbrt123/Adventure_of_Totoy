@@ -1,0 +1,602 @@
+{
+  "warden_cleave_strike_right_1": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      20,
+      -34
+    ]
+  },
+  "warden_cleave_strike_right_2": {
+    "chest": [
+      5.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      24,
+      -8
+    ]
+  },
+  "warden_cleave_strike_right_3": {
+    "chest": [
+      4.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      15,
+      -4
+    ]
+  },
+  "warden_cleave_tell_right_1": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_cleave_tell_right_2": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      24,
+      -12
+    ]
+  },
+  "warden_cleave_tell_right_3": {
+    "chest": [
+      3.6000000000000014,
+      -19.4
+    ],
+    "hook": [
+      24,
+      -25
+    ]
+  },
+  "warden_cleave_tell_right_4": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -36
+    ]
+  },
+  "warden_cleave_tell_right_5": {
+    "chest": [
+      2.833333333333332,
+      -20.5
+    ],
+    "hook": [
+      10,
+      -1
+    ]
+  },
+  "warden_death_right_1": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      16,
+      -6
+    ]
+  },
+  "warden_death_right_2": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      16,
+      -6
+    ]
+  },
+  "warden_death_right_3": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      25,
+      -2
+    ]
+  },
+  "warden_death_right_4": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      25,
+      -2
+    ]
+  },
+  "warden_death_right_5": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      25,
+      -1
+    ]
+  },
+  "warden_death_right_6": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      26,
+      -1
+    ]
+  },
+  "warden_death_right_7": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      26,
+      -1
+    ]
+  },
+  "warden_death_right_8": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      26,
+      -1
+    ]
+  },
+  "warden_exposed_right_1": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      17,
+      -6
+    ]
+  },
+  "warden_exposed_right_2": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      17,
+      -6
+    ]
+  },
+  "warden_exposed_right_3": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      17,
+      -6
+    ]
+  },
+  "warden_exposed_right_4": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      17,
+      -6
+    ]
+  },
+  "warden_guard_hit_right_1": {
+    "chest": [
+      2.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      17,
+      -7
+    ]
+  },
+  "warden_guard_hit_right_2": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_hurt_right_1": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      15,
+      -6
+    ]
+  },
+  "warden_hurt_right_2": {
+    "chest": [
+      5,
+      -18
+    ],
+    "hook": [
+      16,
+      -6
+    ]
+  },
+  "warden_idle_right_1": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_idle_right_2": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_idle_right_3": {
+    "chest": [
+      3.833333333333332,
+      -20.5
+    ],
+    "hook": [
+      18,
+      -8
+    ]
+  },
+  "warden_idle_right_4": {
+    "chest": [
+      3.833333333333332,
+      -20.5
+    ],
+    "hook": [
+      18,
+      -8
+    ]
+  },
+  "warden_idle_right_5": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_idle_right_6": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_lash_strike_right_1": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      24,
+      -12
+    ]
+  },
+  "warden_lash_strike_right_2": {
+    "chest": [
+      4.600000000000001,
+      -19.4
+    ],
+    "hook": [
+      25,
+      -25
+    ]
+  },
+  "warden_lash_strike_right_3": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      25,
+      -14
+    ]
+  },
+  "warden_lash_tell_right_1": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_lash_tell_right_2": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      14,
+      -4
+    ]
+  },
+  "warden_lash_tell_right_3": {
+    "chest": [
+      2.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      10,
+      -1
+    ]
+  },
+  "warden_lash_tell_right_4": {
+    "chest": [
+      2.8000000000000007,
+      -19.8
+    ],
+    "hook": [
+      10,
+      -1
+    ]
+  },
+  "warden_lash_tell_right_5": {
+    "chest": [
+      1.8000000000000007,
+      -19.8
+    ],
+    "hook": [
+      10,
+      -1
+    ]
+  },
+  "warden_recover_right_1": {
+    "chest": [
+      3.833333333333332,
+      -18.5
+    ],
+    "hook": [
+      14,
+      -4
+    ]
+  },
+  "warden_recover_right_2": {
+    "chest": [
+      3.833333333333332,
+      -18.5
+    ],
+    "hook": [
+      15,
+      -7
+    ]
+  },
+  "warden_recover_right_3": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      17,
+      -6
+    ]
+  },
+  "warden_recover_right_4": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_ring_strike_right_1": {
+    "chest": [
+      3.6000000000000014,
+      -16.4
+    ],
+    "hook": [
+      14,
+      -4
+    ]
+  },
+  "warden_ring_strike_right_2": {
+    "chest": [
+      3.833333333333332,
+      -18.5
+    ],
+    "hook": [
+      16,
+      -5
+    ]
+  },
+  "warden_ring_strike_right_3": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_ring_tell_right_1": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_ring_tell_right_2": {
+    "chest": [
+      3.833333333333332,
+      -18.5
+    ],
+    "hook": [
+      17,
+      -6
+    ]
+  },
+  "warden_ring_tell_right_3": {
+    "chest": [
+      3.833333333333332,
+      -17.5
+    ],
+    "hook": [
+      16,
+      -5
+    ]
+  },
+  "warden_ring_tell_right_4": {
+    "chest": [
+      3.6000000000000014,
+      -16.4
+    ],
+    "hook": [
+      14,
+      -6
+    ]
+  },
+  "warden_ring_tell_right_5": {
+    "chest": [
+      3.333333333333332,
+      -16.0
+    ],
+    "hook": [
+      13,
+      -6
+    ]
+  },
+  "warden_wake_right_1": {
+    "chest": [
+      3.833333333333332,
+      -16.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_wake_right_2": {
+    "chest": [
+      3.833333333333332,
+      -17.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_wake_right_3": {
+    "chest": [
+      3.833333333333332,
+      -18.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_wake_right_4": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      18,
+      -7
+    ]
+  },
+  "warden_walk_right_1": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      20,
+      -5
+    ]
+  },
+  "warden_walk_right_2": {
+    "chest": [
+      3.833333333333332,
+      -20.5
+    ],
+    "hook": [
+      18,
+      -8
+    ]
+  },
+  "warden_walk_right_3": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      16,
+      -8
+    ]
+  },
+  "warden_walk_right_4": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      17,
+      -6
+    ]
+  },
+  "warden_walk_right_5": {
+    "chest": [
+      3.833333333333332,
+      -20.5
+    ],
+    "hook": [
+      18,
+      -8
+    ]
+  },
+  "warden_walk_right_6": {
+    "chest": [
+      3.833333333333332,
+      -19.5
+    ],
+    "hook": [
+      20,
+      -8
+    ]
+  }
+}

@@ -5,13 +5,23 @@ const Tuning := preload("res://core/tuning.gd")
 const WHITE := preload("res://art/build/sprites_white.png")
 const Kit := preload("res://presentation/common/ui_kit.gd")
 const STATES: Dictionary = {
+ "warden": {"idle":["idle",6,12,true], "alert":["wake",4,6,false], "chase":["walk",6,7,true], "return":["walk",6,7,true], "windup":["cleave_tell",5,1,false], "strike":["cleave_strike",3,2,false], "recover":["recover",4,4,false], "stagger":["exposed",4,8,true], "hurt":["hurt",2,5,false], "dead":["death",8,8,false]},
  "glowmoth": {"idle":["idle",24,2,true], "alert":["idle",24,2,true], "chase":["move",12,2,true], "return":["move",12,2,true], "windup":["shot_tell",4,1,false], "strike":["shot_release",2,4,false], "recover":["idle",24,2,true], "hurt":["hurt",2,5,false], "dead":["death",4,8,false]},
  "mossling": {"idle":["play_idle",24,6,true], "alert":["spawn",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["attack_tell",3,1,false], "strike":["attack_lunge",3,3,false], "recover":["attack_recover",3,8,false], "crash":["attack_recover",3,8,true], "stagger":["attack_recover",3,8,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]},
  "stag": {"idle":["idle",4,14,true], "alert":["idle",4,6,false], "chase":["walk",6,6,true], "return":["walk",6,6,true], "windup":["slam_raise",4,1,false], "strike":["slam_strike",3,2,false], "recover":["slam_recover",4,8,false], "crash":["charge_crash",3,10,true], "stagger":["stagger",4,10,true], "hurt":["hurt",3,4,false], "roar":["phase2_roar",6,9,false], "dead":["death",8,9,false]},
  "boar": {"idle":["graze_idle",36,6,true], "alert":["idle",4,6,false], "chase":["walk",6,5,true], "return":["walk",6,5,true], "windup":["charge_tell",4,1,false], "strike":["charge_run",4,2,true], "recover":["crash_stun",3,9,false], "crash":["crash_stun",3,9,true], "stagger":["crash_stun",3,9,true], "hurt":["hurt",2,5,false], "dead":["death",5,8,false]}}
-static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> String:
+static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int, guard_hit_tick: int = -1000) -> String:
 	var table: Dictionary = STATES[String(mob["type"])]
 	var pose: Array = table.get(String(mob["state"]), table["idle"])
+	if mob["type"] == &"warden":
+		if mob["state"] in [&"windup", &"strike"]:
+			var attack: String = String(mob.get("attack", &"" )).trim_prefix("warden_")
+			if attack in ["cleave", "lash", "ring"]:
+				pose = [attack + ("_tell" if mob["state"] == &"windup" else "_strike"), 5 if mob["state"] == &"windup" else 3, 1, false]
+		elif not bool(mob.get("guarded", true)) and mob["state"] != &"dead":
+			pose = ["hurt",2,5,false] if mob["state"] == &"hurt" else ["exposed",4,8,true]
+		elif bool(mob.get("guarded", true)) and (mob["state"] == &"hurt" or tick - guard_hit_tick < 10):
+			pose = ["guard_hit",2,5,false]
 	if mob["type"]==&"mossling" and mob["state"]==&"stagger":pose=["hurt",2,6,true]
 	if mob["type"]==&"boar" and mob["state"]==&"recover":pose=["charge_tell",4,6,false]
 	if mob["type"] == &"stag":
@@ -28,6 +38,12 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 	# before aggro, freeze with pause and stop immediately when core reports another state.
 	var clock: int = tick + int(mob["id"]) * 17 if mob["state"] == &"idle" else int(mob["state_ticks"])
 	var n: int = clock / int(pose[2])
+	if mob["type"] == &"warden" and pose[0] == "guard_hit" and tick - guard_hit_tick < 10:
+		n = (tick - guard_hit_tick) / 5
+	if mob["type"] == &"warden" and mob["state"] == &"strike":
+		for tell: Snapshots.TelegraphSnapshot in tells:
+			if tell.owner_id == mob["id"]:
+				n = floori(float(tick - tell.hit_tick) / maxi(1, tell.end_tick - tell.hit_tick) * int(pose[1]))
 	if mob["state"] == &"windup":
 		for tell: Snapshots.TelegraphSnapshot in tells:
 			if tell.owner_id == mob["id"]:
@@ -51,6 +67,8 @@ static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary, he
 	var boss: bool = bool(mob.get("boss", false))
 	# A Glowmoth floats: its bar sits over its wings (sprite top ~29 px), not across them.
 	var top: Vector2 = (at-Vector2(0,60 if boss else (31 if mob["type"] == &"boar" else (36 if mob["type"] == &"glowmoth" else 25)))).round()
+	if mob["type"] == &"warden":
+		top = (at - Vector2(0, 99)).round()
 	if int(mob["hp"]) < int(mob["max_hp"]) or at.distance_to(hero_at)<72.0:
 		if mob.has("level") and int(mob.get("summoner_id", 0)) == 0:  # a summoned moth shows only its bar (five labels stacked are noise)
 			draw_level(canvas, top + Vector2(-7,-7), int(mob["level"]), colors)

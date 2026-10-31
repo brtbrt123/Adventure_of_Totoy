@@ -3,6 +3,8 @@ extends Node2D
 ## healing motes and "+" pulses shine instead of being dimmed by the night light. It only draws halos around particles creature_effects
 ## already placed; no rules, no state of its own.
 const Particles := preload("res://presentation/explore/creature_particles.gd")
+const MobView := preload("res://presentation/explore/mob_view.gd")
+const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
 const GLOW_KINDS: Array[String] = ["heal", "mist"]
 const GREEN: Color = Color8(160, 177, 89)  # grass_5
 const LIGHT: Color = Color8(194, 203, 124)  # grass_6
@@ -25,6 +27,15 @@ func _process(_delta: float) -> void:
 ## The halos of the healing particles at `tick`: [{at, radius, colour}] (a soft outer ring and a brighter core, both additive).
 static func halo_plan(bursts: Array[Dictionary], tick: int, heals: Array[Dictionary], mobs: Array[Dictionary]) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
+	for mob: Dictionary in mobs:
+		if mob["type"] != &"warden" or mob["state"] == &"dead" or not bool(mob.get("guarded", false)):
+			continue
+		var key: String = MobView.frame(mob, [], tick)
+		var chest: Array = WardenEffects.attachments.get(key, {"chest":[5,-18]})["chest"]
+		var at: Vector2 = Vector2(mob["position"]) + Vector2(float(chest[0]) * (-1.0 if Vector2(mob["facing"]).x < 0.0 else 1.0), float(chest[1])) * 2.5
+		var pulse: float = 0.85 + 0.15 * sin(float(tick) * 0.06)
+		out.append({"at":at.round(), "radius":9.0, "colour":Color(0.25,0.65,0.6,0.08*pulse)})
+		out.append({"at":Vector2(mob["position"]).round(), "radius":15.0, "colour":Color(0.2,0.5,0.45,0.04*pulse)})
 	for burst: Dictionary in bursts:
 		if not GLOW_KINDS.has(String(burst["kind"])):
 			continue
