@@ -1,5 +1,7 @@
 # Hollow Trial ground approval package (step 1 only)
 
+**OWNER APPROVED — 2026-10-31 (Asia/Singapore): "yes approved".** Approval applies to the ground painting shown in `ground_full_2x.png`, native asset `native/hollow_trial_ground.png`, SHA-256 `78e7db0d3ee8d67637a78aadcc539051c8e128d6f114b6e3fd0161e30d7e8d13`. The selected painting hash is recorded authoritatively in `validation.json`. No prop sheet or runtime installation is approved by this ground-only checkpoint. Historical pending-approval wording below describes the review before approval.
+
 2026-10-31, `agent/codex/progression`. Owner requested ground-only work and approval before props. All new files are in this art/reference folder. Existing dirty work is preserved; no main merge.
 
 ## Painting

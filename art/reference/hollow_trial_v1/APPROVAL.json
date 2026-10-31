@@ -1,0 +1,10 @@
+{
+  "approved": "2026-10-31",
+  "timezone": "Asia/Singapore",
+  "owner_message": "yes approved",
+  "scope": "ground painting only",
+  "native_asset": "native/hollow_trial_ground.png",
+  "sha256": "78e7db0d3ee8d67637a78aadcc539051c8e128d6f114b6e3fd0161e30d7e8d13",
+  "runtime_installed": false,
+  "prop_sheet_started": false
+}
