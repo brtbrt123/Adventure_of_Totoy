@@ -150,6 +150,43 @@ def _rotate(pixels: dict[tuple[int, int], str], pivot: tuple[float, float], degr
     return out
 
 
+def _close_seams(parts: dict[str, dict[tuple[int, int], str]], canvas: dict[tuple[int, int], str], reach: int = 4) -> None:
+    """Fills the holes a pose opens inside the body: where the torso moved off the legs (a lean, a crouch, a flinch) or a rotation left
+    a pinhole. A transparent pixel is filled only when the rest pose had body there and the posed body surrounds it on all four sides
+    within `reach` pixels; it takes the rest pose's colour at that spot. The gap between the legs and the space outside stay open."""
+    rest: dict[tuple[int, int], str] = {}
+    for name in ("torso", "leg_far", "leg_near", "far_arm"):  # not the swinging blade arm: no ghost arm where it was
+        rest.update(parts[name])
+    filled = []
+    for (x, y), symbol in rest.items():
+        if (x, y) in canvas:
+            continue
+        if all(any((x + dx * k, y + dy * k) in canvas for k in range(1, reach + 1)) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            filled.append(((x, y), symbol))
+    for at, symbol in filled:
+        canvas[at] = symbol
+
+
+def _fill_slivers(canvas: dict[tuple[int, int], str], width: int = 2) -> None:
+    """Closes thin gaps inside the body: a transparent pixel with body on both sides within `width` pixels (left and right, or above
+    and below) becomes the dark outline colour, the way a pixel artist draws a crevice. The generated design has such slivers between
+    the forearm and the thigh and a few pinholes from its background removal; through them the ground showed. Wider gaps (between the
+    legs) stay open."""
+    filled = []
+    xs = [x for x, _ in canvas]
+    ys = [y for _, y in canvas]
+    for y in range(min(ys), max(ys) + 1):
+        for x in range(min(xs), max(xs) + 1):
+            if (x, y) in canvas:
+                continue
+            across = any((x - k, y) in canvas for k in range(1, width + 1)) and any((x + k, y) in canvas for k in range(1, width + 1))
+            down = any((x, y - k) in canvas for k in range(1, width + 1)) and any((x, y + k) in canvas for k in range(1, width + 1))
+            if across or down:
+                filled.append((x, y))
+    for at in filled:
+        canvas[at] = "0"
+
+
 def _hash01(x: int, y: int, salt: int) -> float:
     h = (x * 73856093) ^ (y * 19349663) ^ (salt * 83492791)
     h = (h * 1103515245 + 12345) & 0x7FFFFFFF
@@ -186,6 +223,12 @@ def render(parts: dict[str, dict[tuple[int, int], str]], frame: dict) -> dict[tu
                 elif frame["rune"] == "bright":
                     s = RUNE_BRIGHT.get(s, s)
             canvas[(x + dx, y + dy)] = s
+    _close_seams(parts, canvas)
+    for _ in range(3):  # a gap of 3 px closes in two passes; anything wider (between the legs) never starts to fill
+        size = len(canvas)
+        _fill_slivers(canvas)
+        if len(canvas) == size:
+            break
     if frame["dissolve"] > 0.0:
         # the body crumbles from the top down into moss and root fragments
         top = min(y for _, y in canvas)
