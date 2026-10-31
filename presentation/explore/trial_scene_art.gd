@@ -2,21 +2,17 @@ extends RefCounted
 ## Source-scene art coordinates and silhouette shadows; positions/solidity remain core-owned.
 const Light := preload("res://presentation/common/environment_light.gd")
 const LocalShadow := preload("res://presentation/common/local_prop_shadows.gd")
-static func draw_ring(canvas: Node2D, at: Vector2, colours: Dictionary) -> void:
-	# A worn course of flush flagstones around the altar: irregular, broken and in ground colours, so it reads as old paving and never as
-	# a ring around the player (only real warnings may look like that). Decoration only: no collision, no telegraph.
-	for i: int in 22:
-		if i in [3, 4, 9, 15, 16, 20]:
-			continue  # missing stones: the course is broken, not a closed shape
-		var angle: float = TAU * (float(i) + _jitter(i, 1) * 0.35) / 22.0
-		var radius: float = 37.0 + _jitter(i, 2) * 4.0
-		var width: float = 0.07 + _jitter(i, 3) * 0.04
-		var depth: float = 4.0 + _jitter(i, 4) * 3.0
-		var stone: PackedVector2Array = []
-		for pair: Vector2 in [Vector2(-width, radius), Vector2(width, radius), Vector2(width, radius + depth), Vector2(-width, radius + depth)]:
-			stone.append((at + Vector2(cos(angle + pair.x) * pair.y, sin(angle + pair.x) * pair.y * 0.6)).round())
-		canvas.draw_colored_polygon(stone, colours["9"] if i % 4 == 0 else colours["a"])
-		canvas.draw_polyline(PackedVector2Array([stone[0], stone[1]]), colours["b"], 1.0, false)
+const BASE_SPRITE: String = "hollow_trial_altar_base"  # tools/art/make_trial_altar_base.py
+
+
+## Worn slabs and grass at the altar's foot (owner playtest 2026-10-31: "the ground where the altar is doesn't have anything", then
+## "just add grass and some slabs", no platform): flat floor art under everything, placed by the altar's feet so it follows the altar
+## when it is moved in the editor. Decoration only: walkable floor, no collision, no telegraph.
+static func draw_altar_base(canvas: Node2D, at: Vector2, frames: Dictionary, atlas: Texture2D) -> void:
+	if atlas == null or not frames.has(BASE_SPRITE):
+		return
+	var f: Dictionary = frames[BASE_SPRITE]
+	canvas.draw_texture_rect_region(atlas, Rect2((at - Vector2(f["ax"], f["ay"])).round(), Vector2(f["w"], f["h"])), Rect2(f["x"], f["y"], f["w"], f["h"]))
 
 
 ## A fixed number in [-1, 1] per stone (no randomness: the course is the same every frame).

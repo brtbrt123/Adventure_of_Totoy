@@ -1,0 +1,11 @@
+{
+ "spritecook_assets": [
+  {"asset_id": "23554a81-3a0f-4689-acc0-69dd3522a416", "label": "uploaded reference: the altar on its floor (4x crop of the room render)"},
+  {"asset_id": "6244f1d1-49ed-4533-8a08-71fe51898210", "label": "dais_raw_a.png - a full stone platform, rejected by the owner (too big); kept as the style reference"},
+  {"asset_id": "93945ec1-b720-42c4-8c3d-c7ff1d7692f9", "label": "dais_raw_b.png - platform alternative, not used"},
+  {"asset_id": "6c5be916-5cd8-41e8-b6d7-51de04a330e3", "label": "altar_base_raw.png - slabs and grass at the altar's foot, installed"}
+ ],
+ "generation": {"model": "gpt-image-2", "quality": "low", "credits_used": 6, "credits_left": 1, "date": "2026-10-31",
+  "project_id": "3c073baf-1fa6-458b-8582-27a623ec8815"},
+ "status": "altar_base_raw snapped to Totoy 36 by tools/art/make_trial_altar_base.py (owner: no platform, just grass and some slabs)"
+}

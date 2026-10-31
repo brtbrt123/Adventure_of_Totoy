@@ -828,7 +828,7 @@ func drawables() -> Array[Dictionary]:
 		out.append({"kind": &"npc", "id": npc["id"], "at": npc["position"], "frame": String(npc_frames.get(npc["id"], "")), "left": bool(npc["facing_left"]), "shadow": HERO_SHADOW_RADIUS * height / HERO_HEIGHT, "tint": tint, "height": height})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
 	for mob: Dictionary in snapshot.mobs:
-		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": 22.0 if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 122.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
+		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": WardenEffects.SHADOW_RADIUS if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 122.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		var props: Array[Dictionary]=PropsLayer.drawables(prop_placements,frames,_visible_world_rect().grow(8))
@@ -856,8 +856,8 @@ func _draw() -> void:
 		draw_texture(ground, Vector2.ZERO)
 	if snapshot.scene_id == &"hollow_trial_layered":
 		var altar: Vector2 = TrialArt.altar_at(prop_placements)
+		TrialArt.draw_altar_base(self, altar, frames, sprites)
 		TrialArt.draw_floor(self,prop_placements,frames,sprites,shake_offset())
-		TrialArt.draw_ring(self,altar,colors)
 		trial_fx.draw_ground(self,snapshot.tick,colors,altar)
 	var ring: Dictionary = snapshot.training.get("ring",{})
 	if bool(ring.get("active",false)):

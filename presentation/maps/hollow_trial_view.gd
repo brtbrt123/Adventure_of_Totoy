@@ -6,6 +6,8 @@ const LocalShadows := preload("res://presentation/common/local_prop_shadows.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
 const TrialArt := preload("res://presentation/explore/trial_scene_art.gd")
 var ring_colours: Dictionary = {}
+var atlas_frames: Dictionary = {}  # art/build/sprites.json frames, for the slabs at the altar's foot
+var atlas_texture: Texture2D
 @export var preview_lit: bool = false:
 	set(value):
 		preview_lit = value
@@ -150,6 +152,10 @@ func _rebuild_records() -> void:
 	$FloorEffects.queue_redraw()
 
 func draw_floor(canvas: Node2D) -> void:
+	if atlas_frames.is_empty():
+		atlas_frames = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"]
+		atlas_texture = load("res://art/build/sprites.png")  # held here: a texture freed after _draw draws as a white box
+	TrialArt.draw_altar_base(canvas, Vector2(256, 180), atlas_frames, atlas_texture)
 	for record: Dictionary in prop_records:
 		var at: Vector2 = record["at"]
 		var anchor: Vector2 = record["anchor"]
@@ -167,7 +173,6 @@ func draw_floor(canvas: Node2D) -> void:
 		if bool(record["solid"]):
 			ActorShadow.draw(canvas,at,minf(20.0,size.x*.22),.22)
 	canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
-	TrialArt.draw_ring(canvas,Vector2(256,180),ring_colours)
 
 ## Fireflies stay outside the fight-floor rectangle; simulation tick can freeze them during gameplay pause.
 func draw_motes(canvas: Node2D) -> void:

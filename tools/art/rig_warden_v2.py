@@ -45,6 +45,10 @@ UPPER = {"torso", "head", "near_arm", "far_arm"}  # parts the body offset moves
 # The rune's colours (Totoy 36 symbols) and what they become in each rune state.
 RUNE_DARK = {"p": "g", "o": "f", "n": "f", "u": "e", "t": "e", "m": "f"}
 RUNE_BRIGHT = {"t": "u", "u": "o", "n": "o", "o": "p", "m": "n"}
+# One step darker along each ramp (feet in contact shadow): bark, moss, stone.
+DARKER = {"d": "c", "c": "b", "b": "a", "a": "9", "9": "8", "8": "0", "q": "9", "6": "5", "5": "4", "4": "3", "3": "2", "2": "0",
+          "j": "i", "i": "h", "h": "g", "g": "f", "f": "e", "e": "0"}
+CREVICE = "8"  # the darkest bark: a closed gap reads as a deep fold in the roots, not as a hole
 
 
 def F(**kw) -> dict:
@@ -54,23 +58,36 @@ def F(**kw) -> dict:
 
 
 def poses() -> dict[str, list[dict]]:
+    """Every pose. Owner playtest 2026-10-31 ("stiff", "his movement is so little"): a heavy stomping walk (legs swing from the hips,
+    the body drops on every footfall, arms swing against the legs, the head nods), a breathing idle, and wind-ups and strikes that lean
+    back and lunge through the whole body. Angles: positive = clockwise on screen, so a negative leg angle steps forward."""
     p: dict[str, list[dict]] = {}
-    p["idle"] = [F(body=(0, b)) for b in (0, 0, 1, 1, 1, 0)]
-    p["wake"] = [F(body=(0, d), angles={"head": a, "near_arm": a / 2, "far_arm": -a / 2}) for d, a in ((6, 12), (4, 8), (2, 4), (0, 0))]
-    walk = ((0, -2, 2, 0, 0, 0), (1, -1, 1, -2, 0, 0), (0, 0, 0, 0, -2, 1), (0, 2, -2, 0, 0, 0), (1, 1, -1, 0, 0, -2), (0, 0, 0, -2, 0, 0))
-    p["walk"] = [F(body=(0, bob), angles={"far_arm": -swing * 2.5, "near_arm": swing * 1.5},
-                   legs={"leg_far": (fx, lift_far), "leg_near": (-fx, lift_near)})
-                 for bob, fx, swing, lift_far, lift_near, _ in [(w[0], w[1], w[2], w[3], w[4], w[5]) for w in walk]]
-    p["cleave_tell"] = [F(body=(-l, 0), angles={"near_arm": a, "head": -2}) for a, l in ((-20, 1), (-45, 2), (-70, 2), (-90, 3), (-100, 3))]
-    p["cleave_strike"] = [F(body=(l, d), angles={"near_arm": a, "head": 3}) for a, l, d in ((-40, 2, 0), (15, 4, 2), (30, 3, 2))]
-    p["lash_tell"] = [F(body=(-l, 0), angles={"near_arm": a, "far_arm": -a / 3}) for a, l in ((12, 1), (24, 2), (34, 3), (40, 3), (42, 3))]
-    p["lash_strike"] = [F(body=(l, 0), angles={"near_arm": a, "far_arm": 6}) for a, l in ((-55, 4), (-80, 6), (-75, 5))]
-    p["ring_tell"] = [F(body=(0, d), angles={"far_arm": s, "near_arm": -s}, rune="bright") for d, s in ((1, 4), (2, 8), (3, 12), (4, 16), (4, 18))]
-    p["ring_strike"] = [F(body=(0, d), angles={"far_arm": s, "near_arm": -s}, rune="bright") for d, s in ((7, 6), (3, 2), (1, 0))]
-    p["recover"] = [F(body=(l, 0), angles={"near_arm": a}) for a, l in ((20, 2), (12, 1), (6, 1), (0, 0))]
-    p["guard_hit"] = [F(body=(-3, 0), angles={"head": -4}, rune="bright"), F(body=(-1, 0), angles={"head": -2})]
-    p["hurt"] = [F(body=(-3, 1), angles={"head": 8, "near_arm": 6}), F(body=(-1, 0), angles={"head": 3, "near_arm": 2})]
-    p["exposed"] = [F(body=(-2, d), angles={"head": h, "near_arm": 14, "far_arm": -8}, rune="dark") for d, h in ((5, 12), (8, 18), (8, 20), (8, 18))]
+    # breathing: the chest rises and falls, the arms sway a little with it, the head settles
+    breath = ((0, 0), (0, 0.5), (1, 1), (2, 1.5), (1, 1), (0, 0.5))
+    p["idle"] = [F(body=(0, b), angles={"near_arm": a * 2, "far_arm": -a * 2, "head": a}) for b, a in breath]
+    p["wake"] = [F(body=(0, d), angles={"head": a, "near_arm": a / 2, "far_arm": -a / 2}) for d, a in ((8, 16), (5, 10), (2, 4), (0, 0))]
+    # (near leg, far leg, lift near, lift far, bob, arm swing, head) per frame; frames 1 and 4 are the footfalls (the effects stamp dust there)
+    walk = ((-11, 9, 0, 0, 3, 1.0, 3), (-4, 3, 0, 3, 0, 0.5, 0), (5, -6, 2, 1, -1, -0.5, -2),
+            (9, -11, 0, 0, 3, -1.0, 3), (3, -4, 3, 0, 0, -0.5, 0), (-6, 5, 1, 2, -1, 0.5, -2))
+    p["walk"] = [F(body=(2, bob), angles={"leg_near": ln, "leg_far": lf, "near_arm": 9 * sw, "far_arm": -12 * sw, "head": hd},
+                   legs={"leg_near": (0, -lift_n), "leg_far": (0, -lift_f)})
+                 for ln, lf, lift_n, lift_f, bob, sw, hd in walk]
+    p["cleave_tell"] = [F(body=(-l, c), angles={"near_arm": a, "far_arm": -a / 8, "head": -h, "leg_near": -l})
+                        for a, l, c, h in ((-25, 1, 0, 1), (-55, 3, 1, 3), (-85, 5, 1, 4), (-105, 6, 2, 5), (-115, 7, 2, 6))]
+    p["cleave_strike"] = [F(body=(l, d), angles={"near_arm": a, "far_arm": 12, "head": 5, "leg_near": -l})
+                          for a, l, d in ((-18, 5, 1), (22, 10, 4), (34, 9, 4))]  # the hook comes down through the cone (reach 46)
+    p["lash_tell"] = [F(body=(-l, c), angles={"near_arm": a, "far_arm": -a / 3, "head": -c * 2})
+                      for a, l, c in ((14, 1, 0), (28, 3, 1), (40, 5, 2), (48, 6, 2), (52, 7, 3))]
+    p["lash_strike"] = [F(body=(l, 1), angles={"near_arm": a, "far_arm": 10, "head": 4, "leg_near": -l})
+                        for a, l in ((-60, 6), (-88, 10), (-80, 8))]
+    p["ring_tell"] = [F(body=(0, d), angles={"far_arm": s, "near_arm": -s, "head": -d}, rune="bright")
+                      for d, s in ((1, 6), (2, 12), (4, 18), (5, 24), (6, 28))]
+    p["ring_strike"] = [F(body=(0, d), angles={"far_arm": -s, "near_arm": s, "head": 6}, rune="bright")
+                        for d, s in ((10, 14), (5, 6), (2, 0))]
+    p["recover"] = [F(body=(l, d), angles={"near_arm": a, "head": d}) for a, l, d in ((22, 4, 2), (14, 2, 1), (6, 1, 0), (0, 0, 0))]
+    p["guard_hit"] = [F(body=(-5, 0), angles={"head": -6, "near_arm": -6}, rune="bright"), F(body=(-2, 0), angles={"head": -2})]
+    p["hurt"] = [F(body=(-5, 2), angles={"head": 10, "near_arm": 10}), F(body=(-2, 1), angles={"head": 4, "near_arm": 4})]
+    p["exposed"] = [F(body=(-3, d), angles={"head": h, "near_arm": 18, "far_arm": -10}, rune="dark") for d, h in ((6, 14), (9, 20), (10, 22), (9, 20))]
     p["death"] = [F(body=(-1 * min(i, 4), d), angles={"head": 10 + i * 6, "near_arm": 10 + i * 5, "far_arm": -6 - i * 4},
                     legs={"leg_far": (0, min(i, 3)), "leg_near": (0, min(i, 3))}, rune="dark" if i >= 1 else "lit", dissolve=dv)
                   for i, (d, dv) in enumerate(((3, 0.0), (7, 0.0), (11, 0.08), (15, 0.18), (19, 0.32), (23, 0.5), (26, 0.68), (28, 0.84)))]
@@ -187,6 +204,38 @@ def _fill_slivers(canvas: dict[tuple[int, int], str], width: int = 2) -> None:
         canvas[at] = "0"
 
 
+def _fill_crevices(canvas: dict[tuple[int, int], str], width: int = 5, enclose: int = 10) -> None:
+    """Closes the narrow gaps the generated design left between the roots (forearm and thigh, the folds of the legs): through them the
+    ground showed, which read as missing pixels in play. A transparent pixel is filled when body lies within `width` px on both sides
+    (left and right, or above and below) AND within `enclose` px in all four directions. The space between the legs is open below, so
+    it stays open; so is everything outside the silhouette."""
+    filled = []
+    xs = [x for x, _ in canvas]
+    ys = [y for _, y in canvas]
+    for y in range(min(ys), max(ys) + 1):
+        for x in range(min(xs), max(xs) + 1):
+            if (x, y) in canvas:
+                continue
+            near = lambda dx, dy, reach: any((x + dx * k, y + dy * k) in canvas for k in range(1, reach + 1))
+            if not all(near(dx, dy, enclose) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                continue
+            if (near(1, 0, width) and near(-1, 0, width)) or (near(0, 1, width) and near(0, -1, width)):
+                filled.append((x, y))
+    for at in filled:
+        canvas[at] = CREVICE
+
+
+def _ground_contact(canvas: dict[tuple[int, int], str], rows: int = 6) -> None:
+    """The feet one step darker where they meet the ground (the bottom `rows` px of each column), so the Warden stands in its own
+    shadow instead of floating on the floor like paper."""
+    bottom: dict[int, int] = {}
+    for x, y in canvas:
+        bottom[x] = max(bottom.get(x, y), y)
+    for (x, y), s in list(canvas.items()):
+        if y > bottom[x] - rows and y >= FEET[1] - 14:
+            canvas[(x, y)] = DARKER.get(s, s)
+
+
 def _hash01(x: int, y: int, salt: int) -> float:
     h = (x * 73856093) ^ (y * 19349663) ^ (salt * 83492791)
     h = (h * 1103515245 + 12345) & 0x7FFFFFFF
@@ -229,6 +278,9 @@ def render(parts: dict[str, dict[tuple[int, int], str]], frame: dict) -> dict[tu
         _fill_slivers(canvas)
         if len(canvas) == size:
             break
+    for _ in range(2):  # a filled crevice can enclose the next one
+        _fill_crevices(canvas)
+    _ground_contact(canvas)
     if frame["dissolve"] > 0.0:
         # the body crumbles from the top down into moss and root fragments
         top = min(y for _, y in canvas)

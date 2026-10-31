@@ -62,6 +62,29 @@ const LAYERS: Dictionary = {
 		{"n": 12, "shape": "spark", "life": [10, 18], "speed": [0.6, 1.4], "drag": 0.08, "up": 0.0, "g": 0.0, "size": [1, 1], "cols": ["p", "o", "u"]},
 	],
 	# a summoned moth arrives: teal sparks rising around it
+	# the Warden's footfall: a flat puff of dust and grit kicked out sideways along the ground
+	"stomp": [
+		{"n": 5, "shape": "smoke", "life": [20, 30], "speed": [0.25, 0.55], "drag": 0.07, "up": 0.04, "g": -0.002, "size": [1, 2], "grow": 0.06, "cols": ["c", "b", "a"]},
+		{"n": 9, "shape": "dot", "life": [10, 18], "speed": [0.6, 1.3], "drag": 0.08, "up": 0.5, "g": 0.09, "size": [1, 2], "cols": ["c", "b", "d"]},
+		{"n": 1, "shape": "leaf", "life": [24, 34], "speed": [0.4, 0.8], "drag": 0.04, "up": 0.6, "g": 0.03, "size": [2, 2], "cols": ["6", "7"], "flutter": 1.5},
+	],
+	# the Cleave's blade tearing through the cone: clods, grass and leaves thrown out along the swept arc (the real hit edge)
+	"gouge": [
+		{"n": 26, "shape": "dot", "life": [14, 26], "speed": [0.8, 1.8], "drag": 0.07, "up": 0.7, "g": 0.09, "size": [2, 3], "cols": ["d", "c", "b", "9"]},
+		{"n": 10, "shape": "leaf", "life": [30, 46], "speed": [0.8, 1.6], "drag": 0.04, "up": 0.6, "g": 0.02, "size": [2, 2], "cols": ["7", "6", "6", "d"], "flutter": 2.0},
+		{"n": 8, "shape": "smoke", "life": [26, 38], "speed": [0.2, 0.5], "drag": 0.06, "up": 0.1, "g": -0.003, "size": [2, 3], "grow": 0.1, "cols": ["j", "i", "d"]},
+	],
+	# the Spore Ring's shock: dust rolls outward from the ring's real edge, grit flies, teal spores rise
+	"quake": [
+		{"n": 18, "shape": "smoke", "life": [30, 44], "speed": [0.3, 0.7], "drag": 0.06, "up": 0.1, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["j", "i", "d"]},
+		{"n": 30, "shape": "dot", "life": [14, 26], "speed": [0.9, 1.9], "drag": 0.08, "up": 0.7, "g": 0.09, "size": [2, 3], "cols": ["d", "c", "j"]},
+		{"n": 16, "shape": "spark", "life": [24, 40], "speed": [0.2, 0.6], "drag": 0.04, "up": 0.6, "g": -0.008, "size": [1, 1], "cols": ["o", "p", "u"]},
+	],
+	# a reduced hit on the rune guard: stone chips and teal sparks off the chest
+	"chips": [
+		{"n": 9, "shape": "dot", "life": [12, 22], "speed": [0.7, 1.5], "drag": 0.06, "up": 0.9, "g": 0.12, "size": [1, 2], "cols": ["h", "i", "g"]},
+		{"n": 10, "shape": "spark", "life": [10, 18], "speed": [0.6, 1.4], "drag": 0.08, "up": 0.2, "g": 0.0, "size": [1, 1], "cols": ["p", "o", "u"]},
+	],
 	"reveal": [
 		{"n": 12, "shape": "spark", "life": [16, 28], "speed": [0.3, 0.9], "drag": 0.05, "up": 0.6, "g": -0.005, "size": [1, 1], "cols": ["p", "o", "u"]},
 	],
@@ -102,6 +125,23 @@ static func _spawn(burst: Dictionary, li: int, i: int) -> Dictionary:
 			var r: float = size * sqrt(maxf(0.04, u))
 			var angle: float = dir.angle() + (v * 2.0 - 1.0) * float(burst["half_angle"]) * 0.95
 			return {"origin": at + Vector2.from_angle(angle) * r, "heading": Vector2.from_angle(angle + (rand(s, i, li * 7 + 3) - 0.5) * 0.5), "delay": int(r / size * 8.0)}
+		"gouge":
+			# along the swept arc, out near the real hit edge, thrown outward
+			var size: float = float(burst["size"])
+			var r: float = size * lerpf(0.55, 1.0, u)
+			var angle: float = dir.angle() + (v * 2.0 - 1.0) * float(burst["half_angle"])
+			return {"origin": at + Vector2.from_angle(angle) * r, "heading": Vector2.from_angle(angle + (rand(s, i, li * 7 + 3) - 0.5) * 0.6), "delay": int(v * 5.0)}
+		"quake":
+			# on the ring's real edge, rolling outward
+			var size: float = float(burst["size"])
+			var angle: float = u * TAU
+			return {"origin": at + Vector2.from_angle(angle) * size * lerpf(0.8, 1.0, v), "heading": Vector2.from_angle(angle + (v - 0.5) * 0.4), "delay": int(v * 3.0)}
+		"stomp":
+			# out sideways along the floor (the camera looks down at the ground, so the spread is flattened)
+			var angle: float = u * TAU
+			return {"origin": at + Vector2((v - 0.5) * 10.0, (u - 0.5) * 2.0), "heading": Vector2(cos(angle), sin(angle) * 0.35), "delay": 0}
+		"chips":
+			return {"origin": at + Vector2.from_angle(u * TAU) * 3.0, "heading": Vector2.from_angle(u * TAU), "delay": int(v * 2.0)}
 		"roots":
 			var spot: Vector2 = at + Vector2.from_angle(u * TAU) * 10.0 * v
 			return {"origin": spot, "heading": Vector2.from_angle(-PI / 2.0 + (u - 0.5) * 2.2), "delay": int(v * 3.0)}

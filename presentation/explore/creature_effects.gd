@@ -45,6 +45,9 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 	scene_id = view.scene_id
 	last_tick = view.tick
 	warden.sync(view)
+	for burst: Dictionary in warden.pending_bursts:
+		emit(String(burst["kind"]), burst["at"], int(burst["tick"]), burst.get("extra", {}))
+	warden.pending_bursts.clear()
 	var alive: Dictionary = {}
 	for mob: Dictionary in view.mobs:
 		if mob["type"] == &"glowmoth" and int(mob.get("summoner_id", 0)) != 0 and mob["state"] != &"dead" and not seen_moths.has(int(mob["id"])):
@@ -226,6 +229,7 @@ static func draw_slam_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapsho
 
 func draw_ground(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
 	warden.draw_ground(canvas, view.tick, colors)
+	warden.draw_feet(canvas, view.mobs)
 	for plan: Dictionary in ground_plans(view):
 		sprite(canvas, plan["frame"], plan["at"], frames, atlas)
 	for id: int in tells:
