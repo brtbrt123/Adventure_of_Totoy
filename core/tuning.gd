@@ -442,8 +442,9 @@ const MOBS: Dictionary = {
 	# parried gold attack stuns it (then it is exposed like any stunned mob). Rune Cleave is gold (parry it); an unparried Cleave chains into
 	# Root Lash `chain.delay` ticks later. Root Lash is a red line that does not move the Warden (`stationary`), Spore Ring a red burst around
 	# the Warden itself (`centered`): dash out of both. Only one Warden attacks at a time (`solo_attack`).
+	# Radius 18 since the detailed 118 px art (owner 2026-10-31): the body matches its legs; the Cleave cone (reach + radius) grows with it.
 	&"warden": {
-		"level": 3, "exp": 45, "drop": {"item": &"herb", "chance": 0.8}, "hp": 140, "radius": 11.0, "speed": 0.5, "aggro": 120.0, "tether": 300.0, "hold": 28.0, "wait": 90.0,
+		"level": 3, "exp": 45, "drop": {"item": &"herb", "chance": 0.8}, "hp": 140, "radius": 18.0, "speed": 0.5, "aggro": 120.0, "tether": 300.0, "hold": 34.0, "wait": 90.0,
 		"guard": 0.4, "solo_attack": true,
 		"attacks": [
 			{"id": &"warden_cleave", "kind": &"gold", "shape": &"cone", "reach": 46.0, "half_angle": 0.9, "start_min": 0.0, "start_max": 56.0, "windup": 40, "strike_ticks": 6,

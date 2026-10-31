@@ -26,7 +26,7 @@ The Stag stays the glade's mini-boss and is **not** in the trial. The trial gets
 
 Look (Codex draws it): a root-and-stone knight, about 24x32, moss on bark plates, a teal rune glowing in the chest (the same rune light as the Hollow stones). Sprites needed: idle, walk, three attack windups and strikes, guard hit (blocked), exposed (stunned, rune dark), hurt, defeat.
 
-Numbers (first guess, `Tuning.MOBS[&"warden"]`): level 3, HP 140, speed 0.5 (slower than the hero), radius 11, aggro 120, exp 45, herb drop 0.8.
+Numbers (first guess, `Tuning.MOBS[&"warden"]`): level 3, HP 140, speed 0.5 (slower than the hero), radius 18 (11 until the detailed art, 2026-10-31), aggro 120, exp 45, herb drop 0.8.
 
 - **Guard.** Hits do only about 40 % damage while the rune glows. A successful **parry of a gold attack** knocks the guard down: the Warden is stunned and exposed (full damage, the rune is dark) for the same window as other mobs. So you cannot just trade blows; you must parry it.
 - **Rune Cleave** (gold, cone, reach 46): windup 40, strike 6, damage 20. Parry it. Opens most chains.
