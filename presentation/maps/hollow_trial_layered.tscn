@@ -136,49 +136,49 @@ metadata/on_type = "root_hollow_barrier_closed"
 
 [node name="rune_rock_1" parent="Props" instance=ExtResource("hollow_trial_rune_rock_1")]
 
-position = Vector2(70, 140)
+position = Vector2(79, 104)
 
 metadata/flip = false
 
 [node name="rune_rock_2" parent="Props" instance=ExtResource("hollow_trial_rune_rock_2")]
 
-position = Vector2(96, 98)
+position = Vector2(155, 56)
 
 metadata/flip = false
 
 [node name="rune_rock_3" parent="Props" instance=ExtResource("hollow_trial_rune_rock_3")]
 
-position = Vector2(430, 98)
+position = Vector2(319, 46)
 
 metadata/flip = true
 
 [node name="rune_rock_4" parent="Props" instance=ExtResource("hollow_trial_rune_rock_4")]
 
-position = Vector2(446, 150)
+position = Vector2(442, 116)
 
 metadata/flip = true
 
 [node name="rune_rock_5" parent="Props" instance=ExtResource("hollow_trial_rune_rock_5")]
 
-position = Vector2(80, 236)
+position = Vector2(84, 256)
 
 metadata/flip = false
 
 [node name="rune_rock_6" parent="Props" instance=ExtResource("hollow_trial_rune_rock_6")]
 
-position = Vector2(436, 240)
+position = Vector2(425, 255)
 
 metadata/flip = true
 
 [node name="rune_rock_7" parent="Props" instance=ExtResource("hollow_trial_rune_rock_1")]
 
-position = Vector2(180, 50)
+position = Vector2(236, 34)
 
 metadata/flip = false
 
 [node name="rune_rock_8" parent="Props" instance=ExtResource("hollow_trial_rune_rock_2")]
 
-position = Vector2(332, 50)
+position = Vector2(390, 71)
 
 metadata/flip = true
 
@@ -232,79 +232,79 @@ metadata/flip = true
 
 [node name="rim_bush_1" parent="Props" instance=ExtResource("hollow_trial_bush_1")]
 
-position = Vector2(62, 196)
+position = Vector2(93, 78)
 
 metadata/flip = false
 
 [node name="rim_bush_2" parent="Props" instance=ExtResource("hollow_trial_bush_2")]
 
-position = Vector2(120, 70)
+position = Vector2(259, 27)
 
 metadata/flip = false
 
 [node name="rim_bush_3" parent="Props" instance=ExtResource("hollow_trial_bush_3")]
 
-position = Vector2(244, 40)
+position = Vector2(351, 45)
 
-metadata/flip = false
+metadata/flip = true
 
 [node name="rim_bush_4" parent="Props" instance=ExtResource("hollow_trial_bush_4")]
 
-position = Vector2(392, 70)
+position = Vector2(428, 85)
 
 metadata/flip = true
 
 [node name="rim_bush_5" parent="Props" instance=ExtResource("hollow_trial_bush_1")]
 
-position = Vector2(452, 196)
+position = Vector2(455, 245)
 
 metadata/flip = true
 
 [node name="rim_fern_1" parent="Props" instance=ExtResource("hollow_trial_fern_1")]
 
-position = Vector2(120, 312)
+position = Vector2(74, 250)
 
 metadata/flip = false
 
 [node name="rim_fern_2" parent="Props" instance=ExtResource("hollow_trial_fern_2")]
 
-position = Vector2(392, 312)
+position = Vector2(454, 229)
 
 metadata/flip = true
 
 [node name="rim_fern_3" parent="Props" instance=ExtResource("hollow_trial_fern_1")]
 
-position = Vector2(60, 110)
+position = Vector2(129, 65)
 
 metadata/flip = false
 
 [node name="rim_fern_4" parent="Props" instance=ExtResource("hollow_trial_fern_2")]
 
-position = Vector2(452, 110)
+position = Vector2(458, 137)
 
 metadata/flip = true
 
 [node name="rim_roots_1" parent="Props" instance=ExtResource("hollow_trial_roots_1")]
 
-position = Vector2(88, 272)
+position = Vector2(79, 266)
 
 metadata/flip = false
 
 [node name="rim_roots_2" parent="Props" instance=ExtResource("hollow_trial_roots_2")]
 
-position = Vector2(428, 272)
+position = Vector2(303, 30)
 
 metadata/flip = true
 
 [node name="rim_roots_3" parent="Props" instance=ExtResource("hollow_trial_roots_1")]
 
-position = Vector2(160, 42)
+position = Vector2(199, 34)
 
 metadata/flip = false
 
 [node name="rim_roots_4" parent="Props" instance=ExtResource("hollow_trial_roots_2")]
 
-position = Vector2(352, 42)
+position = Vector2(428, 280)
 
 metadata/flip = true
 

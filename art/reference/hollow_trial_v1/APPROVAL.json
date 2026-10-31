@@ -4,7 +4,16 @@
   "owner_message": "yes approved",
   "scope": "ground painting only",
   "native_asset": "native/hollow_trial_ground.png",
-  "sha256": "78e7db0d3ee8d67637a78aadcc539051c8e128d6f114b6e3fd0161e30d7e8d13",
+  "sha256": "723bc1b23d103ec9f3b22490cbd9fe310c9abf26f8dc733743c4385e52b742ec",
   "runtime_installed": false,
-  "prop_sheet_started": false
+  "prop_sheet_started": false,
+  "edits": [
+    {
+      "date": "2026-10-31",
+      "by": "Claude (covering Codex)",
+      "why": "owner playtest: props and floor pieces looked misplaced",
+      "what": "six pasted slab pieces and two square moss patches painted out of the floor by cloning nearby dirt; nothing else changed",
+      "approved_by_owner": false
+    }
+  ]
 }

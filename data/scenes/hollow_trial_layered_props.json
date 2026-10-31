@@ -394,57 +394,57 @@
   {
    "id": "rune_rock_1",
    "type": "hollow_trial_rune_rock_1",
-   "x": 70,
-   "y": 140,
+   "x": 79,
+   "y": 104,
    "flip": false
   },
   {
    "id": "rune_rock_2",
    "type": "hollow_trial_rune_rock_2",
-   "x": 96,
-   "y": 98,
+   "x": 155,
+   "y": 56,
    "flip": false
   },
   {
    "id": "rune_rock_3",
    "type": "hollow_trial_rune_rock_3",
-   "x": 430,
-   "y": 98,
+   "x": 319,
+   "y": 46,
    "flip": true
   },
   {
    "id": "rune_rock_4",
    "type": "hollow_trial_rune_rock_4",
-   "x": 446,
-   "y": 150,
+   "x": 442,
+   "y": 116,
    "flip": true
   },
   {
    "id": "rune_rock_5",
    "type": "hollow_trial_rune_rock_5",
-   "x": 80,
-   "y": 236,
+   "x": 84,
+   "y": 256,
    "flip": false
   },
   {
    "id": "rune_rock_6",
    "type": "hollow_trial_rune_rock_6",
-   "x": 436,
-   "y": 240,
+   "x": 425,
+   "y": 255,
    "flip": true
   },
   {
    "id": "rune_rock_7",
    "type": "hollow_trial_rune_rock_1",
-   "x": 180,
-   "y": 50,
+   "x": 236,
+   "y": 34,
    "flip": false
   },
   {
    "id": "rune_rock_8",
    "type": "hollow_trial_rune_rock_2",
-   "x": 332,
-   "y": 50,
+   "x": 390,
+   "y": 71,
    "flip": true
   },
   {
@@ -506,92 +506,92 @@
   {
    "id": "rim_bush_1",
    "type": "hollow_trial_bush_1",
-   "x": 62,
-   "y": 196,
+   "x": 93,
+   "y": 78,
    "flip": false
   },
   {
    "id": "rim_bush_2",
    "type": "hollow_trial_bush_2",
-   "x": 120,
-   "y": 70,
+   "x": 259,
+   "y": 27,
    "flip": false
   },
   {
    "id": "rim_bush_3",
    "type": "hollow_trial_bush_3",
-   "x": 244,
-   "y": 40,
-   "flip": false
+   "x": 351,
+   "y": 45,
+   "flip": true
   },
   {
    "id": "rim_bush_4",
    "type": "hollow_trial_bush_4",
-   "x": 392,
-   "y": 70,
+   "x": 428,
+   "y": 85,
    "flip": true
   },
   {
    "id": "rim_bush_5",
    "type": "hollow_trial_bush_1",
-   "x": 452,
-   "y": 196,
+   "x": 455,
+   "y": 245,
    "flip": true
   },
   {
    "id": "rim_fern_1",
    "type": "hollow_trial_fern_1",
-   "x": 120,
-   "y": 312,
+   "x": 74,
+   "y": 250,
    "flip": false
   },
   {
    "id": "rim_fern_2",
    "type": "hollow_trial_fern_2",
-   "x": 392,
-   "y": 312,
+   "x": 454,
+   "y": 229,
    "flip": true
   },
   {
    "id": "rim_fern_3",
    "type": "hollow_trial_fern_1",
-   "x": 60,
-   "y": 110,
+   "x": 129,
+   "y": 65,
    "flip": false
   },
   {
    "id": "rim_fern_4",
    "type": "hollow_trial_fern_2",
-   "x": 452,
-   "y": 110,
+   "x": 458,
+   "y": 137,
    "flip": true
   },
   {
    "id": "rim_roots_1",
    "type": "hollow_trial_roots_1",
-   "x": 88,
-   "y": 272,
+   "x": 79,
+   "y": 266,
    "flip": false
   },
   {
    "id": "rim_roots_2",
    "type": "hollow_trial_roots_2",
-   "x": 428,
-   "y": 272,
+   "x": 303,
+   "y": 30,
    "flip": true
   },
   {
    "id": "rim_roots_3",
    "type": "hollow_trial_roots_1",
-   "x": 160,
-   "y": 42,
+   "x": 199,
+   "y": 34,
    "flip": false
   },
   {
    "id": "rim_roots_4",
    "type": "hollow_trial_roots_2",
-   "x": 352,
-   "y": 42,
+   "x": 428,
+   "y": 280,
    "flip": true
   }
  ]
