@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "scope": "ground-only offline proposal, owner approval pending",
+  "size": [
+    512,
+    352
+  ],
+  "opaque_pixels": 180224,
+  "used_colours": 18,
+  "off_palette_pixels": 0,
+  "reserved_combat_colour_pixels": 0,
+  "transparent_pixels": 0,
+  "raw_size": [
+    1514,
+    1039
+  ],
+  "resampling": "Root Hollow workflow: LANCZOS downsample; existing Lab snap/cleanup; nearest-neighbour previews",
+  "source_sha256": "4fc0877b200971733a895dee3baf0be9507aa6e57f1d43a1f750291f536d0c30",
+  "layout_sha256": "333faf2d4545734b649446ab5217c7b6865d613bdeccb43b356e3466b85bcde4",
+  "guide_sha256": "a0240f779588433e8dda9cc4d2430234b6662b6c7f2fe1ab1194a25aa5a7bafb",
+  "painting_sha256": "78e7db0d3ee8d67637a78aadcc539051c8e128d6f114b6e3fd0161e30d7e8d13",
+  "geometry": "Painting follows layout as a visual reference. No collision or runtime map is changed; outline registration is for human inspection, not automatic collision certification.",
+  "not_verified": [
+    "owner appearance approval",
+    "runtime night exposure",
+    "combat warning readability",
+    "collision/playthrough",
+    "props/lighting/audio"
+  ],
+  "no_runtime_install": true
+}
