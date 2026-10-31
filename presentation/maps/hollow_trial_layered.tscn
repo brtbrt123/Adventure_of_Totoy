@@ -116,7 +116,7 @@ metadata/on_type = "hollow_trial_altar_lit"
 
 [node name="trial_chest" parent="Props" instance=ExtResource("hollow_trial_chest_closed")]
 
-position = Vector2(256, 136)
+position = Vector2(256, 181)
 
 metadata/flip = false
 
@@ -363,16 +363,6 @@ metadata/kind = "altar"
 [node name="Stand" type="Marker2D" parent="Objects/altar"]
 
 position = Vector2(0, 24)
-
-[node name="trial_chest" type="Marker2D" parent="Objects"]
-
-position = Vector2(256, 136)
-
-metadata/kind = "chest"
-
-[node name="Stand" type="Marker2D" parent="Objects/trial_chest"]
-
-position = Vector2(0, 18)
 
 [node name="Encounters" type="Node2D" parent="."]
 

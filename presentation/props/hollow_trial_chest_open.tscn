@@ -1,32 +1,20 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Texture2D" path="res://art/build/sprites/hollow_trial_chest_open.png" id="art"]
-
-[sub_resource type="CircleShape2D" id="C0"]
-
-radius = 6.0
-
-[sub_resource type="CircleShape2D" id="C1"]
-
-radius = 6.0
-
-[sub_resource type="CircleShape2D" id="C2"]
-
-radius = 6.0
 
 [node name="hollow_trial_chest_open" type="Node2D"]
 
 metadata/w = 40
 
-metadata/h = 40
+metadata/h = 64
 
-metadata/base_width = 24
+metadata/base_width = 0
 
-metadata/solid = true
+metadata/solid = false
 
 metadata/image = "hollow_trial_chest_open.png"
 
-metadata/anchor = Vector2(20, 40)
+metadata/anchor = Vector2(20, 64)
 
 metadata/locked = true
 
@@ -40,28 +28,10 @@ texture = ExtResource("art")
 
 centered = false
 
-offset = Vector2(-20, -40)
+offset = Vector2(-20, -64)
 
 [node name="Colliders" type="StaticBody2D" parent="."]
 
 collision_layer = 0
 
 collision_mask = 0
-
-[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
-
-position = Vector2(-6.0, -6.0)
-
-shape = SubResource("C0")
-
-[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
-
-position = Vector2(0.0, -6.0)
-
-shape = SubResource("C1")
-
-[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
-
-position = Vector2(6.0, -6.0)
-
-shape = SubResource("C2")

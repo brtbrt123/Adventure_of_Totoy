@@ -444,5 +444,159 @@
         0.94
       ]
     }
+  ],
+  "hollow_trial_altar_lit": [
+    {
+      "pixel": [
+        31,
+        24
+      ],
+      "halo_radius": 32.0,
+      "energy": 1.1,
+      "pool_radius": 48.0,
+      "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "hollow_trial_rune_rock_1": [
+    {
+      "pixel": [
+        23,
+        16
+      ],
+      "halo_radius": 32.0,
+      "energy": 1.1,
+      "pool_radius": 48.0,
+      "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "hollow_trial_rune_rock_2": [
+    {
+      "pixel": [
+        19,
+        20
+      ],
+      "halo_radius": 32.0,
+      "energy": 1.1,
+      "pool_radius": 48.0,
+      "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "hollow_trial_rune_rock_3": [
+    {
+      "pixel": [
+        20,
+        20
+      ],
+      "halo_radius": 32.0,
+      "energy": 1.1,
+      "pool_radius": 48.0,
+      "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "hollow_trial_rune_rock_4": [
+    {
+      "pixel": [
+        22,
+        19
+      ],
+      "halo_radius": 32.0,
+      "energy": 1.1,
+      "pool_radius": 48.0,
+      "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "hollow_trial_rune_rock_5": [
+    {
+      "pixel": [
+        20,
+        23
+      ],
+      "halo_radius": 32.0,
+      "energy": 1.1,
+      "pool_radius": 48.0,
+      "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "hollow_trial_rune_rock_6": [
+    {
+      "pixel": [
+        14,
+        17
+      ],
+      "halo_radius": 32.0,
+      "energy": 1.1,
+      "pool_radius": 48.0,
+      "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
   ]
 }

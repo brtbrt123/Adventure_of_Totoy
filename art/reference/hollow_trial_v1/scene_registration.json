@@ -1,11 +1,49 @@
 {
-  "status": "CLAUDE REGISTRATION REQUIRED; do not treat suggested colliders as live core data",
-  "generated_scene_sha256": "000fb92c448c674ce661f963bbf2afd3b76ef4bc910a5a0bd954ecfe73be2268",
+  "status": "Registered catalogue present; listed metadata differences need Claude resync",
+  "catalogue_differences": [
+    {
+      "type": "hollow_trial_chest_closed",
+      "field": "h",
+      "registered": 40,
+      "authored": 64
+    },
+    {
+      "type": "hollow_trial_chest_closed",
+      "field": "anchor",
+      "registered": [
+        20,
+        40
+      ],
+      "authored": [
+        20,
+        64
+      ]
+    },
+    {
+      "type": "hollow_trial_chest_open",
+      "field": "h",
+      "registered": 40,
+      "authored": 64
+    },
+    {
+      "type": "hollow_trial_chest_open",
+      "field": "anchor",
+      "registered": [
+        20,
+        40
+      ],
+      "authored": [
+        20,
+        64
+      ]
+    }
+  ],
+  "generated_scene_sha256": "ac307c5ef57532d27a1835309ef677cab827de6c633b02b9d39b3d5e7cd3975d",
   "prop_scene_sha256": {
     "hollow_trial_altar_dark": "4c3d226f9a616f8992dc4af8c5d98fa54d15d1ec098c8657566aedc2128b613f",
     "hollow_trial_altar_lit": "b73125a392c5836ab7a59a2bb11038e8d47141ed016695702c1e464d4a92a9ed",
-    "hollow_trial_chest_closed": "89f6e75c7882775ab4a51cc7753aa572d19274b397636ad4e55cee25c6bb52bd",
-    "hollow_trial_chest_open": "db6ca4d5e69568f8182b22fafce1c7ee9c13e55eb544ba9cf9ca7929c8a1c9a0",
+    "hollow_trial_chest_closed": "fa6841b4cf8d54f30ac132287419341bda3cd07f4d03d29a885d31e661dc6195",
+    "hollow_trial_chest_open": "bef419974b4304b779b6cc421e7eec8822a5865dadb08d57b12b86fa423ce703",
     "hollow_trial_rune_rock_1": "e151364e517eef341e7264260c296b8bd376b58e1d28debb294d4637e9cef86d",
     "hollow_trial_rune_rock_2": "2e357987c79a8034747668e3768068f59cf6e2c201bf3da3de3c48fdca2d5e33",
     "hollow_trial_rune_rock_3": "e5adc39871c6595ab8d29f7a3ea4652e973f7831f20ff6069904a5bc8366e74d",
@@ -96,60 +134,28 @@
     },
     "hollow_trial_chest_closed": {
       "w": 40,
-      "h": 40,
+      "h": 64,
       "anchor": [
         20,
-        40
+        64
       ],
-      "base_width": 24,
-      "solid": true,
+      "base_width": 0,
+      "solid": false,
       "image": "hollow_trial_chest_closed.png",
-      "colliders": [
-        [
-          -6.0,
-          -6.0,
-          6.0
-        ],
-        [
-          0.0,
-          -6.0,
-          6.0
-        ],
-        [
-          6.0,
-          -6.0,
-          6.0
-        ]
-      ],
+      "colliders": [],
       "locked": true
     },
     "hollow_trial_chest_open": {
       "w": 40,
-      "h": 40,
+      "h": 64,
       "anchor": [
         20,
-        40
+        64
       ],
-      "base_width": 24,
-      "solid": true,
+      "base_width": 0,
+      "solid": false,
       "image": "hollow_trial_chest_open.png",
-      "colliders": [
-        [
-          -6.0,
-          -6.0,
-          6.0
-        ],
-        [
-          0.0,
-          -6.0,
-          6.0
-        ],
-        [
-          6.0,
-          -6.0,
-          6.0
-        ]
-      ],
+      "colliders": [],
       "locked": true
     },
     "hollow_trial_rune_rock_1": {
@@ -640,7 +646,7 @@
       "id": "trial_chest",
       "type": "hollow_trial_chest_closed",
       "x": 256,
-      "y": 136,
+      "y": 181,
       "flip": false,
       "when": "flag:trial_chest_opened",
       "on_type": "hollow_trial_chest_open"
@@ -1040,27 +1046,27 @@
       ]
     },
     "hollow_trial_chest_closed": {
-      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_closed.png",
-      "sha256": "d6a58750aa96611bc141d76a63c49f6c88725fa9ef06ace0569a6ff40cfefb05",
+      "source": "art/reference/hollow_trial_v1/scene_variants/chest_closed.png",
+      "sha256": "739256b6c3a17bca5c8245b806f526cd474fd67c3ee963feb0ac9d48d17315ab",
       "anchor": [
         20,
-        40
+        64
       ],
       "size": [
         40,
-        40
+        64
       ]
     },
     "hollow_trial_chest_open": {
-      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_open.png",
-      "sha256": "71255078b3e1d5efeb091195e77c4f3851b91718b642673d9c93b0ee7352f6d5",
+      "source": "art/reference/hollow_trial_v1/scene_variants/chest_open.png",
+      "sha256": "c1e65bfbcb09b65151cbf11e1b21f16f2f21e8a4f445e0a03854af97c9bfdc5c",
       "anchor": [
         20,
-        40
+        64
       ],
       "size": [
         40,
-        40
+        64
       ]
     },
     "hollow_trial_rune_rock_1": {

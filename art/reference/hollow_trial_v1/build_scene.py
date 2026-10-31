@@ -50,6 +50,13 @@ def main():
         canvas.alpha_composite(image,((width-image.width)//2,height-image.height))
         canvas.save(variants/(name+'.png'))
         props[name] = {'anchor':[width//2,height],'suggested_base_size':[round(v*.45) for v in original['suggested_base_size']]}
+    # Owner revision: chest rests on the altar. Add 24 transparent rows BELOW the approved chest, moving no painted pixels.
+    for name in ('chest_closed','chest_open'):
+        image = Image.open(HERE/'prop_review/native'/(name+'.png')).convert('RGBA')
+        canvas = Image.new('RGBA',(40,64))
+        canvas.alpha_composite(image,(0,0))
+        canvas.save(variants/(name+'.png'))
+        props[name] = dict(props[name],anchor=[20,64],suggested_base_size=[0,0])
     layout = json.loads((ROOT/'docs/previews/hollow_trial_v1/layout.json').read_text())
     palette = json.loads((ROOT/'art/palette.json').read_text())
     colours = {tuple(bytes.fromhex(c['hex'][1:])):c['symbol'] for c in palette['colors']}
@@ -58,7 +65,7 @@ def main():
     approvals = {}
     for short, record in props.items():
         name = PREFIX+short
-        source = (variants if short.endswith('_small') else HERE/'prop_review/native')/(short+'.png')
+        source = (variants if short.endswith('_small') or short.startswith('chest_') else HERE/'prop_review/native')/(short+'.png')
         im = Image.open(source).convert('RGBA')
         w,h = im.size
         ax,ay = record['anchor']
@@ -95,7 +102,7 @@ def main():
     ground_dest = ROOT/'presentation/forest/hollow_trial_layered_ground.png'
     ground_dest.write_bytes((HERE/approved['native_asset']).read_bytes())
     placements = [dict(id='trial_altar',type=PREFIX+'altar_dark',x=256,y=180,flip=False,when='flag:cleared_hollow_trial',on_type=PREFIX+'altar_lit'),
-                  dict(id='trial_chest',type=PREFIX+'chest_closed',x=256,y=136,flip=False,when='flag:trial_chest_opened',on_type=PREFIX+'chest_open'),
+                  dict(id='trial_chest',type=PREFIX+'chest_closed',x=256,y=181,flip=False,when='flag:trial_chest_opened',on_type=PREFIX+'chest_open'),
                   dict(id='entry_roots',type='root_hollow_barrier_open',x=256,y=350,flip=False,when='trial:sealed',on_type='root_hollow_barrier_closed')]
     for i,(x,y) in enumerate(layout['rim_slots_glowing_rocks']):
         placements.append(dict(id=f'rune_rock_{i+1}',type=PREFIX+f'rune_rock_{i%6+1}',x=x,y=y,flip=x>256))
@@ -138,8 +145,6 @@ def main():
              '[node name="Rect" type="CollisionShape2D" parent="Exits/to_hollow"]','position = Vector2(28, 3.5)','shape = SubResource("ExitRect")',
              '[node name="Npcs" type="Node2D" parent="."]','[node name="Objects" type="Node2D" parent="."]','[node name="altar" type="Marker2D" parent="Objects"]','position = Vector2(256, 180)','metadata/kind = "altar"',
              '[node name="Stand" type="Marker2D" parent="Objects/altar"]','position = Vector2(0, 24)',
-             '[node name="trial_chest" type="Marker2D" parent="Objects"]','position = Vector2(256, 136)','metadata/kind = "chest"',
-             '[node name="Stand" type="Marker2D" parent="Objects/trial_chest"]','position = Vector2(0, 18)',
              '[node name="Encounters" type="Node2D" parent="."]','[node name="hollow_trial" type="Node2D" parent="Encounters"]','metadata/title = "THE HOLLOW TRIAL"','metadata/leash = 999','metadata/managed = true',
              '[node name="Zone" type="Area2D" parent="Encounters/hollow_trial"]','collision_layer = 0','collision_mask = 0','[node name="Rect" type="CollisionShape2D" parent="Encounters/hollow_trial/Zone"]','position = Vector2(256, 184)','shape = SubResource("FightRect")',
              '[node name="SpawnPoints" type="Node2D" parent="."]']
@@ -152,11 +157,24 @@ def main():
         assert prior.exists() and json.loads(prior.read_text()).get('generated_scene_sha256')==sha(scene_path),'Scene has external edits; preserve them instead of regenerating'
     scene_path.write_text('\n\n'.join(text)+'\n')
     prop_scene_hashes = {name:sha(ROOT/'presentation/props'/(name+'.tscn')) for name in definitions}
-    (HERE/'scene_registration.json').write_text(json.dumps({'status':'CLAUDE REGISTRATION REQUIRED; do not treat suggested colliders as live core data','generated_scene_sha256':sha(scene_path),'prop_scene_sha256':prop_scene_hashes,'props':definitions,'placements':placements,'light_sockets':sockets,'approved_art':approvals},indent=2)+'\n')
+    catalogue_path = ROOT/'data/props/prop_defs_hollow_trial.json'
+    registered = json.loads(catalogue_path.read_text()).get('props',{}) if catalogue_path.exists() else {}
+    differences = [{'type':name,'field':key,'registered':registered.get(name,{}).get(key),'authored':value[key]}
+                   for name,value in definitions.items() for key in ('w','h','anchor','solid','colliders') if registered.get(name,{}).get(key)!=value[key]]
+    (HERE/'scene_registration.json').write_text(json.dumps({'status':'Registered catalogue present; listed metadata differences need Claude resync' if registered else 'CLAUDE REGISTRATION REQUIRED',
+        'catalogue_differences':differences,'generated_scene_sha256':sha(scene_path),'prop_scene_sha256':prop_scene_hashes,'props':definitions,'placements':placements,'light_sockets':sockets,'approved_art':approvals},indent=2)+'\n')
+    lights_path = ROOT/'presentation/common/local_lights.json'
+    lights = json.loads(lights_path.read_text())
+    lights.update(sockets)
+    lights_path.write_text(json.dumps(lights,indent=2)+'\n')
+    regions_path = ROOT/'presentation/common/ambient_regions.json'
+    regions = json.loads(regions_path.read_text())
+    regions['hollow_trial_layered'] = [[24,92,64,176],[424,92,64,176],[112,24,288,40],[112,286,288,36]]
+    regions_path.write_text(json.dumps(regions,indent=2)+'\n')
     (HERE/'PROPS_APPROVAL.json').write_text(json.dumps({'approved':'2026-10-31','timezone':'Asia/Singapore','owner_message':'yes thats good start making the scene',
-        'scope':'20 original prop designs; small tree copies are layout-derived implementation variants for owner scene review',
-        'props':{k:v for k,v in approvals.items() if not k.endswith('_small')},
-        'derived_variants':{k:dict(v,method='nearest-neighbour45% copy of approved tree to keep canopy outside fight floor') for k,v in approvals.items() if k.endswith('_small')}},indent=2)+'\n')
+        'scope':'20 original designs; bottom trees downsized for floor clearance; chest receives transparent padding for later owner-approved on-altar placement',
+        'props':{k:v for k,v in approvals.items() if not k.endswith('_small') and 'chest_' not in k},
+        'derived_variants':{k:dict(v,method='transparent24px bottom padding for chest; nearest-neighbour45% size for small trees') for k,v in approvals.items() if k.endswith('_small') or 'chest_' in k}},indent=2)+'\n')
     print('Prepared20 approved props +2 downsized tree copies,32 placements,ground and registration handoff; no core/data writes')
 
 

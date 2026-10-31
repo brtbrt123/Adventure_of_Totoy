@@ -4,7 +4,7 @@ const EMISSIVE_ALPHA: float = 0.99
 static var _regions: Dictionary = {}
 
 static func supports(scene: StringName) -> bool:
-	return scene in [&"woodland_layered", &"forest_layered", &"root_hollow_layered", &"glade_layered"]
+	return scene in [&"woodland_layered", &"forest_layered", &"root_hollow_layered", &"glade_layered", &"hollow_trial_layered"]
 
 
 static func drawables(scene: StringName, tick: int, size: Vector2) -> Array[Dictionary]:

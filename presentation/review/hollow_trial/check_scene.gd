@@ -24,7 +24,7 @@ func run() -> void:
 		prop.free()
 	check(baked["size"] == [512,352],"map size")
 	check(baked["entries"]["south"] == [256,328],"entry registration")
-	check(baked["objects"].size() == 2 and baked["objects"][0]["stand"] == [256,204],"altar/chest stand markers")
+	check(baked["objects"].size() == 1 and baked["objects"][0]["stand"] == [256,204],"one altar stand starts trial and opens on-altar chest")
 	check(baked["props"].size() == 32,"all approved placements editable and bakeable")
 	check(baked["trial"]["spawn_points"].size() == 12,"real core trial configuration retained")
 	root.add_child(scene)
@@ -42,6 +42,9 @@ func run() -> void:
 			var offset: Vector2 = Vector2(size.x-anchor.x if record["flip"] else anchor.x,anchor.y)
 			var rect: Rect2 = Rect2(Vector2(record["at"])-offset,size)
 			check(not rect.intersects(Rect2(112,92,288,184)),"rim silhouette clears fight floor: " + String(record["id"]))
+			if String(record["id"]).begins_with("rim_tree"):
+				for point: Array in baked["trial"]["spawn_points"]:
+					check(not rect.has_point(Vector2(point[0],point[1])),"tree canopy clears spawn point: "+String(record["id"]))
 	var flags: Array[StringName] = [&"cleared_hollow_trial", &"trial_chest_opened"]
 	scene.sync_snapshot({"state":&"won","sealed":false},flags,100)
 	check(scene.get_node("Props/trial_altar").scene_file_path.ends_with("altar_lit.tscn"),"won switches altar")

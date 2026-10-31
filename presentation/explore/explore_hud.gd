@@ -84,6 +84,14 @@ func _sync_overlay() -> void:
 	if combat != null:
 		if not combat.objective.is_empty():
 			data["objective"] = String(combat.objective.get("text", ""))
+		if not combat.trial.is_empty():
+			var trial: Dictionary = combat.trial
+			match String(trial.get("state","idle")):
+				"idle": data["objective"] = "E at altar: begin trial."
+				"starting": data["objective"] = "The trial awakens."
+				"wave": data["objective"] = "WAVE %d/%d - %s" % [trial["wave"],trial["waves"],("INCOMING" if int(trial["alive"])==0 else "%d LEFT" % int(trial["alive"]))]
+				"between": data["objective"] = "Wave %d cleared." % int(trial["wave"])
+				"won": data["objective"] = "Trial complete." if combat.story_flags.has(&"trial_chest_opened") else "Open the trial chest."
 		if level_banner_visible():
 			data["level_up"] = {"sub": "+%d stat points" % level_points}
 		if feedback_active(combat.tick, task_tick, 100):

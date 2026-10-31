@@ -2,7 +2,7 @@
   "approved": "2026-10-31",
   "timezone": "Asia/Singapore",
   "owner_message": "yes thats good start making the scene",
-  "scope": "20 original prop designs; small tree copies are layout-derived implementation variants for owner scene review",
+  "scope": "20 original designs; bottom trees downsized for floor clearance; chest receives transparent padding for later owner-approved on-altar placement",
   "props": {
     "hollow_trial_altar_dark": {
       "source": "art/reference/hollow_trial_v1/prop_review/native/altar_dark.png",
@@ -26,30 +26,6 @@
       "size": [
         64,
         48
-      ]
-    },
-    "hollow_trial_chest_closed": {
-      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_closed.png",
-      "sha256": "d6a58750aa96611bc141d76a63c49f6c88725fa9ef06ace0569a6ff40cfefb05",
-      "anchor": [
-        20,
-        40
-      ],
-      "size": [
-        40,
-        40
-      ]
-    },
-    "hollow_trial_chest_open": {
-      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_open.png",
-      "sha256": "71255078b3e1d5efeb091195e77c4f3851b91718b642673d9c93b0ee7352f6d5",
-      "anchor": [
-        20,
-        40
-      ],
-      "size": [
-        40,
-        40
       ]
     },
     "hollow_trial_rune_rock_1": {
@@ -246,6 +222,32 @@
     }
   },
   "derived_variants": {
+    "hollow_trial_chest_closed": {
+      "source": "art/reference/hollow_trial_v1/scene_variants/chest_closed.png",
+      "sha256": "739256b6c3a17bca5c8245b806f526cd474fd67c3ee963feb0ac9d48d17315ab",
+      "anchor": [
+        20,
+        64
+      ],
+      "size": [
+        40,
+        64
+      ],
+      "method": "transparent24px bottom padding for chest; nearest-neighbour45% size for small trees"
+    },
+    "hollow_trial_chest_open": {
+      "source": "art/reference/hollow_trial_v1/scene_variants/chest_open.png",
+      "sha256": "c1e65bfbcb09b65151cbf11e1b21f16f2f21e8a4f445e0a03854af97c9bfdc5c",
+      "anchor": [
+        20,
+        64
+      ],
+      "size": [
+        40,
+        64
+      ],
+      "method": "transparent24px bottom padding for chest; nearest-neighbour45% size for small trees"
+    },
     "hollow_trial_tree_1_small": {
       "source": "art/reference/hollow_trial_v1/scene_variants/tree_1_small.png",
       "sha256": "2f2606fad5abc5deed331d851a4151e23cca589f1f3a8e3723fcbda35be4de06",
@@ -257,7 +259,7 @@
         48,
         56
       ],
-      "method": "nearest-neighbour45% copy of approved tree to keep canopy outside fight floor"
+      "method": "transparent24px bottom padding for chest; nearest-neighbour45% size for small trees"
     },
     "hollow_trial_tree_2_small": {
       "source": "art/reference/hollow_trial_v1/scene_variants/tree_2_small.png",
@@ -270,7 +272,7 @@
         56,
         56
       ],
-      "method": "nearest-neighbour45% copy of approved tree to keep canopy outside fight floor"
+      "method": "transparent24px bottom padding for chest; nearest-neighbour45% size for small trees"
     }
   }
 }

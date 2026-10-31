@@ -4,6 +4,8 @@ extends Node2D
 const Light := preload("res://presentation/common/environment_light.gd")
 const LocalShadows := preload("res://presentation/common/local_prop_shadows.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
+const TrialArt := preload("res://presentation/explore/trial_scene_art.gd")
+var ring_colours: Dictionary = {}
 @export var preview_lit: bool = false:
 	set(value):
 		preview_lit = value
@@ -31,6 +33,9 @@ var _editor_layout: String = ""
 var _anchors: Dictionary = {}
 
 func _ready() -> void:
+	var palette: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))
+	for entry: Dictionary in palette["colors"]:
+		ring_colours[entry["symbol"]] = Color(entry["hex"])
 	$Ground.use_parent_material = true
 	$FloorEffects.use_parent_material = true
 	$Props.use_parent_material = true
@@ -162,6 +167,7 @@ func draw_floor(canvas: Node2D) -> void:
 		if bool(record["solid"]):
 			ActorShadow.draw(canvas,at,minf(20.0,size.x*.22),.22)
 	canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
+	TrialArt.draw_ring(canvas,Vector2(256,180),ring_colours)
 
 ## Fireflies stay outside the fight-floor rectangle; simulation tick can freeze them during gameplay pause.
 func draw_motes(canvas: Node2D) -> void:

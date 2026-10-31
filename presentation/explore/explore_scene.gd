@@ -19,6 +19,10 @@ const CreatureEffects := preload("res://presentation/explore/creature_effects.gd
 const CreatureGlow := preload("res://presentation/explore/creature_glow.gd")
 var creature_effects: CreatureEffects = CreatureEffects.new()
 var creature_glow: CreatureGlow
+const TrialArt := preload("res://presentation/explore/trial_scene_art.gd")
+const TrialFX := preload("res://presentation/explore/trial_scene_fx.gd")
+var trial_fx: TrialFX = TrialFX.new()
+var displayed_trial_seal: bool = false
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
@@ -52,6 +56,7 @@ const GROUNDS: Dictionary = {
 const AMBIENT: Dictionary = {
 	&"woodland_layered": Color(0.9, 0.94, 0.88),
 	&"root_hollow_layered": Color(0.88, 0.93, 0.87),
+	&"hollow_trial_layered": Color(0.88, 0.93, 0.87),
 	&"arena": Color(1, 1, 1),
 	&"village_layered": Color(0.93, 0.89, 0.84),
 	&"glade_layered": Color(0.88, 0.95, 0.94),
@@ -241,6 +246,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	world_cues.clear()
 	encounter_effects.clear()
 	creature_effects.clear()
+	trial_fx.clear()
 	progression_view.clear()
 	defeat_started_tick = -1
 	practice_view.enter_scene(scene)
@@ -260,6 +266,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
 	creature_effects.sync(snapshot)
+	trial_fx.sync(snapshot.scene_id,snapshot.tick)
 	progression_view.sync(snapshot, colors, frames, sprites)
 	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
@@ -362,6 +369,7 @@ func advance(intent: InputFrame) -> void:
 		hud.locked_hint("Aspect socket locked")
 	core.step(intent)
 	snapshot = core.snapshot()
+	trial_fx.sync(snapshot.scene_id,snapshot.tick)
 	gate_open = snapshot.gate_open
 	conversation.sync(snapshot.dialogue)
 	conversation.tick()
@@ -388,6 +396,30 @@ func advance(intent: InputFrame) -> void:
 
 
 func _on_event(event: GameEvent) -> void:
+	if snapshot.scene_id == &"hollow_trial_layered":
+		trial_fx.sync(snapshot.scene_id,snapshot.tick)
+		trial_fx.handle_event(event)
+		if bool(snapshot.trial.get("sealed",false)) != displayed_trial_seal:
+			_refresh_props()
+		match event.type:
+			&"trial_started":
+				toast_message = "THE HOLLOW TRIAL"
+				toast_ticks = 100
+				practice_view.audio.cue("aspect_bind",event.tick,.4)
+			&"trial_wave_started":
+				toast_message = "FINAL WAVE" if int(event.data["wave"]) == int(event.data["waves"]) else "WAVE %d / %d" % [event.data["wave"],event.data["waves"]]
+				toast_ticks = 100
+			&"trial_wave_cleared":
+				toast_message = "WAVE CLEARED"
+				toast_ticks = 100
+				practice_view.audio.cue("lesson_complete",event.tick,.4)
+			&"trial_won":
+				toast_message = "TRIAL COMPLETE"
+				toast_ticks = 130
+				practice_view.audio.cue("root_gate_open",event.tick,.5)
+			&"trial_failed":
+				toast_message = "TRIAL ENDED"
+				toast_ticks = 100
 	creature_effects.warden.sync(snapshot)
 	creature_effects.warden.handle_event(event, snapshot)
 	# Events can announce a newly spawned Warden before the HUD's next refresh.
@@ -409,7 +441,7 @@ func _on_event(event: GameEvent) -> void:
 			hud.gate_tick=snapshot.tick
 		GameEvent.CHEST_OPENED:
 			progression_view.chest_tick=snapshot.tick
-			hud.task_message="The Elder's basket."
+			hud.task_message="The trial chest." if snapshot.scene_id == &"hollow_trial_layered" else "The Elder's basket."
 			hud.task_tick=snapshot.tick
 			practice_view.audio.cue("chest_open",snapshot.tick,0.7)
 		GameEvent.HERO_DEFEATED:
@@ -579,6 +611,9 @@ func hint_text() -> String:
 	if snapshot == null or not snapshot.dialogue.is_empty() or bool(snapshot.training.get("active", false)) or snapshot.interact_target == &"" or snapshot.exiting or bubbles.has(snapshot.interact_target):
 		return ""
 	if snapshot.interact_target==&"chest" and snapshot.story_flags.has(&"basket_found"):return "[E] LOOK"
+	if snapshot.scene_id == &"hollow_trial_layered" and snapshot.interact_target == &"altar":
+		if snapshot.story_flags.has(&"trial_chest_opened"): return ""
+		return "[E] OPEN CHEST" if snapshot.trial.get("state",&"") == &"won" else ("[E] BEGIN TRIAL" if snapshot.trial.get("state",&"") == &"idle" else "")
 	return HINT_OVERRIDES.get(snapshot.interact_target, HINTS.get(snapshot.interact_kind, "[E] LOOK"))
 
 
@@ -812,6 +847,10 @@ func _draw() -> void:
 	var ground: Texture2D = ground_texture(snapshot.scene_id)
 	if ground != null:
 		draw_texture(ground, Vector2.ZERO)
+	if snapshot.scene_id == &"hollow_trial_layered":
+		TrialArt.draw_floor(self,prop_placements,frames,sprites,shake_offset())
+		TrialArt.draw_ring(self,Vector2(256,180),colors)
+		trial_fx.draw_ground(self,snapshot.tick,colors)
 	var ring: Dictionary = snapshot.training.get("ring",{})
 	if bool(ring.get("active",false)):
 		var at: Vector2=ring["center"]
@@ -868,6 +907,8 @@ func _draw() -> void:
 	for mob: Dictionary in snapshot.mobs:
 		MobView.decorate(self, mob, colors, snapshot.hero.position, frames, sprites)
 	creature_effects.draw_overlay(self, snapshot, frames, sprites, colors)
+	if snapshot.scene_id == &"hollow_trial_layered":
+		TrialFX.draw_altar_progress(self,snapshot.trial,colors)
 	for cue: Dictionary in world_cues:
 		var age: int = snapshot.tick-int(cue["tick"])
 		var at: Vector2 = cue["at"]
@@ -949,7 +990,10 @@ func shadow_strength() -> float:
 func _refresh_props() -> void:
 	prop_placements.clear()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
-		prop_placements = PropScene.placements(SceneDefs.layered_data(snapshot.scene_id), PropScene.load_defs(), {"gate_open": snapshot.gate_open, "lit": snapshot.lit_switches, "flags": snapshot.story_flags})
+		displayed_trial_seal = bool(snapshot.trial.get("sealed",false))
+		prop_placements = PropScene.placements(SceneDefs.layered_data(snapshot.scene_id), PropScene.load_defs(), {"gate_open": snapshot.gate_open, "lit": snapshot.lit_switches, "flags": snapshot.story_flags, "trial":[&"sealed"] if displayed_trial_seal else []})
+		if snapshot.scene_id == &"hollow_trial_layered":
+			prop_placements = TrialArt.visual_placements(prop_placements,frames)
 	_update_lighting()
 
 

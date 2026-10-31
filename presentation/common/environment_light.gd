@@ -10,7 +10,7 @@ static var _sockets: Dictionary = {}
 
 
 static func supports(scene: StringName) -> bool:
-	return scene in [&"woodland_layered", &"village_layered", &"glade_layered", &"forest_layered", &"root_hollow_layered"]
+	return scene in [&"woodland_layered", &"village_layered", &"glade_layered", &"forest_layered", &"root_hollow_layered", &"hollow_trial_layered"]
 
 
 static func make_material(scene: StringName, size: Vector2, placements: Array[Dictionary] = []) -> ShaderMaterial:
@@ -21,13 +21,13 @@ static func make_material(scene: StringName, size: Vector2, placements: Array[Di
 	result.set_shader_parameter("actor_shadow_alpha", ACTOR_SHADOW_ALPHA)
 	result.set_shader_parameter("world_size", size)
 	result.set_shader_parameter("shaft_slope", SHADOW_PROJECTION.x / SHADOW_PROJECTION.y)
-	result.set_shader_parameter("strength", 0.82 if scene == &"root_hollow_layered" else 1.0)
+	result.set_shader_parameter("strength", 0.82 if scene in [&"root_hollow_layered", &"hollow_trial_layered"] else 1.0)
 	result.set_shader_parameter("light_colour", Vector3(0.64, 0.77, 1.0) if scene == &"village_layered" else Vector3(0.60, 0.79, 1.0))
 	var practicals: Dictionary = lamp_plan(placements)
 	if scene in [&"glade_layered"]:
 		result.set_shader_parameter("lamp_colour", Vector3(0.48, 0.94, 0.86))
 		result.set_shader_parameter("lamp_core_colour", Vector3(0.8, 1.0, 1.0))
-	result.set_shader_parameter("mixed_lights", scene in [&"forest_layered", &"woodland_layered", &"root_hollow_layered"])
+	result.set_shader_parameter("mixed_lights", scene in [&"forest_layered", &"woodland_layered", &"root_hollow_layered", &"hollow_trial_layered"])
 	result.set_shader_parameter("lamp_colours", practicals["colours"])
 	result.set_shader_parameter("lamp_core_colours", practicals["core_colours"])
 	result.set_shader_parameter("lamp_count", practicals["count"])
