@@ -42,6 +42,7 @@ const MobField := preload("res://core/mob_field.gd")
 const QuestBook := preload("res://core/quest_book.gd")
 const Aspects := preload("res://core/aspects.gd")
 const ExploreSkills := preload("res://core/explore_skills.gd")
+const Trial := preload("res://core/trial.gd")
 
 ## The story flag that means the hero owns his first sword (Tovan's handover, DialogueBook grants). A save that has met Tovan
 ## but has no such flag is an older save from before the handover existed: it is treated as armed (set_story_flags).
@@ -103,6 +104,9 @@ class ExploreSnapshot:
 	## Mob projectiles in flight (the Glowmoth orb, core/mob_field.gd projectile_views): [{id, owner_id, visual, position, direction,
 	## radius, fired_tick}]. Their hit is the circle `radius` around `position`; the windup's red lane already warned of the path.
 	var mob_projectiles: Array[Dictionary] = []
+	## The scene's trial (core/trial.gd view): {state (idle, starting, wave, between, won), wave, waves, alive, next_tick, sealed};
+	## empty in a scene without one.
+	var trial: Dictionary = {}
 	## What the hero carries: {item id: count} (herbs from mobs). Presentation saves it (SaveProfile.inventory) on item_received and item_used.
 	var inventory: Dictionary = {}
 	## Hero level (1..Tuning.LEVEL_MAX), EXP earned inside this level, and what this level needs (0 at the top level), plus the total EXP the
@@ -165,6 +169,7 @@ var training: TrainingYard = null  # the scene's practice post, if it has one
 var skills: ExploreSkills = ExploreSkills.new()
 var _uses_flag_states: bool = false
 var mobs: MobField = null  # the scene's encounters, if it has any
+var trial: Trial = null  # the scene's trial (the Hollow Trial room), if it has one
 var quests: Dictionary = QuestBook.default_book()  # the village sequence
 var inventory: Dictionary = {}  # item id -> count
 var exp_total: int = 0  # all the EXP the hero earned (his level follows)
@@ -189,13 +194,14 @@ func _init(p_scene_id: StringName = SceneDefs.START_SCENE, entry: StringName = &
 	if gate_open:  # an opened gate was opened by lighting every switch (the save keeps only the gate)
 		lit_switches.append_array(_puzzle_switches())
 	_uses_flag_states = _scene_uses_flag_states()
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
+	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
 	entry_id = entry if def["entries"].has(entry) else StringName(def["default_entry"])
 	place_at(def["entries"][entry_id])
 	for npc: Dictionary in def["npcs"]:
 		npc_facing_left[npc["id"]] = bool(npc.get("face_left", false))
 	training = TrainingYard.for_scene(def)
 	mobs = MobField.for_scene(def)
+	trial = Trial.for_scene(def)
 	_apply_stats()
 	_update_npcs()
 	interact_target = _find_interact_target()
@@ -230,7 +236,7 @@ func set_gate_open(open: bool) -> void:
 	lit_switches.clear()
 	if open:  # an open gate means every switch is lit
 		lit_switches.append_array(_puzzle_switches())
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
+	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
 	player.position = _clamp(player.position)
 	_queued.append(GameEvent.new(GameEvent.GATE_CHANGED, tick, {"scene": scene_id, "gate_open": gate_open}))
 
@@ -248,6 +254,8 @@ func set_story_flags(flags: Array[StringName]) -> void:
 		story_flags.append(flag)  # the step he is on has already unlocked what it teaches
 	if mobs != null:
 		mobs.sync_flags(story_flags)  # a cleared encounter stays cleared
+	if trial != null:
+		trial.sync_flags(story_flags)  # a won trial stays won
 	_rebuild_flag_obstacles()
 
 
@@ -454,10 +462,16 @@ func _scene_uses_flag_states() -> bool:
 	return false
 
 
+## The colliders again now (the trial sealed or opened its entry); the hero is pushed out of anything that closed on him.
+func rebuild_obstacles() -> void:
+	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
+	player.position = _clamp(player.position)
+
+
 ## The colliders again for the story flags now set (a barrier that opens when its fight is cleared).
 func _rebuild_flag_obstacles() -> void:
 	if _uses_flag_states:
-		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
+		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
 
 
 func _flag_added(flag: StringName, events: Array[GameEvent]) -> void:
@@ -528,6 +542,8 @@ func step(input: InputFrame) -> void:
 		training.resolve(self, events)
 	if mobs != null:
 		mobs.resolve(self, events)
+	if trial != null:
+		trial.step(self, events)
 	_use_item(input, talking, events)
 	if not talking and not exiting and player.state != PlayerState.STATE_DEAD:
 		if input.spend_stat != &"":
@@ -548,6 +564,8 @@ func step(input: InputFrame) -> void:
 		events.append(GameEvent.new(GameEvent.INTERACT, tick, {"scene": scene_id, "target_id": interact_target["id"], "kind": interact_target["kind"], "position": interact_target["position"]}))
 		_use_switch(interact_target["id"], events)
 		_open_chest(interact_target["id"], events)
+		if trial != null:
+			trial.use(self, interact_target["id"], events)
 		if interact_target["kind"] == &"npc":
 			_start_talk(interact_target["id"], events)
 	last_events = events
@@ -621,6 +639,8 @@ func snapshot() -> ExploreSnapshot:
 		snap.encounters = mobs.encounter_views()
 		snap.mob_projectiles = mobs.projectile_views()
 		snap.telegraphs.append_array(mobs.telegraph_snapshots())
+	if trial != null:
+		snap.trial = trial.view(self)
 	snap.inventory = inventory.duplicate()
 	snap.objective = _objective_view()
 	snap.unlocked = {"attack": is_unlocked(&"attack"), "dash": is_unlocked(&"dash"), "parry": is_unlocked(&"parry"),
@@ -701,6 +721,8 @@ func _check_defeat(events: Array[GameEvent]) -> void:
 	_defeat_ticks = 0
 	if mobs != null:
 		mobs.reset_all(tick, &"defeat", events)
+	if trial != null:
+		trial.fail(self, events)  # the try is over; the altar waits again
 	events.append(GameEvent.new(GameEvent.HERO_RESPAWNED, tick, {"scene": scene_id, "checkpoint_id": last_checkpoint if not c.is_empty() else &"", "position": player.position}))
 
 
@@ -804,7 +826,7 @@ func _use_switch(target: StringName, events: Array[GameEvent]) -> void:
 	if all_lit:
 		set_gate_open(true)  # rebuilds the colliders and queues gate_changed for the next step
 	else:
-		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags)
+		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
 
 
 ## True when the hero's body (PLAYER_RADIUS) touches `rect`.
@@ -839,6 +861,11 @@ func _check_exits(events: Array[GameEvent]) -> void:
 			_blocked_told.erase(exit["id"])
 			continue
 		if not _armed.get(exit["id"], false) or exit_fired.has(exit["id"]):
+			continue
+		if trial != null and trial.sealed:  # the trial room's entry roots hold until the trial ends
+			if not _blocked_told.has(exit["id"]):
+				_blocked_told[exit["id"]] = true
+				events.append(GameEvent.new(GameEvent.EXIT_BLOCKED, tick, {"scene": scene_id, "exit_id": exit["id"], "text": String(trial.cfg.get("sealed_text", ""))}))
 			continue
 		if exit.get("gate", &"") == &"road" and not (story_flags.has(QuestBook.DEBUG_FLAG) or QuestBook.road_open(quests, story_flags)):
 			if not _blocked_told.has(exit["id"]):

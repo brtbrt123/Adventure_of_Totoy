@@ -71,10 +71,17 @@ def build_map(data: dict) -> tscn.Scene:
     meta(props, "default_entry", data["default_entry"])
     if "puzzle" in data:
         meta(props, "puzzle", data["puzzle"])
+    if "trial" in data:  # a trial room (core/trial.gd): waves, spawn points, reward; edited in the Inspector for now
+        meta(props, "trial", data["trial"])
     scene.add(sid, "Node2D", None, props)
 
-    ground = scene.add_ext("ground", "Texture2D", data["ground"])
-    scene.add("Ground", "Sprite2D", ".", {"texture_filter": "1", "texture": ground, "centered": "false"})
+    if (ROOT / data["ground"].removeprefix("res://")).exists():
+        ground = scene.add_ext("ground", "Texture2D", data["ground"])
+        scene.add("Ground", "Sprite2D", ".", {"texture_filter": "1", "texture": ground, "centered": "false"})
+    else:  # the floor painting is not delivered yet: keep its path, the scene still opens
+        gp: dict[str, str] = {"texture_filter": "1", "centered": "false"}
+        meta(gp, "ground", data["ground"])
+        scene.add("Ground", "Sprite2D", ".", gp)
     scene.add("Walkable", "Polygon2D", ".", {"color": WALK_COLOUR, "polygon": tscn.packed_vec2([tuple(p) for p in data["outline"]])})
 
     scene.add("Entries", "Node2D")
@@ -122,6 +129,8 @@ def build_map(data: dict) -> tscn.Scene:
             p = {}
             meta(p, "title", row["name"])
             meta(p, "leash", row["leash"])
+            if "managed" in row:
+                meta(p, "managed", row["managed"])
             if "reward" in row:
                 meta(p, "reward", row["reward"])
             scene.add(row["id"], "Node2D", "Encounters", p)

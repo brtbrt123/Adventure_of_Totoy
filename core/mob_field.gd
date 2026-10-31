@@ -52,6 +52,8 @@ class Encounter:
 	var outside_ticks: int = 0
 	var mobs: Array[Mob] = []
 	var touched: bool = false  # something happened here since the encounter was whole (a wake, a blow): a reset has something to undo
+	var managed: bool = false  # a trial's encounter: its mobs come and go with the waves; it never clears itself, leashes or remembers kills
+	var max_attackers: int = Tuning.MOB_MAX_ATTACKERS
 
 
 var scene_id: StringName = &""
@@ -83,6 +85,7 @@ static func for_scene(def: Dictionary) -> RefCounted:
 		enc.leash = float(r.get("leash", 160.0))
 		enc.reward = r.get("reward", {})
 		enc.flag = StringName(FLAG_PREFIX + String(enc.id))
+		enc.managed = bool(r.get("managed", false))
 		var slot: int = 0
 		for m: Variant in r["mobs"]:
 			var spec: Dictionary = m
@@ -103,7 +106,7 @@ static func flag_of(encounter_id: StringName) -> StringName:
 ## The story flags were replaced (CONTINUE): every encounter whose flag is set is cleared and its mobs are gone, no events.
 func sync_flags(flags: Array[StringName]) -> void:
 	for enc: Encounter in encounters:
-		if flags.has(enc.flag):
+		if flags.has(enc.flag) and not enc.managed:
 			enc.state = CLEARED
 			enc.mobs.clear()
 			continue
@@ -188,6 +191,53 @@ func _count_attackers(enc: Encounter) -> int:
 		if mob.is_attacking():
 			n += 1
 	return n
+
+
+## ---- managed encounters (a trial's waves, core/trial.gd) ----------------------------------------------------------------------
+
+## A new mob in a managed encounter at `at`, awake (alert, then it chases); the encounter is active. Returns it.
+func add_mob(core: RefCounted, encounter_id: StringName, type: StringName, at: Vector2, events: Array[GameEvent]) -> Mob:
+	var enc: Encounter = _find(encounter_id)
+	var mob: Mob = Mob.new()
+	mob.setup(_next_summoned_id, type, enc.id, at, 200 + enc.mobs.size())
+	_next_summoned_id += 1
+	mob.state = &"alert"
+	mob.facing = _toward(at, core.player.position, Vector2.LEFT)
+	mob.cooldown = Tuning.MOB_FIRST_COOLDOWN + Tuning.MOB_COOLDOWN_STAGGER * (enc.mobs.size() % 4)
+	enc.mobs.append(mob)
+	enc.state = ACTIVE
+	enc.touched = true
+	events.append(GameEvent.new(GameEvent.MOB_ALERTED, core.tick, {"scene": scene_id, "mob_id": mob.id, "encounter_id": enc.id, "position": at}))
+	return mob
+
+
+## Living mobs of an encounter (0 when there is no such encounter).
+func alive_in(encounter_id: StringName) -> int:
+	var enc: Encounter = _find(encounter_id)
+	return 0 if enc == null else _alive(enc).size()
+
+
+## How many mobs of the encounter may wind up or strike at once (the trial raises it to 4).
+func set_max_attackers(encounter_id: StringName, count: int) -> void:
+	var enc: Encounter = _find(encounter_id)
+	if enc != null:
+		enc.max_attackers = count
+
+
+## A managed encounter is quiet again (its trial was won): dormant, untouched, with no living mobs left to fight.
+func rest(encounter_id: StringName) -> void:
+	var enc: Encounter = _find(encounter_id)
+	if enc != null:
+		enc.state = DORMANT
+		enc.touched = false
+		enc.max_attackers = Tuning.MOB_MAX_ATTACKERS
+
+
+func _find(encounter_id: StringName) -> Encounter:
+	for enc: Encounter in encounters:
+		if enc.id == encounter_id:
+			return enc
+	return null
 
 
 ## ---- mob projectiles (the Glowmoth orb) ------------------------------------------------------------------------------------
@@ -536,6 +586,8 @@ func _wake(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
 
 ## The hero's distance from the encounter: give up after MOB_LEASH_GRACE_TICKS, start over after MOB_RESET_TICKS.
 func _leash(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> void:
+	if enc.managed:
+		return
 	var inside: bool = core.player.position.distance_to(enc.anchor) <= enc.leash
 	enc.outside_ticks = 0 if inside else enc.outside_ticks + 1
 	if enc.state == ACTIVE and enc.outside_ticks >= Tuning.MOB_LEASH_GRACE_TICKS:
@@ -563,6 +615,9 @@ func reset_encounter(enc: Encounter, tick: int, reason: StringName, events: Arra
 	var was_touched: bool = enc.touched
 	_end_projectiles_of(tick, 0, enc.id, &"reset", events)
 	_despawn_all_summons(enc)
+	if enc.managed:  # a trial's mobs only exist during the try
+		enc.mobs.clear()
+		enc.max_attackers = Tuning.MOB_MAX_ATTACKERS
 	for mob: Mob in enc.mobs:
 		if not mob.killed:
 			mob.reset()
@@ -655,6 +710,16 @@ func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent])
 	_end_projectiles_of(core.tick, mob.id, &"", &"owner", events)
 	if mob.is_summoned():  # a called moth pays nothing and is not remembered
 		return
+	if enc.managed:  # a trial wave: pays EXP and rolls its drop, is not remembered, and the trial (not the field) decides what comes next
+		var paid: Dictionary = mob.stats()
+		core.give_exp(int(paid["exp"]), mob.id, events)
+		var roll: Dictionary = paid["drop"]
+		if drop_roll(mob.id) < float(roll["chance"]):
+			events.append(GameEvent.new(GameEvent.MOB_DROPPED, core.tick, {"scene": scene_id, "mob_id": mob.id, "item_id": roll["item"], "position": mob.position}))
+			core.give_item({"reward_id": "%s_drop_%d" % [String(enc.id), mob.id], "kind": "item", "item": roll["item"], "name": String(roll["item"]).capitalize(), "quantity": 1}, enc.id, events)
+		if mob.stats().has("summon"):
+			_despawn_summons(enc, mob)
+		return
 	mob.killed = true
 	if mob.stats().has("summon"):  # the caster fell: its moths (and their orbs) go with it
 		for moth: Mob in enc.mobs:
@@ -736,7 +801,7 @@ func _chase(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, events: 
 	var to_hero: Vector2 = player.position - mob.position
 	var dist: float = to_hero.length()
 	mob.facing = _toward(mob.position, player.position, mob.facing)
-	if mob.cooldown <= 0 and attackers < Tuning.MOB_MAX_ATTACKERS and not (bool(mob.stats().get("solo_attack", false)) and _type_attacking(enc, mob)):
+	if mob.cooldown <= 0 and attackers < enc.max_attackers and not (bool(mob.stats().get("solo_attack", false)) and _type_attacking(enc, mob)):
 		var chosen: Dictionary = _pick_attack(core, enc, mob, dist)
 		if not chosen.is_empty():
 			mob.current_attack = chosen if not mob.attacks().is_empty() else {}
@@ -744,7 +809,7 @@ func _chase(core: RefCounted, enc: Encounter, mob: Mob, attackers: int, events: 
 			return
 	var stats: Dictionary = mob.stats()
 	var hold: float = float(stats["hold"])
-	if attackers >= Tuning.MOB_MAX_ATTACKERS:
+	if attackers >= enc.max_attackers:
 		hold = maxf(hold, float(stats["wait"]))
 	if dist > hold:
 		_move(core, mob, to_hero / dist, float(stats["speed"]))

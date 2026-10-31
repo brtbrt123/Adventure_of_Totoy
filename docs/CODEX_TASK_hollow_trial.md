@@ -33,7 +33,7 @@ Guide: **`docs/previews/hollow_trial_v1/walkable_guide.png`** (2x) and the numbe
 6. **Sound**: altar activate, entry roots close/open, spawn warning, wave start (low horn or drum), wave clear chime, trial complete, trial failed, chest open (exists: `chest_open.wav`). Warnings stay louder than everything else; credits honest as always.
 7. **Tests and captures**: smoke test that every frame and effect key used exists; real-renderer captures (no fixtures once the core exists) of: the empty room, the altar dark and lit, a spawn warning, a wave in progress with a Warden, the wave banner, the win, the open chest and reward card. Full harness at the end.
 
-## Interface (Claude builds these; build against the names, ask if anything is missing)
+## Interface (built by Claude on 2026-10-31: `core/trial.gd`, contract in `docs/architecture.md` "Trial rooms"; ask if anything is missing)
 
 - Objects in the scene data: `altar` (kind `altar`, stand (256, 204)) and `trial_chest` (kind `chest`, stand (256, 154)); interactions as today (`interact_target`, `interact_kind`).
 - Snapshot `trial`: `{state: idle | starting | wave | between | won | failed, wave (1-3), waves 3, alive (mobs left in the wave), next_tick (when the next wave or spawn comes), sealed (entry closed)}`.

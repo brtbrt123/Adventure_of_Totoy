@@ -14,7 +14,8 @@ extends RefCounted
 ##   forest_layered    north exit behind the root gate    -> root_hollow_layered "forest_side"   (gate closed = solid)
 ##   root_hollow_layered west exit                        -> forest_layered   "north"
 ##   root_hollow_layered east exit                        -> glade_layered    "entrance"
-##   root_hollow_layered north shortcut (once the hollow is cleared) -> village_layered "return"
+##   root_hollow_layered north shortcut (once the hollow is cleared) -> hollow_trial_layered "south"
+##   hollow_trial_layered bottom exit (shut while a trial wave lives) -> root_hollow_layered "shortcut"   (a dead end: the trial room)
 ##   glade_layered     bottom-left entrance               -> root_hollow_layered "glade_side"
 ##   glade_layered     root arch                          -> arena            "start"      (the Colossus fight)
 ##   arena             no exits (the fight's victory screen returns to the title)
@@ -36,15 +37,17 @@ const VILLAGE_LAYERED: StringName = &"village_layered"
 const FOREST_LAYERED: StringName = &"forest_layered"
 const WOODLAND_LAYERED: StringName = &"woodland_layered"
 const ROOT_HOLLOW_LAYERED: StringName = &"root_hollow_layered"
-const LAYERED: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, GLADE_LAYERED]
+const HOLLOW_TRIAL_LAYERED: StringName = &"hollow_trial_layered"
+const LAYERED: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, HOLLOW_TRIAL_LAYERED, GLADE_LAYERED]
 ## Every scene the game knows, in route order (the layered chapter, then the arena).
-const ALL: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, GLADE_LAYERED, ARENA]
+const ALL: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, HOLLOW_TRIAL_LAYERED, GLADE_LAYERED, ARENA]
 const LAYERED_PATHS: Dictionary = {
 	GLADE_LAYERED: "res://data/scenes/glade_layered_props.json",
 	VILLAGE_LAYERED: "res://data/scenes/village_layered_props.json",
 	FOREST_LAYERED: "res://data/scenes/forest_layered_props.json",
 	WOODLAND_LAYERED: "res://data/scenes/woodland_layered_props.json",
 	ROOT_HOLLOW_LAYERED: "res://data/scenes/root_hollow_layered_props.json",
+	HOLLOW_TRIAL_LAYERED: "res://data/scenes/hollow_trial_layered_props.json",
 }
 
 ## Where a new game starts.
@@ -109,11 +112,11 @@ static func layered_data(scene_id: StringName) -> Dictionary:
 
 
 ## The solid colliders of a scene: a layered scene builds the types its stateful props show for `gate_open`, the `lit`
-## switch ids and the story `flags`, plus a small circle on every NPC (drawn as sprites); the arena its layout's.
-static func build_obstacles(scene_id: StringName, gate_open: bool = false, lit: Array = [], flags: Array = []) -> Array[Obstacle]:
+## switch ids, the story `flags` and the `trial` tags (core/trial.gd: "sealed"), plus a small circle on every NPC (drawn as sprites); the arena its layout's.
+static func build_obstacles(scene_id: StringName, gate_open: bool = false, lit: Array = [], flags: Array = [], trial: Array = []) -> Array[Obstacle]:
 	var list: Array[Obstacle] = []
 	if scene_id in LAYERED:
-		list = PropScene.build(layered_data(scene_id), PropScene.load_defs(), {"gate_open": gate_open, "lit": lit, "flags": flags})
+		list = PropScene.build(layered_data(scene_id), PropScene.load_defs(), {"gate_open": gate_open, "lit": lit, "flags": flags, "trial": trial})
 		for npc: Dictionary in get_def(scene_id)["npcs"]:
 			SceneBounds.add(list, npc["position"], NPC_RADIUS, npc["position"])
 		return list

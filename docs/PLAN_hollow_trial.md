@@ -58,3 +58,7 @@ Note: this room should be built as a map **scene** (`presentation/maps/*.tscn` +
 ## Layout fixed (2026-10-31)
 
 Scene `hollow_trial_layered`, 512x352, entered from Root Hollow's upper-left exit at its bottom edge (x 228-284), dead end. Altar at (256, 180), chest at (256, 136), fight floor [112, 92, 288x184], twelve spawn points on the rim (all at least 109 px from the entry and 122 px from the altar, 57 px apart). Exact numbers: `docs/previews/hollow_trial_v1/layout.json`, guide `walkable_guide.png`. Codex's art and presentation task: `docs/CODEX_TASK_hollow_trial.md`.
+
+## Core built (2026-10-31, Claude)
+
+`core/trial.gd` + a managed encounter in `core/mob_field.gd` + ExploreCore hooks; the room `hollow_trial_layered` is registered with stand-in props (forest pedestal as the altar, forest chest, rune stones, rim trees, the root knot at the entry); Root Hollow's upper-left exit now leads here (the village's `return` entry stays: the Woodland uses it). Tests: `tests/core/test_hollow_trial.gd` (10). Still open: the ground painting and real props (Codex), the chest's Aspect (owner; a 3-herb placeholder for now), the presentation wiring (Codex), the feel and numbers (owner, by play).

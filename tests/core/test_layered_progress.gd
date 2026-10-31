@@ -14,9 +14,10 @@ const GROUNDS: Dictionary = {
 	&"forest_layered": "res://presentation/forest/forest_layered_ground.png",
 	&"woodland_layered": "res://presentation/forest/woodland_approach_ground.png",
 	&"root_hollow_layered": "res://presentation/forest/root_hollow_layered_ground.png",
+	&"hollow_trial_layered": "res://presentation/forest/hollow_trial_layered_ground.png",
 }
 ## Scenes whose converted ground Codex has not delivered yet (only the path is checked until then).
-const PENDING_GROUNDS: Array[StringName] = [&"forest_layered"]
+const PENDING_GROUNDS: Array[StringName] = [&"forest_layered", &"hollow_trial_layered"]  # the trial room: Codex paints it (docs/CODEX_TASK_hollow_trial.md)
 
 
 func test_the_runtime_grounds_are_in_presentation_and_fit_the_scene() -> void:

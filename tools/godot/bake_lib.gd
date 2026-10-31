@@ -204,7 +204,7 @@ static func bake_map(root: Node2D) -> Dictionary:
 	out["name"] = root.get_meta("title", "")
 	out["size"] = root.get_meta("size", [0, 0])
 	var ground: Sprite2D = root.get_node("Ground")
-	out["ground"] = ground.texture.resource_path
+	out["ground"] = ground.texture.resource_path if ground.texture != null else str(ground.get_meta("ground", ""))
 	var outline: Array = []
 	for point: Vector2 in (root.get_node("Walkable") as Polygon2D).polygon:
 		outline.append(coords(point))
@@ -255,6 +255,8 @@ static func bake_map(root: Node2D) -> Dictionary:
 		var encounters: Array = []
 		for node: Node in _children(root, "Encounters"):
 			var row: Dictionary = {"id": str(node.name), "name": node.get_meta("title", ""), "rect": rect_of(node.get_node("Zone"), root), "leash": node.get_meta("leash", 0)}
+			if node.has_meta("managed"):
+				row["managed"] = node.get_meta("managed")
 			if node.has_meta("reward"):
 				row["reward"] = node.get_meta("reward")
 			var mobs: Array = []
@@ -265,6 +267,8 @@ static func bake_map(root: Node2D) -> Dictionary:
 			row["mobs"] = mobs
 			encounters.append(row)
 		out["encounters"] = encounters
+	if root.has_meta("trial"):
+		out["trial"] = root.get_meta("trial")
 	var props: Array = []
 	for node: Node in _children(root, "Props"):
 		var prop: Node2D = node

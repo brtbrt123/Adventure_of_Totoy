@@ -1,0 +1,547 @@
+{
+ "version": 1,
+ "scene": "hollow_trial_layered",
+ "name": "THE HOLLOW TRIAL",
+ "size": [
+  512,
+  352
+ ],
+ "ground": "res://presentation/forest/hollow_trial_layered_ground.png",
+ "outline": [
+  [
+   228,
+   352
+  ],
+  [
+   200,
+   332
+  ],
+  [
+   150,
+   318
+  ],
+  [
+   96,
+   296
+  ],
+  [
+   60,
+   262
+  ],
+  [
+   40,
+   216
+  ],
+  [
+   36,
+   168
+  ],
+  [
+   46,
+   122
+  ],
+  [
+   72,
+   86
+  ],
+  [
+   112,
+   58
+  ],
+  [
+   160,
+   40
+  ],
+  [
+   212,
+   32
+  ],
+  [
+   256,
+   30
+  ],
+  [
+   300,
+   32
+  ],
+  [
+   352,
+   40
+  ],
+  [
+   400,
+   58
+  ],
+  [
+   440,
+   86
+  ],
+  [
+   466,
+   122
+  ],
+  [
+   476,
+   168
+  ],
+  [
+   472,
+   216
+  ],
+  [
+   452,
+   262
+  ],
+  [
+   416,
+   296
+  ],
+  [
+   362,
+   318
+  ],
+  [
+   312,
+   332
+  ],
+  [
+   284,
+   352
+  ]
+ ],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "prop_margin": 40,
+ "entries": {
+  "south": [
+   256,
+   328
+  ]
+ },
+ "default_entry": "south",
+ "exits": [
+  {
+   "id": "to_hollow",
+   "rect": [
+    228,
+    345,
+    56,
+    7
+   ],
+   "target_scene": "root_hollow_layered",
+   "target_entry": "shortcut"
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "hollow_trial_layered_entry",
+   "position": [
+    256,
+    312
+   ]
+  }
+ ],
+ "npcs": [],
+ "objects": [
+  {
+   "id": "altar",
+   "kind": "altar",
+   "position": [
+    256,
+    180
+   ],
+   "stand": [
+    256,
+    204
+   ]
+  },
+  {
+   "id": "trial_chest",
+   "kind": "chest",
+   "position": [
+    256,
+    136
+   ],
+   "stand": [
+    256,
+    154
+   ]
+  }
+ ],
+ "encounters": [
+  {
+   "id": "hollow_trial",
+   "name": "THE HOLLOW TRIAL",
+   "rect": [
+    112,
+    92,
+    288,
+    184
+   ],
+   "leash": 999,
+   "managed": true,
+   "mobs": []
+  }
+ ],
+ "trial": {
+  "altar": "altar",
+  "chest": "trial_chest",
+  "encounter": "hollow_trial",
+  "flag": "cleared_hollow_trial",
+  "chest_flag": "trial_chest_opened",
+  "start_ticks": 90,
+  "warn_ticks": 36,
+  "between_ticks": 180,
+  "max_attackers": 4,
+  "spawn_points": [
+   [
+    86,
+    180
+   ],
+   [
+    100,
+    124
+   ],
+   [
+    150,
+    84
+   ],
+   [
+    210,
+    66
+   ],
+   [
+    302,
+    66
+   ],
+   [
+    362,
+    84
+   ],
+   [
+    412,
+    124
+   ],
+   [
+    426,
+    180
+   ],
+   [
+    404,
+    238
+   ],
+   [
+    352,
+    276
+   ],
+   [
+    160,
+    276
+   ],
+   [
+    108,
+    238
+   ]
+  ],
+  "spawn_clearance": 48,
+  "waves": [
+   {
+    "groups": [
+     {
+      "after": 0,
+      "mobs": [
+       "mossling",
+       "mossling",
+       "mossling",
+       "mossling",
+       "boar"
+      ]
+     }
+    ]
+   },
+   {
+    "groups": [
+     {
+      "after": 0,
+      "mobs": [
+       "warden",
+       "boar",
+       "boar",
+       "mossling",
+       "mossling",
+       "mossling"
+      ]
+     },
+     {
+      "after": 600,
+      "mobs": [
+       "mossling",
+       "mossling"
+      ]
+     }
+    ]
+   },
+   {
+    "groups": [
+     {
+      "after": 0,
+      "mobs": [
+       "warden",
+       "boar",
+       "boar",
+       "mossling",
+       "mossling"
+      ]
+     },
+     {
+      "after": 480,
+      "mobs": [
+       "warden",
+       "boar",
+       "mossling",
+       "mossling"
+      ]
+     }
+    ]
+   }
+  ],
+  "reward": {
+   "reward_id": "hollow_trial_chest",
+   "kind": "item",
+   "item": "herb",
+   "name": "Herb",
+   "quantity": 3,
+   "note": "placeholder: the owner picks the Aspect this chest gives"
+  },
+  "sealed_text": "The roots hold the way shut until the trial ends."
+ },
+ "props": [
+  {
+   "id": "trial_altar",
+   "type": "forest_pedestal",
+   "x": 256,
+   "y": 180,
+   "flip": false,
+   "shadow_radius": 9,
+   "when": "flag:cleared_hollow_trial",
+   "on_type": "forest_pedestal_lit"
+  },
+  {
+   "id": "trial_chest",
+   "type": "forest_chest",
+   "x": 256,
+   "y": 136,
+   "flip": false,
+   "shadow_radius": 10
+  },
+  {
+   "id": "entry_roots",
+   "type": "root_hollow_barrier_open",
+   "x": 256,
+   "y": 350,
+   "flip": false,
+   "when": "trial:sealed",
+   "on_type": "root_hollow_barrier_closed"
+  },
+  {
+   "id": "rune_rock_1",
+   "type": "root_hollow_rune_stones",
+   "x": 70,
+   "y": 140,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rune_rock_2",
+   "type": "glade_stone_1",
+   "x": 96,
+   "y": 98,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rune_rock_3",
+   "type": "glade_stone_2",
+   "x": 430,
+   "y": 98,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rune_rock_4",
+   "type": "glade_stone_3",
+   "x": 446,
+   "y": 150,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rune_rock_5",
+   "type": "glade_stone_4",
+   "x": 80,
+   "y": 236,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rune_rock_6",
+   "type": "glade_stone_5",
+   "x": 436,
+   "y": 240,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rune_rock_7",
+   "type": "root_hollow_rune_stones",
+   "x": 180,
+   "y": 50,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rune_rock_8",
+   "type": "glade_stone_1",
+   "x": 332,
+   "y": 50,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_tree_1",
+   "type": "root_hollow_tree_ancient",
+   "x": 24,
+   "y": 70,
+   "flip": false,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_tree_2",
+   "type": "root_hollow_tree_rootwall",
+   "x": 18,
+   "y": 230,
+   "flip": false,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_tree_3",
+   "type": "root_hollow_tree_ancient",
+   "x": 488,
+   "y": 66,
+   "flip": true,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_tree_4",
+   "type": "root_hollow_tree_rootwall",
+   "x": 494,
+   "y": 236,
+   "flip": true,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_tree_5",
+   "type": "woodland_tree_broad",
+   "x": 120,
+   "y": 24,
+   "flip": false,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_tree_6",
+   "type": "woodland_tree_slender",
+   "x": 392,
+   "y": 24,
+   "flip": true,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_tree_7",
+   "type": "root_hollow_tree_rootwall",
+   "x": 150,
+   "y": 336,
+   "flip": false,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_tree_8",
+   "type": "woodland_tree_broad",
+   "x": 362,
+   "y": 336,
+   "flip": true,
+   "shadow_radius": 22
+  },
+  {
+   "id": "rim_bush_1",
+   "type": "forest_bush_1",
+   "x": 62,
+   "y": 196,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_2",
+   "type": "forest_bush_2",
+   "x": 120,
+   "y": 70,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_3",
+   "type": "woodland_bush",
+   "x": 244,
+   "y": 40,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_4",
+   "type": "forest_bush_1",
+   "x": 392,
+   "y": 70,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_5",
+   "type": "forest_bush_2",
+   "x": 452,
+   "y": 196,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_6",
+   "type": "forest_fern_1",
+   "x": 120,
+   "y": 282,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_7",
+   "type": "forest_fern_2",
+   "x": 392,
+   "y": 282,
+   "flip": true,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_8",
+   "type": "glade_fern_1",
+   "x": 60,
+   "y": 110,
+   "flip": false,
+   "shadow_radius": 12
+  },
+  {
+   "id": "rim_bush_9",
+   "type": "glade_fern_2",
+   "x": 452,
+   "y": 110,
+   "flip": true,
+   "shadow_radius": 12
+  }
+ ]
+}

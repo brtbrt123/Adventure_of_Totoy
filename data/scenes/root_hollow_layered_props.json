@@ -302,10 +302,10 @@
     36,
     7
    ],
-   "target_scene": "village_layered",
-   "target_entry": "return",
+   "target_scene": "hollow_trial_layered",
+   "target_entry": "south",
    "requires_flag": "cleared_hollow_center",
-   "blocked_text": "A knot of roots seals the shortcut. Clear the hollow first."
+   "blocked_text": "A knot of roots seals the way north. Clear the hollow first."
   }
  ],
  "checkpoints": [

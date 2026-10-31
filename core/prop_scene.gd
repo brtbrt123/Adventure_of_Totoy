@@ -23,7 +23,7 @@ extends RefCounted
 ##      mobs [{type, x, y}]}] (the mobs of a scene, core/mob_field.gd), "prop_margin" (props may stand this far outside the
 ##      world: trees hanging over the edge), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
 ##
-##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>" | "flag:<story flag>",
+##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>" | "flag:<story flag>" | "trial:<tag>",
 ##     "on_type": "<type>"}. `states` = {"gate_open": bool, "lit": [switch ids], "flags": [story flags]} (ExploreCore owns it;
 ##     ExploreSnapshot exposes it; "flag:cleared_hollow_center" is how Root Hollow's root-knot barrier opens). The two types of a pair share w, h and anchor (tools/art/normalize_state_pairs.py; validate() checks
 ##     it), each has its own colliders: a closed root gate is solid across its doorway, the open one only at its trunks.
@@ -71,6 +71,9 @@ static func state_holds(when: String, states: Dictionary) -> bool:
 	if when.begins_with("flag:"):
 		var flags: Array = states.get("flags", [])
 		return flags.has(when.substr(5)) or flags.has(StringName(when.substr(5)))
+	if when.begins_with("trial:"):  # a tag of the scene's trial (core/trial.gd), e.g. "trial:sealed" while a wave lives
+		var tags: Array = states.get("trial", [])
+		return tags.has(when.substr(6)) or tags.has(StringName(when.substr(6)))
 	return false
 
 
@@ -182,6 +185,8 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 		"default_entry": StringName(str(scene.get("default_entry", ""))), "exits": exits, "checkpoints": checkpoints,
 		"npcs": npcs, "objects": objects}
 	result["encounters"] = scene.get("encounters", []).duplicate(true)  # raw rows: core/mob_field.gd reads them
+	if scene.has("trial"):  # a trial room (core/trial.gd): waves, spawn points, the altar, the chest and its reward
+		result["trial"] = scene["trial"].duplicate(true)
 	if scene.has("puzzle"):  # {"switches": [object ids]}: lighting them all opens the gate (ExploreCore)
 		var switches: Array[StringName] = []
 		for switch_id: Variant in scene["puzzle"].get("switches", []):
@@ -281,8 +286,8 @@ static func validate(scene: Dictionary, defs: Dictionary) -> PackedStringArray:
 static func _validate_state_row(id: String, row: Dictionary, types: Dictionary, scene: Dictionary) -> PackedStringArray:
 	var errors: PackedStringArray = PackedStringArray()
 	var when: String = str(row.get("when", ""))
-	if when != "gate_open" and not when.begins_with("lit:") and not when.begins_with("flag:"):
-		errors.append("prop %s: unknown state '%s' (gate_open, lit:<switch> or flag:<story flag>)" % [id, when])
+	if when != "gate_open" and not when.begins_with("lit:") and not when.begins_with("flag:") and not when.begins_with("trial:"):
+		errors.append("prop %s: unknown state '%s' (gate_open, lit:<switch>, flag:<story flag> or trial:<tag>)" % [id, when])
 	elif when.begins_with("lit:") and not scene.get("puzzle", {}).get("switches", []).has(when.substr(4)):
 		errors.append("prop %s: '%s' is not a puzzle switch of the scene" % [id, when.substr(4)])
 	var base: Dictionary = types.get(row.get("type", ""), {})

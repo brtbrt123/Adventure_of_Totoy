@@ -1,3 +1,7 @@
+## Hollow Trial core (2026-10-31, Claude)
+
+The trial room exists in the core: hollow_trial_layered (512x352, dead end behind Root Hollow's upper-left exit, which now leads here instead of the village), core/trial.gd (E at the altar seals the entry, three warned waves of Mossling, Boar and Warden with up to four attackers, win sets cleared_hollow_trial and lights the altar, the chest pays once, falling resets the try), managed encounters in core/mob_field.gd, prop state trial:sealed, ExploreSnapshot.trial and trial_* events (docs/architecture.md "Trial rooms"). Stand-in props until Codex's art; no ground painting yet (pending in the tests). Chest reward is a 3-herb placeholder until the owner picks the Aspect. Tests: test_hollow_trial.gd (10), core 564 pass, Python and the map round trip pass, 50 of 54 smokes headless (3 need a window). Not play-tested; numbers are first guesses.
+
 ## Thornback effects finished and the Glowmoth orb (2026-10-31, Claude, owner-approved crossing of the split)
 
 Fixed the flat-line slam warning (snapshot lacked the cone angle), made the Glowmoth orb a real projectile (core, events, snapshot, 8 tests), and finished the creature effects: slam shock, cracks and rubble reach the real 145 px edge, visible healing links and heal pulses, orb, trail and pop, moth reveal, readable moth bars, chant release frames. Core 554 pass, 51 of 54 smokes pass headless (3 need a window). Details: docs/CROSS_REVIEW_thornback_v3.md (Follow-up). Captures: docs/previews/thornback_v3_real/ (not committed). Look and feel are the owner's call.

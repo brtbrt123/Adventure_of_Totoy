@@ -2,7 +2,7 @@ extends "res://tests/test_case.gd"
 ## Root Hollow (data/scenes/root_hollow_layered_props.json, scene id SceneDefs.ROOT_HOLLOW_LAYERED): the chapter's map between the forest route and the
 ## Stag glade. Valid data, the route in and out, entries and checkpoints that are free and far from every mob, a broad central clearing and an
 ## optional shrine clearing that are mostly open ground, every mob on free reachable ground, the south loop and the shrine fork reachable, a walk
-## from the forest end to the glade end, and the village shortcut that stays shut until the hollow is cleared.
+## from the forest end to the glade end, and the way north to the Hollow Trial that stays shut until the hollow is cleared.
 
 const Obstacle := preload("res://core/obstacle.gd")
 const PropScene := preload("res://core/prop_scene.gd")
@@ -69,7 +69,7 @@ func test_the_route_runs_forest_hollow_glade_with_a_village_shortcut() -> void:
 		targets[exit["id"]] = "%s/%s" % [exit["target_scene"], exit["target_entry"]]
 	assert_eq(targets["to_forest"], "forest_layered/north")
 	assert_eq(targets["to_glade"], "glade_layered/entrance")
-	assert_eq(targets["shortcut"], "village_layered/return")
+	assert_eq(targets["shortcut"], "hollow_trial_layered/south")
 	for exit: Dictionary in _def["exits"]:
 		assert_true(SceneDefs.get_def(exit["target_scene"])["entries"].has(exit["target_entry"]), "%s has its entry" % exit["id"])
 
@@ -203,7 +203,7 @@ func test_walking_from_the_forest_end_to_the_glade_end() -> void:
 	assert_true(core.exiting and core.pending_exit["target_scene"] == SceneDefs.GLADE_LAYERED, "the hero walked out of the east end (unarmed: nothing woke)")
 
 
-func test_the_village_shortcut_opens_when_the_hollow_is_cleared() -> void:
+func test_the_way_to_the_trial_opens_when_the_hollow_is_cleared() -> void:
 	var core: ExploreCore = ExploreCore.new(SCENE, &"shortcut")
 	core.set_story_flags([&"received_first_sword"] as Array[StringName])
 	var rect: Rect2 = Rect2()
@@ -223,4 +223,4 @@ func test_the_village_shortcut_opens_when_the_hollow_is_cleared() -> void:
 	core.step(InputFrame.new())
 	core.player.position = rect.get_center()
 	core.step(InputFrame.new())
-	assert_true(core.exiting and core.pending_exit["target_scene"] == SceneDefs.VILLAGE_LAYERED, "open once cleared")
+	assert_true(core.exiting and core.pending_exit["target_scene"] == SceneDefs.HOLLOW_TRIAL_LAYERED, "open once cleared, into the trial room")

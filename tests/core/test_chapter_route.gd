@@ -32,7 +32,8 @@ func test_the_layered_exits_form_the_chapter_route() -> void:
 		[SceneDefs.FOREST_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED, &"forest_side"],
 		[SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.FOREST_LAYERED, &"north"],
 		[SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.GLADE_LAYERED, &"entrance"],
-		[SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.VILLAGE_LAYERED, &"return"],
+		[SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.HOLLOW_TRIAL_LAYERED, &"south"],
+		[SceneDefs.HOLLOW_TRIAL_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED, &"shortcut"],
 		[SceneDefs.GLADE_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED, &"glade_side"],
 		[SceneDefs.GLADE_LAYERED, SceneDefs.ARENA, &"start"],
 	]
