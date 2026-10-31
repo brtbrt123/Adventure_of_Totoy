@@ -6,6 +6,32 @@ const GameEvent := preload("res://core/game_event.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 static var attachments: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://presentation/explore/warden_attachments.json"))
+
+const RUNE_COLOUR: Vector3 = Vector3(0.48, 0.94, 0.86)  # the rune stones' teal (presentation/common/local_lights.json)
+const RUNE_CORE: Vector3 = Vector3(0.8, 1.0, 1.0)
+
+
+## Where the Warden's chest stone is in the world for the frame `key` (the attachment table is measured in the 48x48 design).
+static func chest_world(mob: Dictionary, key: String) -> Vector2:
+	var chest: Array = attachments.get(key, {"chest": [5, -18]})["chest"]
+	var left: bool = Vector2(mob["facing"]).x < 0.0
+	return Vector2(mob["position"]) + Vector2(float(chest[0]) * (-1.0 if left else 1.0), float(chest[1])) * 2.5
+
+
+## The moving rune lamps of the living Wardens, in the lighting shader's lamp format: a halo at the chest stone (like a rune stone's
+## socket) and a pool on the floor under it. Full while the rune guard is up, a dim ember while it is exposed (the guard-down cue stays).
+## [{point: Vector4, colour: Vector3, core: Vector3}]
+static func lamps(mobs: Array[Dictionary], keys: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for mob: Dictionary in mobs:
+		if mob["type"] != &"warden" or mob["state"] == &"dead":
+			continue
+		var guarded: bool = bool(mob.get("guarded", false))
+		var chest: Vector2 = chest_world(mob, String(keys.get(int(mob["id"]), "")))
+		var feet: Vector2 = mob["position"]
+		out.append({"point": Vector4(chest.x, chest.y, 48.0 if guarded else 20.0, 1.3 if guarded else 0.35), "colour": RUNE_COLOUR, "core": RUNE_CORE})
+		out.append({"point": Vector4(chest.x, feet.y + 3.0, 64.0 if guarded else 30.0, -(0.85 if guarded else 0.2)), "colour": RUNE_COLOUR, "core": RUNE_CORE})
+	return out
 var tells: Dictionary = {}
 var hits: Dictionary = {}
 var breaks: Dictionary = {}

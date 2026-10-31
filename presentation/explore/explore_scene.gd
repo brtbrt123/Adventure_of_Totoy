@@ -19,6 +19,9 @@ const CreatureEffects := preload("res://presentation/explore/creature_effects.gd
 const CreatureGlow := preload("res://presentation/explore/creature_glow.gd")
 var creature_effects: CreatureEffects = CreatureEffects.new()
 var creature_glow: CreatureGlow
+const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
+var _static_lamps: Dictionary = {}  # the props' lamp plan of the scene (EnvironmentLight.lamp_plan)
+var _moving_lamps: int = 0  # lamps added for moving mobs last snapshot
 const TrialArt := preload("res://presentation/explore/trial_scene_art.gd")
 const TrialFX := preload("res://presentation/explore/trial_scene_fx.gd")
 var trial_fx: TrialFX = TrialFX.new()
@@ -842,6 +845,7 @@ func drawables() -> Array[Dictionary]:
 func _draw() -> void:
 	if snapshot == null or colors.is_empty():
 		return
+	_sync_moving_lights()  # every drawn snapshot (stepped, paused or set by a capture) carries its moving lights
 	draw_set_transform(shake_offset())
 	draw_rect(Rect2(Vector2(-8, -8), snapshot.size + Vector2(16, 16)), colors["2"])
 	var ground: Texture2D = ground_texture(snapshot.scene_id)
@@ -1000,6 +1004,42 @@ func _refresh_props() -> void:
 
 func _update_lighting() -> void:
 	material = EnvironmentLight.make_material(snapshot.scene_id, snapshot.size, prop_placements) if lighting_enabled and EnvironmentLight.supports(snapshot.scene_id) else null
+	_static_lamps = EnvironmentLight.lamp_plan(prop_placements) if material != null else {}
+	_moving_lamps = 0
+	_sync_moving_lights()
+
+
+## Lights that move with mobs (the Warden's chest stone): the props' lamps plus one halo and one pool per living Warden, written into
+## the scene's lighting shader every snapshot. Nothing changes while no Warden is present.
+func _sync_moving_lights() -> void:
+	if not (material is ShaderMaterial) or _static_lamps.is_empty():
+		return
+	var keys: Dictionary = {}
+	for mob: Dictionary in snapshot.mobs:
+		if mob["type"] == &"warden":
+			keys[int(mob["id"])] = MobView.frame(mob, snapshot.telegraphs, snapshot.tick)
+	var moving: Array[Dictionary] = WardenEffects.lamps(snapshot.mobs, keys)
+	if moving.is_empty() and _moving_lamps == 0:
+		return
+	var points: PackedVector4Array = (_static_lamps["points"] as PackedVector4Array).duplicate()
+	var colours: PackedVector3Array = (_static_lamps["colours"] as PackedVector3Array).duplicate()
+	var cores: PackedVector3Array = (_static_lamps["core_colours"] as PackedVector3Array).duplicate()
+	var count: int = int(_static_lamps["count"])
+	for lamp: Dictionary in moving:
+		if count >= EnvironmentLight.MAX_LIGHTS:
+			break
+		points[count] = lamp["point"]
+		colours[count] = lamp["colour"]
+		cores[count] = lamp["core"]
+		count += 1
+	var shader: ShaderMaterial = material
+	shader.set_shader_parameter("lamps", points)
+	shader.set_shader_parameter("lamp_colours", colours)
+	shader.set_shader_parameter("lamp_core_colours", cores)
+	shader.set_shader_parameter("lamp_count", count)
+	if not moving.is_empty():
+		shader.set_shader_parameter("mixed_lights", true)  # per-lamp colours, so the teal rune light keeps its colour in any scene
+	_moving_lamps = moving.size()
 
 
 ## The placeholder speech bubble "..." (cream, ink edge, a tail) with its bottom centre at `tip`.
