@@ -1,0 +1,451 @@
+[gd_scene load_steps=31 format=3]
+
+[ext_resource type="Script" path="res://presentation/maps/hollow_trial_view.gd" id="view"]
+
+[ext_resource type="Texture2D" path="res://presentation/forest/hollow_trial_layered_ground.png" id="ground"]
+
+[ext_resource type="Script" path="res://presentation/maps/hollow_trial_floor.gd" id="floor"]
+
+[ext_resource type="Script" path="res://presentation/maps/hollow_trial_overlay.gd" id="overlay"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_altar_dark.tscn" id="hollow_trial_altar_dark"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_altar_lit.tscn" id="hollow_trial_altar_lit"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_1.tscn" id="hollow_trial_bush_1"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_2.tscn" id="hollow_trial_bush_2"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_3.tscn" id="hollow_trial_bush_3"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_4.tscn" id="hollow_trial_bush_4"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_chest_closed.tscn" id="hollow_trial_chest_closed"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_chest_open.tscn" id="hollow_trial_chest_open"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_fern_1.tscn" id="hollow_trial_fern_1"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_fern_2.tscn" id="hollow_trial_fern_2"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_roots_1.tscn" id="hollow_trial_roots_1"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_roots_2.tscn" id="hollow_trial_roots_2"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_1.tscn" id="hollow_trial_rune_rock_1"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_2.tscn" id="hollow_trial_rune_rock_2"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_3.tscn" id="hollow_trial_rune_rock_3"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_4.tscn" id="hollow_trial_rune_rock_4"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_5.tscn" id="hollow_trial_rune_rock_5"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_6.tscn" id="hollow_trial_rune_rock_6"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_tree_1.tscn" id="hollow_trial_tree_1"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_tree_1_small.tscn" id="hollow_trial_tree_1_small"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_tree_2.tscn" id="hollow_trial_tree_2"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_tree_2_small.tscn" id="hollow_trial_tree_2_small"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_barrier_closed.tscn" id="root_hollow_barrier_closed"]
+
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_barrier_open.tscn" id="root_hollow_barrier_open"]
+
+[sub_resource type="RectangleShape2D" id="ExitRect"]
+
+size = Vector2(56, 7)
+
+[sub_resource type="RectangleShape2D" id="FightRect"]
+
+size = Vector2(288, 184)
+
+[node name="hollow_trial_layered" type="Node2D"]
+
+texture_filter = 1
+
+script = ExtResource("view")
+
+metadata/version = 1
+
+metadata/title = "THE HOLLOW TRIAL"
+
+metadata/size = [512, 352]
+
+metadata/boundary_radius = 25
+
+metadata/boundary_spacing = 17
+
+metadata/default_entry = "south"
+
+metadata/prop_margin = 40
+
+metadata/trial = {"altar": "altar", "chest": "altar", "encounter": "hollow_trial", "flag": "cleared_hollow_trial", "chest_flag": "trial_chest_opened", "start_ticks": 90, "warn_ticks": 36, "between_ticks": 180, "max_attackers": 4, "spawn_points": [[86, 180], [100, 124], [150, 84], [210, 66], [302, 66], [362, 84], [412, 124], [426, 180], [404, 238], [352, 276], [160, 276], [108, 238]], "spawn_clearance": 48, "waves": [{"groups": [{"after": 0, "mobs": ["mossling", "mossling", "mossling", "mossling", "boar"]}]}, {"groups": [{"after": 0, "mobs": ["warden", "boar", "boar", "mossling", "mossling", "mossling"]}, {"after": 600, "mobs": ["mossling", "mossling"]}]}, {"groups": [{"after": 0, "mobs": ["warden", "boar", "boar", "mossling", "mossling"]}, {"after": 480, "mobs": ["warden", "boar", "mossling", "mossling"]}]}], "reward": {"reward_id": "hollow_trial_chest", "kind": "item", "item": "herb", "name": "Herb", "quantity": 3, "note": "placeholder: the owner picks the Aspect this chest gives"}, "sealed_text": "The roots hold the way shut until the trial ends."}
+
+metadata/registration_pending = true
+
+[node name="Ground" type="Sprite2D" parent="."]
+
+texture_filter = 1
+
+texture = ExtResource("ground")
+
+centered = false
+
+[node name="FloorEffects" type="Node2D" parent="."]
+
+script = ExtResource("floor")
+
+[node name="Props" type="Node2D" parent="."]
+
+y_sort_enabled = true
+
+[node name="trial_altar" parent="Props" instance=ExtResource("hollow_trial_altar_dark")]
+
+position = Vector2(256, 180)
+
+metadata/flip = false
+
+metadata/when = "flag:cleared_hollow_trial"
+
+metadata/on_type = "hollow_trial_altar_lit"
+
+[node name="trial_chest" parent="Props" instance=ExtResource("hollow_trial_chest_closed")]
+
+position = Vector2(256, 136)
+
+metadata/flip = false
+
+metadata/when = "flag:trial_chest_opened"
+
+metadata/on_type = "hollow_trial_chest_open"
+
+[node name="entry_roots" parent="Props" instance=ExtResource("root_hollow_barrier_open")]
+
+position = Vector2(256, 350)
+
+metadata/flip = false
+
+metadata/when = "trial:sealed"
+
+metadata/on_type = "root_hollow_barrier_closed"
+
+[node name="rune_rock_1" parent="Props" instance=ExtResource("hollow_trial_rune_rock_1")]
+
+position = Vector2(70, 140)
+
+metadata/flip = false
+
+[node name="rune_rock_2" parent="Props" instance=ExtResource("hollow_trial_rune_rock_2")]
+
+position = Vector2(96, 98)
+
+metadata/flip = false
+
+[node name="rune_rock_3" parent="Props" instance=ExtResource("hollow_trial_rune_rock_3")]
+
+position = Vector2(430, 98)
+
+metadata/flip = true
+
+[node name="rune_rock_4" parent="Props" instance=ExtResource("hollow_trial_rune_rock_4")]
+
+position = Vector2(446, 150)
+
+metadata/flip = true
+
+[node name="rune_rock_5" parent="Props" instance=ExtResource("hollow_trial_rune_rock_5")]
+
+position = Vector2(80, 236)
+
+metadata/flip = false
+
+[node name="rune_rock_6" parent="Props" instance=ExtResource("hollow_trial_rune_rock_6")]
+
+position = Vector2(436, 240)
+
+metadata/flip = true
+
+[node name="rune_rock_7" parent="Props" instance=ExtResource("hollow_trial_rune_rock_1")]
+
+position = Vector2(180, 50)
+
+metadata/flip = false
+
+[node name="rune_rock_8" parent="Props" instance=ExtResource("hollow_trial_rune_rock_2")]
+
+position = Vector2(332, 50)
+
+metadata/flip = true
+
+[node name="rim_tree_1" parent="Props" instance=ExtResource("hollow_trial_tree_1")]
+
+position = Vector2(24, 70)
+
+metadata/flip = false
+
+[node name="rim_tree_2" parent="Props" instance=ExtResource("hollow_trial_tree_2")]
+
+position = Vector2(18, 230)
+
+metadata/flip = false
+
+[node name="rim_tree_3" parent="Props" instance=ExtResource("hollow_trial_tree_1")]
+
+position = Vector2(488, 66)
+
+metadata/flip = true
+
+[node name="rim_tree_4" parent="Props" instance=ExtResource("hollow_trial_tree_2")]
+
+position = Vector2(494, 236)
+
+metadata/flip = true
+
+[node name="rim_tree_5" parent="Props" instance=ExtResource("hollow_trial_tree_1")]
+
+position = Vector2(120, 24)
+
+metadata/flip = false
+
+[node name="rim_tree_6" parent="Props" instance=ExtResource("hollow_trial_tree_2")]
+
+position = Vector2(392, 24)
+
+metadata/flip = true
+
+[node name="rim_tree_7" parent="Props" instance=ExtResource("hollow_trial_tree_1_small")]
+
+position = Vector2(150, 336)
+
+metadata/flip = false
+
+[node name="rim_tree_8" parent="Props" instance=ExtResource("hollow_trial_tree_2_small")]
+
+position = Vector2(362, 336)
+
+metadata/flip = true
+
+[node name="rim_bush_1" parent="Props" instance=ExtResource("hollow_trial_bush_1")]
+
+position = Vector2(62, 196)
+
+metadata/flip = false
+
+[node name="rim_bush_2" parent="Props" instance=ExtResource("hollow_trial_bush_2")]
+
+position = Vector2(120, 70)
+
+metadata/flip = false
+
+[node name="rim_bush_3" parent="Props" instance=ExtResource("hollow_trial_bush_3")]
+
+position = Vector2(244, 40)
+
+metadata/flip = false
+
+[node name="rim_bush_4" parent="Props" instance=ExtResource("hollow_trial_bush_4")]
+
+position = Vector2(392, 70)
+
+metadata/flip = true
+
+[node name="rim_bush_5" parent="Props" instance=ExtResource("hollow_trial_bush_1")]
+
+position = Vector2(452, 196)
+
+metadata/flip = true
+
+[node name="rim_fern_1" parent="Props" instance=ExtResource("hollow_trial_fern_1")]
+
+position = Vector2(120, 312)
+
+metadata/flip = false
+
+[node name="rim_fern_2" parent="Props" instance=ExtResource("hollow_trial_fern_2")]
+
+position = Vector2(392, 312)
+
+metadata/flip = true
+
+[node name="rim_fern_3" parent="Props" instance=ExtResource("hollow_trial_fern_1")]
+
+position = Vector2(60, 110)
+
+metadata/flip = false
+
+[node name="rim_fern_4" parent="Props" instance=ExtResource("hollow_trial_fern_2")]
+
+position = Vector2(452, 110)
+
+metadata/flip = true
+
+[node name="rim_roots_1" parent="Props" instance=ExtResource("hollow_trial_roots_1")]
+
+position = Vector2(88, 272)
+
+metadata/flip = false
+
+[node name="rim_roots_2" parent="Props" instance=ExtResource("hollow_trial_roots_2")]
+
+position = Vector2(428, 272)
+
+metadata/flip = true
+
+[node name="rim_roots_3" parent="Props" instance=ExtResource("hollow_trial_roots_1")]
+
+position = Vector2(160, 42)
+
+metadata/flip = false
+
+[node name="rim_roots_4" parent="Props" instance=ExtResource("hollow_trial_roots_2")]
+
+position = Vector2(352, 42)
+
+metadata/flip = true
+
+[node name="Overlay" type="Node2D" parent="."]
+
+script = ExtResource("overlay")
+
+[node name="Walkable" type="Polygon2D" parent="."]
+
+visible = false
+
+polygon = PackedVector2Array(216, 352, 213, 331, 208, 322, 175, 306, 148, 302, 117, 284, 101, 283, 75, 252, 63, 245, 50, 194, 44, 183, 46, 160, 59, 118, 93, 76, 111, 64, 125, 64, 165, 39, 177, 42, 244, 25, 288, 27, 329, 41, 340, 38, 392, 63, 399, 70, 414, 71, 430, 85, 456, 121, 466, 153, 468, 175, 456, 229, 436, 256, 426, 262, 415, 278, 401, 281, 360, 302, 344, 307, 334, 306, 314, 315, 302, 324, 293, 352)
+
+[node name="Entries" type="Node2D" parent="."]
+
+[node name="south" type="Marker2D" parent="Entries"]
+
+position = Vector2(256, 328)
+
+[node name="Checkpoints" type="Node2D" parent="."]
+
+[node name="hollow_trial_layered_entry" type="Marker2D" parent="Checkpoints"]
+
+position = Vector2(256, 312)
+
+[node name="Exits" type="Node2D" parent="."]
+
+[node name="to_hollow" type="Area2D" parent="Exits"]
+
+position = Vector2(228, 345)
+
+collision_layer = 0
+
+collision_mask = 0
+
+metadata/target_scene = "root_hollow_layered"
+
+metadata/target_entry = "shortcut"
+
+[node name="Rect" type="CollisionShape2D" parent="Exits/to_hollow"]
+
+position = Vector2(28, 3.5)
+
+shape = SubResource("ExitRect")
+
+[node name="Npcs" type="Node2D" parent="."]
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="altar" type="Marker2D" parent="Objects"]
+
+position = Vector2(256, 180)
+
+metadata/kind = "altar"
+
+[node name="Stand" type="Marker2D" parent="Objects/altar"]
+
+position = Vector2(0, 24)
+
+[node name="trial_chest" type="Marker2D" parent="Objects"]
+
+position = Vector2(256, 136)
+
+metadata/kind = "chest"
+
+[node name="Stand" type="Marker2D" parent="Objects/trial_chest"]
+
+position = Vector2(0, 18)
+
+[node name="Encounters" type="Node2D" parent="."]
+
+[node name="hollow_trial" type="Node2D" parent="Encounters"]
+
+metadata/title = "THE HOLLOW TRIAL"
+
+metadata/leash = 999
+
+metadata/managed = true
+
+[node name="Zone" type="Area2D" parent="Encounters/hollow_trial"]
+
+collision_layer = 0
+
+collision_mask = 0
+
+[node name="Rect" type="CollisionShape2D" parent="Encounters/hollow_trial/Zone"]
+
+position = Vector2(256, 184)
+
+shape = SubResource("FightRect")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="Spawn1" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(86, 180)
+
+[node name="Spawn2" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(100, 124)
+
+[node name="Spawn3" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(150, 84)
+
+[node name="Spawn4" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(210, 66)
+
+[node name="Spawn5" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(302, 66)
+
+[node name="Spawn6" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(362, 84)
+
+[node name="Spawn7" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(412, 124)
+
+[node name="Spawn8" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(426, 180)
+
+[node name="Spawn9" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(404, 238)
+
+[node name="Spawn10" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(352, 276)
+
+[node name="Spawn11" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(160, 276)
+
+[node name="Spawn12" type="Marker2D" parent="SpawnPoints"]
+
+position = Vector2(108, 238)
+
+[node name="AuthoringCamera" type="Camera2D" parent="."]
+
+position = Vector2(256, 176)

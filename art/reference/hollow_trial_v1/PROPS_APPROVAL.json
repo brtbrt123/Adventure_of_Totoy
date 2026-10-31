@@ -1,0 +1,276 @@
+{
+  "approved": "2026-10-31",
+  "timezone": "Asia/Singapore",
+  "owner_message": "yes thats good start making the scene",
+  "scope": "20 original prop designs; small tree copies are layout-derived implementation variants for owner scene review",
+  "props": {
+    "hollow_trial_altar_dark": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/altar_dark.png",
+      "sha256": "fd5e8fbc34a4605ab2a0ae814eb3328832f1b3923b582d7173023211eb707feb",
+      "anchor": [
+        32,
+        48
+      ],
+      "size": [
+        64,
+        48
+      ]
+    },
+    "hollow_trial_altar_lit": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/altar_lit.png",
+      "sha256": "49022a85199def7605a7bce69b642957c1c8dde2640031de58bddca68f3c0306",
+      "anchor": [
+        32,
+        48
+      ],
+      "size": [
+        64,
+        48
+      ]
+    },
+    "hollow_trial_chest_closed": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_closed.png",
+      "sha256": "d6a58750aa96611bc141d76a63c49f6c88725fa9ef06ace0569a6ff40cfefb05",
+      "anchor": [
+        20,
+        40
+      ],
+      "size": [
+        40,
+        40
+      ]
+    },
+    "hollow_trial_chest_open": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_open.png",
+      "sha256": "71255078b3e1d5efeb091195e77c4f3851b91718b642673d9c93b0ee7352f6d5",
+      "anchor": [
+        20,
+        40
+      ],
+      "size": [
+        40,
+        40
+      ]
+    },
+    "hollow_trial_rune_rock_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_1.png",
+      "sha256": "009dc2fe5dd9d3b72e1295e0d124b099ca38ee6253f54b51ff16ecfbc2eef597",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_rune_rock_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_2.png",
+      "sha256": "718421838037e474a0b0336aba1de645a4b5ff06c1f22849f4ff4f839f90813e",
+      "anchor": [
+        16,
+        40
+      ],
+      "size": [
+        32,
+        40
+      ]
+    },
+    "hollow_trial_rune_rock_3": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_3.png",
+      "sha256": "a7d1bfc019266f87e613230c448774ee88d4710232cd2f1492a1afb356ca2b72",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_rune_rock_4": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_4.png",
+      "sha256": "c3ddb5783e2bba906c9f91bc69a820b6e160345335a2e4223c05b2e3ef1cfebc",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_rune_rock_5": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_5.png",
+      "sha256": "686865aa044017e903417f552396f06a3fa2a7295e3f60194b743db0c884aa05",
+      "anchor": [
+        24,
+        40
+      ],
+      "size": [
+        48,
+        40
+      ]
+    },
+    "hollow_trial_rune_rock_6": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_6.png",
+      "sha256": "d3fe719bcd9d1555adf558a3df6a497022878f37889fdf1e7da1781694cec3c9",
+      "anchor": [
+        16,
+        32
+      ],
+      "size": [
+        32,
+        32
+      ]
+    },
+    "hollow_trial_bush_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_1.png",
+      "sha256": "0ffd324ac3239d5e8413f5077907d023b5e905ce903ff646032570f77d4f1b8e",
+      "anchor": [
+        24,
+        32
+      ],
+      "size": [
+        48,
+        32
+      ]
+    },
+    "hollow_trial_bush_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_2.png",
+      "sha256": "067da4affb9957d8e72d7e180a5092b440b582761074192cffc19445513b6035",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_bush_3": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_3.png",
+      "sha256": "5bc46d9d11d9403f6757fac9bd076049363c5984ff85af6ce0d3ca01e7fedcf4",
+      "anchor": [
+        24,
+        32
+      ],
+      "size": [
+        48,
+        32
+      ]
+    },
+    "hollow_trial_bush_4": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_4.png",
+      "sha256": "ffe9e77877b77781223870586eea95c55c89b067a7dbca7310ca477c82fb21bd",
+      "anchor": [
+        20,
+        24
+      ],
+      "size": [
+        40,
+        24
+      ]
+    },
+    "hollow_trial_roots_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/roots_1.png",
+      "sha256": "d882b443e92f0f84491f211b07e9df6ddcc1af9f47764c2efc1bc504b7cf540d",
+      "anchor": [
+        24,
+        24
+      ],
+      "size": [
+        48,
+        24
+      ]
+    },
+    "hollow_trial_roots_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/roots_2.png",
+      "sha256": "2289e749bfd3b215cdcbd98d4b4b9e6c7bdd228d72283b64dbb78377dbe1cd1b",
+      "anchor": [
+        24,
+        24
+      ],
+      "size": [
+        48,
+        24
+      ]
+    },
+    "hollow_trial_fern_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/fern_1.png",
+      "sha256": "127117f9249cadb9fff8794049ce109ddd53248ed2d3f360dbd6d67fd53bfc3f",
+      "anchor": [
+        12,
+        24
+      ],
+      "size": [
+        24,
+        24
+      ]
+    },
+    "hollow_trial_fern_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/fern_2.png",
+      "sha256": "0162271fabe298494056f19b41907cac6b5f723d507e60bb5da7dfccb1e0e420",
+      "anchor": [
+        12,
+        32
+      ],
+      "size": [
+        24,
+        32
+      ]
+    },
+    "hollow_trial_tree_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/tree_1.png",
+      "sha256": "8d6930d962c7c3f9d63d1af332edc9dbd0958711d0513edd89185ca796d9dcf9",
+      "anchor": [
+        52,
+        120
+      ],
+      "size": [
+        104,
+        120
+      ]
+    },
+    "hollow_trial_tree_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/tree_2.png",
+      "sha256": "ee01e9c0a628903766405c5b0944059845a4e48693606517e0ee092e3e3f3abd",
+      "anchor": [
+        60,
+        112
+      ],
+      "size": [
+        120,
+        112
+      ]
+    }
+  },
+  "derived_variants": {
+    "hollow_trial_tree_1_small": {
+      "source": "art/reference/hollow_trial_v1/scene_variants/tree_1_small.png",
+      "sha256": "2f2606fad5abc5deed331d851a4151e23cca589f1f3a8e3723fcbda35be4de06",
+      "anchor": [
+        24,
+        56
+      ],
+      "size": [
+        48,
+        56
+      ],
+      "method": "nearest-neighbour45% copy of approved tree to keep canopy outside fight floor"
+    },
+    "hollow_trial_tree_2_small": {
+      "source": "art/reference/hollow_trial_v1/scene_variants/tree_2_small.png",
+      "sha256": "082371a0a26cca724c3c96fdd1eee98c4242d0037187c15a674d8e0198e06e04",
+      "anchor": [
+        28,
+        56
+      ],
+      "size": [
+        56,
+        56
+      ],
+      "method": "nearest-neighbour45% copy of approved tree to keep canopy outside fight floor"
+    }
+  }
+}

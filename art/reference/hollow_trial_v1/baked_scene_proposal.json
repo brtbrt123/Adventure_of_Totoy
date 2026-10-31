@@ -1,0 +1,550 @@
+{
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "checkpoints": [
+  {
+   "id": "hollow_trial_layered_entry",
+   "position": [
+    256,
+    312
+   ]
+  }
+ ],
+ "default_entry": "south",
+ "encounters": [
+  {
+   "id": "hollow_trial",
+   "leash": 999,
+   "managed": true,
+   "mobs": [],
+   "name": "THE HOLLOW TRIAL",
+   "rect": [
+    112,
+    92,
+    288,
+    184
+   ]
+  }
+ ],
+ "entries": {
+  "south": [
+   256,
+   328
+  ]
+ },
+ "exits": [
+  {
+   "id": "to_hollow",
+   "rect": [
+    228,
+    345,
+    56,
+    7
+   ],
+   "target_entry": "shortcut",
+   "target_scene": "root_hollow_layered"
+  }
+ ],
+ "ground": "res://presentation/forest/hollow_trial_layered_ground.png",
+ "name": "THE HOLLOW TRIAL",
+ "npcs": [],
+ "objects": [
+  {
+   "id": "altar",
+   "kind": "altar",
+   "position": [
+    256,
+    180
+   ],
+   "stand": [
+    256,
+    204
+   ]
+  },
+  {
+   "id": "trial_chest",
+   "kind": "chest",
+   "position": [
+    256,
+    136
+   ],
+   "stand": [
+    256,
+    154
+   ]
+  }
+ ],
+ "outline": [
+  [
+   228,
+   352
+  ],
+  [
+   200,
+   332
+  ],
+  [
+   150,
+   318
+  ],
+  [
+   96,
+   296
+  ],
+  [
+   60,
+   262
+  ],
+  [
+   40,
+   216
+  ],
+  [
+   36,
+   168
+  ],
+  [
+   46,
+   122
+  ],
+  [
+   72,
+   86
+  ],
+  [
+   112,
+   58
+  ],
+  [
+   160,
+   40
+  ],
+  [
+   212,
+   32
+  ],
+  [
+   256,
+   30
+  ],
+  [
+   300,
+   32
+  ],
+  [
+   352,
+   40
+  ],
+  [
+   400,
+   58
+  ],
+  [
+   440,
+   86
+  ],
+  [
+   466,
+   122
+  ],
+  [
+   476,
+   168
+  ],
+  [
+   472,
+   216
+  ],
+  [
+   452,
+   262
+  ],
+  [
+   416,
+   296
+  ],
+  [
+   362,
+   318
+  ],
+  [
+   312,
+   332
+  ],
+  [
+   284,
+   352
+  ]
+ ],
+ "prop_margin": 40,
+ "props": [
+  {
+   "flip": false,
+   "id": "trial_altar",
+   "on_type": "hollow_trial_altar_lit",
+   "type": "hollow_trial_altar_dark",
+   "when": "flag:cleared_hollow_trial",
+   "x": 256,
+   "y": 180
+  },
+  {
+   "flip": false,
+   "id": "trial_chest",
+   "on_type": "hollow_trial_chest_open",
+   "type": "hollow_trial_chest_closed",
+   "when": "flag:trial_chest_opened",
+   "x": 256,
+   "y": 136
+  },
+  {
+   "flip": false,
+   "id": "entry_roots",
+   "on_type": "root_hollow_barrier_closed",
+   "type": "root_hollow_barrier_open",
+   "when": "trial:sealed",
+   "x": 256,
+   "y": 350
+  },
+  {
+   "flip": false,
+   "id": "rune_rock_1",
+   "type": "hollow_trial_rune_rock_1",
+   "x": 70,
+   "y": 140
+  },
+  {
+   "flip": false,
+   "id": "rune_rock_2",
+   "type": "hollow_trial_rune_rock_2",
+   "x": 96,
+   "y": 98
+  },
+  {
+   "flip": true,
+   "id": "rune_rock_3",
+   "type": "hollow_trial_rune_rock_3",
+   "x": 430,
+   "y": 98
+  },
+  {
+   "flip": true,
+   "id": "rune_rock_4",
+   "type": "hollow_trial_rune_rock_4",
+   "x": 446,
+   "y": 150
+  },
+  {
+   "flip": false,
+   "id": "rune_rock_5",
+   "type": "hollow_trial_rune_rock_5",
+   "x": 80,
+   "y": 236
+  },
+  {
+   "flip": true,
+   "id": "rune_rock_6",
+   "type": "hollow_trial_rune_rock_6",
+   "x": 436,
+   "y": 240
+  },
+  {
+   "flip": false,
+   "id": "rune_rock_7",
+   "type": "hollow_trial_rune_rock_1",
+   "x": 180,
+   "y": 50
+  },
+  {
+   "flip": true,
+   "id": "rune_rock_8",
+   "type": "hollow_trial_rune_rock_2",
+   "x": 332,
+   "y": 50
+  },
+  {
+   "flip": false,
+   "id": "rim_tree_1",
+   "type": "hollow_trial_tree_1",
+   "x": 24,
+   "y": 70
+  },
+  {
+   "flip": false,
+   "id": "rim_tree_2",
+   "type": "hollow_trial_tree_2",
+   "x": 18,
+   "y": 230
+  },
+  {
+   "flip": true,
+   "id": "rim_tree_3",
+   "type": "hollow_trial_tree_1",
+   "x": 488,
+   "y": 66
+  },
+  {
+   "flip": true,
+   "id": "rim_tree_4",
+   "type": "hollow_trial_tree_2",
+   "x": 494,
+   "y": 236
+  },
+  {
+   "flip": false,
+   "id": "rim_tree_5",
+   "type": "hollow_trial_tree_1",
+   "x": 120,
+   "y": 24
+  },
+  {
+   "flip": true,
+   "id": "rim_tree_6",
+   "type": "hollow_trial_tree_2",
+   "x": 392,
+   "y": 24
+  },
+  {
+   "flip": false,
+   "id": "rim_tree_7",
+   "type": "hollow_trial_tree_1_small",
+   "x": 150,
+   "y": 336
+  },
+  {
+   "flip": true,
+   "id": "rim_tree_8",
+   "type": "hollow_trial_tree_2_small",
+   "x": 362,
+   "y": 336
+  },
+  {
+   "flip": false,
+   "id": "rim_bush_1",
+   "type": "hollow_trial_bush_1",
+   "x": 62,
+   "y": 196
+  },
+  {
+   "flip": false,
+   "id": "rim_bush_2",
+   "type": "hollow_trial_bush_2",
+   "x": 120,
+   "y": 70
+  },
+  {
+   "flip": false,
+   "id": "rim_bush_3",
+   "type": "hollow_trial_bush_3",
+   "x": 244,
+   "y": 40
+  },
+  {
+   "flip": true,
+   "id": "rim_bush_4",
+   "type": "hollow_trial_bush_4",
+   "x": 392,
+   "y": 70
+  },
+  {
+   "flip": true,
+   "id": "rim_bush_5",
+   "type": "hollow_trial_bush_1",
+   "x": 452,
+   "y": 196
+  },
+  {
+   "flip": false,
+   "id": "rim_fern_1",
+   "type": "hollow_trial_fern_1",
+   "x": 120,
+   "y": 312
+  },
+  {
+   "flip": true,
+   "id": "rim_fern_2",
+   "type": "hollow_trial_fern_2",
+   "x": 392,
+   "y": 312
+  },
+  {
+   "flip": false,
+   "id": "rim_fern_3",
+   "type": "hollow_trial_fern_1",
+   "x": 60,
+   "y": 110
+  },
+  {
+   "flip": true,
+   "id": "rim_fern_4",
+   "type": "hollow_trial_fern_2",
+   "x": 452,
+   "y": 110
+  },
+  {
+   "flip": false,
+   "id": "rim_roots_1",
+   "type": "hollow_trial_roots_1",
+   "x": 88,
+   "y": 272
+  },
+  {
+   "flip": true,
+   "id": "rim_roots_2",
+   "type": "hollow_trial_roots_2",
+   "x": 428,
+   "y": 272
+  },
+  {
+   "flip": false,
+   "id": "rim_roots_3",
+   "type": "hollow_trial_roots_1",
+   "x": 160,
+   "y": 42
+  },
+  {
+   "flip": true,
+   "id": "rim_roots_4",
+   "type": "hollow_trial_roots_2",
+   "x": 352,
+   "y": 42
+  }
+ ],
+ "scene": "hollow_trial_layered",
+ "size": [
+  512,
+  352
+ ],
+ "trial": {
+  "altar": "altar",
+  "between_ticks": 180,
+  "chest": "altar",
+  "chest_flag": "trial_chest_opened",
+  "encounter": "hollow_trial",
+  "flag": "cleared_hollow_trial",
+  "max_attackers": 4,
+  "reward": {
+   "item": "herb",
+   "kind": "item",
+   "name": "Herb",
+   "note": "placeholder: the owner picks the Aspect this chest gives",
+   "quantity": 3,
+   "reward_id": "hollow_trial_chest"
+  },
+  "sealed_text": "The roots hold the way shut until the trial ends.",
+  "spawn_clearance": 48,
+  "spawn_points": [
+   [
+    86,
+    180
+   ],
+   [
+    100,
+    124
+   ],
+   [
+    150,
+    84
+   ],
+   [
+    210,
+    66
+   ],
+   [
+    302,
+    66
+   ],
+   [
+    362,
+    84
+   ],
+   [
+    412,
+    124
+   ],
+   [
+    426,
+    180
+   ],
+   [
+    404,
+    238
+   ],
+   [
+    352,
+    276
+   ],
+   [
+    160,
+    276
+   ],
+   [
+    108,
+    238
+   ]
+  ],
+  "start_ticks": 90,
+  "warn_ticks": 36,
+  "waves": [
+   {
+    "groups": [
+     {
+      "after": 0,
+      "mobs": [
+       "mossling",
+       "mossling",
+       "mossling",
+       "mossling",
+       "boar"
+      ]
+     }
+    ]
+   },
+   {
+    "groups": [
+     {
+      "after": 0,
+      "mobs": [
+       "warden",
+       "boar",
+       "boar",
+       "mossling",
+       "mossling",
+       "mossling"
+      ]
+     },
+     {
+      "after": 600,
+      "mobs": [
+       "mossling",
+       "mossling"
+      ]
+     }
+    ]
+   },
+   {
+    "groups": [
+     {
+      "after": 0,
+      "mobs": [
+       "warden",
+       "boar",
+       "boar",
+       "mossling",
+       "mossling"
+      ]
+     },
+     {
+      "after": 480,
+      "mobs": [
+       "warden",
+       "boar",
+       "mossling",
+       "mossling"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "version": 1
+}

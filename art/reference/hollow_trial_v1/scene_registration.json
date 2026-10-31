@@ -1,0 +1,1283 @@
+{
+  "status": "CLAUDE REGISTRATION REQUIRED; do not treat suggested colliders as live core data",
+  "generated_scene_sha256": "000fb92c448c674ce661f963bbf2afd3b76ef4bc910a5a0bd954ecfe73be2268",
+  "prop_scene_sha256": {
+    "hollow_trial_altar_dark": "4c3d226f9a616f8992dc4af8c5d98fa54d15d1ec098c8657566aedc2128b613f",
+    "hollow_trial_altar_lit": "b73125a392c5836ab7a59a2bb11038e8d47141ed016695702c1e464d4a92a9ed",
+    "hollow_trial_chest_closed": "89f6e75c7882775ab4a51cc7753aa572d19274b397636ad4e55cee25c6bb52bd",
+    "hollow_trial_chest_open": "db6ca4d5e69568f8182b22fafce1c7ee9c13e55eb544ba9cf9ca7929c8a1c9a0",
+    "hollow_trial_rune_rock_1": "e151364e517eef341e7264260c296b8bd376b58e1d28debb294d4637e9cef86d",
+    "hollow_trial_rune_rock_2": "2e357987c79a8034747668e3768068f59cf6e2c201bf3da3de3c48fdca2d5e33",
+    "hollow_trial_rune_rock_3": "e5adc39871c6595ab8d29f7a3ea4652e973f7831f20ff6069904a5bc8366e74d",
+    "hollow_trial_rune_rock_4": "7499ffc8e24f5eb8ff7bb6570d492a42ba6918b8acb572ee8273be3447db93ef",
+    "hollow_trial_rune_rock_5": "1fa07c24b170645fe0f70c9f38454436899c973a9f6dce7dd8d369249cc63aa8",
+    "hollow_trial_rune_rock_6": "e374e08634a6b857faaa502ab9836dc86792bc125ca788e4dc3b7d0d795603c8",
+    "hollow_trial_bush_1": "dae6b4ab95f63a58375307fe1f5f82ec1146dabd540ec5edef6205b70f30644f",
+    "hollow_trial_bush_2": "b21a2e706cbecdea62211b9a089f6c1793fee0841b6336c9f14f2d048da33645",
+    "hollow_trial_bush_3": "877d620fac06035f894a9446d4c60042633a6162fcb1236ffd0cde898495b9b9",
+    "hollow_trial_bush_4": "5a78991137c3923ac66451ba22737eebd33249c88024538460636bd3601dccdb",
+    "hollow_trial_roots_1": "fd99fbd59e2a0ad7197e4dfa3847dbd63d097d1c48aa7539ab2e625736877d15",
+    "hollow_trial_roots_2": "bd3edbd1f2462d67da4acf986eeca7e6387b55acc9a831a97cd815078e4aa439",
+    "hollow_trial_fern_1": "7b5d5fc8d029e3c9d177411b46ccd6796bc7933ca28b0d55f554703c5196bcc9",
+    "hollow_trial_fern_2": "4698e92edcf786a21a332f90cf9c2860e25ad91891d7f10a23f32b263736fa06",
+    "hollow_trial_tree_1": "ccd262a0b4de05df8e4433163ec062e3599fa7237da17e4130e171a03a77efec",
+    "hollow_trial_tree_2": "09aff7be10707cdc22a92f5ffd17a8c454eb9c2cc942dd1bbbed847d460100fb",
+    "hollow_trial_tree_1_small": "c0d1cf957a2f895de78144bfa57df226f24a8bd0eec332dc5dd6203fb30e4029",
+    "hollow_trial_tree_2_small": "243f1aa093036b4b04480f69d9cb13507ed7598df12f1173c5cb97b84ff9e4ce"
+  },
+  "props": {
+    "hollow_trial_altar_dark": {
+      "w": 64,
+      "h": 48,
+      "anchor": [
+        32,
+        48
+      ],
+      "base_width": 44,
+      "solid": true,
+      "image": "hollow_trial_altar_dark.png",
+      "colliders": [
+        [
+          -12.0,
+          -10.0,
+          10.0
+        ],
+        [
+          -4.0,
+          -10.0,
+          10.0
+        ],
+        [
+          4.0,
+          -10.0,
+          10.0
+        ],
+        [
+          12.0,
+          -10.0,
+          10.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_altar_lit": {
+      "w": 64,
+      "h": 48,
+      "anchor": [
+        32,
+        48
+      ],
+      "base_width": 44,
+      "solid": true,
+      "image": "hollow_trial_altar_lit.png",
+      "colliders": [
+        [
+          -12.0,
+          -10.0,
+          10.0
+        ],
+        [
+          -4.0,
+          -10.0,
+          10.0
+        ],
+        [
+          4.0,
+          -10.0,
+          10.0
+        ],
+        [
+          12.0,
+          -10.0,
+          10.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_chest_closed": {
+      "w": 40,
+      "h": 40,
+      "anchor": [
+        20,
+        40
+      ],
+      "base_width": 24,
+      "solid": true,
+      "image": "hollow_trial_chest_closed.png",
+      "colliders": [
+        [
+          -6.0,
+          -6.0,
+          6.0
+        ],
+        [
+          0.0,
+          -6.0,
+          6.0
+        ],
+        [
+          6.0,
+          -6.0,
+          6.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_chest_open": {
+      "w": 40,
+      "h": 40,
+      "anchor": [
+        20,
+        40
+      ],
+      "base_width": 24,
+      "solid": true,
+      "image": "hollow_trial_chest_open.png",
+      "colliders": [
+        [
+          -6.0,
+          -6.0,
+          6.0
+        ],
+        [
+          0.0,
+          -6.0,
+          6.0
+        ],
+        [
+          6.0,
+          -6.0,
+          6.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_rune_rock_1": {
+      "w": 40,
+      "h": 32,
+      "anchor": [
+        20,
+        32
+      ],
+      "base_width": 30,
+      "solid": true,
+      "image": "hollow_trial_rune_rock_1.png",
+      "colliders": [
+        [
+          -7.0,
+          -8.0,
+          8.0
+        ],
+        [
+          0.0,
+          -8.0,
+          8.0
+        ],
+        [
+          7.0,
+          -8.0,
+          8.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_rune_rock_2": {
+      "w": 32,
+      "h": 40,
+      "anchor": [
+        16,
+        40
+      ],
+      "base_width": 20,
+      "solid": true,
+      "image": "hollow_trial_rune_rock_2.png",
+      "colliders": [
+        [
+          -4.0,
+          -6.0,
+          6.0
+        ],
+        [
+          0.0,
+          -6.0,
+          6.0
+        ],
+        [
+          4.0,
+          -6.0,
+          6.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_rune_rock_3": {
+      "w": 40,
+      "h": 32,
+      "anchor": [
+        20,
+        32
+      ],
+      "base_width": 26,
+      "solid": true,
+      "image": "hollow_trial_rune_rock_3.png",
+      "colliders": [
+        [
+          -7.0,
+          -6.0,
+          6.0
+        ],
+        [
+          -2.333,
+          -6.0,
+          6.0
+        ],
+        [
+          2.333,
+          -6.0,
+          6.0
+        ],
+        [
+          7.0,
+          -6.0,
+          6.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_rune_rock_4": {
+      "w": 40,
+      "h": 32,
+      "anchor": [
+        20,
+        32
+      ],
+      "base_width": 30,
+      "solid": true,
+      "image": "hollow_trial_rune_rock_4.png",
+      "colliders": [
+        [
+          -7.0,
+          -8.0,
+          8.0
+        ],
+        [
+          0.0,
+          -8.0,
+          8.0
+        ],
+        [
+          7.0,
+          -8.0,
+          8.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_rune_rock_5": {
+      "w": 48,
+      "h": 40,
+      "anchor": [
+        24,
+        40
+      ],
+      "base_width": 36,
+      "solid": true,
+      "image": "hollow_trial_rune_rock_5.png",
+      "colliders": [
+        [
+          -9.0,
+          -9.0,
+          9.0
+        ],
+        [
+          0.0,
+          -9.0,
+          9.0
+        ],
+        [
+          9.0,
+          -9.0,
+          9.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_rune_rock_6": {
+      "w": 32,
+      "h": 32,
+      "anchor": [
+        16,
+        32
+      ],
+      "base_width": 22,
+      "solid": true,
+      "image": "hollow_trial_rune_rock_6.png",
+      "colliders": [
+        [
+          -4.0,
+          -7.0,
+          7.0
+        ],
+        [
+          0.0,
+          -7.0,
+          7.0
+        ],
+        [
+          4.0,
+          -7.0,
+          7.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_bush_1": {
+      "w": 48,
+      "h": 32,
+      "anchor": [
+        24,
+        32
+      ],
+      "base_width": 30,
+      "solid": true,
+      "image": "hollow_trial_bush_1.png",
+      "colliders": [
+        [
+          -8.0,
+          -7.0,
+          7.0
+        ],
+        [
+          -2.667,
+          -7.0,
+          7.0
+        ],
+        [
+          2.667,
+          -7.0,
+          7.0
+        ],
+        [
+          8.0,
+          -7.0,
+          7.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_bush_2": {
+      "w": 40,
+      "h": 32,
+      "anchor": [
+        20,
+        32
+      ],
+      "base_width": 26,
+      "solid": true,
+      "image": "hollow_trial_bush_2.png",
+      "colliders": [
+        [
+          -5.0,
+          -8.0,
+          8.0
+        ],
+        [
+          0.0,
+          -8.0,
+          8.0
+        ],
+        [
+          5.0,
+          -8.0,
+          8.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_bush_3": {
+      "w": 48,
+      "h": 32,
+      "anchor": [
+        24,
+        32
+      ],
+      "base_width": 30,
+      "solid": true,
+      "image": "hollow_trial_bush_3.png",
+      "colliders": [
+        [
+          -8.0,
+          -7.0,
+          7.0
+        ],
+        [
+          -2.667,
+          -7.0,
+          7.0
+        ],
+        [
+          2.667,
+          -7.0,
+          7.0
+        ],
+        [
+          8.0,
+          -7.0,
+          7.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_bush_4": {
+      "w": 40,
+      "h": 24,
+      "anchor": [
+        20,
+        24
+      ],
+      "base_width": 24,
+      "solid": true,
+      "image": "hollow_trial_bush_4.png",
+      "colliders": [
+        [
+          -6.0,
+          -6.0,
+          6.0
+        ],
+        [
+          0.0,
+          -6.0,
+          6.0
+        ],
+        [
+          6.0,
+          -6.0,
+          6.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_roots_1": {
+      "w": 48,
+      "h": 24,
+      "anchor": [
+        24,
+        24
+      ],
+      "base_width": 0,
+      "solid": false,
+      "image": "hollow_trial_roots_1.png",
+      "colliders": [],
+      "locked": true
+    },
+    "hollow_trial_roots_2": {
+      "w": 48,
+      "h": 24,
+      "anchor": [
+        24,
+        24
+      ],
+      "base_width": 0,
+      "solid": false,
+      "image": "hollow_trial_roots_2.png",
+      "colliders": [],
+      "locked": true
+    },
+    "hollow_trial_fern_1": {
+      "w": 24,
+      "h": 24,
+      "anchor": [
+        12,
+        24
+      ],
+      "base_width": 0,
+      "solid": false,
+      "image": "hollow_trial_fern_1.png",
+      "colliders": [],
+      "locked": true
+    },
+    "hollow_trial_fern_2": {
+      "w": 24,
+      "h": 32,
+      "anchor": [
+        12,
+        32
+      ],
+      "base_width": 0,
+      "solid": false,
+      "image": "hollow_trial_fern_2.png",
+      "colliders": [],
+      "locked": true
+    },
+    "hollow_trial_tree_1": {
+      "w": 104,
+      "h": 120,
+      "anchor": [
+        52,
+        120
+      ],
+      "base_width": 30,
+      "solid": true,
+      "image": "hollow_trial_tree_1.png",
+      "colliders": [
+        [
+          -6.0,
+          -9.0,
+          9.0
+        ],
+        [
+          0.0,
+          -9.0,
+          9.0
+        ],
+        [
+          6.0,
+          -9.0,
+          9.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_tree_2": {
+      "w": 120,
+      "h": 112,
+      "anchor": [
+        60,
+        112
+      ],
+      "base_width": 36,
+      "solid": true,
+      "image": "hollow_trial_tree_2.png",
+      "colliders": [
+        [
+          -8.0,
+          -10.0,
+          10.0
+        ],
+        [
+          0.0,
+          -10.0,
+          10.0
+        ],
+        [
+          8.0,
+          -10.0,
+          10.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_tree_1_small": {
+      "w": 48,
+      "h": 56,
+      "anchor": [
+        24,
+        56
+      ],
+      "base_width": 14,
+      "solid": true,
+      "image": "hollow_trial_tree_1_small.png",
+      "colliders": [
+        [
+          -3.0,
+          -4.0,
+          4.0
+        ],
+        [
+          0.0,
+          -4.0,
+          4.0
+        ],
+        [
+          3.0,
+          -4.0,
+          4.0
+        ]
+      ],
+      "locked": true
+    },
+    "hollow_trial_tree_2_small": {
+      "w": 56,
+      "h": 56,
+      "anchor": [
+        28,
+        56
+      ],
+      "base_width": 16,
+      "solid": true,
+      "image": "hollow_trial_tree_2_small.png",
+      "colliders": [
+        [
+          -3.5,
+          -4.5,
+          4.5
+        ],
+        [
+          0.0,
+          -4.5,
+          4.5
+        ],
+        [
+          3.5,
+          -4.5,
+          4.5
+        ]
+      ],
+      "locked": true
+    }
+  },
+  "placements": [
+    {
+      "id": "trial_altar",
+      "type": "hollow_trial_altar_dark",
+      "x": 256,
+      "y": 180,
+      "flip": false,
+      "when": "flag:cleared_hollow_trial",
+      "on_type": "hollow_trial_altar_lit"
+    },
+    {
+      "id": "trial_chest",
+      "type": "hollow_trial_chest_closed",
+      "x": 256,
+      "y": 136,
+      "flip": false,
+      "when": "flag:trial_chest_opened",
+      "on_type": "hollow_trial_chest_open"
+    },
+    {
+      "id": "entry_roots",
+      "type": "root_hollow_barrier_open",
+      "x": 256,
+      "y": 350,
+      "flip": false,
+      "when": "trial:sealed",
+      "on_type": "root_hollow_barrier_closed"
+    },
+    {
+      "id": "rune_rock_1",
+      "type": "hollow_trial_rune_rock_1",
+      "x": 70,
+      "y": 140,
+      "flip": false
+    },
+    {
+      "id": "rune_rock_2",
+      "type": "hollow_trial_rune_rock_2",
+      "x": 96,
+      "y": 98,
+      "flip": false
+    },
+    {
+      "id": "rune_rock_3",
+      "type": "hollow_trial_rune_rock_3",
+      "x": 430,
+      "y": 98,
+      "flip": true
+    },
+    {
+      "id": "rune_rock_4",
+      "type": "hollow_trial_rune_rock_4",
+      "x": 446,
+      "y": 150,
+      "flip": true
+    },
+    {
+      "id": "rune_rock_5",
+      "type": "hollow_trial_rune_rock_5",
+      "x": 80,
+      "y": 236,
+      "flip": false
+    },
+    {
+      "id": "rune_rock_6",
+      "type": "hollow_trial_rune_rock_6",
+      "x": 436,
+      "y": 240,
+      "flip": true
+    },
+    {
+      "id": "rune_rock_7",
+      "type": "hollow_trial_rune_rock_1",
+      "x": 180,
+      "y": 50,
+      "flip": false
+    },
+    {
+      "id": "rune_rock_8",
+      "type": "hollow_trial_rune_rock_2",
+      "x": 332,
+      "y": 50,
+      "flip": true
+    },
+    {
+      "id": "rim_tree_1",
+      "type": "hollow_trial_tree_1",
+      "x": 24,
+      "y": 70,
+      "flip": false
+    },
+    {
+      "id": "rim_tree_2",
+      "type": "hollow_trial_tree_2",
+      "x": 18,
+      "y": 230,
+      "flip": false
+    },
+    {
+      "id": "rim_tree_3",
+      "type": "hollow_trial_tree_1",
+      "x": 488,
+      "y": 66,
+      "flip": true
+    },
+    {
+      "id": "rim_tree_4",
+      "type": "hollow_trial_tree_2",
+      "x": 494,
+      "y": 236,
+      "flip": true
+    },
+    {
+      "id": "rim_tree_5",
+      "type": "hollow_trial_tree_1",
+      "x": 120,
+      "y": 24,
+      "flip": false
+    },
+    {
+      "id": "rim_tree_6",
+      "type": "hollow_trial_tree_2",
+      "x": 392,
+      "y": 24,
+      "flip": true
+    },
+    {
+      "id": "rim_tree_7",
+      "type": "hollow_trial_tree_1_small",
+      "x": 150,
+      "y": 336,
+      "flip": false
+    },
+    {
+      "id": "rim_tree_8",
+      "type": "hollow_trial_tree_2_small",
+      "x": 362,
+      "y": 336,
+      "flip": true
+    },
+    {
+      "id": "rim_bush_1",
+      "type": "hollow_trial_bush_1",
+      "x": 62,
+      "y": 196,
+      "flip": false
+    },
+    {
+      "id": "rim_bush_2",
+      "type": "hollow_trial_bush_2",
+      "x": 120,
+      "y": 70,
+      "flip": false
+    },
+    {
+      "id": "rim_bush_3",
+      "type": "hollow_trial_bush_3",
+      "x": 244,
+      "y": 40,
+      "flip": false
+    },
+    {
+      "id": "rim_bush_4",
+      "type": "hollow_trial_bush_4",
+      "x": 392,
+      "y": 70,
+      "flip": true
+    },
+    {
+      "id": "rim_bush_5",
+      "type": "hollow_trial_bush_1",
+      "x": 452,
+      "y": 196,
+      "flip": true
+    },
+    {
+      "id": "rim_fern_1",
+      "type": "hollow_trial_fern_1",
+      "x": 120,
+      "y": 312,
+      "flip": false
+    },
+    {
+      "id": "rim_fern_2",
+      "type": "hollow_trial_fern_2",
+      "x": 392,
+      "y": 312,
+      "flip": true
+    },
+    {
+      "id": "rim_fern_3",
+      "type": "hollow_trial_fern_1",
+      "x": 60,
+      "y": 110,
+      "flip": false
+    },
+    {
+      "id": "rim_fern_4",
+      "type": "hollow_trial_fern_2",
+      "x": 452,
+      "y": 110,
+      "flip": true
+    },
+    {
+      "id": "rim_roots_1",
+      "type": "hollow_trial_roots_1",
+      "x": 88,
+      "y": 272,
+      "flip": false
+    },
+    {
+      "id": "rim_roots_2",
+      "type": "hollow_trial_roots_2",
+      "x": 428,
+      "y": 272,
+      "flip": true
+    },
+    {
+      "id": "rim_roots_3",
+      "type": "hollow_trial_roots_1",
+      "x": 160,
+      "y": 42,
+      "flip": false
+    },
+    {
+      "id": "rim_roots_4",
+      "type": "hollow_trial_roots_2",
+      "x": 352,
+      "y": 42,
+      "flip": true
+    }
+  ],
+  "light_sockets": {
+    "hollow_trial_altar_lit": [
+      {
+        "pixel": [
+          31,
+          24
+        ],
+        "halo_radius": 32.0,
+        "energy": 1.1,
+        "pool_radius": 48.0,
+        "pool_energy": 0.62,
+        "colour": [
+          0.48,
+          0.94,
+          0.86
+        ],
+        "core_colour": [
+          0.8,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "hollow_trial_rune_rock_1": [
+      {
+        "pixel": [
+          23,
+          16
+        ],
+        "halo_radius": 32.0,
+        "energy": 1.1,
+        "pool_radius": 48.0,
+        "pool_energy": 0.62,
+        "colour": [
+          0.48,
+          0.94,
+          0.86
+        ],
+        "core_colour": [
+          0.8,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "hollow_trial_rune_rock_2": [
+      {
+        "pixel": [
+          19,
+          20
+        ],
+        "halo_radius": 32.0,
+        "energy": 1.1,
+        "pool_radius": 48.0,
+        "pool_energy": 0.62,
+        "colour": [
+          0.48,
+          0.94,
+          0.86
+        ],
+        "core_colour": [
+          0.8,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "hollow_trial_rune_rock_3": [
+      {
+        "pixel": [
+          20,
+          20
+        ],
+        "halo_radius": 32.0,
+        "energy": 1.1,
+        "pool_radius": 48.0,
+        "pool_energy": 0.62,
+        "colour": [
+          0.48,
+          0.94,
+          0.86
+        ],
+        "core_colour": [
+          0.8,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "hollow_trial_rune_rock_4": [
+      {
+        "pixel": [
+          22,
+          19
+        ],
+        "halo_radius": 32.0,
+        "energy": 1.1,
+        "pool_radius": 48.0,
+        "pool_energy": 0.62,
+        "colour": [
+          0.48,
+          0.94,
+          0.86
+        ],
+        "core_colour": [
+          0.8,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "hollow_trial_rune_rock_5": [
+      {
+        "pixel": [
+          20,
+          23
+        ],
+        "halo_radius": 32.0,
+        "energy": 1.1,
+        "pool_radius": 48.0,
+        "pool_energy": 0.62,
+        "colour": [
+          0.48,
+          0.94,
+          0.86
+        ],
+        "core_colour": [
+          0.8,
+          1.0,
+          1.0
+        ]
+      }
+    ],
+    "hollow_trial_rune_rock_6": [
+      {
+        "pixel": [
+          14,
+          17
+        ],
+        "halo_radius": 32.0,
+        "energy": 1.1,
+        "pool_radius": 48.0,
+        "pool_energy": 0.62,
+        "colour": [
+          0.48,
+          0.94,
+          0.86
+        ],
+        "core_colour": [
+          0.8,
+          1.0,
+          1.0
+        ]
+      }
+    ]
+  },
+  "approved_art": {
+    "hollow_trial_altar_dark": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/altar_dark.png",
+      "sha256": "fd5e8fbc34a4605ab2a0ae814eb3328832f1b3923b582d7173023211eb707feb",
+      "anchor": [
+        32,
+        48
+      ],
+      "size": [
+        64,
+        48
+      ]
+    },
+    "hollow_trial_altar_lit": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/altar_lit.png",
+      "sha256": "49022a85199def7605a7bce69b642957c1c8dde2640031de58bddca68f3c0306",
+      "anchor": [
+        32,
+        48
+      ],
+      "size": [
+        64,
+        48
+      ]
+    },
+    "hollow_trial_chest_closed": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_closed.png",
+      "sha256": "d6a58750aa96611bc141d76a63c49f6c88725fa9ef06ace0569a6ff40cfefb05",
+      "anchor": [
+        20,
+        40
+      ],
+      "size": [
+        40,
+        40
+      ]
+    },
+    "hollow_trial_chest_open": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/chest_open.png",
+      "sha256": "71255078b3e1d5efeb091195e77c4f3851b91718b642673d9c93b0ee7352f6d5",
+      "anchor": [
+        20,
+        40
+      ],
+      "size": [
+        40,
+        40
+      ]
+    },
+    "hollow_trial_rune_rock_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_1.png",
+      "sha256": "009dc2fe5dd9d3b72e1295e0d124b099ca38ee6253f54b51ff16ecfbc2eef597",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_rune_rock_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_2.png",
+      "sha256": "718421838037e474a0b0336aba1de645a4b5ff06c1f22849f4ff4f839f90813e",
+      "anchor": [
+        16,
+        40
+      ],
+      "size": [
+        32,
+        40
+      ]
+    },
+    "hollow_trial_rune_rock_3": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_3.png",
+      "sha256": "a7d1bfc019266f87e613230c448774ee88d4710232cd2f1492a1afb356ca2b72",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_rune_rock_4": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_4.png",
+      "sha256": "c3ddb5783e2bba906c9f91bc69a820b6e160345335a2e4223c05b2e3ef1cfebc",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_rune_rock_5": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_5.png",
+      "sha256": "686865aa044017e903417f552396f06a3fa2a7295e3f60194b743db0c884aa05",
+      "anchor": [
+        24,
+        40
+      ],
+      "size": [
+        48,
+        40
+      ]
+    },
+    "hollow_trial_rune_rock_6": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/rune_rock_6.png",
+      "sha256": "d3fe719bcd9d1555adf558a3df6a497022878f37889fdf1e7da1781694cec3c9",
+      "anchor": [
+        16,
+        32
+      ],
+      "size": [
+        32,
+        32
+      ]
+    },
+    "hollow_trial_bush_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_1.png",
+      "sha256": "0ffd324ac3239d5e8413f5077907d023b5e905ce903ff646032570f77d4f1b8e",
+      "anchor": [
+        24,
+        32
+      ],
+      "size": [
+        48,
+        32
+      ]
+    },
+    "hollow_trial_bush_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_2.png",
+      "sha256": "067da4affb9957d8e72d7e180a5092b440b582761074192cffc19445513b6035",
+      "anchor": [
+        20,
+        32
+      ],
+      "size": [
+        40,
+        32
+      ]
+    },
+    "hollow_trial_bush_3": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_3.png",
+      "sha256": "5bc46d9d11d9403f6757fac9bd076049363c5984ff85af6ce0d3ca01e7fedcf4",
+      "anchor": [
+        24,
+        32
+      ],
+      "size": [
+        48,
+        32
+      ]
+    },
+    "hollow_trial_bush_4": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/bush_4.png",
+      "sha256": "ffe9e77877b77781223870586eea95c55c89b067a7dbca7310ca477c82fb21bd",
+      "anchor": [
+        20,
+        24
+      ],
+      "size": [
+        40,
+        24
+      ]
+    },
+    "hollow_trial_roots_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/roots_1.png",
+      "sha256": "d882b443e92f0f84491f211b07e9df6ddcc1af9f47764c2efc1bc504b7cf540d",
+      "anchor": [
+        24,
+        24
+      ],
+      "size": [
+        48,
+        24
+      ]
+    },
+    "hollow_trial_roots_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/roots_2.png",
+      "sha256": "2289e749bfd3b215cdcbd98d4b4b9e6c7bdd228d72283b64dbb78377dbe1cd1b",
+      "anchor": [
+        24,
+        24
+      ],
+      "size": [
+        48,
+        24
+      ]
+    },
+    "hollow_trial_fern_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/fern_1.png",
+      "sha256": "127117f9249cadb9fff8794049ce109ddd53248ed2d3f360dbd6d67fd53bfc3f",
+      "anchor": [
+        12,
+        24
+      ],
+      "size": [
+        24,
+        24
+      ]
+    },
+    "hollow_trial_fern_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/fern_2.png",
+      "sha256": "0162271fabe298494056f19b41907cac6b5f723d507e60bb5da7dfccb1e0e420",
+      "anchor": [
+        12,
+        32
+      ],
+      "size": [
+        24,
+        32
+      ]
+    },
+    "hollow_trial_tree_1": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/tree_1.png",
+      "sha256": "8d6930d962c7c3f9d63d1af332edc9dbd0958711d0513edd89185ca796d9dcf9",
+      "anchor": [
+        52,
+        120
+      ],
+      "size": [
+        104,
+        120
+      ]
+    },
+    "hollow_trial_tree_2": {
+      "source": "art/reference/hollow_trial_v1/prop_review/native/tree_2.png",
+      "sha256": "ee01e9c0a628903766405c5b0944059845a4e48693606517e0ee092e3e3f3abd",
+      "anchor": [
+        60,
+        112
+      ],
+      "size": [
+        120,
+        112
+      ]
+    },
+    "hollow_trial_tree_1_small": {
+      "source": "art/reference/hollow_trial_v1/scene_variants/tree_1_small.png",
+      "sha256": "2f2606fad5abc5deed331d851a4151e23cca589f1f3a8e3723fcbda35be4de06",
+      "anchor": [
+        24,
+        56
+      ],
+      "size": [
+        48,
+        56
+      ]
+    },
+    "hollow_trial_tree_2_small": {
+      "source": "art/reference/hollow_trial_v1/scene_variants/tree_2_small.png",
+      "sha256": "082371a0a26cca724c3c96fdd1eee98c4242d0037187c15a674d8e0198e06e04",
+      "anchor": [
+        28,
+        56
+      ],
+      "size": [
+        56,
+        56
+      ]
+    }
+  }
+}
