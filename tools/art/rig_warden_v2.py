@@ -23,6 +23,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+import redraw_warden_2p5 as redraw  # the EPX Scale2x and the outline-keeping majority vote (same folder)
+
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "art/reference/warden_v2_detailed/b_native_totoy36.png"
 FEET = (47, 117)  # where the Warden stands in the source sprite
@@ -30,6 +32,7 @@ MARGIN = 64  # working space around the sprite for raised arms and falls
 RUNE_BOX = (46, 39, 64, 60)  # the rune on the chestplate (x0, y0, x1, y1)
 RUNE_CENTRE = (54, 48)
 HOOK = (98, 114)  # the blade's hooked tip
+SHRINK = 1.5  # owner 2026-10-31: "too big, scale it down by 1.5x" (posed at the design's size, then drawn 2/3 as large)
 
 # part -> (polygon in source pixels, pivot)
 PARTS: dict[str, tuple[list[tuple[int, int]], tuple[int, int]]] = {
@@ -292,9 +295,26 @@ def render(parts: dict[str, dict[tuple[int, int], str]], frame: dict) -> dict[tu
     return canvas
 
 
-def to_grid(canvas: dict[tuple[int, int], str]) -> tuple[list[str], tuple[int, int]]:
-    """Trimmed rows (multiples of 8, the feet kept inside) and the anchor (feet) within them."""
+def shrink(canvas: dict[tuple[int, int], str]) -> tuple[dict[tuple[int, int], str], tuple[int, int]]:
+    """The posed frame at 1/SHRINK size: Scale2x (EPX: rounds diagonals, only the art's own colours) to twice the size, then a majority
+    vote over each 3x3 block (transparency must win clearly, so thin dark outlines survive). The feet land exactly on an output pixel.
+    Returns the smaller canvas and its feet."""
     fx, fy = FEET
+    xs = [x for x, _ in canvas]
+    ys = [y for _, y in canvas]
+    kx = math.ceil((fx - min(xs)) / 3)
+    ky = math.ceil((fy - min(ys)) / 3)
+    x0, y0 = fx - 3 * kx, fy - 3 * ky
+    w = (max(max(xs), fx) + 1 - x0 + 2) // 3 * 3
+    h = (max(max(ys), fy) + 1 - y0 + 2) // 3 * 3
+    grid = [[canvas.get((x0 + i, y0 + j), ".") for i in range(w)] for j in range(h)]
+    small = redraw._vote(redraw._scale2x(grid), 3.0, w * 2 // 3, h * 2 // 3)
+    return {(i, j): s for j, row in enumerate(small) for i, s in enumerate(row) if s != "."}, (2 * kx, 2 * ky)
+
+
+def to_grid(canvas: dict[tuple[int, int], str], feet: tuple[int, int] = FEET) -> tuple[list[str], tuple[int, int]]:
+    """Trimmed rows (multiples of 8, the feet kept inside) and the anchor (feet) within them."""
+    fx, fy = feet
     xs = [x for x, _ in canvas] + [fx]
     ys = [y for _, y in canvas] + [fy]
     left, top = min(xs), min(ys)
@@ -309,11 +329,12 @@ def build() -> dict[str, tuple[list[str], tuple[int, int], dict]]:
     out: dict[str, tuple[list[str], tuple[int, int], dict]] = {}
     for state, frames in poses().items():
         for n, frame in enumerate(frames, start=1):
-            rows, anchor = to_grid(render(parts, frame))
+            rows, anchor = to_grid(*shrink(render(parts, frame)))
             chest = _point_after("torso", frame, RUNE_CENTRE)
             hook = _point_after("near_arm", frame, HOOK)
-            attach = {"chest": [round((chest[0] - FEET[0]) / 2.5, 2), round((chest[1] - FEET[1]) / 2.5, 2)],
-                      "hook": [round((hook[0] - FEET[0]) / 2.5, 2), round((hook[1] - FEET[1]) / 2.5, 2)]}
+            unit = 2.5 * SHRINK  # attachment units: world px / 2.5 (the effects' convention), and the art is drawn 1/SHRINK as large
+            attach = {"chest": [round((chest[0] - FEET[0]) / unit, 2), round((chest[1] - FEET[1]) / unit, 2)],
+                      "hook": [round((hook[0] - FEET[0]) / unit, 2), round((hook[1] - FEET[1]) / unit, 2)]}
             out[f"warden_{state}_right_{n}"] = (rows, anchor, attach)
     return out
 

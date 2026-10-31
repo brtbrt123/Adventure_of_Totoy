@@ -32,8 +32,8 @@ static func halo_plan(bursts: Array[Dictionary], tick: int, heals: Array[Diction
 			continue
 		var at: Vector2 = WardenEffects.chest_world(mob, MobView.frame(mob, [], tick))
 		var pulse: float = 0.85 + 0.15 * sin(float(tick) * 0.06)
-		out.append({"at":at.round(), "radius":9.0, "colour":Color(0.25,0.65,0.6,0.08*pulse)})
-		out.append({"at":Vector2(mob["position"]).round(), "radius":15.0, "colour":Color(0.2,0.5,0.45,0.04*pulse)})
+		out.append({"at":at.round(), "radius":6.0, "colour":Color(0.25,0.65,0.6,0.08*pulse)})
+		out.append({"at":Vector2(mob["position"]).round(), "radius":10.0, "colour":Color(0.2,0.5,0.45,0.04*pulse)})
 	for burst: Dictionary in bursts:
 		if not GLOW_KINDS.has(String(burst["kind"])):
 			continue

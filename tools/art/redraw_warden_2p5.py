@@ -27,7 +27,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "art/reference/warden_cleave_range_v4"
-SCALE = 2.5
+SCALE = 2.5 / 1.5  # the 2.5x game size, then 1.5x smaller with the body (owner 2026-10-31: "scale it down by 1.5x")
 BODY_ANCHOR = (20, 44)  # the 48x48 design's feet
 
 

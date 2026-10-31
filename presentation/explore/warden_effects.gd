@@ -10,15 +10,15 @@ static var attachments: Dictionary = JSON.parse_string(FileAccess.get_file_as_st
 const RUNE_COLOUR: Vector3 = Vector3(0.48, 0.94, 0.86)  # the rune stones' teal (presentation/common/local_lights.json)
 const RUNE_CORE: Vector3 = Vector3(0.8, 1.0, 1.0)
 const MobView := preload("res://presentation/explore/mob_view.gd")
-const SHADOW_RADIUS: float = 60.0  # ActorShadow radius: a 39 x 10 px ellipse under its 103 px wide stance (was 22, a hero-sized dot)
+const SHADOW_RADIUS: float = 40.0  # ActorShadow radius: a 26 x 7 px ellipse under its 69 px wide stance (drawn 1.5x smaller since 2026-10-31)
 ## The footfall frames of the walk (tools/art/rig_warden_v2.py poses(): the planted foot's offset from the feet, + = the leading side)
 ## and how long a footprint and a torn patch of ground stay on the floor.
-const FOOTFALLS: Dictionary = {"warden_walk_right_1": 15.0, "warden_walk_right_4": -3.0}
+const FOOTFALLS: Dictionary = {"warden_walk_right_1": 10.0, "warden_walk_right_4": -2.0}
 const PRINT_TICKS: int = 90
 const SCAR_TICKS: int = 70
 
 
-## Where the Warden's chest stone is in the world for the frame `key` (the attachment table is measured in the 48x48 design).
+## Where the Warden's chest stone is in the world for the frame `key` (attachment units: world px / 2.5, tools/art/rig_warden_v2.py).
 static func chest_world(mob: Dictionary, key: String) -> Vector2:
 	var chest: Array = attachments.get(key, {"chest": [5, -18]})["chest"]
 	var left: bool = Vector2(mob["facing"]).x < 0.0
@@ -36,8 +36,8 @@ static func lamps(mobs: Array[Dictionary], keys: Dictionary) -> Array[Dictionary
 		var guarded: bool = bool(mob.get("guarded", false))
 		var chest: Vector2 = chest_world(mob, String(keys.get(int(mob["id"]), "")))
 		var feet: Vector2 = mob["position"]
-		out.append({"point": Vector4(chest.x, chest.y, 48.0 if guarded else 20.0, 1.3 if guarded else 0.35), "colour": RUNE_COLOUR, "core": RUNE_CORE})
-		out.append({"point": Vector4(chest.x, feet.y + 3.0, 64.0 if guarded else 30.0, -(0.85 if guarded else 0.2)), "colour": RUNE_COLOUR, "core": RUNE_CORE})
+		out.append({"point": Vector4(chest.x, chest.y, 34.0 if guarded else 14.0, 1.3 if guarded else 0.35), "colour": RUNE_COLOUR, "core": RUNE_CORE})
+		out.append({"point": Vector4(chest.x, feet.y + 3.0, 44.0 if guarded else 20.0, -(0.85 if guarded else 0.2)), "colour": RUNE_COLOUR, "core": RUNE_CORE})
 	return out
 var tells: Dictionary = {}
 var hits: Dictionary = {}
@@ -155,10 +155,10 @@ func draw_ground(canvas: CanvasItem, tick: int, colors: Dictionary) -> void:
 		var at: Vector2 = mark["at"]
 		if age > PRINT_TICKS - 30 and (int(at.x) + int(at.y) + age / 3) % 2 == 0:
 			continue  # an old print breaks up before it goes
-		canvas.draw_rect(Rect2(at + Vector2(-6, -1), Vector2(12, 3)), colors["8"])
-		canvas.draw_rect(Rect2(at + Vector2(-4, -2), Vector2(8, 1)), colors["9"])
-		canvas.draw_rect(Rect2(at + Vector2(-8, 1), Vector2(3, 1)), colors["8"])
-		canvas.draw_rect(Rect2(at + Vector2(6, 0), Vector2(3, 1)), colors["8"])
+		canvas.draw_rect(Rect2(at + Vector2(-4, -1), Vector2(8, 2)), colors["8"])
+		canvas.draw_rect(Rect2(at + Vector2(-3, -2), Vector2(6, 1)), colors["9"])
+		canvas.draw_rect(Rect2(at + Vector2(-6, 0), Vector2(2, 1)), colors["8"])
+		canvas.draw_rect(Rect2(at + Vector2(4, 0), Vector2(2, 1)), colors["8"])
 	for scar: Dictionary in scars:
 		_draw_scar(canvas, scar["tell"], tick - int(scar["tick"]), colors)
 	for tell: Snapshots.TelegraphSnapshot in tells.values():
@@ -279,10 +279,10 @@ func draw_feet(canvas: CanvasItem, mobs: Array[Dictionary]) -> void:
 			continue
 		var at: Vector2 = Vector2(mob["position"]).round()
 		var side: float = -1.0 if Vector2(mob["facing"]).x < 0.0 else 1.0
-		for x: float in [-13.0, 11.0]:
+		for x: float in [-9.0, 7.0]:
 			var foot: Vector2 = at + Vector2(x * side, 1)
-			canvas.draw_rect(Rect2(foot + Vector2(-9, -1), Vector2(18, 3)), Color(0.11, 0.094, 0.141, 0.38))
-			canvas.draw_rect(Rect2(foot + Vector2(-6, -2), Vector2(12, 5)), Color(0.11, 0.094, 0.141, 0.22))
+			canvas.draw_rect(Rect2(foot + Vector2(-6, -1), Vector2(12, 2)), Color(0.11, 0.094, 0.141, 0.38))
+			canvas.draw_rect(Rect2(foot + Vector2(-4, -2), Vector2(8, 4)), Color(0.11, 0.094, 0.141, 0.22))
 
 
 static func sprite(canvas: CanvasItem, family: String, n: int, at: Vector2, frames: Dictionary, atlas: Texture2D, left: bool) -> void:
@@ -320,7 +320,7 @@ func draw_actor(canvas: CanvasItem, mob: Dictionary, key: String, tick: int, fra
 		var progress: float = clampf(float(mob["state_ticks"]) / 56.0, 0.0, 1.0)
 		for i: int in 10:
 			var turn: float = float(i) / 10.0 * TAU + float(tick) * 0.09
-			var reach: float = lerpf(46.0, 10.0, fposmod(float(tick) * 0.03 + float(i) * 0.37, 1.0))
+			var reach: float = lerpf(31.0, 7.0, fposmod(float(tick) * 0.03 + float(i) * 0.37, 1.0))
 			var point: Vector2 = (chest_at + Vector2(cos(turn) * reach, sin(turn) * reach * 0.55)).round()
 			var colour: Color = Color("e0f0ec") if (i + tick / 4) % 3 == 0 else Color("6aa89a")
 			canvas.draw_rect(Rect2(point, Vector2.ONE * (2.0 if progress > 0.6 and i % 2 == 0 else 1.0)), colour)

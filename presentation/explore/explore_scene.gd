@@ -828,7 +828,7 @@ func drawables() -> Array[Dictionary]:
 		out.append({"kind": &"npc", "id": npc["id"], "at": npc["position"], "frame": String(npc_frames.get(npc["id"], "")), "left": bool(npc["facing_left"]), "shadow": HERO_SHADOW_RADIUS * height / HERO_HEIGHT, "tint": tint, "height": height})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
 	for mob: Dictionary in snapshot.mobs:
-		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": WardenEffects.SHADOW_RADIUS if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 122.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
+		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": WardenEffects.SHADOW_RADIUS if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 81.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		var props: Array[Dictionary]=PropsLayer.drawables(prop_placements,frames,_visible_world_rect().grow(8))

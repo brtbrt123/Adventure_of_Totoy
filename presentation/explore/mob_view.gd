@@ -68,7 +68,7 @@ static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary, he
 	# A Glowmoth floats: its bar sits over its wings (sprite top ~29 px), not across them.
 	var top: Vector2 = (at-Vector2(0,60 if boss else (31 if mob["type"] == &"boar" else (36 if mob["type"] == &"glowmoth" else 25)))).round()
 	if mob["type"] == &"warden":
-		top = (at - Vector2(0, 126)).round()  # above the detailed 118 px Warden (tools/art/rig_warden_v2.py)
+		top = (at - Vector2(0, 86)).round()  # above the 79 px Warden (tools/art/rig_warden_v2.py, 1.5x smaller since 2026-10-31)
 	if int(mob["hp"]) < int(mob["max_hp"]) or at.distance_to(hero_at)<72.0:
 		if mob.has("level") and int(mob.get("summoner_id", 0)) == 0:  # a summoned moth shows only its bar (five labels stacked are noise)
 			draw_level(canvas, top + Vector2(-7,-7), int(mob["level"]), colors)
