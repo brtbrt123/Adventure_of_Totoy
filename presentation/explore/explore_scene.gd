@@ -82,7 +82,7 @@ const HINTS: Dictionary = {&"npc": "[E] TALK", &"chest": "[E] OPEN", &"sign": "[
 const HINT_OVERRIDES: Dictionary = {&"root_gate": "[E] LOOK"}
 ## The hint floats this far above an object's feet (people: their height + 8).
 const OBJECT_HINT_HEIGHT: float = 30.0
-const DEBUG_SCENES: Dictionary = {"debug_scene_woodland": &"woodland_layered", "debug_scene_hollow": &"root_hollow_layered", "debug_scene_village": &"village_layered", "debug_scene_forest": &"forest_layered", "debug_scene_glade": &"glade_layered", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered"}
+const DEBUG_SCENES: Dictionary = {"debug_scene_woodland": &"woodland_layered", "debug_scene_hollow": &"root_hollow_layered", "debug_scene_village": &"village_layered", "debug_scene_forest": &"forest_layered", "debug_scene_glade": &"glade_layered", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered", "debug_scene_trial": &"hollow_trial_layered"}
 
 var core: ExploreCore
 var snapshot: ExploreCore.ExploreSnapshot
@@ -582,10 +582,13 @@ func fade_alpha() -> float:
 	return 0.0
 
 
-## Debug jump (F2-F5 or 1-4): to the scene's default entry, with the fade.
+## Debug jump (F2-F5 or 1-4, T for the Hollow Trial): to the scene's default entry, with the fade.
 func jump_to(scene: StringName) -> void:
 	core.set_flag(&"received_first_sword")  # debug combat needs an armed hero as well as ability unlocks
 	core.set_flag(&"debug_all_unlocked")
+	if scene == &"hollow_trial_layered":  # T: the trial can be played again (debug only: the won flag and the opened chest are cleared)
+		var replay: Array[StringName] = core.story_flags.filter(func(f: StringName) -> bool: return f != &"cleared_hollow_trial" and f != &"trial_chest_opened")
+		core.set_story_flags(replay)
 	snapshot=core.snapshot()
 	_save_progress(core.scene_id,core.last_checkpoint)
 	begin_transition(scene, &"")
