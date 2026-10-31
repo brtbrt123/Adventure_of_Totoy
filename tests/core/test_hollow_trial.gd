@@ -172,7 +172,7 @@ func test_three_waves_won_light_the_altar_open_the_room_and_the_chest_pays_once(
 	var lit: bool = false
 	for p: Dictionary in PropScene.placements(SceneDefs.layered_data(SCENE), PropScene.load_defs(), {"flags": core.story_flags}):
 		if p["id"] == &"trial_altar":
-			lit = p["type"] == &"forest_pedestal_lit"
+			lit = p["type"] == &"hollow_trial_altar_lit"
 	assert_true(lit, "the altar shows its lit state")
 	var herbs: int = int(core.inventory.get(&"herb", 0))
 	_use(core, &"altar")
@@ -255,3 +255,68 @@ func test_the_same_play_spawns_the_same_way() -> void:
 		runs.append(text)
 	assert_eq(runs[0], runs[1], "deterministic")
 	assert_true(runs[0] != "", "and something spawned")
+
+
+# ---- the registered room (Codex's props, 2026-10-31) -------------------------------------------------------------------------------
+
+const LayoutFlood := preload("res://tests/layout_flood.gd")
+const HERO: float = 6.0
+
+
+func _flood_room(tags: Array = [], flags: Array = []) -> LayoutFlood:
+	var def: Dictionary = SceneDefs.get_def(SCENE)
+	var flood: LayoutFlood = LayoutFlood.new(def["size"], SceneDefs.build_obstacles(SCENE, false, [], flags, tags), HERO)
+	flood.flood(def["entries"][&"south"])
+	return flood
+
+
+func test_the_room_uses_codexs_registered_props() -> void:
+	var defs: Dictionary = PropScene.load_defs()
+	for type_id: String in ["hollow_trial_altar_dark", "hollow_trial_altar_lit", "hollow_trial_chest_closed", "hollow_trial_chest_open", "hollow_trial_tree_1"]:
+		assert_true(defs["props"].has(type_id), "%s is in the catalogue" % type_id)
+	var rows: Dictionary = {}
+	for row: Dictionary in SceneDefs.layered_data(SCENE)["props"]:
+		rows[row["id"]] = row
+	assert_eq(rows["trial_altar"]["type"], "hollow_trial_altar_dark", "the real altar")
+	assert_eq(rows["trial_chest"]["type"], "hollow_trial_chest_closed", "the real chest")
+	assert_eq(Vector2(rows["trial_chest"]["x"], rows["trial_chest"]["y"]), Vector2(256, 181), "on top of the altar, drawn in front of it")
+	assert_false(bool(defs["props"]["hollow_trial_chest_closed"]["solid"]), "the chest adds no collider: the altar holds the body")
+
+
+func test_the_altar_spawn_points_and_way_out_are_reachable() -> void:
+	var flood: LayoutFlood = _flood_room()
+	var def: Dictionary = SceneDefs.get_def(SCENE)
+	for o: Dictionary in def["objects"]:
+		assert_true(flood.reaches(o["stand"]), "%s can be used" % o["id"])
+	for p: Variant in def["trial"]["spawn_points"]:
+		assert_true(flood.reaches(Vector2(float(p[0]), float(p[1]))), "spawn point %s is open floor" % [p])
+	assert_true(flood.reaches(Rect2(def["exits"][0]["rect"]).get_center() + Vector2(0, -6)), "the way out is open when no trial runs")
+
+
+func test_the_fight_floor_is_open_but_for_the_altar() -> void:
+	var def: Dictionary = SceneDefs.get_def(SCENE)
+	var flood: LayoutFlood = _flood_room()
+	var r: Array = [112, 92, 288, 184]  # the fight floor of docs/previews/hollow_trial_v1/layout.json
+	var total: int = 0
+	var open: int = 0
+	var y: float = float(r[1])
+	while y <= float(r[1]) + float(r[3]):
+		var x: float = float(r[0])
+		while x <= float(r[0]) + float(r[2]):
+			total += 1
+			if flood.reaches(Vector2(x, y)) or Vector2(x, y).distance_to(Vector2(256, 170)) < 40.0:
+				open += 1
+			x += 8.0
+		y += 8.0
+	assert_true(float(open) / float(total) > 0.97, "the fight floor is clear apart from the altar (%d of %d samples)" % [open, total])
+
+
+func test_the_sealed_roots_close_the_way_out() -> void:
+	var def: Dictionary = SceneDefs.get_def(SCENE)
+	var inside: Vector2 = Vector2(256, 300)
+	var sealed: LayoutFlood = LayoutFlood.new(def["size"], SceneDefs.build_obstacles(SCENE, false, [], [], [&"sealed"]), HERO)
+	sealed.flood(inside)
+	assert_false(sealed.reaches(Vector2(256, 349)), "the closed roots seal the bottom opening")
+	var open: LayoutFlood = LayoutFlood.new(def["size"], SceneDefs.build_obstacles(SCENE, false, [], [], []), HERO)
+	open.flood(inside)
+	assert_true(open.reaches(Vector2(256, 349)), "and the open roots let him through")

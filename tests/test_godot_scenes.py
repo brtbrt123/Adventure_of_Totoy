@@ -28,7 +28,7 @@ import tscn  # noqa: E402
 
 GODOT = Path(os.environ.get("GODOT", r"C:\Tools\Godot\Godot_v4.7.2-stable_win64_console.exe"))
 TMP = ROOT / "tests" / "_tmp_godot"
-DEF_FILES = ["prop_defs.json", "prop_defs_woodland.json", "prop_defs_root_hollow.json"]
+DEF_FILES = ["prop_defs.json", "prop_defs_woodland.json", "prop_defs_root_hollow.json", "prop_defs_hollow_trial.json"]
 
 
 def run_python(script: str, *args: str) -> None:

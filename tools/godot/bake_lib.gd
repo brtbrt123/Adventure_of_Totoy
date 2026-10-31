@@ -8,7 +8,7 @@ extends RefCounted
 ## (`22` stays an integer, `6.0` stays a float), so the files come back byte for byte.
 
 const PROPS_DIR: String = "res://presentation/props"
-const DEF_FILES: Array[String] = ["res://data/props/prop_defs.json", "res://data/props/prop_defs_woodland.json", "res://data/props/prop_defs_root_hollow.json"]
+const DEF_FILES: Array[String] = ["res://data/props/prop_defs.json", "res://data/props/prop_defs_woodland.json", "res://data/props/prop_defs_root_hollow.json", "res://data/props/prop_defs_hollow_trial.json"]
 
 
 # ---------------------------------------------------------------------------------------------------------- numbers

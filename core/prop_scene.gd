@@ -34,7 +34,7 @@ const SceneBounds := preload("res://core/scene_bounds.gd")
 
 const DEFS_PATH: String = "res://data/props/prop_defs.json"
 ## Catalogues of later areas, merged into the main one by load_defs() (a type in the main file wins).
-const EXTRA_DEFS_PATHS: Array[String] = ["res://data/props/prop_defs_woodland.json", "res://data/props/prop_defs_root_hollow.json"]
+const EXTRA_DEFS_PATHS: Array[String] = ["res://data/props/prop_defs_woodland.json", "res://data/props/prop_defs_root_hollow.json", "res://data/props/prop_defs_hollow_trial.json"]
 
 
 ## Reads a JSON file into a Dictionary; empty when it is missing or not an object (callers validate()).

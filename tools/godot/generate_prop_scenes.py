@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import tscn  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
-DEF_FILES = ["data/props/prop_defs.json", "data/props/prop_defs_woodland.json", "data/props/prop_defs_root_hollow.json"]
+DEF_FILES = ["data/props/prop_defs.json", "data/props/prop_defs_woodland.json", "data/props/prop_defs_root_hollow.json", "data/props/prop_defs_hollow_trial.json"]
 OUT_DIR = ROOT / "presentation" / "props"
 SPRITES_DIR = "res://art/build/sprites/"
 

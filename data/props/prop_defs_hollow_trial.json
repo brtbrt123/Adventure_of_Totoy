@@ -1,0 +1,610 @@
+{
+ "version": 1,
+ "props": {
+  "hollow_trial_altar_dark": {
+   "w": 64,
+   "h": 48,
+   "anchor": [
+    32,
+    48
+   ],
+   "base_width": 44,
+   "solid": true,
+   "colliders": [
+    [
+     -12.0,
+     -10.0,
+     10.0
+    ],
+    [
+     -4.0,
+     -10.0,
+     10.0
+    ],
+    [
+     4.0,
+     -10.0,
+     10.0
+    ],
+    [
+     12.0,
+     -10.0,
+     10.0
+    ]
+   ],
+   "image": "hollow_trial_altar_dark.png",
+   "locked": true,
+   "state_pair": [
+    "hollow_trial_altar_dark",
+    "hollow_trial_altar_lit"
+   ],
+   "note": "trial altar: four circles across its 44 px base; dark until cleared_hollow_trial, then the lit state (same canvas, anchor, colliders)"
+  },
+  "hollow_trial_altar_lit": {
+   "w": 64,
+   "h": 48,
+   "anchor": [
+    32,
+    48
+   ],
+   "base_width": 44,
+   "solid": true,
+   "colliders": [
+    [
+     -12.0,
+     -10.0,
+     10.0
+    ],
+    [
+     -4.0,
+     -10.0,
+     10.0
+    ],
+    [
+     4.0,
+     -10.0,
+     10.0
+    ],
+    [
+     12.0,
+     -10.0,
+     10.0
+    ]
+   ],
+   "image": "hollow_trial_altar_lit.png",
+   "locked": true,
+   "state_pair": [
+    "hollow_trial_altar_dark",
+    "hollow_trial_altar_lit"
+   ],
+   "note": "trial altar: four circles across its 44 px base; dark until cleared_hollow_trial, then the lit state (same canvas, anchor, colliders)"
+  },
+  "hollow_trial_chest_closed": {
+   "w": 40,
+   "h": 40,
+   "anchor": [
+    20,
+    40
+   ],
+   "base_width": 0,
+   "solid": false,
+   "colliders": [],
+   "image": "hollow_trial_chest_closed.png",
+   "locked": true,
+   "state_pair": [
+    "hollow_trial_chest_closed",
+    "hollow_trial_chest_open"
+   ],
+   "note": "the chest ON TOP of the altar (owner 2026-10-31): not solid (the altar holds the body); its art still needs re-canvasing to 40x64, anchor (20, 64), so it rests on the altar's top face"
+  },
+  "hollow_trial_chest_open": {
+   "w": 40,
+   "h": 40,
+   "anchor": [
+    20,
+    40
+   ],
+   "base_width": 0,
+   "solid": false,
+   "colliders": [],
+   "image": "hollow_trial_chest_open.png",
+   "locked": true,
+   "state_pair": [
+    "hollow_trial_chest_closed",
+    "hollow_trial_chest_open"
+   ],
+   "note": "the chest ON TOP of the altar (owner 2026-10-31): not solid (the altar holds the body); its art still needs re-canvasing to 40x64, anchor (20, 64), so it rests on the altar's top face"
+  },
+  "hollow_trial_rune_rock_1": {
+   "w": 40,
+   "h": 32,
+   "anchor": [
+    20,
+    32
+   ],
+   "base_width": 30,
+   "solid": true,
+   "colliders": [
+    [
+     -7.0,
+     -8.0,
+     8.0
+    ],
+    [
+     0.0,
+     -8.0,
+     8.0
+    ],
+    [
+     7.0,
+     -8.0,
+     8.0
+    ]
+   ],
+   "image": "hollow_trial_rune_rock_1.png",
+   "locked": true,
+   "note": "glowing rune rock on the rim: circles along its base"
+  },
+  "hollow_trial_rune_rock_2": {
+   "w": 32,
+   "h": 40,
+   "anchor": [
+    16,
+    40
+   ],
+   "base_width": 20,
+   "solid": true,
+   "colliders": [
+    [
+     -4.0,
+     -6.0,
+     6.0
+    ],
+    [
+     0.0,
+     -6.0,
+     6.0
+    ],
+    [
+     4.0,
+     -6.0,
+     6.0
+    ]
+   ],
+   "image": "hollow_trial_rune_rock_2.png",
+   "locked": true,
+   "note": "glowing rune rock on the rim: circles along its base"
+  },
+  "hollow_trial_rune_rock_3": {
+   "w": 40,
+   "h": 32,
+   "anchor": [
+    20,
+    32
+   ],
+   "base_width": 26,
+   "solid": true,
+   "colliders": [
+    [
+     -7.0,
+     -6.0,
+     6.0
+    ],
+    [
+     -2.333,
+     -6.0,
+     6.0
+    ],
+    [
+     2.333,
+     -6.0,
+     6.0
+    ],
+    [
+     7.0,
+     -6.0,
+     6.0
+    ]
+   ],
+   "image": "hollow_trial_rune_rock_3.png",
+   "locked": true,
+   "note": "glowing rune rock on the rim: circles along its base"
+  },
+  "hollow_trial_rune_rock_4": {
+   "w": 40,
+   "h": 32,
+   "anchor": [
+    20,
+    32
+   ],
+   "base_width": 30,
+   "solid": true,
+   "colliders": [
+    [
+     -7.0,
+     -8.0,
+     8.0
+    ],
+    [
+     0.0,
+     -8.0,
+     8.0
+    ],
+    [
+     7.0,
+     -8.0,
+     8.0
+    ]
+   ],
+   "image": "hollow_trial_rune_rock_4.png",
+   "locked": true,
+   "note": "glowing rune rock on the rim: circles along its base"
+  },
+  "hollow_trial_rune_rock_5": {
+   "w": 48,
+   "h": 40,
+   "anchor": [
+    24,
+    40
+   ],
+   "base_width": 36,
+   "solid": true,
+   "colliders": [
+    [
+     -9.0,
+     -9.0,
+     9.0
+    ],
+    [
+     0.0,
+     -9.0,
+     9.0
+    ],
+    [
+     9.0,
+     -9.0,
+     9.0
+    ]
+   ],
+   "image": "hollow_trial_rune_rock_5.png",
+   "locked": true,
+   "note": "glowing rune rock on the rim: circles along its base"
+  },
+  "hollow_trial_rune_rock_6": {
+   "w": 32,
+   "h": 32,
+   "anchor": [
+    16,
+    32
+   ],
+   "base_width": 22,
+   "solid": true,
+   "colliders": [
+    [
+     -4.0,
+     -7.0,
+     7.0
+    ],
+    [
+     0.0,
+     -7.0,
+     7.0
+    ],
+    [
+     4.0,
+     -7.0,
+     7.0
+    ]
+   ],
+   "image": "hollow_trial_rune_rock_6.png",
+   "locked": true,
+   "note": "glowing rune rock on the rim: circles along its base"
+  },
+  "hollow_trial_bush_1": {
+   "w": 48,
+   "h": 32,
+   "anchor": [
+    24,
+    32
+   ],
+   "base_width": 30,
+   "solid": true,
+   "colliders": [
+    [
+     -8.0,
+     -7.0,
+     7.0
+    ],
+    [
+     -2.667,
+     -7.0,
+     7.0
+    ],
+    [
+     2.667,
+     -7.0,
+     7.0
+    ],
+    [
+     8.0,
+     -7.0,
+     7.0
+    ]
+   ],
+   "image": "hollow_trial_bush_1.png",
+   "locked": true,
+   "note": "rim bush: circles along its base"
+  },
+  "hollow_trial_bush_2": {
+   "w": 40,
+   "h": 32,
+   "anchor": [
+    20,
+    32
+   ],
+   "base_width": 26,
+   "solid": true,
+   "colliders": [
+    [
+     -5.0,
+     -8.0,
+     8.0
+    ],
+    [
+     0.0,
+     -8.0,
+     8.0
+    ],
+    [
+     5.0,
+     -8.0,
+     8.0
+    ]
+   ],
+   "image": "hollow_trial_bush_2.png",
+   "locked": true,
+   "note": "rim bush: circles along its base"
+  },
+  "hollow_trial_bush_3": {
+   "w": 48,
+   "h": 32,
+   "anchor": [
+    24,
+    32
+   ],
+   "base_width": 30,
+   "solid": true,
+   "colliders": [
+    [
+     -8.0,
+     -7.0,
+     7.0
+    ],
+    [
+     -2.667,
+     -7.0,
+     7.0
+    ],
+    [
+     2.667,
+     -7.0,
+     7.0
+    ],
+    [
+     8.0,
+     -7.0,
+     7.0
+    ]
+   ],
+   "image": "hollow_trial_bush_3.png",
+   "locked": true,
+   "note": "rim bush: circles along its base"
+  },
+  "hollow_trial_bush_4": {
+   "w": 40,
+   "h": 24,
+   "anchor": [
+    20,
+    24
+   ],
+   "base_width": 24,
+   "solid": true,
+   "colliders": [
+    [
+     -6.0,
+     -6.0,
+     6.0
+    ],
+    [
+     0.0,
+     -6.0,
+     6.0
+    ],
+    [
+     6.0,
+     -6.0,
+     6.0
+    ]
+   ],
+   "image": "hollow_trial_bush_4.png",
+   "locked": true,
+   "note": "rim bush: circles along its base"
+  },
+  "hollow_trial_roots_1": {
+   "w": 48,
+   "h": 24,
+   "anchor": [
+    24,
+    24
+   ],
+   "base_width": 0,
+   "solid": false,
+   "colliders": [],
+   "image": "hollow_trial_roots_1.png",
+   "locked": true,
+   "note": "flat roots on the rim floor: not solid"
+  },
+  "hollow_trial_roots_2": {
+   "w": 48,
+   "h": 24,
+   "anchor": [
+    24,
+    24
+   ],
+   "base_width": 0,
+   "solid": false,
+   "colliders": [],
+   "image": "hollow_trial_roots_2.png",
+   "locked": true,
+   "note": "flat roots on the rim floor: not solid"
+  },
+  "hollow_trial_fern_1": {
+   "w": 24,
+   "h": 24,
+   "anchor": [
+    12,
+    24
+   ],
+   "base_width": 0,
+   "solid": false,
+   "colliders": [],
+   "image": "hollow_trial_fern_1.png",
+   "locked": true,
+   "note": "fern on the rim: not solid"
+  },
+  "hollow_trial_fern_2": {
+   "w": 24,
+   "h": 32,
+   "anchor": [
+    12,
+    32
+   ],
+   "base_width": 0,
+   "solid": false,
+   "colliders": [],
+   "image": "hollow_trial_fern_2.png",
+   "locked": true,
+   "note": "fern on the rim: not solid"
+  },
+  "hollow_trial_tree_1": {
+   "w": 104,
+   "h": 120,
+   "anchor": [
+    52,
+    120
+   ],
+   "base_width": 30,
+   "solid": true,
+   "colliders": [
+    [
+     -6.0,
+     -9.0,
+     9.0
+    ],
+    [
+     0.0,
+     -9.0,
+     9.0
+    ],
+    [
+     6.0,
+     -9.0,
+     9.0
+    ]
+   ],
+   "image": "hollow_trial_tree_1.png",
+   "locked": true,
+   "note": "rim tree: circles at the trunk only (the canopy hangs over the forest, never over the fight floor)"
+  },
+  "hollow_trial_tree_2": {
+   "w": 120,
+   "h": 112,
+   "anchor": [
+    60,
+    112
+   ],
+   "base_width": 36,
+   "solid": true,
+   "colliders": [
+    [
+     -8.0,
+     -10.0,
+     10.0
+    ],
+    [
+     0.0,
+     -10.0,
+     10.0
+    ],
+    [
+     8.0,
+     -10.0,
+     10.0
+    ]
+   ],
+   "image": "hollow_trial_tree_2.png",
+   "locked": true,
+   "note": "rim tree: circles at the trunk only (the canopy hangs over the forest, never over the fight floor)"
+  },
+  "hollow_trial_tree_1_small": {
+   "w": 48,
+   "h": 56,
+   "anchor": [
+    24,
+    56
+   ],
+   "base_width": 14,
+   "solid": true,
+   "colliders": [
+    [
+     -3.0,
+     -4.0,
+     4.0
+    ],
+    [
+     0.0,
+     -4.0,
+     4.0
+    ],
+    [
+     3.0,
+     -4.0,
+     4.0
+    ]
+   ],
+   "image": "hollow_trial_tree_1_small.png",
+   "locked": true,
+   "note": "rim tree: circles at the trunk only (the canopy hangs over the forest, never over the fight floor)"
+  },
+  "hollow_trial_tree_2_small": {
+   "w": 56,
+   "h": 56,
+   "anchor": [
+    28,
+    56
+   ],
+   "base_width": 16,
+   "solid": true,
+   "colliders": [
+    [
+     -3.5,
+     -4.5,
+     4.5
+    ],
+    [
+     0.0,
+     -4.5,
+     4.5
+    ],
+    [
+     3.5,
+     -4.5,
+     4.5
+    ]
+   ],
+   "image": "hollow_trial_tree_2_small.png",
+   "locked": true,
+   "note": "rim tree: circles at the trunk only (the canopy hangs over the forest, never over the fight floor)"
+  }
+ }
+}

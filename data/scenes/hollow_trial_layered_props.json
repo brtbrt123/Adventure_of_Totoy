@@ -9,103 +9,163 @@
  "ground": "res://presentation/forest/hollow_trial_layered_ground.png",
  "outline": [
   [
-   228,
+   216,
    352
   ],
   [
-   200,
-   332
+   213,
+   331
   ],
   [
-   150,
-   318
+   208,
+   322
   ],
   [
-   96,
-   296
+   175,
+   306
   ],
   [
-   60,
-   262
+   148,
+   302
   ],
   [
-   40,
-   216
+   117,
+   284
   ],
   [
-   36,
-   168
+   101,
+   283
+  ],
+  [
+   75,
+   252
+  ],
+  [
+   63,
+   245
+  ],
+  [
+   50,
+   194
+  ],
+  [
+   44,
+   183
   ],
   [
    46,
-   122
+   160
   ],
   [
-   72,
-   86
+   59,
+   118
   ],
   [
-   112,
-   58
+   93,
+   76
   ],
   [
-   160,
-   40
+   111,
+   64
   ],
   [
-   212,
-   32
+   125,
+   64
   ],
   [
-   256,
-   30
+   165,
+   39
   ],
   [
-   300,
-   32
+   177,
+   42
   ],
   [
-   352,
-   40
+   244,
+   25
   ],
   [
-   400,
-   58
+   288,
+   27
   ],
   [
-   440,
-   86
+   329,
+   41
+  ],
+  [
+   340,
+   38
+  ],
+  [
+   392,
+   63
+  ],
+  [
+   399,
+   70
+  ],
+  [
+   414,
+   71
+  ],
+  [
+   430,
+   85
+  ],
+  [
+   456,
+   121
   ],
   [
    466,
-   122
+   153
   ],
   [
-   476,
-   168
+   468,
+   175
   ],
   [
-   472,
-   216
+   456,
+   229
   ],
   [
-   452,
+   436,
+   256
+  ],
+  [
+   426,
    262
   ],
   [
-   416,
-   296
+   415,
+   278
   ],
   [
-   362,
-   318
+   401,
+   281
   ],
   [
-   312,
-   332
+   360,
+   302
   ],
   [
-   284,
+   344,
+   307
+  ],
+  [
+   334,
+   306
+  ],
+  [
+   314,
+   315
+  ],
+  [
+   302,
+   324
+  ],
+  [
+   293,
    352
   ]
  ],
@@ -306,20 +366,21 @@
  "props": [
   {
    "id": "trial_altar",
-   "type": "forest_pedestal",
+   "type": "hollow_trial_altar_dark",
    "x": 256,
    "y": 180,
    "flip": false,
-   "shadow_radius": 9,
    "when": "flag:cleared_hollow_trial",
-   "on_type": "forest_pedestal_lit"
+   "on_type": "hollow_trial_altar_lit"
   },
   {
    "id": "trial_chest",
-   "type": "forest_chest",
+   "type": "hollow_trial_chest_closed",
    "x": 256,
    "y": 181,
-   "flip": false
+   "flip": false,
+   "when": "flag:trial_chest_opened",
+   "on_type": "hollow_trial_chest_open"
   },
   {
    "id": "entry_roots",
@@ -332,203 +393,206 @@
   },
   {
    "id": "rune_rock_1",
-   "type": "root_hollow_rune_stones",
+   "type": "hollow_trial_rune_rock_1",
    "x": 70,
    "y": 140,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
    "id": "rune_rock_2",
-   "type": "glade_stone_1",
+   "type": "hollow_trial_rune_rock_2",
    "x": 96,
    "y": 98,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
    "id": "rune_rock_3",
-   "type": "glade_stone_2",
+   "type": "hollow_trial_rune_rock_3",
    "x": 430,
    "y": 98,
-   "flip": true,
-   "shadow_radius": 12
+   "flip": true
   },
   {
    "id": "rune_rock_4",
-   "type": "glade_stone_3",
+   "type": "hollow_trial_rune_rock_4",
    "x": 446,
    "y": 150,
-   "flip": true,
-   "shadow_radius": 12
+   "flip": true
   },
   {
    "id": "rune_rock_5",
-   "type": "glade_stone_4",
+   "type": "hollow_trial_rune_rock_5",
    "x": 80,
    "y": 236,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
    "id": "rune_rock_6",
-   "type": "glade_stone_5",
+   "type": "hollow_trial_rune_rock_6",
    "x": 436,
    "y": 240,
-   "flip": true,
-   "shadow_radius": 12
+   "flip": true
   },
   {
    "id": "rune_rock_7",
-   "type": "root_hollow_rune_stones",
+   "type": "hollow_trial_rune_rock_1",
    "x": 180,
    "y": 50,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
    "id": "rune_rock_8",
-   "type": "glade_stone_1",
+   "type": "hollow_trial_rune_rock_2",
    "x": 332,
    "y": 50,
-   "flip": true,
-   "shadow_radius": 12
+   "flip": true
   },
   {
    "id": "rim_tree_1",
-   "type": "root_hollow_tree_ancient",
+   "type": "hollow_trial_tree_1",
    "x": 24,
    "y": 70,
-   "flip": false,
-   "shadow_radius": 22
+   "flip": false
   },
   {
    "id": "rim_tree_2",
-   "type": "root_hollow_tree_rootwall",
+   "type": "hollow_trial_tree_2",
    "x": 18,
    "y": 230,
-   "flip": false,
-   "shadow_radius": 22
+   "flip": false
   },
   {
    "id": "rim_tree_3",
-   "type": "root_hollow_tree_ancient",
+   "type": "hollow_trial_tree_1",
    "x": 488,
    "y": 66,
-   "flip": true,
-   "shadow_radius": 22
+   "flip": true
   },
   {
    "id": "rim_tree_4",
-   "type": "root_hollow_tree_rootwall",
+   "type": "hollow_trial_tree_2",
    "x": 494,
    "y": 236,
-   "flip": true,
-   "shadow_radius": 22
+   "flip": true
   },
   {
    "id": "rim_tree_5",
-   "type": "woodland_tree_broad",
+   "type": "hollow_trial_tree_1",
    "x": 120,
    "y": 24,
-   "flip": false,
-   "shadow_radius": 22
+   "flip": false
   },
   {
    "id": "rim_tree_6",
-   "type": "woodland_tree_slender",
+   "type": "hollow_trial_tree_2",
    "x": 392,
    "y": 24,
-   "flip": true,
-   "shadow_radius": 22
+   "flip": true
   },
   {
    "id": "rim_tree_7",
-   "type": "root_hollow_tree_rootwall",
+   "type": "hollow_trial_tree_1_small",
    "x": 150,
    "y": 336,
-   "flip": false,
-   "shadow_radius": 22
+   "flip": false
   },
   {
    "id": "rim_tree_8",
-   "type": "woodland_tree_broad",
+   "type": "hollow_trial_tree_2_small",
    "x": 362,
    "y": 336,
-   "flip": true,
-   "shadow_radius": 22
+   "flip": true
   },
   {
    "id": "rim_bush_1",
-   "type": "forest_bush_1",
+   "type": "hollow_trial_bush_1",
    "x": 62,
    "y": 196,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
    "id": "rim_bush_2",
-   "type": "forest_bush_2",
+   "type": "hollow_trial_bush_2",
    "x": 120,
    "y": 70,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
    "id": "rim_bush_3",
-   "type": "woodland_bush",
+   "type": "hollow_trial_bush_3",
    "x": 244,
    "y": 40,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
    "id": "rim_bush_4",
-   "type": "forest_bush_1",
+   "type": "hollow_trial_bush_4",
    "x": 392,
    "y": 70,
-   "flip": true,
-   "shadow_radius": 12
+   "flip": true
   },
   {
    "id": "rim_bush_5",
-   "type": "forest_bush_2",
+   "type": "hollow_trial_bush_1",
    "x": 452,
    "y": 196,
-   "flip": true,
-   "shadow_radius": 12
+   "flip": true
   },
   {
-   "id": "rim_bush_6",
-   "type": "forest_fern_1",
+   "id": "rim_fern_1",
+   "type": "hollow_trial_fern_1",
    "x": 120,
-   "y": 282,
-   "flip": false,
-   "shadow_radius": 12
+   "y": 312,
+   "flip": false
   },
   {
-   "id": "rim_bush_7",
-   "type": "forest_fern_2",
+   "id": "rim_fern_2",
+   "type": "hollow_trial_fern_2",
    "x": 392,
-   "y": 282,
-   "flip": true,
-   "shadow_radius": 12
+   "y": 312,
+   "flip": true
   },
   {
-   "id": "rim_bush_8",
-   "type": "glade_fern_1",
+   "id": "rim_fern_3",
+   "type": "hollow_trial_fern_1",
    "x": 60,
    "y": 110,
-   "flip": false,
-   "shadow_radius": 12
+   "flip": false
   },
   {
-   "id": "rim_bush_9",
-   "type": "glade_fern_2",
+   "id": "rim_fern_4",
+   "type": "hollow_trial_fern_2",
    "x": 452,
    "y": 110,
-   "flip": true,
-   "shadow_radius": 12
+   "flip": true
+  },
+  {
+   "id": "rim_roots_1",
+   "type": "hollow_trial_roots_1",
+   "x": 88,
+   "y": 272,
+   "flip": false
+  },
+  {
+   "id": "rim_roots_2",
+   "type": "hollow_trial_roots_2",
+   "x": 428,
+   "y": 272,
+   "flip": true
+  },
+  {
+   "id": "rim_roots_3",
+   "type": "hollow_trial_roots_1",
+   "x": 160,
+   "y": 42,
+   "flip": false
+  },
+  {
+   "id": "rim_roots_4",
+   "type": "hollow_trial_roots_2",
+   "x": 352,
+   "y": 42,
+   "flip": true
   }
  ]
 }

@@ -47,3 +47,14 @@ Guide: **`docs/previews/hollow_trial_v1/walkable_guide.png`** (2x) and the numbe
 - Root Hollow side: Claude retargets the upper-left exit from the village to this room and updates its blocked text; the Root Hollow ground already has the trail north.
 
 Report what you ran and what you could not judge (look, feel, sound are the owner's call). Do not merge to main.
+
+## Registered by Claude (2026-10-31)
+
+- **Catalogue:** `data/props/prop_defs_hollow_trial.json` (22 types from `art/reference/hollow_trial_v1/scene_registration.json`, your suggested colliders kept; merged by `PropScene.load_defs`). Altar dark/lit and chest closed/open are state pairs. **The chest is not solid** (it sits on the altar; the altar's four circles hold the body).
+- **Placements:** your 32, with one owner change: **the chest stands on the altar, feet (256, 181)** (one pixel in front of the altar so it draws over it). Used from the altar's stand: E starts the trial, after a win E opens the chest.
+- **Outline:** traced from your floor painting (dirt = walkable) and written to `docs/previews/hollow_trial_v1/layout.json` and the scene data; the guide is updated. All twelve spawn points stay on open floor; the bottom opening (x 216-293) holds the 56 px exit.
+- **Checked by tests** (`tests/core/test_hollow_trial.gd`): the altar's stand, every spawn point and the way out are reachable from the entry; the fight floor is open apart from the altar; the closed entry roots seal the opening and the open ones let the hero through.
+- **Your side, still open:**
+  1. **Re-canvas the chest** so it rests on the altar's top face: 40x64 with the anchor at (20, 64) (the altar's top face ends about 24 px above its base; adjust by eye). Same for the open state. Until then the chest draws at the altar's foot.
+  2. Merge the seven light sockets from the registration file into `presentation/common/local_lights.json` (presentation data; not done by Claude) and any contact/cast-shadow entries into `prop_art.json`.
+  3. The owner's review of the concept (docs: the feedback list in chat): no tree canopy over the fight floor or the spawn points, a flagstone/rune ring around the altar, contrast with a Warden and a Boar on the floor, palette-snapped ground.

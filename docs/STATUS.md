@@ -1,3 +1,7 @@
+## Hollow Trial props registered (2026-10-31, Claude)
+
+Codex's 22 props are in data/props/prop_defs_hollow_trial.json and placed in the room (chest on top of the altar, not solid; the altar holds the body). Walkable outline traced from Codex's floor painting. Tests: altar, spawn points and way out reachable, fight floor open apart from the altar, entry roots seal and open (test_hollow_trial.gd, 14). Core 568 pass, Python pass. smoke_profile and smoke_variant_atlases fail on Codex's uncommitted atlas rebuild (art/build), not on this change. Codex: re-canvas the chest to sit on the altar, merge the light sockets, the owner's review list (docs/CODEX_TASK_hollow_trial.md).
+
 ## Hollow Trial core (2026-10-31, Claude)
 
 The trial room exists in the core: hollow_trial_layered (512x352, dead end behind Root Hollow's upper-left exit, which now leads here instead of the village), core/trial.gd (E at the altar seals the entry, three warned waves of Mossling, Boar and Warden with up to four attackers, win sets cleared_hollow_trial and lights the altar, the chest pays once, falling resets the try), managed encounters in core/mob_field.gd, prop state trial:sealed, ExploreSnapshot.trial and trial_* events (docs/architecture.md "Trial rooms"). Stand-in props until Codex's art; no ground painting yet (pending in the tests). Chest reward is a 3-herb placeholder until the owner picks the Aspect. Tests: test_hollow_trial.gd (10), core 564 pass, Python and the map round trip pass, 50 of 54 smokes headless (3 need a window). Not play-tested; numbers are first guesses.
