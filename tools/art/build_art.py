@@ -26,8 +26,9 @@ TILE_SEPARATION = 2  # gap between tiles: one extruded pixel on each side
 EXTRUDE = 1
 # Shelf-packed sprite atlas. 256 wide reached 256x8126 with the Chain Scythe set; widened to 512 (2026-10-21) for the
 # Spirit Lantern / Phantom Cut set, and to 1024 (2026-10-21) for the Echo Step / Stone Ward / Sprint set (512 would be
-# 512x8978). Everything reads frame rectangles from sprites.json, so the width is free to change.
-SPRITE_ATLAS_WIDTH = 1024
+# 512x8978), and to 2048 (2026-10-31) when the Runebound Warden was redrawn natively at 2.5x (1024 would pass 8192 tall).
+# Everything reads frame rectangles from sprites.json, so the width is free to change.
+SPRITE_ATLAS_WIDTH = 2048
 SPRITE_ATLAS_MAX = 8192  # keep both sides at or under 8192 px (safe texture size for the gl_compatibility renderer)
 RES_BUILD = "res://art/build"
 

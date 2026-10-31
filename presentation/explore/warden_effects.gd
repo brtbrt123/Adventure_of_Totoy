@@ -110,9 +110,8 @@ static func sprite(canvas: CanvasItem, family: String, n: int, at: Vector2, fram
 	if not frames.has(key):
 		return
 	var f: Dictionary = frames[key]
-	var dest: Rect2 = ArenaAnimation.destination(Vector2.ZERO, f, left)
-	dest.position = (at + dest.position * 2.5).round()
-	dest.size *= 2.5
+	# The effect frames are drawn at their native game size (redrawn at 2.5x by tools/art/redraw_warden_2p5.py): no stretching here.
+	var dest: Rect2 = ArenaAnimation.destination(at.round(), f, left)
 	canvas.draw_texture_rect_region(atlas, dest, Rect2(f["x"], f["y"], f["w"], f["h"]))
 
 func draw_actor(canvas: CanvasItem, mob: Dictionary, key: String, tick: int, frames: Dictionary, atlas: Texture2D) -> void:
