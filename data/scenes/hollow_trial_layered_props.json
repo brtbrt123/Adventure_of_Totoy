@@ -154,18 +154,6 @@
     256,
     204
    ]
-  },
-  {
-   "id": "trial_chest",
-   "kind": "chest",
-   "position": [
-    256,
-    136
-   ],
-   "stand": [
-    256,
-    154
-   ]
   }
  ],
  "encounters": [
@@ -185,7 +173,7 @@
  ],
  "trial": {
   "altar": "altar",
-  "chest": "trial_chest",
+  "chest": "altar",
   "encounter": "hollow_trial",
   "flag": "cleared_hollow_trial",
   "chest_flag": "trial_chest_opened",
@@ -330,9 +318,8 @@
    "id": "trial_chest",
    "type": "forest_chest",
    "x": 256,
-   "y": 136,
-   "flip": false,
-   "shadow_radius": 10
+   "y": 181,
+   "flip": false
   },
   {
    "id": "entry_roots",

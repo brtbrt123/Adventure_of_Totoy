@@ -143,7 +143,7 @@
  "chest": {
   "feet": [
    256,
-   136
+   181
   ],
   "base": [
    24,
@@ -151,8 +151,10 @@
   ],
   "stand": [
    256,
-   154
-  ]
+   204
+  ],
+  "on_altar": true,
+  "note": "sits ON TOP of the altar; feet one pixel below the altar so it draws in front; used from the altar stand"
  },
  "spawn_points": [
   [

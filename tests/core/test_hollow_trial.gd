@@ -1,7 +1,8 @@
 extends "res://tests/test_case.gd"
 ## The Hollow Trial (data/scenes/hollow_trial_layered_props.json, core/trial.gd, docs/PLAN_hollow_trial.md): the dead-end room behind
 ## Root Hollow's upper exit. E at the altar seals the entry and starts three waves (warned at the rim before each group appears); surviving
-## them sets cleared_hollow_trial, lights the altar, opens the entry and lets the chest give its reward once. Falling resets the try.
+## them sets cleared_hollow_trial, lights the altar, opens the entry and lets the chest on top of the altar give its reward once (E at the
+## altar again). Falling resets the try.
 
 const SceneDefs := preload("res://core/scene_defs.gd")
 const ExploreCore := preload("res://core/explore_core.gd")
@@ -174,21 +175,21 @@ func test_three_waves_won_light_the_altar_open_the_room_and_the_chest_pays_once(
 			lit = p["type"] == &"forest_pedestal_lit"
 	assert_true(lit, "the altar shows its lit state")
 	var herbs: int = int(core.inventory.get(&"herb", 0))
-	_use(core, &"trial_chest")
+	_use(core, &"altar")
 	assert_false(_events(core, GameEvent.CHEST_OPENED).is_empty(), "the chest opens")
 	var after: int = int(core.inventory.get(&"herb", 0))
 	assert_eq(after - herbs, 3, "and pays its (placeholder) reward")
-	_use(core, &"trial_chest")
+	_use(core, &"altar")
 	assert_true(_events(core, GameEvent.CHEST_OPENED).is_empty(), "only once")
 	assert_eq(int(core.inventory.get(&"herb", 0)), after, "no second reward")
-	_use(core, &"altar")
 	assert_true(_events(core, GameEvent.TRIAL_STARTED).is_empty(), "a won trial does not start again")
 
 
-func test_the_chest_stays_shut_before_the_trial_is_won() -> void:
+func test_the_chest_on_the_altar_stays_shut_before_the_trial_is_won() -> void:
 	var core: ExploreCore = _core()
-	_use(core, &"trial_chest")
-	assert_true(_events(core, GameEvent.CHEST_OPENED).is_empty(), "shut")
+	_use(core, &"altar")
+	assert_false(_events(core, GameEvent.TRIAL_STARTED).is_empty(), "E at the altar starts the trial instead")
+	assert_true(_events(core, GameEvent.CHEST_OPENED).is_empty(), "the chest on top stays shut")
 	assert_false(core.has_flag(&"trial_chest_opened"), "no flag")
 
 
@@ -238,8 +239,7 @@ func test_a_won_trial_stays_won_after_continue() -> void:
 	assert_false(core.trial.sealed, "open")
 	_use(core, &"altar")
 	assert_true(_events(core, GameEvent.TRIAL_STARTED).is_empty(), "nothing to start")
-	_use(core, &"trial_chest")
-	assert_false(_events(core, GameEvent.CHEST_OPENED).is_empty(), "the unopened chest can still be opened")
+	assert_false(_events(core, GameEvent.CHEST_OPENED).is_empty(), "E at the altar opens the unopened chest on top")
 
 
 func test_the_same_play_spawns_the_same_way() -> void:

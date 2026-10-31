@@ -62,3 +62,7 @@ Scene `hollow_trial_layered`, 512x352, entered from Root Hollow's upper-left exi
 ## Core built (2026-10-31, Claude)
 
 `core/trial.gd` + a managed encounter in `core/mob_field.gd` + ExploreCore hooks; the room `hollow_trial_layered` is registered with stand-in props (forest pedestal as the altar, forest chest, rune stones, rim trees, the root knot at the entry); Root Hollow's upper-left exit now leads here (the village's `return` entry stays: the Woodland uses it). Tests: `tests/core/test_hollow_trial.gd` (10). Still open: the ground painting and real props (Codex), the chest's Aspect (owner; a 3-herb placeholder for now), the presentation wiring (Codex), the feel and numbers (owner, by play).
+
+## Chest on top of the altar (owner, 2026-10-31)
+
+The chest sits on the altar's top (prop `trial_chest`, feet (256, 181), one pixel in front of the altar). There is one object, the altar: E there starts the trial before a win and opens the chest after it. Layout and guide updated.

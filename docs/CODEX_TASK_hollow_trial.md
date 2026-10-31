@@ -12,7 +12,7 @@ Guide: **`docs/previews/hollow_trial_v1/walkable_guide.png`** (2x) and the numbe
 - **One way in and out:** the bottom edge, x 228-284 (the hero arrives from Root Hollow walking north and enters at the bottom). No other exit: it is a dead end, surrounded by forest.
 - **Walkable clearing:** a broad rounded clearing (outline in `layout.json`), about 440x320, dirt and worn grass with old flagstones near the centre. The **fight floor [112, 92, 288x184] stays completely open**: flush ground cover only, nothing that hides a gold or red warning (Boar charges cross it; Warden lines are 150 px long).
 - **Altar** in the middle, feet at (256, 180), base about 44x20: an old rune-stone altar, waist high, with a socket ring on top. Two states: **dark** (rune grooves dull) and **lit** (rune grooves teal-white, a soft upward glow). **No gold and no red** (combat cue colours), and keep the lit state teal so it never reads as a warning.
-- **Chest** just north of the altar, feet at (256, 136), base about 24x12: an old root-bound chest, **closed** and **open** states, same canvas and anchor. It can reuse the forest chest style if it fits.
+- **Chest ON TOP of the altar** (owner, 2026-10-31): an old root-bound chest, about 24x12, sitting on the altar's top. **closed** and **open** states, same canvas and anchor. Its anchor is at the altar's base line, feet (256, 181) (one pixel below the altar's feet so it always draws in front of the altar), so the canvas includes the altar's height under the chest. The hero uses both from the altar's stand (256, 204): E starts the trial before a win and opens the chest after it.
 - **Rim:** many **glowing rocks** (8 slots, teal rune light like the Root Hollow stones), **bushes** between them, **trees outside the outline** (8 slots) framing the room, roots and ferns at the edges. Spacious inside, dense outside.
 - **Entry seal:** the knot of roots that already closes Root Hollow's shortcut (`root_hollow_barrier_closed/open`) is reused at this room's entry: closed while a wave is alive, open otherwise. If it does not fit the bottom edge, propose a matching variant.
 
@@ -29,16 +29,16 @@ Guide: **`docs/previews/hollow_trial_v1/walkable_guide.png`** (2x) and the numbe
    - Trial won: the altar lights fully (lit state), a column of teal light, then the chest is ready (a faint shimmer on its lock).
    - Chest open: the existing chest-open effect, then the existing **Aspect reward card** (`item_received` kind `aspect`).
    - Trial failed (hero falls): the altar dims, the rune circle fades.
-5. **UI**: a wave banner ("WAVE 1 / 3", "WAVE 2 / 3", "FINAL WAVE"), "TRIAL COMPLETE", a small "mobs left" readout in the existing fight chip style, the altar hint ("E  Begin the trial", only while idle), the chest hint after a win. Same UI kit and fonts as the rest.
+5. **UI**: a wave banner ("WAVE 1 / 3", "WAVE 2 / 3", "FINAL WAVE"), "TRIAL COMPLETE", a small "mobs left" readout in the existing fight chip style, the altar hint ("E  Begin the trial" while idle, "E  Open the chest" after a win, nothing during a try). Same UI kit and fonts as the rest.
 6. **Sound**: altar activate, entry roots close/open, spawn warning, wave start (low horn or drum), wave clear chime, trial complete, trial failed, chest open (exists: `chest_open.wav`). Warnings stay louder than everything else; credits honest as always.
 7. **Tests and captures**: smoke test that every frame and effect key used exists; real-renderer captures (no fixtures once the core exists) of: the empty room, the altar dark and lit, a spawn warning, a wave in progress with a Warden, the wave banner, the win, the open chest and reward card. Full harness at the end.
 
 ## Interface (built by Claude on 2026-10-31: `core/trial.gd`, contract in `docs/architecture.md` "Trial rooms"; ask if anything is missing)
 
-- Objects in the scene data: `altar` (kind `altar`, stand (256, 204)) and `trial_chest` (kind `chest`, stand (256, 154)); interactions as today (`interact_target`, `interact_kind`).
+- Objects in the scene data: only `altar` (kind `altar`, stand (256, 204)): E there starts the trial before a win and opens the chest on top after it; interactions as today (`interact_target`, `interact_kind`).
 - Snapshot `trial`: `{state: idle | starting | wave | between | won | failed, wave (1-3), waves 3, alive (mobs left in the wave), next_tick (when the next wave or spawn comes), sealed (entry closed)}`.
 - Events: `trial_started`, `trial_spawn_warned` {wave, positions, arrive_tick}, `trial_wave_started` {wave}, `trial_wave_cleared` {wave}, `trial_won`, `trial_failed`, plus the usual `flag_set` (`cleared_hollow_trial`) and `item_received` (the Aspect).
-- Prop states: altar `when: "flag:cleared_hollow_trial"` -> lit; chest `when: "flag:trial_chest_opened"` -> open; entry roots `when: "trial:sealed"` -> closed (a new state key Claude adds).
+- Prop states: altar `when: "flag:cleared_hollow_trial"` -> lit; chest (prop `trial_chest`, feet (256, 181)) `when: "flag:trial_chest_opened"` -> open; entry roots `when: "trial:sealed"` -> closed (a new state key Claude adds).
 - Mobs come from the core like every encounter (Mossling, Boar, Warden; summoned rules unchanged). Presentation never spawns or positions a rules-bearing mob.
 
 ## Not yours / not decided
