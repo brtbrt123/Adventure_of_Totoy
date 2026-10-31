@@ -228,7 +228,7 @@ static func draw_slam_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapsho
 		canvas.draw_polyline(rim, colors["j"] if age < 14 else colors["h"], 1.0, false)
 
 func draw_ground(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
-	warden.draw_ground(canvas, view.tick, colors)
+	warden.draw_ground(canvas, view.tick, colors, frames, atlas)
 	warden.draw_feet(canvas, view.mobs)
 	for plan: Dictionary in ground_plans(view):
 		sprite(canvas, plan["frame"], plan["at"], frames, atlas)
@@ -278,6 +278,7 @@ static func draw_links(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, co
 
 ## Drawn over actors and HP bars: healing links, orbs with their trail, orb pops, moth reveals and the Stag's heal pulses.
 func draw_overlay(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
+	warden.draw_overlay(canvas, view.mobs, view.tick, frames, atlas)
 	Particles.draw(canvas, bursts, view.tick, colors)
 	draw_links(canvas, view, colors)
 	for orb: Dictionary in orbs.values():

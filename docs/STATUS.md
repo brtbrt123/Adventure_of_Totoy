@@ -1,3 +1,13 @@
+## Runebound Warden attack effects from Gemini (2026-10-31, Claude, done while Codex is out)
+
+The owner had Gemini draw the Warden's attack effects from a prompt with the real hit sizes. tools/art/import_warden_fx.py imports the 8 sheets (art/reference/warden_fx_gemini/*.jpg): it finds the cells, keys out the magenta and the pink glow, snaps to Totoy 36 (gold only on the Cleave, red only on the dodge attacks), scales each sheet to its hit size and anchors each frame where it attaches. Result: 44 frames fx_warden2_* (contact sheet beside the sources). In game (presentation/explore/warden_effects.gd):
+- Cleave slash: its rim sits on the 58 px cone edge, turned to the attack direction.
+- Lash: the crack grows along the line during the windup, then five root clumps erupt one after another along the 150 px line.
+- Ring: its edge sits on the 48 px radius.
+- Ring charge, guard hit and guard break: drawn at the chest stone.
+- Footstep: dust at each footfall.
+Combat effects use the lighting shader's emissive pass so gold and red keep their colour at night. The code-drawn slash, roots and shock band are gone; torn-ground scars and footprints stay. Turned frames (the slash and crack at angles other than left or right) show stepped pixels; the fallback is 8 pre-turned directions. Core 568, smokes, both trial checks and the scene audit pass. Comparison: presentation/review/warden_v2/fx_gemini_compare.png. Look is the owner's call.
+
 ## Runebound Warden drawn 1.5x smaller (2026-10-31, Claude, done while Codex is out)
 
 Owner: "too big, scale it down by 1.5x". tools/art/rig_warden_v2.py still poses the detailed design at its own size, then shrinks each frame by 1.5 (Scale2x, then a majority vote per 3x3 block, so outlines survive): 79 px tall (was 118), feet exact. The 75 effect frames are redrawn at 2.5/1.5 (tools/art/redraw_warden_2p5.py). Shadow, foot shadows, footprints, footfall offsets, rune lamp and halo, HP bar height (86) and draw height (81) scaled to match. Core: radius 18 -> 12, hold 34 -> 28, so the Cleave cone (reach + radius) shrinks with the arm. Core 568, Python Warden art test, smokes, both trial checks and the scene audit pass. Comparison: presentation/review/warden_v2/scale_compare.png. Feel is the owner's call.

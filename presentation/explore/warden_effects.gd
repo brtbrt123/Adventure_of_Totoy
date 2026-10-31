@@ -104,7 +104,6 @@ func sync(view: Explore.ExploreSnapshot) -> void:
 			var side: float = -1.0 if Vector2(mob["facing"]).x < 0.0 else 1.0
 			var foot: Vector2 = Vector2(mob["position"]) + Vector2(float(FOOTFALLS[key]) * side, 1.0)
 			prints.append({"at": foot.round(), "tick": view.tick})
-			_burst("stomp", foot, view.tick)
 		keys[id] = key
 	for tell: Snapshots.TelegraphSnapshot in view.telegraphs:
 		if alive.has(tell.owner_id):
@@ -115,14 +114,10 @@ func sync(view: Explore.ExploreSnapshot) -> void:
 			continue
 		fired[tell.id] = view.tick
 		scars.append({"tell": tell, "tick": tell.hit_tick})
-		match tell.shape:
-			&"cone":
-				_burst("gouge", tell.center, tell.hit_tick, {"dir": tell.direction, "half_angle": tell.half_angle, "size": tell.size})
-			&"line":
-				for i: int in 6:
-					_burst("roots", tell.center + tell.direction * tell.size * (float(i) + 0.5) / 6.0, tell.hit_tick + i)
-			_:
-				_burst("quake", tell.center, tell.hit_tick, {"size": tell.size})
+		# the Cleave's and the Ring's frames carry their own debris; the Lash's clumps get spirit sparks and clods as they break the floor
+		if tell.shape == &"line":
+			for i: int in LASH_CLUMPS:
+				_burst("roots", tell.center + tell.direction * tell.size * (float(i) + 0.5) / float(LASH_CLUMPS), tell.hit_tick + i * 2)
 	for id: int in fired.keys():
 		if view.tick - int(fired[id]) > 120:
 			fired.erase(id)
@@ -147,9 +142,10 @@ func active_tells(tick: int) -> Array[Snapshots.TelegraphSnapshot]:
 			out.append(tell)
 	return out
 
-## The floor around the Warden: its footprints, the ground its strikes tore (where they really hit), and each strike while it is active,
-## drawn at the committed telegraph's real size (owner playtest 2026-10-31: the effects must match the Warden's size).
-func draw_ground(canvas: CanvasItem, tick: int, colors: Dictionary) -> void:
+## The floor around the Warden: its footprints and footfall dust, the ground its strikes tore (where they really hit), and each strike
+## while it is active. The strikes are the Gemini effect frames (tools/art/import_warden_fx.py, owner 2026-10-31), each fitted to the
+## committed telegraph's real size: the Cleave's rim on the cone's edge, the Lash's roots along its line, the Ring's edge on its radius.
+func draw_ground(canvas: CanvasItem, tick: int, colors: Dictionary, frames: Dictionary, atlas: Texture2D) -> void:
 	for mark: Dictionary in prints:
 		var age: int = tick - int(mark["tick"])
 		var at: Vector2 = mark["at"]
@@ -164,85 +160,90 @@ func draw_ground(canvas: CanvasItem, tick: int, colors: Dictionary) -> void:
 	for tell: Snapshots.TelegraphSnapshot in tells.values():
 		var age: int = tick - tell.hit_tick
 		var span: int = maxi(1, tell.end_tick - tell.hit_tick)
-		if age >= 0 and tick < tell.end_tick + 6:
-			match tell.shape:
-				&"cone":
-					_draw_cleave(canvas, tell, age, span, colors)
-				&"line":
-					_draw_lash(canvas, tell, age, span, colors)
-				_:
-					_draw_shock(canvas, tell, age, span, colors)
-		elif age < 0 and tell.shape == &"line":
-			# the lash winding up: a crack runs out under the floor along the line it will tear
-			var progress: float = clampf(float(tick - tell.start_tick) / maxi(1, tell.hit_tick - tell.start_tick), 0.0, 1.0)
-			var crack: PackedVector2Array = []
-			for i: int in 19:
-				var t: float = progress * float(i) / 18.0
-				crack.append((tell.center + tell.direction * tell.size * t + tell.direction.orthogonal() * (2.0 if i % 2 == 0 else -2.0)).round())
-			canvas.draw_polyline(crack, colors["8"], 2.0, false)
-			canvas.draw_polyline(crack, colors["t"], 1.0, false)
+		var angle: float = tell.direction.angle()
+		match tell.shape:
+			&"cone":
+				# 4 frames across the strike, then 2 of the slash breaking into splinters
+				if age >= 0 and age < span + 6:
+					turned(canvas, "cleave", 1 + age * 4 / span if age < span else 5 + (age - span) / 3, tell.center, angle, frames, atlas)
+			&"line":
+				if age < 0:  # the windup: the crack runs out along the line it will tear
+					var progress: float = clampf(float(tick - tell.start_tick) / maxi(1, tell.hit_tick - tell.start_tick), 0.0, 1.0)
+					turned(canvas, "lash_crack", 1 + int(progress * 5.99), tell.center, angle, frames, atlas)
+				elif age < LASH_TICKS:
+					turned(canvas, "lash_crack", 6, tell.center, angle, frames, atlas)
+					_draw_lash(canvas, tell, age, frames, atlas)
+			_:
+				# 4 frames running out to the real edge during the strike, then 2 of spores and dust breaking up
+				if age >= 0 and age < span + 10:
+					placed(canvas, "ring", 1 + age * 4 / span if age < span else 5 + (age - span) / 5, tell.center, frames, atlas)
+	for mark: Dictionary in prints:
+		var age: int = tick - int(mark["tick"])
+		if age < 16:
+			placed(canvas, "footstep", 1 + age / 4, mark["at"], frames, atlas, false)
 
 
-## The Cleave: the blade's swept trail across the real cone (from one side to the other over the strike), drawn as slash lines out to
-## the cone's real edge: a cream leading edge, gold behind it, the outer lines longest (the hook tip travels furthest), all gone a few
-## ticks after the strike.
-static func _draw_cleave(canvas: CanvasItem, tell: Snapshots.TelegraphSnapshot, age: int, span: int, colors: Dictionary) -> void:
-	var sweep: float = clampf(float(age + 1) / float(span), 0.0, 1.0)
-	var fade: int = maxi(0, age - span)
-	if fade >= 5:
+const LASH_CLUMPS: int = 5  # root clumps along the 150 px line (each about 30 px wide)
+const LASH_TICKS: int = 24  # the last clump's 8 frames (2 ticks each) end 8 ticks after it starts
+
+
+## The Lash: root clumps burst out of the floor one after another along the real line, from the Warden outward, stand and sink. The roots
+## grow upright whatever way the line runs (only the crack under them turns with it); clumps further down the screen are drawn last.
+static func _draw_lash(canvas: CanvasItem, tell: Snapshots.TelegraphSnapshot, age: int, frames: Dictionary, atlas: Texture2D) -> void:
+	var spots: Array[Dictionary] = []
+	for i: int in LASH_CLUMPS:
+		var born: int = i * 2  # the eruption runs out along the line
+		if age < born or age - born >= 16:
+			continue
+		spots.append({"at": tell.center + tell.direction * tell.size * (float(i) + 0.5) / float(LASH_CLUMPS), "n": 1 + (age - born) / 2})
+	spots.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
+	for spot: Dictionary in spots:
+		placed(canvas, "lash", int(spot["n"]), spot["at"], frames, atlas)
+
+
+## Combat effects glow through the night light (the lighting shader's emissive pass, as the fireflies do), so the gold and red stay
+## gold and red in any scene; footfall dust is lit like the floor.
+const GLOW: Color = Color(1.0, 1.0, 1.0, preload("res://presentation/common/ambient_fireflies.gd").EMISSIVE_ALPHA)
+
+
+## Effect frame `fx_warden2_<name>_<n>` with its anchor at `at`, upright.
+static func placed(canvas: CanvasItem, name: String, n: int, at: Vector2, frames: Dictionary, atlas: Texture2D, glow: bool = true) -> void:
+	var key: String = "fx_warden2_%s_%d" % [name, n]
+	if not frames.has(key):
 		return
-	var start: float = tell.direction.angle() - tell.half_angle
-	var lead: float = start + 2.0 * tell.half_angle * sweep
-	for k: int in 6:
-		var r: float = tell.size * (1.0 - 0.07 * float(k))
-		var tail: float = lerpf(lead, start, clampf(0.95 - 0.13 * float(k) - 0.2 * float(fade), 0.0, 1.0))  # inner lines trail shorter
-		if lead - tail < 0.02:
+	var f: Dictionary = frames[key]
+	canvas.draw_texture_rect_region(atlas, Rect2((at - Vector2(f["ax"], f["ay"])).round(), Vector2(f["w"], f["h"])), Rect2(f["x"], f["y"], f["w"], f["h"]), GLOW if glow else Color.WHITE)
+
+
+## Effect frame `fx_warden2_<name>_<n>` (drawn pointing right) turned to `angle` around its anchor at `at`. Pointing left it is also
+## mirrored top to bottom, so its light still falls from above. Turned to an angle other than left or right, its pixels step (the
+## owner judges that in play; the fallback is frames pre-turned to 8 directions).
+static func turned(canvas: CanvasItem, name: String, n: int, at: Vector2, angle: float, frames: Dictionary, atlas: Texture2D) -> void:
+	var key: String = "fx_warden2_%s_%d" % [name, n]
+	if not frames.has(key):
+		return
+	var f: Dictionary = frames[key]
+	var base: Vector2 = canvas.call("shake_offset") if canvas.has_method("shake_offset") else Vector2.ZERO
+	var mirror: float = -1.0 if cos(angle) < 0.0 else 1.0
+	canvas.draw_set_transform_matrix(Transform2D(0.0, base) * Transform2D(angle, Vector2(1.0, mirror), 0.0, at.round()))
+	canvas.draw_texture_rect_region(atlas, Rect2(-Vector2(f["ax"], f["ay"]), Vector2(f["w"], f["h"])), Rect2(f["x"], f["y"], f["w"], f["h"]), GLOW)
+	canvas.draw_set_transform(base)
+
+
+## In front of the Warden: the Spore Ring gathering at the chest stone (the spore vortex; the warning on the floor is the telegraph's own),
+## the guard hit at the chest stone (a reduced hit on the rune guard) and the guard break when the Cleave is parried and the rune shatters.
+func draw_overlay(canvas: CanvasItem, mobs: Array[Dictionary], tick: int, frames: Dictionary, atlas: Texture2D) -> void:
+	for mob: Dictionary in mobs:
+		if mob["type"] != &"warden" or mob["state"] == &"dead":
 			continue
-		var line: PackedVector2Array = []
-		for i: int in 17:
-			line.append((tell.center + Vector2.from_angle(lerpf(tail, lead, float(i) / 16.0)) * r).round())
-		var cut: int = 12 if k < 2 else 14
-		canvas.draw_polyline(line.slice(0, cut + 1), colors["y"] if k % 2 == 0 else colors["x"], 2.0 if k < 2 else 1.0, false)
-		canvas.draw_polyline(line.slice(cut), colors["1"], 2.0 if k < 2 else 1.0, false)
-
-
-## The Lash: roots burst out of the floor one after another along the real line (inside its width), stand while it is active, then sink.
-static func _draw_lash(canvas: CanvasItem, tell: Snapshots.TelegraphSnapshot, age: int, span: int, colors: Dictionary) -> void:
-	var across: Vector2 = tell.direction.orthogonal()
-	var count: int = maxi(4, int(tell.size / 12.0))
-	for i: int in count:
-		var t: float = (float(i) + 0.5) / float(count)
-		var born: int = int(t * 6.0)  # the eruption runs out along the line in six ticks
-		var grown: float = clampf(float(age - born + 1) / 3.0, 0.0, 1.0)
-		if age >= span:
-			grown *= clampf(1.0 - float(age - span) / 6.0, 0.0, 1.0)
-		if grown <= 0.0:
-			continue
-		var side: float = (1.0 if i % 2 == 0 else -1.0) * tell.width * 0.22
-		var base: Vector2 = (tell.center + tell.direction * tell.size * t + across * side).round()
-		var height: float = (14.0 + float((i * 7) % 5) * 3.0) * grown
-		var lean: Vector2 = tell.direction * 3.0
-		canvas.draw_colored_polygon(PackedVector2Array([base + Vector2(-6, 2), base + Vector2(6, 2), base + Vector2(5, -1), base + Vector2(-5, -1)]), colors["8"])
-		canvas.draw_colored_polygon(PackedVector2Array([base + Vector2(-4, 1), base + Vector2(4, 1), base + lean + Vector2(1, -height), base + lean + Vector2(-1, -height)]), colors["0"])
-		canvas.draw_colored_polygon(PackedVector2Array([base + Vector2(-2, 0), base + Vector2(2, 0), base + lean + Vector2(0, 1 - height), base + lean + Vector2(-1, 1 - height)]), colors["c"] if i % 2 == 0 else colors["b"])
-		canvas.draw_line((base + Vector2(-1, -1)).round(), (base + lean * 0.6 + Vector2(-1, 2 - height * 0.6)).round(), colors["d"], 1.0, false)  # lit edge
-		canvas.draw_rect(Rect2((base + lean + Vector2(-1, -height - 1)).round(), Vector2(2, 3)), colors["z"] if age < span else colors["u"])
-
-
-## The Spore Ring: a shock band runs out from the Warden to the ring's real edge and holds there for a moment.
-static func _draw_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapshot, age: int, span: int, colors: Dictionary) -> void:
-	var front: float = tell.size * minf(1.0, float(age + 1) / maxf(1.0, float(span)))
-	for layer: int in 3:
-		var r: float = front - float(layer) * 4.0
-		if r <= 3.0:
-			continue
-		var colour: Color = colors["z"] if layer == 0 and age < span else (colors["j"] if layer == 0 else (colors["i"] if layer == 1 else colors["9"]))
-		canvas.draw_arc(tell.center.round(), r, 0.0, TAU, 48, colour, 2.0 if layer == 0 else 1.0, false)
-	for i: int in 16:
-		var angle: float = float(i) / 16.0 * TAU + 0.2
-		var point: Vector2 = (tell.center + Vector2.from_angle(angle) * front).round()
-		canvas.draw_rect(Rect2(point - Vector2.ONE, Vector2(3, 3)), colors["9"])
-		canvas.draw_rect(Rect2(point - Vector2(0, 1), Vector2(1, 1)), colors["j"])
+		var id: int = int(mob["id"])
+		var chest: Vector2 = chest_world(mob, String(keys.get(id, "")))
+		if mob["state"] == &"windup" and mob.get("attack", &"") == &"warden_ring":
+			placed(canvas, "ring_charge", 1 + posmod(int(mob["state_ticks"]) / 6, 4), chest, frames, atlas)
+		if hits.has(id) and tick - int(hits[id]) < 12:
+			placed(canvas, "guard_hit", 1 + (tick - int(hits[id])) / 3, chest, frames, atlas)
+		if breaks.has(id) and tick - int(breaks[id]) < 18:
+			placed(canvas, "guard_break", 1 + (tick - int(breaks[id])) / 3, chest, frames, atlas)
 
 
 ## Torn ground the strike leaves at its real hit area: furrows for the Cleave, a split line for the Lash, a cracked ring for the Ring.
@@ -308,19 +309,7 @@ func draw_actor(canvas: CanvasItem, mob: Dictionary, key: String, tick: int, fra
 	# The chest stone's glow is the scene's rune lamp (lamps()) and the halo (creature_glow.gd); a guard hit throws chips (handle_event).
 	if bool(mob.get("guarded", false)):
 		sprite(canvas, "idle_spores", posmod(tick / 8 + id, 6) + 1, at, frames, atlas, left)
-	if breaks.has(id) and tick - int(breaks[id]) < 16:
-		sprite(canvas, "guard_break", mini(8, (tick - int(breaks[id])) / 2 + 1), at, frames, atlas, left)
 	if state == &"stagger":
 		sprite(canvas, "exposed_dust", posmod(tick / 6, 6) + 1, at, frames, atlas, left)
 	if arrivals.has(id) and tick - int(arrivals[id]) < 18:
 		sprite(canvas, "arrival", mini(6, (tick - int(arrivals[id])) / 3 + 1), at, frames, atlas, left)
-	if state == &"windup" and mob.get("attack", &"") == &"warden_ring":
-		# the Spore Ring gathers: spores and rune light spiral in to the chest stone (the warning on the floor is the telegraph's own)
-		var chest_at: Vector2 = chest_world(mob, key)
-		var progress: float = clampf(float(mob["state_ticks"]) / 56.0, 0.0, 1.0)
-		for i: int in 10:
-			var turn: float = float(i) / 10.0 * TAU + float(tick) * 0.09
-			var reach: float = lerpf(31.0, 7.0, fposmod(float(tick) * 0.03 + float(i) * 0.37, 1.0))
-			var point: Vector2 = (chest_at + Vector2(cos(turn) * reach, sin(turn) * reach * 0.55)).round()
-			var colour: Color = Color("e0f0ec") if (i + tick / 4) % 3 == 0 else Color("6aa89a")
-			canvas.draw_rect(Rect2(point, Vector2.ONE * (2.0 if progress > 0.6 and i % 2 == 0 else 1.0)), colour)
