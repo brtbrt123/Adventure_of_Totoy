@@ -34,3 +34,14 @@ Reviewed: `3ef88a54` (editable visual scene, props, registration handoff) and `9
 ## Cannot judge
 
 The look and feel, whether crowded waves stay readable at full speed, the reused sounds, and whether the trial is hard but fair: these are the owner's call after a real playthrough. The gameplay check restores HP and uses lethal hits to speed up clears, so it proves the wiring, not the balance.
+
+## Fixes made (Claude, 2026-10-31, while Codex is out)
+
+1. **Altar position:** the flagstone course, the trial pulses and the three progress marks now follow the `trial_altar` placement's feet (`TrialArt.altar_at`), so moving the altar in the Godot scene moves them too.
+2. **The ring:** redrawn as a broken, irregular course of worn flagstones in ground colours (dirt browns, missing stones, no rune dots, no blue), so only real warnings look like a ring around the player.
+3. **Contrast:** the dark altar now casts a wide, soft rune-light pool over the fight floor (`local_lights.json` `hollow_trial_altar_dark`: pool radius 150, energy 1.0; the lit altar's pool widened to 120). Measured on the real capture: the floor around the altar is about 13 % brighter, so mobs near the centre stand out. **Limit:** a mob at the far edge of the floor (the Boar in the wave-2 capture) is outside the pool and still dark; if that is still too hard to read in play, the next step is a faint rim light on mobs in this scene.
+4. **Finding 4 was wrong about its cause:** the blocky shape near the top edge is **not** a trial shadow. It is the **Runebound Warden, drawn at 2.5x** (`warden_effects.gd` scales its rectangle by 2.5), standing at the top edge of the floor. Turning the trial's local shadows off did not change it. A non-integer scale gives uneven, chunky pixels next to the 1x art and goes against the project's "integer scaling only" rule. **Not fixed here** (it is the Warden's art, approved at that size): the clean fix is to redraw the Warden's frames at the larger size natively (or use a whole-number scale such as 2x or 3x). Owner's call.
+
+Notes 1-3 done too: the "begin trial" hint needs an armed hero; the anchor/size override is removed (all 22 catalogue anchors match the atlas); arrival pulses only follow `mob_alerted` of the trial encounter. Note 4 (the number behind the level badge) is left for the HUD pass.
+
+Checks after the fixes: Codex's `check_scene.gd` and `check_gameplay.gd` pass headless; real-renderer captures redone (spawn warning, wave 2, win, chest).

@@ -613,7 +613,7 @@ func hint_text() -> String:
 	if snapshot.interact_target==&"chest" and snapshot.story_flags.has(&"basket_found"):return "[E] LOOK"
 	if snapshot.scene_id == &"hollow_trial_layered" and snapshot.interact_target == &"altar":
 		if snapshot.story_flags.has(&"trial_chest_opened"): return ""
-		return "[E] OPEN CHEST" if snapshot.trial.get("state",&"") == &"won" else ("[E] BEGIN TRIAL" if snapshot.trial.get("state",&"") == &"idle" else "")
+		return "[E] OPEN CHEST" if snapshot.trial.get("state",&"") == &"won" else ("[E] BEGIN TRIAL" if snapshot.trial.get("state",&"") == &"idle" and snapshot.armed else "")
 	return HINT_OVERRIDES.get(snapshot.interact_target, HINTS.get(snapshot.interact_kind, "[E] LOOK"))
 
 
@@ -848,9 +848,10 @@ func _draw() -> void:
 	if ground != null:
 		draw_texture(ground, Vector2.ZERO)
 	if snapshot.scene_id == &"hollow_trial_layered":
+		var altar: Vector2 = TrialArt.altar_at(prop_placements)
 		TrialArt.draw_floor(self,prop_placements,frames,sprites,shake_offset())
-		TrialArt.draw_ring(self,Vector2(256,180),colors)
-		trial_fx.draw_ground(self,snapshot.tick,colors)
+		TrialArt.draw_ring(self,altar,colors)
+		trial_fx.draw_ground(self,snapshot.tick,colors,altar)
 	var ring: Dictionary = snapshot.training.get("ring",{})
 	if bool(ring.get("active",false)):
 		var at: Vector2=ring["center"]
@@ -908,7 +909,7 @@ func _draw() -> void:
 		MobView.decorate(self, mob, colors, snapshot.hero.position, frames, sprites)
 	creature_effects.draw_overlay(self, snapshot, frames, sprites, colors)
 	if snapshot.scene_id == &"hollow_trial_layered":
-		TrialFX.draw_altar_progress(self,snapshot.trial,colors)
+		TrialFX.draw_altar_progress(self,snapshot.trial,colors,TrialArt.altar_at(prop_placements))
 	for cue: Dictionary in world_cues:
 		var age: int = snapshot.tick-int(cue["tick"])
 		var at: Vector2 = cue["at"]

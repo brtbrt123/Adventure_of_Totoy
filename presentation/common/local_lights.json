@@ -453,7 +453,7 @@
       ],
       "halo_radius": 32.0,
       "energy": 1.1,
-      "pool_radius": 48.0,
+      "pool_radius": 120.0,
       "pool_energy": 0.62,
       "colour": [
         0.48,
@@ -587,6 +587,28 @@
       "energy": 1.1,
       "pool_radius": 48.0,
       "pool_energy": 0.62,
+      "colour": [
+        0.48,
+        0.94,
+        0.86
+      ],
+      "core_colour": [
+        0.8,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "hollow_trial_altar_dark": [
+    {
+      "pixel": [
+        31,
+        24
+      ],
+      "halo_radius": 14.0,
+      "energy": 0.45,
+      "pool_radius": 150.0,
+      "pool_energy": 1.0,
       "colour": [
         0.48,
         0.94,

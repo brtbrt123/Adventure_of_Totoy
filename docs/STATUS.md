@@ -1,3 +1,7 @@
+## Hollow Trial review fixes (2026-10-31, Claude, done while Codex is out)
+
+Fixed the cross-review findings in Codex's Hollow Trial presentation: altar ring, pulses and progress marks follow the altar's placement; the ring is now a broken course of worn flagstones in ground colours (no longer looks like an indicator); a wide rune-light pool from the altar lifts the fight floor (about 13 percent brighter at the centre; far-edge mobs still dark); hint needs an armed hero; anchor override removed; arrival pulses only for trial mobs. The blocky shape near the top edge is the Warden drawn at a non-integer 2.5x scale, not a trial bug: left for the owner. Core 568, Python, all headless smokes and Codex's two trial checks pass; captures redone. docs/CROSS_REVIEW_hollow_trial.md.
+
 ## Hollow Trial props registered (2026-10-31, Claude)
 
 Codex's 22 props are in data/props/prop_defs_hollow_trial.json and placed in the room (chest on top of the altar, not solid; the altar holds the body). Walkable outline traced from Codex's floor painting. Tests: altar, spawn points and way out reachable, fight floor open apart from the altar, entry roots seal and open (test_hollow_trial.gd, 14). Core 568 pass, Python pass. smoke_profile and smoke_variant_atlases fail on Codex's uncommitted atlas rebuild (art/build), not on this change. Codex: re-canvas the chest to sit on the altar, merge the light sockets, the owner's review list (docs/CODEX_TASK_hollow_trial.md).

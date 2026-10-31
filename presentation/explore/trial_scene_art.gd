@@ -3,29 +3,41 @@ extends RefCounted
 const Light := preload("res://presentation/common/environment_light.gd")
 const LocalShadow := preload("res://presentation/common/local_prop_shadows.gd")
 static func draw_ring(canvas: Node2D, at: Vector2, colours: Dictionary) -> void:
-	# Flush flagstone/rune course: decoration, never a telegraph or collision boundary.
-	for i: int in 18:
-		var angle: float = TAU*i/18.0
+	# A worn course of flush flagstones around the altar: irregular, broken and in ground colours, so it reads as old paving and never as
+	# a ring around the player (only real warnings may look like that). Decoration only: no collision, no telegraph.
+	for i: int in 22:
+		if i in [3, 4, 9, 15, 16, 20]:
+			continue  # missing stones: the course is broken, not a closed shape
+		var angle: float = TAU * (float(i) + _jitter(i, 1) * 0.35) / 22.0
+		var radius: float = 37.0 + _jitter(i, 2) * 4.0
+		var width: float = 0.07 + _jitter(i, 3) * 0.04
+		var depth: float = 4.0 + _jitter(i, 4) * 3.0
 		var stone: PackedVector2Array = []
-		for pair: Vector2 in [Vector2(-.10,35),Vector2(.10,35),Vector2(.10,42),Vector2(-.10,42)]:
-			stone.append((at+Vector2(cos(angle+pair.x)*pair.y,sin(angle+pair.x)*pair.y*.6)).round())
-		canvas.draw_colored_polygon(stone,colours["e"] if i%3==0 else colours["f"])
-		canvas.draw_polyline(PackedVector2Array([stone[0],stone[1],stone[2]]),colours["g"],1.0,false)
-		if i%3==0:
-			var rune: Vector2 = at+Vector2(cos(angle)*38,sin(angle)*23)
-			canvas.draw_rect(Rect2(rune.round(),Vector2(2,1)),colours["t"])
+		for pair: Vector2 in [Vector2(-width, radius), Vector2(width, radius), Vector2(width, radius + depth), Vector2(-width, radius + depth)]:
+			stone.append((at + Vector2(cos(angle + pair.x) * pair.y, sin(angle + pair.x) * pair.y * 0.6)).round())
+		canvas.draw_colored_polygon(stone, colours["9"] if i % 4 == 0 else colours["a"])
+		canvas.draw_polyline(PackedVector2Array([stone[0], stone[1]]), colours["b"], 1.0, false)
+
+
+## A fixed number in [-1, 1] per stone (no randomness: the course is the same every frame).
+static func _jitter(i: int, k: int) -> float:
+	var x: int = ((i + 1) * 73856093) ^ (k * 19349663)
+	x = (x * 1103515245 + 12345) & 0x7fffffff
+	return float(x % 2001) / 1000.0 - 1.0
+
+
+## Where the altar stands now (its placement's feet), so everything drawn around it follows it when it is moved in the editor.
+static func altar_at(placements: Array[Dictionary], fallback: Vector2 = Vector2(256, 180)) -> Vector2:
+	for p: Dictionary in placements:
+		if String(p["id"]) == "trial_altar":
+			return p["feet"]
+	return fallback
 
 static func visual_placements(source: Array[Dictionary], frames: Dictionary) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for p: Dictionary in source:
 		var item: Dictionary = p.duplicate()
-		var name: String = String(p["type"])
-		if name.begins_with("hollow_trial_") and not bool(p["solid"]) and frames.has(name):
-			# Decorative source canvas may include transparent support height (the chest resting on the altar).
-			# No physical shape or world position is changed.
-			var f: Dictionary = frames[name]
-			item["anchor"] = Vector2(f["ax"],f["ay"])
-			item["size"] = Vector2(f["w"],f["h"])
+		# The catalogue's anchors and sizes match the art (the chest's 40x64 canvas included), so nothing is overridden here.
 		if String(p["id"]) == "trial_chest":
 			item["shadow_radius"] = 0.0 # its support is the altar, not an additional body on the floor
 		out.append(item)

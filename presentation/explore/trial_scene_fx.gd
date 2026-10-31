@@ -29,7 +29,8 @@ func handle_event(event: GameEvent) -> void:
 			for at: Vector2 in event.data["positions"]:
 				warnings.append({"at":at,"tick":event.tick,"arrive":int(event.data["arrive_tick"])})
 		&"mob_alerted":
-			arrivals.append({"at":event.data["position"],"tick":event.tick})
+			if event.data.get("encounter_id", &"") == &"hollow_trial":  # only the trial's own arrivals
+				arrivals.append({"at":event.data["position"],"tick":event.tick})
 		&"trial_started", &"trial_wave_cleared", &"trial_won":
 			pulses.append({"tick":event.tick})
 		&"trial_failed":
@@ -42,7 +43,7 @@ static func cleared_segments(trial: Dictionary) -> int:
 		return int(trial.get("waves",3))
 	return maxi(0,int(trial.get("wave",0))-(0 if trial.get("state",&"")==&"between" else 1))
 
-func draw_ground(canvas: Node2D, tick: int, colours: Dictionary) -> void:
+func draw_ground(canvas: Node2D, tick: int, colours: Dictionary, altar: Vector2 = Vector2(256, 180)) -> void:
 	for w: Dictionary in warnings:
 		var at: Vector2 = w["at"]
 		var progress: float = clampf(float(tick-int(w["tick"]))/maxi(1,int(w["arrive"])-int(w["tick"])),0.0,1.0)
@@ -57,9 +58,9 @@ func draw_ground(canvas: Node2D, tick: int, colours: Dictionary) -> void:
 		canvas.draw_arc(arrival["at"],4+age*.6,0,TAU,24,colours["o"] if age<8 else colours["t"],1.0,false)
 	for pulse: Dictionary in pulses:
 		var age: int = tick-int(pulse["tick"])
-		canvas.draw_arc(Vector2(256,180),8+age*2.5,0,TAU,48,colours["u"] if age<12 else colours["t"],1.0,false)
+		canvas.draw_arc(altar,8+age*2.5,0,TAU,48,colours["u"] if age<12 else colours["t"],1.0,false)
 
-static func draw_altar_progress(canvas: Node2D, trial: Dictionary, colours: Dictionary) -> void:
+static func draw_altar_progress(canvas: Node2D, trial: Dictionary, colours: Dictionary, altar: Vector2 = Vector2(256, 180)) -> void:
 	var cleared: int = cleared_segments(trial)
 	for i: int in 3:
-		canvas.draw_rect(Rect2(245+i*10,170,6,2),colours["o"] if i<cleared else colours["e"])
+		canvas.draw_rect(Rect2(altar + Vector2(-11 + i * 10, -10), Vector2(6, 2)),colours["o"] if i<cleared else colours["e"])
