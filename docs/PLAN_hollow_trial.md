@@ -54,3 +54,7 @@ Hard on purpose: mobs in a wave wake together, boars charge across the whole flo
 3. Owner: confirm the Warden's name and look, pick the Aspect, play and say if it is hard enough; numbers are first guesses and are not judged.
 
 Note: this room should be built as a map **scene** (`presentation/maps/*.tscn` + baker) once the phase 2 migration lands; until then it is a normal `data/scenes` file.
+
+## Layout fixed (2026-10-31)
+
+Scene `hollow_trial_layered`, 512x352, entered from Root Hollow's upper-left exit at its bottom edge (x 228-284), dead end. Altar at (256, 180), chest at (256, 136), fight floor [112, 92, 288x184], twelve spawn points on the rim (all at least 109 px from the entry and 122 px from the altar, 57 px apart). Exact numbers: `docs/previews/hollow_trial_v1/layout.json`, guide `walkable_guide.png`. Codex's art and presentation task: `docs/CODEX_TASK_hollow_trial.md`.
