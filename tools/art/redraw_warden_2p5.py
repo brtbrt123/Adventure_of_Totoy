@@ -8,8 +8,8 @@ and the effects were stretched at draw time. This tool redraws both at their gam
     colours) gives a 6x image; a majority vote over each 2.4x2.4 window brings it to exactly 2.5x. Transparency must win clearly, so
     thin dark outlines survive. Every output pixel is a palette colour or fully transparent.
 
-It rewrites exactly the Warden grids that exist in art/src (warden_*.txt and fx_warden_*.txt): body anchors become (50, 110) like
-before, effect anchors are the design anchor x 2.5. Canvases are trimmed to the art (multiples of 8) to keep the atlas small.
+It rewrites the Warden EFFECT grids that exist in art/src (fx_warden_*.txt): effect anchors are the design anchor x 2.5. The body
+poses come from the detailed design instead (tools/art/rig_warden_v2.py, owner request 2026-10-31). Canvases are trimmed to the art (multiples of 8) to keep the atlas small.
 
     python tools/art/redraw_warden_2p5.py            # rewrite the grids, then validate/build/preview as usual
     python tools/art/redraw_warden_2p5.py --check    # only report what would change
@@ -138,10 +138,7 @@ def sources() -> dict[str, tuple[Path, tuple[int, int]]]:
     """Every Warden grid in art/src mapped to its design PNG and design anchor."""
     manifest = json.loads((SOURCE / "manifest.json").read_text(encoding="utf-8"))
     out: dict[str, tuple[Path, tuple[int, int]]] = {}
-    for grid in sorted((ROOT / "art/src").glob("warden_*.txt")):
-        stem = grid.stem
-        state = stem[len("warden_"):].split("_right_")[0]
-        out[stem] = (SOURCE / "body" / state / f"{stem}.png", BODY_ANCHOR)
+    # The body (warden_*.txt) is no longer redrawn here: since the detailed design it comes from tools/art/rig_warden_v2.py.
     for grid in sorted((ROOT / "art/src").glob("fx_warden_*.txt")):
         stem = grid.stem
         family = stem[len("fx_warden_"):].rsplit("_", 1)[0]

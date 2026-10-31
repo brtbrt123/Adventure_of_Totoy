@@ -1,5 +1,6 @@
-"""Verify imported pixels in feet coordinates, independent of packing/trim dimensions. Since 2026-10-31 the Warden is redrawn natively
-at 2.5x from its 48x48 design (tools/art/redraw_warden_2p5.py); the atlas must hold exactly that redraw."""
+"""Verify imported pixels in feet coordinates, independent of packing/trim dimensions. Since 2026-10-31 the Warden's body is the detailed
+design posed by tools/art/rig_warden_v2.py and its effects are redrawn natively at 2.5x (tools/art/redraw_warden_2p5.py); the atlas
+must hold exactly those."""
 from pathlib import Path
 import hashlib
 import json
@@ -12,6 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools' / 'art'))
 import redraw_warden_2p5 as redraw_tool  # noqa: E402
+import rig_warden_v2 as rig_tool  # noqa: E402
 
 
 def pixels(im, anchor):
@@ -27,16 +29,15 @@ class WardenArtTests(unittest.TestCase):
         manifest = json.loads((v4/'manifest.json').read_text())
         count = 0
         palette = {c['symbol']: tuple(bytes.fromhex(c['hex'][1:])) for c in json.loads((ROOT/'art/palette.json').read_text())['colors']}
+        body = rig_tool.build()  # the detailed design posed (owner 2026-10-31)
         for key, f in frames.items():
             if key.startswith('warden_'):
-                state = key[len('warden_'):].split('_right_')[0]
-                source, design_anchor = v4/'body'/state/(key+'.png'), redraw_tool.BODY_ANCHOR
+                rows, anchor, _ = body[key]
             elif key.startswith('fx_warden_'):
                 family = key[len('fx_warden_'):].rsplit('_',1)[0]
-                source, design_anchor = v4/'fx'/family/(key+'.png'), tuple(manifest['fx_assets'][key]['anchor'])
+                rows, anchor = redraw_tool.redraw(v4/'fx'/family/(key+'.png'), tuple(manifest['fx_assets'][key]['anchor']))
             else:
                 continue
-            rows, anchor = redraw_tool.redraw(source, design_anchor)
             im = Image.new('RGBA', (len(rows[0]), len(rows)), (0, 0, 0, 0))
             for y, row in enumerate(rows):
                 for x, symbol in enumerate(row):

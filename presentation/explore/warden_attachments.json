@@ -1,602 +1,602 @@
 {
-  "warden_cleave_strike_right_1": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      20,
-      -34
-    ]
-  },
-  "warden_cleave_strike_right_2": {
-    "chest": [
-      5.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      24,
-      -8
-    ]
-  },
-  "warden_cleave_strike_right_3": {
-    "chest": [
-      4.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      15,
-      -4
-    ]
-  },
-  "warden_cleave_tell_right_1": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      18,
-      -7
-    ]
-  },
-  "warden_cleave_tell_right_2": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      24,
-      -12
-    ]
-  },
-  "warden_cleave_tell_right_3": {
-    "chest": [
-      3.6000000000000014,
-      -19.4
-    ],
-    "hook": [
-      24,
-      -25
-    ]
-  },
-  "warden_cleave_tell_right_4": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      18,
-      -36
-    ]
-  },
-  "warden_cleave_tell_right_5": {
-    "chest": [
-      2.833333333333332,
-      -20.5
-    ],
-    "hook": [
-      10,
-      -1
-    ]
-  },
-  "warden_death_right_1": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      16,
-      -6
-    ]
-  },
-  "warden_death_right_2": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      16,
-      -6
-    ]
-  },
-  "warden_death_right_3": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      25,
-      -2
-    ]
-  },
-  "warden_death_right_4": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      25,
-      -2
-    ]
-  },
-  "warden_death_right_5": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      25,
-      -1
-    ]
-  },
-  "warden_death_right_6": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      26,
-      -1
-    ]
-  },
-  "warden_death_right_7": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      26,
-      -1
-    ]
-  },
-  "warden_death_right_8": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      26,
-      -1
-    ]
-  },
-  "warden_exposed_right_1": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      17,
-      -6
-    ]
-  },
-  "warden_exposed_right_2": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      17,
-      -6
-    ]
-  },
-  "warden_exposed_right_3": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      17,
-      -6
-    ]
-  },
-  "warden_exposed_right_4": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      17,
-      -6
-    ]
-  },
-  "warden_guard_hit_right_1": {
-    "chest": [
-      2.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      17,
-      -7
-    ]
-  },
-  "warden_guard_hit_right_2": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      18,
-      -7
-    ]
-  },
-  "warden_hurt_right_1": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      15,
-      -6
-    ]
-  },
-  "warden_hurt_right_2": {
-    "chest": [
-      5,
-      -18
-    ],
-    "hook": [
-      16,
-      -6
-    ]
-  },
   "warden_idle_right_1": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      18,
-      -7
+      20.4,
+      -1.2
     ]
   },
   "warden_idle_right_2": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      18,
-      -7
+      20.4,
+      -1.2
     ]
   },
   "warden_idle_right_3": {
     "chest": [
-      3.833333333333332,
-      -20.5
+      2.8,
+      -27.2
     ],
     "hook": [
-      18,
-      -8
+      20.4,
+      -0.8
     ]
   },
   "warden_idle_right_4": {
     "chest": [
-      3.833333333333332,
-      -20.5
+      2.8,
+      -27.2
     ],
     "hook": [
-      18,
-      -8
+      20.4,
+      -0.8
     ]
   },
   "warden_idle_right_5": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.2
     ],
     "hook": [
-      18,
-      -7
+      20.4,
+      -0.8
     ]
   },
   "warden_idle_right_6": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      18,
-      -7
-    ]
-  },
-  "warden_lash_strike_right_1": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      24,
-      -12
-    ]
-  },
-  "warden_lash_strike_right_2": {
-    "chest": [
-      4.600000000000001,
-      -19.4
-    ],
-    "hook": [
-      25,
-      -25
-    ]
-  },
-  "warden_lash_strike_right_3": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      25,
-      -14
-    ]
-  },
-  "warden_lash_tell_right_1": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      18,
-      -7
-    ]
-  },
-  "warden_lash_tell_right_2": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      14,
-      -4
-    ]
-  },
-  "warden_lash_tell_right_3": {
-    "chest": [
-      2.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      10,
-      -1
-    ]
-  },
-  "warden_lash_tell_right_4": {
-    "chest": [
-      2.8000000000000007,
-      -19.8
-    ],
-    "hook": [
-      10,
-      -1
-    ]
-  },
-  "warden_lash_tell_right_5": {
-    "chest": [
-      1.8000000000000007,
-      -19.8
-    ],
-    "hook": [
-      10,
-      -1
-    ]
-  },
-  "warden_recover_right_1": {
-    "chest": [
-      3.833333333333332,
-      -18.5
-    ],
-    "hook": [
-      14,
-      -4
-    ]
-  },
-  "warden_recover_right_2": {
-    "chest": [
-      3.833333333333332,
-      -18.5
-    ],
-    "hook": [
-      15,
-      -7
-    ]
-  },
-  "warden_recover_right_3": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      17,
-      -6
-    ]
-  },
-  "warden_recover_right_4": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      18,
-      -7
-    ]
-  },
-  "warden_ring_strike_right_1": {
-    "chest": [
-      3.6000000000000014,
-      -16.4
-    ],
-    "hook": [
-      14,
-      -4
-    ]
-  },
-  "warden_ring_strike_right_2": {
-    "chest": [
-      3.833333333333332,
-      -18.5
-    ],
-    "hook": [
-      16,
-      -5
-    ]
-  },
-  "warden_ring_strike_right_3": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      18,
-      -7
-    ]
-  },
-  "warden_ring_tell_right_1": {
-    "chest": [
-      3.833333333333332,
-      -19.5
-    ],
-    "hook": [
-      18,
-      -7
-    ]
-  },
-  "warden_ring_tell_right_2": {
-    "chest": [
-      3.833333333333332,
-      -18.5
-    ],
-    "hook": [
-      17,
-      -6
-    ]
-  },
-  "warden_ring_tell_right_3": {
-    "chest": [
-      3.833333333333332,
-      -17.5
-    ],
-    "hook": [
-      16,
-      -5
-    ]
-  },
-  "warden_ring_tell_right_4": {
-    "chest": [
-      3.6000000000000014,
-      -16.4
-    ],
-    "hook": [
-      14,
-      -6
-    ]
-  },
-  "warden_ring_tell_right_5": {
-    "chest": [
-      3.333333333333332,
-      -16.0
-    ],
-    "hook": [
-      13,
-      -6
+      20.4,
+      -1.2
     ]
   },
   "warden_wake_right_1": {
     "chest": [
-      3.833333333333332,
-      -16.5
+      2.8,
+      -25.2
     ],
     "hook": [
-      18,
-      -7
+      17.15,
+      2.41
     ]
   },
   "warden_wake_right_2": {
     "chest": [
-      3.833333333333332,
-      -17.5
+      2.8,
+      -26.0
     ],
     "hook": [
-      18,
-      -7
+      18.25,
+      1.25
     ]
   },
   "warden_wake_right_3": {
     "chest": [
-      3.833333333333332,
-      -18.5
+      2.8,
+      -26.8
     ],
     "hook": [
-      18,
-      -7
+      19.33,
+      0.04
     ]
   },
   "warden_wake_right_4": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      18,
-      -7
+      20.4,
+      -1.2
     ]
   },
   "warden_walk_right_1": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      20,
-      -5
+      18.79,
+      -0.55
     ]
   },
   "warden_walk_right_2": {
     "chest": [
-      3.833333333333332,
-      -20.5
+      2.8,
+      -27.2
     ],
     "hook": [
-      18,
-      -8
+      19.6,
+      -0.46
     ]
   },
   "warden_walk_right_3": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      16,
-      -8
+      20.4,
+      -1.2
     ]
   },
   "warden_walk_right_4": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      17,
-      -6
+      21.97,
+      -1.93
     ]
   },
   "warden_walk_right_5": {
     "chest": [
-      3.833333333333332,
-      -20.5
+      2.8,
+      -27.2
     ],
     "hook": [
-      18,
-      -8
+      21.19,
+      -1.16
     ]
   },
   "warden_walk_right_6": {
     "chest": [
-      3.833333333333332,
-      -19.5
+      2.8,
+      -27.6
     ],
     "hook": [
-      20,
-      -8
+      20.4,
+      -1.2
+    ]
+  },
+  "warden_cleave_tell_right_1": {
+    "chest": [
+      2.4,
+      -27.6
+    ],
+    "hook": [
+      29.6,
+      -7.55
+    ]
+  },
+  "warden_cleave_tell_right_2": {
+    "chest": [
+      2.0,
+      -27.6
+    ],
+    "hook": [
+      37.23,
+      -19.44
+    ]
+  },
+  "warden_cleave_tell_right_3": {
+    "chest": [
+      2.0,
+      -27.6
+    ],
+    "hook": [
+      39.48,
+      -33.61
+    ]
+  },
+  "warden_cleave_tell_right_4": {
+    "chest": [
+      1.6,
+      -27.6
+    ],
+    "hook": [
+      36.4,
+      -44.8
+    ]
+  },
+  "warden_cleave_tell_right_5": {
+    "chest": [
+      1.6,
+      -27.6
+    ],
+    "hook": [
+      33.65,
+      -49.88
+    ]
+  },
+  "warden_cleave_strike_right_1": {
+    "chest": [
+      3.6,
+      -27.6
+    ],
+    "hook": [
+      37.65,
+      -16.8
+    ]
+  },
+  "warden_cleave_strike_right_2": {
+    "chest": [
+      4.4,
+      -26.8
+    ],
+    "hook": [
+      13.68,
+      1.98
+    ]
+  },
+  "warden_cleave_strike_right_3": {
+    "chest": [
+      4.0,
+      -26.8
+    ],
+    "hook": [
+      4.63,
+      2.13
+    ]
+  },
+  "warden_lash_tell_right_1": {
+    "chest": [
+      2.4,
+      -27.6
+    ],
+    "hook": [
+      13.39,
+      0.88
+    ]
+  },
+  "warden_lash_tell_right_2": {
+    "chest": [
+      2.0,
+      -27.6
+    ],
+    "hook": [
+      6.09,
+      1.54
+    ]
+  },
+  "warden_lash_tell_right_3": {
+    "chest": [
+      1.6,
+      -27.6
+    ],
+    "hook": [
+      -0.06,
+      0.98
+    ]
+  },
+  "warden_lash_tell_right_4": {
+    "chest": [
+      1.6,
+      -27.6
+    ],
+    "hook": [
+      -3.43,
+      0.17
+    ]
+  },
+  "warden_lash_tell_right_5": {
+    "chest": [
+      1.6,
+      -27.6
+    ],
+    "hook": [
+      -4.53,
+      -0.18
+    ]
+  },
+  "warden_lash_strike_right_1": {
+    "chest": [
+      4.4,
+      -27.6
+    ],
+    "hook": [
+      41.27,
+      -24.98
+    ]
+  },
+  "warden_lash_strike_right_2": {
+    "chest": [
+      5.2,
+      -27.6
+    ],
+    "hook": [
+      41.83,
+      -39.32
+    ]
+  },
+  "warden_lash_strike_right_3": {
+    "chest": [
+      4.8,
+      -27.6
+    ],
+    "hook": [
+      41.98,
+      -36.48
+    ]
+  },
+  "warden_ring_tell_right_1": {
+    "chest": [
+      2.8,
+      -27.2
+    ],
+    "hook": [
+      22.49,
+      -1.79
+    ]
+  },
+  "warden_ring_tell_right_2": {
+    "chest": [
+      2.8,
+      -26.8
+    ],
+    "hook": [
+      24.5,
+      -2.53
+    ]
+  },
+  "warden_ring_tell_right_3": {
+    "chest": [
+      2.8,
+      -26.4
+    ],
+    "hook": [
+      26.43,
+      -3.41
+    ]
+  },
+  "warden_ring_tell_right_4": {
+    "chest": [
+      2.8,
+      -26.0
+    ],
+    "hook": [
+      28.27,
+      -4.42
+    ]
+  },
+  "warden_ring_tell_right_5": {
+    "chest": [
+      2.8,
+      -26.0
+    ],
+    "hook": [
+      29.15,
+      -5.17
+    ]
+  },
+  "warden_ring_strike_right_1": {
+    "chest": [
+      2.8,
+      -24.8
+    ],
+    "hook": [
+      23.51,
+      0.05
+    ]
+  },
+  "warden_ring_strike_right_2": {
+    "chest": [
+      2.8,
+      -26.4
+    ],
+    "hook": [
+      21.45,
+      -0.48
+    ]
+  },
+  "warden_ring_strike_right_3": {
+    "chest": [
+      2.8,
+      -27.2
+    ],
+    "hook": [
+      20.4,
+      -0.8
+    ]
+  },
+  "warden_recover_right_1": {
+    "chest": [
+      3.6,
+      -27.6
+    ],
+    "hook": [
+      10.01,
+      1.48
+    ]
+  },
+  "warden_recover_right_2": {
+    "chest": [
+      3.2,
+      -27.6
+    ],
+    "hook": [
+      14.19,
+      0.88
+    ]
+  },
+  "warden_recover_right_3": {
+    "chest": [
+      3.2,
+      -27.6
+    ],
+    "hook": [
+      17.55,
+      0.01
+    ]
+  },
+  "warden_recover_right_4": {
+    "chest": [
+      2.8,
+      -27.6
+    ],
+    "hook": [
+      20.4,
+      -1.2
+    ]
+  },
+  "warden_guard_hit_right_1": {
+    "chest": [
+      1.6,
+      -27.6
+    ],
+    "hook": [
+      19.2,
+      -1.2
+    ]
+  },
+  "warden_guard_hit_right_2": {
+    "chest": [
+      2.4,
+      -27.6
+    ],
+    "hook": [
+      20.0,
+      -1.2
+    ]
+  },
+  "warden_hurt_right_1": {
+    "chest": [
+      1.6,
+      -27.2
+    ],
+    "hook": [
+      15.95,
+      0.41
+    ]
+  },
+  "warden_hurt_right_2": {
+    "chest": [
+      2.4,
+      -27.6
+    ],
+    "hook": [
+      18.93,
+      -0.76
+    ]
+  },
+  "warden_exposed_right_1": {
+    "chest": [
+      2.0,
+      -25.6
+    ],
+    "hook": [
+      11.85,
+      3.09
+    ]
+  },
+  "warden_exposed_right_2": {
+    "chest": [
+      2.0,
+      -24.4
+    ],
+    "hook": [
+      11.85,
+      4.29
+    ]
+  },
+  "warden_exposed_right_3": {
+    "chest": [
+      2.0,
+      -24.4
+    ],
+    "hook": [
+      11.85,
+      4.29
+    ]
+  },
+  "warden_exposed_right_4": {
+    "chest": [
+      2.0,
+      -24.4
+    ],
+    "hook": [
+      11.85,
+      4.29
+    ]
+  },
+  "warden_death_right_1": {
+    "chest": [
+      2.8,
+      -26.4
+    ],
+    "hook": [
+      14.92,
+      1.83
+    ]
+  },
+  "warden_death_right_2": {
+    "chest": [
+      2.4,
+      -24.8
+    ],
+    "hook": [
+      11.68,
+      3.98
+    ]
+  },
+  "warden_death_right_3": {
+    "chest": [
+      2.0,
+      -23.2
+    ],
+    "hook": [
+      8.41,
+      5.88
+    ]
+  },
+  "warden_death_right_4": {
+    "chest": [
+      1.6,
+      -21.6
+    ],
+    "hook": [
+      5.12,
+      7.53
+    ]
+  },
+  "warden_death_right_5": {
+    "chest": [
+      1.2,
+      -20.0
+    ],
+    "hook": [
+      1.83,
+      8.93
+    ]
+  },
+  "warden_death_right_6": {
+    "chest": [
+      1.2,
+      -18.4
+    ],
+    "hook": [
+      -1.02,
+      10.07
+    ]
+  },
+  "warden_death_right_7": {
+    "chest": [
+      1.2,
+      -17.2
+    ],
+    "hook": [
+      -3.83,
+      10.57
+    ]
+  },
+  "warden_death_right_8": {
+    "chest": [
+      1.2,
+      -16.4
+    ],
+    "hook": [
+      -6.56,
+      10.43
     ]
   }
 }
