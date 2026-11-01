@@ -174,6 +174,8 @@ def import_sheet(name: str, colours: dict[str, tuple[int, int, int]]) -> list[tu
         cw, ch = int((box[2] - box[0]) * scale), int((box[3] - box[1]) * scale)
         if anchor_mode == "rim":  # the outer rim on the hit edge, the slash centred on the cone's axis
             anchor = (round(max(xs) - CLEAVE_RIM), round((min(ys) + max(ys)) / 2))
+            # Gemini's speed streaks trail back past the feet: the slash is cut there, so it only sweeps the cone in front
+            canvas = {k: v for k, v in canvas.items() if k[0] >= anchor[0] + 2}
         elif anchor_mode == "ground":
             anchor = (cw // 2, ground)
         elif anchor_mode == "back":  # the crack's back end at the feet, on its own centre line

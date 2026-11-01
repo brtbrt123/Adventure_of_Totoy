@@ -1,3 +1,12 @@
+## Runebound Warden gallery scene (2026-11-01, Claude, done while Codex is out)
+
+Owner: see every Warden animation and effect in the Godot editor. presentation/library/warden_gallery.tscn (a @tool scene) plays in the 2D view without running the game:
+- the 14 body animations at game timings;
+- four attack loops (Cleave pointing right and turned down-left, Lash, Spore Ring): the wind-up with its hit area outlined, the strike effect at the real hit size, the torn ground;
+- the effect frames (ring charge, guard hit, guard break, footstep, death);
+- every particle burst kind.
+It draws through the game's own code (warden_effects.gd, creature_particles.gd) and the built atlas, so it shows exactly what the game shows. Inspector: playing, speed, facing_left, show_labels. Also: the Cleave slash frames are now cut at the Warden's feet (tools/art/import_warden_fx.py), so Gemini's trailing streaks no longer sweep behind the body. Smokes, trial checks, scene audit pass; capture presentation/review/warden_v2/warden_gallery.png. First piece of the library scene in docs/GODOT_EDITABLE_PLAN.md step 6; steps 3-4 (SpriteFrames and effect scenes for everything) are still to do.
+
 ## Creature particles drawn as pixel art (2026-10-31, Claude, done while Codex is out)
 
 Owner: "improve the particles, leaves and dust" (done in code, not by an image generator). presentation/explore/creature_particles.gd draws every particle as a small pixel-art shape shaded with the neighbouring steps of its own palette ramp:
