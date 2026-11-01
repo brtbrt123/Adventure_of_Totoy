@@ -1,3 +1,7 @@
+## Wind sway removed (2026-11-01, Claude, done while Codex is out)
+
+Owner: "I don't like the sway, remove it". The plant wind sway is gone: its code in explore_scene.gd, the "Wind in the plants" group of scene_look.gd and its section in docs/ANIMATION_EDITING.md, and the forest wind clip. Glow, colour grade, vignette and ground mist stay. Explore smokes, the resource test and both trial checks pass.
+
 ## Scene look shaders: glow, colour grade, vignette, ground mist, wind (2026-11-01, Claude, done while Codex is out)
 
 Owner: "add shaders so the scene looks good"; chose all four looks for every explore scene.

@@ -29,11 +29,9 @@ var displayed_trial_seal: bool = false
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
-const SceneLook := preload("res://presentation/effects/scene_look.gd")  # the scene's grade, vignette, glow, mist and wind (looks/<scene>.tres)
+const SceneLook := preload("res://presentation/effects/scene_look.gd")  # the scene's grade, vignette, glow and mist (looks/<scene>.tres)
 const SCENE_POST := preload("res://presentation/effects/scene_post.gdshader")
 const MIST_PASS_ALPHA: float = 0.985  # a rect drawn with this alpha is the lighting shader's mist pass (overhead_light.gdshader)
-## Plant props that sway in the wind (by name); the mushrooms and the Root Hollow root wall stay still.
-const SWAYING: Array[String] = ["bush", "fern", "flowers", "thorns", "tree"]
 var look: Resource = null  # SceneLook of the current scene
 var post_rect: ColorRect = null  # the screen look, between the world and the HUD
 var _mist_edges: Dictionary = {}  # scene id -> ImageTexture (1 near the floor's edge)
@@ -973,18 +971,7 @@ func _draw_item(item: Dictionary) -> void:
 			var rect: Rect2 = item["rect"]
 			rect.position += offset
 			drawn["rect"] = rect
-		var sway: float = _sway(drawn)
-		if sway != 0.0:
-			# the plant leans from its base: its top row moves `sway` whole pixels, the rows below proportionally less (nearest
-			# sampling keeps the pixels square, so it reads as rows sliding, the way pixel-art foliage moves)
-			var feet: Vector2 = Vector2(drawn["at"]).round()
-			var height: float = maxf(1.0, absf((drawn["rect"] as Rect2).size.y))
-			var lean: Transform2D = Transform2D(Vector2(1, 0), Vector2(-sway / height, 1), Vector2.ZERO)
-			draw_set_transform_matrix(Transform2D(0.0, shake_offset()) * Transform2D(0.0, feet) * lean * Transform2D(0.0, -feet))
-			PropsLayer.draw(self, drawn, sprites, ambient())
-			draw_set_transform(shake_offset())
-		else:
-			PropsLayer.draw(self, drawn, sprites, ambient())
+		PropsLayer.draw(self, drawn, sprites, ambient())
 		return
 	var at: Vector2 = Vector2(item["at"]).round()
 	var radius: float = float(item["shadow"])
@@ -1017,26 +1004,6 @@ func _draw_item(item: Dictionary) -> void:
 		_draw_buff_aura(snapshot.hero, true)
 		_draw_spin_ring(snapshot.hero, true)
 		_draw_hero_aspect_overlays(snapshot.hero, key, at, bool(item["left"]))
-
-
-## How far (whole px) a plant prop's top leans in the wind right now (0 for anything that does not sway, or when the scene's wind is
-## off). Follows the game clock (it pauses with the game); each plant has its own phase.
-func _sway(item: Dictionary) -> float:
-	if look == null or not bool(look.get("wind_enabled")) or float(look.get("wind_sway")) <= 0.0:
-		return 0.0
-	var type: String = String(item.get("type", ""))
-	if type.contains("rootwall") or type.contains("mushroom"):
-		return 0.0
-	var plant: bool = false
-	for word: String in SWAYING:
-		if type.contains(word):
-			plant = true
-	if not plant:
-		return 0.0
-	var at: Vector2 = item["at"]
-	var t: float = float(snapshot.tick) / 60.0 * float(look.get("wind_speed")) * TAU
-	var gust: float = 1.0 - float(look.get("wind_gusts")) * (0.5 + 0.5 * sin(float(snapshot.tick) / 60.0 * 0.37 + at.x * 0.011))
-	return roundf(float(look.get("wind_sway")) * gust * sin(t + at.x * 0.07 + at.y * 0.05))
 
 
 func _draw_actor_cast(item: Dictionary) -> void:

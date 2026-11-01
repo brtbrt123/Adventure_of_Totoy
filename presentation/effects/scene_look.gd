@@ -1,7 +1,7 @@
 @tool
 extends Resource
 ## How an explore scene looks on screen (owner 2026-11-01: "add shaders so the scene looks good"): a colour grade, a vignette, a glow on
-## bright things, drifting ground mist and wind in the plants. One per scene, presentation/effects/looks/<scene id>.tres
+## bright things and drifting ground mist (the wind sway was tried and removed at the owner's request). One per scene, presentation/effects/looks/<scene id>.tres
 ## (village_layered, forest_layered, glade_layered, woodland_layered, root_hollow_layered, hollow_trial_layered), every value editable in
 ## the Inspector; a scene without a file uses these defaults. Read when the scene is entered (presentation/explore/explore_scene.gd);
 ## the shaders are presentation/effects/scene_post.gdshader (grade, vignette, glow) and presentation/common/overhead_light.gdshader
@@ -39,13 +39,6 @@ const DIR: String = "res://presentation/effects/looks/"
 @export_range(8.0, 200.0, 1.0) var mist_scale: float = 54.0  ## the size of its clouds (px)
 @export_range(0.0, 30.0, 0.5) var mist_speed: float = 6.0  ## how fast it drifts (px a second)
 @export var mist_colour: Color = Color(0.44, 0.48, 0.52)  ## kept dim and near grey: a bright or blue mist would wash the floor out
-
-@export_group("Wind in the plants")
-@export var wind_enabled: bool = true
-@export_range(0.0, 6.0, 0.5) var wind_sway: float = 1.0  ## how far the tops of bushes, ferns and trees lean (whole px)
-@export_range(0.0, 4.0, 0.05) var wind_speed: float = 0.9  ## sways a second
-@export_range(0.0, 1.0, 0.05) var wind_gusts: float = 0.5  ## how much the strength rises and falls
-
 
 ## The scene's look: its file, or these defaults.
 static func for_scene(scene_id: StringName) -> Resource:

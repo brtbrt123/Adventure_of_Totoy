@@ -81,7 +81,7 @@ Particles and these settings are read when the game starts (and when a gallery r
 ## Scene look (shaders)
 
 `presentation/effects/looks/<scene>.tres`, one per explore scene (village, forest, glade, woodland, Root Hollow, Hollow Trial). Open
-one; the Inspector has five groups, each with an on/off switch:
+one; the Inspector has four groups, each with an on/off switch:
 
 - **Colour grade:** exposure, contrast, saturation, a tint for the dark tones (cool night) and one for the light tones (warm lamps).
 - **Vignette:** how dark the screen edges get, where it starts, its colour.
@@ -89,7 +89,6 @@ one; the Inspector has five groups, each with an on/off switch:
   must be to glow, how far it reaches.
 - **Ground mist:** density on the open floor and at the forest edge (and how far in the edge reaches), cloud size, drift speed,
   colour. It lies under the characters and props and is lit by the moonlight.
-- **Wind in the plants:** how far the tops of bushes, ferns, flowers, thorns and trees lean (whole pixels), how fast, how gusty.
 
 The screen look is `presentation/effects/scene_post.gdshader` (on a layer over the world and under the HUD, so menus and text are
 never touched); the mist is a pass of the scene's lighting shader (`presentation/common/overhead_light.gdshader`). A scene's look is
