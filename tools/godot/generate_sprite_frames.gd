@@ -147,7 +147,7 @@ func run() -> void:
 ## Every character frame set (the legacy totoy and mossbound_colossus frames are not used by the game and are left out).
 func sets() -> Array[String]:
 	var out: Array[String] = [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING, ArenaAnimation.SET_SCYTHE,
-		"totoy_unarmed", "golem2", "warden", "stag", "boar", "mossling", "glowmoth"]
+		ArenaAnimation.SET_STAFF, "totoy_unarmed", "golem2", "warden", "stag", "boar", "mossling", "glowmoth"]
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(NPC_MANIFEST))
 	for npc: String in Dictionary(manifest.get("states", {})).keys():
 		out.append("npc_" + npc)
@@ -181,7 +181,7 @@ func animations(set_name: String, names: Array[String]) -> Dictionary:
 ## {animation: [per-frame ticks or a single ticks value, loop]} from the game's tables.
 func defaults(set_name: String) -> Dictionary:
 	var out: Dictionary = {}
-	if set_name in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING, ArenaAnimation.SET_SCYTHE]:
+	if set_name in [ArenaAnimation.SET_KATANA, ArenaAnimation.SET_DAGGER, ArenaAnimation.SET_LIGHTNING, ArenaAnimation.SET_SCYTHE, ArenaAnimation.SET_STAFF]:
 		for anim: String in ArenaAnimation.PLAYER:
 			out[anim] = [int(ArenaAnimation.PLAYER[anim][1]), bool(ArenaAnimation.PLAYER[anim][2])]
 		out["ward_hold"] = [DEFAULT_TICKS, true]

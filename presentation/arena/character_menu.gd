@@ -72,11 +72,11 @@ const CARD: Rect2 = Rect2(260, 36, 108, 106)
 const ASPECT_GRID_START: int = GRID_COLS
 const FEEDBACK_SECONDS: float = 1.6
 
-const WEAPON_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK KATANA", Tuning.WEAPON_DUAL_DAGGER: "DUAL DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "CHAIN SCYTHE"}
+const WEAPON_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK KATANA", Tuning.WEAPON_DUAL_DAGGER: "DUAL DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "CHAIN SCYTHE", Tuning.WEAPON_STAR_STAFF: "STAR STAFF"}
 ## The weapon's right-click active: its description key and the short name of the RMB stat row.
-const ACTIVE_KEYS: Dictionary = {Tuning.WEAPON_BLACK_KATANA: &"black_form", Tuning.WEAPON_DUAL_DAGGER: &"lightning_barrage", Tuning.WEAPON_CHAIN_SCYTHE: &"reapers_coil"}
-const ACTIVE_ROW_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK FORM", Tuning.WEAPON_DUAL_DAGGER: "BARRAGE", Tuning.WEAPON_CHAIN_SCYTHE: "REAPER'S COIL"}
-const SHORT_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "KATANA", Tuning.WEAPON_DUAL_DAGGER: "DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "SCYTHE"}
+const ACTIVE_KEYS: Dictionary = {Tuning.WEAPON_BLACK_KATANA: &"black_form", Tuning.WEAPON_DUAL_DAGGER: &"lightning_barrage", Tuning.WEAPON_CHAIN_SCYTHE: &"reapers_coil", Tuning.WEAPON_STAR_STAFF: &"disintegration"}
+const ACTIVE_ROW_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK FORM", Tuning.WEAPON_DUAL_DAGGER: "BARRAGE", Tuning.WEAPON_CHAIN_SCYTHE: "REAPER'S COIL", Tuning.WEAPON_STAR_STAFF: "DISINTEGRATION"}
+const SHORT_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "KATANA", Tuning.WEAPON_DUAL_DAGGER: "DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "SCYTHE", Tuning.WEAPON_STAR_STAFF: "STAFF"}
 
 const ExploreCore := preload("res://core/explore_core.gd")
 var progression: ExploreCore.ExploreSnapshot
@@ -591,7 +591,7 @@ static func weapon_data(weapon: StringName) -> Dictionary:
 		swing_ticks.append(total)
 		combo_ticks += total
 		damage.append(roundi(Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[i] * 100) / 100.0)
-		reach.append(Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[i])
+		reach.append(Tuning.STAFF_BURST_RANGE if Weapons.is_ranged(weapon) else Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[i])  # the staff casts at range
 	return {"name": WEAPON_NAMES.get(weapon, "WEAPON"), "combo": combo, "swing_ticks": swing_ticks, "combo_ticks": combo_ticks, "damage": damage, "reach": reach, "edge": Weapons.edge_per_hit(weapon), "arc_deg": rad_to_deg(acos(Weapons.arc_dot(weapon))), "cost": Weapons.active_edge_cost(weapon), "cd": Weapons.active_cooldown(weapon)}
 
 
@@ -684,6 +684,15 @@ static func descriptions(equipped: StringName, aspects: Array = Aspects.DEFAULT_
 		"SLOW, WIDE %d-HIT SWEEPS THAT ALSO HIT TO THE SIDES, %s DMG." % [scy["combo"], damage_text(scy)],
 		"RMB REAPER'S COIL: HOOK UP TO %s PX, DRAG THE BOSS IN, STUN, SPIN." % num(Tuning.REAPER_COIL_HOOK_RANGE),
 		"COIL %s EDGE  CD %s S  STUN %s S  SPIN %d X %s DMG" % [num(scy["cost"]), secs(scy["cd"]), secs(Tuning.REAPER_COIL_STAGGER_TICKS), Tuning.REAPER_COIL_SPIN_HITS, spin_damage]]]
+	var stf: Dictionary = weapon_data(Tuning.WEAPON_STAR_STAFF)
+	d[Tuning.WEAPON_STAR_STAFF] = ["STAR STAFF", "WEAPON  EQUIPPED" if equipped == Tuning.WEAPON_STAR_STAFF else "WEAPON", [
+		"CASTS AT RANGE (%s PX): %d BURSTS, %s DMG TO ALL IN THE BLAST." % [num(Tuning.STAFF_BURST_RANGE), stf["combo"], damage_text(stf)],
+		"THE THIRD IS THE GREAT BURST. DASH: A SHORT BLINK. RMB DISINTEGRATION.",
+		"RMB %s EDGE  CD %s S  BLAST %s/%s PX  +%s EDGE PER HIT" % [num(stf["cost"]), secs(stf["cd"]), num(Tuning.STAFF_BURST_RADIUS[0]), num(Tuning.STAFF_BURST_RADIUS[2]), num(stf["edge"])]]]
+	d[&"disintegration"] = ["DISINTEGRATION", "STAR STAFF  RMB", [
+		"A MAGIC CIRCLE MARKS THE TARGET; YOU CALL A METEOR DOWN ON IT.",
+		"ROOTED BUT UNTOUCHABLE WHILE YOU CALL. IT HITS ALL IN THE CIRCLE.",
+		"%s EDGE  CD %s S  %s PX  %s DMG  LANDS IN %s S" % [num(stf["cost"]), secs(stf["cd"]), num(Tuning.DISINTEGRATION_RADIUS), num(Tuning.ATTACK_DAMAGE * Tuning.DISINTEGRATION_DAMAGE_MULT), secs(Weapons.disintegration_impact_ticks())]]]
 	d[&"black_form"] = ["BLACK FORM", "BLACK KATANA  RMB", [
 		"FOR %s S YOUR SWINGS ARE X%s FASTER AND ALL YOUR HITS DEAL X%s." % [secs(Tuning.BLACK_KATANA_BUFF_DURATION_TICKS), num(Tuning.BLACK_KATANA_ATTACK_SPEED_MULT), num(Tuning.BLACK_KATANA_DAMAGE_MULT)],
 		"NO ANIMATION LOCK: USE IT EVEN MID-SWING. NO SWAP WHILE ON.",
@@ -1065,6 +1074,7 @@ static func figure_frame(weapon: StringName) -> String:
 	match weapon:
 		Tuning.WEAPON_DUAL_DAGGER: prefix = ArenaAnimation.SET_DAGGER
 		Tuning.WEAPON_CHAIN_SCYTHE: prefix = ArenaAnimation.SET_SCYTHE
+		Tuning.WEAPON_STAR_STAFF: prefix = ArenaAnimation.SET_STAFF
 	return ArenaAnimation.hero_frame(prefix, "idle", 1)
 
 

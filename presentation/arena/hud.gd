@@ -29,10 +29,13 @@ const LIGHTNING_FORM_ICON: String = "ui_aspect_lightning_form_1"
 ## The Chain Scythe medallion (a whole 48 px socket like the dagger's) and its Reaper's Coil slot icon (24 px).
 const SCYTHE_MEDALLION: String = "ui_weapon_chain_scythe_1"
 const REAPER_COIL_ICON: String = "ui_aspect_reapers_coil_1"
+## The Star Staff medallion and its Disintegration slot icon (tools/art/make_staff_sprites.py).
+const STAFF_MEDALLION: String = "ui_weapon_star_staff_1"
+const DISINTEGRATION_ICON: String = "ui_aspect_disintegration_1"
 ## Whole-socket medallions by weapon (the katana draws the frame plus its blade glyph instead).
-const MEDALLIONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: DAGGER_MEDALLION, Tuning.WEAPON_CHAIN_SCYTHE: SCYTHE_MEDALLION}
+const MEDALLIONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: DAGGER_MEDALLION, Tuning.WEAPON_CHAIN_SCYTHE: SCYTHE_MEDALLION, Tuning.WEAPON_STAR_STAFF: STAFF_MEDALLION}
 ## Active slot icons by weapon (the katana's buff has none: its box only).
-const FORM_ICONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: LIGHTNING_FORM_ICON, Tuning.WEAPON_CHAIN_SCYTHE: REAPER_COIL_ICON}
+const FORM_ICONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: LIGHTNING_FORM_ICON, Tuning.WEAPON_CHAIN_SCYTHE: REAPER_COIL_ICON, Tuning.WEAPON_STAR_STAFF: DISINTEGRATION_ICON}
 static func form_icon_rect() -> Rect2:
 	return Rect2(58, 148, 24, 24)
 var counter_max: int = 1
@@ -549,6 +552,7 @@ static func weapon_label(weapon: StringName) -> String:
 		Tuning.WEAPON_BLACK_KATANA: return "BLACK"
 		Tuning.WEAPON_DUAL_DAGGER: return "DAGGER"
 		Tuning.WEAPON_CHAIN_SCYTHE: return "SCYTHE"
+		Tuning.WEAPON_STAR_STAFF: return "STAFF"
 	return "SWORD"
 
 static func weapon_status(snap: Snapshots.GameSnapshot) -> Dictionary:

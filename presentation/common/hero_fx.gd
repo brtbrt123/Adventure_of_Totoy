@@ -17,6 +17,7 @@ const Weapons := preload("res://core/weapons.gd")
 const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
+const StaffView := preload("res://presentation/common/staff_view.gd")
 const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
 const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
@@ -24,6 +25,8 @@ const WeaponPaths := preload("res://presentation/common/weapon_paths.gd")
 const WeaponPathGlow := preload("res://presentation/common/weapon_path_glow.gd")
 const EMISSIVE_ALPHA: float = preload("res://presentation/common/ambient_fireflies.gd").EMISSIVE_ALPHA
 var weapon_path_glow: WeaponPathGlow
+## The Star Staff's casts, blink and Disintegration (presentation/common/staff_view.gd).
+var staff_view: StaffView = StaffView.new()
 ## Count actual render submissions (capture tests verify both the road and arena use this shared entry point).
 var weapon_path_draws: int = 0
 
@@ -230,6 +233,67 @@ func age_hero_fx() -> void:
 		particles[index]["position"] += particles[index]["velocity"]
 		if particles[index]["life"] <= 0:
 			particles.remove_at(index)
+	var hero: Snapshots.EntitySnapshot = fx_hero()
+	if hero != null:
+		staff_view.step(cosmetic_tick, hero)
+	if staff_view.shake_request > 0:
+		shake_left = maxi(shake_left, staff_view.shake_request)
+		staff_view.shake_request = 0
+	if staff_view.flash_request:
+		staff_view.flash_request = false
+		_flash(cosmetic_tick, colors.get("1", Color.WHITE), [0.55, 0.55, 0.4, 0.4, 0.25, 0.25, 0.12, 0.12] as Array[float])
+
+
+# --- the Star Staff (presentation/common/staff_view.gd) ---
+
+## A core event for the staff's look (staff_burst, a blink's dash_started, disintegration_*); the scenes route them here.
+func on_staff_event(event: GameEvent) -> void:
+	staff_view.on_event(event, fx_hero())
+
+
+## The staff's ground layer: circles, rings, the meteor's shadow, the crater and dust (under the characters).
+func _draw_staff_ground() -> void:
+	var hero: Snapshots.EntitySnapshot = fx_hero()
+	if hero != null and sprites != null:
+		staff_view.draw_ground(self, frames, sprites, colors, _cosmetic_tick(), hero, EMISSIVE_ALPHA)
+
+
+## The staff's air layer: the cast, bursts, pillars, the circle's rays, the call, the meteor, the blast and particles.
+func _draw_staff(_shake_offset: Vector2) -> void:
+	var hero: Snapshots.EntitySnapshot = fx_hero()
+	if hero != null and sprites != null:
+		staff_view.draw_air(self, frames, sprites, colors, _cosmetic_tick(), hero, staff_crystal(), EMISSIVE_ALPHA)
+
+
+## Where the staff's crystal is this frame (world): by the pose the hero frame shows (the offsets were measured on the frames
+## tools/art/make_staff_sprites.py writes), mirrored when he faces left.
+func staff_crystal() -> Vector2:
+	var hero: Snapshots.EntitySnapshot = fx_hero()
+	var key: String = fx_hero_frame()
+	var offset: Vector2 = Vector2(10, -30)  # pose 1, standing
+	if key.contains("_cast_right_1") or ((key.contains("_attack1_") or key.contains("_attack2_")) and not key.ends_with("_6")):
+		offset = Vector2(23, -24)  # pose 3, pointing the staff
+	elif key.contains("_cast_right_2") or key.contains("_parry_") or key.contains("_ward_") or key.contains("_attack3_right_3") or key.contains("_attack3_right_4") or key.contains("_attack3_right_5"):
+		offset = Vector2(6, -31)  # pose 5, the staff planted
+	elif key.contains("_cast_right_3") or key.contains("_victory_"):
+		offset = Vector2(5, -38)  # pose 8, raised
+	elif key.contains("_attack3_right_1") or key.contains("_attack3_right_2"):
+		offset = Vector2(7, -40)  # pose 4, overhead
+	elif key.contains("_dash_"):
+		offset = Vector2(12, -29)
+	if facing_left:
+		offset.x = -offset.x
+	return hero.position.round() + offset
+
+
+## How dark the scene is while Disintegration is cast (0..1).
+func staff_dim() -> float:
+	return staff_view.dim(_cosmetic_tick())
+
+
+## The staff's lights for the lighting shader's moving lamps.
+func staff_lamps() -> Array[Dictionary]:
+	return staff_view.lamps(_cosmetic_tick())
 
 
 ## The uniform offset that shakes floor, actors and effects together.
@@ -392,7 +456,7 @@ func _mirror(offset: Vector2, left: bool) -> Vector2:
 
 ## True for the first frame of an Echo Step arrival (the echo flares; the hero appears with arrive frame 2).
 func hero_hidden() -> bool:
-	return hero_hidden_until >= 0 and _cosmetic_tick() < hero_hidden_until
+	return (hero_hidden_until >= 0 and _cosmetic_tick() < hero_hidden_until) or staff_view.hides_hero(_cosmetic_tick())
 
 func _cosmetic_tick() -> int:
 	return fx_tick() + fx_result_ticks()
@@ -909,6 +973,11 @@ func _on_aspect_event(event: GameEvent) -> void:
 			fx_cue("weapon_buff_end", tick, 0.45)
 		&"phantom_echo":
 			var hero: Snapshots.EntitySnapshot = fx_hero()
+			if Weapons.is_ranged(StringName(event.data.get("weapon_id", hero.weapon_id))):
+				# the Star Staff's echo is a phantom of its cast: a lilac burst on the target, not a blade's ghost
+				staff_view.phantom_burst(tick, Vector2(event.data.get("position", hero.position)), int(event.data.get("swing_combo_index", 1)))
+				fx_cue("swing", tick, 0.45)
+				return
 			var weapon: String = AspectEffects.weapon_key(StringName(event.data.get("weapon_id", hero.weapon_id)))
 			var swing: int = int(event.data.get("swing_combo_index", 1))
 			var ghost_at: Vector2 = (hero.position + Vector2(-AspectEffects.GHOST_OFFSET if facing_left else AspectEffects.GHOST_OFFSET, 0)).round()

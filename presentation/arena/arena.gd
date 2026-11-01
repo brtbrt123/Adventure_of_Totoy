@@ -9,6 +9,7 @@ const SaveStore := preload("res://core/save_store.gd")
 const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
 const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cutin.gd")
 const ReapersCoilCutIn := preload("res://presentation/arena/reapers_coil_cutin.gd")
+const DisintegrationCutIn := preload("res://presentation/arena/disintegration_cutin.gd")
 const Aspects := preload("res://core/aspects.gd")
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const CoreAnchors := preload("res://presentation/arena/core_anchors.gd")
@@ -45,6 +46,7 @@ var cutin: BlackFormCutIn
 var lightning_cutin: LightningFormCutIn
 ## The Reaper's Coil cut-in (Chain Scythe right click); freezes the world the same way.
 var coil_cutin: ReapersCoilCutIn
+var disint_cutin: DisintegrationCutIn
 ## True between a Phantom echo's attack_hit and its damage_taken (the echo flashes the boss less than a real hit).
 var echo_hit_pending: bool = false
 var profile: Object = null
@@ -126,6 +128,9 @@ func _ready() -> void:
 	coil_cutin = ReapersCoilCutIn.new()
 	coil_cutin.position = Vector2(32, 18)
 	$HUD.add_child(coil_cutin)
+	disint_cutin = DisintegrationCutIn.new()
+	disint_cutin.position = Vector2(32, 18)
+	$HUD.add_child(disint_cutin)
 	character_menu = CharacterMenu.new()
 	character_menu.equip_request = request_equip
 	character_menu.aspect_request = request_aspect_equip
@@ -258,7 +263,7 @@ func fx_target_contact(target_id: int, fallback: Vector2) -> Vector2:
 
 ## True while any weapon cut-in plays (the world does not step).
 func cutin_playing() -> bool:
-	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active)
+	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active) or (disint_cutin != null and disint_cutin.active)
 
 func _read_json(path: String) -> Dictionary:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -277,6 +282,8 @@ func _physics_process(delta: float) -> void:
 			lightning_cutin.advance(delta)
 		if coil_cutin.active:
 			coil_cutin.advance(delta)
+		if disint_cutin.active:
+			disint_cutin.advance(delta)
 		return
 	# The character menu freezes the world the same way; TAB / ESC close it (the closing frame does not step either).
 	if character_menu != null and character_menu.is_open:
@@ -405,6 +412,9 @@ func _restart() -> void:
 		lightning_cutin.stop()
 	if coil_cutin != null:
 		coil_cutin.stop()
+	if disint_cutin != null:
+		disint_cutin.stop()
+	staff_view.clear()
 	close_menu()
 	lightning_fx.clear()
 	coil_fx.clear()
@@ -511,7 +521,9 @@ func _on_event(event: GameEvent) -> void:
 					lightning_cutin.start()
 				elif buff["form"] == Weapons.FORM_REAPER_COIL and coil_cutin != null:
 					coil_cutin.start()
-				elif buff["form"] not in [Weapons.FORM_LIGHTNING, Weapons.FORM_REAPER_COIL] and cutin != null:
+				elif buff["form"] == Weapons.FORM_DISINTEGRATION and disint_cutin != null:
+					disint_cutin.start()
+				elif buff["form"] not in [Weapons.FORM_LIGHTNING, Weapons.FORM_REAPER_COIL, Weapons.FORM_DISINTEGRATION] and cutin != null:
 					cutin.start()
 			combat_audio.cue("weapon_buff_start" if buff["started"] else "weapon_buff_end", event.tick)
 		&"lightning_blink":
@@ -568,6 +580,9 @@ func _on_event(event: GameEvent) -> void:
 			combat_audio.cue("release_" + String(event.data["skill_id"]), event.tick)
 		&"dash_started":
 			_sound_dash_started(event)
+			on_staff_event(event)  # the Star Staff's blink (staff_view ignores a plain dash)
+		&"staff_burst", &"disintegration_started", &"disintegration_impact", &"disintegration_ended":
+			on_staff_event(event)
 		&"attack_hit":
 			if bool(event.data.get("echo", false)):
 				# A Phantom echo is not a swing: no hit burst, shake, finisher, lightning spark or hit sound here (its own
@@ -643,6 +658,7 @@ func _draw() -> void:
 		_draw_imported("fx_dust_%d" % (6 - int(trail["life"])), trail["position"])
 	_draw_lightning_ground()
 	_draw_coil_ground()
+	_draw_staff_ground()
 	_draw_lantern_ground()
 	_draw_ward_echo_ground()
 	_draw_dash()
@@ -698,6 +714,7 @@ func _draw() -> void:
 	_draw_buff_transition()
 	_draw_lightning(offset)
 	_draw_scythe(offset)
+	_draw_staff(offset)
 	_draw_aspects_front()
 	_draw_ward_echo_front(offset)
 	if debug_enabled:

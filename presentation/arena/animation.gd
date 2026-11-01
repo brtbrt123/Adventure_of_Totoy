@@ -16,6 +16,9 @@ const SET_KATANA: String = "hero2"
 const SET_DAGGER: String = "totoy_dagger"
 const SET_LIGHTNING: String = "totoy_lightning"
 const SET_SCYTHE: String = "totoy_scythe"
+const SET_STAFF: String = "totoy_staff"
+## Disintegration's cast frames of the staff set (totoy_staff_cast_right_<n>): point the staff, plant it, call the meteor.
+const STAFF_CAST_POINT_TICKS: int = 8
 ## Poses the Lightning Form set has art for; any other pose (victory) uses the plain dagger frame.
 const LIGHTNING_POSES: Array[String] = ["idle", "walk", "dash", "parry", "hurt", "attack1", "attack2", "attack3", "attack4"]
 const DIRECTIONS: Array[String] = ["right"]
@@ -70,6 +73,11 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 		if state == String(PlayerState.STATE_REAPER_COIL):
 			# Reaper's Coil poses by the core's phase and phase tick (wind-up/throw, haul, spin, catch).
 			return ScytheEffects.coil_frame(actor.reaper_coil_phase, actor.reaper_coil_phase_tick)
+		if state == String(PlayerState.STATE_STAFF_CAST):
+			# Disintegration's cast by the core's timeline: he points the staff, plants it while the circle forms, then calls.
+			var cast_tick: int = actor.disintegration_tick
+			var n: int = 1 if cast_tick < STAFF_CAST_POINT_TICKS else (2 if cast_tick < Tuning.DISINTEGRATION_FORM_TICKS else 3)
+			return hero_frame(SET_STAFF, "cast", n)
 		if state == String(PlayerState.STATE_LIGHTNING_BARRAGE):
 			return barrage_frame(prefix, actor.lightning_barrage_slash, snap.tick - actor.lightning_barrage_slash_tick)
 		if state.begins_with("attack_"):
@@ -176,6 +184,7 @@ static func hero_set(actor: Snapshots.EntitySnapshot) -> String:
 	match actor.weapon_id:
 		Tuning.WEAPON_DUAL_DAGGER: return SET_DAGGER
 		Tuning.WEAPON_CHAIN_SCYTHE: return SET_SCYTHE
+		Tuning.WEAPON_STAR_STAFF: return SET_STAFF
 	return SET_KATANA
 
 ## The weapon a hero frame set belongs to.
@@ -183,6 +192,7 @@ static func set_weapon(prefix: String) -> StringName:
 	match prefix:
 		SET_DAGGER, SET_LIGHTNING: return Tuning.WEAPON_DUAL_DAGGER
 		SET_SCYTHE: return Tuning.WEAPON_CHAIN_SCYTHE
+		SET_STAFF: return Tuning.WEAPON_STAR_STAFF
 	return Tuning.WEAPON_BLACK_KATANA
 
 ## Frame `n` of `<set>_<pose>` in the owner's order (<set>.tres), by default `<set>_<pose>_right_<n>`; the Lightning set borrows
@@ -206,11 +216,14 @@ static func hero_names(prefix: String) -> Array[String]:
 		for pose: String in WARD_POSES:
 			for n: int in range(1, int(WARD_POSES[pose]) + 1):
 				names.append(hero_frame(prefix, pose, n))
+	if prefix == SET_STAFF:
+		for n: int in range(1, 4):
+			names.append(hero_frame(prefix, "cast", n))
 	return names
 
 static func all_names() -> Array[String]:
 	var names: Array[String] = []
-	for prefix: String in [SET_KATANA, SET_DAGGER, SET_LIGHTNING, SET_SCYTHE]:
+	for prefix: String in [SET_KATANA, SET_DAGGER, SET_LIGHTNING, SET_SCYTHE, SET_STAFF]:
 		for name_key: String in hero_names(prefix):
 			if not names.has(name_key):
 				names.append(name_key)

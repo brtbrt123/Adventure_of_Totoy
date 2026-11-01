@@ -122,8 +122,10 @@ const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
 var cutin: BlackFormCutIn
 const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cutin.gd")
 const ReapersCoilCutIn := preload("res://presentation/arena/reapers_coil_cutin.gd")
+const DisintegrationCutIn := preload("res://presentation/arena/disintegration_cutin.gd")
 var lightning_cutin: LightningFormCutIn
 var coil_cutin: ReapersCoilCutIn
+var disint_cutin: DisintegrationCutIn
 var intro_arrival_ticks: int = 0
 var transitions: int = 0  # scene changes done (tests)
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
@@ -169,6 +171,9 @@ func _ready() -> void:
 	coil_cutin = ReapersCoilCutIn.new()
 	coil_cutin.position = Vector2(32, 18)
 	$HUD.add_child(coil_cutin)
+	disint_cutin = DisintegrationCutIn.new()
+	disint_cutin.position = Vector2(32, 18)
+	$HUD.add_child(disint_cutin)
 	_load_chain_origins()
 	var manifest: Dictionary = _read_json(NPC_MANIFEST)
 	var states: Dictionary = manifest.get("states", {})
@@ -255,9 +260,10 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	aspect_fx.clear()
 	buff_events.clear()
 	buff_transition.clear()
-	for playing: Node in [cutin, lightning_cutin, coil_cutin]:
+	for playing: Node in [cutin, lightning_cutin, coil_cutin, disint_cutin]:
 		if playing != null:
 			playing.stop()
+	staff_view.clear()
 	lightning_fx.clear()
 	coil_fx.clear()
 	coil_hook_tick = -1
@@ -310,7 +316,7 @@ func _save_progress(scene: StringName, checkpoint: StringName) -> void:
 
 ## True while any weapon cut-in plays (the road does not step).
 func cutin_playing() -> bool:
-	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active)
+	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active) or (disint_cutin != null and disint_cutin.active)
 
 
 func _physics_process(delta: float) -> void:
@@ -321,6 +327,8 @@ func _physics_process(delta: float) -> void:
 			lightning_cutin.advance(delta)
 		if coil_cutin.active:
 			coil_cutin.advance(delta)
+		if disint_cutin.active:
+			disint_cutin.advance(delta)
 		return
 	if snapshot != null and snapshot.defeated:
 		advance(InputFrame.new())
@@ -492,7 +500,7 @@ func _on_event(event: GameEvent) -> void:
 			_save_progress(core.scene_id, core.last_checkpoint)
 		GameEvent.ITEM_RECEIVED:
 			_save_progress(core.scene_id, core.last_checkpoint)
-			var icons: Dictionary = {&"sprint": "ui_aspect_sprint_1", &"herb": "hud_copper_herb", &"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
+			var icons: Dictionary = {&"sprint": "ui_aspect_sprint_1", &"herb": "hud_copper_herb", &"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1", &"star_staff": "ui_weapon_star_staff_1"}
 			show_reward({"kind": event.data["kind"], "name": event.data["name"], "quantity": event.data["quantity"], "icon": icons.get(StringName(event.data["item_id"]), "")})
 		GameEvent.FLAG_SET, GameEvent.DIALOGUE_ENDED:
 			if event.type == GameEvent.FLAG_SET:
@@ -537,6 +545,8 @@ func _on_event(event: GameEvent) -> void:
 						lightning_cutin.start()
 					elif buff["form"] == Weapons.FORM_REAPER_COIL and coil_cutin != null:
 						coil_cutin.start()
+					elif buff["form"] == Weapons.FORM_DISINTEGRATION and disint_cutin != null:
+						disint_cutin.start()
 					elif cutin != null:
 						cutin.start()
 				practice_view.audio.cue("weapon_buff_start" if buff["started"] else "weapon_buff_end", event.tick)
@@ -546,6 +556,10 @@ func _on_event(event: GameEvent) -> void:
 			_on_lightning_strike(event)
 		&"reaper_coil_started", &"reaper_coil_hooked", &"reaper_coil_missed", &"reaper_coil_drag", &"reaper_coil_spin", &"reaper_coil_ended":
 			_on_reaper_coil(event)
+		&"staff_burst", &"disintegration_started", &"disintegration_impact", &"disintegration_ended":
+			on_staff_event(event)
+		&"dash_started":
+			on_staff_event(event)  # the Star Staff's blink (staff_view ignores a plain dash)
 		&"lightning_barrage_ended":
 			if event.data.get("reason", &"") == &"complete":
 				_burst(snapshot.hero.position - Vector2(0, 12), 8, colors["o"], 0.7)
@@ -834,7 +848,11 @@ func npc_frame_for(npc: Dictionary, tick: int) -> String:
 
 
 func ambient() -> Color:
-	return AMBIENT.get(snapshot.scene_id, Color.WHITE) if snapshot != null else Color.WHITE
+	var base: Color = AMBIENT.get(snapshot.scene_id, Color.WHITE) if snapshot != null else Color.WHITE
+	var night: float = staff_dim() if snapshot != null else 0.0
+	if night <= 0.0:
+		return base
+	return Color(base.r * (1.0 - night * 0.75), base.g * (1.0 - night * 0.7), base.b * (1.0 - night * 0.55), base.a)
 
 
 func _visible_world_rect() -> Rect2:
@@ -884,6 +902,9 @@ func _draw() -> void:
 	# the ground mist: over the floor, under the warnings, props and characters (the lighting shader draws it)
 	if material is ShaderMaterial and look != null and bool(look.get("mist_enabled")):
 		draw_rect(Rect2(Vector2.ZERO, snapshot.size), Color(1, 1, 1, MIST_PASS_ALPHA))
+	var night: float = staff_dim()  # Disintegration darkens the floor (and ambient() the props and characters); its magic stays lit
+	if night > 0.0:
+		draw_rect(Rect2(Vector2(-8, -8), snapshot.size + Vector2(16, 16)), Color(0.02, 0.03, 0.09, night * 0.65))
 	var ring: Dictionary = snapshot.training.get("ring",{})
 	if bool(ring.get("active",false)):
 		var at: Vector2=ring["center"]
@@ -894,6 +915,7 @@ func _draw() -> void:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
 	_draw_lightning_ground()
 	_draw_coil_ground()
+	_draw_staff_ground()
 	_draw_lantern_ground()
 	_draw_ward_echo_ground()
 	creature_effects.draw_ground(self, snapshot, frames, sprites, colors)
@@ -929,6 +951,7 @@ func _draw() -> void:
 	_draw_buff_transition()
 	_draw_lightning(shake_offset())
 	_draw_scythe(shake_offset())
+	_draw_staff(shake_offset())
 	for effect: Dictionary in practice_effects:
 		if effect["type"] in [GameEvent.PARRY_SUCCEEDED, GameEvent.TRAINING_POST_HIT]:
 			continue  # drawn by the shared layer
@@ -1102,6 +1125,7 @@ func _sync_moving_lights() -> void:
 		if mob["type"] == &"warden":
 			keys[int(mob["id"])] = MobView.frame(mob, snapshot.telegraphs, snapshot.tick)
 	var moving: Array[Dictionary] = WardenEffects.lamps(snapshot.mobs, keys)
+	moving.append_array(staff_lamps())  # the Star Staff's circle, meteor, blast and crater light the ground
 	if moving.is_empty() and _moving_lamps == 0:
 		return
 	var points: PackedVector4Array = (_static_lamps["points"] as PackedVector4Array).duplicate()

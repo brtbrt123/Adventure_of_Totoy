@@ -1,3 +1,32 @@
+## Star Staff wired into the game (2026-11-01, Claude, done while Codex is out)
+
+Owner: "yes I like what you did, wire them".
+- Core (commit 9ed14356): the Star Staff (`star_staff`) is the fourth weapon. See docs/architecture.md "Star Staff / Disintegration".
+  - The cast bursts at range: it snaps onto the nearest enemy in the aim cone within 96 px. Two Arcane Bursts, then the bigger Great Burst.
+  - The dash is a 45 px blink.
+  - Right click is Disintegration: the circle under the target follows it until 18 ticks before the impact. The hero is rooted and invulnerable while he calls. The meteor lands 78 ticks after the press and hits everything in the 58 px circle.
+  - It works against the boss, mobs and the training post. Tests: tests/core/test_star_staff.gd. The blade-cycle tests now cycle the three blades.
+- Art: tools/art/make_staff_sprites.py writes art/src totoy_staff_* (62 hero frames from the 8 key poses: breathing idle, stepping walk, the cast poses, three Disintegration cast frames) and fx_staff_* (110 effect frames drawn by tools/art/staff_fx.py, the same code as the approved previews), plus the weapon medallion and the Disintegration slot icon.
+- Presentation:
+  - presentation/common/staff_view.gd draws the casts, the blink and Disintegration from the core's events and the hero's snapshot. Ground effects draw under the characters, the rest over them.
+  - presentation/common/staff_particles.gd is a port of the preview's particles.
+  - Both are wired through hero_fx.gd into the road and the fight.
+  - On the road, Disintegration darkens the scene (a floor overlay and a dimmer ambient), and its circle, meteor, blast and crater are moving lamps for the lighting shader.
+  - The cut-in: presentation/arena/disintegration_cutin.gd, a sibling of the Reaper's Coil one, uses the json's one pose scale.
+  - The character menu and the HUD know the staff (names, descriptions with the real numbers, medallion, slot icon).
+- Aspects with the staff (owner: "with Phantom Edge the sword is still the next attack, not a staff attack"):
+  - Phantom Cut's echo used to fall back to the katana's ghost and arc. With the staff it is now a lilac phantom burst on the target.
+  - The aspect tools now also make the staff's per-frame overlays (Phantom Cut glow, Echo Step shield, Sprint aura and afterimages) and its Stone Ward poses. Existing overlays are unchanged.
+  - The blade-only smoke tests skip the staff or cycle the three blades. The aspects smoke checks the phantom burst.
+- The run leans forward (owner: "I want him leaning forward"): the staff's walk frames go through the katana hero's lean warp (tools/art/make_hero_lean_sheet.py) at 16 degrees, with the staff as its own layer moved rigidly with the hand. It uses the stride pose with a bouncing stride, since only key poses exist. Before/after: art/reference/staff_v1/preview/staff_run_lean.gif.
+- Editable in Godot: presentation/animations/totoy_staff.tres and presentation/animations/effects/fx_staff.tres (the generator now knows the staff set).
+- In-game capture: presentation/review/staff/capture_staff.gd (window only) plays the Hollow Trial against the Warden with the staff and Phantom Cut. tools/art/staff_capture_gif.py makes art/reference/staff_v1/ingame/*.gif from the frames.
+- Not done:
+  - The hero only has the key poses (proper animation sheets are the next art step).
+  - The fight scene does not darken for Disintegration (the road does).
+  - Nobody has played it: every number is a first guess.
+- Mistake: six art/src/fx_warden2_* files (lash_crack_3/5/6, ring_2/4/5) had small uncommitted edits that were not mine. My clean-build script swapped them to the committed version and a Windows file lock broke the restore, so those edits were lost. The committed versions are intact. If those edits were wanted, they need redoing.
+
 ## Staff effects redrawn with particles, the ultimate after the owner's reference, cut-in layout (2026-11-01, Claude, done while Codex is out)
 
 Owner feedback on the first previews:

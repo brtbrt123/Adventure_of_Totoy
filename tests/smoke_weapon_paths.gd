@@ -60,6 +60,8 @@ func run() -> void:
 				forward_arc += 1
 	check(forward_arc > 10 and overhead.get_pixel(67, 78).a > 0.5, "third katana cut follows the overhead arc into its low blade tip")
 	for weapon: StringName in Weapons.IDS:
+		if Weapons.is_ranged(weapon):
+			continue  # the Star Staff casts: no blade path (its bolt and burst are presentation/common/staff_view.gd)
 		var arena: Arena = load("res://presentation/arena/arena.tscn").instantiate() as Arena
 		root.add_child(arena)
 		arena.set_physics_process(false)

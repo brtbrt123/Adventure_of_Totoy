@@ -57,11 +57,19 @@ func press(field: String) -> void:
 	step(frame)
 
 
-## The old Q press as an equip request: the weapon after the equipped one in Weapons.IDS.
+## The old Q press as an equip request: the next blade after the equipped one.
 func swap() -> void:
 	var frame: InputFrame = InputFrame.new()
-	frame.weapon_equip = Weapons.next(arena.snapshot.player.weapon_id)
+	frame.weapon_equip = _next_blade(arena.snapshot.player.weapon_id)
 	step(frame)
+
+
+
+## The next of the three blades (katana -> dagger -> scythe -> katana); this smoke was written for them (the Star Staff casts).
+static func _next_blade(weapon: StringName) -> StringName:
+	var blades: Array[StringName] = [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE]
+	var i: int = blades.find(weapon)
+	return weapon if i < 0 else blades[(i + 1) % blades.size()]
 
 
 func save(label: String) -> void:
