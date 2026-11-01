@@ -89,9 +89,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("12_tghni")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"idle",
-"speed": 20.0
+"speed": 8.571428571428571
 }, {
 "frames": [{
 "duration": 1.0,
@@ -146,9 +146,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("26_18cep")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"pool_idle",
-"speed": 20.0
+"speed": 7.5
 }, {
 "frames": [{
 "duration": 1.0,

@@ -1,0 +1,66 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_qqix4"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_do5be"]
+
+[sub_resource type="Resource" id="Resource_2sx2m"]
+script = ExtResource("1_qqix4")
+count = 16
+shape = "smoke"
+life_min = 36
+life_max = 52
+speed_min = 0.3
+speed_max = 0.7
+up = 0.15
+gravity = -0.003
+size_min = 2.0
+size_max = 4.0
+grow = 0.12
+colours = PackedStringArray("d", "c", "b")
+
+[sub_resource type="Resource" id="Resource_vupeh"]
+script = ExtResource("1_qqix4")
+count = 40
+life_min = 16
+life_max = 30
+speed_min = 1.0
+speed_max = 2.2
+drag = 0.08
+up = 0.6
+gravity = 0.06
+size_min = 2.0
+size_max = 4.0
+colours = PackedStringArray("j", "d", "c")
+
+[sub_resource type="Resource" id="Resource_qf0cs"]
+script = ExtResource("1_qqix4")
+count = 26
+shape = "leaf"
+life_min = 40
+life_max = 60
+speed_min = 1.0
+speed_max = 2.0
+drag = 0.04
+up = 0.5
+gravity = 0.02
+size_min = 2.0
+flutter = 2.0
+colours = PackedStringArray("7", "6", "6", "d")
+
+[sub_resource type="Resource" id="Resource_45t5r"]
+script = ExtResource("1_qqix4")
+count = 10
+shape = "blade"
+life_min = 18
+life_max = 30
+speed_min = 0.8
+speed_max = 1.6
+drag = 0.06
+up = 0.9
+gravity = 0.1
+size_max = 1.0
+colours = PackedStringArray("5", "4", "6")
+
+[resource]
+script = ExtResource("2_do5be")
+layers = Array[Resource]([SubResource("Resource_2sx2m"), SubResource("Resource_vupeh"), SubResource("Resource_qf0cs"), SubResource("Resource_45t5r")])

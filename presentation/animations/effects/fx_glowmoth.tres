@@ -24,9 +24,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("4_ak3jp")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"orb",
-"speed": 20.0
+"speed": 15.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -43,5 +43,5 @@ animations = [{
 }],
 "loop": 0,
 "name": &"orb_pop",
-"speed": 20.0
+"speed": 15.0
 }]

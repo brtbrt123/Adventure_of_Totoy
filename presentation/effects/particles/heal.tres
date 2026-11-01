@@ -1,0 +1,23 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_2rsrl"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_nlv2h"]
+
+[sub_resource type="Resource" id="Resource_8nga7"]
+script = ExtResource("1_2rsrl")
+count = 6
+shape = "mote"
+life_min = 30
+life_max = 46
+speed_min = 0.1
+speed_max = 0.3
+drag = 0.02
+up = 0.45
+gravity = -0.004
+size_min = 2.0
+flutter = 1.2
+colours = PackedStringArray("6", "5")
+
+[resource]
+script = ExtResource("2_nlv2h")
+layers = Array[Resource]([SubResource("Resource_8nga7")])

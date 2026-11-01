@@ -3,6 +3,8 @@ extends SceneTree
 ## animation has frames, every frame is a built sprite with an anchor, speeds and durations are positive, and the library's
 ## frame picking stays in range. It does not pin the timings: those are the owner's to change.
 const AnimLib := preload("res://presentation/common/anim_library.gd")
+const Particles := preload("res://presentation/explore/creature_particles.gd")
+const FxSettings := preload("res://presentation/effects/fx_settings.gd")
 var failures: int = 0
 
 
@@ -49,6 +51,13 @@ func run() -> void:
 				var n: int = AnimLib.at(set_name, String(anim), t, [count, 1, true])
 				check(n >= 1 and n <= count, "%s/%s frame %d in range at tick %d" % [set_name, anim, n, t])
 	check(sets >= 17 + 31, "every character set and effect family has a SpriteFrames (%d)" % sets)
+	# the particle kinds and the code-drawn shapes' settings load and are usable
+	for kind: String in Particles.DEFAULT_LAYERS:
+		check(Particles.LAYERS.has(kind) and not (Particles.LAYERS[kind] as Array).is_empty(), "particle kind %s has layers" % kind)
+		for layer: Dictionary in Particles.LAYERS[kind]:
+			check(int(layer["n"]) >= 0 and int(layer["life"][1]) >= int(layer["life"][0]) and not (layer["cols"] as Array).is_empty(), "particle kind %s layer is sane" % kind)
+	var settings: Resource = FxSettings.current()
+	check(settings != null and int(settings.get("slam_front_ticks")) > 0 and int(settings.get("max_bursts")) > 0, "fx_settings loads")
 	# by default the effect order is the art's own: the remapped frame table equals the built one
 	var remapped: Dictionary = AnimLib.remap(atlas)
 	check(remapped.size() == atlas.size(), "the remap keeps every frame name")

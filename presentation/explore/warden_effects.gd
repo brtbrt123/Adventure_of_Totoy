@@ -1,4 +1,5 @@
 extends RefCounted
+const AnimLib := preload("res://presentation/common/anim_library.gd")  # the owner's effect timing (presentation/animations/effects, docs/ANIMATION_EDITING.md)
 ## Cosmetic history only. Ground geometry is the committed core telegraph, never the body scale.
 const Snapshots := preload("res://core/snapshots.gd")
 const Explore := preload("res://core/explore_core.gd")
@@ -10,12 +11,13 @@ static var attachments: Dictionary = JSON.parse_string(FileAccess.get_file_as_st
 const RUNE_COLOUR: Vector3 = Vector3(0.48, 0.94, 0.86)  # the rune stones' teal (presentation/common/local_lights.json)
 const RUNE_CORE: Vector3 = Vector3(0.8, 1.0, 1.0)
 const MobView := preload("res://presentation/explore/mob_view.gd")
-const SHADOW_RADIUS: float = 40.0  # ActorShadow radius: a 26 x 7 px ellipse under its 69 px wide stance (drawn 1.5x smaller since 2026-10-31)
+const FxSettings := preload("res://presentation/effects/fx_settings.gd")  # the owner's sizes and times (presentation/effects/fx_settings.tres)
+static var SHADOW_RADIUS: float = FxSettings.current().warden_shadow_radius  # ActorShadow radius: 40 makes a 26 x 7 px ellipse under its 69 px stance
 ## The footfall frames of the walk (tools/art/rig_warden_v2.py poses(): the planted foot's offset from the feet, + = the leading side)
 ## and how long a footprint and a torn patch of ground stay on the floor.
-const FOOTFALLS: Dictionary = {"warden_walk_right_1": 10.0, "warden_walk_right_4": -2.0}
-const PRINT_TICKS: int = 90
-const SCAR_TICKS: int = 70
+static var FOOTFALLS: Dictionary = {"warden_walk_right_1": FxSettings.current().warden_footfall_lead, "warden_walk_right_4": FxSettings.current().warden_footfall_trail}
+static var PRINT_TICKS: int = FxSettings.current().warden_print_ticks
+static var SCAR_TICKS: int = FxSettings.current().warden_scar_ticks
 
 
 ## Where the Warden's chest stone is in the world for the frame `key` (attachment units: world px / 2.5, tools/art/rig_warden_v2.py).
@@ -179,11 +181,11 @@ func draw_ground(canvas: CanvasItem, tick: int, colors: Dictionary, frames: Dict
 					placed(canvas, "ring", 1 + age * 4 / span if age < span else 5 + (age - span) / 5, tell.center, frames, atlas)
 	for mark: Dictionary in prints:
 		var age: int = tick - int(mark["tick"])
-		if age < 16:
-			placed(canvas, "footstep", 1 + age / 4, mark["at"], frames, atlas, false)
+		if age < AnimLib.effect_length("fx_warden2_footstep", 16):
+			placed(canvas, "footstep", AnimLib.effect_at("fx_warden2_footstep", age, [4, 4, false]), mark["at"], frames, atlas, false)
 
 
-const LASH_CLUMPS: int = 5  # root clumps along the 150 px line (each about 30 px wide)
+static var LASH_CLUMPS: int = FxSettings.current().warden_lash_clumps  # root clumps along the 150 px line (each about 30 px wide)
 const LASH_TICKS: int = 24  # the last clump's 8 frames (2 ticks each) end 8 ticks after it starts
 
 
@@ -193,9 +195,9 @@ static func _draw_lash(canvas: CanvasItem, tell: Snapshots.TelegraphSnapshot, ag
 	var spots: Array[Dictionary] = []
 	for i: int in LASH_CLUMPS:
 		var born: int = i * 2  # the eruption runs out along the line
-		if age < born or age - born >= 16:
+		if age < born or age - born >= AnimLib.effect_length("fx_warden2_lash", 16):
 			continue
-		spots.append({"at": tell.center + tell.direction * tell.size * (float(i) + 0.5) / float(LASH_CLUMPS), "n": 1 + (age - born) / 2})
+		spots.append({"at": tell.center + tell.direction * tell.size * (float(i) + 0.5) / float(LASH_CLUMPS), "n": AnimLib.effect_at("fx_warden2_lash", age - born, [8, 2, false])})
 	spots.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
 	for spot: Dictionary in spots:
 		placed(canvas, "lash", int(spot["n"]), spot["at"], frames, atlas)
@@ -239,11 +241,11 @@ func draw_overlay(canvas: CanvasItem, mobs: Array[Dictionary], tick: int, frames
 		var id: int = int(mob["id"])
 		var chest: Vector2 = chest_world(mob, String(keys.get(id, "")))
 		if mob["state"] == &"windup" and mob.get("attack", &"") == &"warden_ring":
-			placed(canvas, "ring_charge", 1 + posmod(int(mob["state_ticks"]) / 6, 4), chest, frames, atlas)
-		if hits.has(id) and tick - int(hits[id]) < 12:
-			placed(canvas, "guard_hit", 1 + (tick - int(hits[id])) / 3, chest, frames, atlas)
-		if breaks.has(id) and tick - int(breaks[id]) < 18:
-			placed(canvas, "guard_break", 1 + (tick - int(breaks[id])) / 3, chest, frames, atlas)
+			placed(canvas, "ring_charge", AnimLib.effect_at("fx_warden2_ring_charge", int(mob["state_ticks"]), [4, 6, true]), chest, frames, atlas)
+		if hits.has(id) and tick - int(hits[id]) < AnimLib.effect_length("fx_warden2_guard_hit", 12):
+			placed(canvas, "guard_hit", AnimLib.effect_at("fx_warden2_guard_hit", tick - int(hits[id]), [4, 3, false]), chest, frames, atlas)
+		if breaks.has(id) and tick - int(breaks[id]) < AnimLib.effect_length("fx_warden2_guard_break", 18):
+			placed(canvas, "guard_break", AnimLib.effect_at("fx_warden2_guard_break", tick - int(breaks[id]), [6, 3, false]), chest, frames, atlas)
 
 
 ## Torn ground the strike leaves at its real hit area: furrows for the Cleave, a split line for the Lash, a cracked ring for the Ring.
@@ -282,8 +284,9 @@ func draw_feet(canvas: CanvasItem, mobs: Array[Dictionary]) -> void:
 		var side: float = -1.0 if Vector2(mob["facing"]).x < 0.0 else 1.0
 		for x: float in [-9.0, 7.0]:
 			var foot: Vector2 = at + Vector2(x * side, 1)
-			canvas.draw_rect(Rect2(foot + Vector2(-6, -1), Vector2(12, 2)), Color(0.11, 0.094, 0.141, 0.38))
-			canvas.draw_rect(Rect2(foot + Vector2(-4, -2), Vector2(8, 4)), Color(0.11, 0.094, 0.141, 0.22))
+			var alpha: float = FxSettings.current().warden_foot_shadow_alpha
+			canvas.draw_rect(Rect2(foot + Vector2(-6, -1), Vector2(12, 2)), Color(0.11, 0.094, 0.141, alpha))
+			canvas.draw_rect(Rect2(foot + Vector2(-4, -2), Vector2(8, 4)), Color(0.11, 0.094, 0.141, alpha * 0.58))
 
 
 static func sprite(canvas: CanvasItem, family: String, n: int, at: Vector2, frames: Dictionary, atlas: Texture2D, left: bool) -> void:
@@ -303,13 +306,13 @@ func draw_actor(canvas: CanvasItem, mob: Dictionary, key: String, tick: int, fra
 	var body_frame: int = int(key.get_slice("_", key.get_slice_count("_") - 1))
 	if state == &"dead":
 		if int(mob["state_ticks"]) < 12:
-			sprite(canvas, "death_flash", mini(4, int(mob["state_ticks"]) / 3 + 1), at, frames, atlas, left)
+			sprite(canvas, "death_flash", AnimLib.effect_at("fx_warden_death_flash", int(mob["state_ticks"]), [4, 3, false]), at, frames, atlas, left)
 		sprite(canvas, "death_debris", mini(8, body_frame), at, frames, atlas, left)
 		return
 	# The chest stone's glow is the scene's rune lamp (lamps()) and the halo (creature_glow.gd); a guard hit throws chips (handle_event).
 	if bool(mob.get("guarded", false)):
-		sprite(canvas, "idle_spores", posmod(tick / 8 + id, 6) + 1, at, frames, atlas, left)
+		sprite(canvas, "idle_spores", AnimLib.effect_at("fx_warden_idle_spores", tick + id * 8, [6, 8, true]), at, frames, atlas, left)
 	if state == &"stagger":
-		sprite(canvas, "exposed_dust", posmod(tick / 6, 6) + 1, at, frames, atlas, left)
-	if arrivals.has(id) and tick - int(arrivals[id]) < 18:
-		sprite(canvas, "arrival", mini(6, (tick - int(arrivals[id])) / 3 + 1), at, frames, atlas, left)
+		sprite(canvas, "exposed_dust", AnimLib.effect_at("fx_warden_exposed_dust", tick, [6, 6, true]), at, frames, atlas, left)
+	if arrivals.has(id) and tick - int(arrivals[id]) < AnimLib.effect_length("fx_warden_arrival", 18):
+		sprite(canvas, "arrival", AnimLib.effect_at("fx_warden_arrival", tick - int(arrivals[id]), [6, 3, false]), at, frames, atlas, left)

@@ -281,7 +281,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("32_usssk")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_crash_1",
 "speed": 20.0
 }, {
@@ -298,7 +298,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("36_uk7se")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_crash_2",
 "speed": 20.0
 }, {
@@ -315,7 +315,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("40_abbt8")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_crash_3",
 "speed": 20.0
 }, {
@@ -332,7 +332,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("44_7pquk")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_run_1",
 "speed": 20.0
 }, {
@@ -349,7 +349,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("48_al50b")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_run_2",
 "speed": 20.0
 }, {
@@ -366,7 +366,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("52_y6uwc")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_run_3",
 "speed": 20.0
 }, {
@@ -383,7 +383,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("56_jhfv2")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_run_4",
 "speed": 20.0
 }, {
@@ -400,7 +400,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("60_oicec")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_tell_1",
 "speed": 20.0
 }, {
@@ -417,7 +417,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("64_r763v")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_tell_2",
 "speed": 20.0
 }, {
@@ -434,7 +434,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("68_m3q6b")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_tell_3",
 "speed": 20.0
 }, {
@@ -451,7 +451,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("72_sj31r")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_tell_4",
 "speed": 20.0
 }, {
@@ -468,7 +468,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("76_tk5wg")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_charge_tell_5",
 "speed": 20.0
 }, {
@@ -485,7 +485,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("80_lgax7")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_idle_1",
 "speed": 20.0
 }, {
@@ -502,7 +502,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("84_nkiaa")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_idle_2",
 "speed": 20.0
 }, {
@@ -519,7 +519,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("88_m47lk")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_idle_3",
 "speed": 20.0
 }, {
@@ -536,7 +536,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("92_mkchj")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_idle_4",
 "speed": 20.0
 }, {
@@ -553,7 +553,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("96_471uq")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_phase2_roar_1",
 "speed": 20.0
 }, {
@@ -570,7 +570,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("100_3ghjf")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_phase2_roar_2",
 "speed": 20.0
 }, {
@@ -587,7 +587,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("104_a5o6c")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_phase2_roar_3",
 "speed": 20.0
 }, {
@@ -604,7 +604,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("108_t11at")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_phase2_roar_4",
 "speed": 20.0
 }, {
@@ -621,7 +621,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("112_fve6h")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_phase2_roar_5",
 "speed": 20.0
 }, {
@@ -638,7 +638,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("116_txp8u")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_phase2_roar_6",
 "speed": 20.0
 }, {
@@ -655,7 +655,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("120_xbjqk")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_raise_1",
 "speed": 20.0
 }, {
@@ -672,7 +672,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("124_7uyyq")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_raise_2",
 "speed": 20.0
 }, {
@@ -689,7 +689,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("128_cu2s6")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_raise_3",
 "speed": 20.0
 }, {
@@ -706,7 +706,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("132_ydlod")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_raise_4",
 "speed": 20.0
 }, {
@@ -723,7 +723,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("136_vfi6l")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_recover_1",
 "speed": 20.0
 }, {
@@ -740,7 +740,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("140_70dws")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_recover_2",
 "speed": 20.0
 }, {
@@ -757,7 +757,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("144_msrah")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_recover_3",
 "speed": 20.0
 }, {
@@ -774,7 +774,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("148_irqls")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_recover_4",
 "speed": 20.0
 }, {
@@ -791,7 +791,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("152_u3r3a")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_strike_1",
 "speed": 20.0
 }, {
@@ -808,7 +808,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("156_jj3h3")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_strike_2",
 "speed": 20.0
 }, {
@@ -825,7 +825,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("160_57gad")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"horn_slam_strike_3",
 "speed": 20.0
 }, {

@@ -212,9 +212,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("36_d3nd7")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"exposed_dust",
-"speed": 20.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -301,9 +301,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("59_aw438")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"idle_spores",
-"speed": 20.0
+"speed": 7.5
 }, {
 "frames": [{
 "duration": 1.0,

@@ -7,7 +7,35 @@ extends RefCounted
 ## up (extra upward px/tick at the start), g (px/tick^2, + falls, - rises), size [min, max] px, grow (smoke px/tick), cols, flutter (px of
 ## sideways sway, leaves). Spawn modes per kind say where particles start and which way they go (see _spawn).
 
-const LAYERS: Dictionary = {
+## The burst kinds as the owner edits them: presentation/effects/particles/<kind>.tres (presentation/effects/particle_kind.gd and
+## particle_layer.gd, written by tools/godot/generate_sprite_frames.gd). A kind without a resource uses DEFAULT_LAYERS.
+const KINDS_DIR: String = "res://presentation/effects/particles/"
+static var LAYERS: Dictionary = _layers()
+
+
+static func _layers() -> Dictionary:
+	var out: Dictionary = DEFAULT_LAYERS.duplicate(true)
+	for kind: String in DEFAULT_LAYERS:
+		var path: String = KINDS_DIR + kind + ".tres"
+		if not ResourceLoader.exists(path):
+			continue
+		var res: Resource = load(path)
+		if res == null or not (res.get("layers") is Array):
+			continue
+		var layers: Array = []
+		for layer: Resource in res.get("layers"):
+			if layer != null and layer.has_method("to_layer"):
+				layers.append(layer.call("to_layer"))
+		out[kind] = layers
+	return out
+
+
+## Forgets the edited kinds and reads them again (the galleries, after the owner saves one).
+static func reload_kinds() -> void:
+	LAYERS = _layers()
+
+
+const DEFAULT_LAYERS: Dictionary = {
 	# the slam: smoke rolls out, dust kicks up, leaves are blown off the floor, all over the cone the core hit
 	"slam": [
 		{"n": 16, "shape": "smoke", "life": [36, 52], "speed": [0.3, 0.7], "drag": 0.05, "up": 0.15, "g": -0.003, "size": [2, 4], "grow": 0.12, "cols": ["d", "c", "b"]},

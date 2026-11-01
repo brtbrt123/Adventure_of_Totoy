@@ -1,4 +1,5 @@
 extends Node2D
+const AnimLib := preload("res://presentation/common/anim_library.gd")  # the owner's effect timing (presentation/animations/effects, docs/ANIMATION_EDITING.md)
 ## The hero's combat effects, shared by every scene that draws him: the fight (arena.gd) and the road (explore_scene.gd).
 ## Both extend this script, so one effect looks and behaves the same everywhere. Mob and boss effects are NOT here (each
 ## scene has its own). The effects come from core events and the hero's snapshot: hit bursts, particles, dust, parry
@@ -245,14 +246,15 @@ func draw_hero_impacts() -> void:
 		var age: int = tick - int(impact["tick"])
 		var contact: Vector2 = impact.get("contact", impact["position"])
 		var size_scale: Vector2 = Vector2(1.15, 1.15) if bool(impact["perfect"]) else Vector2(0.75, 0.75)
-		_draw_imported("fx_parry_%d" % (mini(5, age / 2) + 1), contact, size_scale)
+		_draw_imported("fx_parry_%d" % AnimLib.effect_at("fx_parry", age, [6, 2, false]), contact, size_scale)
 		if age < 2 and bool(impact["perfect"]):
 			_draw_imported("fx_flash_1", contact, Vector2(0.6, 0.6))
 	for burst: Dictionary in hit_bursts:
 		var age: int = _cosmetic_tick() - int(burst["tick"])
 		var contact: Vector2 = burst.get("contact", burst["position"])
 		var heavy: bool = bool(burst.get("finisher", false)) or bool(burst["counter"])
-		_draw_imported("fx_%s_%d" % ["counter" if bool(burst["counter"]) else "hit", mini(5, age / 2) + 1], contact, Vector2(1.3, 1.3) if heavy else Vector2.ONE)
+		var burst_fx: String = "fx_counter" if bool(burst["counter"]) else "fx_hit"
+		_draw_imported("%s_%d" % [burst_fx, AnimLib.effect_at(burst_fx, age, [6, 2, false])], contact, Vector2(1.3, 1.3) if heavy else Vector2.ONE)
 		if age < 2:
 			_draw_imported("fx_flash_1", contact, Vector2(0.65, 0.65) if heavy else Vector2(0.4, 0.4))
 	for particle: Dictionary in particles:
@@ -288,7 +290,7 @@ func fx_dark_sprites() -> Texture2D:
 
 ## The dark aura behind a dash afterimage in the Black Form look.
 func fx_black_ghost(at: Vector2, left: bool) -> void:
-	_draw_buff_frame("fx_black_aura_back_%d" % (posmod(fx_tick() / 5, 6) + 1), at, 1, left)
+	_draw_buff_frame("fx_black_aura_back_%d" % AnimLib.effect_at("fx_black_aura_back", fx_tick(), [6, 5, true]), at, 1, left)
 
 
 ## weapon_buff_started / weapon_buff_ended: the aura burst and particles. Returns {"started", "form"} for the scene to play its
@@ -366,7 +368,7 @@ func draw_dash_fx() -> void:
 		elif white_sprites != null:
 			draw_texture_rect_region(white_sprites, rect, source, Color(colors["o"], fade * 0.55))
 	if hero.state == &"dash":
-		_draw_imported("fx_dash_%d" % (mini(5, hero.state_ticks / 2) + 1), hero.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
+		_draw_imported("fx_dash_%d" % AnimLib.effect_at("fx_dash", hero.state_ticks, [6, 2, false]), hero.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
 
 
 # --- moved here from the arena (unchanged apart from the fx_* hooks) ---
@@ -979,7 +981,7 @@ func _draw_buff_transition() -> void:
 	var level: int = maxi(1, 4 - age / 3)
 	var at: Vector2 = fx_hero().position if bool(buff_transition["started"]) else Vector2(buff_transition["at"])
 	if buff_transition.get("form", &"") == Weapons.FORM_LIGHTNING:
-		_draw_buff_frame("fx_lightning_aura_back_%d" % (mini(9, age) + 1), at, level, facing_left)
+		_draw_buff_frame("fx_lightning_aura_back_%d" % AnimLib.effect_at("fx_lightning_aura_back", age, [10, 1, false]), at, level, facing_left)
 		return
 	if buff_transition.get("form", &"") == Weapons.FORM_REAPER_COIL:
 		return  # no aura: the coil's chain and ring are its look

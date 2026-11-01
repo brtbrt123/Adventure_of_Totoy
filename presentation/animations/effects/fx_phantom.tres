@@ -471,9 +471,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("88_71bvc")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"marker",
-"speed": 20.0
+"speed": 8.571428571428571
 }, {
 "frames": [{
 "duration": 1.0,

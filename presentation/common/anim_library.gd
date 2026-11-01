@@ -66,6 +66,19 @@ static func effect_of(sequence: String) -> Array[String]:
 	return [family, anim]
 
 
+## Frame n (1-based) of effect `sequence` `ticks` after it began, at the owner's timing (its family resource); without one, the
+## code's `spec` [frame count, ticks per frame, loop] (holding the last frame when it does not loop).
+static func effect_at(sequence: String, ticks: int, spec: Array) -> int:
+	var where: Array[String] = effect_of(sequence)
+	return at("effects/" + where[0], where[1], ticks, spec)
+
+
+## How long effect `sequence` runs at the owner's timing (ticks); `fallback` without a resource.
+static func effect_length(sequence: String, fallback: int) -> int:
+	var where: Array[String] = effect_of(sequence)
+	return length("effects/" + where[0], where[1], fallback)
+
+
 ## The owner's per-frame durations (ticks) of an effect sequence; `fallback` (the code's list) without a resource.
 static func durations(sequence: String, fallback: Array[int]) -> Array[int]:
 	var where: Array[String] = effect_of(sequence)

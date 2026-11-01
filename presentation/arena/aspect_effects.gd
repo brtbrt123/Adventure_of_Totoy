@@ -89,7 +89,7 @@ static func lantern_key(age: int, since_pulse: int) -> String:
 	var pulse: int = sequence_frame(PULSE_TICKS, since_pulse)
 	if pulse > 0:
 		return "fx_lantern_pulse_%d" % pulse
-	return "fx_lantern_idle_%d" % (posmod((age - sequence_length(PLACE_TICKS)) / IDLE_FRAME_TICKS, 6) + 1)
+	return "fx_lantern_idle_%d" % AnimLib.effect_at("fx_lantern_idle", age - sequence_length(PLACE_TICKS), [6, IDLE_FRAME_TICKS, true])
 
 
 ## The floor pool frame `age` ticks after the placement: it opens with place 2-4, then loops.
@@ -100,7 +100,7 @@ static func pool_key(age: int) -> String:
 	var open: int = sequence_frame(POOL_OPEN_TICKS, open_age)
 	if open > 0:
 		return "fx_lantern_pool_open_%d" % open
-	return "fx_lantern_pool_idle_%d" % (posmod((open_age - sequence_length(POOL_OPEN_TICKS)) / POOL_IDLE_FRAME_TICKS, 4) + 1)
+	return "fx_lantern_pool_idle_%d" % AnimLib.effect_at("fx_lantern_pool_idle", open_age - sequence_length(POOL_OPEN_TICKS), [4, POOL_IDLE_FRAME_TICKS, true])
 
 
 ## Ticks since the lantern's latest pulse, from the snapshot alone (-1 before the first pulse).
@@ -144,7 +144,7 @@ static func since_start(phantom_ticks_left: int) -> int:
 
 
 static func marker_key(tick: int) -> String:
-	return "fx_phantom_marker_%d" % (posmod(tick / MARKER_FRAME_TICKS, 4) + 1)
+	return "fx_phantom_marker_%d" % AnimLib.effect_at("fx_phantom_marker", tick, [4, MARKER_FRAME_TICKS, true])
 
 
 static func ghost_key(weapon: String, swing: int, frame: int) -> String:

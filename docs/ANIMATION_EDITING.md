@@ -1,7 +1,7 @@
 # Editing animations in Godot
 
-Since 2026-11-01 every character animation and every animated effect is a Godot `SpriteFrames` resource the game plays from, and
-every frame can be repainted by hand.
+Since 2026-11-01 every character animation and every animated effect is a Godot `SpriteFrames` resource the game plays from, the
+particles and the code-drawn shapes have resources of their own, and every frame can be repainted by hand.
 
 ## Watch
 
@@ -48,11 +48,35 @@ Warden's attack effects; `fx_stag.tres` the Thornback's; a family's own sequence
   scuff), `fx_echo` (place, vanish, trail_head, arrive, dust), `fx_ward` (absorb, block, shockwave, cracks), `fx_sprint` (start,
   end). Speed and per-frame durations change the frames AND how long the effect stays (its life is the sum), and frames you add
   play.
-- **The other effects keep the code's pace** (their frame is worked out from their age: the parry and hit bursts, the dash, the
-  auras, the Warden's and the Thornback's attack effects, ...). Their speed in the resource does nothing; change their order or
-  frames.
+- **Timing for 32 more effects** whose frame the code worked out from their age at a steady pace: the parry, hit and counter
+  bursts, the dash, the Black Form and Lightning auras, the boss impacts (slam, sweep, stomp, beam), the lantern and pool idles, the
+  Phantom marker, the echo anchor, the ward barrier, the sprint lines, dust and wind, the moth trail and orb, the orb pop, the
+  Thornback's horn glows, the Warden's spores, dust, arrival and death flash, and the Warden's Gemini effects (guard hit, guard
+  break, footstep, ring charge, lash roots). Speed, durations and loop are yours; for the Warden's, how long they show too.
+- **Still on the code's pace** (order and frames yours): effects timed to an attack's strike (the Warden's Cleave slash and Spore
+  Ring, the boss charge impact), the lightning afterimage and depart, the Phantom ghost and arc, the scythe arc and pull, the
+  Thornback's root sites, and the few that play one sequence at a second pace (the Black Form aura's one-shot, the slow orb pop).
+  Their speed in the resource does nothing.
 - Hero-frame overlays (the Phantom glow, the echo shield outline, the sprint aura) follow the hero's own frames, so they are not
   separate animations: edit the hero animation.
+
+## Particles
+
+`presentation/effects/particles/<kind>.tres`, one per burst kind: `slam`, `roots`, `kick`, `crash`, `roar`, `stomp`, `chips`,
+`chant`, `release`, `heal`, `mist`, `orb_trail`, `pop`, `reveal` (`gouge` and `quake` are unused). Open one: the Inspector lists its
+layers; open a layer to change **count, shape** (dot, smoke, leaf, blade, spark, mote), **life, speed, drag, up, gravity, size,
+grow, flutter** and **colours** (Totoy 36 symbols, listed in the tooltip). Add a layer with the "+" (pick New Resource, then load
+`presentation/effects/particle_layer.gd` as its script) or remove one. Where a burst starts and which way it heads stays in
+`creature_particles.gd`.
+
+## Code-drawn shapes
+
+`presentation/effects/fx_settings.tres`: the sizes, durations and counts of the creature effects drawn as shapes, grouped in the
+Inspector. Runebound Warden: stance shadow, foot shadow strength, where the feet land, how long footprints and torn ground stay,
+root clumps along the Lash. Thornback: how long the slam marks last, how fast the shock front runs, how many cracks, how long the
+hit edge stays, how often the heal pulse and mist show. All creatures: particle bursts alive at once.
+
+Particles and these settings are read when the game starts (and when a gallery reloads); save, then run.
 
 ## Repaint a frame
 
@@ -74,7 +98,8 @@ $godot = "C:\Tools\Godot\Godot_v4.7.2-stable_win64_console.exe"
 & $godot --headless --path . --script res://tools/godot/generate_sprite_frames.gd
 ```
 
-It keeps everything you edited and only adds the animations that are new; frames whose PNG is gone are dropped. To throw your edits
+It keeps everything you edited and only adds the animations that are new; frames whose PNG is gone are dropped. It also writes the
+particle kinds and `fx_settings.tres` when they are missing. To throw your edits
 away and start a set again from the code's tables, delete its `.tres` (or pass `-- --reset` for all of them). If a re-rig changes an
 animation's frame count, add or remove those frames in the resource yourself (or delete the animation and run the generator).
 

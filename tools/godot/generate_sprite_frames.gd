@@ -19,6 +19,10 @@ const AspectEffects := preload("res://presentation/arena/aspect_effects.gd")
 const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const WardEchoSprintEffects := preload("res://presentation/arena/ward_echo_sprint_effects.gd")
+const Particles := preload("res://presentation/explore/creature_particles.gd")
+const ParticleKind := preload("res://presentation/effects/particle_kind.gd")
+const ParticleLayer := preload("res://presentation/effects/particle_layer.gd")
+const FxSettings := preload("res://presentation/effects/fx_settings.gd")
 const OUT: String = "res://presentation/animations/"
 const EFFECT_TICKS: int = 3  # an effect sequence without a per-frame tick list in the code (its pace stays in code: order only)
 const SPRITES: String = "res://art/build/sprites/"
@@ -79,15 +83,42 @@ func run() -> void:
 			keys.append("%s_%d" % [sequence, n])
 		families[where[0]][where[1]] = keys
 	var timed: Dictionary = effect_timing()
+	var paced: Dictionary = effect_paced()
 	var effects: int = 0
 	for family: String in families:
 		var timing: Dictionary = {}
 		for anim: String in families[family]:
 			var sequence: String = family if anim == "play" else family + "_" + anim
-			timing[anim] = [timed.get(sequence, [EFFECT_TICKS]), false]
-		if write(family, families[family], timing, reset, AnimLib.EFFECTS_DIR):
+			var spec: Array = paced.get(sequence, paced.get("fx_stag_horn_" if sequence.begins_with("fx_stag_horn_") else "", []))
+			if not spec.is_empty():
+				var ticks: Array = []
+				for i: int in int(spec[0]):
+					ticks.append(int(spec[1]))
+				timing[anim] = [ticks, bool(spec[2])]
+			else:
+				timing[anim] = [timed.get(sequence, [EFFECT_TICKS]), false]
+		if write(family, families[family], timing, reset, AnimLib.EFFECTS_DIR, true):
 			effects += 1
-	print("SPRITE FRAMES OK: %d written, %d unchanged in %s; %d of %d effect families written in %s" % [written, kept, OUT, effects, families.size(), AnimLib.EFFECTS_DIR])
+	# Particle burst kinds (presentation/effects/particles/<kind>.tres) and the code-drawn shapes' settings: written once, then the owner's.
+	DirAccess.make_dir_recursive_absolute(Particles.KINDS_DIR)
+	var kinds: int = 0
+	for kind: String in Particles.DEFAULT_LAYERS:
+		var path: String = Particles.KINDS_DIR + kind + ".tres"
+		if ResourceLoader.exists(path) and not reset:
+			continue
+		var res: Resource = ParticleKind.new()
+		var layers: Array[Resource] = []
+		for layer: Dictionary in Particles.DEFAULT_LAYERS[kind]:
+			var edit: Resource = ParticleLayer.new()
+			edit.call("from_layer", layer)
+			layers.append(edit)
+		res.set("layers", layers)
+		ResourceSaver.save(res, path)
+		kinds += 1
+	var settings: bool = reset or not ResourceLoader.exists(FxSettings.PATH)
+	if settings:
+		ResourceSaver.save(FxSettings.new(), FxSettings.PATH)
+	print("SPRITE FRAMES OK: %d written, %d unchanged in %s; %d of %d effect families written in %s; %d particle kinds written; settings %s" % [written, kept, OUT, effects, families.size(), AnimLib.EFFECTS_DIR, kinds, "written" if settings else "kept"])
 	quit(0)
 
 
@@ -176,8 +207,53 @@ func effect_timing() -> Dictionary:
 	}
 
 
-## Builds or updates the set's resource; true when the file was written.
-func write(set_name: String, anims: Dictionary, timing: Dictionary, reset: bool, folder: String = OUT) -> bool:
+## The effects whose frame the code works out from their age at a steady pace: [frame count, ticks per frame, loop] (their code
+## reads AnimLib.effect_at with the same spec, so the resource's starting values play exactly as before).
+func effect_paced() -> Dictionary:
+	return {
+		"fx_lantern_idle": [6, AspectEffects.IDLE_FRAME_TICKS, true], "fx_lantern_pool_idle": [4, AspectEffects.POOL_IDLE_FRAME_TICKS, true],
+		"fx_phantom_marker": [4, AspectEffects.MARKER_FRAME_TICKS, true], "fx_charge": [6, 2, true], "fx_slam": [6, 2, false],
+		"fx_sweep": [6, 2, false], "fx_stomp": [6, 2, false], "fx_beam_body": [4, 2, false],
+		"fx_echo_anchor": [6, WardEchoSprintEffects.ANCHOR_FRAME_TICKS, true], "fx_ward_barrier": [6, WardEchoSprintEffects.BARRIER_FRAME_TICKS, true],
+		"fx_sprint_lines": [4, WardEchoSprintEffects.LINES_FRAME_TICKS, true], "fx_sprint_dust": [6, WardEchoSprintEffects.DUST_FRAME_TICKS, true],
+		"fx_sprint_wind": [4, WardEchoSprintEffects.WIND_FRAME_TICKS, true],
+		"fx_parry": [6, 2, false], "fx_hit": [6, 2, false], "fx_counter": [6, 2, false], "fx_black_aura_back": [6, 5, true], "fx_dash": [6, 2, false],
+		"fx_lightning_aura_back": [10, 1, false], "fx_ch1_moth_trail": [4, 4, true], "fx_glowmoth_orb": [4, 4, true], "fx_glowmoth_orb_pop": [4, 4, false],
+		"fx_stag_horn_": [4, 3, true],
+		"fx_warden_death_flash": [4, 3, false], "fx_warden_idle_spores": [6, 8, true], "fx_warden_exposed_dust": [6, 6, true], "fx_warden_arrival": [6, 3, false],
+		"fx_warden2_ring_charge": [4, 6, true], "fx_warden2_guard_hit": [4, 3, false], "fx_warden2_guard_break": [6, 3, false],
+		"fx_warden2_footstep": [4, 4, false], "fx_warden2_lash": [8, 2, false],
+	}
+
+
+## True when an effect animation still has the placeholder timing the first effect pass gave every effect (EFFECT_TICKS a frame,
+## no loop, nothing changed by the owner): it can take its code's real pace without overwriting an edit.
+func _placeholder(frames: SpriteFrames, anim: StringName) -> bool:
+	if not is_equal_approx(frames.get_animation_speed(anim), 60.0 / EFFECT_TICKS) or frames.get_animation_loop(anim):
+		return false
+	for i: int in frames.get_frame_count(anim):
+		if not is_equal_approx(frames.get_frame_duration(anim, i), 1.0):
+			return false
+	return true
+
+
+## Sets an animation's speed, per-frame durations (from ticks) and loop flag, keeping its frames.
+func _time(frames: SpriteFrames, anim: StringName, spec: Array) -> void:
+	var ticks: Array = spec[0] if spec[0] is Array else [spec[0]]
+	var base: int = int(ticks[0])
+	for t: Variant in ticks:
+		base = mini(base, int(t))
+	base = maxi(1, base)
+	frames.set_animation_speed(anim, 60.0 / base)
+	frames.set_animation_loop(anim, bool(spec[1]))
+	for i: int in frames.get_frame_count(anim):
+		var t: int = int(ticks[mini(i, ticks.size() - 1)])
+		frames.set_frame(anim, i, frames.get_frame_texture(anim, i), float(t) / float(base))
+
+
+## Builds or updates the set's resource; true when the file was written. `effects`: an effect animation still on the placeholder
+## timing takes its code's real pace.
+func write(set_name: String, anims: Dictionary, timing: Dictionary, reset: bool, folder: String = OUT, effects: bool = false) -> bool:
 	var path: String = folder + set_name + ".tres"
 	var frames: SpriteFrames = null
 	if not reset and ResourceLoader.exists(path):
@@ -198,6 +274,10 @@ func write(set_name: String, anims: Dictionary, timing: Dictionary, reset: bool,
 	order.sort()
 	for anim: String in order:
 		if frames.has_animation(anim):
+			var spec: Array = timing.get(anim, [])
+			if effects and not spec.is_empty() and _placeholder(frames, anim) and not (spec[0] is Array and (spec[0] as Array).all(func(t: Variant) -> bool: return int(t) == EFFECT_TICKS) and not bool(spec[1])):
+				_time(frames, anim, spec)
+				changed = true
 			continue
 		var spec: Array = timing.get(anim, [DEFAULT_TICKS, false])
 		var ticks: Array = spec[0] if spec[0] is Array else [spec[0]]

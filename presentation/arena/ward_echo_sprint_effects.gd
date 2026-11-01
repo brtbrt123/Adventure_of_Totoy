@@ -91,7 +91,7 @@ static func anchor_key(age: int, ticks_left: int) -> String:
 	if ticks_left > 0 and ticks_left <= COUNTDOWN_TICKS:
 		var n: int = clampi((COUNTDOWN_TICKS - ticks_left) / COUNTDOWN_FRAME_TICKS, 0, 3) + 1
 		return "fx_echo_countdown_%d" % n
-	return "fx_echo_anchor_%d" % (posmod((age - sequence_length(PLACE_TICKS)) / ANCHOR_FRAME_TICKS, 6) + 1)
+	return "fx_echo_anchor_%d" % AnimLib.effect_at("fx_echo_anchor", age - sequence_length(PLACE_TICKS), [6, ANCHOR_FRAME_TICKS, true])
 
 
 ## The i-frame shield phase with `invuln_ticks` left (12 on the arrival tick): 1-3 looping, 4 on the last ticks.
@@ -169,7 +169,7 @@ static func barrier_visible(ward_ticks_left: int) -> bool:
 
 static func barrier_key(ward_ticks_left: int) -> String:
 	var elapsed: int = Tuning.STONE_WARD_DURATION_TICKS - ward_ticks_left
-	return "fx_ward_barrier_%d" % (posmod(elapsed / BARRIER_FRAME_TICKS, 6) + 1)
+	return "fx_ward_barrier_%d" % AnimLib.effect_at("fx_ward_barrier", elapsed, [6, BARRIER_FRAME_TICKS, true])
 
 
 ## Stored-energy glow level 1-3 for `stored` damage (thirds of the cap), 0 when nothing is stored.
@@ -218,15 +218,15 @@ static func after_key(hero_frame: String, k: int) -> String:
 
 
 static func lines_key(tick: int) -> String:
-	return "fx_sprint_lines_%d" % (posmod(tick / LINES_FRAME_TICKS, 4) + 1)
+	return "fx_sprint_lines_%d" % AnimLib.effect_at("fx_sprint_lines", tick, [4, LINES_FRAME_TICKS, true])
 
 
 static func dust_key(tick: int) -> String:
-	return "fx_sprint_dust_%d" % (posmod(tick / DUST_FRAME_TICKS, 6) + 1)
+	return "fx_sprint_dust_%d" % AnimLib.effect_at("fx_sprint_dust", tick, [6, DUST_FRAME_TICKS, true])
 
 
 static func wind_key(tick: int) -> String:
-	return "fx_sprint_wind_%d" % (posmod(tick / WIND_FRAME_TICKS, 4) + 1)
+	return "fx_sprint_wind_%d" % AnimLib.effect_at("fx_sprint_wind", tick, [4, WIND_FRAME_TICKS, true])
 
 
 ## Every sprite these effects can request by group (the per-hero-frame overlays are looked up per frame).

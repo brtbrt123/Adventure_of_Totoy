@@ -1,4 +1,5 @@
 extends Node2D
+const AnimLib := preload("res://presentation/common/anim_library.gd")  # the owner's effect timing (presentation/animations/effects, docs/ANIMATION_EDITING.md)
 ## Cosmetic state transitions only. Core events confirm contacts; a whiff still has a swish.
 const ExploreCore := preload("res://core/explore_core.gd")
 const Snapshots := preload("res://core/snapshots.gd")
@@ -85,6 +86,7 @@ func _draw() -> void:
 			continue
 		var parry: bool = effect["type"] == &"parry_succeeded" or bool(effect.get("counter",false))
 		var at: Vector2 = Vector2(effect["at"]) + (Vector2(0, -14) if parry else Vector2.ZERO)
-		_draw_frame("fx_%s_%d" % ["parry" if parry else "hit", mini(5, age / 2) + 1], at, false, 1.15 if bool(effect["perfect"]) else 1.0)
+		var burst_fx: String = "fx_parry" if parry else "fx_hit"
+		_draw_frame("%s_%d" % [burst_fx, AnimLib.effect_at(burst_fx, age, [6, 2, false])], at, false, 1.15 if bool(effect["perfect"]) else 1.0)
 		if age < 2:
 			_draw_frame("fx_flash_1", at, false, 0.55 if parry else 0.4)

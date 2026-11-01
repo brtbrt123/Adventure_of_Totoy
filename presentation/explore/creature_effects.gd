@@ -1,4 +1,5 @@
 extends RefCounted
+const AnimLib := preload("res://presentation/common/anim_library.gd")  # the owner's effect timing (presentation/animations/effects, docs/ANIMATION_EDITING.md)
 ## Snapshot-driven cosmetics shared by every exploration map. Never spawns mobs or changes HP/hits.
 const ExploreCore := preload("res://core/explore_core.gd")
 const Snapshots := preload("res://core/snapshots.gd")
@@ -6,7 +7,8 @@ const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const Particles := preload("res://presentation/explore/creature_particles.gd")
 const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
 var warden: WardenEffects = WardenEffects.new()
-const SLAM_TICKS: int = 26  # how long the slam's ground effects last after the hit tick
+const FxSettings := preload("res://presentation/effects/fx_settings.gd")  # the owner's sizes and times (presentation/effects/fx_settings.tres)
+static var SLAM_TICKS: int = FxSettings.current().slam_ticks  # how long the slam's ground effects last after the hit tick
 var tells: Dictionary = {}
 var previous: Dictionary = {}
 var trails: Array[Dictionary] = []
@@ -70,7 +72,7 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 			emit("crash", at + Vector2(mob["facing"]) * 18, view.tick, {"dir": Vector2(mob["facing"])})
 		# The core heals a whole point every few ticks; show one pulse a second at most, so the Stag stays visible.
 		var last_heal: int = int(old.get("heal_tick", -1000))
-		if not old.is_empty() and int(mob["hp"]) > int(old["hp"]) and bool(mob.get("regen_active", false)) and view.tick - last_heal >= 60:
+		if not old.is_empty() and int(mob["hp"]) > int(old["hp"]) and bool(mob.get("regen_active", false)) and view.tick - last_heal >= FxSettings.current().heal_pulse_every:
 			heals.append({"id": id, "tick": view.tick, "amount": int(mob["hp"]) - int(old["hp"])})
 			emit("heal", at, view.tick)
 			last_heal = view.tick
@@ -82,7 +84,7 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 				emit("chant", horns(mob), view.tick)
 			elif mob["state"] == &"strike" and was == &"windup":
 				emit("release", horns(mob), view.tick)
-		if bool(mob.get("regen_active", false)) and view.tick % 20 == 0:
+		if bool(mob.get("regen_active", false)) and view.tick % FxSettings.current().mist_every == 0:
 			emit("mist", at, view.tick)
 		previous[id] = {"at": at, "state": mob["state"], "hp": mob["hp"], "trail_tick": old.get("trail_tick", view.tick - 3), "heal_tick": last_heal}
 	var current: Dictionary = {}
@@ -131,8 +133,8 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 	pops = pops.filter(func(e: Dictionary) -> bool: return view.tick - int(e["tick"]) < 16)
 	reveals = reveals.filter(func(e: Dictionary) -> bool: return view.tick - int(e["tick"]) < 24)
 	bursts = bursts.filter(func(b: Dictionary) -> bool: return view.tick - int(b["tick"]) < Particles.max_life(String(b["kind"])))
-	if bursts.size() > 96:
-		bursts = bursts.slice(bursts.size() - 96)
+	if bursts.size() > FxSettings.current().max_bursts:
+		bursts = bursts.slice(bursts.size() - FxSettings.current().max_bursts)
 	if trails.size() > 80:
 		trails = trails.slice(trails.size() - 80)
 
@@ -196,7 +198,7 @@ func ground_plans(view: ExploreCore.ExploreSnapshot) -> Array[Dictionary]:
 static func draw_slam_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapshot, age: int, colors: Dictionary) -> void:
 	if age < 0 or age >= SLAM_TICKS:
 		return
-	var front: float = tell.size * minf(1.0, float(age + 1) / 8.0)
+	var front: float = tell.size * minf(1.0, float(age + 1) / float(FxSettings.current().slam_front_ticks))
 	var base: float = tell.direction.angle()
 	for layer: int in 3:
 		var r: float = front - float(layer) * 5.0
@@ -209,8 +211,9 @@ static func draw_slam_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapsho
 		var colour: Color = colors["p"] if layer == 0 and age < 10 else (colors["o"] if layer == 0 else colors["t"])
 		canvas.draw_polyline(arc, colour, 2.0 if layer == 0 else 1.0, false)
 	# cracks: jagged lines from the hoof to the shock front, never past the hit edge
-	for k: int in 5:
-		var angle: float = base + (float(k) / 4.0 * 2.0 - 1.0) * tell.half_angle * 0.8
+	var cracks: int = FxSettings.current().slam_cracks
+	for k: int in cracks:
+		var angle: float = base + (float(k) / maxf(1.0, float(cracks - 1)) * 2.0 - 1.0) * tell.half_angle * 0.8
 		var crack: PackedVector2Array = [tell.center.round()]
 		var steps: int = 6
 		for s: int in range(1, steps + 1):
@@ -220,7 +223,7 @@ static func draw_slam_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapsho
 		canvas.draw_polyline(crack, colors["8"], 2.0, false)
 		canvas.draw_polyline(crack, colors["9"], 1.0, false)
 	# the rim of the real hit area lingers after the front reached it
-	if age >= 8 and age < 20:
+	if age >= FxSettings.current().slam_front_ticks and age < FxSettings.current().slam_rim_until:
 		var rim: PackedVector2Array = []
 		for i: int in 41:
 			var angle: float = base - tell.half_angle + 2.0 * tell.half_angle * i / 40.0
@@ -287,11 +290,11 @@ func draw_overlay(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames:
 			var p: Vector2 = path[i]
 			var size: float = 1.0 + float(i) * 0.5
 			canvas.draw_rect(Rect2(p.round() - Vector2.ONE * size * 0.5, Vector2.ONE * size), colors["u"] if i < path.size() - 3 else colors["o"])
-		sprite(canvas, "fx_ch1_moth_trail_%d" % (posmod(view.tick / 4, 4) + 1), orb["at"], frames, atlas, Vector2(orb["dir"]).x < 0.0)
-		sprite(canvas, "fx_glowmoth_orb_%d" % (posmod(view.tick / 4, 4) + 1), orb["at"], frames, atlas)
+		sprite(canvas, "fx_ch1_moth_trail_%d" % AnimLib.effect_at("fx_ch1_moth_trail", view.tick, [4, 4, true]), orb["at"], frames, atlas, Vector2(orb["dir"]).x < 0.0)
+		sprite(canvas, "fx_glowmoth_orb_%d" % AnimLib.effect_at("fx_glowmoth_orb", view.tick, [4, 4, true]), orb["at"], frames, atlas)
 	for pop: Dictionary in pops:
 		var age: int = view.tick - int(pop["tick"])
-		sprite(canvas, "fx_glowmoth_orb_pop_%d" % mini(4, age / 4 + 1), pop["at"], frames, atlas)
+		sprite(canvas, "fx_glowmoth_orb_pop_%d" % AnimLib.effect_at("fx_glowmoth_orb_pop", age, [4, 4, false]), pop["at"], frames, atlas)
 	for reveal: Dictionary in reveals:
 		var age: int = view.tick - int(reveal["tick"])
 		var at: Vector2 = reveal["at"]
@@ -336,4 +339,4 @@ func draw_actor(canvas: CanvasItem, mob: Dictionary, key: String, tick: int, fra
 			sprite(canvas, "fx_stag_summon_" + key.get_slice("_", 3), at, frames, atlas, left)
 		else:
 			var stem: String = key.trim_prefix("stag_").replace("_right_", "_")
-			sprite(canvas, "fx_stag_horn_%s_%d" % [stem, posmod(tick / 3, 4) + 1], at, frames, atlas, left)
+			sprite(canvas, "fx_stag_horn_%s_%d" % [stem, AnimLib.effect_at("fx_stag_horn_" + stem, tick, [4, 3, true])], at, frames, atlas, left)

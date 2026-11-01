@@ -55,6 +55,7 @@ func _ready() -> void:
 
 func _load() -> void:
 	AnimLib.clear_cache()  # the owner may have edited warden.tres
+	Particles.reload_kinds()  # and the particle kinds (presentation/effects/particles)
 	frames = AnimLib.remap(JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"])  # effect order, as in game
 	atlas = load("res://art/build/sprites.png")
 	colors.clear()

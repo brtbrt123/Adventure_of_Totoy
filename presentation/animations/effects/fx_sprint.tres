@@ -45,9 +45,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("6_c3xbv")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"dust",
-"speed": 20.0
+"speed": 15.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -79,9 +79,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("14_qktpn")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"lines",
-"speed": 20.0
+"speed": 15.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -116,7 +116,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("23_seycv")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"wind",
-"speed": 20.0
+"speed": 15.0
 }]

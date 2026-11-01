@@ -144,7 +144,7 @@ animations = [{
 }],
 "loop": 0,
 "name": &"aura_back",
-"speed": 20.0
+"speed": 60.0
 }, {
 "frames": [{
 "duration": 1.0,

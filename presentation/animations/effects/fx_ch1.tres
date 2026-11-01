@@ -110,9 +110,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("18_j1ai8")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"moth_trail",
-"speed": 20.0
+"speed": 15.0
 }, {
 "frames": [{
 "duration": 1.0,

@@ -1,3 +1,14 @@
+## The rest editable: effect timing, particles, code-drawn shapes (2026-11-01, Claude, done while Codex is out)
+
+Owner: "add everything" (make the rest editable). Guide: docs/ANIMATION_EDITING.md.
+- 32 more effects that worked out their frame from their age at a steady pace now read their timing from their resource (AnimLib.effect_at / effect_length): parry, hit, counter, dash, auras, boss impacts, lantern and pool idles, Phantom marker, echo anchor, ward barrier, sprint lines, dust and wind, moth trail, orb and pop, Thornback horn glows, the Warden's spores, dust, arrival and death flash, and its Gemini guard hit, guard break, footstep, ring charge and lash roots.
+- Their starting values are the code's pace: the generator moved the untouched placeholder animations onto it (21 families); 32 sequences checked identical tick by tick, lengths too.
+- Still on the code's pace: effects timed to a strike, and sequences played at a second pace (listed in the guide).
+- Particles: 16 burst kinds as resources (presentation/effects/particles/<kind>.tres, particle_kind.gd and particle_layer.gd), read by creature_particles.gd (DEFAULT_LAYERS is the fallback). Checked identical: 4125 sampled points.
+- Code-drawn shapes: presentation/effects/fx_settings.tres (fx_settings.gd), with the Warden's shadow, foot shadow, footfall points, print and scar lives and lash clumps, the Thornback's slam timings, cracks, rim, heal and mist rates, and the burst cap. Same defaults as before.
+- smoke_anim_library covers particles and settings.
+- Core 568 and both trial checks pass; 52 of 55 smokes pass, the other 3 are the capture smokes that need a window.
+
 ## Every animated effect editable in Godot (2026-11-01, Claude, done while Codex is out)
 
 Owner: "yes, effects next". 31 effect-family SpriteFrames in presentation/animations/effects/ (fx_lantern, fx_ward, fx_warden2, fx_stag, fx_lightning, ...; 193 animated sequences; the hero-frame overlays follow the hero's own frames and are left out), made by the same generator.

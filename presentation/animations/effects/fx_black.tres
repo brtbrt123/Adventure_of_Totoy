@@ -40,9 +40,9 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("6_fecsu")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"aura_back",
-"speed": 20.0
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
