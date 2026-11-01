@@ -1,3 +1,29 @@
+## Staff effects redrawn with particles, the ultimate after the owner's reference, cut-in layout (2026-11-01, Claude, done while Codex is out)
+
+Owner feedback on the first previews:
+- the basic attack's frames were inconsistent and cut off, and the finisher's circle sat on top of the mob;
+- the ultimate looked small and unnatural;
+- nothing had particles;
+- the cut-in was not aligned or organised.
+
+Then a reference sheet for the ultimate: a teal rune circle with rocks lifting, a flaming meteor falling straight down, a fire and rock explosion, smoke, a cracked crater.
+
+- tools/art/staff_fx.py draws every staff effect in code at game scale (Totoy 36, hard alpha). Each has a fixed size and a ground anchor.
+  - Effects: cast flash, bolt, Arcane Burst, ground rings, light pillar, the rune circle (ground and air parts), the meteor, the fire ring, the explosion (12 frames), the crater with cooling cracks.
+  - A particle system on the ground plane (x, ground y, height): sparks, motes, embers, bouncing rocks, crystal shards, smoke, dust, wisps, sparkles, and the blink's streaks and re-forming motes.
+- Layers:
+  - Ground effects (circles, rings, crater) draw under the characters.
+  - Rocks, shards, dust and smoke sort in depth with the characters.
+  - Fire, bursts and sparks draw over them.
+- Colours: the meteor's fire uses gold and red, since AGENTS.md allows them for hit effects. The circle stays teal, so it never reads as an enemy's red warning.
+- tools/art/preview_staff.py writes staff_attack.gif, staff_blink.gif and staff_ultimate.gif to art/reference/staff_v1/preview/. staff_ultimate.gif replaces staff_disintegration.gif, which is removed.
+  - The previews add touches the game's presentation can do too: light from the fire and magic on the ground, the scene darkening while the ultimate is cast, camera shake, a hit flash, and the Hollow Trial scene look (glow, grade, vignette).
+- Cut-in:
+  - One scale for all poses, so the hero keeps his size and stays inside the banner.
+  - The burst pose is now the cast (pose 3).
+  - The backdrop strike is the meteor ultimate, drawn at x4 with the same code: it appears during the call, crashes on the cut, then the blast and smoke over the crater. The meteor breaks out over the banner's edge.
+- Not in the game and not checked in Godot. The hero still has only the 8 key poses.
+
 ## Staff cut-in in the shared format and preview GIFs (2026-11-01, Claude, done while Codex is out)
 
 Owner: "why the cutout doesn't look like what we have on the other weapon", and a GIF to see the animation.

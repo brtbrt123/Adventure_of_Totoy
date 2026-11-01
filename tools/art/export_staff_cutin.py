@@ -6,23 +6,29 @@ in the Totoy 36 palette with hard alpha, scaled up with integer nearest-neighbou
 falloff; ink impact silhouettes; a 12-frame aura atlas; four backdrop effect frames; three full-screen flash frames; a json with
 sizes, anchors and timings; a preview GIF and a contact sheet. The mask helpers come from export_lightning_cutin.py.
 
-Staff differences: a sapphire night-sky language (water_1 deep, water_2, water_4, water_5, water_6 pale, cream star core, a lilac
-accent on the runes), star motes instead of ghost wisps, a magic circle turning under the feet in the aura, and a falling star
-crashing into a ground circle as the backdrop strike. The banner leaves to the right (the star falls on).
+Staff differences: a sapphire rim (water_1 deep, water_2, water_4, water_6 pale, cream), star motes instead of ghost wisps, the
+staff's teal magic circle turning under the feet in the aura, and the ultimate itself as the backdrop strike, drawn with the same
+code as the game-scale effects (tools/art/staff_fx.py, after the owner's meteor reference): the meteor appears over the circle while
+he calls it, crashes on the cut to the burst (it breaks out over the banner's edge), the blast, then smoke over the cracked crater.
+The banner leaves to the right.
+
+Layout (owner 2026-11-01: "the cutout doesn't look properly aligned and organised"): one scale for every pose (FIG_K: the tallest
+pose fits inside the banner with its punch-in), so the hero keeps his size from beat to beat and stays inside the banner; he stands
+left of centre (FIG_X), the circle and the meteor fill the right of the banner.
 
 Poses come from the staff concept (tools/art/import_staff_concept.py, art/reference/staff_v1/imported/hero_<n>.png):
-  crouch = pose 5 (plants the staff, the circle forms), ready = pose 8 (raises the staff, calls the star),
-  burst = pose 4 (swings the staff overhead and down: the star falls)
+  crouch = pose 5 (plants the staff, the circle forms), ready = pose 8 (raises the staff, calls the meteor),
+  burst = pose 3 (points the staff at the target as the meteor falls)
 
 Outputs (presentation/cutin/):
   staff_pose_<name>.png / _sil.png   lit pose and ink impact silhouette (x12)
-  staff_aura.png                     12 frames (6x2 atlas, x8): star motes rising, a magic circle turning at the feet, bottom-centred
-  staff_strike_<1..4>.png            800x450 backdrop (x8): the star falling, the crash on the circle, the pillar, the embers
+  staff_aura.png                     12 frames (6x2 atlas, x8): the magic circle turning at the feet, motes rising, bottom-centred
+  staff_strike_<1..4>.png            800x450 backdrop (x4): the meteor over the circle, the crash, the blast, smoke over the crater
   staff_flash_<1..3>.png             800x450 full-width pop (x4): pale flash with dark falling streaks, then streaks fading
-  staff_cutin.json                   sizes, anchors, atlas frames, file lists and suggested timings
+  staff_cutin.json                   sizes, anchors, the pose fit and position, atlas frames, file lists and suggested timings
   staff_cutin_preview.gif            about 1.2 s at 30 fps on the dark cut-in background (viewing only)
   staff_cutin_contact.png            every preview frame at 320x180 plus the raw assets (viewing only)
-Pillow only, fixed seeds. Run from the project root after import_staff_concept.py:
+Pillow and numpy, fixed seeds. Run from the project root after import_staff_concept.py:
   python tools/art/export_staff_cutin.py
 """
 from __future__ import annotations
@@ -31,15 +37,17 @@ import json
 import math
 import random
 import sys
+import time
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import artlib  # noqa: E402
+import staff_fx as SFX  # noqa: E402  the game-scale staff effects (the circle, the meteor, the blast)
 from export_lightning_cutin import (  # noqa: E402  shared cut-in format helpers
     FONT, FPS, H, RIGHT_TOP, SLOPE, FIG_SCALE, W, FW, FH, FX_SCALE, AURA_SCALE,
-    alpha_mask, banner_poly, bolt_layers, check_hard, dilate, draw_path, ease_back, ease_in, ease_out, minus, poly_mask, ramp,
+    alpha_mask, banner_poly, check_hard, dilate, draw_path, ease_back, ease_in, ease_out, minus, poly_mask, ramp,
     rim_light, solid, up, y_bot,
 )
 
@@ -50,9 +58,9 @@ PAL = artlib.load_palette()
 FORBIDDEN = set(PAL.reserved)
 
 POSE_SCALE = 12
-STRIKE_SCALE = 8     # the falling star is drawn at 100x57 and scaled x8
+STRIKE_SCALE = 4     # the strike is drawn at 200x113 and scaled x4: about the size of the hero's pixels in this cut-in
 PAD = 8
-POSE_FILES = {"crouch": "hero_5.png", "ready": "hero_8.png", "burst": "hero_4.png"}
+POSE_FILES = {"crouch": "hero_5.png", "ready": "hero_8.png", "burst": "hero_3.png"}
 SEEDS = {"crouch": 41, "ready": 42, "burst": 43}
 MOTES = {"crouch": 6, "ready": 9, "burst": 12}
 
@@ -123,43 +131,25 @@ def make_pose(name: str) -> tuple[Image.Image, Image.Image, dict]:
             "source": "art/reference/staff_v1/imported/" + POSE_FILES[name],
             "content": {"crouch": "plants the staff, the circle forms (concept pose 5)",
                         "ready": "raises the staff, calls the star (concept pose 8)",
-                        "burst": "swings the staff overhead and down, the star falls (concept pose 4)"}[name]}
+                        "burst": "points the staff at the target as the meteor falls (concept pose 3)"}[name]}
     return up(lit, k), up(sil, k), meta
 
 
 # ------------------------------------------------------------------------------------------------- aura atlas
-def ellipse_pts(cx: float, cy: float, rx: float, ry: float, a0: float, a1: float, step: float = 6) -> list[tuple[float, float]]:
-    n = max(2, int((a1 - a0) / step))
-    return [(cx + math.cos(math.radians(a0 + (a1 - a0) * i / n)) * rx, cy + math.sin(math.radians(a0 + (a1 - a0) * i / n)) * ry)
-            for i in range(n + 1)]
-
-
 def make_aura_frame(i: int) -> Image.Image:
-    """48x56 at 1x: star motes rising from the feet and a magic circle turning under them (x8, bottom-centred)."""
+    """48x56 at 1x: the staff's magic circle turning under his feet (the one the ultimate draws, staff_fx.rune_circle) with rays
+    rising off it and star motes climbing (x8, bottom-centred)."""
     rng = random.Random(900 + i)
     w, h = 48, 56
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    cx, cy, rx, ry = w / 2, h - 7, 21, 5
-    back = Image.new("L", (w, h), 0)
-    front = Image.new("L", (w, h), 0)
-    draw_path(back, ellipse_pts(cx, cy, rx, ry, 180, 360))
-    draw_path(front, ellipse_pts(cx, cy, rx, ry, 0, 180))
-    inner = Image.new("L", (w, h), 0)
-    draw_path(inner, ellipse_pts(cx, cy, rx - 6, ry - 2, 0, 360))
-    ticks = Image.new("L", (w, h), 0)
-    for k in range(8):  # rune ticks turning around the ring
-        ang = math.radians(i * 15 + k * 45)
-        tx, ty = round(cx + math.cos(ang) * (rx - 3)), round(cy + math.sin(ang) * (ry - 1))
-        ticks.putpixel((tx, ty), 255)
-    img.alpha_composite(solid(back, "k"))
-    img.alpha_composite(solid(inner, "l"))
-    img.alpha_composite(solid(ticks, "v"))
-    img.alpha_composite(bolt_layers(front, ["l"], "n"))
+    ground, air = SFX.rune_circle(21, 1.0, 0.85, rot=i * 15, spikes=0.5, k=i, glyphs=10)
+    img.alpha_composite(ground.img, (w // 2 - ground.ax, h - 8 - ground.ay))
+    img.alpha_composite(air.img, (w // 2 - air.ax, h - 8 - air.ay))
     arms = Image.new("L", (w, h), 0)
     cores = Image.new("L", (w, h), 0)
     for j in range(6):  # motes rising: each climbs with the frame number, wrapping
-        sx = cx + rng.uniform(-17, 17)
-        y = (h - 8) - ((rng.uniform(0, 44) + i * 3.7) % 44)
+        sx = w / 2 + rng.uniform(-17, 17)
+        y = (h - 10) - ((rng.uniform(0, 42) + i * 3.7) % 42)
         x = round(sx + math.sin(y * 0.3 + j) * 1.5)
         plus(arms, x, round(y), 1 if (i + j) % 3 else 0)
         cores.putpixel((min(w - 1, max(0, x)), min(h - 1, max(0, round(y)))), 255)
@@ -169,86 +159,35 @@ def make_aura_frame(i: int) -> Image.Image:
 
 
 # ------------------------------------------------------------------------------------------- backdrop strike
-SWD, SHD = 100, 57
-SKY = (SWD * 0.98, -6.0)      # where the star comes from (top right)
-GROUND = (SWD * 0.63, SHD * 0.60)  # where it lands (the circle's centre, inside the banner)
-
-
-def along(s: float) -> tuple[float, float]:
-    return (SKY[0] + (GROUND[0] - SKY[0]) * s, SKY[1] + (GROUND[1] - SKY[1]) * s)
-
-
-def ground_circle(img: Image.Image, bright: bool, rx: float = 14, ry: float = 4) -> None:
-    cx, cy = GROUND
-    outer = Image.new("L", (SWD, SHD), 0)
-    draw_path(outer, ellipse_pts(cx, cy, rx, ry, 0, 360))
-    inner = Image.new("L", (SWD, SHD), 0)
-    draw_path(inner, ellipse_pts(cx, cy, rx * 0.7, ry * 0.7, 0, 360))
-    star = Image.new("L", (SWD, SHD), 0)  # the six-pointed star inside, two triangles
-    for rot in (90, 270):
-        pts = [(cx + math.cos(math.radians(rot + k * 120)) * rx * 0.7, cy + math.sin(math.radians(rot + k * 120)) * ry * 0.7) for k in range(4)]
-        draw_path(star, pts)
-    img.alpha_composite(solid(star, "v" if bright else "k"))
-    img.alpha_composite(bolt_layers(inner, ["k"], "l"))
-    img.alpha_composite(bolt_layers(outer, ["l"] if bright else ["k"], "o" if bright else "l"))
-
-
-def star_head(img: Image.Image, x: float, y: float, arm: int) -> None:
-    core = Image.new("L", (SWD, SHD), 0)
-    plus(core, round(x), round(y), arm)
-    for dx, dy in ((1, 1), (-1, -1), (1, -1), (-1, 1)):
-        px, py = round(x) + dx, round(y) + dy
-        if 0 <= px < SWD and 0 <= py < SHD:
-            core.putpixel((px, py), 255)
-    img.alpha_composite(bolt_layers(core, ["p", "o", "n"], "1"))
-
-
-def trail(img: Image.Image, s0: float, s1: float) -> None:
-    """The burning tail from s0 (thin, far) to s1 (the head): thicker and paler toward the head."""
-    for width, sym_ring, sym in ((5, "l", "n"), (3, "n", "o"), (1, "o", "p")):
-        m = Image.new("L", (SWD, SHD), 0)
-        span = s1 - s0
-        a = s0 + span * {5: 0.45, 3: 0.25, 1: 0.0}[width]
-        draw_path(m, [along(a), along(s1)], width)
-        img.alpha_composite(bolt_layers(m, [sym_ring], sym))
-    core = Image.new("L", (SWD, SHD), 0)
-    draw_path(core, [along(s0 + (s1 - s0) * 0.6), along(s1)])
-    img.alpha_composite(solid(core, "1"))
+SWD, SHD = 200, 113
+GROUND = (117, 66)  # where the meteor lands (the circle's centre), on the banner's floor right of the hero (grid px, x4 on the canvas)
 
 
 def make_strike(phase: int) -> Image.Image:
-    rng = random.Random(170 + phase)
+    """The ultimate in the banner, drawn with the same code as the game-scale effects (staff_fx) at the strike grid:
+    1 the meteor falling onto the charged circle, 2 the crash (also drawn past the banner's edge), 3 the blast, 4 smoke, rocks
+    and the cracked crater (held until the banner leaves)."""
     img = Image.new("RGBA", (SWD, SHD), (0, 0, 0, 0))
-    if phase == 1:  # the star high up, a short tail; the circle waits, dim
-        ground_circle(img, False)
-        trail(img, 0.0, 0.42)
-        star_head(img, *along(0.42), 2)
-    elif phase == 2:  # the crash: the full tail into the bright circle
-        ground_circle(img, True, 15, 4.5)
-        trail(img, 0.15, 1.0)
-        star_head(img, *along(1.0), 4)
-    elif phase == 3:  # the pillar of light out of the circle, shards flying
-        ground_circle(img, True, 16, 5)
-        cx, cy = GROUND
-        for width, top, halos in ((3, cy - 22, ["n", "l"]), (1, cy - 36, ["o", "n"])):  # a tapering pillar of light
-            pillar = Image.new("L", (SWD, SHD), 0)
-            draw_path(pillar, [(cx, cy - 1), (cx, top)], width)
-            img.alpha_composite(bolt_layers(pillar, halos, "o" if width == 3 else "1"))
-        for _ in range(16):
-            ang = rng.uniform(math.pi * 1.05, math.pi * 1.95)
-            r = rng.uniform(6, 16)
-            plus_m = Image.new("L", (SWD, SHD), 0)
-            plus(plus_m, round(cx + math.cos(ang) * r * 1.6), round(cy + math.sin(ang) * r), rng.choice((0, 1)))
-            img.alpha_composite(solid(plus_m, rng.choice("op1")))
-    else:  # the embers: motes drifting up over a fading ring
-        cx, cy = GROUND
-        ring = Image.new("L", (SWD, SHD), 0)
-        draw_path(ring, ellipse_pts(cx, cy, 16, 5, 0, 360, 12)[::2])
-        img.alpha_composite(solid(ring, "k"))
-        for _ in range(22):
-            m = Image.new("L", (SWD, SHD), 0)
-            plus(m, round(cx + rng.uniform(-18, 18)), round(cy - rng.uniform(2, 34)), rng.choice((0, 0, 1)))
-            img.alpha_composite(solid(m, rng.choice("lnop")))
+    gx, gy = GROUND
+
+    def put(spr, x, y):
+        SFX._paste_clipped(img, spr, x, y)
+
+    if phase in (1, 2):
+        ground, air = SFX.rune_circle(30, 1.0, 1.0, rot=phase * 20, spikes=0.7 if phase == 1 else 1.4, k=phase, glyphs=12)
+        put(ground, gx, gy)
+        put(air, gx, gy)
+    if phase == 1:  # the meteor coming down out of the sky (its flames run off the top of the banner)
+        put(SFX.meteor(3, r=10, flame=58), gx, gy - 16)
+    elif phase == 2:
+        put(SFX.fire_ring(1, 5, 40), gx, gy)
+        put(SFX.meteor(5, r=10, flame=58), gx, gy)
+    elif phase == 3:
+        put(SFX.crater(1.0, 1.0, rx=28), gx, gy)
+        put(SFX.explosion(3, size=0.48), gx, gy)
+    else:
+        put(SFX.crater(0.5, 1.0, rx=28), gx, gy)
+        put(SFX.explosion(9, size=0.48), gx, gy)
     return up(img, STRIKE_SCALE).crop((0, 0, W, H))
 
 
@@ -300,12 +239,17 @@ DEEP = col("k")[:3]
 INK = col("0")[:3]
 IMPACT = (232, 240, 250)
 N_FRAMES = 36
-FIG_FIT = {"crouch": 0.95, "ready": 0.82, "burst": 0.78}
+# One scale for every pose (owner 2026-11-01: the cut-in looked unorganised: the hero changed size between beats and his staff
+# crossed the banner's edge). The tallest pose, with its 1.12 punch-in, fits inside the banner (240 px) with a margin.
+BANNER_H = 240.0
+_TALLEST = max(Image.open(POSES_DIR / f).height for f in POSE_FILES.values())
+FIG_K = (BANNER_H - 18) / (_TALLEST * 1.12)  # canvas px per pose px
+FIG_FIT = {name: round(FIG_K / (POSE_SCALE * FIG_SCALE), 4) for name in POSE_FILES}
 BEATS = [("crouch", 0.10, 0.37), ("ready", 0.37, 0.62), ("burst", 0.62, 1.20)]
 CUTS = [0.37, 0.62]
 SLAM = 0.70
 EXIT = (0.98, 1.16)
-FIG_X = 300.0
+FIG_X = 240.0
 GRAD = Image.linear_gradient("L").resize((W, H))
 BAN_BG = Image.composite(Image.new("RGBA", (W, H), BAN_BOT + (255,)), Image.new("RGBA", (W, H), BAN_TOP + (255,)), GRAD)
 
@@ -316,11 +260,12 @@ def banner_offset(t: float) -> float:
 
 
 def strike_at(t: float, k: int) -> int:
+    # the call (ready beat): the meteor appears over the circle; the cut to the burst: the crash, the blast, then the smoke holds
     if t >= CUTS[1]:
         n = int((t - CUTS[1]) * FPS + 1e-6)
-        return [1, 1, 2, 2, 3, 3, 4][n] if n < 7 else (3 if k % 6 == 0 else 4)
-    if 0.2 <= t < CUTS[0] and k % 3 == 0:
-        return 4
+        return [2, 2, 3, 3, 3][n] if n < 5 else 4
+    if 0.47 <= t < CUTS[1]:
+        return 1
     return 0
 
 
@@ -419,7 +364,7 @@ def render_preview(assets) -> list[Image.Image]:
         layer = BAN_BG.copy()
         layer.alpha_composite(sky_layer(k, off))
         st = strike_at(t, k)
-        strike_out = st == 2
+        strike_out = st in (1, 2)  # the falling meteor and the crash break out over the banner's edge
         if st:  # the crash (2) shows inside the banner and, below, past its edge
             layer.alpha_composite(strikes[st - 1], (int(off * 0.2), 0))
         fig = None
@@ -439,15 +384,14 @@ def render_preview(assets) -> list[Image.Image]:
                 layer.paste(Image.new("RGBA", (W, H), IMPACT + (255,)), (0, 0))
                 layer.alpha_composite(radial(k, (fx, 230)))
             fig = img.resize((int(img.width * sc), int(img.height * sc)), Image.NEAREST)
-            lift = 14 * math.sin(math.pi * ramp(local, 0.0, 0.25)) if beat[0] == "burst" else 0  # a small hop on the swing
             px_ = fx - meta["pad"] * sc - meta["inner_w"] * sc * meta["feet_x"] + shake[0]
-            py_ = y_bot(fx, off) - 4 - (fig.height - meta["pad"] * sc) + shake[1] - lift
+            py_ = y_bot(fx, off) - 4 - (fig.height - meta["pad"] * sc) + shake[1]
             if impact:
                 layer.alpha_composite(fig, (int(px_), int(py_)))
             if any(c + 1 / FPS <= t < c + 2 / FPS + 1e-6 for c in CUTS):
                 layer.alpha_composite(Image.new("RGBA", (W, H), IMPACT + (95,)))
         if st and strike_out:
-            frame.alpha_composite(strikes[1], (int(off * 0.2), 0))
+            frame.alpha_composite(strikes[st - 1], (int(off * 0.2), 0))
         frame.paste(layer, (0, 0), pm)
         if beat and not impact:
             frame.alpha_composite(fig, (int(px_), int(py_)))
@@ -509,10 +453,30 @@ def contact_sheet(frames, poses, strikes, flashes, aura) -> Image.Image:
 
 
 # ------------------------------------------------------------------------------------------------------- main
-def save(img: Image.Image, name: str, written: list) -> None:
-    check_hard(img, name)
-    img.save(OUT / name)
+def save(img: Image.Image, name: str, written: list, fire: bool = False) -> None:
+    """Hard alpha and palette colours only. The strike frames may use gold and red: the meteor's fire is the skill's hit effect
+    (AGENTS.md lists hit effects among the combat cues those colours are kept for); everything else keeps them out."""
+    if fire:
+        allowed = set(PAL.by_symbol.values())
+        for _, (r, g, b, a) in img.getcolors(1 << 20):
+            if a not in (0, 255) or (a == 255 and (r, g, b) not in allowed):
+                raise SystemExit(f"{name}: not hard-alpha Totoy 36")
+    else:
+        check_hard(img, name)
+    retry(lambda: img.save(OUT / name))
     written.append(name)
+
+
+def retry(write) -> None:
+    """Windows: the Godot editor (or a viewer) may hold a file for a moment; try again for up to 30 s."""
+    for attempt in range(30):
+        try:
+            write()
+            return
+        except OSError:
+            if attempt == 29:
+                raise
+            time.sleep(1.0)
 
 
 def main() -> int:
@@ -523,12 +487,13 @@ def main() -> int:
         "status": "review stage; not wired into the game",
         "title": "DISINTEGRATION", "subtitle_suggestion": "circle size / damage from the core, like the other cut-ins",
         "canvas": [W, H],
-        "palette": "Totoy 36, hard alpha; no gold x,y or red z,A",
+        "palette": "Totoy 36, hard alpha; gold x,y and red z,A only in the strike frames (the meteor's fire: a hit effect)",
+        "fig_fit": FIG_FIT, "fig_x": FIG_X,
         "pose_scale": POSE_SCALE, "aura_scale": AURA_SCALE, "fx_scale": FX_SCALE, "strike_scale": STRIKE_SCALE,
         "poses": {}, "aura": {}, "strikes": [], "flashes": [],
         "timing_s": {"note": "suggested, preview seconds at 30 fps; a sibling of black_form_cutin.gd may scale them by SPEED",
                      "flash_pop": [0.0, 0.167], "banner_in": [0.03, 0.17], "beats": BEATS, "cuts": CUTS,
-                     "strike_on_burst": [[1, 0.067], [2, 0.067], [3, 0.1], ["3/4 flicker", "until exit"]],
+                     "strike": [[1, "0.47 until the burst cut"], [2, 0.067], [3, 0.1], [4, "until exit"]],
                      "crash_flash": CUTS[1] + 2 / FPS,
                      "title_slam": SLAM, "exit": list(EXIT), "exit_direction": "right (the star falls on)", "end": EXIT[1]},
     }
@@ -551,7 +516,7 @@ def main() -> int:
     meta["aura"] = {"cell_w": cw, "cell_h": chh, "frames": frames, "anchor": "bottom centre"}
     strikes = [make_strike(p) for p in range(1, 5)]
     for i, s in enumerate(strikes):
-        save(s, f"staff_strike_{i + 1}.png", written)
+        save(s, f"staff_strike_{i + 1}.png", written, fire=True)
         meta["strikes"].append(f"staff_strike_{i + 1}.png")
     flashes = [make_flash(p) for p in range(1, 4)]
     for i, f in enumerate(flashes):
@@ -561,9 +526,10 @@ def main() -> int:
     written.append("staff_cutin.json")
     preview = render_preview((poses, aura, strikes, flashes))
     gif = [f.convert("P", palette=Image.ADAPTIVE, colors=255) for f in preview]
-    gif[0].save(OUT / "staff_cutin_preview.gif", save_all=True, append_images=gif[1:], duration=33, loop=0, disposal=1)
+    retry(lambda: gif[0].save(OUT / "staff_cutin_preview.gif", save_all=True, append_images=gif[1:], duration=33, loop=0, disposal=1))
     written.append("staff_cutin_preview.gif")
-    contact_sheet(preview, poses, strikes, flashes, aura).save(OUT / "staff_cutin_contact.png")
+    sheet = contact_sheet(preview, poses, strikes, flashes, aura)
+    retry(lambda: sheet.save(OUT / "staff_cutin_contact.png"))
     written.append("staff_cutin_contact.png")
     for n in written:
         print(n)
