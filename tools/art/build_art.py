@@ -166,6 +166,29 @@ def build_sprite_atlas(sprites: dict[str, Image.Image], out: Path, anchors: dict
     })
 
 
+OVERRIDE_DIR = artlib.ROOT / "art" / "overrides"
+
+
+def load_override(path: Path, palette: "artlib.Palette") -> Image.Image:
+    """A frame repainted by hand (owner 2026-11-01): art/overrides/<frame>.png replaces that frame in every build, whatever tool
+    generated its grid. Start from art/build/sprites/<frame>.png (same canvas, so the feet stay where they are) and paint in any
+    editor. The image is made game-safe here: alpha below 128 becomes transparent, everything else fully opaque and snapped to the
+    nearest Totoy 36 colour (the combat gold and red included, so use them only where combat cues belong)."""
+    image = Image.open(path).convert("RGBA")
+    colours = list(palette.by_symbol.values())
+    cache: dict[tuple[int, int, int], tuple[int, int, int]] = {}
+    out = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    for y in range(image.height):
+        for x in range(image.width):
+            r, g, b, a = image.getpixel((x, y))
+            if a < 128:
+                continue
+            if (r, g, b) not in cache:
+                cache[(r, g, b)] = min(colours, key=lambda c: (r - c[0]) ** 2 + (g - c[1]) ** 2 + (b - c[2]) ** 2)
+            out.putpixel((x, y), cache[(r, g, b)] + (255,))
+    return out
+
+
 def main() -> int:
     try:
         palette = artlib.load_palette()
@@ -188,10 +211,14 @@ def main() -> int:
     tiles: dict[str, Image.Image] = {}
     sprites: dict[str, Image.Image] = {}
     anchors: dict[str, tuple[int, int]] = {}
+    overrides = 0
     for source in sources:
         if source.anchor is not None:
             anchors[source.name] = source.anchor
-        image = artlib.render(source, palette)
+        override = OVERRIDE_DIR / f"{source.name}.png"
+        image = load_override(override, palette) if override.exists() else artlib.render(source, palette)
+        if override.exists():
+            overrides += 1
         group, folder = (tiles, "tiles") if source.kind == "tile" else (sprites, "sprites")
         image.save(out / folder / f"{source.name}.png")
         group[source.name] = image
@@ -199,7 +226,11 @@ def main() -> int:
         build_tiles(tiles, out)
     if sprites:
         build_sprite_atlas(sprites, out, anchors, palette)
-    print(f"Built {len(tiles)} tile(s) and {len(sprites)} sprite(s) into {out}")
+    print(f"Built {len(tiles)} tile(s) and {len(sprites)} sprite(s) into {out}" + (f" ({overrides} repainted from art/overrides)" if overrides else ""))
+    print("New animation frames? Put them into the editable SpriteFrames: see docs/ANIMATION_EDITING.md (generate_sprite_frames.gd)")
+    unknown = sorted(p.stem for p in OVERRIDE_DIR.glob("*.png") if p.stem not in tiles and p.stem not in sprites) if OVERRIDE_DIR.exists() else []
+    if unknown:
+        print("WARNING: art/overrides has PNGs that match no frame (check the file name): " + ", ".join(unknown))
     return 0
 
 

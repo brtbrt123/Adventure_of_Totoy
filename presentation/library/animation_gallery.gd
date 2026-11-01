@@ -13,6 +13,11 @@ extends Node2D
 ## It reads the built atlas: after changing art, run build_art.py and press "reload" (or reopen the scene).
 
 const TICKS_PER_SECOND: float = 60.0
+const AnimLib := preload("res://presentation/common/anim_library.gd")
+## The character sets with an editable SpriteFrames (presentation/animations/<set>.tres): their animations play in the owner's
+## frame order and timing here, like in the game; every other animation at ticks_per_frame.
+const EDITABLE_SETS: Array[String] = ["hero2", "totoy_dagger", "totoy_lightning", "totoy_scythe", "totoy_unarmed", "golem2", "warden", "stag",
+	"boar", "mossling", "glowmoth", "npc_child", "npc_edda", "npc_elder", "npc_mira", "npc_tovan", "npc_worker"]
 const LABEL_HEIGHT: float = 10.0
 const PAD: float = 6.0
 
@@ -50,6 +55,7 @@ func _ready() -> void:
 
 
 func _load() -> void:
+	AnimLib.clear_cache()  # the owner may have edited the SpriteFrames
 	frames = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"]
 	atlas = load("res://art/build/sprites.png")
 	_layout()
@@ -134,7 +140,13 @@ func _layout() -> void:
 			y += row_h + PAD
 			x = 0.0
 			row_h = 0.0
-		entries.append({"name": name, "keys": keys, "at": Vector2(x, y), "size": size, "feet": Vector2(size.x * 0.5, LABEL_HEIGHT + PAD + up)})
+		var owner_set: String = ""
+		var anim: String = ""
+		for candidate: String in EDITABLE_SETS:
+			if name.begins_with(candidate + "_") and AnimLib.has(candidate, name.trim_prefix(candidate + "_").trim_suffix("_right")):
+				owner_set = candidate
+				anim = name.trim_prefix(candidate + "_").trim_suffix("_right")
+		entries.append({"name": name, "keys": keys, "at": Vector2(x, y), "size": size, "feet": Vector2(size.x * 0.5, LABEL_HEIGHT + PAD + up), "set": owner_set, "anim": anim})
 		x += size.x + PAD
 		row_h = maxf(row_h, size.y)
 	queue_redraw()
@@ -163,7 +175,17 @@ func _draw() -> void:
 		draw_rect(Rect2(at, size), Color(0.11, 0.094, 0.141), false, 1.0)
 		var keys: Array[String] = entry["keys"]
 		var i: int = (tick / ticks_per_frame) % keys.size()
-		var f: Dictionary = frames[keys[i]]
+		var shown: String = keys[i]
+		var total: int = keys.size()
+		if not String(entry["set"]).is_empty():  # the owner's SpriteFrames: their order and timing, looped with a short pause
+			var set_name: String = entry["set"]
+			var anim: String = entry["anim"]
+			total = AnimLib.count(set_name, anim, keys.size())
+			i = AnimLib.at(set_name, anim, tick % (AnimLib.length(set_name, anim, total * ticks_per_frame) + 12), [total, ticks_per_frame, true]) - 1
+			shown = AnimLib.key(set_name, anim, i + 1, keys[mini(i, keys.size() - 1)])
+		if not frames.has(shown):
+			continue
+		var f: Dictionary = frames[shown]
 		var dest: Rect2 = Rect2(at + Vector2(entry["feet"]), Vector2.ZERO)
 		var ax: float = float(f.get("ax", float(f["w"]) * 0.5))
 		var ay: float = float(f.get("ay", float(f["h"]) - 4.0))
@@ -173,4 +195,4 @@ func _draw() -> void:
 		dest.size = Vector2(-w if facing_left else w, h)
 		draw_texture_rect_region(atlas, dest, Rect2(f["x"], f["y"], w, h))
 		if show_labels:
-			draw_string(font, at + Vector2(3, 9), "%s  %d/%d" % [entry["name"], i + 1, keys.size()], HORIZONTAL_ALIGNMENT_LEFT, size.x - 4.0, 8, Color(0.96, 0.93, 0.84))
+			draw_string(font, at + Vector2(3, 9), "%s  %d/%d" % [entry["name"], i + 1, total], HORIZONTAL_ALIGNMENT_LEFT, size.x - 4.0, 8, Color(0.96, 0.93, 0.84))

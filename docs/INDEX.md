@@ -15,6 +15,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - The rules for agents live in `AGENTS.md` at the project root (not in the vault)
 
 ## Shared presentation
+- [[ANIMATION_EDITING]]: edit every character animation in Godot (SpriteFrames in presentation/animations), repaint frames (art/overrides), the animation galleries
 - [[WEAPON_PATHS]]: global weapon trails, glow/particles, finisher correction and regression captures
 
 ## Work in progress

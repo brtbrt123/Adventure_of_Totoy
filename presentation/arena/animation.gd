@@ -6,6 +6,9 @@ const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const WardEchoSprintEffects := preload("res://presentation/arena/ward_echo_sprint_effects.gd")
+## The owner's SpriteFrames (presentation/animations/<set>.tres): frame order and, for freely running poses, timing. The tables
+## below are the fallback for a set or pose without one (and the generator's starting values).
+const AnimLib := preload("res://presentation/common/anim_library.gd")
 ## Stone Ward pose frame counts (raise, hold loop, drop) of every hero set.
 const WARD_POSES: Dictionary = {"ward_raise": 4, "ward_hold": 4, "ward_drop": 3}
 ## Hero frame sets by equipped weapon (same numbering per state): katana, dagger, dagger in Lightning Form, scythe.
@@ -85,12 +88,12 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 			return ward_frame(prefix, actor.ward_ticks_left)
 		if state == "walk":
 			# The walk cycle runs at the walking speed's rate (twice as fast while Sprint runs).
-			return hero_frame(prefix, "walk", frame_index(PLAYER["walk"], walk_ticks(ticks, actor.move_speed_mult)))
+			return hero_frame(prefix, "walk", timed(prefix, "walk", walk_ticks(ticks, actor.move_speed_mult), PLAYER["walk"]))
 		if not PLAYER.has(state):
 			state = "idle"
-		return hero_frame(prefix, state, frame_index(PLAYER[state], ticks))
+		return hero_frame(prefix, state, timed(prefix, state, ticks, PLAYER[state]))
 	if state == "dead":
-		return "golem2_death_%d" % frame_index(BOSS["death"], snap.result_ticks)
+		return boss_frame("death", AnimLib.at("golem2", "death", snap.result_ticks, BOSS["death"]))
 	if state == "attack":
 		var tell: Snapshots.TelegraphSnapshot = attack_tell(actor.id, snap)
 		if tell != null:
@@ -103,15 +106,28 @@ static func choose(actor: Snapshots.EntitySnapshot, snap: Snapshots.GameSnapshot
 						start_tick = maxi(start_tick, earlier.end_tick + STRIKE_HOLD_TICKS + 1)
 				var progress: float = clampf(float(snap.tick - start_tick) / maxi(1, tell.hit_tick - start_tick), 0.0, 1.0)
 				index = mini(2, floori(progress * 3)) + 1
-			return "golem2_%s_%d" % [pose, index]
+			return boss_frame(pose, index)
 	if state == "recover" and not last_attack.is_empty():
 		var index: int = 4 + mini(2, maxi(0, snap.tick - int(last_attack["hit_tick"])) / 3)
-		return "golem2_%s_%d" % [ATTACKS.get(String(last_attack["attack"]), "slam"), index]
+		return boss_frame(ATTACKS.get(String(last_attack["attack"]), "slam"), index)
 	if state == "posture_broken":
 		state = "staggered"
 	if state == "recover":
 		state = "idle"
-	return "golem2_%s_%d" % [state, frame_index(BOSS.get(state, BOSS["idle"]), actor.state_ticks)]
+	return boss_frame(state, AnimLib.at("golem2", state, actor.state_ticks, BOSS.get(state, BOSS["idle"])))
+
+
+## Boss frame `n` of `pose` (the owner's frame order in golem2.tres).
+static func boss_frame(pose: String, n: int) -> String:
+	return AnimLib.key("golem2", pose, n, "golem2_%s_%d" % [pose, n])
+
+
+## The 1-based frame `ticks` into a freely running hero pose (the owner's timing in <set>.tres; `spec` without one). The Lightning
+## set borrows the dagger's poses it has no art for.
+static func timed(prefix: String, pose: String, ticks: int, spec: Array) -> int:
+	if prefix == SET_LIGHTNING and pose not in LIGHTNING_POSES:
+		prefix = SET_DAGGER
+	return AnimLib.at(prefix, pose, ticks, spec)
 
 ## Walk-cycle ticks scaled by the move speed multiplier (the cycle plays `mult` times as fast; 1.0 unchanged).
 static func walk_ticks(ticks: int, mult: float) -> int:
@@ -169,11 +185,12 @@ static func set_weapon(prefix: String) -> StringName:
 		SET_SCYTHE: return Tuning.WEAPON_CHAIN_SCYTHE
 	return Tuning.WEAPON_BLACK_KATANA
 
-## `<set>_<pose>_right_<n>`; the Lightning set borrows the dagger frame for poses it has no art for.
+## Frame `n` of `<set>_<pose>` in the owner's order (<set>.tres), by default `<set>_<pose>_right_<n>`; the Lightning set borrows
+## the dagger frame for poses it has no art for.
 static func hero_frame(prefix: String, pose: String, n: int) -> String:
 	if prefix == SET_LIGHTNING and pose not in LIGHTNING_POSES:
 		prefix = SET_DAGGER
-	return "%s_%s_right_%d" % [prefix, pose, n]
+	return AnimLib.key(prefix, pose, n, "%s_%s_right_%d" % [prefix, pose, n])
 
 ## Every frame a hero set can request (all states, swings 1..combo_max of its weapon).
 static func hero_names(prefix: String) -> Array[String]:

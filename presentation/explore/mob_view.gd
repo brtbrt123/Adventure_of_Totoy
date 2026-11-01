@@ -4,6 +4,7 @@ const Snapshots := preload("res://core/snapshots.gd")
 const Tuning := preload("res://core/tuning.gd")
 const WHITE := preload("res://art/build/sprites_white.png")
 const Kit := preload("res://presentation/common/ui_kit.gd")
+const AnimLib := preload("res://presentation/common/anim_library.gd")  # the owner's SpriteFrames: frame order and free-running timing
 const STATES: Dictionary = {
  "warden": {"idle":["idle",6,12,true], "alert":["wake",4,6,false], "chase":["walk",6,7,true], "return":["walk",6,7,true], "windup":["cleave_tell",5,1,false], "strike":["cleave_strike",3,2,false], "recover":["recover",4,4,false], "stagger":["exposed",4,8,true], "hurt":["hurt",2,5,false], "dead":["death",8,8,false]},
  "glowmoth": {"idle":["idle",24,2,true], "alert":["idle",24,2,true], "chase":["move",12,2,true], "return":["move",12,2,true], "windup":["shot_tell",4,1,false], "strike":["shot_release",2,4,false], "recover":["idle",24,2,true], "hurt":["hurt",2,5,false], "dead":["death",4,8,false]},
@@ -37,30 +38,44 @@ static func frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], ti
 	# Dormant encounters leave idle state_ticks at zero. Use the simulation clock so they animate
 	# before aggro, freeze with pause and stop immediately when core reports another state.
 	var clock: int = tick + int(mob["id"]) * 17 if mob["state"] == &"idle" else int(mob["state_ticks"])
-	var n: int = clock / int(pose[2])
+	var type: String = String(mob["type"])
+	var count: int = AnimLib.count(type, String(pose[0]), int(pose[1]))
+	var spec: Array = [count, int(pose[2]), bool(pose[3])]
+	var primary: Array = _primary(type, String(pose[0]))
+	var owners_pace: bool = primary.is_empty() or (int(primary[0]) == int(pose[2]) and bool(primary[1]) == bool(pose[3]))
+	var n: int = (AnimLib.at(type, String(pose[0]), clock, spec) - 1) if owners_pace else clock / int(pose[2])
 	if mob["type"] == &"warden" and pose[0] == "guard_hit" and tick - guard_hit_tick < 10:
 		n = (tick - guard_hit_tick) / 5
 	if mob["type"] == &"warden" and mob["state"] == &"strike":
 		for tell: Snapshots.TelegraphSnapshot in tells:
 			if tell.owner_id == mob["id"]:
-				n = floori(float(tick - tell.hit_tick) / maxi(1, tell.end_tick - tell.hit_tick) * int(pose[1]))
+				n = floori(float(tick - tell.hit_tick) / maxi(1, tell.end_tick - tell.hit_tick) * count)
 	if mob["state"] == &"windup":
 		for tell: Snapshots.TelegraphSnapshot in tells:
 			if tell.owner_id == mob["id"]:
-				n = floori(float(tick-tell.start_tick) / maxi(1,tell.hit_tick-tell.start_tick) * int(pose[1]))
+				n = floori(float(tick-tell.start_tick) / maxi(1,tell.hit_tick-tell.start_tick) * count)
 	# A non-damaging summon needs cast progress from core, never an invented damage warning.
 	if mob.get("attack_id", &"") == &"stag_summon" and mob["state"] == &"windup" and mob.has("cast_start_tick") and mob.has("cast_release_tick"):
-		n = floori(float(tick - int(mob["cast_start_tick"])) / maxi(1, int(mob["cast_release_tick"]) - int(mob["cast_start_tick"])) * int(pose[1]))
+		n = floori(float(tick - int(mob["cast_start_tick"])) / maxi(1, int(mob["cast_release_tick"]) - int(mob["cast_start_tick"])) * count)
 	# The release frames run on from the release tick through strike AND recover (state_ticks restarts between them).
 	if mob.get("attack_id", &"") == &"stag_summon" and mob["state"] in [&"strike", &"recover"] and int(mob.get("cast_release_tick", -1)) >= 0:
 		n = (tick - int(mob["cast_release_tick"])) / int(pose[2])
 	if mob["type"]==&"boar" and mob["state"]==&"windup" and n>=2:
 		n=2+posmod(int(mob["state_ticks"])/4,2)
 	if mob["state"] == &"dead":
-		n = floori(float(mob["state_ticks"]) / Tuning.MOB_DEATH_TICKS * int(pose[1]))
-	n = posmod(n,int(pose[1])) if bool(pose[3]) else clampi(n,0,int(pose[1])-1)
+		n = floori(float(mob["state_ticks"]) / Tuning.MOB_DEATH_TICKS * count)
+	n = posmod(n,count) if bool(pose[3]) else clampi(n,0,count-1)
 	if mob["type"]==&"boar" and mob["state"]==&"recover":n=3-n
-	return "%s_%s_right_%d" % [mob["type"],pose[0],n+1]
+	return AnimLib.key(type, String(pose[0]), n + 1, "%s_%s_right_%d" % [type, pose[0], n + 1])
+## The pace (ticks per frame, loop) the pose's SpriteFrames animation started from: its first use in STATES (presentation/animations,
+## tools/godot/generate_sprite_frames.gd). That use plays at the owner's timing; another state playing the same pose at another pace
+## (the Stag's startled idle, a looping stun) keeps the code's pace with the owner's frames.
+static func _primary(type: String, pose_name: String) -> Array:
+	for state: String in STATES.get(type, {}):
+		var pose: Array = STATES[type][state]
+		if pose[0] == pose_name:
+			return [int(pose[2]), bool(pose[3])]
+	return []
 static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary, hero_at: Vector2, frames: Dictionary, atlas: Texture2D) -> void:
 	if mob["state"] == &"dead": return
 	var at: Vector2 = mob["position"]

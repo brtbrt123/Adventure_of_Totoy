@@ -1,0 +1,81 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_compass_right_1.png" id="1_edul6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_idle_right_1.png" id="2_y3wu1"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_idle_right_2.png" id="3_02185"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_idle_right_3.png" id="4_au6qk"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_idle_right_4.png" id="5_8fc7o"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_talk_right_1.png" id="6_rs18o"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_talk_right_2.png" id="7_xp5ut"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_talk_right_3.png" id="8_uulm1"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_walk_right_1.png" id="9_noq3k"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_walk_right_2.png" id="10_4rjpl"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_walk_right_3.png" id="11_qykgs"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_walk_right_4.png" id="12_dpva7"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_walk_right_5.png" id="13_thr5a"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_mira_walk_right_6.png" id="14_377p0"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_edul6")
+}],
+"loop": 1,
+"name": &"compass",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 3.0,
+"texture": ExtResource("2_y3wu1")
+}, {
+"duration": 1.75,
+"texture": ExtResource("3_02185")
+}, {
+"duration": 1.75,
+"texture": ExtResource("4_au6qk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_8fc7o")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 7.5
+}, {
+"frames": [{
+"duration": 1.25,
+"texture": ExtResource("6_rs18o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_xp5ut")
+}, {
+"duration": 1.25,
+"texture": ExtResource("8_uulm1")
+}],
+"loop": 1,
+"name": &"talk",
+"speed": 7.5
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_noq3k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_4rjpl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_qykgs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_dpva7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_thr5a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_377p0")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 8.571428571428571
+}]

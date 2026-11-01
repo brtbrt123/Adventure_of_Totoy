@@ -789,7 +789,7 @@ static func hero_frame_for(hero: Snapshots.EntitySnapshot, armed: bool = true) -
 	if not armed:
 		var state: String = String(hero.state) if UNARMED_FRAMES.has(String(hero.state)) else "idle"
 		var ticks: int = ArenaAnimation.walk_ticks(hero.state_ticks, hero.move_speed_mult) if state == "walk" else hero.state_ticks
-		return ArenaAnimation.hero_frame("totoy_unarmed", state, ArenaAnimation.frame_index(UNARMED_FRAMES[state], ticks))
+		return ArenaAnimation.hero_frame("totoy_unarmed", state, ArenaAnimation.AnimLib.at("totoy_unarmed", state, ticks, UNARMED_FRAMES[state]))
 	var view: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
 	return ArenaAnimation.choose(hero, view, {})
 
@@ -797,6 +797,8 @@ static func hero_frame_for(hero: Snapshots.EntitySnapshot, armed: bool = true) -
 ## The NPC's idle loop frame (4 frames, the source ticks 24/14/14/8) at `tick`.
 func npc_frame_for(npc: Dictionary, tick: int) -> String:
 	var visual: String = String(npc["visual"])
+	if ArenaAnimation.AnimLib.has(visual, "idle"):  # the owner's npc_<name>.tres (its per-frame durations carry the source ticks)
+		return ArenaAnimation.AnimLib.key(visual, "idle", ArenaAnimation.AnimLib.at(visual, "idle", tick, [4, 8, true]), "")
 	var ticks: Array = npc_idle_ticks.get(visual.trim_prefix("npc_"), NPC_IDLE_TICKS_DEFAULT)
 	var total: int = 0
 	for t: Variant in ticks:

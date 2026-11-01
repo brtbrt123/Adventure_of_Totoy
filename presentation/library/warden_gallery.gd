@@ -20,6 +20,7 @@ const Particles := preload("res://presentation/explore/creature_particles.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
+const AnimLib := preload("res://presentation/common/anim_library.gd")  # warden.tres: the owner's frame order and timing
 const TICKS_PER_SECOND: float = 60.0
 
 ## The body animations and their ticks per frame (idle, wake, walk, hurt, exposed: mob_view.gd STATES; tells and strikes: the
@@ -53,6 +54,7 @@ func _ready() -> void:
 
 
 func _load() -> void:
+	AnimLib.clear_cache()  # the owner may have edited warden.tres
 	frames = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"]
 	atlas = load("res://art/build/sprites.png")
 	colors.clear()
@@ -81,8 +83,9 @@ func _draw() -> void:
 		var cell: Vector2 = Vector2((i % 7) * 104, y + (i / 7) * 120)
 		_panel(cell, Vector2(100, 112))
 		var anim: String = BODY[i][0]
-		var count: int = _count("warden_%s_right_" % anim)
-		var n: int = (tick / int(BODY[i][1])) % maxi(1, count) + 1
+		var count: int = AnimLib.count("warden", anim, _count("warden_%s_right_" % anim))
+		var spec: Array = [count, int(BODY[i][1]), true]
+		var n: int = AnimLib.at("warden", anim, tick % (AnimLib.length("warden", anim, count * int(BODY[i][1])) + 12), spec)
 		var feet: Vector2 = cell + Vector2(50, 100)
 		ActorShadow.draw(self, feet, WardenEffects.SHADOW_RADIUS)
 		_body(anim, n, feet, facing_left)
@@ -188,7 +191,7 @@ func _attack(i: int, cell: Vector2, tick: int, font: Font) -> void:
 
 
 func _body(anim: String, n: int, feet: Vector2, left: bool) -> void:
-	var key: String = "warden_%s_right_%d" % [anim, n]
+	var key: String = AnimLib.key("warden", anim, n, "warden_%s_right_%d" % [anim, n])
 	if not frames.has(key):
 		return
 	var f: Dictionary = frames[key]

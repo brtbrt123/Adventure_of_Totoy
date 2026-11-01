@@ -820,9 +820,10 @@ func prepare_visuals() -> void:
 				var pose: String = reaction["pose"]
 				var spec: Array = ArenaAnimation.PLAYER[pose] if actor.id == snapshot.player.id else ArenaAnimation.BOSS[pose]
 				if actor.id == snapshot.player.id:
-					requested = ArenaAnimation.hero_frame(ArenaAnimation.hero_set(actor), pose, ArenaAnimation.frame_index(spec, age))
+					var hero_set: String = ArenaAnimation.hero_set(actor)
+					requested = ArenaAnimation.hero_frame(hero_set, pose, ArenaAnimation.timed(hero_set, pose, age, spec))
 				else:
-					requested = "golem2_%s_%d" % [pose, ArenaAnimation.frame_index(spec, age)]
+					requested = ArenaAnimation.boss_frame(pose, ArenaAnimation.AnimLib.at("golem2", pose, age, spec))
 		selected_frames[actor.id] = _resolve_frame(requested, actor)
 
 func _resolve_frame(requested: String, actor: Snapshots.EntitySnapshot) -> String:

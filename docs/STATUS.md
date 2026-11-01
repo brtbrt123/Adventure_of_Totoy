@@ -1,3 +1,15 @@
+## Every character animation editable in Godot, frames repaintable (2026-11-01, Claude, done while Codex is out)
+
+Owner: "make all of it editable". Guide: docs/ANIMATION_EDITING.md.
+- 17 SpriteFrames resources in presentation/animations/ (the four hero weapon sets, the unarmed hero, the arena golem, Warden, Thornback, boar, mossling, glowmoth, six NPCs; 137 animations), made by tools/godot/generate_sprite_frames.gd from the built PNGs, with starting speeds from the game's own tables. The generator keeps the owner's edits and only adds new animations.
+- The game plays from them through presentation/common/anim_library.gd (arena animation.gd and arena.gd, explore mob_view.gd, the unarmed hero and NPC idles in explore_scene.gd): frame order everywhere, timing for free-running poses. Combat-paced poses keep the core's pace. A mob state that plays a pose at its own pace keeps it. Without a resource, the old tables apply.
+- Checked: the defaults reproduce the old frame choice tick for tick (hero, golem, unarmed, NPC idles; 7800 mob-state checks).
+- Pixel overrides: art/overrides/<frame>.png replaces that frame in every build_art.py (snapped to Totoy 36, hard alpha; unknown names reported). Tested by painting and restoring a Warden frame.
+- Both galleries play from the resources.
+- New test: tests/smoke_anim_library.gd.
+- Core 568, Python 94, 52 of 55 smokes pass; the other 3 are the capture smokes that need a window.
+- Effects (hero skills, creature and Warden effects) are not in this: next step.
+
 ## All-animations gallery scene (2026-11-01, Claude, done while Codex is out)
 
 Owner: "make a scene for all" animations. presentation/library/animation_gallery.tscn (a @tool scene) plays every animated sequence of the built atlas in the Godot editor: 643 animations in 50 sets (characters, mobs, props, then the fx_* effects), each looping in its own labelled cell, frames placed on their anchors. Inspector: filter (comma-separated words, e.g. "hero2" or "stag_, fx_warden2"), ticks_per_frame (one speed for all; the game times each animation in code), playing, speed, facing_left, include_stills, row_width, show_labels, reload (after build_art.py). Game timings per animation are only in the Warden gallery (warden_gallery.tscn). Capture: presentation/review/warden_v2/animation_gallery.png. Still to do from docs/GODOT_EDITABLE_PLAN.md: SpriteFrames resources and effect scenes that can be edited, not only watched.
