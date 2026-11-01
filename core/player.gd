@@ -23,6 +23,7 @@ const STATE_SKILL_RECOVERY: StringName = &"skill_recovery"
 const STATE_LIGHTNING_BARRAGE: StringName = &"lightning_barrage"
 ## Reaper's Coil (Chain Scythe active): the core runs the hook, drag, spin or pull; no movement, no actions.
 const STATE_REAPER_COIL: StringName = &"reaper_coil"
+const STATE_STAFF_CAST: StringName = &"staff_cast"  # Disintegration's cast (rooted, invulnerable): scripted by the core
 ## Stone Ward is up: every hit is blocked and stored; slow movement, facing locked, no actions until it ends.
 const STATE_WARD: StringName = &"ward"
 const STATE_DEAD: StringName = &"dead"
@@ -56,7 +57,7 @@ var state_ticks: int = 0
 var dash_cooldown: int = 0
 var edge: float = 0.0
 var attack_hit_done: bool = false  # one hit per swing: set when a swing connects, cleared when the next swing starts
-var weapon_id: StringName = Tuning.WEAPON_BLACK_KATANA  # the equipped weapon (black_katana, dual_dagger or chain_scythe)
+var weapon_id: StringName = Tuning.WEAPON_BLACK_KATANA  # the equipped weapon (black_katana, dual_dagger, chain_scythe or star_staff)
 var buff_ticks: int = 0  # weapon buff / form ticks left (0 = not active); always the equipped weapon's (no swap while it runs)
 ## Ticks until each weapon's active can be used again, per weapon id. They all count down, equipped or not.
 var active_cooldowns: Dictionary[StringName, int] = {}
@@ -83,6 +84,10 @@ var coil_running: bool = false
 var coil_phase: StringName = &""  # one of the COIL_* phases while it runs
 var coil_phase_tick: int = 0  # ticks since the phase began (the core advances it)
 var coil_dir: Vector2 = Vector2.RIGHT  # the chain's direction, fixed on the press (aim, else facing)
+var disint_requested: bool = false  # set when Disintegration is activated; the core reads and clears it
+var disint_running: bool = false  # Disintegration's timeline runs (the core's; the cast state is only its first part)
+var swing_point: Vector2 = Vector2.ZERO  # the Star Staff's burst point for the swing in progress (fixed when it starts)
+var dash_blink: bool = false  # the current dash is the Star Staff's blink
 var coil_from: Vector2 = Vector2.ZERO  # where the chain starts (the player's position)
 var coil_target: Vector2 = Vector2.ZERO  # the chain's end: hook tip, the held boss edge, or the pull anchor
 var coil_hooked: bool = false  # true once the hook caught the boss
@@ -190,11 +195,11 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 		_combo_grace -= 1
 		if _combo_grace == 0:
 			combo_index = 1
-	if barrage_requested or coil_requested:
-		return  # the core starts the barrage / coil this tick; the rest of this input is not used
+	if barrage_requested or coil_requested or disint_requested:
+		return  # the core starts the barrage / coil / Disintegration this tick; the rest of this input is not used
 	var move: Vector2 = input.move.limit_length(1.0)
-	if state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or state == STATE_WARD:
-		pass  # facing is scripted (barrage, coil) or locked (ward)
+	if state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or state == STATE_WARD or state == STATE_STAFF_CAST:
+		pass  # facing is scripted (barrage, coil, cast) or locked (ward)
 	elif input.aim.length_squared() > 0.0001:
 		facing = input.aim.normalized()
 	elif move.length_squared() > 0.0001:
@@ -208,8 +213,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 			position += move * speed
 			_set_state(STATE_WALK if move.length_squared() > 0.0001 else STATE_IDLE)
 		STATE_DASH:
-			position += _dash_dir * Tuning.DASH_SPEED
-			if state_ticks >= Tuning.DASH_TICKS:
+			position += _dash_dir * (Tuning.STAFF_BLINK_SPEED if dash_blink else Tuning.DASH_SPEED)
+			if state_ticks >= (Tuning.STAFF_BLINK_TICKS if dash_blink else Tuning.DASH_TICKS):
 				_set_state(STATE_IDLE)
 		STATE_PARRY:
 			if input.dash_pressed and dash_cooldown == 0:
@@ -225,6 +230,11 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 			position += move * speed * Tuning.ATTACK_MOVE_FACTOR
 			if state_ticks >= _swing_ticks(0):
 				_set_state(STATE_ATTACK_ACTIVE)
+				if Weapons.is_ranged(weapon_id):  # the cast goes off where it was aimed (hit or miss: presentation draws it)
+					events.append(GameEvent.new(GameEvent.STAFF_BURST, tick, {
+						"entity_id": id, "position": swing_point, "radius": Weapons.burst_radius(weapon_id, combo_index),
+						"combo_index": combo_index, "finisher": combo_index == combo_max(),
+					}))
 		STATE_ATTACK_ACTIVE:
 			position += move * speed * Tuning.ATTACK_MOVE_FACTOR
 			if state_ticks >= _swing_ticks(1):
@@ -251,6 +261,8 @@ func step(input: InputFrame, tick: int, events: Array[GameEvent]) -> void:
 			pass  # scripted by the core (GameCore._resolve_lightning_barrage): no movement, no actions
 		STATE_REAPER_COIL:
 			pass  # scripted by the core (GameCore._resolve_reaper_coil): no movement, no actions
+		STATE_STAFF_CAST:
+			pass  # Disintegration's cast, scripted by the core: rooted, no actions until the meteor falls
 		STATE_WARD:
 			if ward_ticks_left <= 0:
 				_set_state(STATE_IDLE)
@@ -279,7 +291,7 @@ func parry_ticks_since_press() -> int:
 func is_invulnerable() -> bool:
 	if state == STATE_DEAD:
 		return false
-	return state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0 or _echo_invuln > 0
+	return state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or state == STATE_STAFF_CAST or _dash_invuln > 0 or _hurt_invuln > 0 or _blink_invuln > 0 or _echo_invuln > 0
 
 
 ## Echo Step arrival i-frames left (0 when none).
@@ -327,6 +339,8 @@ func die(tick: int, events: Array[GameEvent]) -> void:
 		end_barrage(tick, events, &"death")
 	if coil_running:
 		end_reaper_coil(tick, events, &"death")
+	if disint_running:
+		end_disintegration(tick, events, &"death")
 	if buff_ticks > 0:
 		buff_ticks = 0
 		_emit_buff_end(tick, events, &"death")
@@ -413,6 +427,38 @@ func end_reaper_coil(tick: int, events: Array[GameEvent], reason: StringName) ->
 		_emit_buff_end(tick, events, &"death" if reason == &"death" else &"expired")
 	if state == STATE_REAPER_COIL:
 		_set_state(STATE_IDLE)
+
+
+## The core starts Disintegration on the activation tick (it found the target): the hero plants the staff and calls the meteor
+## (rooted, invulnerable) until the core releases the cast.
+func start_disintegration(_tick: int, _events: Array[GameEvent]) -> void:
+	disint_requested = false
+	disint_running = true
+	pending_release = &""
+	attack_hit_done = true
+	reset_combo()
+	_set_state(STATE_STAFF_CAST)
+	state_ticks = 0
+
+
+## The meteor falls: the cast is over and the hero is free again (the core's timeline goes on to the impact).
+func release_staff_cast() -> void:
+	if state == STATE_STAFF_CAST:
+		_set_state(STATE_IDLE)
+
+
+func end_disintegration(tick: int, events: Array[GameEvent], reason: StringName) -> void:
+	if not disint_running:
+		return
+	disint_running = false
+	events.append(GameEvent.new(GameEvent.DISINTEGRATION_ENDED, tick, {"entity_id": id, "reason": reason}))
+	if state == STATE_STAFF_CAST:
+		_set_state(STATE_IDLE)
+
+
+## Where the swing in progress hits from: the hero for a blade, the burst's point for the Star Staff.
+func swing_origin() -> Vector2:
+	return swing_point if Weapons.is_ranged(weapon_id) else position
 
 
 ## A gold hit was parried: build Edge and take a short riposte step toward the attacker.
@@ -527,6 +573,7 @@ func _try_weapon_active(tick: int, events: Array[GameEvent], input: InputFrame) 
 	buff_cooldown = Weapons.active_cooldown(weapon_id)
 	barrage_requested = Weapons.has_lightning_barrage(weapon_id)
 	coil_requested = Weapons.has_reaper_coil(weapon_id)
+	disint_requested = Weapons.has_disintegration(weapon_id)
 	if coil_requested:
 		coil_dir = input.aim.normalized() if input.aim.length_squared() > 0.0001 else facing.normalized()
 	events.append(GameEvent.new(GameEvent.WEAPON_BUFF_STARTED, tick, {
@@ -559,7 +606,7 @@ func try_weapon_equip(target: StringName, tick: int, events: Array[GameEvent]) -
 ## any state but dead, the Lightning Barrage and Reaper's Coil. Needs Edge and its cooldown; cannot be refreshed while
 ## it runs. The cost is spent and the cooldown starts on the press. Returns true if it started.
 func _try_phantom_cut(tick: int, events: Array[GameEvent]) -> bool:
-	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or barrage_requested or coil_requested:
+	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or state == STATE_STAFF_CAST or barrage_requested or coil_requested or disint_requested:
 		return false
 	if phantom_ticks_left > 0 or aspect_cooldowns.get(SKILL_PHANTOM_CUT, 0) > 0:
 		return false
@@ -576,7 +623,7 @@ func _try_phantom_cut(tick: int, events: Array[GameEvent]) -> bool:
 ## Sprint (a buff aspect in the pressed slot): the same free-action rules as Phantom Cut (any state but dead, the
 ## barrage and the coil; Edge and cooldown on the press; no refresh while it runs). Returns true if it started.
 func _try_sprint(tick: int, events: Array[GameEvent]) -> bool:
-	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or barrage_requested or coil_requested:
+	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or state == STATE_STAFF_CAST or barrage_requested or coil_requested or disint_requested:
 		return false
 	if sprint_ticks_left > 0 or aspect_cooldowns.get(SKILL_SPRINT, 0) > 0:
 		return false
@@ -596,7 +643,7 @@ func _try_sprint(tick: int, events: Array[GameEvent]) -> bool:
 ## anchor exists (nothing spent). The Edge and the cooldown are spent on the press; the core places the anchor on this
 ## same tick (after the movement) and emits echo_placed. Returns true if it was accepted.
 func _try_echo_step(tick: int, events: Array[GameEvent]) -> bool:
-	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or barrage_requested or coil_requested:
+	if state == STATE_DEAD or state == STATE_LIGHTNING_BARRAGE or state == STATE_REAPER_COIL or state == STATE_STAFF_CAST or barrage_requested or coil_requested or disint_requested:
 		return false
 	if echo_exists or echo_requested or aspect_cooldowns.get(SKILL_ECHO_STEP, 0) > 0:
 		return false
@@ -752,6 +799,8 @@ func _start_swing(index: int) -> void:
 	attack_hit_done = false
 	_combo_queued = false
 	_combo_grace = 0
+	if Weapons.is_ranged(weapon_id):  # straight ahead at full range; the core moves it onto a target in the aim cone this tick
+		swing_point = position + facing * Tuning.STAFF_BURST_RANGE
 	_set_state(STATE_ATTACK_WINDUP)
 
 
@@ -775,10 +824,11 @@ func reset_combo() -> void:
 func _start_dash(move: Vector2, tick: int, events: Array[GameEvent]) -> void:
 	_dash_dir = move.normalized() if move.length_squared() > 0.0001 else facing
 	dash_cooldown = maxi(1, Tuning.DASH_COOLDOWN_TICKS - dash_cooldown_bonus)
-	_dash_invuln = Tuning.DASH_INVULN_TICKS
+	dash_blink = Weapons.has_blink_dash(weapon_id)
+	_dash_invuln = Tuning.STAFF_BLINK_INVULN_TICKS if dash_blink else Tuning.DASH_INVULN_TICKS
 	reset_combo()
 	_set_state(STATE_DASH)
-	events.append(GameEvent.new(GameEvent.DASH_STARTED, tick, {"entity_id": id, "direction": _dash_dir}))
+	events.append(GameEvent.new(GameEvent.DASH_STARTED, tick, {"entity_id": id, "direction": _dash_dir, "blink": dash_blink, "from": position}))
 
 
 func _set_state(new_state: StringName) -> void:

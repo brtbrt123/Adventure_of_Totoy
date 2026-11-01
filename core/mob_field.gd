@@ -159,6 +159,13 @@ func resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 				mob.state_ticks = mini(mob.state_ticks + 1, Tuning.MOB_DEATH_TICKS + 1)
 	if player.state == PlayerState.STATE_DEAD:
 		return
+	if Weapons.is_ranged(player.weapon_id) and player.state == PlayerState.STATE_ATTACK_WINDUP and player.state_ticks == 0:
+		var rows: Array = []
+		for row: Dictionary in living():
+			rows.append({"position": row["mob"].position, "radius": float(row["mob"].radius)})
+		var target: Variant = Weapons.burst_target(player.position, player.facing, rows)
+		if target is Vector2:  # the Star Staff's cast snaps onto the nearest mob in the aim cone and range
+			player.swing_point = target
 	var swinging: bool = player.state == PlayerState.STATE_ATTACK_ACTIVE
 	if swinging and not _was_swinging:
 		_swing_serial += 1
@@ -637,11 +644,11 @@ func _hero_blows(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> 
 	for mob: Mob in _alive(enc):
 		if mob.last_swing == _swing_serial:
 			continue
-		var to_mob: Vector2 = mob.position - player.position
+		var to_mob: Vector2 = mob.position - player.swing_origin()
 		var dist: float = to_mob.length()
-		if dist - mob.radius > Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[swing]:
+		if dist - mob.radius > Weapons.swing_reach(weapon, player.combo_index):
 			continue
-		if dist > 0.0001 and player.facing.dot(to_mob / dist) < Weapons.arc_dot(weapon):
+		if dist > 0.0001 and player.facing.dot(to_mob / dist) < Weapons.swing_arc_dot(weapon):
 			continue
 		mob.last_swing = _swing_serial
 		player.attack_hit_done = true

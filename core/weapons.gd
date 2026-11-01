@@ -7,11 +7,12 @@ extends RefCounted
 const Tuning := preload("res://core/tuning.gd")
 
 ## Every weapon, in the inventory's order (InputFrame.weapon_equip picks one by id).
-const IDS: Array[StringName] = [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE]
+const IDS: Array[StringName] = [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE, Tuning.WEAPON_STAR_STAFF]
 ## What the weapon's active is called in events and in snapshot.player.weapon_form.
 const FORM_BLACK_KATANA_BUFF: StringName = &"black_katana_buff"
 const FORM_LIGHTNING: StringName = &"lightning_form"
 const FORM_REAPER_COIL: StringName = &"reaper_coil"
+const FORM_DISINTEGRATION: StringName = &"disintegration"
 
 
 static func is_known(weapon: StringName) -> bool:
@@ -33,6 +34,8 @@ static func combo_max(weapon: StringName) -> int:
 			return Tuning.DAGGER_COMBO_MAX
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.SCYTHE_COMBO_MAX
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.STAFF_COMBO_MAX
 	return Tuning.COMBO_MAX
 
 
@@ -42,6 +45,8 @@ static func windup_ticks(weapon: StringName) -> Array[int]:
 			return Tuning.DAGGER_SWING_WINDUP_TICKS
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.SCYTHE_SWING_WINDUP_TICKS
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.STAFF_SWING_WINDUP_TICKS
 	return Tuning.SWING_WINDUP_TICKS
 
 
@@ -51,6 +56,8 @@ static func active_ticks(weapon: StringName) -> Array[int]:
 			return Tuning.DAGGER_SWING_ACTIVE_TICKS
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.SCYTHE_SWING_ACTIVE_TICKS
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.STAFF_SWING_ACTIVE_TICKS
 	return Tuning.SWING_ACTIVE_TICKS
 
 
@@ -60,6 +67,8 @@ static func recovery_ticks(weapon: StringName) -> Array[int]:
 			return Tuning.DAGGER_SWING_RECOVERY_TICKS
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.SCYTHE_SWING_RECOVERY_TICKS
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.STAFF_SWING_RECOVERY_TICKS
 	return Tuning.SWING_RECOVERY_TICKS
 
 
@@ -75,6 +84,8 @@ static func damage_mults(weapon: StringName) -> Array[float]:
 			return Tuning.DAGGER_SWING_DAMAGE_MULT
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.SCYTHE_SWING_DAMAGE_MULT
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.STAFF_SWING_DAMAGE_MULT
 	return Tuning.SWING_DAMAGE_MULT
 
 
@@ -92,10 +103,60 @@ static func arc_dot(weapon: StringName) -> float:
 	return Tuning.SCYTHE_ARC_DOT if weapon == Tuning.WEAPON_CHAIN_SCYTHE else Tuning.ATTACK_ARC_DOT
 
 
+# --- where a swing hits: a blade around the hero, the Star Staff's burst around its aim point ---
+
+## True when the weapon's swing is a cast that bursts at a point away from the hero (the Star Staff).
+static func is_ranged(weapon: StringName) -> bool:
+	return weapon == Tuning.WEAPON_STAR_STAFF
+
+
+## How far from the swing's origin (PlayerState.swing_origin(): the hero, or the burst's point) a target's edge may be.
+static func swing_reach(weapon: StringName, combo_index: int) -> float:
+	if is_ranged(weapon):
+		return burst_radius(weapon, combo_index)
+	return Tuning.ATTACK_RANGE * range_mults(weapon)[combo_index - 1]
+
+
+## The swing's arc around its origin: the weapon's arc for a blade, all the way round (-1) for a burst.
+static func swing_arc_dot(weapon: StringName) -> float:
+	return -1.0 if is_ranged(weapon) else arc_dot(weapon)
+
+
+## The Star Staff's burst radius for swing `combo_index` (1-based); 0 for a blade.
+static func burst_radius(weapon: StringName, combo_index: int) -> float:
+	return Tuning.STAFF_BURST_RADIUS[combo_index - 1] if is_ranged(weapon) else 0.0
+
+
+## Where a burst cast from `origin` toward `aim` (a unit vector) goes off: on the nearest target (rows of {"position",
+## "radius"}) in the aim cone whose edge is within STAFF_BURST_RANGE, else STAFF_BURST_RANGE px straight ahead.
+static func burst_point(origin: Vector2, aim: Vector2, targets: Array) -> Vector2:
+	var target: Variant = burst_target(origin, aim, targets)
+	return target if target is Vector2 else origin + aim * Tuning.STAFF_BURST_RANGE
+
+
+## The position of the target a burst snaps onto (see burst_point), or null when none is in the cone and range.
+static func burst_target(origin: Vector2, aim: Vector2, targets: Array) -> Variant:
+	var best: Variant = null
+	var best_gap: float = INF
+	for row: Dictionary in targets:
+		var at: Vector2 = row["position"]
+		var to: Vector2 = at - origin
+		var gap: float = to.length() - float(row.get("radius", 0.0))
+		if gap > Tuning.STAFF_BURST_RANGE or gap >= best_gap:
+			continue
+		if to.length_squared() > 0.0001 and aim.dot(to.normalized()) < Tuning.STAFF_AIM_CONE_DOT:
+			continue
+		best_gap = gap
+		best = at
+	return best
+
+
 ## Posture a normal (not counter) hit of swing `combo_index` (1-based) adds.
 static func swing_posture(weapon: StringName, combo_index: int) -> float:
 	if weapon == Tuning.WEAPON_CHAIN_SCYTHE:
 		return Tuning.SCYTHE_SWING_POSTURE[combo_index - 1]
+	if weapon == Tuning.WEAPON_STAR_STAFF:
+		return Tuning.STAFF_SWING_POSTURE[combo_index - 1]
 	return Tuning.NORMAL_HIT_POSTURE
 
 
@@ -105,6 +166,8 @@ static func edge_per_hit(weapon: StringName) -> float:
 			return Tuning.DAGGER_EDGE_PER_HIT
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.SCYTHE_EDGE_PER_HIT
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.STAFF_EDGE_PER_HIT
 	return Tuning.EDGE_PER_HIT
 
 
@@ -125,9 +188,29 @@ static func has_reaper_coil(weapon: StringName) -> bool:
 	return weapon == Tuning.WEAPON_CHAIN_SCYTHE
 
 
-## True when the active needs a living boss (the scripted ones: the barrage and Reaper's Coil).
+## True when activating the weapon's active calls Disintegration (Star Staff).
+static func has_disintegration(weapon: StringName) -> bool:
+	return weapon == Tuning.WEAPON_STAR_STAFF
+
+
+## True when the weapon's dash is a blink (Star Staff).
+static func has_blink_dash(weapon: StringName) -> bool:
+	return weapon == Tuning.WEAPON_STAR_STAFF
+
+
+## True when the active needs a living target (the scripted ones: the barrage, Reaper's Coil and Disintegration).
 static func active_needs_target(weapon: StringName) -> bool:
-	return has_lightning_barrage(weapon) or has_reaper_coil(weapon)
+	return has_lightning_barrage(weapon) or has_reaper_coil(weapon) or has_disintegration(weapon)
+
+
+## Ticks from the activation to Disintegration's impact (FORM + CHARGE + FALL).
+static func disintegration_impact_ticks() -> int:
+	return Tuning.DISINTEGRATION_FORM_TICKS + Tuning.DISINTEGRATION_CHARGE_TICKS + Tuning.DISINTEGRATION_FALL_TICKS
+
+
+## Ticks from the activation to the end of Disintegration (the impact and its aftermath). The form's duration.
+static func disintegration_total_ticks() -> int:
+	return disintegration_impact_ticks() + Tuning.DISINTEGRATION_AFTER_TICKS
 
 
 ## Slashes in a Lightning Barrage: one per side in LIGHTNING_BLINK_ORDER.
@@ -175,6 +258,8 @@ static func active_form(weapon: StringName) -> StringName:
 			return FORM_LIGHTNING
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return FORM_REAPER_COIL
+		Tuning.WEAPON_STAR_STAFF:
+			return FORM_DISINTEGRATION
 	return &""
 
 
@@ -186,6 +271,8 @@ static func active_duration(weapon: StringName) -> int:
 			return barrage_total_ticks()  # Lightning Form is only the barrage
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return reaper_coil_total_ticks()  # the "form" is only the skill
+		Tuning.WEAPON_STAR_STAFF:
+			return disintegration_total_ticks()  # the "form" is only the skill
 	return 0
 
 
@@ -197,6 +284,8 @@ static func active_cooldown(weapon: StringName) -> int:
 			return Tuning.LIGHTNING_FORM_COOLDOWN_TICKS
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.REAPER_COIL_COOLDOWN_TICKS
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.DISINTEGRATION_COOLDOWN_TICKS
 	return 0
 
 
@@ -208,6 +297,8 @@ static func active_edge_cost(weapon: StringName) -> float:
 			return Tuning.LIGHTNING_FORM_EDGE_COST
 		Tuning.WEAPON_CHAIN_SCYTHE:
 			return Tuning.REAPER_COIL_EDGE_COST
+		Tuning.WEAPON_STAR_STAFF:
+			return Tuning.DISINTEGRATION_EDGE_COST
 	return 0.0
 
 

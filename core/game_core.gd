@@ -14,6 +14,7 @@ const SkillAttack := preload("res://core/skill_attack.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const ArenaLayout := preload("res://core/arena_layout.gd")
 const Weapons := preload("res://core/weapons.gd")
+const Disintegration := preload("res://core/disintegration.gd")
 const Aspects := preload("res://core/aspects.gd")
 const Lantern := preload("res://core/lantern.gd")
 const Echo := preload("res://core/echo.gd")
@@ -37,6 +38,7 @@ var last_events: Array[GameEvent] = []
 
 ## Live skill attacks (melee arcs, dash lanes, travelling projectiles). A projectile outlives the player's state.
 var skill_attacks: Array[SkillAttack] = []
+var disintegration: Disintegration = Disintegration.new()  # the Star Staff's active, while it runs
 
 ## The solid props of the ruins (pillars, trees, boulders): the player and the boss cannot walk through them.
 var obstacles: Array[Obstacle] = ArenaLayout.build()
@@ -73,6 +75,7 @@ func step(input: InputFrame) -> void:
 	_place_echo(events)
 	_resolve_lightning_barrage(events)
 	_resolve_reaper_coil(events)
+	_resolve_disintegration(events)
 	if player.ward_release_pending:
 		_release_ward(&"expired", events)
 	_resolve_echo_recall(events)
@@ -287,6 +290,12 @@ func _player_snapshot() -> Snapshots.EntitySnapshot:
 	e.reaper_coil_from = player.position if player.coil_running else Vector2.ZERO
 	e.reaper_coil_target = player.coil_target if player.coil_running else Vector2.ZERO
 	e.reaper_coil_spin_hit = player.coil_spin_hit if player.coil_running else 0
+	e.swing_point = player.swing_point
+	e.blink = player.dash_blink and player.state == PlayerState.STATE_DASH
+	e.disintegration_phase = disintegration.phase(tick)
+	e.disintegration_tick = disintegration.elapsed(tick) if disintegration.running else 0
+	e.disintegration_center = disintegration.center
+	e.disintegration_impact_tick = disintegration.impact_tick() if disintegration.running else -1
 	e.equipped_aspects = player.equipped_aspects.duplicate()
 	e.phantom_ticks_left = player.phantom_ticks_left
 	e.phantom_pending_echoes = phantom_echoes.size()
@@ -317,15 +326,19 @@ func _boss_snapshot() -> Snapshots.EntitySnapshot:
 ## The normal weapon swing (skills are resolved from their SkillAttack objects instead). Reach, damage and Edge gain come
 ## from the equipped weapon's tables (core/weapons.gd). The Dual Dagger's last swing also calls a lightning strike.
 func _resolve_player_attack(events: Array[GameEvent]) -> void:
+	if Weapons.is_ranged(player.weapon_id) and player.state == PlayerState.STATE_ATTACK_WINDUP and player.state_ticks == 0 and boss.state != BossState.STATE_DEAD:
+		var target: Variant = Weapons.burst_target(player.position, player.facing, [{"position": boss.position, "radius": Tuning.BOSS_RADIUS}])
+		if target is Vector2:  # the Star Staff's cast snaps onto the boss when it is in the aim cone and range
+			player.swing_point = target
 	if player.attack_hit_done or boss.state == BossState.STATE_DEAD or player.state != PlayerState.STATE_ATTACK_ACTIVE:
 		return
 	var weapon: StringName = player.weapon_id
 	var swing: int = player.combo_index - 1
-	var to_boss: Vector2 = boss.position - player.position
+	var to_boss: Vector2 = boss.position - player.swing_origin()
 	var dist: float = to_boss.length()
-	if dist - Tuning.BOSS_RADIUS > Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[swing]:
+	if dist - Tuning.BOSS_RADIUS > Weapons.swing_reach(weapon, player.combo_index):
 		return
-	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Weapons.arc_dot(weapon):
+	if dist > 0.0001 and player.facing.dot(to_boss / dist) < Weapons.swing_arc_dot(weapon):
 		return
 	player.attack_hit_done = true
 	var base: float = Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[swing] * player.swing_damage_mult
@@ -653,6 +666,41 @@ func _barrage_hit(slash: int, events: Array[GameEvent]) -> void:
 ## boss is pulled in, then stunned) -> SPIN (two hits) -> RECOVERY, or on a miss HOOK -> PULL (the player is pulled to
 ## where the chain stopped) -> RECOVERY. Ends when the timeline is over, the boss dies (boss_dead) or the player dies
 ## (death, see Player.die).
+## Disintegration (the Star Staff's active) against the boss: started on the activation tick (the boss is the target), the
+## circle follows it until the lock, the cast ends when the meteor falls, and on the impact tick the boss takes the hit when its
+## edge is within DISINTEGRATION_RADIUS of the circle. Ends after the aftermath, or when the hero dies.
+func _resolve_disintegration(events: Array[GameEvent]) -> void:
+	if player.disint_requested:
+		player.disint_requested = false
+		if boss.state != BossState.STATE_DEAD and player.state != PlayerState.STATE_DEAD:
+			disintegration.start(tick, boss.id, boss.position)
+			player.start_disintegration(tick, events)
+			events.append(GameEvent.new(GameEvent.DISINTEGRATION_STARTED, tick, {
+				"entity_id": player.id, "target_id": boss.id, "position": disintegration.center, "radius": Tuning.DISINTEGRATION_RADIUS,
+				"impact_tick": disintegration.impact_tick(), "lock_tick": disintegration.lock_tick(),
+			}))
+		return
+	if not disintegration.running:
+		return
+	if not player.disint_running:  # the hero fell: the cast is gone
+		disintegration.stop()
+		return
+	disintegration.follow(tick, boss.position if boss.state != BossState.STATE_DEAD else null)
+	if tick == disintegration.cast_end_tick():
+		player.release_staff_cast()
+	if tick == disintegration.impact_tick():
+		var hit: bool = boss.state != BossState.STATE_DEAD and boss.position.distance_to(disintegration.center) - Tuning.BOSS_RADIUS <= Tuning.DISINTEGRATION_RADIUS
+		events.append(GameEvent.new(GameEvent.DISINTEGRATION_IMPACT, tick, {
+			"entity_id": player.id, "position": disintegration.center, "radius": Tuning.DISINTEGRATION_RADIUS, "hit_ids": [boss.id] if hit else [],
+		}))
+		if hit:
+			_land_player_hit(Tuning.ATTACK_DAMAGE * Tuning.DISINTEGRATION_DAMAGE_MULT * player.damage_mult(), Tuning.DISINTEGRATION_EDGE_PER_HIT,
+				{"skill_id": Weapons.FORM_DISINTEGRATION, "weapon_id": player.weapon_id}, events, Tuning.DISINTEGRATION_POSTURE)
+	if tick >= disintegration.end_tick():
+		disintegration.stop()
+		player.end_disintegration(tick, events, &"complete")
+
+
 func _resolve_reaper_coil(events: Array[GameEvent]) -> void:
 	if player.coil_requested:
 		player.coil_requested = false

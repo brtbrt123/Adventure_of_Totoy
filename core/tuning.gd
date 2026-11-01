@@ -311,6 +311,44 @@ const REAPER_COIL_SPIN_POSTURE: float = 10.0
 const REAPER_COIL_EDGE_PER_HIT: float = 5.0  # small, like the barrage
 const REAPER_COIL_RECOVERY_TICKS: int = 10
 
+# Star Staff (the mage weapon, owner 2026-11-01): first guesses, tune in play.
+# The swing is a cast: an Arcane Burst goes off STAFF_BURST_RANGE px away in the aim direction, or on the nearest enemy in
+# the aim cone (STAFF_AIM_CONE_DOT) within that range plus its radius; the point is fixed when the cast starts (the bolt flies
+# during the windup) and the burst hits everything within its radius (plus their radius) of it on the active tick: two
+# small bursts, then the Great Burst finisher. The dash is a blink: STAFF_BLINK_TICKS of STAFF_BLINK_SPEED px (walls stop
+# it like a dash, the core resolves every tick's move), STAFF_BLINK_INVULN_TICKS i-frames from its start.
+const WEAPON_STAR_STAFF: StringName = &"star_staff"
+const STAFF_COMBO_MAX: int = 3
+const STAFF_SWING_WINDUP_TICKS: Array[int] = [10, 10, 16]  # the cast and the bolt's flight
+const STAFF_SWING_ACTIVE_TICKS: Array[int] = [2, 2, 3]
+const STAFF_SWING_RECOVERY_TICKS: Array[int] = [12, 12, 22]
+const STAFF_SWING_DAMAGE_MULT: Array[float] = [0.8, 0.8, 1.6]  # every enemy in the burst takes it
+const STAFF_SWING_POSTURE: Array[float] = [4.0, 4.0, 10.0]
+const STAFF_BURST_RADIUS: Array[float] = [16.0, 16.0, 30.0]  # the Great Burst is the finisher
+const STAFF_BURST_RANGE: float = 96.0
+const STAFF_AIM_CONE_DOT: float = 0.5
+const STAFF_EDGE_PER_HIT: float = 15.0  # it hits from afar, so less Edge than a blade
+const STAFF_BLINK_TICKS: int = 3
+const STAFF_BLINK_SPEED: float = 15.0  # 45 px in 3 ticks
+const STAFF_BLINK_INVULN_TICKS: int = 8
+
+# Disintegration: the Star Staff's active (right click). Needs a target (the same pick as the barrage and the coil); costs
+# Edge, cooldown from the activation. A magic circle forms under the target (FORM), charges (CHARGE) while the hero is rooted
+# and invulnerable (player state staff_cast), then the meteor falls (FALL; the hero is free again) and lands at the impact:
+# everything within DISINTEGRATION_RADIUS px (plus its radius) of the circle's centre takes the hit. The circle follows the
+# target until DISINTEGRATION_LOCK_TICKS before the impact, then stays (the last moment to step out).
+const DISINTEGRATION_EDGE_COST: float = 60.0
+const DISINTEGRATION_COOLDOWN_TICKS: int = 900  # 15 seconds
+const DISINTEGRATION_FORM_TICKS: int = 24
+const DISINTEGRATION_CHARGE_TICKS: int = 30
+const DISINTEGRATION_FALL_TICKS: int = 24
+const DISINTEGRATION_AFTER_TICKS: int = 40  # the blast and smoke after the impact (presentation; the form ends with them)
+const DISINTEGRATION_LOCK_TICKS: int = 18
+const DISINTEGRATION_RADIUS: float = 58.0
+const DISINTEGRATION_DAMAGE_MULT: float = 4.0  # x ATTACK_DAMAGE to every enemy in the circle
+const DISINTEGRATION_POSTURE: float = 30.0
+const DISINTEGRATION_EDGE_PER_HIT: float = 0.0
+
 # Edge (sword mechanic): close hits and parries build it, a counter spends all of it for extra damage
 const EDGE_MAX: float = 100.0
 const EDGE_PER_HIT: float = 25.0

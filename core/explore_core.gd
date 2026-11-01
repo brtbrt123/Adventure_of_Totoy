@@ -379,7 +379,7 @@ func _respec(events: Array[GameEvent]) -> void:
 
 ## The weapon and the three Aspects in his slots (CONTINUE: SaveProfile.weapon_id / equipped_aspects). Anything invalid is ignored.
 func set_loadout(weapon: StringName, aspects: Array[StringName]) -> void:
-	if [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE].has(weapon):
+	if [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE, Tuning.WEAPON_STAR_STAFF].has(weapon):
 		player.weapon_id = weapon
 	if Aspects.is_valid_loadout(aspects):
 		player.equipped_aspects = aspects.duplicate()
@@ -598,6 +598,12 @@ func snapshot() -> ExploreSnapshot:
 	hero.weapon_buff_active = player.is_buff_active()
 	hero.weapon_buff_ticks_left = player.buff_ticks
 	hero.weapon_form = player.active_form()
+	hero.swing_point = player.swing_point
+	hero.blink = player.dash_blink and player.state == PlayerState.STATE_DASH
+	hero.disintegration_phase = skills.disintegration.phase(tick)
+	hero.disintegration_tick = skills.disintegration.elapsed(tick) if skills.disintegration.running else 0
+	hero.disintegration_center = skills.disintegration.center
+	hero.disintegration_impact_tick = skills.disintegration.impact_tick() if skills.disintegration.running else -1
 	hero.lightning_blink_index = player.last_blink_direction
 	hero.lightning_blink_tick = player.last_blink_tick
 	hero.lightning_blink_from = player.last_blink_from

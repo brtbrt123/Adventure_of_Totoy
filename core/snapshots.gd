@@ -18,8 +18,8 @@ class EntitySnapshot:
 	var invulnerable: bool = false
 	var combo_index: int = 0  # player only (1..combo_max, see docs/architecture.md); 0 for other entities
 	var combo_max: int = 0  # player only: swings in the equipped weapon's combo (katana 3, dagger 4)
-	var weapon_id: StringName = &""  # player only: the equipped weapon, &"black_katana", &"dual_dagger" or &"chain_scythe"
-	var weapon_form: StringName = &""  # player only: the running active, &"black_katana_buff" / &"lightning_form" / &"reaper_coil", else empty
+	var weapon_id: StringName = &""  # player only: the equipped weapon, &"black_katana", &"dual_dagger", &"chain_scythe" or &"star_staff"
+	var weapon_form: StringName = &""  # player only: the running active, &"black_katana_buff" / &"lightning_form" / &"reaper_coil" / &"disintegration", else empty
 	var move_speed_mult: float = 1.0  # player only: walking speed multiplier right now (x2 while Sprint runs)
 	var lightning_blink_index: int = -1  # player only: direction (0-7) of the latest lightning blink, -1 before any
 	var lightning_blink_tick: int = -1  # player only: tick of the latest lightning blink (it equals snapshot.tick on the blink tick)
@@ -32,6 +32,12 @@ class EntitySnapshot:
 	var reaper_coil_from: Vector2 = Vector2.ZERO  # player only: where the chain starts (the player), while the coil runs
 	var reaper_coil_target: Vector2 = Vector2.ZERO  # player only: the chain's end (hook: its tip; drag: the boss edge; pull: the anchor)
 	var reaper_coil_spin_hit: int = 0  # player only: spin hits done so far (0-2) during the coil, else 0
+	var swing_point: Vector2 = Vector2.ZERO  # player only: the Star Staff's burst point for the cast in progress (fixed at its start)
+	var blink: bool = false  # player only: true while the dash in progress is the Star Staff's blink
+	var disintegration_phase: StringName = &""  # player only: form, charge, fall, after while Disintegration runs, else empty
+	var disintegration_tick: int = 0  # player only: ticks since Disintegration started (0 on its first tick)
+	var disintegration_center: Vector2 = Vector2.ZERO  # player only: the circle's centre (it follows the target until the lock)
+	var disintegration_impact_tick: int = -1  # player only: the tick the meteor lands, -1 when none runs
 	var dragged: bool = false  # boss only: true while Reaper's Coil drags it (state staggered or posture_broken)
 	var stagger_ticks_left: int = 0  # boss only: ticks of the Reaper's Coil stun left in state staggered (0 while dragged)
 	var weapon_buff_active: bool = false  # player only

@@ -17,12 +17,14 @@ const Collision := preload("res://core/collision.gd")
 const Weapons := preload("res://core/weapons.gd")
 const Obstacle := preload("res://core/obstacle.gd")
 const MobField := preload("res://core/mob_field.gd")
+const Disintegration := preload("res://core/disintegration.gd")
 
 var lanterns: Array[Lantern] = []
 var echoes: Array[Echo] = []
 ## Phantom Cut echoes waiting to land, in queue order: {land_tick, mob_id, base, combo_index, weapon_id, hit_tick}.
 var phantom_echoes: Array[Dictionary] = []
 var skill_attacks: Array[SkillAttack] = []
+var disintegration: Disintegration = Disintegration.new()  # the Star Staff's active, while it runs
 var _next_attack_id: int = 1
 var _next_lantern_id: int = 1
 var _next_echo_id: int = 1
@@ -34,6 +36,7 @@ func clear() -> void:
 	echoes.clear()
 	phantom_echoes.clear()
 	skill_attacks.clear()
+	disintegration.stop()
 
 
 ## Before the hero's own step: he must know whether an echo anchor exists (Echo Step needs none, or recalls), and whether a
@@ -84,6 +87,7 @@ func after_move(core: RefCounted, player_before: Vector2, events: Array[GameEven
 	_place_echo(core, events)
 	_resolve_lightning_barrage(core, events)
 	_resolve_reaper_coil(core, events)
+	_resolve_disintegration(core, events)
 	if player.ward_release_pending:
 		_release_ward(core, &"expired", events)
 	_resolve_echo_recall(core, events)
@@ -551,6 +555,58 @@ var _dragged: Array[int] = []  # it and the mobs clumped around it: all pulled i
 ## aim direction) -> DRAG (the hooked mob and the clump around it are pulled in, then stunned) -> SPIN (hits every mob around
 ## the hero, the damage shared out by how many) -> RECOVERY, or on a miss HOOK -> PULL (the hero is pulled to where the chain
 ## stopped) -> RECOVERY.
+# ---- Disintegration (the Star Staff's active) -------------------------------------------------------------------------------
+
+## Started on the activation tick on the picked mob; the circle follows it until the lock; the cast ends when the meteor falls;
+## on the impact tick every living mob whose edge is within DISINTEGRATION_RADIUS of the circle takes the hit (with the multi-hit
+## falloff of the other casts). Ends after the aftermath, or when the hero dies.
+func _resolve_disintegration(core: RefCounted, events: Array[GameEvent]) -> void:
+	var player: PlayerState = core.player
+	var tick: int = core.tick
+	if player.disint_requested:
+		player.disint_requested = false
+		var row: Dictionary = _target_row(core)
+		if not row.is_empty() and player.state != PlayerState.STATE_DEAD:
+			disintegration.start(tick, row["mob"].id, row["mob"].position)
+			player.start_disintegration(tick, events)
+			events.append(GameEvent.new(GameEvent.DISINTEGRATION_STARTED, tick, {
+				"entity_id": player.id, "target_id": disintegration.target_id, "position": disintegration.center,
+				"radius": Tuning.DISINTEGRATION_RADIUS, "impact_tick": disintegration.impact_tick(), "lock_tick": disintegration.lock_tick(),
+			}))
+		return
+	if not disintegration.running:
+		return
+	if not player.disint_running:  # the hero fell: the cast is gone
+		disintegration.stop()
+		return
+	var target: Dictionary = _find_mob(core, disintegration.target_id)
+	disintegration.follow(tick, target["mob"].position if not target.is_empty() else null)
+	if tick == disintegration.cast_end_tick():
+		player.release_staff_cast()
+	if tick == disintegration.impact_tick():
+		_disintegration_impact(core, events)
+	if tick >= disintegration.end_tick():
+		disintegration.stop()
+		player.end_disintegration(tick, events, &"complete")
+
+
+func _disintegration_impact(core: RefCounted, events: Array[GameEvent]) -> void:
+	var player: PlayerState = core.player
+	var rows: Array[Dictionary] = []
+	var ids: Array[int] = []
+	for row: Dictionary in core.mobs.living():
+		if row["mob"].position.distance_to(disintegration.center) - float(row["mob"].radius) <= Tuning.DISINTEGRATION_RADIUS:
+			rows.append(row)
+			ids.append(row["mob"].id)
+	events.append(GameEvent.new(GameEvent.DISINTEGRATION_IMPACT, core.tick, {
+		"entity_id": player.id, "position": disintegration.center, "radius": Tuning.DISINTEGRATION_RADIUS, "hit_ids": ids,
+	}))
+	var each: float = Tuning.ATTACK_DAMAGE * Tuning.DISINTEGRATION_DAMAGE_MULT * player.damage_mult() * float(core.damage_mult()) * multi_hit_mult(rows.size())
+	for row: Dictionary in rows:
+		if core.mobs.hit_mob(core, row["enc"], row["mob"], each, {"skill_id": Weapons.FORM_DISINTEGRATION, "weapon_id": player.weapon_id}, events):
+			break
+
+
 func _resolve_reaper_coil(core: RefCounted, events: Array[GameEvent]) -> void:
 	var player: PlayerState = core.player
 	var tick: int = core.tick

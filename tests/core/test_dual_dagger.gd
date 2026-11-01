@@ -38,9 +38,17 @@ func _frame(equip: StringName = &"", active: bool = false, attack: bool = false,
 	return frame
 
 
-## The old Q press, as an equip request for the next weapon in Weapons.IDS (katana -> dagger -> scythe -> katana).
+## The old Q press, as an equip request for the next blade (katana -> dagger -> scythe -> katana).
 func _swap(core: GameCore) -> void:
-	core.step(_frame(Weapons.next(core.player.weapon_id)))
+	core.step(_frame(_next_blade(core.player.weapon_id)))
+
+
+## The next of the three blades (katana -> dagger -> scythe -> katana): these tests were written for them; the Star Staff has
+## its own tests (test_star_staff.gd).
+static func _next_blade(weapon: StringName) -> StringName:
+	var blades: Array[StringName] = [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE]
+	var i: int = blades.find(weapon)
+	return weapon if i < 0 else blades[(i + 1) % blades.size()]
 
 
 func _count(core: GameCore, type: StringName) -> int:
@@ -509,7 +517,7 @@ func _scripted_frame(core: GameCore, i: int) -> InputFrame:
 	frame.move = to_boss.normalized() if to_boss.length() > 40.0 else Vector2.ZERO
 	frame.aim = to_boss.normalized()
 	frame.attack_pressed = i % 3 == 0 and i % 400 >= 60
-	frame.weapon_equip = Weapons.next(core.player.weapon_id) if i % 400 >= 45 and i % 400 <= 55 else &""  # the lockout makes the first request count
+	frame.weapon_equip = _next_blade(core.player.weapon_id) if i % 400 >= 45 and i % 400 <= 55 else &""  # the lockout makes the first request count
 	frame.weapon_active_pressed = i % 50 == 7
 	frame.dash_pressed = i % 97 == 11
 	frame.parry_pressed = i % 131 == 17

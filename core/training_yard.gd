@@ -127,15 +127,18 @@ func resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 
 func _resolve_swing(core: RefCounted, events: Array[GameEvent]) -> void:
 	var player: PlayerState = core.player
+	if Weapons.is_ranged(player.weapon_id) and player.state == PlayerState.STATE_ATTACK_WINDUP and player.state_ticks == 0:
+		var target: Variant = Weapons.burst_target(player.position, player.facing, [{"position": center(), "radius": BODY_RADIUS}])
+		if target is Vector2:  # the Star Staff's cast snaps onto the post
+			player.swing_point = target
 	if player.state != PlayerState.STATE_ATTACK_ACTIVE or player.attack_hit_done:
 		return
 	var weapon: StringName = player.weapon_id
-	var swing: int = player.combo_index - 1
-	var to_post: Vector2 = center() - player.position
+	var to_post: Vector2 = center() - player.swing_origin()
 	var dist: float = to_post.length()
-	if dist - BODY_RADIUS > Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[swing]:
+	if dist - BODY_RADIUS > Weapons.swing_reach(weapon, player.combo_index):
 		return
-	if dist > 0.0001 and player.facing.dot(to_post / dist) < Weapons.arc_dot(weapon):
+	if dist > 0.0001 and player.facing.dot(to_post / dist) < Weapons.swing_arc_dot(weapon):
 		return
 	player.attack_hit_done = true
 	hits += 1
