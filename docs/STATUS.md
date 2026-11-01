@@ -1,3 +1,19 @@
+## Staff cut-in in the shared format and preview GIFs (2026-11-01, Claude, done while Codex is out)
+
+Owner: "why the cutout doesn't look like what we have on the other weapon", and a GIF to see the animation.
+- Why it differed: the first cut-in was a painted 3-panel illustration from the image generator. The other weapons use the shared format: the in-game pixel poses scaled x12 with a coloured rim, a slanted banner, a backdrop strike, flashes and the title.
+- tools/art/import_staff_concept.py cuts the concept sheets to game scale (review only, nothing in art/src). Output goes to art/reference/staff_v1/imported/ (PNG frames, anchors in imported.json, a 6x contact sheet).
+  - The hero is 35 px tall like hero2. The crystal's magenta centre is filled with cream, the circle is squashed to a 2:1 ground ellipse, and the scorch keeps one patch.
+- tools/art/export_staff_cutin.py writes presentation/cutin/staff_* in the shared format (copied from Reaper's Coil).
+  - Poses: concept pose 5 (plant the staff), 8 (call the star), 4 (swing down).
+  - Colours: sapphire rim, star motes, a magic circle turning in the aura.
+  - Strike: a falling star crashing into a ground circle, then a pillar of light and embers.
+  - Title "DISINTEGRATION", subtitle "MARK - CALL - STARFALL". The banner leaves to the right.
+  - Not wired into the game.
+- tools/art/preview_staff.py writes art/reference/staff_v1/preview/staff_{attack,blink,disintegration}.gif: the hero, the Warden as the target and the Hollow Trial floor, at game scale, 4x.
+  - The hero only has the 8 key poses, so his moves swap poses. Full animation sheets come after approval.
+- Not verified in Godot (nothing loads these yet). No game code changed.
+
 ## Mage staff concept art v1 (2026-11-01, Claude, done while Codex is out)
 
 Owner: a new weapon, a mage staff.

@@ -1,0 +1,195 @@
+{
+ "generator": "tools/art/export_staff_cutin.py (Pillow only, fixed seeds; shared format of export_lightning_cutin.py)",
+ "status": "review stage; not wired into the game",
+ "title": "DISINTEGRATION",
+ "subtitle_suggestion": "circle size / damage from the core, like the other cut-ins",
+ "canvas": [
+  800,
+  450
+ ],
+ "palette": "Totoy 36, hard alpha; no gold x,y or red z,A",
+ "pose_scale": 12,
+ "aura_scale": 8,
+ "fx_scale": 4,
+ "strike_scale": 8,
+ "poses": {
+  "crouch": {
+   "w": 564,
+   "h": 600,
+   "pad": 96,
+   "inner_w": 372,
+   "inner_h": 408,
+   "feet_x": 0.484,
+   "source": "art/reference/staff_v1/imported/hero_5.png",
+   "content": "plants the staff, the circle forms (concept pose 5)"
+  },
+  "ready": {
+   "w": 492,
+   "h": 708,
+   "pad": 96,
+   "inner_w": 300,
+   "inner_h": 516,
+   "feet_x": 0.4,
+   "source": "art/reference/staff_v1/imported/hero_8.png",
+   "content": "raises the staff, calls the star (concept pose 8)"
+  },
+  "burst": {
+   "w": 624,
+   "h": 732,
+   "pad": 96,
+   "inner_w": 432,
+   "inner_h": 540,
+   "feet_x": 0.5,
+   "source": "art/reference/staff_v1/imported/hero_4.png",
+   "content": "swings the staff overhead and down, the star falls (concept pose 4)"
+  }
+ },
+ "aura": {
+  "cell_w": 384,
+  "cell_h": 448,
+  "frames": [
+   {
+    "x": 0,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 384,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 768,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1152,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1536,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1920,
+    "y": 0,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 0,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 384,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 768,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1152,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1536,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   },
+   {
+    "x": 1920,
+    "y": 448,
+    "w": 384,
+    "h": 448
+   }
+  ],
+  "anchor": "bottom centre"
+ },
+ "strikes": [
+  "staff_strike_1.png",
+  "staff_strike_2.png",
+  "staff_strike_3.png",
+  "staff_strike_4.png"
+ ],
+ "flashes": [
+  "staff_flash_1.png",
+  "staff_flash_2.png",
+  "staff_flash_3.png"
+ ],
+ "timing_s": {
+  "note": "suggested, preview seconds at 30 fps; a sibling of black_form_cutin.gd may scale them by SPEED",
+  "flash_pop": [
+   0.0,
+   0.167
+  ],
+  "banner_in": [
+   0.03,
+   0.17
+  ],
+  "beats": [
+   [
+    "crouch",
+    0.1,
+    0.37
+   ],
+   [
+    "ready",
+    0.37,
+    0.62
+   ],
+   [
+    "burst",
+    0.62,
+    1.2
+   ]
+  ],
+  "cuts": [
+   0.37,
+   0.62
+  ],
+  "strike_on_burst": [
+   [
+    1,
+    0.067
+   ],
+   [
+    2,
+    0.067
+   ],
+   [
+    3,
+    0.1
+   ],
+   [
+    "3/4 flicker",
+    "until exit"
+   ]
+  ],
+  "crash_flash": 0.6866666666666666,
+  "title_slam": 0.7,
+  "exit": [
+   0.98,
+   1.16
+  ],
+  "exit_direction": "right (the star falls on)",
+  "end": 1.16
+ }
+}
