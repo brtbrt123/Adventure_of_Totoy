@@ -87,6 +87,7 @@ func _ready() -> void:
 	for entry: Dictionary in palette.get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
+	frames = ArenaAnimation.AnimLib.remap(frames)  # every effect plays in the owner's frame order (presentation/animations/effects)
 	sprites = load("res://art/build/sprites.png") as Texture2D
 	# The Black Form, gold-impact and hit-flash copies of the atlas are built by tools/art/build_art.py (they used to be
 	# recoloured here pixel by pixel, about 1 s of _ready); the runtime recolour stays only as a fallback.

@@ -1,4 +1,6 @@
 extends RefCounted
+## Per-frame tick lists marked `static var` come from the owner's effect SpriteFrames (presentation/animations/effects/, docs/ANIMATION_EDITING.md); the lists here are the fallback.
+const AnimLib := preload("res://presentation/common/anim_library.gd")
 ## Cosmetic timing and naming for the Chain Scythe and its Reaper's Coil (swing arcs, chain, flying head, hook clink,
 ## drag streaks/dust/scuffs, stagger burst, dizzy stars, spin ring halves, miss poof). Pure functions over ticks and
 ## positions taken from the snapshot and core events; no rules, no damage, no hit decisions.
@@ -11,12 +13,12 @@ const Weapons := preload("res://core/weapons.gd")
 ## Live event effects at most (the oldest is dropped first), like a cap on any burst of events.
 const MAX_LIVE: int = 40
 ## Ticks per frame of the event sequences (frame n = entry n-1).
-const HOOK_TICKS: Array[int] = [2, 2, 3, 3, 3]
-const LAND_TICKS: Array[int] = [2, 3, 3, 4]
-const STAGGER_TICKS: Array[int] = [2, 2, 3, 3, 3, 4]
-const DUST_TICKS: Array[int] = [2, 3, 3, 4]
+static var HOOK_TICKS: Array[int] = AnimLib.durations("fx_chain_hook", [2, 2, 3, 3, 3])
+static var LAND_TICKS: Array[int] = AnimLib.durations("fx_chain_land", [2, 3, 3, 4])
+static var STAGGER_TICKS: Array[int] = AnimLib.durations("fx_chain_stagger", [2, 2, 3, 3, 3, 4])
+static var DUST_TICKS: Array[int] = AnimLib.durations("fx_chain_dust", [2, 3, 3, 4])
 ## Scuff decals stay on the floor a while: fresh (1) to almost gone (4).
-const SCUFF_TICKS: Array[int] = [12, 14, 14, 16]
+static var SCUFF_TICKS: Array[int] = AnimLib.durations("fx_chain_scuff", [12, 14, 14, 16])
 ## Spin hit spark (the hook's spark/mote frames 4-5) and a short flash.
 const SPARK_TICKS: Array[int] = [3, 4]
 ## Arc phases over the swing: lead + peak over the active ticks, then follow and fragments early in the recovery.

@@ -11,8 +11,15 @@ extends RefCounted
 ## telegraphs) take their frames and order from here but their pace from the core.
 ## A set without a resource, or an animation missing from it, falls back to the code's own tables (nothing breaks).
 ## Pure lookup; the game state never depends on it.
+##
+## Effects (owner 2026-11-01, next step): one SpriteFrames per effect family, presentation/animations/effects/fx_<family>.tres, an
+## animation per effect sequence (fx_lantern_place -> fx_lantern.tres, animation "place"; a family's own sequence, fx_counter, is
+## animation "play"). remap() gives every effect its owner's frame order (the frame table the game draws from is rewritten, so every
+## effect's code asks for frame n and gets the frame the owner put at n). durations() gives the effects that run on per-frame tick
+## lists (most hero, aspect, lightning, scythe, ward/echo/sprint effects) the owner's durations: the effect's frames AND its life.
 
 const DIR: String = "res://presentation/animations/"
+const EFFECTS_DIR: String = "res://presentation/animations/effects/"
 const TICKS_PER_SECOND: float = 60.0
 
 ## set -> {animation: {"keys": Array[String], "ticks": Array[int], "loop": bool}}; {} for a set with no resource.
@@ -25,10 +32,13 @@ static func clear_cache() -> void:
 
 
 static func _animations_of(set_name: String) -> Dictionary:
-	if _sets.has(set_name):
-		return _sets[set_name]
+	return _read(DIR + set_name + ".tres")
+
+
+static func _read(path: String) -> Dictionary:
+	if _sets.has(path):
+		return _sets[path]
 	var data: Dictionary = {}
-	var path: String = DIR + set_name + ".tres"
 	if ResourceLoader.exists(path):
 		var frames: SpriteFrames = load(path) as SpriteFrames
 		if frames != null:
@@ -44,8 +54,51 @@ static func _animations_of(set_name: String) -> Dictionary:
 					ticks.append(maxi(1, roundi(TICKS_PER_SECOND / fps * frames.get_frame_duration(anim, i))))
 				if not keys.is_empty():
 					data[String(anim)] = {"keys": keys, "ticks": ticks, "loop": frames.get_animation_loop(anim)}
-	_sets[set_name] = data
+	_sets[path] = data
 	return data
+
+
+## The effect family and animation of an effect sequence: fx_lantern_place -> ["fx_lantern", "place"], fx_counter -> ["fx_counter", "play"].
+static func effect_of(sequence: String) -> Array[String]:
+	var words: PackedStringArray = sequence.split("_")
+	var family: String = words[0] + "_" + words[1] if words.size() > 1 else sequence
+	var anim: String = sequence.trim_prefix(family + "_") if sequence.length() > family.length() else "play"
+	return [family, anim]
+
+
+## The owner's per-frame durations (ticks) of an effect sequence; `fallback` (the code's list) without a resource.
+static func durations(sequence: String, fallback: Array[int]) -> Array[int]:
+	var where: Array[String] = effect_of(sequence)
+	var entry: Dictionary = _read(EFFECTS_DIR + where[0] + ".tres").get(where[1], {})
+	if entry.is_empty():
+		return fallback
+	var out: Array[int] = []
+	out.assign(entry["ticks"])
+	return out
+
+
+## The frame table (art/build/sprites.json "frames") with every effect sequence in its owner's order: entry `<sequence>_<n>` becomes
+## the frame the owner put at place n (held at the last for places past the end). Called where the game loads the table.
+static func remap(frames: Dictionary) -> Dictionary:
+	if not DirAccess.dir_exists_absolute(EFFECTS_DIR):
+		return frames
+	var out: Dictionary = frames.duplicate()
+	for file: String in DirAccess.get_files_at(EFFECTS_DIR):
+		if not file.ends_with(".tres"):
+			continue
+		var family: String = file.get_basename()
+		var animations: Dictionary = _read(EFFECTS_DIR + file)
+		for anim: String in animations:
+			var sequence: String = family if anim == "play" else family + "_" + anim
+			var keys: Array = animations[anim]["keys"]
+			var places: int = keys.size()
+			while frames.has("%s_%d" % [sequence, places + 1]):
+				places += 1  # the code may still ask for the places the art has
+			for n: int in range(1, places + 1):
+				var source: String = keys[mini(n, keys.size()) - 1]
+				if frames.has(source):
+					out["%s_%d" % [sequence, n]] = frames[source]
+	return out
 
 
 ## True when the set's resource has this animation.

@@ -1,4 +1,6 @@
 extends RefCounted
+## Per-frame tick lists marked `static var` come from the owner's effect SpriteFrames (presentation/animations/effects/, docs/ANIMATION_EDITING.md); the lists here are the fallback.
+const AnimLib := preload("res://presentation/common/anim_library.gd")
 ## Cosmetic timing and naming for the Echo Step, Stone Ward and Sprint aspects: the echo anchor and its countdown, the
 ## recall (vanish, pull trail, arrival, i-frame shield), the ward pose, barrier, absorb flash, stored glow, block sparks,
 ## shockwave and floor cracks, and the sprint aura, afterimages, speed lines, dust, wind and start/end bursts. Pure
@@ -12,17 +14,17 @@ const AspectEffects := preload("res://presentation/arena/aspect_effects.gd")
 const MAX_LIVE: int = 40
 
 # --- Echo Step --------------------------------------------------------------------------------------------------------
-const PLACE_TICKS: Array[int] = [3, 4, 4, 4, 5]
+static var PLACE_TICKS: Array[int] = AnimLib.durations("fx_echo_place", [3, 4, 4, 4, 5])
 const ANCHOR_FRAME_TICKS: int = 6  # 100 ms, 6 frames looping
 ## The anchor turns into the countdown for the last ticks before the recall (4 frames x 5 ticks, about 320 ms).
 const COUNTDOWN_TICKS: int = 20
 const COUNTDOWN_FRAME_TICKS: int = 5
-const VANISH_TICKS: Array[int] = [3, 3, 4, 4, 5]
-const TRAIL_TICKS: Array[int] = [2, 3, 4, 4]
-const ARRIVE_TICKS: Array[int] = [3, 3, 4, 4, 5]
+static var VANISH_TICKS: Array[int] = AnimLib.durations("fx_echo_vanish", [3, 3, 4, 4, 5])
+static var TRAIL_TICKS: Array[int] = AnimLib.durations("fx_echo_trail_head", [2, 3, 4, 4])
+static var ARRIVE_TICKS: Array[int] = AnimLib.durations("fx_echo_arrive", [3, 3, 4, 4, 5])
 ## The hero is drawn at the echo from arrive frame 2 (frame 1 is the echo flaring and the streaks pulling in).
 const ARRIVE_HIDE_TICKS: int = 3
-const ECHO_DUST_TICKS: Array[int] = [4, 4, 4, 4, 4]
+static var ECHO_DUST_TICKS: Array[int] = AnimLib.durations("fx_echo_dust", [4, 4, 4, 4, 4])
 const SHIELD_PHASE_TICKS: int = 4  # 70 ms; phases 1-3 loop during the i-frames, 4 on the last ticks
 ## The recall streak flies at chest height.
 const CHEST: Vector2 = Vector2(0, -14)
@@ -38,19 +40,19 @@ const WARD_RAISE_TICKS: Array[int] = [3, 4, 4, 5]
 const WARD_HOLD_FRAME_TICKS: int = 6  # 100 ms, 4 frames looping
 const WARD_DROP_TICKS: Array[int] = [4, 4, 5]
 const BARRIER_FRAME_TICKS: int = 5  # 90 ms, 6 frames looping
-const ABSORB_TICKS: Array[int] = [2, 3, 4, 4]
+static var ABSORB_TICKS: Array[int] = AnimLib.durations("fx_ward_absorb", [2, 3, 4, 4])
 const STORE_FRAME_TICKS: int = 5
-const BLOCK_TICKS: Array[int] = [2, 3, 3, 4, 4]
+static var BLOCK_TICKS: Array[int] = AnimLib.durations("fx_ward_block", [2, 3, 3, 4, 4])
 ## The block impact sits on the ward's front, relative to the feet, facing right.
 const BLOCK_POINT: Vector2 = Vector2(22, -16)
-const SHOCKWAVE_TICKS: Array[int] = [2, 3, 3, 3, 4, 4, 4, 5]
+static var SHOCKWAVE_TICKS: Array[int] = AnimLib.durations("fx_ward_shockwave", [2, 3, 3, 3, 4, 4, 4, 5])
 ## Ring radius drawn by each shockwave frame (manifest radius_px); the last one is the art's full radius.
 const SHOCKWAVE_RADIUS_PX: Array[int] = [6, 18, 30, 41, 50, 57, 62, 64]
-const CRACKS_TICKS: Array[int] = [7, 10, 16, 18]
+static var CRACKS_TICKS: Array[int] = AnimLib.durations("fx_ward_cracks", [7, 10, 16, 18])
 
 # --- Sprint -----------------------------------------------------------------------------------------------------------
-const SPRINT_START_TICKS: Array[int] = [2, 3, 4, 4, 5]
-const SPRINT_END_TICKS: Array[int] = [4, 5, 5, 6]
+static var SPRINT_START_TICKS: Array[int] = AnimLib.durations("fx_sprint_start", [2, 3, 4, 4, 5])
+static var SPRINT_END_TICKS: Array[int] = AnimLib.durations("fx_sprint_end", [4, 5, 5, 6])
 const AURA_PHASE_TICKS: int = 5  # 80 ms, 6 phases
 const AURA_PHASES: int = 6
 const LINES_FRAME_TICKS: int = 4  # 60 ms, 4 frames

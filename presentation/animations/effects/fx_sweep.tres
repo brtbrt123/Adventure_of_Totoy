@@ -1,0 +1,34 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_sweep_1.png" id="1_08jxy"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_sweep_2.png" id="2_lrvuq"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_sweep_3.png" id="3_atdfq"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_sweep_4.png" id="4_v3mn2"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_sweep_5.png" id="5_1nsp3"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_sweep_6.png" id="6_plptd"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_08jxy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_lrvuq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_atdfq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_v3mn2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_1nsp3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_plptd")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 20.0
+}]

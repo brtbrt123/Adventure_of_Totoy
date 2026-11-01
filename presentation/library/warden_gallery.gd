@@ -55,7 +55,7 @@ func _ready() -> void:
 
 func _load() -> void:
 	AnimLib.clear_cache()  # the owner may have edited warden.tres
-	frames = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"]
+	frames = AnimLib.remap(JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"])  # effect order, as in game
 	atlas = load("res://art/build/sprites.png")
 	colors.clear()
 	for entry: Dictionary in JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))["colors"]:

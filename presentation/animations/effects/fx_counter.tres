@@ -1,0 +1,34 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_counter_1.png" id="1_nxh2n"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_counter_2.png" id="2_8o34a"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_counter_3.png" id="3_wao3e"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_counter_4.png" id="4_21faj"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_counter_5.png" id="5_j0c5g"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_counter_6.png" id="6_chr62"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_nxh2n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_8o34a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_wao3e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_21faj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_j0c5g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_chr62")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 20.0
+}]

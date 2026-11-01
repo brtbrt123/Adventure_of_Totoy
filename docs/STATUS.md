@@ -1,3 +1,13 @@
+## Every animated effect editable in Godot (2026-11-01, Claude, done while Codex is out)
+
+Owner: "yes, effects next". 31 effect-family SpriteFrames in presentation/animations/effects/ (fx_lantern, fx_ward, fx_warden2, fx_stag, fx_lightning, ...; 193 animated sequences; the hero-frame overlays follow the hero's own frames and are left out), made by the same generator.
+- Frame order, every effect: AnimLib.remap rewrites the frame table where arena.gd and explore_scene.gd load it, so an effect asking for frame n gets the owner's frame n. No call site changed. Default: identical table (3589 entries checked).
+- Timing for the 30 effects on per-frame tick lists: the lists in aspect_effects.gd, lightning_effects.gd, scythe_effects.gd and ward_echo_sprint_effects.gd are now `static var` read from the resources (AnimLib.durations). Durations change the frames and the effect's life; added frames play. Default: identical values.
+- The other effects keep the code's pace (order editable).
+- Checked with a scratch edit that swapped two frames and doubled one duration; the game read both; restored after.
+- Test smoke_anim_library now covers all 48 resources. Core 568 and both trial checks pass; 52 of 55 smokes pass, the other 3 are the capture smokes that need a window.
+- Galleries play effects from the resources. Guide: docs/ANIMATION_EDITING.md "Effects".
+
 ## Every character animation editable in Godot, frames repaintable (2026-11-01, Claude, done while Codex is out)
 
 Owner: "make all of it editable". Guide: docs/ANIMATION_EDITING.md.

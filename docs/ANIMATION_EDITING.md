@@ -1,13 +1,12 @@
 # Editing animations in Godot
 
-Since 2026-11-01 every character animation is a Godot `SpriteFrames` resource the game plays from, and every frame can be repainted
-by hand. Effects (the hero's skills, the creature effects, the Warden's attack effects) are not in this yet; they still run on code
-timing (next step of `docs/GODOT_EDITABLE_PLAN.md`).
+Since 2026-11-01 every character animation and every animated effect is a Godot `SpriteFrames` resource the game plays from, and
+every frame can be repainted by hand.
 
 ## Watch
 
-- `presentation/library/animation_gallery.tscn`: every animation looping in the editor's 2D view. The character sets play with
-  your timing from their `SpriteFrames`; the rest at the gallery's `ticks_per_frame`. Inspector: `filter`, `speed`, `playing`,
+- `presentation/library/animation_gallery.tscn`: every animation looping in the editor's 2D view. Characters and effects play with
+  your order and timing from their `SpriteFrames`; the few without one at the gallery's `ticks_per_frame`. Inspector: `filter`, `speed`, `playing`,
   `facing_left`, `reload` (after editing a resource or rebuilding art).
 - `presentation/library/warden_gallery.tscn`: the Warden with its attacks, effects and particles.
 
@@ -34,6 +33,26 @@ their FPS does nothing; change the order or the frames.
 
 A mob state that plays a pose at a pace of its own (the Thornback's quick startled idle, the boar's and mossling's looping stun)
 keeps that pace and uses your frames.
+
+## Effects
+
+`presentation/animations/effects/fx_<family>.tres`, one per effect family, an animation per effect: `fx_lantern.tres` holds
+`place`, `pulse`, `fade`, `pool_open`, ...; `fx_ward.tres` holds `cracks`, `shockwave`, `block`, `absorb`; `fx_warden2.tres` the
+Warden's attack effects; `fx_stag.tres` the Thornback's; a family's own sequence (`fx_counter`, `fx_parry`) is the animation `play`.
+
+- **Frame order: every effect.** Reorder, remove or repeat frames and the game shows them in that order. (How it works: the game's
+  frame table is rewritten when it loads, so an effect that asks for its frame n gets the frame you put at n. An effect never asks
+  for more frames than its art had, so adding frames does nothing there, except for the effects below.)
+- **Timing too, for 30 effects** that run on per-frame tick lists: `fx_lantern` (place, pulse, fade, pool_open, pool_pulse, motes,
+  spark), `fx_phantom` (start, end, spark), `fx_lightning` (spark, blink, strike, ground), `fx_chain` (hook, land, stagger, dust,
+  scuff), `fx_echo` (place, vanish, trail_head, arrive, dust), `fx_ward` (absorb, block, shockwave, cracks), `fx_sprint` (start,
+  end). Speed and per-frame durations change the frames AND how long the effect stays (its life is the sum), and frames you add
+  play.
+- **The other effects keep the code's pace** (their frame is worked out from their age: the parry and hit bursts, the dash, the
+  auras, the Warden's and the Thornback's attack effects, ...). Their speed in the resource does nothing; change their order or
+  frames.
+- Hero-frame overlays (the Phantom glow, the echo shield outline, the sprint aura) follow the hero's own frames, so they are not
+  separate animations: edit the hero animation.
 
 ## Repaint a frame
 

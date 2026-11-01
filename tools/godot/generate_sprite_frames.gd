@@ -14,7 +14,13 @@ extends SceneTree
 
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const MobView := preload("res://presentation/explore/mob_view.gd")
+const AnimLib := preload("res://presentation/common/anim_library.gd")
+const AspectEffects := preload("res://presentation/arena/aspect_effects.gd")
+const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
+const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
+const WardEchoSprintEffects := preload("res://presentation/arena/ward_echo_sprint_effects.gd")
 const OUT: String = "res://presentation/animations/"
+const EFFECT_TICKS: int = 3  # an effect sequence without a per-frame tick list in the code (its pace stays in code: order only)
 const SPRITES: String = "res://art/build/sprites/"
 const DEFAULT_TICKS: int = 6
 const NPC_MANIFEST: String = "res://art/build/chapter1_npc_sprites_manifest.json"
@@ -51,7 +57,37 @@ func run() -> void:
 			written += 1
 		else:
 			kept += 1
-	print("SPRITE FRAMES OK: %d written, %d unchanged in %s" % [written, kept, OUT])
+	# Effects: one resource per family (fx_lantern.tres ...), an animation per animated sequence; the hero-frame overlays (names with
+	# _right/_left: Phantom glow, echo shield, sprint aura) follow the hero's frames and are left out.
+	DirAccess.make_dir_recursive_absolute(AnimLib.EFFECTS_DIR)
+	var families: Dictionary = {}
+	var number: RegEx = RegEx.create_from_string("^(fx_.*)_(\\d+)$")
+	var counts: Dictionary = {}
+	for name: String in names:
+		var m: RegExMatch = number.search(name)
+		if m == null or m.get_string(1).contains("_right") or m.get_string(1).contains("_left"):
+			continue
+		counts[m.get_string(1)] = maxi(int(counts.get(m.get_string(1), 0)), int(m.get_string(2)))
+	for sequence: String in counts:
+		if int(counts[sequence]) < 2:
+			continue
+		var where: Array[String] = AnimLib.effect_of(sequence)
+		if not families.has(where[0]):
+			families[where[0]] = {}
+		var keys: Array[String] = []
+		for n: int in range(1, int(counts[sequence]) + 1):
+			keys.append("%s_%d" % [sequence, n])
+		families[where[0]][where[1]] = keys
+	var timed: Dictionary = effect_timing()
+	var effects: int = 0
+	for family: String in families:
+		var timing: Dictionary = {}
+		for anim: String in families[family]:
+			var sequence: String = family if anim == "play" else family + "_" + anim
+			timing[anim] = [timed.get(sequence, [EFFECT_TICKS]), false]
+		if write(family, families[family], timing, reset, AnimLib.EFFECTS_DIR):
+			effects += 1
+	print("SPRITE FRAMES OK: %d written, %d unchanged in %s; %d of %d effect families written in %s" % [written, kept, OUT, effects, families.size(), AnimLib.EFFECTS_DIR])
 	quit(0)
 
 
@@ -119,9 +155,30 @@ func defaults(set_name: String) -> Dictionary:
 	return out
 
 
+## The effects that run on a per-frame tick list in the code: their lists are the starting durations (and, once the resource exists,
+## the game reads them back from it: presentation/arena/*_effects.gd `static var ..._TICKS`).
+func effect_timing() -> Dictionary:
+	return {
+		"fx_lantern_place": AspectEffects.PLACE_TICKS, "fx_lantern_pulse": AspectEffects.PULSE_TICKS, "fx_lantern_fade": AspectEffects.FADE_TICKS,
+		"fx_lantern_pool_open": AspectEffects.POOL_OPEN_TICKS, "fx_lantern_pool_pulse": AspectEffects.POOL_PULSE_TICKS,
+		"fx_lantern_motes": AspectEffects.MOTES_TICKS, "fx_lantern_spark": AspectEffects.SPARK_TICKS, "fx_phantom_start": AspectEffects.START_TICKS,
+		"fx_phantom_end": AspectEffects.END_TICKS, "fx_phantom_spark": AspectEffects.ECHO_SPARK_TICKS,
+		"fx_lightning_spark": LightningEffects.SPARK_TICKS, "fx_lightning_blink": LightningEffects.BLINK_TICKS,
+		"fx_lightning_strike": LightningEffects.STRIKE_TICKS, "fx_lightning_ground": LightningEffects.GROUND_TICKS,
+		"fx_chain_hook": ScytheEffects.HOOK_TICKS, "fx_chain_land": ScytheEffects.LAND_TICKS, "fx_chain_stagger": ScytheEffects.STAGGER_TICKS,
+		"fx_chain_dust": ScytheEffects.DUST_TICKS, "fx_chain_scuff": ScytheEffects.SCUFF_TICKS,
+		"fx_echo_place": WardEchoSprintEffects.PLACE_TICKS, "fx_echo_vanish": WardEchoSprintEffects.VANISH_TICKS,
+		"fx_echo_trail_head": WardEchoSprintEffects.TRAIL_TICKS, "fx_echo_arrive": WardEchoSprintEffects.ARRIVE_TICKS,
+		"fx_echo_dust": WardEchoSprintEffects.ECHO_DUST_TICKS, "fx_ward_absorb": WardEchoSprintEffects.ABSORB_TICKS,
+		"fx_ward_block": WardEchoSprintEffects.BLOCK_TICKS, "fx_ward_shockwave": WardEchoSprintEffects.SHOCKWAVE_TICKS,
+		"fx_ward_cracks": WardEchoSprintEffects.CRACKS_TICKS, "fx_sprint_start": WardEchoSprintEffects.SPRINT_START_TICKS,
+		"fx_sprint_end": WardEchoSprintEffects.SPRINT_END_TICKS,
+	}
+
+
 ## Builds or updates the set's resource; true when the file was written.
-func write(set_name: String, anims: Dictionary, timing: Dictionary, reset: bool) -> bool:
-	var path: String = OUT + set_name + ".tres"
+func write(set_name: String, anims: Dictionary, timing: Dictionary, reset: bool, folder: String = OUT) -> bool:
+	var path: String = folder + set_name + ".tres"
 	var frames: SpriteFrames = null
 	if not reset and ResourceLoader.exists(path):
 		frames = load(path) as SpriteFrames

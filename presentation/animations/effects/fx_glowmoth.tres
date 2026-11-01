@@ -1,0 +1,47 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_1.png" id="1_cvxvf"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_2.png" id="2_v2lfm"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_3.png" id="3_cvqbv"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_4.png" id="4_ak3jp"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_pop_1.png" id="5_66ync"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_pop_2.png" id="6_fsjrh"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_pop_3.png" id="7_46xtk"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_glowmoth_orb_pop_4.png" id="8_slws3"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_cvxvf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_v2lfm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_cvqbv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ak3jp")
+}],
+"loop": 0,
+"name": &"orb",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_66ync")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_fsjrh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_46xtk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_slws3")
+}],
+"loop": 0,
+"name": &"orb_pop",
+"speed": 20.0
+}]

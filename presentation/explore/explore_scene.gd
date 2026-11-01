@@ -138,6 +138,7 @@ func _ready() -> void:
 	for entry: Dictionary in palette.get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
+	frames = ArenaAnimation.AnimLib.remap(frames)  # every effect plays in the owner's frame order (presentation/animations/effects)
 	sprites = load("res://art/build/sprites.png") as Texture2D
 	load_variant_atlases()
 	cutin = BlackFormCutIn.new()

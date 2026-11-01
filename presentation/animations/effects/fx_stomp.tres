@@ -1,0 +1,34 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_stomp_1.png" id="1_w46la"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_stomp_2.png" id="2_j5ojh"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_stomp_3.png" id="3_p0y1g"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_stomp_4.png" id="4_qiw28"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_stomp_5.png" id="5_q3c82"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_stomp_6.png" id="6_htp54"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_w46la")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_j5ojh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_p0y1g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_qiw28")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_q3c82")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_htp54")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 20.0
+}]

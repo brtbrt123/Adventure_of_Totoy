@@ -14,8 +14,8 @@ extends Node2D
 
 const TICKS_PER_SECOND: float = 60.0
 const AnimLib := preload("res://presentation/common/anim_library.gd")
-## The character sets with an editable SpriteFrames (presentation/animations/<set>.tres): their animations play in the owner's
-## frame order and timing here, like in the game; every other animation at ticks_per_frame.
+## The character sets with an editable SpriteFrames (presentation/animations/<set>.tres) and every effect with one
+## (presentation/animations/effects/fx_<family>.tres) play in the owner's frame order and timing here; the rest at ticks_per_frame.
 const EDITABLE_SETS: Array[String] = ["hero2", "totoy_dagger", "totoy_lightning", "totoy_scythe", "totoy_unarmed", "golem2", "warden", "stag",
 	"boar", "mossling", "glowmoth", "npc_child", "npc_edda", "npc_elder", "npc_mira", "npc_tovan", "npc_worker"]
 const LABEL_HEIGHT: float = 10.0
@@ -146,6 +146,11 @@ func _layout() -> void:
 			if name.begins_with(candidate + "_") and AnimLib.has(candidate, name.trim_prefix(candidate + "_").trim_suffix("_right")):
 				owner_set = candidate
 				anim = name.trim_prefix(candidate + "_").trim_suffix("_right")
+		if name.begins_with("fx_"):  # an effect: its family's SpriteFrames (presentation/animations/effects)
+			var where: Array[String] = AnimLib.effect_of(name)
+			if AnimLib.has("effects/" + where[0], where[1]):
+				owner_set = "effects/" + where[0]
+				anim = where[1]
 		entries.append({"name": name, "keys": keys, "at": Vector2(x, y), "size": size, "feet": Vector2(size.x * 0.5, LABEL_HEIGHT + PAD + up), "set": owner_set, "anim": anim})
 		x += size.x + PAD
 		row_h = maxf(row_h, size.y)

@@ -20,7 +20,12 @@ func run() -> void:
 	var atlas: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"]
 	var sets: int = 0
 	var animations: int = 0
+	var files: Array[String] = []
 	for file: String in DirAccess.get_files_at(AnimLib.DIR):
+		files.append(file)
+	for file: String in DirAccess.get_files_at(AnimLib.EFFECTS_DIR):
+		files.append("effects/" + file)  # the effect families (AnimLib reads them as set "effects/<family>")
+	for file: String in files:
 		if not file.ends_with(".tres"):
 			continue
 		sets += 1
@@ -43,6 +48,9 @@ func run() -> void:
 			for t: int in range(0, length * 2 + 5, 3):
 				var n: int = AnimLib.at(set_name, String(anim), t, [count, 1, true])
 				check(n >= 1 and n <= count, "%s/%s frame %d in range at tick %d" % [set_name, anim, n, t])
-	check(sets >= 17, "every character set has a SpriteFrames (%d)" % sets)
+	check(sets >= 17 + 31, "every character set and effect family has a SpriteFrames (%d)" % sets)
+	# by default the effect order is the art's own: the remapped frame table equals the built one
+	var remapped: Dictionary = AnimLib.remap(atlas)
+	check(remapped.size() == atlas.size(), "the remap keeps every frame name")
 	print("ANIM LIBRARY OK: %d sets, %d animations" % [sets, animations] if failures == 0 else "ANIM LIBRARY FAILED: %d" % failures)
 	quit(1 if failures else 0)
