@@ -23,6 +23,16 @@ const Particles := preload("res://presentation/explore/creature_particles.gd")
 const ParticleKind := preload("res://presentation/effects/particle_kind.gd")
 const ParticleLayer := preload("res://presentation/effects/particle_layer.gd")
 const FxSettings := preload("res://presentation/effects/fx_settings.gd")
+const SceneLook := preload("res://presentation/effects/scene_look.gd")
+## Each explore scene's starting look (presentation/effects/looks/<scene>.tres): the SceneLook defaults with these changes.
+const LOOKS: Dictionary = {
+	"village_layered": {"mist_density": 0.08, "glow_strength": 0.45, "vignette_strength": 0.34},
+	"forest_layered": {},
+	"glade_layered": {"glow_strength": 0.62, "mist_density": 0.12},
+	"woodland_layered": {"mist_density": 0.14},
+	"root_hollow_layered": {"mist_density": 0.16, "glow_strength": 0.65},
+	"hollow_trial_layered": {"mist_density": 0.17, "mist_edge_boost": 2.3, "glow_strength": 0.7, "vignette_strength": 0.48},
+}
 const OUT: String = "res://presentation/animations/"
 const EFFECT_TICKS: int = 3  # an effect sequence without a per-frame tick list in the code (its pace stays in code: order only)
 const SPRITES: String = "res://art/build/sprites/"
@@ -115,6 +125,18 @@ func run() -> void:
 		res.set("layers", layers)
 		ResourceSaver.save(res, path)
 		kinds += 1
+	DirAccess.make_dir_recursive_absolute(SceneLook.DIR)
+	var looks: int = 0
+	for scene: String in LOOKS:
+		var path: String = SceneLook.DIR + scene + ".tres"
+		if ResourceLoader.exists(path) and not reset:
+			continue
+		var look: Resource = SceneLook.new()
+		for key: String in LOOKS[scene]:
+			look.set(key, LOOKS[scene][key])
+		ResourceSaver.save(look, path)
+		looks += 1
+	print("scene looks written: %d" % looks)
 	var settings: bool = reset or not ResourceLoader.exists(FxSettings.PATH)
 	if settings:
 		ResourceSaver.save(FxSettings.new(), FxSettings.PATH)

@@ -1,3 +1,15 @@
+## Scene look shaders: glow, colour grade, vignette, ground mist, wind (2026-11-01, Claude, done while Codex is out)
+
+Owner: "add shaders so the scene looks good"; chose all four looks for every explore scene.
+- presentation/effects/scene_look.gd: one look per scene in presentation/effects/looks/<scene>.tres, edited in the Inspector (grade, vignette, glow, mist, wind; each switchable). Starting tunes are in tools/godot/generate_sprite_frames.gd LOOKS, written when missing.
+- Screen look: presentation/effects/scene_post.gdshader on a CanvasLayer (1) between the world and the HUD; the HUD moved to layer 2. It does the glow on bright pixels (three rings of taps), the grade and the vignette.
+- Ground mist: a new pass of overhead_light.gdshader (a rect drawn with alpha 0.985 after the floor, before warnings, props and actors). Drifting noise on the pixel grid, stepped and dithered alpha capped at half, moonlit, thicker near the floor outline (an edge mask built from the scene outline).
+- Wind: plant props (bush, fern, flowers, thorns, tree; not mushrooms or the root wall) lean by whole pixels from their base. Shear around the feet, on the game clock, own phase per plant.
+- First tune was too foggy; dimmed and made patchier after looking at captures.
+- Core 568, both trial checks pass; 52 of 55 smokes pass, the other 3 are the capture smokes that need a window.
+- Captures: presentation/review/scene_look/ (before/after for six scenes; forest GIF for wind and mist).
+- Look is the owner's call.
+
 ## The rest editable: effect timing, particles, code-drawn shapes (2026-11-01, Claude, done while Codex is out)
 
 Owner: "add everything" (make the rest editable). Guide: docs/ANIMATION_EDITING.md.

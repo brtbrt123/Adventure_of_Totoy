@@ -29,6 +29,14 @@ var displayed_trial_seal: bool = false
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
+const SceneLook := preload("res://presentation/effects/scene_look.gd")  # the scene's grade, vignette, glow, mist and wind (looks/<scene>.tres)
+const SCENE_POST := preload("res://presentation/effects/scene_post.gdshader")
+const MIST_PASS_ALPHA: float = 0.985  # a rect drawn with this alpha is the lighting shader's mist pass (overhead_light.gdshader)
+## Plant props that sway in the wind (by name); the mushrooms and the Root Hollow root wall stay still.
+const SWAYING: Array[String] = ["bush", "fern", "flowers", "thorns", "tree"]
+var look: Resource = null  # SceneLook of the current scene
+var post_rect: ColorRect = null  # the screen look, between the world and the HUD
+var _mist_edges: Dictionary = {}  # scene id -> ImageTexture (1 near the floor's edge)
 
 const RewardPopup := preload("res://presentation/explore/reward_popup.gd")
 var reward_popup: RewardPopup
@@ -134,6 +142,19 @@ func _ready() -> void:
 	add_child(practice_view)
 	creature_glow = CreatureGlow.new()  # the healing particles' additive glow, over the world and under the HUD
 	add_child(creature_glow)
+	# The screen look (grade, vignette, glow): a full-screen rect on its own layer over the world and under the HUD.
+	var post_layer: CanvasLayer = CanvasLayer.new()
+	post_layer.name = "SceneLook"
+	post_layer.layer = 1
+	get_node("HUD").layer = 2
+	post_rect = ColorRect.new()
+	post_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	post_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var post_material: ShaderMaterial = ShaderMaterial.new()
+	post_material.shader = SCENE_POST
+	post_rect.material = post_material
+	post_layer.add_child(post_rect)
+	add_child(post_layer)
 	var palette: Dictionary = _read_json("res://art/palette.json")
 	for entry: Dictionary in palette.get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
@@ -862,6 +883,9 @@ func _draw() -> void:
 		TrialArt.draw_altar_base(self, altar, frames, sprites)
 		TrialArt.draw_floor(self,prop_placements,frames,sprites,shake_offset())
 		trial_fx.draw_ground(self,snapshot.tick,colors,altar)
+	# the ground mist: over the floor, under the warnings, props and characters (the lighting shader draws it)
+	if material is ShaderMaterial and look != null and bool(look.get("mist_enabled")):
+		draw_rect(Rect2(Vector2.ZERO, snapshot.size), Color(1, 1, 1, MIST_PASS_ALPHA))
 	var ring: Dictionary = snapshot.training.get("ring",{})
 	if bool(ring.get("active",false)):
 		var at: Vector2=ring["center"]
@@ -949,7 +973,18 @@ func _draw_item(item: Dictionary) -> void:
 			var rect: Rect2 = item["rect"]
 			rect.position += offset
 			drawn["rect"] = rect
-		PropsLayer.draw(self, drawn, sprites, ambient())
+		var sway: float = _sway(drawn)
+		if sway != 0.0:
+			# the plant leans from its base: its top row moves `sway` whole pixels, the rows below proportionally less (nearest
+			# sampling keeps the pixels square, so it reads as rows sliding, the way pixel-art foliage moves)
+			var feet: Vector2 = Vector2(drawn["at"]).round()
+			var height: float = maxf(1.0, absf((drawn["rect"] as Rect2).size.y))
+			var lean: Transform2D = Transform2D(Vector2(1, 0), Vector2(-sway / height, 1), Vector2.ZERO)
+			draw_set_transform_matrix(Transform2D(0.0, shake_offset()) * Transform2D(0.0, feet) * lean * Transform2D(0.0, -feet))
+			PropsLayer.draw(self, drawn, sprites, ambient())
+			draw_set_transform(shake_offset())
+		else:
+			PropsLayer.draw(self, drawn, sprites, ambient())
 		return
 	var at: Vector2 = Vector2(item["at"]).round()
 	var radius: float = float(item["shadow"])
@@ -984,6 +1019,26 @@ func _draw_item(item: Dictionary) -> void:
 		_draw_hero_aspect_overlays(snapshot.hero, key, at, bool(item["left"]))
 
 
+## How far (whole px) a plant prop's top leans in the wind right now (0 for anything that does not sway, or when the scene's wind is
+## off). Follows the game clock (it pauses with the game); each plant has its own phase.
+func _sway(item: Dictionary) -> float:
+	if look == null or not bool(look.get("wind_enabled")) or float(look.get("wind_sway")) <= 0.0:
+		return 0.0
+	var type: String = String(item.get("type", ""))
+	if type.contains("rootwall") or type.contains("mushroom"):
+		return 0.0
+	var plant: bool = false
+	for word: String in SWAYING:
+		if type.contains(word):
+			plant = true
+	if not plant:
+		return 0.0
+	var at: Vector2 = item["at"]
+	var t: float = float(snapshot.tick) / 60.0 * float(look.get("wind_speed")) * TAU
+	var gust: float = 1.0 - float(look.get("wind_gusts")) * (0.5 + 0.5 * sin(float(snapshot.tick) / 60.0 * 0.37 + at.x * 0.011))
+	return roundf(float(look.get("wind_sway")) * gust * sin(t + at.x * 0.07 + at.y * 0.05))
+
+
 func _draw_actor_cast(item: Dictionary) -> void:
 	if not frames.has(item["frame"]):
 		return
@@ -1013,6 +1068,61 @@ func _update_lighting() -> void:
 	_static_lamps = EnvironmentLight.lamp_plan(prop_placements) if material != null else {}
 	_moving_lamps = 0
 	_sync_moving_lights()
+	_apply_look()
+
+
+## The scene's look (presentation/effects/looks/<scene>.tres): the screen shader's grade, vignette and glow, and the lighting shader's
+## mist. Read when the scene is entered.
+func _apply_look() -> void:
+	if snapshot == null:
+		return
+	look = SceneLook.for_scene(snapshot.scene_id)
+	if post_rect != null:
+		var post: ShaderMaterial = post_rect.material
+		var scale_px: float = get_viewport().get_final_transform().get_scale().x if is_inside_tree() else 3.0
+		post.set_shader_parameter("pixel_scale", maxf(1.0, scale_px))
+		for name: String in ["grade_enabled", "exposure", "contrast", "saturation", "vignette_enabled", "vignette_strength", "vignette_radius",
+				"vignette_softness", "glow_enabled", "glow_strength", "glow_threshold", "glow_radius"]:
+			post.set_shader_parameter(name, look.get(name))
+		for name: String in ["shadow_tint", "highlight_tint", "vignette_colour", "glow_tint"]:
+			var c: Color = look.get(name)
+			post.set_shader_parameter(name, Vector3(c.r, c.g, c.b))
+	if material is ShaderMaterial:
+		var shader: ShaderMaterial = material
+		shader.set_shader_parameter("mist_pass_alpha", MIST_PASS_ALPHA)
+		shader.set_shader_parameter("mist_enabled", bool(look.get("mist_enabled")))
+		for name: String in ["mist_density", "mist_edge_boost", "mist_scale", "mist_speed"]:
+			shader.set_shader_parameter(name, look.get(name))
+		var mc: Color = look.get("mist_colour")
+		shader.set_shader_parameter("mist_colour", Vector3(mc.r, mc.g, mc.b))
+		shader.set_shader_parameter("mist_edge", _mist_edge(float(look.get("mist_edge_width"))))
+
+
+## How near each spot is to the edge of the walkable floor (1 at the edge, 0 from `width` px in), at a quarter of the scene's size:
+## the mist thickens there, where the forest begins.
+func _mist_edge(width: float) -> Texture2D:
+	var cache_key: String = "%s/%d" % [snapshot.scene_id, int(width)]
+	if _mist_edges.has(cache_key):
+		return _mist_edges[cache_key]
+	var outline: PackedVector2Array = []
+	for point: Variant in Array(SceneDefs.layered_data(snapshot.scene_id).get("outline", [])):
+		outline.append(Vector2(point[0], point[1]))
+	var w: int = maxi(1, int(snapshot.size.x) / 4)
+	var h: int = maxi(1, int(snapshot.size.y) / 4)
+	var image: Image = Image.create(w, h, false, Image.FORMAT_L8)
+	for y: int in h:
+		for x: int in w:
+			var at: Vector2 = Vector2(x * 4 + 2, y * 4 + 2)
+			var near: float = 1.0
+			if outline.size() >= 3 and Geometry2D.is_point_in_polygon(at, outline):
+				var dist: float = INF
+				for i: int in outline.size():
+					dist = minf(dist, at.distance_to(Geometry2D.get_closest_point_to_segment(at, outline[i], outline[(i + 1) % outline.size()])))
+				near = clampf(1.0 - dist / maxf(1.0, width), 0.0, 1.0)
+			image.set_pixel(x, y, Color(near, near, near))
+	var texture: ImageTexture = ImageTexture.create_from_image(image)
+	_mist_edges[cache_key] = texture
+	return texture
 
 
 ## Lights that move with mobs (the Warden's chest stone): the props' lamps plus one halo and one pool per living Warden, written into

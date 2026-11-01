@@ -78,6 +78,23 @@ hit edge stays, how often the heal pulse and mist show. All creatures: particle 
 
 Particles and these settings are read when the game starts (and when a gallery reloads); save, then run.
 
+## Scene look (shaders)
+
+`presentation/effects/looks/<scene>.tres`, one per explore scene (village, forest, glade, woodland, Root Hollow, Hollow Trial). Open
+one; the Inspector has five groups, each with an on/off switch:
+
+- **Colour grade:** exposure, contrast, saturation, a tint for the dark tones (cool night) and one for the light tones (warm lamps).
+- **Vignette:** how dark the screen edges get, where it starts, its colour.
+- **Glow:** how much light bright things spill (rune stones, the Warden's chest, lanterns, sparks, attack effects), how bright a pixel
+  must be to glow, how far it reaches.
+- **Ground mist:** density on the open floor and at the forest edge (and how far in the edge reaches), cloud size, drift speed,
+  colour. It lies under the characters and props and is lit by the moonlight.
+- **Wind in the plants:** how far the tops of bushes, ferns, flowers, thorns and trees lean (whole pixels), how fast, how gusty.
+
+The screen look is `presentation/effects/scene_post.gdshader` (on a layer over the world and under the HUD, so menus and text are
+never touched); the mist is a pass of the scene's lighting shader (`presentation/common/overhead_light.gdshader`). A scene's look is
+read when you enter it. Delete a file to get the defaults back (and run the generator to write it again with the scene's start values).
+
 ## Repaint a frame
 
 1. Copy the frame from `art/build/sprites/<frame>.png` to `art/overrides/<frame>.png` (same name).
