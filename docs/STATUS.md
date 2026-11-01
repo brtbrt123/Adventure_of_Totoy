@@ -1,3 +1,24 @@
+## Mage staff concept art v1 (2026-11-01, Claude, done while Codex is out)
+
+Owner: a new weapon, a mage staff.
+- The design so far: the dash is a short blink (teleport). The basic attack is a ranged small explosion. The right click is Disintegration: a circle under the target, then a falling object strikes it.
+- Owner asked for the art from an image generator, so I made concept sheets with the Higgsfield MCP (Nano Banana 2.1; GPT Image 2.5 needs a paid plan), using the hero's in-game frames and the portrait as references. 9 sheets, 13.5 of 50 free credits.
+- Sheets in art/reference/staff_v1/ (sources.json has the job ids; staff_concept_v1.png shows all of them):
+  - the staff with its weapon, Disintegration and Blink icons;
+  - the hero with the staff in 8 key poses;
+  - the Arcane Burst (6 frames) and the Great Burst finisher (6);
+  - the blink depart and arrive (8);
+  - the Disintegration target circle (8) and falling star with impact (8);
+  - the starburnt ground (4);
+  - a 3-panel cut-in.
+- Colour language: sapphire and pale blue with cream starlight, no red or gold, since those mean enemy warnings. So the falling object is a falling star, not a fiery meteor.
+- Not imported and not in the game. Waiting on the owner's approval and design answers (circle fixed or following the target, the name, numbers).
+- Known flaws:
+  - the starburnt ground came out as two stacked patches;
+  - the crystal centre in the pose sheet is magenta (it will key out, so fill it at import);
+  - the target circle is drawn round, not as a ground ellipse (squash at import);
+  - the pose sheet is 8 key poses, not full animations yet.
+
 ## Wind sway removed (2026-11-01, Claude, done while Codex is out)
 
 Owner: "I don't like the sway, remove it". The plant wind sway is gone: its code in explore_scene.gd, the "Wind in the plants" group of scene_look.gd and its section in docs/ANIMATION_EDITING.md, and the forest wind clip. Glow, colour grade, vignette and ground mist stay. Explore smokes, the resource test and both trial checks pass.
