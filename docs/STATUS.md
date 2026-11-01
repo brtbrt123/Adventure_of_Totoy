@@ -1,3 +1,7 @@
+## All-animations gallery scene (2026-11-01, Claude, done while Codex is out)
+
+Owner: "make a scene for all" animations. presentation/library/animation_gallery.tscn (a @tool scene) plays every animated sequence of the built atlas in the Godot editor: 643 animations in 50 sets (characters, mobs, props, then the fx_* effects), each looping in its own labelled cell, frames placed on their anchors. Inspector: filter (comma-separated words, e.g. "hero2" or "stag_, fx_warden2"), ticks_per_frame (one speed for all; the game times each animation in code), playing, speed, facing_left, include_stills, row_width, show_labels, reload (after build_art.py). Game timings per animation are only in the Warden gallery (warden_gallery.tscn). Capture: presentation/review/warden_v2/animation_gallery.png. Still to do from docs/GODOT_EDITABLE_PLAN.md: SpriteFrames resources and effect scenes that can be edited, not only watched.
+
 ## Runebound Warden gallery scene (2026-11-01, Claude, done while Codex is out)
 
 Owner: see every Warden animation and effect in the Godot editor. presentation/library/warden_gallery.tscn (a @tool scene) plays in the 2D view without running the game:
