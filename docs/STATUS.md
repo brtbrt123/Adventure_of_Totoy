@@ -1,3 +1,14 @@
+## Star Staff run: 12 frames (2026-11-02, Claude, done while Codex is out)
+
+Owner: "try 12 frames".
+- Six in-betweens were generated from the six in-game run frames: art/reference/staff_v1/Staff_Run_Inbetween.png (2 tries x 1.5 credits; job ids in sources.json).
+  - The first try's in-betweens were near-copies and were not kept.
+  - The second describes each pose: the front foot landing, the knee coming through, the push-off, then the same with the legs swapped.
+- tools/art/import_staff_run.py cuts them like the run frames (the katana run's height and head-based anchor). make_staff_sprites.py interleaves them: totoy_staff_walk_right_1..12 = run 1, in-between 1, run 2, ... run 6, in-between 6.
+- Timing: presentation/animations/totoy_staff.tres has the 12-frame walk at 3 and 2 ticks (30 a cycle, the same pace as the 6-frame runs). The generator sets this for the staff, and its old 6-frame resource was regenerated.
+- The aspect tools take a per-set frame count (SET_COUNTS: the staff's walk has 12), so Phantom Cut's glow, Echo Step's shield and Sprint's aura cover all 12 frames.
+- Preview: art/reference/staff_v1/preview/staff_run_cycle.gif (6 frames before vs 12 now, at game pace). The animation library, animation, aspects, character menu and variant atlas smokes pass. Not watched in the game window.
+
 ## Star Staff run cycle from image generation (2026-11-02, Claude, done while Codex is out)
 
 Owner: a 12-frame run sheet "as reference for more smooth animation", then "generate frames instead" (the sheet never reached a file).

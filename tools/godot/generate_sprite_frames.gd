@@ -185,6 +185,8 @@ func defaults(set_name: String) -> Dictionary:
 		for anim: String in ArenaAnimation.PLAYER:
 			out[anim] = [int(ArenaAnimation.PLAYER[anim][1]), bool(ArenaAnimation.PLAYER[anim][2])]
 		out["ward_hold"] = [DEFAULT_TICKS, true]
+		if set_name == ArenaAnimation.SET_STAFF:  # its 12-frame run keeps the 6-frame runs' pace: 3 and 2 ticks, 30 a cycle
+			out["walk"] = [[3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2], true]
 	elif set_name == "totoy_unarmed":
 		for anim: String in UNARMED:
 			out[anim] = [int(UNARMED[anim][1]), bool(UNARMED[anim][2])]

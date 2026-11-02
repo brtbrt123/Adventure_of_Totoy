@@ -2,10 +2,10 @@
 
 Hero frames (totoy_staff_<pose>_right_<n>): built from the 8 key poses cut from the staff concept
 (tools/art/import_staff_concept.py, art/reference/staff_v1/imported/hero_<n>.png), with the frame counts every hero set has
-(presentation/arena/animation.gd); the run is a real 6-frame cycle (tools/art/import_staff_run.py). Elsewhere only key poses
+(presentation/arena/animation.gd); the run is a real 12-frame cycle (tools/art/import_staff_run.py). Elsewhere only key poses
 exist so far, so motion is a pixel-art breath (the upper body sinks one pixel) and pose changes.
 
-    idle      pose 1, breathing              walk      the run cycle (tools/art/import_staff_run.py), leaning forward
+    idle      pose 1, breathing              walk      the 12-frame run (tools/art/import_staff_run.py), leaning forward
     dash      pose 6 (the blink dissolve)    parry     pose 5 (the staff planted)
     hurt      pose 7                         victory   pose 8 (the staff raised), breathing
     attack1/2 the cast: pose 3 (pointing the staff), back to 1 at the end of the recovery
@@ -94,19 +94,21 @@ def breathe(canvas: dict, anchor: tuple[int, int]) -> dict:
     return out
 
 
-RUN = {m["file"]: m for m in json.loads((IMPORTED / "run.json").read_text(encoding="utf-8"))["frames"]}
+RUN = {m["file"]: m for name in ("run.json", "run_ib.json") for m in json.loads((IMPORTED / name).read_text(encoding="utf-8"))["frames"]}
 
 
 def run_frame(n: int) -> tuple[dict, tuple[int, int]]:
-    """Frame n of the run cycle (owner 2026-11-02: a smoother run, leaning forward): the generated run sheet cut to game scale
-    by tools/art/import_staff_run.py (art/reference/staff_v1/imported/run_<n>.png, the katana run's poses with the staff)."""
-    m = RUN[f"run_{n}.png"]
+    """Frame n (1-12) of the run cycle (owner 2026-11-02: "try 12 frames"): the six generated run poses (run_<k>.png, the katana
+    run's poses with the staff) interleaved with their six generated in-betweens (run_ib_<k>.png), both cut to game scale by
+    tools/art/import_staff_run.py: odd frames are run_1..6, even frames run_ib_1..6."""
+    k = (n + 1) // 2
+    m = RUN[f"run_{k}.png" if n % 2 else f"run_ib_{k}.png"]
     return grid_of(Image.open(IMPORTED / m["file"])), (m["ax"], m["ay"])
 
 
 HERO_FRAMES: dict[str, list[tuple[int, bool]]] = {  # pose -> [(key pose, breath)] per frame
     "idle": [(1, False), (1, False), (1, True), (1, True)],
-    "walk": [(0, False)] * 6,  # the generated run cycle (run_frame()), not a key pose
+    "walk": [(0, False)] * 12,  # the generated 12-frame run cycle (run_frame()), not a key pose
     "dash": [(6, False)] * 4,
     "parry": [(5, False)] * 6,
     "hurt": [(7, False)] * 4,
