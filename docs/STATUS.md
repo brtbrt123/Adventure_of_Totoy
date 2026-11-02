@@ -1,3 +1,14 @@
+## Mobile blueprint (2026-11-02, Claude, a proposal while Codex is out)
+
+Owner: "make a blueprint for how it is gonna look if we do a mobile".
+- art/reference/mobile_v1/mobile_blueprint.png is made from the real game:
+  - a phone-shaped capture, 20:9 with the expand aspect: 480 x 216 game px;
+  - the desktop HUD captured alone over magenta and moved to the top.
+- Touch controls in the HUD's style: a floating stick on the left; on the right, Attack (the weapon medallion) with Parry, Dash and the weapon skill on an inner ring and the Z/X/C aspect slots on an outer ring; items above the stick; pause top-right; a tap bubble for interact.
+- Also on the sheet: sizes in mm, thumb zones and safe area, the 16:9 version and what it takes.
+- Notes and open questions: docs/MOBILE_BLUEPRINT.md. Tools: tools/art/mobile_blueprint.py, presentation/review/mobile/capture_mobile_view.gd (window only).
+- Nothing in the game changed. Not done: any touch input, export or device test.
+
 ## Hero effects in the staff's style, phase 1: hits, parries, dash and the basic slash (2026-11-02, Claude, done while Codex is out)
 
 Owner: "I like the effects of the staff skill, can you redo all effects, aspects, attacks of mobs and hero except the golem".
