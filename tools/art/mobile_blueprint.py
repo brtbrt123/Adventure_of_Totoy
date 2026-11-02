@@ -10,7 +10,8 @@ The touch controls are drawn here as pixel art at game scale (1 game px = 3 px h
 Sizes are in game px and in millimetres on a 6.5 inch 20:9 phone (216 game px tall = 68 mm, so 1 game px = 0.31 mm); a touch
 target should be at least 7 mm (about 22 game px).
 
-    python tools/art/mobile_blueprint.py      # writes art/reference/mobile_v1/mobile_blueprint.png
+    python tools/art/mobile_blueprint.py      # writes art/reference/mobile_v1/mobile_blueprint.png and mobile_screen.png
+                                              # (the phone's screen alone, 1440x648, no notes: a reference for other tools)
 """
 from __future__ import annotations
 
@@ -389,7 +390,8 @@ def main() -> int:
         d.text((x3, ly + 52 + k * 27), t, font=font(19, False), fill=col)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(OUT)
-    print("wrote", OUT, canvas.size)
+    screen.convert("RGB").save(OUT.with_name("mobile_screen.png"))
+    print("wrote", OUT, canvas.size, "and", OUT.with_name("mobile_screen.png").name)
     return 0
 
 
