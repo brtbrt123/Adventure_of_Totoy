@@ -98,7 +98,7 @@ func sync(view: Explore.ExploreSnapshot) -> void:
 			breaks[id] = view.tick
 			_burst("stomp", mob["position"], view.tick)
 		if mob["state"] == &"dead" and previous.has(id) and previous[id] != &"dead":
-			_burst("crash", Vector2(mob["position"]) + Vector2(0, -4), view.tick, {"dir": Vector2(mob["facing"])})
+			_burst("crash", Vector2(mob["position"]) + Vector2(0, -4), view.tick, {"dir": Vector2(mob["facing"]), "warden": true})
 		previous[id] = mob["state"]
 		# Footfalls: the walk's planted frames stamp dust and a print under the foot that came down.
 		var key: String = MobView.frame(mob, view.telegraphs, view.tick)

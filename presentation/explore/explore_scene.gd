@@ -422,6 +422,7 @@ func advance(intent: InputFrame) -> void:
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
 	creature_effects.sync(snapshot)
+	shake_left = maxi(shake_left, creature_effects.fx.take_shake())  # the mobs' heavy blows shake the view
 	progression_view.sync(snapshot, colors, frames, sprites)
 	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
@@ -1128,8 +1129,9 @@ func _sync_moving_lights() -> void:
 		if mob["type"] == &"warden":
 			keys[int(mob["id"])] = MobView.frame(mob, snapshot.telegraphs, snapshot.tick)
 	var moving: Array[Dictionary] = WardenEffects.lamps(snapshot.mobs, keys)
-	moving.append_array(staff_lamps())
-	moving.append_array(impact_lamps())  # hits and parries flash on the ground  # the Star Staff's circle, meteor, blast and crater light the ground
+	moving.append_array(staff_lamps())  # the Star Staff's circle, meteor, blast and crater light the ground
+	moving.append_array(impact_lamps())  # hits, parries, the weapon forms and the aspects flash on the ground
+	moving.append_array(creature_effects.fx.lamps(snapshot.tick))  # the mobs' slams, releases and pops
 	if moving.is_empty() and _moving_lamps == 0:
 		return
 	var points: PackedVector4Array = (_static_lamps["points"] as PackedVector4Array).duplicate()

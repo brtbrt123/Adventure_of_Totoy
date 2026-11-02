@@ -6,7 +6,10 @@ const Snapshots := preload("res://core/snapshots.gd")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const Particles := preload("res://presentation/explore/creature_particles.gd")
 const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
+const MobFxView := preload("res://presentation/explore/mob_fx_view.gd")
 var warden: WardenEffects = WardenEffects.new()
+## The staff-style live layer on the same bursts: stones that bounce, dust rings, rings on the ground, light, shake.
+var fx: MobFxView = MobFxView.new()
 const FxSettings := preload("res://presentation/effects/fx_settings.gd")  # the owner's sizes and times (presentation/effects/fx_settings.tres)
 static var SLAM_TICKS: int = FxSettings.current().slam_ticks  # how long the slam's ground effects last after the hit tick
 var tells: Dictionary = {}
@@ -25,6 +28,7 @@ var last_tick: int = -1
 
 func clear() -> void:
 	warden.clear()
+	fx.clear()
 	tells.clear()
 	previous.clear()
 	trails.clear()
@@ -46,6 +50,7 @@ func sync(view: ExploreCore.ExploreSnapshot) -> void:
 		return
 	scene_id = view.scene_id
 	last_tick = view.tick
+	fx.step(view.tick)
 	warden.sync(view)
 	for burst: Dictionary in warden.pending_bursts:
 		emit(String(burst["kind"]), burst["at"], int(burst["tick"]), burst.get("extra", {}))
@@ -144,6 +149,7 @@ func emit(kind: String, at: Vector2, tick: int, extra: Dictionary = {}) -> void:
 	var burst: Dictionary = {"kind": kind, "at": at, "tick": tick, "seed": tick * 131 + _burst_serial * 7919}
 	burst.merge(extra)
 	bursts.append(burst)
+	fx.burst(kind, at, tick, extra)
 
 
 ## The horn tips of the Stag, where the chant gathers and the release flies from.
@@ -231,6 +237,7 @@ static func draw_slam_shock(canvas: CanvasItem, tell: Snapshots.TelegraphSnapsho
 		canvas.draw_polyline(rim, colors["j"] if age < 14 else colors["h"], 1.0, false)
 
 func draw_ground(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
+	fx.draw_ground(canvas, colors, frames, atlas, view.tick)
 	warden.draw_ground(canvas, view.tick, colors, frames, atlas)
 	warden.draw_feet(canvas, view.mobs)
 	for plan: Dictionary in ground_plans(view):
@@ -283,6 +290,7 @@ static func draw_links(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, co
 func draw_overlay(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, atlas: Texture2D, colors: Dictionary) -> void:
 	warden.draw_overlay(canvas, view.mobs, view.tick, frames, atlas)
 	Particles.draw(canvas, bursts, view.tick, colors)
+	fx.draw_air(canvas, colors, frames, atlas)
 	draw_links(canvas, view, colors)
 	for orb: Dictionary in orbs.values():
 		var path: Array = orb["path"]

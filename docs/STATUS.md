@@ -1,3 +1,35 @@
+## Hero effects in the staff's style, phase 4: the mobs' attacks (2026-11-02, Claude, done while Codex is out)
+
+Owner: "Yes, start phase 4" (the mobs' attacks, not the golem). This ends the effects redo the owner asked for ("redo all effects, aspects, attacks of mobs and hero except the golem").
+
+- **Frames.** tools/art/make_mob_fx_art.py redraws 35 chapter 1 frames with the staff's code, at the same names, counts, sizes and anchors. Flat dithered dust and specks become solid shaded puffs, clods, stones, leaves, glowing motes and rings:
+  - the boar's crash and dust;
+  - the leaf puff;
+  - the moth trail;
+  - the purify sparkle;
+  - the stag's slam rubble;
+  - the orb pop.
+- **Kept art.** These keep their art:
+  - The Warden's attached effects are pinned pixel for pixel to its reviewed reference (tests/test_warden_art.py).
+  - The root spikes, the glowing orb and the stag's chant, horns and summon already read well.
+- **Live layer.** presentation/explore/mob_fx_view.gd, owned by creature_effects.gd, takes the same bursts the creature effects emit and adds:
+  - stones thrown up that bounce, and dust rings;
+  - rings on the ground for the stag's slam and roar and the Warden's stagger and fall;
+  - stone chips and sparks off the Warden's guard;
+  - motes and sparks for chants, releases, heals and orb pops;
+  - light for the road's lamps, and a shake for the heavy blows.
+  - The Warden's fall now says it is the Warden's (warden_effects.gd), so it lands heavier than a boar's crash.
+- **Review files:** the in-game GIFs are art/reference/mob_fx_v1/ingame/:
+  - trial_waves: mosslings and boars;
+  - warden: its blows and its fall;
+  - stag: in its glade.
+  - They were captured by presentation/review/hero_fx/capture_mobs.gd (window only; one scene per run, `-- --part=stag` for the glade). All frames are on art/reference/mob_fx_v1/frames.png.
+- **Tests:**
+  - Python 94 pass, the Warden art test included.
+  - Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+- **Mistake, fixed:** writing the new layer, I first named it presentation/explore/mob_view.gd and overwrote the existing file of that name (the mobs' poses). It was committed and unchanged, so it is restored from git, and the new layer is mob_fx_view.gd.
+- **Not done:** nobody has played phases 1 to 4.
+
 ## Hero effects in the staff's style, phase 3: the aspects (2026-11-02, Claude, done while Codex is out)
 
 Owner: "Yes, start phase 3" (the aspects).
