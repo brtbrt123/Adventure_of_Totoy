@@ -3167,36 +3167,36 @@
    "anchors": [
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ]
    ],
    "frame_sizes": [
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ]
    ],
@@ -3209,10 +3209,10 @@
    "hero_frame": "totoy_staff_walk_right_1",
    "anchor": [
     12,
-    31
+    29
    ],
    "size": [
-    40,
+    32,
     32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
@@ -3221,20 +3221,20 @@
    "frames": 4,
    "anchors": [
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ]
    ],
    "frame_sizes": [
@@ -3263,8 +3263,8 @@
    ],
    "hero_frame": "totoy_staff_walk_right_2",
    "anchor": [
-    10,
-    31
+    11,
+    29
    ],
    "size": [
     32,
@@ -3276,38 +3276,38 @@
    "frames": 4,
    "anchors": [
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ]
    ],
    "frame_sizes": [
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ]
    ],
    "ms": [
@@ -3318,12 +3318,12 @@
    ],
    "hero_frame": "totoy_staff_walk_right_3",
    "anchor": [
-    9,
-    32
+    10,
+    29
    ],
    "size": [
     32,
-    40
+    32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
   },
@@ -3332,36 +3332,36 @@
    "anchors": [
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ]
    ],
    "frame_sizes": [
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ]
    ],
@@ -3374,10 +3374,10 @@
    "hero_frame": "totoy_staff_walk_right_4",
    "anchor": [
     12,
-    31
+    30
    ],
    "size": [
-    40,
+    32,
     32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
@@ -3386,20 +3386,20 @@
    "frames": 4,
    "anchors": [
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ]
    ],
    "frame_sizes": [
@@ -3428,8 +3428,8 @@
    ],
    "hero_frame": "totoy_staff_walk_right_5",
    "anchor": [
-    10,
-    31
+    11,
+    29
    ],
    "size": [
     32,
@@ -3441,38 +3441,38 @@
    "frames": 4,
    "anchors": [
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ]
    ],
    "frame_sizes": [
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ]
    ],
    "ms": [
@@ -3483,12 +3483,12 @@
    ],
    "hero_frame": "totoy_staff_walk_right_6",
    "anchor": [
-    9,
-    32
+    10,
+    30
    ],
    "size": [
     32,
-    40
+    32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
   },
@@ -6079,28 +6079,28 @@
    "anchors": [
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ]
    ],
    "frame_sizes": [
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ]
    ],
@@ -6112,10 +6112,10 @@
    ],
    "anchor": [
     12,
-    31
+    29
    ],
    "size": [
-    40,
+    32,
     32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw BEHIND the hero at an earlier position (or behind_px against his facing), mirrored with him"
@@ -6124,16 +6124,16 @@
    "frames": 3,
    "anchors": [
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ]
    ],
    "frame_sizes": [
@@ -6157,8 +6157,8 @@
     36
    ],
    "anchor": [
-    10,
-    31
+    11,
+    29
    ],
    "size": [
     32,
@@ -6170,30 +6170,30 @@
    "frames": 3,
    "anchors": [
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ]
    ],
    "frame_sizes": [
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ]
    ],
    "hero_frame": "totoy_staff_walk_right_3",
@@ -6203,12 +6203,12 @@
     36
    ],
    "anchor": [
-    9,
-    32
+    10,
+    29
    ],
    "size": [
     32,
-    40
+    32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw BEHIND the hero at an earlier position (or behind_px against his facing), mirrored with him"
   },
@@ -6217,28 +6217,28 @@
    "anchors": [
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ]
    ],
    "frame_sizes": [
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ]
    ],
@@ -6250,10 +6250,10 @@
    ],
    "anchor": [
     12,
-    31
+    30
    ],
    "size": [
-    40,
+    32,
     32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw BEHIND the hero at an earlier position (or behind_px against his facing), mirrored with him"
@@ -6262,16 +6262,16 @@
    "frames": 3,
    "anchors": [
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ]
    ],
    "frame_sizes": [
@@ -6295,8 +6295,8 @@
     36
    ],
    "anchor": [
-    10,
-    31
+    11,
+    29
    ],
    "size": [
     32,
@@ -6308,30 +6308,30 @@
    "frames": 3,
    "anchors": [
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ]
    ],
    "frame_sizes": [
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ]
    ],
    "hero_frame": "totoy_staff_walk_right_6",
@@ -6341,12 +6341,12 @@
     36
    ],
    "anchor": [
-    9,
-    32
+    10,
+    30
    ],
    "size": [
     32,
-    40
+    32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw BEHIND the hero at an earlier position (or behind_px against his facing), mirrored with him"
   },
@@ -10005,52 +10005,52 @@
    "anchors": [
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ],
     [
      12,
-     31
+     29
     ]
    ],
    "frame_sizes": [
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ]
    ],
@@ -10065,10 +10065,10 @@
    "hero_frame": "totoy_staff_walk_right_1",
    "anchor": [
     12,
-    31
+    29
    ],
    "size": [
-    40,
+    32,
     32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
@@ -10077,28 +10077,28 @@
    "frames": 6,
    "anchors": [
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ]
    ],
    "frame_sizes": [
@@ -10137,8 +10137,8 @@
    ],
    "hero_frame": "totoy_staff_walk_right_2",
    "anchor": [
-    10,
-    31
+    11,
+    29
    ],
    "size": [
     32,
@@ -10150,54 +10150,54 @@
    "frames": 6,
    "anchors": [
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ],
     [
-     9,
-     32
+     10,
+     29
     ]
    ],
    "frame_sizes": [
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ]
    ],
    "ms": [
@@ -10210,12 +10210,12 @@
    ],
    "hero_frame": "totoy_staff_walk_right_3",
    "anchor": [
-    9,
-    32
+    10,
+    29
    ],
    "size": [
     32,
-    40
+    32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
   },
@@ -10224,52 +10224,52 @@
    "anchors": [
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ],
     [
      12,
-     31
+     30
     ]
    ],
    "frame_sizes": [
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ],
     [
-     40,
+     32,
      32
     ]
    ],
@@ -10284,10 +10284,10 @@
    "hero_frame": "totoy_staff_walk_right_4",
    "anchor": [
     12,
-    31
+    30
    ],
    "size": [
-    40,
+    32,
     32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
@@ -10296,28 +10296,28 @@
    "frames": 6,
    "anchors": [
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ],
     [
-     10,
-     31
+     11,
+     29
     ]
    ],
    "frame_sizes": [
@@ -10356,8 +10356,8 @@
    ],
    "hero_frame": "totoy_staff_walk_right_5",
    "anchor": [
-    10,
-    31
+    11,
+    29
    ],
    "size": [
     32,
@@ -10369,54 +10369,54 @@
    "frames": 6,
    "anchors": [
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ],
     [
-     9,
-     32
+     10,
+     30
     ]
    ],
    "frame_sizes": [
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ],
     [
      32,
-     40
+     32
     ]
    ],
    "ms": [
@@ -10429,12 +10429,12 @@
    ],
    "hero_frame": "totoy_staff_walk_right_6",
    "anchor": [
-    9,
-    32
+    10,
+    30
    ],
    "size": [
     32,
-    40
+    32
    ],
    "anchor_meaning": "the hero frame's feet point inside the crop; draw on top of that hero frame, mirrored with him"
   },

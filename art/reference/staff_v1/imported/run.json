@@ -1,0 +1,91 @@
+{
+ "generator": "tools/art/import_staff_run.py",
+ "source": "art/reference/staff_v1/Staff_Run.png",
+ "scale": 0.1148,
+ "frames": [
+  {
+   "file": "run_1.png",
+   "w": 27,
+   "h": 30,
+   "ax": 12,
+   "ay": 29
+  },
+  {
+   "file": "run_2.png",
+   "w": 27,
+   "h": 30,
+   "ax": 11,
+   "ay": 29
+  },
+  {
+   "file": "run_3.png",
+   "w": 27,
+   "h": 30,
+   "ax": 10,
+   "ay": 29
+  },
+  {
+   "file": "run_4.png",
+   "w": 27,
+   "h": 31,
+   "ax": 12,
+   "ay": 30
+  },
+  {
+   "file": "run_5.png",
+   "w": 27,
+   "h": 30,
+   "ax": 11,
+   "ay": 29
+  },
+  {
+   "file": "run_6.png",
+   "w": 27,
+   "h": 31,
+   "ax": 10,
+   "ay": 30
+  },
+  {
+   "file": "run_7.png",
+   "w": 27,
+   "h": 33,
+   "ax": 9,
+   "ay": 32
+  },
+  {
+   "file": "run_8.png",
+   "w": 27,
+   "h": 33,
+   "ax": 8,
+   "ay": 32
+  },
+  {
+   "file": "run_9.png",
+   "w": 27,
+   "h": 33,
+   "ax": 9,
+   "ay": 32
+  },
+  {
+   "file": "run_10.png",
+   "w": 27,
+   "h": 32,
+   "ax": 9,
+   "ay": 31
+  },
+  {
+   "file": "run_11.png",
+   "w": 27,
+   "h": 33,
+   "ax": 9,
+   "ay": 32
+  },
+  {
+   "file": "run_12.png",
+   "w": 27,
+   "h": 33,
+   "ax": 8,
+   "ay": 32
+  }
+ ]
+}

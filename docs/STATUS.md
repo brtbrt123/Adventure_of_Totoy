@@ -1,3 +1,13 @@
+## Star Staff run cycle from image generation (2026-11-02, Claude, done while Codex is out)
+
+Owner: a 12-frame run sheet "as reference for more smooth animation", then "generate frames instead" (the sheet never reached a file).
+- art/reference/staff_v1/Staff_Run.png (Nano Banana 2.1, 2 tries x 1.5 credits; job ids in sources.json).
+  - The first try mixed standing poses and copies of its reference, so it was not kept.
+  - The second used the staff idle frame (the design) and the katana run cycle (the motion) as references. Its top row is the katana run's six poses with the staff held low, the crescent leading. Its bottom row of in-betweens stands more upright, which would make the lean wobble, so it is cut but not used.
+- tools/art/import_staff_run.py cuts it to game scale as tall as the katana run (31 px), with the anchor on the row's ground line and 7 px behind the head like the katana run, so the body does not jitter.
+- totoy_staff_walk_right_1..6 are now that cycle: the legs alternate, it leans forward, and the staff stays in hand. This replaces the warped single pose. The aspect overlays were regenerated for the new frames.
+- Preview: art/reference/staff_v1/preview/staff_run_cycle.gif (beside the katana run). Animation, aspects, animation library, character menu and variant atlas smokes pass.
+
 ## Star Staff wired into the game (2026-11-01, Claude, done while Codex is out)
 
 Owner: "yes I like what you did, wire them".

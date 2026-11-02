@@ -2,10 +2,10 @@
 
 Hero frames (totoy_staff_<pose>_right_<n>): built from the 8 key poses cut from the staff concept
 (tools/art/import_staff_concept.py, art/reference/staff_v1/imported/hero_<n>.png), with the frame counts every hero set has
-(presentation/arena/animation.gd). Only key poses exist so far, so motion is a pixel-art breath (the upper body sinks one pixel)
-and pose changes; proper animation sheets are the next art step.
+(presentation/arena/animation.gd); the run is a real 6-frame cycle (tools/art/import_staff_run.py). Elsewhere only key poses
+exist so far, so motion is a pixel-art breath (the upper body sinks one pixel) and pose changes.
 
-    idle      pose 1, breathing              walk      the stride (2) leaning forward 16 degrees, bouncing
+    idle      pose 1, breathing              walk      the run cycle (tools/art/import_staff_run.py), leaning forward
     dash      pose 6 (the blink dissolve)    parry     pose 5 (the staff planted)
     hurt      pose 7                         victory   pose 8 (the staff raised), breathing
     attack1/2 the cast: pose 3 (pointing the staff), back to 1 at the end of the recovery
@@ -94,63 +94,19 @@ def breathe(canvas: dict, anchor: tuple[int, int]) -> dict:
     return out
 
 
-# The staff in the two key poses the run uses (pixel coordinates of the imported frames hero_1 / hero_2): the crescent's box,
-# the shaft as a segment, and the hand that grips it. The lean moves this layer rigidly with the hand, like the katana's blade.
-STAFF_PARTS = {
-    1: {"crystal": (14, 0, 20, 9), "shaft": ((15.5, 8.0), (15.5, 33.5)), "grip": (16, 16)},
-    2: {"crystal": (19, 3, 28, 13), "shaft": ((21.5, 12.0), (14.0, 19.5)), "grip": (18, 19)},
-}
-SKIN = set("qrs")
-RUN_LEAN = 16.0  # degrees (the katana's run leans 21; the staff's crescent sits by his head, so a little less keeps it clear)
+RUN = {m["file"]: m for m in json.loads((IMPORTED / "run.json").read_text(encoding="utf-8"))["frames"]}
 
 
-def staff_pixels(canvas: dict, key: int) -> set[tuple[int, int]]:
-    parts = STAFF_PARTS[key]
-    x0, y0, x1, y1 = parts["crystal"]
-    (ax, ay), (bx, by) = parts["shaft"]
-    out = set()
-    for (x, y), s in canvas.items():
-        if x0 <= x <= x1 and y0 <= y <= y1 and s not in SKIN:
-            out.add((x, y))
-            continue
-        t = max(0.0, min(1.0, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / ((bx - ax) ** 2 + (by - ay) ** 2)))
-        if ((x - ax - t * (bx - ax)) ** 2 + (y - ay - t * (by - ay)) ** 2) ** 0.5 <= 1.1 and s not in SKIN:
-            out.add((x, y))
-    return out
-
-
-def leaned(canvas: dict, anchor: tuple[int, int], n: int, key: int) -> tuple[dict, tuple[int, int]]:
-    """The run leaning forward (owner 2026-11-01: "I want him leaning forward"): the katana hero's pose-aware lean
-    (tools/art/make_hero_lean_sheet.py, its WALK pose for walk frame n: the torso rotates forward around the hips, the head
-    stays upright, the hips slide forward and the stride widens). The staff is its own layer (STAFF_PARTS) moved rigidly with
-    the hand, as the katana's blade is. The frame gets room in front first: the lean pushes the head and the staff forward."""
-    import make_hero_lean_sheet as L
-    xs = [x for x, _ in canvas]
-    ys = [y for _, y in canvas]
-    left, top = min(xs) - 4, min(ys) - 6
-    w, h = max(xs) - left + 1 + 18, max(anchor[1], max(ys)) - top + 1
-    grid = [[L.T] * w for _ in range(h)]
-    for (x, y), s in canvas.items():
-        grid[y - top][x - left] = s
-    local = (anchor[0] - left, anchor[1] - top)
-    staff = {(x - left + L.PAD, y - top + L.PAD) for x, y in staff_pixels(canvas, key)}
-    gx, gy = STAFF_PARTS[key]["grip"]
-    # the cycle: a long stride (hips low), a shorter one, then passing (narrow, hips up a pixel), twice: the run bounces
-    stride, drop = [(1.4, 1), (1.22, 1), (1.04, 0)][(n - 1) % 3]
-    pose = L.P(**{**L.WALK, "lean": RUN_LEAN, "level": 0.5, "stride": stride, "drop": drop, "grip": (gx - left, gy - top)})
-    saved_load, saved_mask = L.load, L.katana_mask
-    L.load = lambda name: ([row[:] for row in grid], local)
-    L.katana_mask = lambda g: set(staff)
-    try:
-        frame = L.build_frame("walk", n, f"totoy_staff_walk_right_{n}", pose)
-    finally:
-        L.load, L.katana_mask = saved_load, saved_mask
-    return {(x, y): s for y, row in enumerate(frame.grid) for x, s in enumerate(row) if s != L.T}, tuple(frame.anchor)
+def run_frame(n: int) -> tuple[dict, tuple[int, int]]:
+    """Frame n of the run cycle (owner 2026-11-02: a smoother run, leaning forward): the generated run sheet cut to game scale
+    by tools/art/import_staff_run.py (art/reference/staff_v1/imported/run_<n>.png, the katana run's poses with the staff)."""
+    m = RUN[f"run_{n}.png"]
+    return grid_of(Image.open(IMPORTED / m["file"])), (m["ax"], m["ay"])
 
 
 HERO_FRAMES: dict[str, list[tuple[int, bool]]] = {  # pose -> [(key pose, breath)] per frame
     "idle": [(1, False), (1, False), (1, True), (1, True)],
-    "walk": [(2, False)] * 6,  # the stride pose, leaned forward (leaned()); frames 3 and 6 pass upright-ish and higher
+    "walk": [(0, False)] * 6,  # the generated run cycle (run_frame()), not a key pose
     "dash": [(6, False)] * 4,
     "parry": [(5, False)] * 6,
     "hurt": [(7, False)] * 4,
@@ -165,11 +121,9 @@ HERO_FRAMES: dict[str, list[tuple[int, bool]]] = {  # pose -> [(key pose, breath
 def hero_sprites(written: list[str]) -> None:
     for name, frames in HERO_FRAMES.items():
         for i, (key, breath) in enumerate(frames, start=1):
-            canvas, anchor = pose(key)
+            canvas, anchor = run_frame(i) if name == "walk" else pose(key)
             if breath:
                 canvas = breathe(canvas, anchor)
-            if name == "walk":
-                canvas, anchor = leaned(canvas, anchor, i, key)
             write(f"{PREFIX_HERO}{name}_right_{i}", canvas, anchor, written)
 
 
