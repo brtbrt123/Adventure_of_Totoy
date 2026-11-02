@@ -198,6 +198,9 @@ func _draw() -> void:
 	if _warming:
 		_warming = false
 		_draw_warmup()
+		# the warm-up is faint, but its draws stay on screen until the next redraw: the stacked passes of all the cut-ins
+		# showed as a white haze across the top of the road and the fight (owner 2026-11-02), so they are cleared next frame
+		queue_redraw.call_deferred()
 		return
 	if not active or not available:
 		return

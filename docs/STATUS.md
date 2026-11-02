@@ -1,3 +1,14 @@
+## Debugging from the first scene: the white haze at the top (2026-11-02, Claude, done while Codex is out)
+
+Owner: "lets start debugging starting to the first scene", then "whats this like the white" (a haze beside the objective bar).
+
+- **The start runs clean.** presentation/review/playthrough/capture_start.gd plays it from the main scene with real input events in real time: the title, NEW GAME, the intro (each panel, then a skip), the village arrival, walking about, talking to Mira. It uses a throwaway save (user://playthrough_save.json), so the owner's save is untouched. The console shows no errors or warnings.
+- **The haze.** Each weapon cut-in draws one "invisible" warm-up pass (alpha 0.01) when the scene loads, to load its textures and fonts. That pass was never cleared, so its title strings stayed on screen until the cut-in first played.
+  - Four cut-ins (Black Form, Lightning Form, Reaper's Coil, Disintegration) stack dozens of these faint passes. Together they showed as a white haze across the top of the road and the fight.
+  - Found by hiding the HUD's nodes one at a time on a frozen frame.
+  - Fix: each cut-in redraws on the next frame, which clears the warm-up (presentation/arena/*_cutin.gd). Checked on the arrival frame: the haze is gone.
+- **Tests:** Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window, as before.
+
 ## Hero effects in the staff's style, phase 4: the mobs' attacks (2026-11-02, Claude, done while Codex is out)
 
 Owner: "Yes, start phase 4" (the mobs' attacks, not the golem). This ends the effects redo the owner asked for ("redo all effects, aspects, attacks of mobs and hero except the golem").
