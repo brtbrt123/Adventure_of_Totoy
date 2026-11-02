@@ -1,4 +1,41 @@
-# HANDOFF: Adventure of Totoy (current checkpoint 2026-10-31)
+# HANDOFF: Adventure of Totoy (current checkpoint 2026-11-02)
+
+> **START HERE for the next session (Claude, 2026-11-02).** The owner stopped the last session: "I don't like what it looks, your work is not good". The session was too long, so this is a fresh start.
+>
+> **Committed and pushed** on `agent/codex/progression` (last commit `d5d4cdcf`; never merge to `main`):
+> - The effects redo in the Star Staff's style, in four phases: hero hits, parries and the basic slash on the hit area; the weapon forms; the aspects; the mobs (not the golem). The owner has not played them.
+> - A mobile layout blueprint: `docs/MOBILE_BLUEPRINT.md`.
+> - The fix for the white haze across the top of the screen (the weapon cut-ins' warm-up draw).
+> - A real-input playthrough of the game's start: `presentation/review/playthrough/capture_start.gd`. The title, intro, village arrival and Mira all ran with no console errors.
+> - Details are in the newest sections of [[STATUS]].
+>
+> **NOT committed: village work in progress that the owner did not like the look of.** The owner asked, looking at the rune gate: "move the gate more on upper left", "it doesn't have any wall and fences add it", "the glowing stone is not glowing", "remove the knock on the hut". What is in the working tree:
+> - **Gate.** Moved from (48,128) to (42,108) up the painted path, so its arch is now cut off at the top of the arrival view. The arrival entry and its checkpoint moved to (68,126). File: `data/scenes/village_layered_props.json`.
+> - **Walls and fences, drawn in code.** These are probably what the owner disliked: plain grey blocks next to the painted props.
+>   - Two `village_wall` beside the gate and three `village_fence_side` down the west edge.
+>   - New types in `data/props/prop_defs.json`, contact shadows in `presentation/common/prop_art.json`, cast shadows in `art/reference/shadow_layers/manifest.json`.
+>   - Art in `art/src/village_wall*.txt`, `village_fence*.txt` and `fx_shadow_village_wall*/fence*`, made by `tools/art/make_village_walls.py`.
+>   - Scenes `presentation/props/village_wall.tscn`, `village_fence.tscn` and `village_fence_side.tscn`.
+> - **Glowing stone.** A teal light socket for `village_standing_stone` in `presentation/common/local_lights.json`, and its `Light1` marker in `presentation/props/village_standing_stone.tscn`. In game it glowed correctly.
+> - **Knock.** The `edda_door` object (the [E] KNOCK on Edda's cottage) is removed from the village data.
+> - **Tests** adjusted: `tests/core/test_village_layered.gd`, `tests/core/test_explore_core.gd`, `tests/test_village_extraction.py`. At the last run, core 577 and Python 94 passed. The full smoke run was stopped by the owner.
+> - **Art build.** `art/build/*` was rebuilt with these sprites, and the contact sheets may be stale.
+>
+> **First step:** ask the owner which of the four village changes to keep. The stone light and the knock removal match what was asked. If the walls and fences are redone, they need art that matches the painted village (`art/reference/layered_village/`), not code-drawn blocks. The gate may need to come back down so its arch shows.
+>
+> To drop all of it: run `git checkout HEAD --` on the tracked files listed above and delete the new untracked ones (`art/src/village_wall*`, `art/src/village_fence*`, `art/src/fx_shadow_village_wall*`, `art/src/fx_shadow_village_fence*`, `presentation/props/village_wall*.tscn`, `presentation/props/village_fence*.tscn`, `tools/art/make_village_walls.py`). Then rebuild the art (validate, build, preview).
+>
+> **Working rules this owner holds:**
+> - The owner points out visual problems; Claude chases functional bugs (console errors, broken flow).
+> - Show the owner a picture before changing how something looks.
+> - Never touch the owner's uncommitted scenes: `intro.tscn`, `dialogue_box.tscn`, `explore_overlay.tscn`, `aspect_socket.tscn`, `scene_ribbon.tscn`, `welcome_card.tscn`, `result_panel.tscn`, plus `project.godot`. Ask before committing them.
+> - Commit only your own hunks of shared docs (STATUS, INDEX).
+> - No Co-Authored-By lines. Push after each commit.
+>
+> **Gotchas:**
+> - The Godot editor is often open. It locks `art/build` files (Errno 22: retry), and it deletes and recreates `art/build/contact_sheet_*.png.import`. Restore those with `git checkout HEAD --`.
+> - `tools/godot/generate_prop_scenes.py` also reformats the `presentation/props/hollow_trial_*.tscn` scenes. Restore those after running it.
+> - Three smokes only pass with a window: `smoke_capture_hero`, `smoke_gemini_capture`, `smoke_hero_capture`.
 
 > **START HERE for the new Codex chat (2026-10-31):** read [[WARDEN_INTEGRATION]] and [[CODEX_NEXT_SESSION_warden]]. Owner authorized wiring after requesting a 2.5x body. Warden now has60 installed enlarged poses,75 attached FX, actual-core-geometry floor effects and13 recorded sound cues. Runtime review media is in `presentation/review/warden/`. See the integration note for final test status. Claude cross-review remains pending because its OAuth session expired. Trial room/waves/rewards remain separate. Branch `agent/codex/progression`; preserve the dirty worktree and never merge main.
 
