@@ -417,6 +417,7 @@ func _restart() -> void:
 	staff_view.clear()
 	impact_view.clear()
 	form_view.clear()
+	aspect_view.clear()
 	close_menu()
 	lightning_fx.clear()
 	coil_fx.clear()

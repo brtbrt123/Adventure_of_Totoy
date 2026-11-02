@@ -266,6 +266,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	staff_view.clear()
 	impact_view.clear()
 	form_view.clear()
+	aspect_view.clear()
 	lightning_fx.clear()
 	coil_fx.clear()
 	coil_hook_tick = -1

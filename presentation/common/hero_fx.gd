@@ -20,6 +20,7 @@ const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const StaffView := preload("res://presentation/common/staff_view.gd")
 const ImpactView := preload("res://presentation/common/impact_view.gd")
 const FormView := preload("res://presentation/common/form_view.gd")
+const AspectView := preload("res://presentation/common/aspect_view.gd")
 const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
 const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
@@ -31,6 +32,8 @@ var staff_view: StaffView = StaffView.new()
 var impact_view: ImpactView = ImpactView.new()
 ## The live part of the weapon forms (Black Katana, Lightning Form, Reaper's Coil): embers, crackles, sparks, dust, light.
 var form_view: FormView = FormView.new()
+## The live part of the aspects (Lantern, Phantom Cut, Echo Step, Stone Ward, Sprint, the skills): motes, sparks, dust, light.
+var aspect_view: AspectView = AspectView.new()
 ## Count actual render submissions of the blades' slash (tests check both the road and the arena use this shared entry point).
 var swing_draws: int = 0
 
@@ -185,6 +188,7 @@ func on_hero_skill_event(event: GameEvent) -> bool:
 		return false
 	released_skill_attacks[attack_id] = true
 	current_skill_release = event.data.duplicate()
+	aspect_view.skill(_cosmetic_tick(), StringName(event.data.get("skill_id", &"")), fx_hero())
 	return true
 
 
@@ -242,6 +246,7 @@ func age_hero_fx() -> void:
 		staff_view.step(cosmetic_tick, hero)
 		impact_view.step(cosmetic_tick, hero)
 		form_view.step(cosmetic_tick, hero)
+		aspect_view.step(cosmetic_tick, hero, hero_moving)
 		var swing: Dictionary = hero_swing_plan()
 		if not swing.is_empty() and float(swing["fade"]) >= 1.0:  # sparks fly off the blade's end while it sweeps
 			var lead: Vector2 = SwingArc.lead_point(swing)
@@ -269,12 +274,14 @@ func _draw_impact_ground() -> void:
 	if sprites != null:
 		impact_view.draw_ground(self, colors, frames, sprites, _cosmetic_tick(), EMISSIVE_ALPHA)
 		form_view.draw_ground(self, colors, frames, sprites, _cosmetic_tick(), EMISSIVE_ALPHA)
+		aspect_view.draw_ground(self, colors, frames, sprites, _cosmetic_tick(), EMISSIVE_ALPHA)
 
 
 ## The lights of hits, parries and the weapon forms for the lighting shader's moving lamps.
 func impact_lamps() -> Array[Dictionary]:
 	var out: Array[Dictionary] = impact_view.lamps(_cosmetic_tick())
 	out.append_array(form_view.lamps(_cosmetic_tick()))
+	out.append_array(aspect_view.lamps(_cosmetic_tick()))
 	return out
 
 
@@ -353,6 +360,7 @@ func draw_hero_impacts() -> void:
 	if sprites != null:
 		impact_view.draw_air(self, colors, frames, sprites, EMISSIVE_ALPHA)
 		form_view.draw_air(self, colors, frames, sprites, EMISSIVE_ALPHA)
+		aspect_view.draw_air(self, colors, frames, sprites, EMISSIVE_ALPHA)
 
 
 ## Screen-sized flashes (call after the shake transform is reset, with the screen's top-left in world space).
@@ -688,6 +696,7 @@ func _draw_echo_trail(item: Dictionary, shake_offset: Vector2) -> void:
 ## Events of the three aspects. Sounds reuse the combat cues (no new audio).
 func _on_ward_echo_sprint(event: GameEvent) -> void:
 	var tick: int = event.tick
+	aspect_view.on_event(_cosmetic_tick(), event, fx_hero())
 	match event.type:
 		&"sprint_started":
 			_add_wes_fx({"kind": "sprint_start", "tick": tick, "at": fx_hero().position.round(), "left": facing_left, "life": WardEchoSprintEffects.sequence_length(WardEchoSprintEffects.SPRINT_START_TICKS)})
@@ -982,9 +991,10 @@ func echo_drawables() -> Array[Dictionary]:
 ## snapshot every frame). Sounds reuse the combat cues (no new audio).
 func _on_aspect_event(event: GameEvent) -> void:
 	var tick: int = event.tick
+	if event.type != &"phantom_echo":  # an echo's particles need its contact (below)
+		aspect_view.on_event(_cosmetic_tick(), event, fx_hero())
 	match event.type:
 		&"lantern_placed":
-			_dust(Vector2(event.data["position"]))
 			fx_cue("deflect", tick, 0.45)
 		&"lantern_pulse":
 			var at: Vector2 = event.data["position"]
@@ -1016,6 +1026,7 @@ func _on_aspect_event(event: GameEvent) -> void:
 			AspectEffects.add(aspect_fx, {"kind": "echo", "tick": tick, "at": ghost_at, "left": facing_left, "weapon": weapon, "swing": swing, "life": AspectEffects.echo_life()})
 			var contact: Vector2 = fx_target_contact(int(event.data.get("target_id", -1)), Vector2(event.data.get("position", hero.position)))
 			AspectEffects.add(aspect_fx, {"kind": "echo_spark", "tick": tick + AspectEffects.ECHO_SPARK_DELAY, "at": contact.round(), "life": AspectEffects.ECHO_SPARK_DELAY + AspectEffects.sequence_length(AspectEffects.ECHO_SPARK_TICKS)})
+			aspect_view.on_event(_cosmetic_tick(), event, hero, contact)
 			fx_cue("swing", tick, 0.45)
 
 

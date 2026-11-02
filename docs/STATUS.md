@@ -1,3 +1,29 @@
+## Hero effects in the staff's style, phase 3: the aspects (2026-11-02, Claude, done while Codex is out)
+
+Owner: "Yes, start phase 3" (the aspects).
+
+- **Frames.** tools/art/make_aspect_fx_art.py redraws 139 frames with the staff's code: the faint dotted outlines become solid glowing shapes, at the same names, counts, sizes and anchors.
+  - Phantom Cut: start, end, marker, spark.
+  - Echo Step: vanish and arrive columns, the shell, dust, the recall trail.
+  - Spirit Lantern: its pool (idle, opening, pulse), motes, spark.
+  - Sprint: start, end, speed lines, wind, dust.
+  - Stone Ward: the shield (barrier, absorb, holding 1-3 blows), block, glowing cracks, the shockwave with stones.
+- **Kept art.** The lantern itself, the stone slabs, the echo's silhouettes, the Phantom ghosts and arcs, the per-pose glow outlines and the three skill strikes keep their art.
+- **Live layer.** presentation/common/aspect_view.gd adds motes, sparks, dust, rings and light for:
+  - Spirit Lantern: the pool lights the road while it burns; motes and a flash at each pulse.
+  - Phantom Cut: lilac motes and light while it runs; sparks where echoes land.
+  - Echo Step: placing, the recall streak, fading.
+  - Stone Ward: rising, blocking, and the release, which throws stones, dust and a big light.
+  - Sprint: dust and wind while running.
+  - Breaking Edge, Gale Cut and Moon Cleave: their particles.
+- **Review files:** the in-game GIFs are art/reference/aspect_fx_v1/ingame/ (one per aspect), captured by presentation/review/hero_fx/capture_aspects.gd (window only). That capture refills Edge and opens Breaking Edge's parry window by hand. All frames are on art/reference/aspect_fx_v1/frames.png.
+- **Tests:**
+  - The aspects, road-aspects, Ward/Echo/Sprint and effects smokes pass.
+  - Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+- **Not done:**
+  - Next: phase 4, the mobs' attacks (not the golem).
+  - Nobody has played it.
+
 ## Hero effects in the staff's style, phase 2: the weapon forms (2026-11-02, Claude, done while Codex is out)
 
 Owner: "Yes, start phase 2" (the weapon skills and forms).
