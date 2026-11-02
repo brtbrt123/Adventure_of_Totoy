@@ -1,3 +1,7 @@
+## Star Staff run back to 6 frames (2026-11-02, Claude, done while Codex is out)
+
+Owner: "6 is enough". The 12-frame commit (6b9c6f73) is undone: every file it changed is back to the 6-frame run of 45f32861, and the files it added are removed (the in-between sheet, its frames, walk frames 7-12 and their overlays). They stay in the history if wanted later. The animation library, animation, aspects and variant atlas smokes pass. The game plays the staff run as 6 frames x 5 ticks, like the other weapons.
+
 ## Star Staff run: 12 frames (2026-11-02, Claude, done while Codex is out)
 
 Owner: "try 12 frames".

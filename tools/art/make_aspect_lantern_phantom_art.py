@@ -519,14 +519,12 @@ WEAPONS = {  # weapon -> (hero frame set, metal symbols, brighten map, swings)
 }
 GLOW_STATES = [("idle", 4), ("walk", 6), ("dash", 4), ("parry", 6), ("hurt", 4)]  # + attack<s> 1-6 per swing
 GLOW_PHASES = 6  # shimmer loop, about 80 ms per phase, independent of the hero frame
-# Sets whose state has more frames than the table above: the Star Staff runs a 12-frame cycle (owner 2026-11-02).
-SET_COUNTS = {"totoy_staff": {"walk": 12}}
 
 
 def glow_frame_names(weapon: str) -> list[str]:
     """Every hero frame the game animates while the buff can run (victory and the Reaper's Coil poses excluded)."""
     vid, _, _, swings = WEAPONS[weapon]
-    names = [f"{vid}_{st}_right_{n}" for st, cnt in GLOW_STATES for n in range(1, SET_COUNTS.get(vid, {}).get(st, cnt) + 1)]
+    names = [f"{vid}_{st}_right_{n}" for st, cnt in GLOW_STATES for n in range(1, cnt + 1)]
     names += [f"{vid}_attack{s}_right_{n}" for s in range(1, swings + 1) for n in range(1, 7)]
     return names
 

@@ -59,8 +59,6 @@ SW_, SH_ = LP.SW_, LP.SH_  # GIF scene 192x120 game pixels, shown at 4x
 
 HERO_SETS = {"katana": "hero2", "dagger": "totoy_dagger", "scythe": "totoy_scythe", "staff": "totoy_staff"}
 MOVE_STATES = [("idle", 4), ("walk", 6), ("dash", 4)]  # the frames Sprint and the Echo Step shield cover
-# Sets whose state has more frames than the table above: the Star Staff runs a 12-frame cycle (owner 2026-11-02).
-SET_COUNTS = {"totoy_staff": {"walk": 12}}
 
 
 def dz(x: int, y: int, level: float) -> bool:
@@ -87,7 +85,7 @@ def pad(g: Grid, anchor: tuple[int, int], left: int, top: int, right: int, botto
 
 
 def move_frames(vid: str) -> list[str]:
-    return [f"{vid}_{st}_right_{n}" for st, cnt in MOVE_STATES for n in range(1, SET_COUNTS.get(vid, {}).get(st, cnt) + 1)]
+    return [f"{vid}_{st}_right_{n}" for st, cnt in MOVE_STATES for n in range(1, cnt + 1)]
 
 
 # ================================================================================================ ECHO STEP

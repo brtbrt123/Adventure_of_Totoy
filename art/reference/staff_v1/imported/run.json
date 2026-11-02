@@ -1,6 +1,7 @@
 {
  "generator": "tools/art/import_staff_run.py",
  "source": "art/reference/staff_v1/Staff_Run.png",
+ "scale": 0.1148,
  "frames": [
   {
    "file": "run_1.png",
