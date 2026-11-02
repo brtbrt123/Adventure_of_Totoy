@@ -107,8 +107,6 @@ func catalog() -> void:
 			check(not plan.is_empty(), "aura lost during " + String(state))
 			for layer: String in ["back", "front"]:
 				check(arena.frames.has(plan[layer]), "missing aura layer")
-			if not String(plan["slash"]).is_empty():
-				check(arena.frames.has(plan["slash"]), "missing buff slash")
 			check(arena.frames.has(Anim.choose(hero, snap, {})), "missing buff actor pose")
 	check(View.fade_level(hero, snap.hud.weapon_buff_duration) == 4, "full duration aura faded early")
 	hero.weapon_buff_ticks_left = 1
@@ -222,35 +220,36 @@ func slash_attachment() -> void:
 		input.attack_pressed = true
 		input.aim = direction
 		step(input)
-		check(arena.weapon_slash_effect().is_empty(), "slash appears before sword strike")
+		check(arena.hero_swing_plan().is_empty(), "slash appears before sword strike")
 		while arena.snapshot.player.state == &"attack_windup":
 			step(InputFrame.new())
-		var trail: Dictionary = arena.weapon_slash_effect()
+		# the Black Form's slash is the swing's hit area in black fire (presentation/common/swing_arc.gd), turned with him
+		var trail: Dictionary = arena.hero_swing_plan()
 		check(not trail.is_empty(), "active swing loses its trail")
 		if not trail.is_empty():
-			var offset: Vector2 = Vector2(trail["at"]) - arena.snapshot.player.position
-			check(offset == Vector2(-15 if arena.facing_left else 15, -12), "slash detaches from painted blade for aim " + str(direction))
-			check(bool(trail["left"]) == arena.facing_left, "slash mirrors differently from hero")
+			check(bool(trail["black"]) and trail["colours"] == arena.SwingArc.BLACK, "the Black Form's slash is black fire for aim " + str(direction))
+			check(is_equal_approx(float(trail["reach"]), Weapons.swing_reach(Tuning.WEAPON_BLACK_KATANA, arena.snapshot.player.combo_index)), "the black slash matches the swing's reach")
+			check(absf(angle_difference((float(trail["from"]) + float(trail["to"])) * 0.5, arena.snapshot.player.facing.angle())) < 0.01, "the black slash faces where he swings")
 		await save("attached_%d_%d" % [roundi(direction.x), roundi(direction.y)])
 		while arena.snapshot.player.state == &"attack_active":
 			step(InputFrame.new())
 		while arena.snapshot.player.state == &"attack_recovery" and arena.snapshot.player.state_ticks < 6:
 			step(InputFrame.new())
-		check(arena.weapon_slash_effect().is_empty(), "stray slash hangs through recovery")
+		check(arena.hero_swing_plan().is_empty() or float(arena.hero_swing_plan()["fade"]) < 1.0, "stray slash hangs through recovery")
 	fixture()
 	activate()
 	# A hurt/victory override must never receive an unrelated attack overlay.
 	arena.snapshot.player.state = &"attack_active"
 	arena.snapshot.player.state_ticks = 0
 	arena.selected_frames[arena.snapshot.player.id] = "hero2_hurt_right_1"
-	check(arena.weapon_slash_effect().is_empty(), "hurt pose retains attack overlay")
+	check(arena.hero_swing_plan().is_empty(), "hurt pose retains attack overlay")
 	arena.snapshot.result = &"victory"
 	arena.selected_frames[arena.snapshot.player.id] = "hero2_victory_right_1"
-	check(arena.weapon_slash_effect().is_empty(), "victory keeps frozen slash")
+	check(arena.hero_swing_plan().is_empty(), "victory keeps frozen slash")
 	arena.snapshot.result = &"playing"
 	arena.snapshot.player.state = &"skill_windup"
 	arena.snapshot.player.skill_id = &"moon_cleave"
-	check(String(View.plan(arena.snapshot)["slash"]).is_empty(), "Moon hold shows a premature black cut")
+	check(arena.hero_swing_plan().is_empty(), "Moon hold shows a premature black cut")
 
 ## The same HUD and look contract for the Dual Dagger's Lightning Form (its own numbers, its own aura, no slash).
 func dagger_form() -> void:
@@ -269,7 +268,7 @@ func dagger_form() -> void:
 	check(arena.snapshot.hud.weapon_buff_duration == Weapons.barrage_total_ticks() and float(status["duration_fraction"]) > 0.9, "the form (only the barrage) shows its run ring")
 	check(int(status["cooldown"]) == ceili(arena.snapshot.hud.weapon_buff_cooldown_ticks * Tuning.TICK_DT), "form HUD cooldown from the snapshot")
 	var plan: Dictionary = View.plan(arena.snapshot)
-	check(String(plan["back"]).begins_with("fx_lightning_aura_back_") and String(plan["slash"]).is_empty(), "form aura plan")
+	check(String(plan["back"]).begins_with("fx_lightning_aura_back_") and not plan.has("slash"), "form aura plan")
 	check(not arena.black_form_look(arena.snapshot.player), "Black Form darkening on the dagger")
 	check(int(arena.combat_audio.played.get("weapon_buff_start", 0)) == 1, "form start cue")
 	arena.lightning_cutin.stop()
@@ -300,7 +299,7 @@ func scythe_coil() -> void:
 	arena.coil_cutin.stop()
 	var status: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(arena.snapshot.hud.weapon_buff_duration == Weapons.reaper_coil_total_ticks() and float(status["duration_fraction"]) > 0.9, "the coil shows its run ring")
-	check(View.plan(arena.snapshot).is_empty() and arena.weapon_slash_effect().is_empty(), "the coil draws the katana aura or slash")
+	check(View.plan(arena.snapshot).is_empty() and not bool(arena.hero_swing_plan().get("black", false)), "the coil draws the katana aura or slash")
 	check(not arena.black_form_look(arena.snapshot.player), "Black Form darkening on the scythe")
 	check(int(arena.combat_audio.played.get("weapon_buff_start", 0)) == 1, "coil start cue")
 	while arena.snapshot.player.weapon_buff_active:

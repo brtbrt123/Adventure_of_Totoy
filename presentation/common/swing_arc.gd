@@ -18,6 +18,8 @@ const COLOURS: Dictionary = {
 	Tuning.WEAPON_DUAL_DAGGER: ["1", "p", "o", "n", "l"],
 	Tuning.WEAPON_CHAIN_SCYTHE: ["1", "p", "u", "t", "k"],
 }
+## The Black Katana form's slash: black fire, a violet edge, pale lilac where the blade is.
+const BLACK: Array = ["p", "v", "0", "k", "k"]
 const LEAD_TICKS: int = 2  # the sweep starts this many ticks before the active frames
 const FADE_TICKS: int = 8  # the recovery fades it out over this many ticks (the finisher over FADE_TICKS + 4)
 
@@ -55,8 +57,10 @@ static func plan(hero: Snapshots.EntitySnapshot, left: bool, pose: String) -> Di
 	var side: float = -1.0 if (facing.x < -0.01 or (absf(facing.x) <= 0.01 and left)) else 1.0
 	var down: float = (1.0 if swing % 2 == 1 else -1.0) * side
 	var angle: float = facing.angle()
+	var black: bool = weapon == Tuning.WEAPON_BLACK_KATANA and hero.weapon_buff_active and hero.weapon_form == Weapons.FORM_BLACK_KATANA_BUFF
 	return {"center": hero.position, "reach": Weapons.swing_reach(weapon, swing), "from": angle - half * down, "to": angle + half * down,
-		"progress": clampf(progress, 0.0, 1.0), "fade": fade, "colours": COLOURS[weapon], "finisher": finisher, "swing": swing}
+		"progress": clampf(progress, 0.0, 1.0), "fade": fade, "colours": BLACK if black else COLOURS[weapon], "finisher": finisher, "swing": swing,
+		"black": black}
 
 
 ## The point of the blade on the ground (the slash's leading end) for a plan.
@@ -88,8 +92,8 @@ static var _shapes: Dictionary = {}
 
 ## The crescent around (0, 0): [Vector2i offset, symbol, alpha]. Cached: a swing shows a handful of distinct shapes.
 static func _shape(p: Dictionary) -> Array:
-	var key: String = "%s|%d|%d|%d|%d|%d|%s" % [p["colours"][2], roundi(float(p["reach"]) * 10.0), roundi(float(p["from"]) * 200.0),
-		roundi(float(p["to"]) * 200.0), roundi(float(p["progress"]) * 40.0), roundi(float(p["fade"]) * 40.0), p["finisher"]]
+	var key: String = "%s|%d|%d|%d|%d|%d|%s|%s" % [p["colours"][2], roundi(float(p["reach"]) * 10.0), roundi(float(p["from"]) * 200.0),
+		roundi(float(p["to"]) * 200.0), roundi(float(p["progress"]) * 40.0), roundi(float(p["fade"]) * 40.0), p["finisher"], p.get("black", false)]
 	if _shapes.has(key):
 		return _shapes[key]
 	var colours: Array = p["colours"]
@@ -98,7 +102,7 @@ static func _shape(p: Dictionary) -> Array:
 	var a1: float = p["to"]
 	var progress: float = p["progress"]
 	var fade: float = p["fade"]
-	var tmax: float = minf(11.0, reach * (0.34 if bool(p["finisher"]) else 0.28))
+	var tmax: float = minf(13.0 if bool(p.get("black", false)) else 11.0, reach * (0.34 if bool(p["finisher"]) else 0.28) * (1.3 if bool(p.get("black", false)) else 1.0))
 	var cool: float = 0.0 if fade >= 1.0 else (1.0 - fade) * 1.8
 	var best: Dictionary = {}  # Vector2i -> [level, alpha]
 	var steps: int = maxi(12, int(absf(a1 - a0) * reach * 2.5 * progress))

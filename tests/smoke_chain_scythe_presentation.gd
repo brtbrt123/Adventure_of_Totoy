@@ -180,7 +180,7 @@ func swap_swings_hud() -> void:
 		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
 		if hero.state.begins_with("attack_"):
 			check(chosen().begins_with("totoy_scythe_attack%d_" % hero.combo_index), "swing %d drew %s" % [hero.combo_index, chosen()])
-			check(arena.weapon_slash_effect().is_empty() and arena.weapon_buff_effect().is_empty(), "katana slash or aura over a scythe swing")
+			check(arena.weapon_buff_effect().is_empty() and not bool(arena.hero_swing_plan().get("black", false)), "katana black fire over a scythe swing")
 			var arc: Dictionary = arena.scythe_arc_effect()
 			if hero.state == &"attack_active":
 				check(not arc.is_empty() and String(arc["key"]).begins_with("fx_scythe_arc_%d_" % hero.combo_index), "swing %d active without its arc" % hero.combo_index)
@@ -250,7 +250,7 @@ func coil_hit() -> void:
 		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
 		if hero.state == PlayerState.STATE_REAPER_COIL:
 			check(chosen().begins_with("totoy_scythe_coil_"), "coil pose: " + chosen())
-			check(arena.weapon_buff_effect().is_empty() and arena.weapon_slash_effect().is_empty(), "katana look during the coil")
+			check(arena.weapon_buff_effect().is_empty() and not bool(arena.hero_swing_plan().get("black", false)), "katana look during the coil")
 		var phase: StringName = hero.reaper_coil_phase
 		if phase == PlayerState.COIL_HOOK and hero.reaper_coil_phase_tick == 5:
 			check(Fx.chain_visible(hero) and arena.chain_hand().distance_to(arena.chain_tip()) > 30.0, "no chain in flight: %.1f px" % arena.chain_hand().distance_to(arena.chain_tip()))

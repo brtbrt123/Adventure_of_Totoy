@@ -1,10 +1,11 @@
 """GIFs from the hero effects' in-game capture (presentation/review/hero_fx/capture_hero_fx.gd saves the game's own frames and
 segments.json, which frames show what).
 
-    python tools/art/hero_fx_capture_gif.py <capture dir> [crop]
+    python tools/art/hero_fx_capture_gif.py <capture dir> [crop] [out dir]
 
-Writes art/reference/hero_fx_v1/ingame/<segment>.gif (black_katana, dual_dagger, chain_scythe, dash, parry): the middle of the
-window (`crop` of its width and height, default 0.6, so the fight fills the GIF), 30 fps, one palette per GIF.
+Writes <out dir>/<segment>.gif (default art/reference/hero_fx_v1/ingame: black_katana, dual_dagger, chain_scythe, dash, parry;
+the weapon forms' capture, presentation/review/hero_fx/capture_forms.gd, goes to art/reference/form_fx_v1/ingame): the middle of
+the window (`crop` of its width and height, default 0.6, so the fight fills the GIF), 30 fps, one palette per GIF.
 """
 from __future__ import annotations
 
@@ -24,8 +25,9 @@ OUT = ROOT / "art/reference/hero_fx_v1/ingame"
 def main() -> int:
     src = Path(sys.argv[1])
     crop = float(sys.argv[2]) if len(sys.argv) > 2 else 0.6
+    out = ROOT / sys.argv[3] if len(sys.argv) > 3 else OUT
     segments = json.loads((src / "segments.json").read_text(encoding="utf-8"))
-    OUT.mkdir(parents=True, exist_ok=True)
+    out.mkdir(parents=True, exist_ok=True)
     for name, (start, end) in segments.items():
         frames = []
         for i in range(start, end):
@@ -38,7 +40,7 @@ def main() -> int:
             left, top = (w - cw) // 2, (h - ch) // 2
             frames.append(img.crop((left, top, left + cw, top + ch)))
         if frames:
-            save(frames, OUT / f"{name}.gif")
+            save(frames, out / f"{name}.gif")
     return 0
 
 

@@ -265,6 +265,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 			playing.stop()
 	staff_view.clear()
 	impact_view.clear()
+	form_view.clear()
 	lightning_fx.clear()
 	coil_fx.clear()
 	coil_hook_tick = -1
@@ -949,7 +950,6 @@ func _draw() -> void:
 	_draw_skill_effect(shake_offset())
 	_draw_skill_projectiles(shake_offset())
 	_draw_skill_contacts()
-	_draw_buff_slash(shake_offset())
 	_draw_buff_transition()
 	_draw_lightning(shake_offset())
 	_draw_scythe(shake_offset())

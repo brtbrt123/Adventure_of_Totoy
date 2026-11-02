@@ -1,3 +1,27 @@
+## Hero effects in the staff's style, phase 2: the weapon forms (2026-11-02, Claude, done while Codex is out)
+
+Owner: "Yes, start phase 2" (the weapon skills and forms).
+
+- **Frames.** tools/art/make_form_fx_art.py redraws 148 frames with the staff's code (tools/art/staff_fx.py), at the same names, counts, sizes and anchors:
+  - Black Katana form: hollow black fire, swaying tongues with violet rims and a see-through core, so his dark silhouette still shows inside it.
+  - Lightning Form: crackling arcs on him and at his feet, the afterimage, the blink flash, forked sparks, the cut in 8 directions, the chain tiles, the scorch and the sky strike.
+  - Reaper's Coil: the spin crescent round him, the thrown scythe, chain links with a running glint, the hook's bite, the stagger burst, dizzy stars, dust, drag marks and speed lines.
+- **Live layer.** presentation/common/form_view.gd adds:
+  - Black Form: embers, dark wisps, a pulsing violet ring and a violet light; a burst of black fire when it starts, smoke when it ends.
+  - Lightning Form: crackling sparks and a flickering light; sparks and motes along each blink; for the sky strike, sparks, shards, smoke, a ground ring and a big flash of light.
+  - Reaper's Coil: sparks at the bite, dust, sparks on the dragged target, spin dust and a teal light.
+  - It lights the road's lamps, and replaces the old pixel bursts.
+- **The Black Form's slash** is now the hit-area crescent in black fire (swing_arc.gd), like the other blades. The detached side-view slash is no longer drawn.
+- **Review files:** the in-game GIFs are art/reference/form_fx_v1/ingame/ (black_katana, dual_dagger, chain_scythe), captured by presentation/review/hero_fx/capture_forms.gd (window only). All frames are on art/reference/form_fx_v1/frames.png.
+- **Tests:**
+  - The buff, dagger and scythe smokes check the black crescent instead of the detached slash.
+  - Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+- **Contact sheets:** 20 pages now. The 40 old trail frames are gone, so the 21st page is removed.
+- **Not done:**
+  - fx_black_slash, fx_chain_whip and fx_scythe_arc_* are no longer drawn and are left as they are.
+  - Next: phase 3, the aspects; then phase 4, the mobs' attacks (not the golem).
+  - Nobody has played it.
+
 ## Mobile blueprint (2026-11-02, Claude, a proposal while Codex is out)
 
 Owner: "make a blueprint for how it is gonna look if we do a mobile".

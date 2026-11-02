@@ -24,6 +24,7 @@ The hit test lives in the core (`core/weapons.gd`):
 - It is white hot where the blade is. The body is in the blade's colour: lilac katana, steel daggers, teal scythe.
 - It fades through the first 8 recovery ticks (12 for the finisher) by dithering.
 - The finisher's crescent is thicker.
+- In the Black Katana form (2026-11-02, phase 2) the same crescent is black fire: an ink body, a violet edge, pale lilac where the blade is, a third thicker. It replaced the detached side-view slash (`fx_black_slash`, no longer drawn).
 - It is drawn in the Star Staff's style: Totoy 36, hard alpha, ordered dithering, emissive, so night lighting does not swallow it.
 - Sparks fly off its leading end while it sweeps (`impact_view.gd`).
 

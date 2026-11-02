@@ -19,6 +19,7 @@ const LightningEffects := preload("res://presentation/arena/lightning_effects.gd
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const StaffView := preload("res://presentation/common/staff_view.gd")
 const ImpactView := preload("res://presentation/common/impact_view.gd")
+const FormView := preload("res://presentation/common/form_view.gd")
 const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
 const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
@@ -28,6 +29,8 @@ const EMISSIVE_ALPHA: float = preload("res://presentation/common/ambient_firefli
 var staff_view: StaffView = StaffView.new()
 ## The live part of hits, counters, parries and the dash in the staff's style (sparks, dust, ground rings, light).
 var impact_view: ImpactView = ImpactView.new()
+## The live part of the weapon forms (Black Katana, Lightning Form, Reaper's Coil): embers, crackles, sparks, dust, light.
+var form_view: FormView = FormView.new()
 ## Count actual render submissions of the blades' slash (tests check both the road and the arena use this shared entry point).
 var swing_draws: int = 0
 
@@ -238,6 +241,7 @@ func age_hero_fx() -> void:
 	if hero != null:
 		staff_view.step(cosmetic_tick, hero)
 		impact_view.step(cosmetic_tick, hero)
+		form_view.step(cosmetic_tick, hero)
 		var swing: Dictionary = hero_swing_plan()
 		if not swing.is_empty() and float(swing["fade"]) >= 1.0:  # sparks fly off the blade's end while it sweeps
 			var lead: Vector2 = SwingArc.lead_point(swing)
@@ -260,15 +264,18 @@ func on_staff_event(event: GameEvent) -> void:
 		impact_view.dash_started(_cosmetic_tick(), Vector2(event.data.get("from", fx_hero().position)), Vector2(event.data.get("direction", Vector2.ZERO)))
 
 
-## Under the characters: the rings of light and the dust of hits, parries and dashes (impact_view).
+## Under the characters: the rings of light and the dust of hits, parries, dashes (impact_view) and the weapon forms (form_view).
 func _draw_impact_ground() -> void:
 	if sprites != null:
 		impact_view.draw_ground(self, colors, frames, sprites, _cosmetic_tick(), EMISSIVE_ALPHA)
+		form_view.draw_ground(self, colors, frames, sprites, _cosmetic_tick(), EMISSIVE_ALPHA)
 
 
-## The lights of hits and parries for the lighting shader's moving lamps.
+## The lights of hits, parries and the weapon forms for the lighting shader's moving lamps.
 func impact_lamps() -> Array[Dictionary]:
-	return impact_view.lamps(_cosmetic_tick())
+	var out: Array[Dictionary] = impact_view.lamps(_cosmetic_tick())
+	out.append_array(form_view.lamps(_cosmetic_tick()))
+	return out
 
 
 ## The staff's ground layer: circles, rings, the meteor's shadow, the crater and dust (under the characters).
@@ -345,6 +352,7 @@ func draw_hero_impacts() -> void:
 		draw_rect(Rect2(at.round(), Vector2.ONE), particle["color"])
 	if sprites != null:
 		impact_view.draw_air(self, colors, frames, sprites, EMISSIVE_ALPHA)
+		form_view.draw_air(self, colors, frames, sprites, EMISSIVE_ALPHA)
 
 
 ## Screen-sized flashes (call after the shake transform is reset, with the screen's top-left in world space).
@@ -391,7 +399,10 @@ func on_hero_weapon_buff(event: GameEvent) -> Dictionary:
 	var lightning: bool = form == Weapons.FORM_LIGHTNING
 	var coil: bool = form == Weapons.FORM_REAPER_COIL
 	buff_transition = {"tick": event.tick, "started": started, "at": fx_hero().position, "form": form}
-	_burst(fx_hero().position - Vector2(0, 12), 12 if started else 6, colors["o"] if lightning else (colors["u"] if coil else colors["k"]), 0.8)
+	if started:
+		form_view.form_started(_cosmetic_tick(), form, fx_hero().position)
+	else:
+		form_view.form_ended(_cosmetic_tick(), form, fx_hero().position)
 	return {"started": started, "form": form}
 
 
@@ -1045,23 +1056,6 @@ func _draw_buff_aura(actor: Snapshots.EntitySnapshot, front: bool) -> void:
 		return
 	_draw_buff_frame(effect["front" if front else "back"], actor.position, int(effect["level"]), facing_left)
 
-## Match the painted side-view blade rather than rotating independently toward aim.
-func weapon_slash_effect() -> Dictionary:
-	var effect: Dictionary = weapon_buff_effect()
-	if effect.is_empty() or String(effect["slash"]).is_empty():
-		return {}
-	var chosen: String = fx_hero_frame()
-	if not chosen.begins_with("hero2_attack") and not (fx_hero().state == &"skill_active" and chosen.begins_with("hero2_dash")):
-		return {}
-	return {"key": effect["slash"], "at": (fx_hero().position + Vector2(-15 if facing_left else 15, -12)).round(), "left": facing_left, "level": effect["level"]}
-
-func _draw_buff_slash(_shake_offset: Vector2) -> void:
-	var effect: Dictionary = weapon_slash_effect()
-	if effect.is_empty():
-		return
-	# Draw directly in world coordinates, sharing the actor's current canvas transform.
-	_draw_buff_frame(effect["key"], effect["at"], int(effect["level"]), bool(effect["left"]))
-
 func _draw_buff_transition() -> void:
 	if buff_transition.is_empty():
 		return
@@ -1111,6 +1105,7 @@ func _on_lightning_blink(event: GameEvent) -> void:
 	_add_lightning_fx({"kind": "chain", "tick": tick, "from": from + LightningEffects.CHEST, "to": to + LightningEffects.CHEST, "life": LightningEffects.CHAIN_TICKS})
 	_add_lightning_fx({"kind": "arrive", "tick": tick, "at": to, "life": LightningEffects.sequence_length(LightningEffects.BLINK_TICKS)})
 	_add_lightning_fx({"kind": "cut", "tick": tick + windup, "at": (target + fx_body_offset()).round(), "direction": LightningEffects.cut_direction(side, to, target), "life": LightningEffects.sequence_length(LightningEffects.CUT_TICKS)})
+	form_view.blink(_cosmetic_tick(), from, to)
 	shake_left = maxi(shake_left, 2)
 	_flash(tick, colors["p"], [0.14])
 	fx_cue("lightning_blink", tick, 0.6)
@@ -1129,7 +1124,7 @@ func _on_lightning_strike(event: GameEvent) -> void:
 		strengths.append(LightningEffects.strike_flash(age))
 	_flash(tick, colors["p"], strengths)
 	shake_left = maxi(shake_left, 8)
-	_burst(at + fx_body_offset(), 18, colors["1"], 1.6)
+	form_view.strike(_cosmetic_tick(), at, at + fx_body_offset())
 	fx_cue("lightning_crack", tick)
 
 func _add_coil_fx(effect: Dictionary) -> void:
@@ -1148,7 +1143,7 @@ func _on_reaper_coil(event: GameEvent) -> void:
 			coil_hook_tick = tick
 			var bite: Vector2 = Vector2(event.data["to"]) + CHAIN_HEIGHT
 			_add_coil_fx({"kind": "hook", "tick": tick, "at": bite.round(), "life": ScytheEffects.sequence_length(ScytheEffects.HOOK_TICKS)})
-			_burst(bite, 10, colors["u"], 1.0)
+			form_view.coil_hooked(_cosmetic_tick(), bite, Vector2(event.data["to"]).y)
 			shake_left = maxi(shake_left, 3)
 			_flash(tick, colors["p"], [0.16, 0.06])
 			fx_cue("deflect", tick, 0.9)
@@ -1158,27 +1153,29 @@ func _on_reaper_coil(event: GameEvent) -> void:
 			_add_coil_fx({"kind": "land", "tick": tick, "at": anchor.round(), "life": ScytheEffects.sequence_length(ScytheEffects.LAND_TICKS)})
 			if event.data.get("blocked_by", &"range") != &"range":
 				_add_coil_fx({"kind": "spark", "tick": tick, "at": (anchor + CHAIN_HEIGHT).round(), "life": ScytheEffects.sequence_length(ScytheEffects.SPARK_TICKS)})
-			_dust(anchor)
+			form_view.coil_missed(anchor)
 			shake_left = maxi(shake_left, 1)
 			fx_cue("deflect", tick, 0.5)
 			fx_cue("dash", tick, 0.7)
 		&"reaper_coil_drag":
 			var chest: Vector2 = fx_target_contact(int(event.data.get("target_id", -1)), Vector2(event.data["to"]))
 			_add_coil_fx({"kind": "stagger", "tick": tick, "at": chest.round(), "life": ScytheEffects.sequence_length(ScytheEffects.STAGGER_TICKS)})
-			_burst(chest, 14, colors["p"], 1.2)
+			form_view.coil_drag_hit(_cosmetic_tick(), chest, Vector2(event.data["to"]).y)
 			shake_left = maxi(shake_left, 5)
 			fx_cue("posture_break", tick)
 		&"reaper_coil_spin":
 			var connects: bool = bool(event.data.get("connects", false))
 			fx_cue("swing", tick, 1.0 if connects else 0.7)
 			if connects:
-				for contact: Vector2 in fx_spin_contacts(event):
+				var contacts: Array[Vector2] = fx_spin_contacts(event)
+				for contact: Vector2 in contacts:
 					_add_coil_fx({"kind": "spark", "tick": tick, "at": contact.round(), "life": ScytheEffects.sequence_length(ScytheEffects.SPARK_TICKS)})
+				form_view.coil_spin_hit(_cosmetic_tick(), contacts)
 				shake_left = maxi(shake_left, 2)
 				_flash(tick, colors["p"], [0.12])
 		&"reaper_coil_ended":
 			if event.data.get("reason", &"") in [&"complete", &"missed"]:
-				_burst(fx_hero().position - Vector2(0, 12), 6, colors["u"], 0.6)
+				form_view.form_ended(_cosmetic_tick(), Weapons.FORM_REAPER_COIL, fx_hero().position)
 
 ## Per fresh tick while the boss is dragged: dust puffs at its leading foot and scuff decals where it slid.
 func _coil_drag_trail() -> void:

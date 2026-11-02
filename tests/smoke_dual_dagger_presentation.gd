@@ -185,7 +185,7 @@ func swap_and_hud() -> void:
 		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
 		if hero.state.begins_with("attack_"):
 			check(chosen().begins_with("totoy_dagger_attack%d_" % hero.combo_index), "swing %d drew %s" % [hero.combo_index, chosen()])
-			check(arena.weapon_slash_effect().is_empty(), "katana slash drawn over a dagger swing")
+			check(not bool(arena.hero_swing_plan().get("black", false)), "katana black fire drawn over a dagger swing")
 			if hero.state == &"attack_active" and not swings.has(hero.combo_index):
 				swings[hero.combo_index] = true
 				await save("swing%d" % hero.combo_index)
@@ -254,7 +254,7 @@ func lightning_form() -> void:
 	check(chosen().begins_with("totoy_lightning_"), "form look not drawn: " + chosen())
 	var effect: Dictionary = arena.weapon_buff_effect()
 	check(not effect.is_empty() and String(effect["back"]).begins_with("fx_lightning_aura_back_") and String(effect["front"]).begins_with("fx_lightning_aura_front_"), "form aura layers")
-	check(String(effect["slash"]).is_empty(), "form adds a detached slash")
+	check(not effect.has("slash"), "form adds a detached slash")
 	check(not arena.black_form_look(arena.snapshot.player), "form uses the Black Form darkening")
 	var running: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(bool(running["active"]) and float(running["duration_fraction"]) > 0.9, "HUD shows the barrage running (run ring)")
