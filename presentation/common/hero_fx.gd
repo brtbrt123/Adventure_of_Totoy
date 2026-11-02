@@ -18,23 +18,18 @@ const WeaponBuffView := preload("res://presentation/arena/weapon_buff_view.gd")
 const LightningEffects := preload("res://presentation/arena/lightning_effects.gd")
 const ScytheEffects := preload("res://presentation/arena/scythe_effects.gd")
 const StaffView := preload("res://presentation/common/staff_view.gd")
+const ImpactView := preload("res://presentation/common/impact_view.gd")
 const SCYTHE_MANIFEST: String = "res://art/build/chain_scythe_sprites_manifest.json"
 const CHAIN_HEIGHT: Vector2 = Vector2(0, -14)
 const SkillEffects := preload("res://presentation/arena/skill_effects.gd")
-const WeaponPaths := preload("res://presentation/common/weapon_paths.gd")
-const WeaponPathGlow := preload("res://presentation/common/weapon_path_glow.gd")
+const SwingArc := preload("res://presentation/common/swing_arc.gd")
 const EMISSIVE_ALPHA: float = preload("res://presentation/common/ambient_fireflies.gd").EMISSIVE_ALPHA
-var weapon_path_glow: WeaponPathGlow
 ## The Star Staff's casts, blink and Disintegration (presentation/common/staff_view.gd).
 var staff_view: StaffView = StaffView.new()
-## Count actual render submissions (capture tests verify both the road and arena use this shared entry point).
-var weapon_path_draws: int = 0
-
-
-func _init() -> void:
-	weapon_path_glow = WeaponPathGlow.new()
-	weapon_path_glow.name = "SharedWeaponGlow"
-	add_child(weapon_path_glow)
+## The live part of hits, counters, parries and the dash in the staff's style (sparks, dust, ground rings, light).
+var impact_view: ImpactView = ImpactView.new()
+## Count actual render submissions of the blades' slash (tests check both the road and the arena use this shared entry point).
+var swing_draws: int = 0
 
 var colors: Dictionary = {}
 var frames: Dictionary = {}
@@ -98,19 +93,22 @@ var released_skill_attacks: Dictionary = {}
 # --- what a scene tells this layer (override in the scene) ---
 
 ## All effects behind the hero go through one entry point in every scene. Keep new weapon effects here so a scene
-## cannot accidentally get Sprint/aura but omit regular weapon paths. Draw immediately before the hero's body.
+## cannot accidentally get Sprint/aura but omit the blades' slash. Draw immediately before the hero's body. The slash is the
+## swing's hit area (presentation/common/swing_arc.gd) around `at`, his feet as drawn (shake included).
 func draw_hero_back(actor: Snapshots.EntitySnapshot, pose: String, at: Vector2, left: bool) -> void:
-	var path: String = WeaponPaths.key(actor, pose) if fx_playing() else ""
-	if not path.is_empty() and frames.has(path):
-		_draw_anchored(path, at, left, Color(1, 1, 1, EMISSIVE_ALPHA))
-		weapon_path_draws += 1
+	var swing: Dictionary = SwingArc.plan(actor, left, pose) if fx_playing() else {}
+	if not swing.is_empty():
+		swing["center"] = at
+		SwingArc.draw(self, colors, swing, EMISSIVE_ALPHA)
+		swing_draws += 1
 	_draw_sprint_back(actor, at, left)
 	_draw_buff_aura(actor, false)
 
 
-## The plan is shared as well as rendering; headless tests can exercise it through either scene's snapshot hooks.
-func hero_weapon_path_key() -> String:
-	return WeaponPaths.key(fx_hero(), fx_hero_frame()) if fx_playing() and not hero_hidden() else ""
+## The blades' slash this tick (swing_arc.gd plan; {} for none). Shared as well as the rendering: headless tests check it
+## through either scene's snapshot hooks.
+func hero_swing_plan() -> Dictionary:
+	return SwingArc.plan(fx_hero(), facing_left, fx_hero_frame()) if fx_playing() and not hero_hidden() else {}
 
 func fx_hero() -> Snapshots.EntitySnapshot:
 	return null
@@ -189,18 +187,21 @@ func on_hero_skill_event(event: GameEvent) -> bool:
 
 # --- the hero's swing and parry (called from the scene's event handler) ---
 
-## The hero's swing landed: the burst picture at `contact`, a spray of particles and a little shake.
+## The hero's swing landed: the burst picture at `contact`, sparks, dust and light from impact_view (the target's ground point is
+## `position`) and a little shake.
 func on_hero_hit(tick: int, position: Vector2, contact: Vector2, counter: bool, finisher: bool, skill_id: Variant = &"") -> void:
-	hit_bursts.append({"position": position, "contact": contact, "tick": tick, "counter": counter, "finisher": finisher, "skill_id": skill_id, "facing": fx_hero().facing})
+	var hero: Snapshots.EntitySnapshot = fx_hero()
+	hit_bursts.append({"position": position, "contact": contact, "tick": tick, "counter": counter, "finisher": finisher, "skill_id": skill_id, "facing": hero.facing})
 	shake_left = maxi(shake_left, 3 if finisher else 1)
-	_burst(contact, 16 if counter or finisher else 8, colors["1"], 1.8 if counter else 0.9)
+	impact_view.hit(_cosmetic_tick(), position, contact, hero.weapon_id, counter, finisher, hero.facing if hero.facing.length() > 0.01 else Vector2(-1 if facing_left else 1, 0))
 	if counter:
 		shake_left = maxi(shake_left, 5)
 
 
-## The hero parried: gold sparks, the parry ring, shake and a faint flash (a perfect parry is bigger).
+## The hero parried: the gold diamond, gold sparks and a ring on the ground (impact_view), shake and a faint flash (a perfect
+## parry is bigger).
 func on_hero_parry(tick: int, position: Vector2, contact: Vector2, perfect: bool) -> void:
-	_burst(contact, 16 if perfect else 7, colors["x"], 1.6 if perfect else 1.0)
+	impact_view.parry(_cosmetic_tick(), position, contact, perfect)
 	parry_impacts.append({"position": position, "tick": tick, "perfect": perfect, "contact": contact})
 	shake_left = maxi(shake_left, 7 if perfect else 3)
 	screen_flash_until = tick + (2 if perfect else 1)
@@ -236,6 +237,11 @@ func age_hero_fx() -> void:
 	var hero: Snapshots.EntitySnapshot = fx_hero()
 	if hero != null:
 		staff_view.step(cosmetic_tick, hero)
+		impact_view.step(cosmetic_tick, hero)
+		var swing: Dictionary = hero_swing_plan()
+		if not swing.is_empty() and float(swing["fade"]) >= 1.0:  # sparks fly off the blade's end while it sweeps
+			var lead: Vector2 = SwingArc.lead_point(swing)
+			impact_view.swing_sparks(cosmetic_tick, lead, (lead - hero.position).normalized(), swing["colours"])
 	if staff_view.shake_request > 0:
 		shake_left = maxi(shake_left, staff_view.shake_request)
 		staff_view.shake_request = 0
@@ -246,9 +252,23 @@ func age_hero_fx() -> void:
 
 # --- the Star Staff (presentation/common/staff_view.gd) ---
 
-## A core event for the staff's look (staff_burst, a blink's dash_started, disintegration_*); the scenes route them here.
+## A core event for the staff's look (staff_burst, a blink's dash_started, disintegration_*) and a plain dash's dust; the scenes
+## route them here.
 func on_staff_event(event: GameEvent) -> void:
 	staff_view.on_event(event, fx_hero())
+	if event.type == GameEvent.DASH_STARTED and not bool(event.data.get("blink", false)):
+		impact_view.dash_started(_cosmetic_tick(), Vector2(event.data.get("from", fx_hero().position)), Vector2(event.data.get("direction", Vector2.ZERO)))
+
+
+## Under the characters: the rings of light and the dust of hits, parries and dashes (impact_view).
+func _draw_impact_ground() -> void:
+	if sprites != null:
+		impact_view.draw_ground(self, colors, frames, sprites, _cosmetic_tick(), EMISSIVE_ALPHA)
+
+
+## The lights of hits and parries for the lighting shader's moving lamps.
+func impact_lamps() -> Array[Dictionary]:
+	return impact_view.lamps(_cosmetic_tick())
 
 
 ## The staff's ground layer: circles, rings, the meteor's shadow, the crater and dust (under the characters).
@@ -309,21 +329,22 @@ func draw_hero_impacts() -> void:
 	for impact: Dictionary in parry_impacts:
 		var age: int = tick - int(impact["tick"])
 		var contact: Vector2 = impact.get("contact", impact["position"])
-		var size_scale: Vector2 = Vector2(1.15, 1.15) if bool(impact["perfect"]) else Vector2(0.75, 0.75)
-		_draw_imported("fx_parry_%d" % AnimLib.effect_at("fx_parry", age, [6, 2, false]), contact, size_scale)
+		_draw_imported("fx_parry_%d" % AnimLib.effect_at("fx_parry", age, [6, 2, false]), contact)
 		if age < 2 and bool(impact["perfect"]):
-			_draw_imported("fx_flash_1", contact, Vector2(0.6, 0.6))
+			_draw_imported("fx_flash_%d" % (age + 1), contact)
 	for burst: Dictionary in hit_bursts:
 		var age: int = _cosmetic_tick() - int(burst["tick"])
 		var contact: Vector2 = burst.get("contact", burst["position"])
-		var heavy: bool = bool(burst.get("finisher", false)) or bool(burst["counter"])
 		var burst_fx: String = "fx_counter" if bool(burst["counter"]) else "fx_hit"
-		_draw_imported("%s_%d" % [burst_fx, AnimLib.effect_at(burst_fx, age, [6, 2, false])], contact, Vector2(1.3, 1.3) if heavy else Vector2.ONE)
-		if age < 2:
-			_draw_imported("fx_flash_1", contact, Vector2(0.65, 0.65) if heavy else Vector2(0.4, 0.4))
+		# one size per frame, never scaled (a scaled pixel frame turns uneven); a heavy blow is bigger through its particles
+		_draw_imported("%s_%d" % [burst_fx, AnimLib.effect_at(burst_fx, age, [6, 2, false])], contact)
+		if age < 2 and bool(burst.get("finisher", false)) and not bool(burst["counter"]):
+			_draw_imported("fx_flash_%d" % (age + 1), contact)
 	for particle: Dictionary in particles:
 		var at: Vector2 = particle["position"]
 		draw_rect(Rect2(at.round(), Vector2.ONE), particle["color"])
+	if sprites != null:
+		impact_view.draw_air(self, colors, frames, sprites, EMISSIVE_ALPHA)
 
 
 ## Screen-sized flashes (call after the shake transform is reset, with the screen's top-left in world space).
@@ -432,7 +453,7 @@ func draw_dash_fx() -> void:
 		elif white_sprites != null:
 			draw_texture_rect_region(white_sprites, rect, source, Color(colors["o"], fade * 0.55))
 	if hero.state == &"dash":
-		_draw_imported("fx_dash_%d" % AnimLib.effect_at("fx_dash", hero.state_ticks, [6, 2, false]), hero.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
+		_draw_imported("fx_dash_%d" % AnimLib.effect_at("fx_dash", hero.state_ticks, [6, 2, false]), hero.position.round(), Vector2(-1 if facing_left else 1, 1))
 
 
 # --- moved here from the arena (unchanged apart from the fx_* hooks) ---

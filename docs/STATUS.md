@@ -1,3 +1,48 @@
+## Hero effects in the staff's style, phase 1: hits, parries, dash and the basic slash (2026-11-02, Claude, done while Codex is out)
+
+Owner: "I like the effects of the staff skill, can you redo all effects, aspects, attacks of mobs and hero except the golem".
+
+Phase 1 is the hero's basic combat effects. Then, mid-phase, the owner asked:
+- "change the attack that have a turn and sharp curve and make it just a crescent slash";
+- "can you send me an attack sheet of the hero with its attack range";
+- "check the basic attack range match effects on it".
+
+Changes:
+- **Frames.** tools/art/make_hero_fx_art.py redraws them with the staff's code (tools/art/staff_fx.py). Each family has one size and one anchor, and frames are never scaled in the game any more:
+  - fx_hit: 32x32;
+  - fx_counter: 48x48, gold;
+  - fx_parry: 40x40, the gold diamond;
+  - fx_flash: 24x24;
+  - fx_dash: 48x24, anchored at the feet.
+- **Live layer.** presentation/common/impact_view.gd adds sparks, dust, ground rings and light:
+  - sparks thrown off each blow fall to the target's feet and bounce;
+  - shards and motes on heavy blows;
+  - dust at the target's feet;
+  - a ring of light on the ground under finishers, counters and parries;
+  - dust and wind for a dash;
+  - lamps on the road;
+  - sparks off the slash.
+  - The particle system is shared with the staff, renamed from staff_particles.gd to presentation/common/fx_particles.gd.
+- **The blades' basic slash is now the hit area itself.** presentation/common/swing_arc.gd draws a crescent whose outer edge is core/weapons.gd swing_reach around the hero's feet and whose ends are the swing's arc, turned to his facing (any direction).
+  - It sweeps during the swing (odd swings down, even swings up) and fades in the recovery.
+  - It replaces the pose-traced fx_weapon_path_* trails, which reached behind and above him where nothing is hit.
+  - Those frames, weapon_paths.gd, weapon_path_glow.gd and its shader, fx_weapon.tres and the old trail smoke and capture are removed. See docs/WEAPON_PATHS.md.
+- **Training post.** It no longer draws a second hit and parry picture over the shared one.
+
+Review files:
+- art/reference/hero_fx_v1/attack_ranges.png (tools/art/attack_range_sheet.py): every swing with its hit area from core/tuning.gd and the slash.
+- art/reference/hero_fx_v1/ingame/*.gif: the real game against the Warden. These are the katana, dagger and scythe combos, a dash and real parries. Captured by presentation/review/hero_fx/capture_hero_fx.gd (window only); tools/art/hero_fx_capture_gif.py makes the GIFs.
+
+Tests:
+- tests/smoke_swing_arcs.gd is new: every blade, swing and facing, every pixel inside the hit area, both scenes.
+- smoke_effects now looks for the hit's sparks in impact_view.
+- Core 577 pass. Python 94 pass.
+- Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+
+Not done:
+- The other phases: the weapon forms and skills, the aspects, then the mobs' attacks (not the golem).
+- Nobody has played it.
+
 ## Star Staff run back to 6 frames (2026-11-02, Claude, done while Codex is out)
 
 Owner: "6 is enough". The 12-frame commit (6b9c6f73) is undone: every file it changed is back to the 6-frame run of 45f32861, and the files it added are removed (the in-between sheet, its frames, walk frames 7-12 and their overlays). They stay in the history if wanted later. The animation library, animation, aspects and variant atlas smokes pass. The game plays the staff run as 6 frames x 5 ticks, like the other weapons.

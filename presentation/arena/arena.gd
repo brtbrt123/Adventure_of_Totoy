@@ -415,6 +415,7 @@ func _restart() -> void:
 	if disint_cutin != null:
 		disint_cutin.stop()
 	staff_view.clear()
+	impact_view.clear()
 	close_menu()
 	lightning_fx.clear()
 	coil_fx.clear()
@@ -659,6 +660,7 @@ func _draw() -> void:
 	_draw_lightning_ground()
 	_draw_coil_ground()
 	_draw_staff_ground()
+	_draw_impact_ground()
 	_draw_lantern_ground()
 	_draw_ward_echo_ground()
 	_draw_dash()

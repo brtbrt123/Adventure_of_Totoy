@@ -82,7 +82,7 @@ func _step(frame: InputFrame) -> void:
 			_expect(Vector2(arena.hit_bursts.back()["contact"]).y < Vector2(event.data["position"]).y, "hit spark is still at feet")
 			if event.data["kind"] == &"counter":
 				_expect(int(arena.flashes[arena.snapshot.entities[0].id]) == 10, "counter flash duration")
-			_expect(not arena.particles.is_empty(), "hit has no spark")
+			_expect(not arena.impact_view.particles.items.is_empty(), "hit has no spark")  # sparks, dust: presentation/common/impact_view.gd
 			_expect(not arena.hit_bursts.is_empty(), "hit has no short bright burst")
 			if event.data["kind"] == &"counter":
 				_expect(arena.shake_left > 0, "counter has no shake")

@@ -15,7 +15,7 @@ const GameEvent := preload("res://core/game_event.gd")
 const Tuning := preload("res://core/tuning.gd")
 const Weapons := preload("res://core/weapons.gd")
 const PlayerState := preload("res://core/player.gd")
-const StaffParticles := preload("res://presentation/common/staff_particles.gd")
+const FxParticles := preload("res://presentation/common/fx_particles.gd")
 
 const BURST_FRAME_TICKS: int = 3
 const BIG_BURST_FRAME_TICKS: int = 4
@@ -35,7 +35,7 @@ const TEAL_LIGHT: Vector3 = Vector3(0.45, 0.95, 0.9)
 const WARM_LIGHT: Vector3 = Vector3(1.0, 0.62, 0.28)
 const WARM_CORE: Vector3 = Vector3(1.05, 0.95, 0.8)
 
-var particles: StaffParticles = StaffParticles.new(23)
+var particles: FxParticles = FxParticles.new(23)
 ## One-shot effects: {kind, tick, at, ...}: burst, big_burst, ring, shock, column, blink_column, blink_streak, explosion,
 ## fire_ring, crater.
 var effects: Array[Dictionary] = []
@@ -162,7 +162,7 @@ func step(tick: int, hero: Snapshots.EntitySnapshot) -> void:
 				var a: float = float(j) * TAU / 12.0 + rng.randf_range(-0.2, 0.2)
 				var d: float = rng.randf_range(0.92, 1.12)
 				var p: Dictionary = particles.add(&"lift", c.x + cos(a) * rx * d, c.y + sin(a) * rx * 0.4 * d, 0.0, Vector3.ZERO, 100000)
-				p["shape"] = rng.randi_range(5, StaffParticles.ROCKS - 1)
+				p["shape"] = rng.randi_range(5, FxParticles.ROCKS - 1)
 				p["tz"] = rng.randf_range(5.0, 14.0)
 		if t < Tuning.DISINTEGRATION_FORM_TICKS + Tuning.DISINTEGRATION_CHARGE_TICKS and rng.randf() < 0.28:
 			var a: float = rng.randf_range(0.0, TAU)
@@ -346,7 +346,7 @@ func draw_air(canvas: CanvasItem, frames: Dictionary, sprites: Texture2D, colors
 				_sprite(canvas, frames, sprites, "fx_staff_burst_%d" % (1 + mini(5, since / BURST_FRAME_TICKS)), at + Vector2(0, -15), glow)
 			"phantom_burst":
 				var key: String = ("fx_staff_burst_big_%d" if bool(effect["big"]) else "fx_staff_burst_%d") % (1 + mini(5, since / BURST_FRAME_TICKS))
-				StaffParticles._sprite(canvas, frames, sprites, key, at + Vector2(0, -20 if bool(effect["big"]) else -15), glow, PHANTOM_TINT)
+				FxParticles._sprite(canvas, frames, sprites, key, at + Vector2(0, -20 if bool(effect["big"]) else -15), glow, PHANTOM_TINT)
 			"big_burst":
 				_sprite(canvas, frames, sprites, "fx_staff_burst_big_%d" % (1 + mini(5, since / BIG_BURST_FRAME_TICKS)), at + Vector2(0, -20), glow)
 			"column":
@@ -377,25 +377,17 @@ func draw_air(canvas: CanvasItem, frames: Dictionary, sprites: Texture2D, colors
 
 
 func _sprite(canvas: CanvasItem, frames: Dictionary, sprites: Texture2D, key: String, at: Vector2, glow: float) -> void:
-	StaffParticles._sprite(canvas, frames, sprites, key, at, glow)
+	FxParticles._sprite(canvas, frames, sprites, key, at, glow)
 
 
 static func _pixel(canvas: CanvasItem, colors: Dictionary, at: Vector2, sym: String, glow: float, alpha: float = 1.0) -> void:
-	if StaffParticles.keep(at, alpha):
+	if FxParticles.keep(at, alpha):
 		canvas.draw_rect(Rect2(at.round(), Vector2.ONE), Color(colors[sym], glow))
 
 
 ## A flat ring of light on the ground (rx across, rx * 0.38 deep); `power` 1 bright and solid, 0 gone.
 static func _ring(canvas: CanvasItem, colors: Dictionary, at: Vector2, rx: float, power: float, glow: float, colours: Array = MAGIC) -> void:
-	if power <= 0.0:
-		return
-	var ry: float = rx * 0.38
-	var lead: int = 0 if power > 0.75 else (1 if power > 0.45 else 2)
-	var steps: int = maxi(16, int((rx + ry) * 5.0))
-	for i: int in steps:
-		var a: float = TAU * float(i) / float(steps)
-		_pixel(canvas, colors, at + Vector2(cos(a) * rx, sin(a) * ry), colours[mini(colours.size() - 1, lead + 1)], glow, minf(1.0, power * 1.4))
-		_pixel(canvas, colors, at + Vector2(cos(a) * (rx - 1.0), sin(a) * (ry - 1.0)), colours[lead], glow, minf(1.0, power * 1.2))
+	FxParticles.ground_ring(canvas, colors, at, rx, power, glow, colours)
 
 
 ## A dark ellipse on the ground (the meteor's shadow).
@@ -408,7 +400,7 @@ static func _ellipse(canvas: CanvasItem, colors: Dictionary, at: Vector2, rx: fl
 		var half: float = rx * sqrt(1.0 - dy * dy)
 		for x: int in range(int(-half), int(half) + 1):
 			var p: Vector2 = (at + Vector2(x, y)).round()
-			if StaffParticles.keep(p, alpha * (1.0 if absf(float(x)) < half * 0.6 else 0.7)):
+			if FxParticles.keep(p, alpha * (1.0 if absf(float(x)) < half * 0.6 else 0.7)):
 				canvas.draw_rect(Rect2(p, Vector2.ONE), colors["0"])
 
 

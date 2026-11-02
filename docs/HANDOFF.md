@@ -8,7 +8,7 @@
 
 > **Root Hollow (2026-10-30):** Claude registered live colliders/placements/gate in ad118e0f; Codex finished Root Hollow-only exposure, teal pools and nearest-practical projected cast shadows. Ancient/root-wall canopy y-sort is preserved. Live gate/depth/route/warning captures and PASS cross-review: presentation/review/root_hollow_final/REVIEW.md. Full harness passes. Local shadows use a soft parallel-ray mask approximation, not physical volumetric occlusion; owner judges appearance.
 
-> **Weapon paths (2026-10-29):** approved trails, glow and particles use the shared `hero_fx.gd` base in both arena and exploration. Future hero renderers must call `draw_hero_back`; see [[WEAPON_PATHS]]. The third katana cut was corrected to travel forward over the head.
+> **Basic attack slash (2026-11-02):** the blades' slash is drawn from the swing's hit area (reach and arc from core/weapons.gd, turned to the hero's facing) by `presentation/common/swing_arc.gd`, through the shared `hero_fx.gd` base in both arena and exploration. Future hero renderers must call `draw_hero_back`; see [[WEAPON_PATHS]]. It replaced the pose-traced trail frames of 2026-10-29.
 
 > **UI update (2026-10-29):** owner approved switching the base view to 384x216 and installing the SpriteCook bronze/teal kit with existing game icons. See decision [[0005-384x216-fantasy-ui]], newest STATUS and live captures in `presentation/review/ui_kit_live/`.
 

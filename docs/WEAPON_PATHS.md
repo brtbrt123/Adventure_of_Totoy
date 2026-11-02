@@ -1,30 +1,59 @@
-# Shared weapon paths, glow and particles
+# The blades' basic attack slash
 
-Owner approved the three weapon path previews and requested integration globally, including luminous trails and particles (2026-10-29).
+The blades' slash shows the swing's hit area: the swing's reach around the hero's feet, inside its arc, turned to his facing. It replaced the pose-traced trail frames on 2026-11-02.
 
-## One implementation for every hero scene
+- The owner asked: "change the attack that have a turn and sharp curve and make it just a crescent slash", then "check the basic attack range match effects on it".
+- The old trails (approved 2026-10-29) followed the blade tip in each side-view pose. Several reached behind or above the hero, where nothing is hit, and none turned with him when he faced up or down.
 
-Both `arena.gd` and `explore_scene.gd` extend `presentation/common/hero_fx.gd`. Their hero drawing calls **`draw_hero_back(actor, selected_pose, feet, left)`** immediately before drawing the body. This entry point draws the regular weapon path, Sprint and the rear buff aura. Future scenes that render Totoy must use this entry point too; do not implement a scene-specific trail renderer.
+## What the game hits, and what the slash draws
 
-`presentation/common/weapon_paths.gd` selects the frame using the actual actor pose, state and equipped frame set. It supports three katana swings, four dagger swings (also the Lightning Form frame set) and three scythe swings. Paths appear in the active phase and dissolve in the first six recovery ticks. Windup, unarmed, hurt, dead, skill/cut-in and interrupted poses produce no regular path. No target or boss is required, so missed swings also have a trail.
+The hit test lives in the core (`core/weapons.gd`):
+- A blade's swing hits a target whose edge is within `swing_reach(weapon, swing)` of the hero's feet.
+- The target must also be inside the arc: `facing.dot(direction) >= swing_arc_dot(weapon)`.
 
-The owner caught a reversed third katana cut in the first preview. Its raised-to-low blade motion crosses more than 180 degrees, so shortest-angle interpolation incorrectly swung underneath the hands. Its authored segment now explicitly travels clockwise over the head and down in front; the normal mirror handles left-facing attacks. A regression checks both the forward overhead arc and its low blade-tip endpoint. `katana_alignment_v2.gif` and the `*_third.png` runtime captures show the correction.
+| Weapon | Reach (px) | Arc |
+|---|---|---|
+| Katana | 26, 26, 32.5 (finisher) | 157° |
+| Dual daggers | 19.5 for all four swings | 157° |
+| Chain scythe | 33.8, 33.8, 36.4 | 203° |
 
-`weapon_path_glow.gd` is a child created by the shared base for both scenes. Its small additive shader samples only the standalone path texture, preserving source art transparency. It supplies the halo and square-pixel sparks. The path uses the existing environment shader's emissive-pass convention, so woodland night lighting does not swallow it. This does not add scene lights or affect gameplay.
+`presentation/common/swing_arc.gd` draws a crescent on the ground from those same numbers:
+- Its outer edge is the reach, around the feet. Its ends are the arc's ends, turned to the hero's facing vector (any direction, not only left and right).
+- It sweeps from one end of the arc to the other. It starts two ticks before the active frames and reaches the far end on the last active tick.
+- Odd swings sweep top to bottom on his right side (mirrored on the left); even swings sweep back up.
+- It is white hot where the blade is. The body is in the blade's colour: lilac katana, steel daggers, teal scythe.
+- It fades through the first 8 recovery ticks (12 for the finisher) by dithering.
+- The finisher's crescent is thicker.
+- It is drawn in the Star Staff's style: Totoy 36, hard alpha, ordered dithering, emissive, so night lighting does not swallow it.
+- Sparks fly off its leading end while it sweeps (`impact_view.gd`).
 
-Sparks emit from the bright cutting edge once per fresh simulation tick, not once per rendered frame; they expire in 9–13 ticks and are capped at 48. Clock resets clear them; pausing does not multiply them. Camera motion/shake and left-facing poses use the hero's world anchor. Palette colours remain violet/ice blue/teal. Asset PNGs retain Totoy 36 and hard alpha; halo blending is a runtime effect.
+## One entry point in every scene
 
-The old separate scythe arc draw in the arena and generic road-only practice crescent were removed from rendering, avoiding different/stacked trails across scenes. Practice audio and confirmed contacts, and existing skill/weapon-form effects, remain.
+- Both `arena.gd` and `explore_scene.gd` extend `presentation/common/hero_fx.gd`.
+- Their hero drawing calls `draw_hero_back(actor, selected_pose, feet, left)` just before drawing the body. This draws the slash, Sprint and the rear buff aura, at the hero's sorted depth.
+- Future scenes that render Totoy must use this entry point too.
+- `hero_swing_plan()` exposes the plan for tests. The training post's `practice_view.slash_effect()` returns the same plan.
 
-## Assets and reproduction
+There is no slash in these cases:
+- the windup (until its last two ticks), unarmed, hurt, dead, skill or interrupted poses;
+- the Star Staff, which casts (`staff_view.gd`).
 
-Approved source and conversion: `art/reference/weapon_paths_review_v1/`. `install.py` converts its 40 transparent effect frames into `art/src/fx_weapon_path_*.txt`, anchor (48,78), 128x96. Standard validate/build/preview regenerates runtime PNGs and atlas. The original hero and weapon sprites are reused. No additional generation credits.
+## Checks and the attack sheet
 
-## Regression checks
+- `tests/smoke_swing_arcs.gd` checks every blade, every swing and five facings:
+  - every pixel of the crescent lies inside the hit area;
+  - its edge reaches the reach;
+  - the arc is centred on the facing;
+  - the sweep and fade timing is right;
+  - a real swing shows it in both the fight and the road.
+- `tools/art/attack_range_sheet.py` writes `art/reference/hero_fx_v1/attack_ranges.png`:
+  - every swing with its hit area, read from `core/tuning.gd`;
+  - the slash drawn with the same maths as `swing_arc.gd`.
 
-- `tests/smoke_weapon_paths.gd`: every combo stage, mirrored feet anchors, missing/expired/interrupted/unarmed cases; real core swings for all weapons in **both** scenes; particle emission and expiry.
-- `tests/capture_weapon_paths.gd`: actual renderer submissions of the shared path, glow and particles in all **12** scene/weapon/facing cases. Uses an isolated fixture save. `-- --motion` adds full-combo crops under the ignored `art/build/arena_weapon_paths_motion/` folder.
-- `-- --third` explicitly waits for the third combo swing in all 12 cases. Capture fixtures mark road encounters cleared so mob hits cannot interrupt the alignment check; this does not affect normal play.
-- `art/reference/weapon_paths_review_v1/ingame/compose.py`: converts those runtime captures into the six-panel live GIF, slowed 2.4x for review. Runtime capture pixels remain at integer 3x.
+Removed with this change, all still in the history:
+- the old trail frames `fx_weapon_path_*`;
+- `weapon_paths.gd`, `weapon_path_glow.gd` and its shader;
+- their animation resource `fx_weapon.tres`;
+- `tests/smoke_weapon_paths.gd` and `tests/capture_weapon_paths.gd`.
 
-Full-size captures and animated evidence are in `art/reference/weapon_paths_review_v1/ingame/`. Owner playtesting and Claude cross-review remain pending; screenshots cannot establish combat readability or feel.
+The review captures of the old trails stay in `art/reference/weapon_paths_review_v1/`.

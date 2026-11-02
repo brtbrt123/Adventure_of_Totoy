@@ -264,6 +264,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 		if playing != null:
 			playing.stop()
 	staff_view.clear()
+	impact_view.clear()
 	lightning_fx.clear()
 	coil_fx.clear()
 	coil_hook_tick = -1
@@ -916,6 +917,7 @@ func _draw() -> void:
 	_draw_lightning_ground()
 	_draw_coil_ground()
 	_draw_staff_ground()
+	_draw_impact_ground()
 	_draw_lantern_ground()
 	_draw_ward_echo_ground()
 	creature_effects.draw_ground(self, snapshot, frames, sprites, colors)
@@ -1125,7 +1127,8 @@ func _sync_moving_lights() -> void:
 		if mob["type"] == &"warden":
 			keys[int(mob["id"])] = MobView.frame(mob, snapshot.telegraphs, snapshot.tick)
 	var moving: Array[Dictionary] = WardenEffects.lamps(snapshot.mobs, keys)
-	moving.append_array(staff_lamps())  # the Star Staff's circle, meteor, blast and crater light the ground
+	moving.append_array(staff_lamps())
+	moving.append_array(impact_lamps())  # hits and parries flash on the ground  # the Star Staff's circle, meteor, blast and crater light the ground
 	if moving.is_empty() and _moving_lamps == 0:
 		return
 	var points: PackedVector4Array = (_static_lamps["points"] as PackedVector4Array).duplicate()

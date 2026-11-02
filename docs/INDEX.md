@@ -16,7 +16,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 
 ## Shared presentation
 - [[ANIMATION_EDITING]]: edit every character animation in Godot (SpriteFrames in presentation/animations), repaint frames (art/overrides), the animation galleries
-- [[WEAPON_PATHS]]: global weapon trails, glow/particles, finisher correction and regression captures
+- [[WEAPON_PATHS]]: the blades' basic slash, drawn from the swing's hit area (reach and arc) and turned with the hero
 
 ## Work in progress
 - [[CLAUDE_TASK_village_playtest_polish]]: roomier training yard, Tovan first sword/unarmed state and reward event; Codex presentation ready
