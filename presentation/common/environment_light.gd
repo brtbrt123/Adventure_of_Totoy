@@ -27,7 +27,7 @@ static func make_material(scene: StringName, size: Vector2, placements: Array[Di
 	if scene in [&"glade_layered"]:
 		result.set_shader_parameter("lamp_colour", Vector3(0.48, 0.94, 0.86))
 		result.set_shader_parameter("lamp_core_colour", Vector3(0.8, 1.0, 1.0))
-	result.set_shader_parameter("mixed_lights", scene in [&"forest_layered", &"woodland_layered", &"root_hollow_layered", &"hollow_trial_layered"])
+	result.set_shader_parameter("mixed_lights", scene in [&"village_layered", &"forest_layered", &"woodland_layered", &"root_hollow_layered", &"hollow_trial_layered"])
 	result.set_shader_parameter("lamp_colours", practicals["colours"])
 	result.set_shader_parameter("lamp_core_colours", practicals["core_colours"])
 	result.set_shader_parameter("lamp_count", practicals["count"])

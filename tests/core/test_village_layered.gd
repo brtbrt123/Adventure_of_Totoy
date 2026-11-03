@@ -23,7 +23,7 @@ const DIRECTIONS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vect
 const SOLID_TYPES: Array[String] = ["village_gate", "village_cottage", "village_forge", "village_big_tree", "village_east_tree",
 	"village_shrine", "village_standing_stone", "village_lamp_post", "village_dummy", "village_shelf", "village_barrel_a",
 	"village_barrel_b", "village_barrel_c", "village_barrel_tipped", "village_crate_a", "village_crate_b", "village_pile",
-	"village_rocks", "village_stump", "village_slab", "village_slab_tilted", "village_rubble", "village_chest"]
+	"village_rocks", "village_stump", "village_slab", "village_slab_tilted", "village_rubble", "village_chest", "village_wall", "village_fence"]
 const DECOR_TYPES: Array[String] = ["village_bush_1", "village_bush_2", "village_fern_1", "village_fern_2",
 	"village_mushrooms", "village_mushrooms_small", "village_bucket", "village_rope"]
 
@@ -79,7 +79,7 @@ func test_the_data_is_valid_and_every_type_is_classified() -> void:
 		if String(p["type"]) == "village_forge":
 			forges += 1
 	assert_eq(forges, 1, "exactly one forge")
-	for t: String in ["village_gate", "village_cottage", "village_forge", "village_big_tree", "village_east_tree", "village_shrine",
+	for t: String in ["village_cottage", "village_forge", "village_big_tree", "village_east_tree", "village_shrine",
 			"village_standing_stone", "village_lamp_post", "village_dummy", "village_chest"]:
 		assert_true(used.has(t), "%s is placed" % t)
 
@@ -120,7 +120,7 @@ func test_the_cast_and_spots() -> void:
 	for o: Dictionary in layered["objects"]:
 		objects.append(String(o["id"]) + ":" + String(o["kind"]))
 	objects.sort()
-	assert_eq(objects, ["chest:chest", "edda_door:door", "training_dummy:dummy"], "the chest, door and training dummy interactions")
+	assert_eq(objects, ["chest:chest", "training_dummy:dummy"], "the chest and training dummy interactions (Edda's door has no knock: owner 2026-11-02)")
 	var keys: Array = []
 	for key: Variant in layered["entries"]:
 		keys.append(String(key))
@@ -164,11 +164,7 @@ func test_every_spot_is_free_and_reachable() -> void:
 		assert_eq(core.interact_target.get("id", &""), o["id"], "%s: standing on the use spot targets it" % o["id"])
 	# the door and the chest are solid props: the hero cannot walk onto them
 	assert_false(Collision.fits(obstacles, _placement("chest")["feet"], HERO), "the chest is solid")
-	var door: Vector2 = Vector2(0, 0)
-	for o: Dictionary in def["objects"]:
-		if o["id"] == &"edda_door":
-			door = o["position"]
-	assert_false(Collision.fits(obstacles, door, HERO), "the cottage door is solid, as in the painted village")
+	assert_false(Collision.fits(obstacles, Vector2(428, 106), HERO), "the cottage door is solid, as in the painted village")
 	for n: Dictionary in def["npcs"]:
 		var near: ExploreCore = _new(SCENE)
 		var placed: bool = false
@@ -216,50 +212,6 @@ func test_decor_is_walkable() -> void:
 		if bool(p["solid"]):
 			continue
 		assert_true(Collision.fits(obstacles, p["feet"], HERO), "%s: the hero can stand on the decor prop's anchor" % p["id"])
-
-
-func test_the_rune_gate_passage_is_open_and_the_pillars_are_solid() -> void:
-	var gate: Vector2 = _placement("gate")["feet"]
-	var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(SCENE)
-	var gap_x: float = gate.x + 26.0  # between the left pillar (dx -14..13) and the door leaf + right pillar (dx 40..77)
-	for dir: Vector2 in [Vector2.UP, Vector2.DOWN]:
-		var pos: Vector2 = Vector2(gap_x, gate.y + (28.0 if dir == Vector2.UP else -28.0))
-		var crossed: bool = false
-		for i: int in 120:
-			pos = Collision.move_resolved(obstacles, pos, pos + dir * 1.0, HERO)
-			if (dir == Vector2.UP and pos.y < gate.y - 24.0) or (dir == Vector2.DOWN and pos.y > gate.y + 24.0):
-				crossed = true
-				break
-		assert_true(crossed, "the hero walks %s through the gate's opening (ended at %s)" % [str(dir), str(pos)])
-	var core: ExploreCore = _new(SCENE)
-	core.place_at(Vector2(gap_x, gate.y + 30.0))
-	for i: int in 40:
-		core.step(_frame(Vector2.UP, i == 2))
-		core.exiting = false
-	assert_true(core.player.position.y < gate.y - 12.0, "a dash north goes through the opening (at %s)" % str(core.player.position))
-	# the left pillar and the door leaf / right pillar stop him from the south
-	for foot_x: float in [0.0, 58.0]:
-		var p: Vector2 = Vector2(gate.x + foot_x, gate.y + 24.0)
-		for i: int in 80:
-			p = Collision.move_resolved(obstacles, p, p + Vector2.UP, HERO)
-		assert_true(p.y > gate.y - 22.0, "the gate's solid part at dx %.0f stops the hero from the south (y %.1f)" % [foot_x, p.y])
-	# the clear width of the passage is a comfortable multiple of the hero (12 px) at its narrowest row
-	var widest_gap: float = 0.0
-	var y: float = gate.y - 12.0
-	while y <= gate.y + 12.0:
-		var run: float = 0.0
-		var best: float = 0.0
-		var x: float = gate.x - 10.0
-		while x <= gate.x + 90.0:
-			if Collision.fits(obstacles, Vector2(x, y), HERO):
-				run += 1.0
-				best = maxf(best, run)
-			else:
-				run = 0.0
-			x += 1.0
-		widest_gap = maxf(widest_gap, best)
-		y += 4.0
-	assert_true(widest_gap >= 14.0, "a hero-wide strip is free in the gate rows (%.0f px)" % widest_gap)
 
 
 func test_the_bot_walks_arrival_to_the_exit_and_back() -> void:

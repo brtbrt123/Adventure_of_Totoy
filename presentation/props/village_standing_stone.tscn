@@ -66,3 +66,7 @@ shape = SubResource("CircleShape2D_2")
 [node name="Circle3" type="CollisionShape2D" parent="Colliders"]
 position = Vector2(11, -6)
 shape = SubResource("CircleShape2D_3")
+
+[node name="Light1" type="Marker2D" parent="."]
+position = Vector2(-1.5, -42.5)
+metadata/socket = {"pixel": [23.0, 29.5], "halo_radius": 35.0, "energy": 1.35, "pool_radius": 48.0, "pool_energy": 0.7, "colour": [0.36, 0.64, 1.0], "core_colour": [0.78, 0.9, 1.0]}

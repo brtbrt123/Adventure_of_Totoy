@@ -5107,6 +5107,108 @@
           "blur_padding": 4
         }
       }
+    },
+    "village_wall": {
+      "object": "village_wall",
+      "object_source": "art/reference/village_wall_fence_v1/props/village_wall.png",
+      "object_size": [
+        89,
+        34
+      ],
+      "object_anchor": [
+        44.5,
+        34
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_wall_1",
+          "size": [
+            112,
+            24
+          ],
+          "anchor": [
+            47,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -43,
+            0,
+            55,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_wall_flipped_1",
+          "size": [
+            112,
+            24
+          ],
+          "anchor": [
+            47,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -43,
+            0,
+            55,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "222c09e82971586a78e4ce30229cb5f1287bc58c0ec23b9c0db96e317c127dd2"
+    },
+    "village_fence": {
+      "object": "village_fence",
+      "object_source": "art/reference/village_wall_fence_v1/props/village_fence.png",
+      "object_size": [
+        83,
+        35
+      ],
+      "object_anchor": [
+        41.5,
+        35
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_village_fence_1",
+          "size": [
+            104,
+            24
+          ],
+          "anchor": [
+            44,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -40,
+            0,
+            50,
+            9
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_village_fence_flipped_1",
+          "size": [
+            104,
+            24
+          ],
+          "anchor": [
+            44,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -40,
+            0,
+            50,
+            9
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "3032b6dc894fe4efa38c2f292256f7a57498a9d7dc336058738d26ea8b9d3a92"
     }
   }
 }

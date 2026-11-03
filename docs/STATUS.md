@@ -1,3 +1,15 @@
+## Village scene cleanup: no auto-walk, no knock, blue stone glow (2026-11-03, Claude, done while Codex is out)
+
+Owner (first words): "I report visual errors, you fix functional bugs, and you show me a picture before changing how anything looks." Asked for: the rune gate moved up-left, walls and fences, a glowing stone, the knock on Edda's hut removed, "remove the hero auto walking when the game start in village". Of the old uncommitted village work the owner kept only the knock removal; then asked for generated wall/fence art (Higgsfield nano_banana_2_1, about 5 credits; sources in art/reference/village_wall_fence_v1/), saw it wired, disliked it ("just remove the wall and gate we dont use it anymore"), and left the objective text "Speak to Mira by the gate." as it is.
+
+- **Removed:** the scripted arrival walk (`intro_arrival_ticks` setup in presentation/explore/explore_scene.gd; the controls card now opens on arrival); Edda's `edda_door` knock object; the gate, both walls and the fence from `data/scenes/village_layered_props.json` (arrival and checkpoint are back at (74,146)).
+- **Kept, unused:** the wall and fence art, types and scenes (`village_wall`, `village_fence`: art/src, prop_defs, prop_art, shadow manifest, presentation/props, `tools/art/make_village_walls.py`, cut-outs from `tools/art/extract_props.py`). The gate type is also still there. Place them in the scene data to use them.
+- **Stone glow:** the village standing stone has a blue light (`village_standing_stone` in presentation/common/local_lights.json, halo 35, energy 1.35, pool 48 / 0.7, colour 0.36/0.64/1.0). Cause of "not glowing": the village scene did not use per-light colours, so every light got the default warm colour; `village_layered` is now in the `mixed_lights` list in presentation/common/environment_light.gd. The lamp and forge looked unchanged in captures.
+- **Tests:** deleted the gate-passage core test, dropped the "gate is placed" check, objects now 2 (chest, dummy), the intro smoke checks that the hero does not walk. Core 576 passed, Python 94 passed, `smoke_intro_cutscene` OK, real-input playthrough with no script errors. NOT run: the full smoke harness.
+- **Captures:** presentation/review/village_mock/ (village_wired_v1/v2, village_no_gate, village_stone_glow_blue).
+- **Mistakes:** a scratch playthrough of mine showed a boot icon, a dagger and dark capsules that the owner then fixed themselves; I never found what drew them. I also first generated the wall diagonally, which would not have lined up with the gate.
+- **Not done:** the objective text still mentions the gate; the owner's own scene edits (intro, dialogue_box, explore_overlay, aspect_socket, scene_ribbon, welcome_card, result_panel, project.godot) were not touched or committed.
+
 ## Project skills for sessions (2026-11-03, Claude)
 
 Owner: "install the game dev skill ... pick the skill that will be compatible and useful"; no catalog skill was found, and the web ones (godot-gdscript-patterns and others) were not read or installed. Instead three project skills were written in `.claude/skills/`, so every session in this repo has them:

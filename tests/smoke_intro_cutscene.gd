@@ -234,13 +234,9 @@ func _actual_village_handover() -> void:
 	_expect(village.snapshot.scene_id == &"village_layered" and village.fade_phase == &"in", "actual exploration receives village arrival and incoming fade")
 	_expect(village.snapshot.story_flags.has(&"intro_seen"), "actual village snapshot receives saved intro_seen")
 	_expect(SaveStore.load_profile().has_progress(), "village arrival records resumable progress")
-	_expect(village.intro_arrival_ticks == 18 and not village.conversation.controls_open, "arrival walk waits for fade and defers controls card")
 	var position_before: Vector2 = village.snapshot.hero.position
-	for i: int in Explore.FADE_TICKS:
+	for i: int in Explore.FADE_TICKS + 18:
 		village._physics_process(1.0 / 60.0)
-	_expect(village.intro_arrival_ticks == 18 and village.snapshot.hero.position == position_before, "hero waits while the village fades in")
-	for i: int in 18:
-		village._physics_process(1.0 / 60.0)
-	_expect(village.intro_arrival_ticks == 0 and village.snapshot.hero.position.y > position_before.y, "core movement carries Totoy down from the gate")
-	_expect(village.conversation.controls_open, "controls open after the arrival walk")
+	_expect(village.intro_arrival_ticks == 0 and village.snapshot.hero.position == position_before, "Totoy does not walk by himself after the intro")
+	_expect(village.conversation.controls_open, "the controls card opens on arrival")
 	village.free()

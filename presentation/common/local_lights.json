@@ -620,5 +620,27 @@
         1.0
       ]
     }
+  ],
+  "village_standing_stone": [
+    {
+      "pixel": [
+        23.0,
+        29.5
+      ],
+      "halo_radius": 35.0,
+      "energy": 1.35,
+      "pool_radius": 48.0,
+      "pool_energy": 0.7,
+      "colour": [
+        0.36,
+        0.64,
+        1.0
+      ],
+      "core_colour": [
+        0.78,
+        0.9,
+        1.0
+      ]
+    }
   ]
 }

@@ -206,9 +206,7 @@ func _ready() -> void:
 	if not SceneDefs.LAYERED.has(scene):
 		scene = SceneDefs.START_SCENE
 	enter_scene(scene, StringName(start.get("entry", &"")), StringName(start.get("checkpoint", &"")))
-	if bool(start.get("intro_arrival",false)) and scene==SceneDefs.START_SCENE:
-		intro_arrival_ticks = 18
-		conversation.controls_open = false
+	# no scripted arrival walk any more (owner 2026-11-03): the hero stands still where the entry puts them
 	fade_phase = &"in"
 	fade_ticks = 0
 	_update_hud()

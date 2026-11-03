@@ -1,34 +1,10 @@
 # HANDOFF: Adventure of Totoy (current checkpoint 2026-11-02)
 
-> **START HERE for the next session (Claude, 2026-11-02).** The owner stopped the last session: "I don't like what it looks, your work is not good". The session was too long, so this is a fresh start.
+> **START HERE for the next session (Claude, 2026-11-03).** We are debugging the game from the first scene: the owner reports visual errors, Claude fixes functional bugs and shows a picture before changing how anything looks.
 >
-> **Read [[EFFECTS_REDO]] (every effects layer, its file, the generators, the image-generator accounts) and [[INDEX]] first.**
->
-> **Committed and pushed** on `agent/codex/progression` (last commit `d5d4cdcf`; never merge to `main`):
-> - The effects redo in the Star Staff's style, in four phases: hero hits, parries and the basic slash on the hit area; the weapon forms; the aspects; the mobs (not the golem). The owner has not played them.
-> - A mobile layout blueprint: `docs/MOBILE_BLUEPRINT.md`.
-> - The fix for the white haze across the top of the screen (the weapon cut-ins' warm-up draw).
-> - A real-input playthrough of the game's start: `presentation/review/playthrough/capture_start.gd`. The title, intro, village arrival and Mira all ran with no console errors.
-> - Details are in the newest sections of [[STATUS]].
->
-> **Village request, REVERTED (2026-11-03).** Nothing of it is left in the repo or the working tree. The owner asked, looking at the rune gate in the village (screenshot: the gate at the top left of the arrival view, with the objective banner above it):
-> - move the gate more to the upper left;
-> - add walls and fences (the gate has none);
-> - make the glowing standing stone glow;
-> - remove the knock ([E] KNOCK on Edda's cottage door; it has no purpose).
->
-> A first attempt was made and the owner rejected how it looked ("your work is not good"), so everything was reverted:
-> - **Gate** moved up-left: its arch got cut off at the top of the arrival view.
-> - **Walls and fences** drawn in code: plain grey blocks that clashed with the painted props. Code-drawn props must not be used for this.
-> - **Stone light:** a teal light socket for `village_standing_stone` (`presentation/common/local_lights.json`, the `Light1` marker in its prop scene). It did glow in game.
-> - **Knock:** the `edda_door` object removed from `data/scenes/village_layered_props.json`, plus the two tests that count objects (`tests/core/test_explore_core.gd` expects 2, `tests/core/test_village_layered.gd`).
->
-> Redo it from scratch: all four requests are still open. Show the owner a picture first ([[feedback-show-before-visual-changes]]). Walls and fences need art in the painted village's style (`art/reference/layered_village/`), made through the import pipeline or image generation with the village props as references. The first and last requests are plain data edits.
->
-> **Also reported by the owner (2026-11-03), not investigated yet** (screenshots in the chat, not in the repo):
-> - A segmented dark post standing in the forest at the village's west edge. It was probably the rejected fence, now gone, so check it is.
-> - "DASH LOCKED" with a boot icon is the tutorial lock text (expected). Two dark rings next to the lamp post are unexplained: a prop, a debug overlay (the window title says DEBUG) or a UI piece.
-> - The Z, X, C aspect sockets in the HUD look wrong. `presentation/ui/pieces/hud/aspect_socket.tscn` has the owner's own uncommitted edits (cost label moved, font 7 to 5), so ask what is wrong before touching it.
+> **Done and committed on `agent/codex/progression` (never merge to `main`):** the village cleanup of 2026-11-03, see the top of [[STATUS]]. The hero no longer auto-walks after the intro; Edda's hut has no knock; the village standing stone glows blue (the village scene now uses per-light colours); the gate, walls and fence were tried and removed from the village scene (the owner did not like them). The wall and fence art/types stay in the project unused (`tools/art/make_village_walls.py`, Higgsfield cut-outs in `art/reference/village_wall_fence_v1/`).
+> - Open: the objective still reads "Speak to Mira by the gate." (owner said leave it). A boot icon, dagger and dark capsules once seen in the village were fixed by the owner themselves; the cause was never found.
+> - The effects redo in the Star Staff's style (phases 1-4), the mobile blueprint (`docs/MOBILE_BLUEPRINT.md`), the white-haze fix and the real-input playthrough (`presentation/review/playthrough/capture_start.gd`) are from 2026-11-02 and in STATUS.
 >
 > **Working rules this owner holds:**
 > - The owner points out visual problems; Claude chases functional bugs (console errors, broken flow).
@@ -41,6 +17,8 @@
 > - The Godot editor is often open. It locks `art/build` files (Errno 22: retry), and it deletes and recreates `art/build/contact_sheet_*.png.import`. Restore those with `git checkout HEAD --`.
 > - `tools/godot/generate_prop_scenes.py` also reformats the `presentation/props/hollow_trial_*.tscn` scenes. Restore those after running it.
 > - Three smokes only pass with a window: `smoke_capture_hero`, `smoke_gemini_capture`, `smoke_hero_capture`.
+> - A village light colour is only used when the scene is in the `mixed_lights` list in `presentation/common/environment_light.gd`.
+> - Image generation: Higgsfield (`nano_banana_2_1`, 1.5 credits per image, about 25 left); SpriteCook is on the free tier with 1 credit.
 
 > **START HERE for the new Codex chat (2026-10-31):** read [[WARDEN_INTEGRATION]] and [[CODEX_NEXT_SESSION_warden]]. Owner authorized wiring after requesting a 2.5x body. Warden now has60 installed enlarged poses,75 attached FX, actual-core-geometry floor effects and13 recorded sound cues. Runtime review media is in `presentation/review/warden/`. See the integration note for final test status. Claude cross-review remains pending because its OAuth session expired. Trial room/waves/rewards remain separate. Branch `agent/codex/progression`; preserve the dirty worktree and never merge main.
 

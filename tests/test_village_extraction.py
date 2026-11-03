@@ -20,11 +20,15 @@ DEFS = ROOT / "data" / "props" / "prop_defs.json"
 CUTS = ROOT / "art" / "reference" / "layered_village" / "props"
 
 
+OTHER_SHEET = {"village_wall", "village_fence"}
+
+
 class VillageExtractionTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.defs = json.loads(DEFS.read_text(encoding="utf-8"))["props"]
-        cls.village = {k: v for k, v in cls.defs.items() if k.startswith("village_")}
+        # the wall and fence come from their own sheet (art/reference/village_wall_fence_v1, tools/art/make_village_walls.py)
+        cls.village = {k: v for k, v in cls.defs.items() if k.startswith("village_") and k not in OTHER_SHEET}
         pal = artlib.load_palette()
         cls.allowed = {rgb for sym, rgb in pal.by_symbol.items() if sym not in pal.reserved}
 

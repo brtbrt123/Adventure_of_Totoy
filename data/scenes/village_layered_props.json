@@ -215,18 +215,6 @@
    ]
   },
   {
-   "id": "edda_door",
-   "kind": "door",
-   "position": [
-    428,
-    106
-   ],
-   "stand": [
-    428,
-    124
-   ]
-  },
-  {
    "id": "training_dummy",
    "kind": "dummy",
    "position": [
@@ -240,14 +228,6 @@
   }
  ],
  "props": [
-  {
-   "id": "gate",
-   "type": "village_gate",
-   "x": 48,
-   "y": 128,
-   "flip": false,
-   "shadow_radius": 26
-  },
   {
    "id": "big_tree",
    "type": "village_big_tree",

@@ -368,7 +368,7 @@ func test_snapshot_lists_the_scene() -> void:
 	assert_eq(snap.scene_id, SceneDefs.VILLAGE_LAYERED)
 	assert_eq(snap.size, Vector2(571, 336))
 	assert_eq(snap.npcs.size(), 6)
-	assert_eq(snap.objects.size(), 3)
+	assert_eq(snap.objects.size(), 2)  # the chest and the training dummy (Edda's door lost its knock: owner 2026-11-02)
 	assert_eq(snap.hero.visual_id, &"totoy")
 	assert_eq(snap.hero.weapon_id, Tuning.WEAPON_BLACK_KATANA)
 	assert_true(snap.obstacles.size() > 50 and snap.exits.size() == 1 and snap.checkpoints.size() == 1)
