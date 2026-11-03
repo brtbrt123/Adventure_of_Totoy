@@ -6,6 +6,7 @@ const SHADOW_PROJECTION: Vector2 = Vector2(0.30, 0.25)
 const MAX_LIGHTS: int = 32
 const PROP_SHADOW_ALPHA: float = 0.30
 const ACTOR_SHADOW_ALPHA: float = 0.20
+const LAMP_SHADOW_ALPHA: float = 0.85  # the shader's lamp_shadow_alpha
 static var _sockets: Dictionary = {}
 
 
@@ -19,6 +20,7 @@ static func make_material(scene: StringName, size: Vector2, placements: Array[Di
 	result.set_shader_parameter("emissive_pass_alpha", Fireflies.EMISSIVE_ALPHA)
 	result.set_shader_parameter("prop_shadow_alpha", PROP_SHADOW_ALPHA)
 	result.set_shader_parameter("actor_shadow_alpha", ACTOR_SHADOW_ALPHA)
+	result.set_shader_parameter("lamp_shadow_alpha", LAMP_SHADOW_ALPHA)
 	result.set_shader_parameter("world_size", size)
 	result.set_shader_parameter("shaft_slope", SHADOW_PROJECTION.x / SHADOW_PROJECTION.y)
 	result.set_shader_parameter("strength", 0.82 if scene in [&"root_hollow_layered", &"hollow_trial_layered"] else 1.0)
@@ -27,7 +29,7 @@ static func make_material(scene: StringName, size: Vector2, placements: Array[Di
 	if scene in [&"glade_layered"]:
 		result.set_shader_parameter("lamp_colour", Vector3(0.48, 0.94, 0.86))
 		result.set_shader_parameter("lamp_core_colour", Vector3(0.8, 1.0, 1.0))
-	result.set_shader_parameter("mixed_lights", scene in [&"village_layered", &"forest_layered", &"woodland_layered", &"root_hollow_layered", &"hollow_trial_layered"])
+	result.set_shader_parameter("mixed_lights", scene in [&"village_layered", &"glade_layered", &"forest_layered", &"woodland_layered", &"root_hollow_layered", &"hollow_trial_layered"])
 	result.set_shader_parameter("lamp_colours", practicals["colours"])
 	result.set_shader_parameter("lamp_core_colours", practicals["core_colours"])
 	result.set_shader_parameter("lamp_count", practicals["count"])
@@ -76,9 +78,9 @@ static func lamp_plan(placements: Array[Dictionary]) -> Dictionary:
 
 ## Projects the current animated actor silhouette onto the same ground plane.
 ## Both facings keep the key light fixed; the source anchor always lands on feet.
-static func actor_transform(feet: Vector2, frame: Dictionary, flipped: bool) -> Transform2D:
+static func actor_transform(feet: Vector2, frame: Dictionary, flipped: bool, projection: Vector2 = SHADOW_PROJECTION) -> Transform2D:
 	var ax: float = float(frame.get("ax", float(frame["w"]) * 0.5))
 	var ay: float = float(frame.get("ay", float(frame["h"]) - 4.0))
 	var direction: float = -1.0 if flipped else 1.0
-	var origin: Vector2 = feet.round() + Vector2(-direction * ax + ay * SHADOW_PROJECTION.x, ay * SHADOW_PROJECTION.y)
-	return Transform2D(Vector2(direction, 0), -SHADOW_PROJECTION, origin)
+	var origin: Vector2 = feet.round() + Vector2(-direction * ax + ay * projection.x, ay * projection.y)
+	return Transform2D(Vector2(direction, 0), -projection, origin)

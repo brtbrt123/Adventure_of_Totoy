@@ -20,6 +20,9 @@ const CreatureGlow := preload("res://presentation/explore/creature_glow.gd")
 var creature_effects: CreatureEffects = CreatureEffects.new()
 var creature_glow: CreatureGlow
 const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
+const LAMP_SHADOW_EASE: float = 0.12  # how much of the way the shadow turns toward its target each frame
+var _lamp_shadows: Dictionary = {}  # per character: the eased lamp-shadow vector
+const LAMP_SHADOW_LENGTH: float = 2.0  # ground shift per pixel of height, right next to a light
 var _static_lamps: Dictionary = {}  # the props' lamp plan of the scene (EnvironmentLight.lamp_plan)
 var _moving_lamps: int = 0  # lamps added for moving mobs last snapshot
 const TrialArt := preload("res://presentation/explore/trial_scene_art.gd")
@@ -233,6 +236,7 @@ func ground_texture(scene: StringName) -> Texture2D:
 ## Builds the core of `scene` with the hero at `entry` (or on `checkpoint` when given, the CONTINUE case), shows the
 ## scene name and saves the scene as the current one. The arena is not explored: it loads the Colossus fight.
 func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringName = &"") -> void:
+	_lamp_shadows.clear()
 	if scene == SceneDefs.ARENA:
 		_save_progress(SceneDefs.ARENA, &"ruins_gate")
 		change_scene.call(ARENA_SCENE)
@@ -1037,7 +1041,43 @@ func _draw_actor_cast(item: Dictionary) -> void:
 	var frame: Dictionary = frames[item["frame"]]
 	draw_set_transform_matrix(EnvironmentLight.actor_transform(item["at"], frame, bool(item["left"])))
 	draw_texture_rect_region(sprites, Rect2(Vector2.ZERO, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(0, 0, 0, EnvironmentLight.ACTOR_SHADOW_ALPHA))
+	var lamp: Vector2 = _lamp_shadow(item["at"], str(item.get("id", "")))
+	if lamp != Vector2.ZERO:
+		draw_set_transform_matrix(EnvironmentLight.actor_transform(item["at"], frame, bool(item["left"]), lamp))
+		draw_texture_rect_region(sprites, Rect2(Vector2.ZERO, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(0, 0, 0, EnvironmentLight.LAMP_SHADOW_ALPHA))
 	draw_set_transform(shake_offset())
+
+
+## The ground shift per pixel of height of the shadow the nearest lamp or glow stone throws from a character at `feet`. It points away
+## from the light; it is nothing right under the light, longest a little way out, and shrinks to nothing at the edge of the light's
+## reach (the shadow pass cannot fade, so the length does the fading). The direction is eased over a few frames per character, so
+## walking round a lamp turns the shadow smoothly instead of snapping it.
+func _lamp_shadow(feet: Vector2, key: String) -> Vector2:
+	var target: Vector2 = Vector2.ZERO
+	if snapshot != null and not _static_lamps.is_empty():
+		var points: PackedVector4Array = _static_lamps["points"]
+		var best_weight: float = 0.0
+		for i: int in range(0, int(_static_lamps["count"]) - 1, 2):
+			var halo: Vector4 = points[i]
+			if halo.w <= 0.0:
+				continue
+			var base: Vector2 = Vector2(points[i + 1].x, points[i + 1].y)  # the fixture's foot on the floor
+			var delta: Vector2 = feet - base
+			var reach: float = halo.z * 2.2
+			var d: float = delta.length()
+			if d < 0.5 or d >= reach:
+				continue
+			var near: float = smoothstep(2.0, 38.0, d)  # standing under the light: almost no shadow
+			var far: float = 1.0 - smoothstep(reach * 0.3, reach, d)
+			var weight: float = near * far
+			if weight > best_weight:
+				best_weight = weight
+				target = Vector2(delta.x / d, delta.y / d * 0.8) * (LAMP_SHADOW_LENGTH * weight)
+	var eased: Vector2 = (_lamp_shadows.get(key, Vector2.ZERO) as Vector2).lerp(target, LAMP_SHADOW_EASE)
+	if eased.length() < 0.01:
+		eased = Vector2.ZERO
+	_lamp_shadows[key] = eased
+	return eased
 
 
 func shadow_strength() -> float:

@@ -3,6 +3,7 @@
 > **START HERE for the next session (Claude, 2026-11-03).** We are debugging the game from the first scene: the owner reports visual errors, Claude fixes functional bugs and shows a picture before changing how anything looks.
 >
 > **Done and committed on `agent/codex/progression` (never merge to `main`):** the village cleanup of 2026-11-03, see the top of [[STATUS]]. The hero no longer auto-walks after the intro; Edda's hut has no knock; the village standing stone glows blue (the village scene now uses per-light colours); the gate, walls and fence were tried and removed from the village scene (the owner did not like them). The wall and fence art/types stay in the project unused (`tools/art/make_village_walls.py`, Higgsfield cut-outs in `art/reference/village_wall_fence_v1/`).
+> - Lighting (2026-11-03): lamps, stones and the forge glow stronger, all glow stones share the village stone's blue light, and characters throw an eased shadow from the nearest light (`_lamp_shadow` in explore_scene.gd). The forest, Root Hollow and trial scenes were not re-checked after that; see the newest STATUS entry.
 > - Open: the objective still reads "Speak to Mira by the gate." (owner said leave it). A boot icon, dagger and dark capsules once seen in the village were fixed by the owner themselves; the cause was never found.
 > - The effects redo in the Star Staff's style (phases 1-4), the mobile blueprint (`docs/MOBILE_BLUEPRINT.md`), the white-haze fix and the real-input playthrough (`presentation/review/playthrough/capture_start.gd`) are from 2026-11-02 and in STATUS.
 >

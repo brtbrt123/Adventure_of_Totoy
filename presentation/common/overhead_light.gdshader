@@ -11,6 +11,7 @@ uniform vec3 lamp_colour = vec3(1.0, 0.79, 0.52);
 uniform float emissive_pass_alpha = 0.99;
 uniform float prop_shadow_alpha = 0.30;
 uniform float actor_shadow_alpha = 0.20;
+uniform float lamp_shadow_alpha = 0.85;  // the shadow a lamp or glow stone throws from a character: darker than the moon's
 uniform bool mixed_lights = false;
 uniform vec3 lamp_colours[32];
 uniform vec3 lamp_core_colours[32];
@@ -83,7 +84,7 @@ void fragment() {
 		}
 	}
 	bool shadow_pass = max(draw_colour.r, max(draw_colour.g, draw_colour.b)) < 0.001
-		&& (abs(draw_colour.a - prop_shadow_alpha) < 0.0001 || abs(draw_colour.a - actor_shadow_alpha) < 0.0001);
+		&& (abs(draw_colour.a - prop_shadow_alpha) < 0.0001 || abs(draw_colour.a - actor_shadow_alpha) < 0.0001 || abs(draw_colour.a - lamp_shadow_alpha) < 0.0001);
 	if (abs(draw_colour.a - mist_pass_alpha) < 0.0001) {
 		if (!mist_enabled) {
 			COLOR = vec4(0.0);
@@ -117,7 +118,10 @@ void fragment() {
 		vec3 lit = base.rgb * exposure * mix(vec3(1.0), light_colour, strength);
 		float warmth = min(1.8, warm_pool * 0.95 + warm_halo * 0.75);
 		if (mixed_lights) {
-			lit += base.rgb * min(vec3(1.8), pool_rgb * 0.95 + halo_rgb * 0.75) * 0.65;
+			// overlapping lights add up, so ease the sum toward its cap instead of cutting it (one light is unchanged, a ring of stones
+			// does not blow out)
+			vec3 summed = pool_rgb * 0.95 + halo_rgb * 0.75;
+			lit += base.rgb * (vec3(1.8) * (vec3(1.0) - exp(-summed / 1.8))) * 0.65;
 			lit += min(vec3(0.075), halo_rgb * 0.035);
 		} else {
 			lit += base.rgb * lamp_colour * warmth * 0.65;

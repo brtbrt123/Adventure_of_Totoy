@@ -5,10 +5,10 @@
         30.5,
         39.0
       ],
-      "halo_radius": 28.0,
-      "energy": 1.15,
-      "pool_radius": 45.0,
-      "pool_energy": 0.8
+      "halo_radius": 52.0,
+      "energy": 1.9,
+      "pool_radius": 125.0,
+      "pool_energy": 1.9
     }
   ],
   "village_east_tree": [
@@ -29,10 +29,10 @@
         33.0,
         55.0
       ],
-      "halo_radius": 30.0,
-      "energy": 1.35,
-      "pool_radius": 50.0,
-      "pool_energy": 1.0
+      "halo_radius": 54.0,
+      "energy": 2.16,
+      "pool_radius": 120.0,
+      "pool_energy": 2.0
     }
   ],
   "village_cottage": [
@@ -63,18 +63,18 @@
         28.0,
         23.1
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -85,18 +85,18 @@
         26.2,
         23.6
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -107,18 +107,18 @@
         24.8,
         20.3
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -129,18 +129,18 @@
         23.1,
         23.7
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -151,18 +151,18 @@
         17.5,
         22.6
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -173,18 +173,18 @@
         10.3,
         19.1
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -195,18 +195,18 @@
         27.8,
         25.5
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -301,10 +301,10 @@
         5.0,
         25.0
       ],
-      "halo_radius": 25.0,
-      "energy": 1.05,
-      "pool_radius": 40.0,
-      "pool_energy": 0.6,
+      "halo_radius": 45.0,
+      "energy": 1.68,
+      "pool_radius": 96.0,
+      "pool_energy": 1.2,
       "colour": [
         1.0,
         0.79,
@@ -323,10 +323,10 @@
         12,
         22
       ],
-      "halo_radius": 25.0,
-      "energy": 1.05,
-      "pool_radius": 40.0,
-      "pool_energy": 0.6,
+      "halo_radius": 45.0,
+      "energy": 1.68,
+      "pool_radius": 96.0,
+      "pool_energy": 1.2,
       "colour": [
         1.0,
         0.79,
@@ -345,18 +345,18 @@
         24,
         17
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -367,18 +367,18 @@
         12,
         27
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     },
@@ -387,18 +387,18 @@
         32,
         16
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     },
@@ -407,18 +407,18 @@
         53,
         28
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -451,18 +451,18 @@
         31,
         24
       ],
-      "halo_radius": 32.0,
-      "energy": 1.1,
-      "pool_radius": 120.0,
-      "pool_energy": 0.62,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -473,18 +473,18 @@
         23,
         16
       ],
-      "halo_radius": 32.0,
-      "energy": 1.1,
-      "pool_radius": 48.0,
-      "pool_energy": 0.62,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -495,18 +495,18 @@
         19,
         20
       ],
-      "halo_radius": 32.0,
-      "energy": 1.1,
-      "pool_radius": 48.0,
-      "pool_energy": 0.62,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -517,18 +517,18 @@
         20,
         20
       ],
-      "halo_radius": 32.0,
-      "energy": 1.1,
-      "pool_radius": 48.0,
-      "pool_energy": 0.62,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -539,18 +539,18 @@
         22,
         19
       ],
-      "halo_radius": 32.0,
-      "energy": 1.1,
-      "pool_radius": 48.0,
-      "pool_energy": 0.62,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -561,18 +561,18 @@
         20,
         23
       ],
-      "halo_radius": 32.0,
-      "energy": 1.1,
-      "pool_radius": 48.0,
-      "pool_energy": 0.62,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -583,18 +583,18 @@
         14,
         17
       ],
-      "halo_radius": 32.0,
-      "energy": 1.1,
-      "pool_radius": 48.0,
-      "pool_energy": 0.62,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
-        0.48,
-        0.94,
-        0.86
+        0.36,
+        0.64,
+        1.0
       ],
       "core_colour": [
-        0.8,
-        1.0,
+        0.78,
+        0.9,
         1.0
       ]
     }
@@ -627,10 +627,10 @@
         23.0,
         29.5
       ],
-      "halo_radius": 35.0,
-      "energy": 1.35,
-      "pool_radius": 48.0,
-      "pool_energy": 0.7,
+      "halo_radius": 100.0,
+      "energy": 1.25,
+      "pool_radius": 150.0,
+      "pool_energy": 1.9,
       "colour": [
         0.36,
         0.64,
