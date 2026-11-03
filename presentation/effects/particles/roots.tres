@@ -1,0 +1,61 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_fyjiw"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_opb1u"]
+
+[sub_resource type="Resource" id="Resource_5lqxk"]
+script = ExtResource("1_fyjiw")
+count = 14
+life_min = 18
+life_max = 28
+speed_min = 0.8
+speed_max = 1.8
+drag = 0.03
+up = 1.2
+gravity = 0.12
+size_min = 2.0
+size_max = 3.0
+colours = PackedStringArray("d", "c", "b")
+
+[sub_resource type="Resource" id="Resource_j2kls"]
+script = ExtResource("1_fyjiw")
+shape = "spark"
+life_min = 20
+life_max = 34
+speed_min = 0.2
+speed_max = 0.6
+drag = 0.04
+up = 0.5
+gravity = -0.01
+size_max = 1.0
+colours = PackedStringArray("o", "p", "u")
+
+[sub_resource type="Resource" id="Resource_7642t"]
+script = ExtResource("1_fyjiw")
+count = 5
+shape = "leaf"
+life_min = 26
+life_max = 40
+speed_min = 0.6
+speed_max = 1.2
+drag = 0.04
+up = 0.9
+size_min = 2.0
+flutter = 1.5
+colours = PackedStringArray("7", "6")
+
+[sub_resource type="Resource" id="Resource_n06db"]
+script = ExtResource("1_fyjiw")
+count = 3
+shape = "blade"
+life_min = 16
+life_max = 26
+speed_max = 1.1
+up = 1.0
+gravity = 0.1
+size_max = 1.0
+colours = PackedStringArray("5", "4")
+
+[resource]
+script = ExtResource("2_opb1u")
+layers = Array[Resource]([SubResource("Resource_5lqxk"), SubResource("Resource_j2kls"), SubResource("Resource_7642t"), SubResource("Resource_n06db")])

@@ -1,3 +1,5 @@
+> Completion update 2026-10-27: core route/save migration was already pushed, and Codex has now retired painted presentation/test dependencies. See LAYERED_MIGRATION_COMPLETED.md for current status and the Claude follow-up. Statements below saying routes are not switched describe the earlier handoff, not the current game.
+
 # Owner decision: layered maps are the official chapter maps
 
 Confirmed by the owner on 2026-10-27: **"yes we will use the layared map"**, in reply to switching normal routes/saves to the layered village/forest/glade and then retiring the old playable maps. Keep original paintings as art references. The Colossus arena remains the existing arena; there is no replacement layered arena in this decision.

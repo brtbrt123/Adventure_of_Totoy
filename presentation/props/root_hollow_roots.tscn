@@ -1,0 +1,67 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/root_hollow_roots.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_root_hollow_roots_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_root_hollow_roots_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 4, 48, 28)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 6
+
+[node name="root_hollow_roots" type="Node2D"]
+metadata/w = 48
+metadata/h = 28
+metadata/base_width = 32
+metadata/solid = true
+metadata/image = "root_hollow_roots.png"
+metadata/note = "twisted root clump: solid, so keep it off the trails"
+metadata/locked = true
+metadata/contact_shadow = {"size": [48, 28], "core": [[2, 19, 2], [0, 20, 4], [9, 20, 1], [25, 20, 3], [0, 21, 2], [7, 21, 3], [22, 21, 6], [44, 21, 1], [4, 22, 5], [22, 22, 3], [44, 22, 4], [4, 23, 3], [13, 23, 4], [28, 23, 3], [45, 23, 3], [11, 24, 6], [19, 24, 2], [28, 24, 3], [38, 24, 3], [10, 25, 3], [18, 25, 4], [32, 25, 1], [36, 25, 8], [10, 26, 1], [17, 26, 2], [21, 26, 1], [31, 26, 3], [36, 26, 2], [41, 26, 3], [17, 27, 1], [31, 27, 1], [33, 27, 3], [34, 28, 2]], "edge": [[1, 19, 1], [4, 19, 1], [-1, 20, 1], [4, 20, 1], [8, 20, 1], [10, 20, 1], [24, 20, 1], [28, 20, 1], [-1, 21, 1], [2, 21, 2], [6, 21, 1], [10, 21, 1], [21, 21, 1], [28, 21, 1], [43, 21, 1], [45, 21, 1], [0, 22, 2], [3, 22, 1], [9, 22, 1], [21, 22, 1], [25, 22, 3], [43, 22, 1], [48, 22, 1], [3, 23, 1], [7, 23, 2], [12, 23, 1], [17, 23, 1], [22, 23, 3], [27, 23, 1], [31, 23, 1], [44, 23, 1], [48, 23, 1], [4, 24, 3], [10, 24, 1], [17, 24, 2], [21, 24, 1], [27, 24, 1], [31, 24, 1], [37, 24, 1], [41, 24, 1], [45, 24, 3], [9, 25, 1], [13, 25, 5], [22, 25, 1], [28, 25, 4], [33, 25, 1], [35, 25, 1], [44, 25, 1], [9, 26, 1], [11, 26, 2], [16, 26, 1], [19, 26, 2], [22, 26, 1], [30, 26, 1], [34, 26, 2], [38, 26, 3], [44, 26, 1], [10, 27, 1], [16, 27, 1], [18, 27, 1], [21, 27, 1], [30, 27, 1], [32, 27, 1], [36, 27, 2], [41, 27, 3], [17, 28, 1], [31, 28, 1], [33, 28, 1], [36, 28, 1], [34, 29, 2]]}
+metadata/flip_offset = Vector2(-24, -28)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-24, -28)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-26, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-27, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-10.0, -4)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0.0, -4)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(10.0, -4)
+shape = SubResource("CircleShape2D_3")

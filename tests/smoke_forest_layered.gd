@@ -73,8 +73,8 @@ func capture_overview(label: String) -> void:
 			scene.snapshot.tick += 12
 			await capture("motion_%02d" % frame)
 	scene.hud.visible = true
-	root.content_scale_size = Vector2i(320, 180)
-	root.size = Vector2i(1280, 720)
+	root.content_scale_size = Vector2i(384, 216)
+	root.size = Vector2i(1152, 648)
 	scene.camera.enabled = true
 	scene._update_camera()
 
@@ -201,9 +201,9 @@ func run() -> void:
 		scene.advance(bot.next_input(scene.snapshot.hero.position))
 		if scene.fade_phase != &"":
 			break
-	expect(scene.pending_scene == &"glade", "Walked through gate to glade exit")
+	expect(scene.pending_scene == &"root_hollow_layered", "Walked through gate to the Root Hollow exit")
 	finish_fade()
-	expect(scene.snapshot.scene_id == &"glade", "Exit completes transition")
+	expect(scene.snapshot.scene_id == &"root_hollow_layered", "Exit completes transition")
 	expect(InputMap.has_action("debug_scene_forest_layered"), "Forest debug binding")
 	scene.jump_to(Explore.DEBUG_SCENES["debug_scene_forest_layered"])
 	finish_fade()

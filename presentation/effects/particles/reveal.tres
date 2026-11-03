@@ -1,0 +1,21 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_k3icl"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_koeeo"]
+
+[sub_resource type="Resource" id="Resource_dtrvd"]
+script = ExtResource("1_k3icl")
+count = 12
+shape = "spark"
+life_min = 16
+life_max = 28
+speed_min = 0.3
+speed_max = 0.9
+up = 0.6
+gravity = -0.005
+size_max = 1.0
+colours = PackedStringArray("p", "o", "u")
+
+[resource]
+script = ExtResource("2_koeeo")
+layers = Array[Resource]([SubResource("Resource_dtrvd")])

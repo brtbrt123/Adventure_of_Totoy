@@ -655,5 +655,404 @@
       "license": "CC0-1.0",
       "origin": "Interface Sounds tick_001.ogg; chosen by owner; copied unchanged"
     }
+  ],
+  "warden_recorded_remixes": [
+    {
+      "file": "warden_wake.wav",
+      "sha256": "efab9cea34757a9019c7959ede89a2c7564f329d5541ab63ab92b099dc4ad08d",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "golem_charge.wav",
+            0.65,
+            0.55,
+            0
+          ],
+          [
+            "gold_warning.wav",
+            0.65,
+            0.25,
+            0.08
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.43425292968750007,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "golem_charge.wav": "323fe50b330deb9011ad75723ef9575599eb193723a49062256ff572fe173dfa",
+        "gold_warning.wav": "4d2dad477c2e01ec52b6e22056f547e2d1906dee97dad521d638d36bf6b4baab"
+      }
+    },
+    {
+      "file": "warden_step.wav",
+      "sha256": "1f669c4b7b9576372756e7b09a7251713206e32ed9f9803c5db56ce0f08f51d6",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "armor_hit.wav",
+            0.55,
+            0.65,
+            0
+          ],
+          [
+            "golem_stomp.wav",
+            0.8,
+            0.35,
+            0
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.5668252563476565,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "armor_hit.wav": "45b478650277cebfb9eda8d53096df7b4433ae025af5a023046156e84d83746f",
+        "golem_stomp.wav": "44740b3be51041e60074d89e0a539b99394e17844d56a59506872464a9e40853"
+      }
+    },
+    {
+      "file": "warden_step_2.wav",
+      "sha256": "5a39e5e4fef3a08f4f2e11d95c45645605c651d42903d0f449def5e3aeeb5c2c",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "armor_hit_2.wav",
+            0.6,
+            0.65,
+            0
+          ],
+          [
+            "golem_stomp.wav",
+            0.9,
+            0.35,
+            0
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.4343014526367188,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "armor_hit_2.wav": "8282e6c26b43fd34a0eaedbcf9f87ce73cd178d29ce79767115fbf91a7ec6821",
+        "golem_stomp.wav": "44740b3be51041e60074d89e0a539b99394e17844d56a59506872464a9e40853"
+      }
+    },
+    {
+      "file": "warden_cleave_tell.wav",
+      "sha256": "93a2a7d8b813ef9b8559f247aa6e32416494422bec0378bd9c6ae2e640f4d806",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "swing.wav",
+            0.65,
+            0.6,
+            0
+          ],
+          [
+            "armor_hit.wav",
+            0.6,
+            0.25,
+            0.1
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.299258422851562,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "swing.wav": "23873988a85c40a579d63a31c6a9fb2d8d3a0630747914419ca3bbceab053b50",
+        "armor_hit.wav": "45b478650277cebfb9eda8d53096df7b4433ae025af5a023046156e84d83746f"
+      }
+    },
+    {
+      "file": "warden_cleave_strike.wav",
+      "sha256": "e2c61dd8e92dbe82bce33df730162b0a054d1c0858f82bbdb875e6ae5e540ece",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "golem_sweep.wav",
+            0.7,
+            0.6,
+            0
+          ],
+          [
+            "armor_hit_2.wav",
+            0.65,
+            0.5,
+            0.06
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.5606433105468748,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "golem_sweep.wav": "d60f27eab5be368c1b902199ef834f8c9d46e6e9e7281d12083c9bf69b322eb3",
+        "armor_hit_2.wav": "8282e6c26b43fd34a0eaedbcf9f87ce73cd178d29ce79767115fbf91a7ec6821"
+      }
+    },
+    {
+      "file": "warden_lash_tell.wav",
+      "sha256": "b3f2dab18367a7aac1c8f31a4e82a96e9f93c90d9bfb3c7cca249d509de17332",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "golem_charge.wav",
+            0.8,
+            0.5,
+            0
+          ],
+          [
+            "swing_2.wav",
+            0.7,
+            0.3,
+            0.1
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.39941711425781246,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "golem_charge.wav": "323fe50b330deb9011ad75723ef9575599eb193723a49062256ff572fe173dfa",
+        "swing_2.wav": "15a7797c236e6665c3e21a14d84c736773c702c13a97c432926946ef1324a0a5"
+      }
+    },
+    {
+      "file": "warden_lash_strike.wav",
+      "sha256": "e1ec37994d57ac827a0d7904b1adbb601d662e340674efeb635e25366f187bc3",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "swing_2.wav",
+            1.25,
+            0.6,
+            0
+          ],
+          [
+            "armor_hit_3.wav",
+            1.15,
+            0.65,
+            0.07
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.2894257318405878,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "swing_2.wav": "15a7797c236e6665c3e21a14d84c736773c702c13a97c432926946ef1324a0a5",
+        "armor_hit_3.wav": "eae18e4dffe4653a547241cfde694ffc29bfc621460496c5473c9e1d3cb32d81"
+      }
+    },
+    {
+      "file": "warden_ring_tell.wav",
+      "sha256": "5d0c0feaf1cd053eb68026b6f38d0374a44074910ec41a926e62a32d990f278d",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "golem_beam.wav",
+            0.65,
+            0.45,
+            0
+          ],
+          [
+            "swing.wav",
+            0.6,
+            0.3,
+            0.1
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.3244292449951168,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "golem_beam.wav": "f1c1c3a286d7a9d29e7b72a83441e5432c324fc85c78d85a1e1aa113cf265ac5",
+        "swing.wav": "23873988a85c40a579d63a31c6a9fb2d8d3a0630747914419ca3bbceab053b50"
+      }
+    },
+    {
+      "file": "warden_ring_strike.wav",
+      "sha256": "e9d327158d54ab3e5cfa8df477ee81ecb56c99f4e67a0f09c5db7a8ad25fe93b",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "golem_stomp.wav",
+            0.65,
+            0.65,
+            0
+          ],
+          [
+            "golem_sweep.wav",
+            0.8,
+            0.3,
+            0.08
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.5719833374023438,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "golem_stomp.wav": "44740b3be51041e60074d89e0a539b99394e17844d56a59506872464a9e40853",
+        "golem_sweep.wav": "d60f27eab5be368c1b902199ef834f8c9d46e6e9e7281d12083c9bf69b322eb3"
+      }
+    },
+    {
+      "file": "warden_guard_hit.wav",
+      "sha256": "d373cd943ddc8518523add847a27b272775cad598c155f2ee61661af41efbbdb",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "armor_hit.wav",
+            0.6,
+            0.55,
+            0
+          ],
+          [
+            "gold_warning.wav",
+            1.4,
+            0.3,
+            0.02
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.2356466674804686,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "armor_hit.wav": "45b478650277cebfb9eda8d53096df7b4433ae025af5a023046156e84d83746f",
+        "gold_warning.wav": "4d2dad477c2e01ec52b6e22056f547e2d1906dee97dad521d638d36bf6b4baab"
+      }
+    },
+    {
+      "file": "warden_guard_hit_2.wav",
+      "sha256": "d7a66fcaaea70b92851d7c017faa57c026593715e5f6e1ed8db836d569b98827",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "armor_hit_2.wav",
+            0.65,
+            0.55,
+            0
+          ],
+          [
+            "gold_warning.wav",
+            1.5,
+            0.3,
+            0.02
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.23647440384845306,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "armor_hit_2.wav": "8282e6c26b43fd34a0eaedbcf9f87ce73cd178d29ce79767115fbf91a7ec6821",
+        "gold_warning.wav": "4d2dad477c2e01ec52b6e22056f547e2d1906dee97dad521d638d36bf6b4baab"
+      }
+    },
+    {
+      "file": "warden_guard_break.wav",
+      "sha256": "add46debf633c589f2e4f24844ccf638f37589ad8192a074048533cdb07f808e",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "posture_break.wav",
+            1.15,
+            0.6,
+            0
+          ],
+          [
+            "gold_warning.wav",
+            0.5,
+            0.3,
+            0.08
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.2804337066857993,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "posture_break.wav": "d68a77c64d16cec4e9ffcb86f83939afa2ac9adf18c77c6eea5c217330982e43",
+        "gold_warning.wav": "4d2dad477c2e01ec52b6e22056f547e2d1906dee97dad521d638d36bf6b4baab"
+      }
+    },
+    {
+      "file": "warden_death.wav",
+      "sha256": "af8a210ecaca0423240d1b80f90536016ec70f89a8f3b588998cb7dcb285902c",
+      "creator": "Project foley remix of existing recorded CC0 cues (Kenney, artisticdude, StarNinjas, Brian MacIntosh); see retained source credits",
+      "license": "CC0-1.0 source recordings; project remix",
+      "processing": {
+        "layers": [
+          [
+            "armor_hit_3.wav",
+            0.55,
+            0.5,
+            0
+          ],
+          [
+            "golem_stomp.wav",
+            0.6,
+            0.5,
+            0.13
+          ],
+          [
+            "armor_hit.wav",
+            0.7,
+            0.25,
+            0.38
+          ]
+        ],
+        "sample_rate": 44100,
+        "peak": 0.4353118896484377,
+        "fade_in_ms": 5,
+        "fade_out_ms": 80
+      },
+      "source_sha256": {
+        "armor_hit_3.wav": "eae18e4dffe4653a547241cfde694ffc29bfc621460496c5473c9e1d3cb32d81",
+        "golem_stomp.wav": "44740b3be51041e60074d89e0a539b99394e17844d56a59506872464a9e40853",
+        "armor_hit.wav": "45b478650277cebfb9eda8d53096df7b4433ae025af5a023046156e84d83746f"
+      }
+    }
   ]
 }

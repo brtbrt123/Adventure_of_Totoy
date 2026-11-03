@@ -1,0 +1,21 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_qreex"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_xmubf"]
+
+[sub_resource type="Resource" id="Resource_y0vue"]
+script = ExtResource("1_qreex")
+count = 2
+shape = "spark"
+life_min = 8
+life_max = 14
+speed_min = 0.05
+speed_max = 0.3
+up = 0.1
+gravity = 0.0
+size_max = 1.0
+colours = PackedStringArray("o", "u", "p")
+
+[resource]
+script = ExtResource("2_xmubf")
+layers = Array[Resource]([SubResource("Resource_y0vue")])

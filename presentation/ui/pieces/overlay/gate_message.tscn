@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://cd5ohkqft00a6" path="res://art/ui_kit/panel_medium.png" id="5_tex"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="9_fon"]
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("9_fon")
+variation_opentype = {
+2003265652: 400.0
+}
+
+[node name="Gate" type="NinePatchRect"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 356
+offset_bottom = 34
+texture = ExtResource("5_tex")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Line1" type="Label" parent="."]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 7.0
+offset_right = 342.0
+offset_bottom = 17.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8
+text = "THE RUNE GATE HOLDS."
+
+[node name="Line2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 16.0
+offset_right = 342.0
+offset_bottom = 26.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8
+text = "FINISH YOUR TASKS IN LANTERNFEN."

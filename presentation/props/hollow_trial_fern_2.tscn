@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/hollow_trial_fern_2.png" id="art"]
+
+[node name="hollow_trial_fern_2" type="Node2D"]
+
+metadata/w = 24
+
+metadata/h = 32
+
+metadata/base_width = 0
+
+metadata/solid = false
+
+metadata/image = "hollow_trial_fern_2.png"
+
+metadata/anchor = Vector2(12, 32)
+
+metadata/locked = true
+
+metadata/registration_pending = true
+
+[node name="Sprite" type="Sprite2D" parent="."]
+
+texture_filter = 1
+
+texture = ExtResource("art")
+
+centered = false
+
+offset = Vector2(-12, -32)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+
+collision_layer = 0
+
+collision_mask = 0

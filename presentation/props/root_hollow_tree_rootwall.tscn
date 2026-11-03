@@ -1,0 +1,67 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/root_hollow_tree_rootwall.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_root_hollow_tree_rootwall_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_root_hollow_tree_rootwall_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 4, 86, 124)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 7
+
+[node name="root_hollow_tree_rootwall" type="Node2D"]
+metadata/w = 86
+metadata/h = 124
+metadata/base_width = 30
+metadata/solid = true
+metadata/image = "root_hollow_tree_rootwall.png"
+metadata/note = "root-wall tree: the trunk base (30 px)"
+metadata/locked = true
+metadata/contact_shadow = {"size": [86, 124], "core": [[13, 109, 1], [13, 110, 1], [69, 110, 1], [68, 111, 2], [68, 112, 1], [17, 115, 4], [32, 115, 2], [15, 116, 6], [31, 116, 4], [37, 116, 1], [55, 116, 1], [59, 116, 3], [14, 117, 3], [21, 117, 2], [24, 117, 1], [31, 117, 1], [34, 117, 5], [54, 117, 2], [58, 117, 7], [14, 118, 1], [21, 118, 4], [30, 118, 1], [35, 118, 2], [38, 118, 3], [46, 118, 2], [54, 118, 1], [56, 118, 1], [58, 118, 1], [62, 118, 4], [67, 118, 1], [23, 119, 1], [29, 119, 2], [39, 119, 2], [45, 119, 4], [53, 119, 1], [56, 119, 2], [65, 119, 3], [29, 120, 1], [44, 120, 2], [48, 120, 1], [51, 120, 1], [53, 120, 1], [57, 120, 1], [66, 120, 1], [25, 121, 2], [28, 121, 1], [41, 121, 4], [49, 121, 3], [25, 122, 4], [41, 122, 3], [49, 122, 2], [27, 123, 1], [52, 123, 1], [52, 124, 1]], "edge": [[12, 109, 1], [14, 109, 1], [12, 110, 1], [14, 110, 1], [68, 110, 1], [70, 110, 1], [13, 111, 1], [67, 111, 1], [70, 111, 1], [67, 112, 1], [69, 112, 1], [68, 113, 1], [16, 115, 1], [21, 115, 1], [31, 115, 1], [34, 115, 1], [14, 116, 1], [21, 116, 1], [30, 116, 1], [35, 116, 2], [38, 116, 1], [54, 116, 1], [56, 116, 1], [58, 116, 1], [62, 116, 1], [13, 117, 1], [17, 117, 4], [23, 117, 1], [25, 117, 1], [30, 117, 1], [32, 117, 2], [39, 117, 1], [53, 117, 1], [56, 117, 2], [65, 117, 1], [13, 118, 1], [15, 118, 2], [20, 118, 1], [25, 118, 1], [29, 118, 1], [31, 118, 1], [34, 118, 1], [37, 118, 1], [41, 118, 1], [45, 118, 1], [48, 118, 1], [53, 118, 1], [55, 118, 1], [57, 118, 1], [59, 118, 3], [66, 118, 1], [68, 118, 1], [14, 119, 1], [21, 119, 2], [24, 119, 1], [28, 119, 1], [31, 119, 1], [35, 119, 2], [38, 119, 1], [41, 119, 1], [44, 119, 1], [49, 119, 1], [52, 119, 1], [54, 119, 2], [58, 119, 1], [62, 119, 3], [68, 119, 1], [23, 120, 1], [28, 120, 1], [30, 120, 1], [39, 120, 2], [43, 120, 1], [46, 120, 2], [49, 120, 2], [52, 120, 1], [54, 120, 1], [56, 120, 1], [58, 120, 1], [65, 120, 1], [67, 120, 1], [24, 121, 1], [27, 121, 1], [29, 121, 1], [40, 121, 1], [45, 121, 1], [48, 121, 1], [52, 121, 2], [57, 121, 1], [66, 121, 1], [24, 122, 1], [29, 122, 1], [40, 122, 1], [44, 122, 1], [48, 122, 1], [51, 122, 1], [25, 123, 2], [28, 123, 1], [41, 123, 3], [49, 123, 3], [53, 123, 1], [27, 124, 1], [51, 124, 1], [53, 124, 1], [52, 125, 1]]}
+metadata/flip_offset = Vector2(-43, -124)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-43, -124)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-32, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-28, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-8.0, -5)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0.0, -5)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(8.0, -5)
+shape = SubResource("CircleShape2D_3")

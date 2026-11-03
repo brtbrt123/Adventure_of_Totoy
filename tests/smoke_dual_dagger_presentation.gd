@@ -57,11 +57,19 @@ func press(field: String) -> void:
 	step(frame)
 
 
-## The old Q press as an equip request: the weapon after the equipped one in Weapons.IDS.
+## The old Q press as an equip request: the next blade after the equipped one.
 func swap() -> void:
 	var frame: InputFrame = InputFrame.new()
-	frame.weapon_equip = Weapons.next(arena.snapshot.player.weapon_id)
+	frame.weapon_equip = _next_blade(arena.snapshot.player.weapon_id)
 	step(frame)
+
+
+
+## The next of the three blades (katana -> dagger -> scythe -> katana); this smoke was written for them (the Star Staff casts).
+static func _next_blade(weapon: StringName) -> StringName:
+	var blades: Array[StringName] = [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE]
+	var i: int = blades.find(weapon)
+	return weapon if i < 0 else blades[(i + 1) % blades.size()]
 
 
 func save(label: String) -> void:
@@ -122,7 +130,7 @@ func pure_helpers() -> void:
 	check(Vector2(arena.frames[Hud.LIGHTNING_FORM_ICON]["w"], arena.frames[Hud.LIGHTNING_FORM_ICON]["h"]) == Hud.form_icon_rect().size, "form icon must be drawn at its native 24 px")
 	for rect: Rect2 in Hud.aspect_rects() + [Hud.weapon_rect()]:
 		check(not rect.intersects(Hud.form_icon_rect()), "form icon overlaps a socket")
-	check(Rect2(0, 0, 320, 180).encloses(Hud.form_icon_rect()), "form icon off screen")
+	check(Rect2(0, 0, 384, 216).encloses(Hud.form_icon_rect()), "form icon off screen")
 	# the cut travels from the blink side through the boss
 	for side: int in range(8):
 		var arrival: Vector2 = Vector2(400, 240) + Weapons.blink_direction(side) * 30.0
@@ -177,7 +185,7 @@ func swap_and_hud() -> void:
 		var hero: Snapshots.EntitySnapshot = arena.snapshot.player
 		if hero.state.begins_with("attack_"):
 			check(chosen().begins_with("totoy_dagger_attack%d_" % hero.combo_index), "swing %d drew %s" % [hero.combo_index, chosen()])
-			check(arena.weapon_slash_effect().is_empty(), "katana slash drawn over a dagger swing")
+			check(not bool(arena.hero_swing_plan().get("black", false)), "katana black fire drawn over a dagger swing")
 			if hero.state == &"attack_active" and not swings.has(hero.combo_index):
 				swings[hero.combo_index] = true
 				await save("swing%d" % hero.combo_index)
@@ -246,7 +254,7 @@ func lightning_form() -> void:
 	check(chosen().begins_with("totoy_lightning_"), "form look not drawn: " + chosen())
 	var effect: Dictionary = arena.weapon_buff_effect()
 	check(not effect.is_empty() and String(effect["back"]).begins_with("fx_lightning_aura_back_") and String(effect["front"]).begins_with("fx_lightning_aura_front_"), "form aura layers")
-	check(String(effect["slash"]).is_empty(), "form adds a detached slash")
+	check(not effect.has("slash"), "form adds a detached slash")
 	check(not arena.black_form_look(arena.snapshot.player), "form uses the Black Form darkening")
 	var running: Dictionary = Hud.weapon_status(arena.snapshot)
 	check(bool(running["active"]) and float(running["duration_fraction"]) > 0.9, "HUD shows the barrage running (run ring)")

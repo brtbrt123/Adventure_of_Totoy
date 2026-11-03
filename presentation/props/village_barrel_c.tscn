@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_barrel_c.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_barrel_c_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_barrel_c_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 5, 24, 27)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 8
+
+[node name="village_barrel_c" type="Node2D"]
+metadata/w = 24
+metadata/h = 27
+metadata/base_width = 21
+metadata/solid = true
+metadata/image = "village_barrel_c.png"
+metadata/note = "barrel"
+metadata/locked = true
+metadata/src_bbox = [436, 257, 560, 396]
+metadata/contact_shadow = {"core": [[1, 22, 2], [1, 23, 3], [21, 23, 3], [1, 24, 4], [20, 24, 4], [2, 25, 6], [18, 25, 6], [3, 26, 19], [4, 27, 17], [7, 28, 12]], "edge": [[3, 22, 1], [4, 23, 1], [24, 23, 1], [5, 24, 1], [24, 24, 1], [1, 25, 1], [8, 25, 1], [24, 25, 1], [1, 26, 2], [22, 26, 3], [2, 27, 2], [21, 27, 4], [3, 28, 4], [19, 28, 4], [4, 29, 18], [7, 30, 13]], "size": [24, 27]}
+metadata/flip_offset = Vector2(-11.5, -27)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-12.5, -27)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-15, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-14, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0, -5)
+shape = SubResource("CircleShape2D_1")

@@ -19,7 +19,7 @@ func run() -> void:
 	if Engine.has_meta(Explore.PERSIST_META):
 		Engine.remove_meta(Explore.PERSIST_META)
 	root.size = Vector2i(1280, 720)
-	for id: StringName in [&"village", &"village_layered"]:
+	for id: StringName in [&"village_layered"]:
 		Engine.set_meta(Explore.START_META, {"scene": id})
 		scene = (load("res://presentation/explore/explore_scene.tscn") as PackedScene).instantiate() as Explore
 		root.add_child(scene)

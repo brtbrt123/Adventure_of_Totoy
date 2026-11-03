@@ -1,0 +1,75 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/forest_thorns_2.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_thorns_2_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_thorns_2_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 2, 52, 38)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 7
+
+[node name="forest_thorns_2" type="Node2D"]
+metadata/w = 52
+metadata/h = 38
+metadata/base_width = 42
+metadata/solid = true
+metadata/image = "forest_thorns_2.png"
+metadata/note = "thorn bush (solid)"
+metadata/locked = true
+metadata/src_bbox = [1340, 730, 1515, 858]
+metadata/contact_shadow = {"size": [52, 38], "core": [[0, 21, 1], [0, 22, 2], [1, 23, 1], [51, 25, 1], [50, 26, 2], [50, 27, 1], [48, 30, 2], [2, 31, 4], [48, 31, 2], [2, 32, 5], [8, 32, 2], [36, 32, 1], [6, 33, 4], [19, 33, 1], [30, 33, 1], [36, 33, 3], [41, 33, 4], [7, 34, 1], [15, 34, 5], [25, 34, 1], [29, 34, 4], [37, 34, 11], [10, 35, 1], [13, 35, 6], [24, 35, 3], [29, 35, 1], [31, 35, 3], [39, 35, 2], [45, 35, 3], [10, 36, 5], [20, 36, 1], [23, 36, 2], [26, 36, 3], [33, 36, 3], [11, 37, 2], [20, 37, 4], [27, 37, 2], [34, 37, 2], [21, 38, 2]], "edge": [[-1, 21, 1], [1, 21, 1], [-1, 22, 1], [2, 22, 1], [0, 23, 1], [2, 23, 1], [1, 24, 1], [50, 25, 1], [52, 25, 1], [49, 26, 1], [52, 26, 1], [49, 27, 1], [51, 27, 1], [50, 28, 1], [47, 30, 1], [50, 30, 1], [1, 31, 1], [6, 31, 1], [47, 31, 1], [50, 31, 1], [1, 32, 1], [7, 32, 1], [10, 32, 1], [35, 32, 1], [37, 32, 1], [48, 32, 2], [2, 33, 4], [10, 33, 1], [18, 33, 1], [20, 33, 1], [29, 33, 1], [31, 33, 1], [35, 33, 1], [39, 33, 2], [45, 33, 1], [6, 34, 1], [8, 34, 2], [14, 34, 1], [20, 34, 1], [24, 34, 1], [26, 34, 1], [28, 34, 1], [33, 34, 1], [36, 34, 1], [48, 34, 1], [7, 35, 1], [9, 35, 1], [11, 35, 2], [19, 35, 1], [23, 35, 1], [27, 35, 2], [30, 35, 1], [34, 35, 1], [37, 35, 2], [41, 35, 4], [48, 35, 1], [9, 36, 1], [15, 36, 5], [21, 36, 2], [25, 36, 1], [29, 36, 1], [31, 36, 2], [36, 36, 1], [39, 36, 2], [45, 36, 3], [10, 37, 1], [13, 37, 2], [19, 37, 1], [24, 37, 1], [26, 37, 1], [29, 37, 1], [33, 37, 1], [36, 37, 1], [11, 38, 2], [20, 38, 1], [23, 38, 1], [27, 38, 2], [34, 38, 2], [21, 39, 2]]}
+metadata/flip_offset = Vector2(-25.0, -38)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-27.0, -38)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-28, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-26, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-13, -4)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-4, -4)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(4, -4)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(13, -4)
+shape = SubResource("CircleShape2D_4")

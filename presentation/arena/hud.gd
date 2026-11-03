@@ -4,8 +4,17 @@ const Tuning := preload("res://core/tuning.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const Weapons := preload("res://core/weapons.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
+const Kit := preload("res://presentation/common/ui_kit.gd")
+const HudStrip := preload("res://presentation/ui/hud_strip.tscn")
+const BossPanel := preload("res://presentation/ui/boss_panel.tscn")
+const ResultPanel := preload("res://presentation/ui/result_panel.tscn")
 const Aspects := preload("res://core/aspects.gd")
 var snapshot: Snapshots.GameSnapshot
+## The HUD strip (presentation/ui/hud_strip.tscn, the same scene the road uses), made when the fight HUD first draws.
+var arena_strip: Control = null
+## The boss panel and the result panel (presentation/ui/boss_panel.tscn, result_panel.tscn), made when first needed.
+var boss_panel_node: Control = null
+var result_node: Control = null
 var colors: Dictionary = {}
 var debug_enabled: bool = false
 # Extra result-screen lines (the arena fills them when progress is saved).
@@ -20,12 +29,15 @@ const LIGHTNING_FORM_ICON: String = "ui_aspect_lightning_form_1"
 ## The Chain Scythe medallion (a whole 48 px socket like the dagger's) and its Reaper's Coil slot icon (24 px).
 const SCYTHE_MEDALLION: String = "ui_weapon_chain_scythe_1"
 const REAPER_COIL_ICON: String = "ui_aspect_reapers_coil_1"
+## The Star Staff medallion and its Disintegration slot icon (tools/art/make_staff_sprites.py).
+const STAFF_MEDALLION: String = "ui_weapon_star_staff_1"
+const DISINTEGRATION_ICON: String = "ui_aspect_disintegration_1"
 ## Whole-socket medallions by weapon (the katana draws the frame plus its blade glyph instead).
-const MEDALLIONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: DAGGER_MEDALLION, Tuning.WEAPON_CHAIN_SCYTHE: SCYTHE_MEDALLION}
+const MEDALLIONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: DAGGER_MEDALLION, Tuning.WEAPON_CHAIN_SCYTHE: SCYTHE_MEDALLION, Tuning.WEAPON_STAR_STAFF: STAFF_MEDALLION}
 ## Active slot icons by weapon (the katana's buff has none: its box only).
-const FORM_ICONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: LIGHTNING_FORM_ICON, Tuning.WEAPON_CHAIN_SCYTHE: REAPER_COIL_ICON}
+const FORM_ICONS: Dictionary = {Tuning.WEAPON_DUAL_DAGGER: LIGHTNING_FORM_ICON, Tuning.WEAPON_CHAIN_SCYTHE: REAPER_COIL_ICON, Tuning.WEAPON_STAR_STAFF: DISINTEGRATION_ICON}
 static func form_icon_rect() -> Rect2:
-	return Rect2(58, 115, 24, 24)
+	return Rect2(58, 148, 24, 24)
 var counter_max: int = 1
 ## Tests and captures: draw this Aspect socket's (0-2) hover tooltip as if the mouse were on it; -1 = off.
 var hint_slot_override: int = -1
@@ -105,12 +117,12 @@ static func format_ticks(ticks: int) -> String:
 ## Text is a real font drawn at the window resolution (the project stretches the canvas, so a font size of 7
 ## "game pixels" is rendered with 28 screen pixels at the default 4x window): crisp at any size. The old
 ## 3x5 bitmap glyph table above is no longer used for drawing.
-const FONT_PATH: String = "res://presentation/fonts/PixelifySans.ttf"
-const FONT_SIZE: int = 9  # game pixels; the cap height is about 5-6 game pixels, like the old bitmap letters
-const FONT_WEIGHT: int = 400  # Pixelify Sans has a weight axis of 400-700
+const FONT_PATH: String = "res://presentation/fonts/Cinzel.ttf"
+const FONT_SIZE: int = 9  # game pixels; Cinzel cap height is about 6 game pixels
+const FONT_WEIGHT: int = 400  # Cinzel regular body weight
 static var _font: Font = null
 
-## Pixelify Sans (OFL, see presentation/fonts/README.md); Godot's built-in font if that file is missing.
+## Cinzel body text (OFL, see presentation/fonts/README.md), rendered at window resolution.
 static func ui_font() -> Font:
 	if _font == null:
 		var variation: FontVariation = FontVariation.new()
@@ -123,11 +135,9 @@ static func ui_font() -> Font:
 		_font = variation
 	return _font
 
-## Everything uses the pixel font, numbers included (the human's choice, 2026-10-19, knowing that in Pixelify Sans
-## a 5 looks like an S, a 0 like an O and a Z like a 2). `stat_font()` is kept as the name for number text so the
-## choice stays in one place. `size_px` overrides the size (in game pixels) where a number deserves to be bigger.
+## Original bitmap digits and input glyphs, installed with the approved kit (2026-10-29).
 static func stat_font() -> Font:
-	return ui_font()
+	return preload("res://art/ui_kit/pixel_keys.fnt")
 
 ## The menu face: Cinzel (OFL, see presentation/fonts/README.md), carved-looking capitals like the title logo.
 ## Falls back to the pixel font if the file is missing.
@@ -146,26 +156,48 @@ static func menu_font() -> Font:
 			_menu_font = ui_font()
 	return _menu_font
 
-## Cap height as a fraction of the font size (the pixel font's 5 of 9, Cinzel's capitals about 0.7 of the em).
+## Cap height as a fraction of the font size: six pixels on the bitmap font's eight-pixel em.
 static func _cap_ratio(face: Font) -> float:
-	return 0.70 if face == _menu_font and _menu_font != _font else 5.0 / 9.0
+	return 0.75 if face == stat_font() else 0.70
 
 static func _size_for(_font: Font, scale_px: int, size_px: int = 0) -> int:
+	if _font == stat_font():
+		return 8 * maxi(1, (size_px if size_px > 0 else FONT_SIZE * scale_px) / 8)
 	return size_px if size_px > 0 else FONT_SIZE * scale_px
+
+
+## Numerals and input labels keep the original square-pixel shapes (especially 5, Z and C).
+static func text_face(text: String) -> Font:
+	var value: String = text.to_upper()
+	if value in ["TAB", "SHIFT", "SPACE", "LMB", "RMB", "ENTER", "ESC", "Z", "X", "C", "+"]:
+		return stat_font()
+	var digit: bool = false
+	for ch: String in value:
+		if ch in "0123456789":
+			digit = true
+		elif ch not in " /+-%.,:XES":
+			return ui_font()
+	return stat_font() if digit else ui_font()
 
 ## Width of `text` in game pixels at a size multiplier (`font` defaults to the pixel font).
 static func text_width(text: String, scale_px: int = 1, font: Font = null, size_px: int = 0) -> float:
-	var face: Font = font if font != null else ui_font()
+	var face: Font = font if font != null else text_face(text)
+	if face == ui_font() and text_face(text) == stat_font():
+		face = stat_font()
 	return face.get_string_size(text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, _size_for(face, scale_px, size_px)).x
 
 ## `at` is the top-left of the letters, as with the old bitmap text.
 func lettering(at: Vector2, text: String, color: Color, scale_px: int = 1, font: Font = null, size_px: int = 0) -> void:
-	var face: Font = font if font != null else ui_font()
+	var face: Font = font if font != null else text_face(text)
+	if face == ui_font() and text_face(text) == stat_font():
+		face = stat_font()
 	var size: int = _size_for(face, scale_px, size_px)
 	draw_string(face, Vector2(at.x, at.y + _cap_ratio(face) * size), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
 
 func outlined(at: Vector2, text: String, color: Color, outline: Color, scale_px: int = 1, font: Font = null, size_px: int = 0) -> void:
-	var face: Font = font if font != null else ui_font()
+	var face: Font = font if font != null else text_face(text)
+	if face == ui_font() and text_face(text) == stat_font():
+		face = stat_font()
 	var size: int = _size_for(face, scale_px, size_px)
 	draw_string_outline(face, Vector2(at.x, at.y + _cap_ratio(face) * size), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, maxi(2, 2 * size / FONT_SIZE), outline)
 	lettering(at, text, color, scale_px, font, size_px)
@@ -258,89 +290,92 @@ func _draw() -> void:
 	var h: Snapshots.HudSnapshot = snapshot.hud
 	_draw_profile(h)
 	_draw_skills(h)
-	if not snapshot.entities.is_empty() and not menu_open:
-		var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
-		var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
-		if head_position.x < -12.0 or head_position.x > 332.0 or head_position.y < -24.0 or head_position.y > 196.0:
-			panel.position = Vector2(206.0, 3.0)  # the boss is off screen: its panel waits in the top right corner
-		ui("ui_boss", Rect2(panel.position + Vector2(0, 7), Vector2(104, 24)))
-		centered(panel.position.x + 52.0, panel.position.y, "MOSSBOUND COLOSSUS", colors["z"], colors["0"])
-		bar(panel.position + Vector2(8, 18), 88, h.boss_hp, h.boss_max_hp, colors["7"], 3, float(health_ghosts.get("boss", h.boss_hp)))
-		bar(panel.position + Vector2(20, 27), 64, h.boss_posture, h.boss_posture_max, colors["p"] if boss.state == &"posture_broken" else colors["v"], 2)
-		if h.counter_window_ticks_left > 0:
-			outlined(panel.position + Vector2(4, 33), "COUNTER - ATTACK", colors["p"], colors["0"])
-			bar(panel.position + Vector2(4, 41), 88, h.counter_window_ticks_left, counter_max, colors["o"], 2)
+	_sync_boss_panel(h)
 	if debug_enabled:
 		draw_rect(Rect2(5, 131, 175, 16), colors["0"])
 		lettering(Vector2(8, 134), "TICK %d" % snapshot.tick, colors["p"], 1, stat_font())
 		lettering(Vector2(8, 141), "PLAYER " + String(snapshot.player.state), colors["p"], 1, stat_font())
-	if snapshot.result != &"playing":
-		_draw_result()
+	_sync_result()
 
 
 ## The DEFEAT / VICTORY panel in the shared frame (UiPanel) with a banner title in Cinzel; every line is kept
 ## (R TO RESTART, the saved TIME / BEST lines, ESC: TITLE when the game came from the title screen).
 static func result_panel_rect(line_count: int, has_hint: bool) -> Rect2:
-	var h: int = 34 + (line_count * 9 + 4 if line_count > 0 else 0) + (12 if has_hint else 0)
-	return Rect2(64, 86 - h / 2, 192, h)
+	var h: int = 44 + (line_count * 10 + 4 if line_count > 0 else 0) + (12 if has_hint else 0)
+	return Rect2(96, 108 - h / 2, 192, h)
 
-func _draw_result() -> void:
-	var victory: bool = snapshot.result == &"victory"
-	var theme: StringName = &"victory" if victory else &"defeat"
-	var rect: Rect2 = result_panel_rect(result_lines.size(), result_hint != "")
-	var top: int = int(rect.position.y)
-	UiPanel.draw_panel(self, rect, theme, colors)
-	UiPanel.banner(self, 160, top - 8, 112, 22, theme, colors)
-	centered(160, top - 2, "VICTORY" if victory else "DEFEAT", colors["1"], colors["0"], 1, menu_font(), 13)
-	var hint_color: Color = colors["o"] if victory else colors["j"]
-	var y: int = top + 21
-	lettering(Vector2(160 - text_width("R TO RESTART") * 0.5, y), "R TO RESTART", hint_color)
-	y += 10
-	if not result_lines.is_empty():
-		draw_rect(Rect2(110, y - 2, 100, 1), colors["f"])
-		y += 2
-		for line: String in result_lines:
-			lettering(Vector2(160 - text_width(line, 1, stat_font()) * 0.5, y), line, colors["1"], 1, stat_font())
-			y += 9
-	if result_hint != "":
-		var t: Dictionary = UiPanel.theme(theme)
-		draw_rect(Rect2(124, y, 72, 1), colors[t["accent"]])
-		UiPanel.px(self, 160, y, colors[t["gem"]])
-		y += 4
-		lettering(Vector2(160 - text_width(result_hint) * 0.5, y), result_hint, hint_color)
+## The boss's name and bars: the scene boss_panel.tscn, moved to follow his head (parked top right when he is off screen).
+func _sync_boss_panel(h: Snapshots.HudSnapshot) -> void:
+	if boss_panel_node == null:
+		boss_panel_node = BossPanel.instantiate()
+		boss_panel_node.show_behind_parent = true
+		add_child(boss_panel_node)
+	var shown: bool = not snapshot.entities.is_empty() and not menu_open
+	boss_panel_node.visible = shown
+	if not shown:
+		return
+	var boss: Snapshots.EntitySnapshot = snapshot.entities[0]
+	var panel: Rect2 = boss_panel(head_position, h.counter_window_ticks_left > 0)
+	if head_position.x < -12.0 or head_position.x > 396.0 or head_position.y < -24.0 or head_position.y > 236.0:
+		panel.position = Vector2(278.0, 3.0)  # the boss is off screen: its panel waits in the top right corner
+	boss_panel_node.atlas = portrait_atlas
+	boss_panel_node.frames = ui_frames
+	boss_panel_node.position = panel.position
+	boss_panel_node.apply({
+		"hp": h.boss_hp, "hp_max": h.boss_max_hp, "ghost": float(health_ghosts.get("boss", h.boss_hp)),
+		"posture": h.boss_posture, "posture_max": h.boss_posture_max, "broken": boss.state == &"posture_broken",
+		"counter_ticks": h.counter_window_ticks_left, "counter_max": counter_max,
+	})
 
-## Fixed small footprint; all meter amounts are read directly from the HUD snapshot.
+
+## The DEFEAT / VICTORY panel: the scene result_panel.tscn, centred, as tall as its lines need.
+func _sync_result() -> void:
+	if result_node == null:
+		result_node = ResultPanel.instantiate()
+		add_child(result_node)
+	result_node.visible = snapshot.result != &"playing"
+	if not result_node.visible:
+		return
+	var height: float = result_node.apply({"victory": snapshot.result == &"victory", "lines": result_lines, "hint": result_hint})
+	result_node.position = Vector2(96, 108 - int(height) / 2)
+
+## The fight strip, bottom left (kit bars, 384x216 layout): HEALTH and its numbers over the health vial with its ghost
+## segment, then the Edge and dash bars. All meter amounts are read directly from the HUD snapshot.
+const STRIP_X: float = 58.0
+const STRIP_W: float = 136.0
+const HP_Y: float = 182.0
+const THIN_Y: float = 203.0
+
+
 func _draw_profile(h: Snapshots.HudSnapshot) -> void:
 	if portrait_sprite != null:
 		portrait_sprite.hide()
-	# Bottom-left combat strip, following the owner's sketch. No portrait.
-	UiPanel.draw_panel(self, Rect2(54, 140, 112, 37), &"info", colors, false)
-	var hp: String = "%d / %d" % [h.player_hp, h.player_max_hp]
-	lettering(Vector2(60, 145), "HEALTH", colors["u"], 1, null, 7)
-	lettering(Vector2(159 - text_width(hp, 1, stat_font(), 7), 145), hp, colors["1"], 1, stat_font(), 7)
-	bar(Vector2(60, 153), 100, h.player_hp, h.player_max_hp, colors["t"], 5, float(health_ghosts.get("player", h.player_hp)))
-	ui("ui_icon_edge_1", Rect2(58, 160, 6, 6))
-	bar(Vector2(67, 162), 86, h.edge, h.edge_max, colors["v"], 3)
-	ui("ui_icon_dash_1", Rect2(58, 168, 6, 6))
-	bar(Vector2(67, 170), 70, dash_fraction(h), 1.0, colors["n"], 2)
-	_draw_status_icons(h)
-
-## Only active states exposed by the core appear here; no invented debuff rules.
-func _draw_status_icons(h: Snapshots.HudSnapshot) -> void:
-	var index: int = 0
+	if arena_strip == null:
+		arena_strip = HudStrip.instantiate()
+		arena_strip.show_behind_parent = true  # the rings and seconds drawn by this script go on top
+		add_child(arena_strip)
+	arena_strip.atlas = portrait_atlas
+	arena_strip.frames = ui_frames
+	var weapon: StringName = snapshot.player.weapon_id
+	var status: Array = []
 	for row: Dictionary in skill_rows(h, snapshot.tick):
-		if not bool(row["running"]):
-			continue
-		var rect: Rect2 = Rect2(88 + index * 22, 119, 18, 18)
-		UiPanel.draw_panel(self, rect.grow(1), &"info", colors, false)
-		ui(row["icon"], rect)
-		index += 1
+		if bool(row["running"]):
+			status.append(row["icon"])
+	var aspects: Array = []
+	for row: Dictionary in skill_rows(h, snapshot.tick):
+		aspects.append({"unlocked": true, "owned": true, "usable": true, "icon": row["icon"], "key": row["key"], "cost": "%dE" % int(row["cost"]), "cost_color": colors["v"] if h.edge >= float(row["cost"]) else colors["i"]})
+	arena_strip.apply({
+		"whole_medallion": MEDALLIONS.get(weapon, ""), "weapon_glyph": weapon_icon_key, "armed": true, "plate": weapon_label(weapon),
+		"hp": h.player_hp, "max_hp": h.player_max_hp, "ghost": float(health_ghosts.get("player", h.player_hp)),
+		"edge": h.edge / maxf(1.0, h.edge_max), "dash": dash_fraction(h), "status": status, "aspects": aspects,
+	})
 
-func ui(key: String, rect: Rect2) -> void:
+func ui(key: String, rect: Rect2, source_offset: Vector2 = Vector2.ZERO, source_size: Vector2 = Vector2.ZERO) -> void:
 	if portrait_atlas == null or not ui_frames.has(key):
 		return
 	var frame: Dictionary = ui_frames[key]
-	draw_texture_rect_region(portrait_atlas, rect, Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+	var size: Vector2 = source_size if source_size != Vector2.ZERO else Vector2(frame["w"], frame["h"])
+	draw_texture_rect_region(portrait_atlas, rect, Rect2(Vector2(frame["x"], frame["y"]) + source_offset, size))
 
 static func dash_fraction(h: Snapshots.HudSnapshot) -> float:
 	if h.dash_cooldown_ticks <= 0:
@@ -366,7 +401,7 @@ func track_head(target: Vector2, tick: int, actor_id: int, ground: Vector2 = Vec
 
 static func boss_panel(head: Vector2, counter: bool) -> Rect2:
 	var height: float = 47.0 if counter else 33.0
-	return Rect2(Vector2(clampf(head.x - 52, 2, 214), clampf(head.y - 4 - height, 2, 164 - height)).round(), Vector2(104, height))
+	return Rect2(Vector2(clampf(head.x - 52, 2, 278), clampf(head.y - 4 - height, 2, 200 - height)).round(), Vector2(104, height))
 
 ## The Aspect socket icons (24 px) by aspect id: "ui_aspect_<id>_1". While a Spirit Lantern stands its slot shows the
 ## burning icon ui_aspect_spirit_lantern_lit_1..4 (about 120 ms per frame).
@@ -421,10 +456,14 @@ static func skill_rows(h: Snapshots.HudSnapshot, tick: int = 0) -> Array[Diction
 ## The owner's layout: three small Aspect sockets beside the bottom health strip.
 ## Native sprite sizes keep the new HUD at integer scale.
 static func aspect_rects() -> Array[Rect2]:
-	return [Rect2(174, 147, 24, 24), Rect2(206, 147, 24, 24), Rect2(238, 147, 24, 24)]
+	return [Rect2(268, 172, 37, 40), Rect2(306, 172, 37, 40), Rect2(344, 172, 37, 40)]
+
+## The 16x16 icon spot inside socket `slot` (the diamond's middle; the icons' own rings are cropped away).
+static func aspect_icon_rect(slot: int) -> Rect2:
+	return Kit.socket_icon_rect(aspect_rects()[slot].position)
 
 static func weapon_rect() -> Rect2:
-	return Rect2(4, 130, 48, 48)
+	return Rect2(4, 164, 48, 48)
 
 ## The cooldown ring's fill (1 = just used) of a skill row.
 static func cooldown_fraction(row: Dictionary) -> float:
@@ -451,21 +490,13 @@ func _seconds(centre: Vector2, ticks: int, color: Color) -> void:
 func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 	var rows: Array[Dictionary] = skill_rows(h, snapshot.tick)
 	var sockets: Array[Rect2] = aspect_rects()
-	if MEDALLIONS.has(snapshot.player.weapon_id):
-		ui(MEDALLIONS[snapshot.player.weapon_id], weapon_rect())
-	else:
-		ui("ui_weapon_frame_1", weapon_rect())
-		ui(weapon_icon_key, Rect2(weapon_rect().position + Vector2(8, 8), Vector2(32, 32)))
-	var name_plate: Rect2 = Rect2(weapon_rect().position + Vector2(2, 37), Vector2(44, 10))
-	UiPanel.draw_panel(self, name_plate, &"info", colors, false)
-	centered(name_plate.get_center().x, name_plate.position.y + 2, weapon_label(snapshot.player.weapon_id), colors["1"], colors["0"], 1, null, 7)
 	_draw_weapon_active()
 	var hint: Dictionary = {}
 	for slot: int in range(3):
 		var row: Dictionary = rows[slot]
 		var socket: Rect2 = sockets[slot]
-		var centre: Vector2 = socket.get_center()
-		ui(row["icon"], socket)
+		var icon: Rect2 = aspect_icon_rect(slot)
+		var centre: Vector2 = icon.get_center()
 		# Snapshot-only rings. The core still accepts or rejects every press.
 		var running: float = run_fraction(row)
 		if int(row["cooldown"]) > 0:
@@ -479,40 +510,34 @@ func _draw_skills(h: Snapshots.HudSnapshot) -> void:
 			_seconds(centre, int(row["ticks_left"]), colors["v"])  # buffs, the echo countdown, the ward: seconds still running
 		elif running <= 0.0 and int(row["cooldown"]) > 0:
 			_seconds(centre, int(row["cooldown"]), colors["p"])
-		var badge: Vector2 = socket.position + Vector2(-2, 16)
-		draw_rect(Rect2(badge - Vector2.ONE, Vector2(8, 8)), colors["0"])
-		UiPanel.outline(self, Rect2(badge - Vector2.ONE, Vector2(8, 8)), colors["t"])
-		lettering(badge, row["key"], colors["1"], 1, stat_font())
-		var cost: String = "%dE" % int(row["cost"])
-		draw_rect(Rect2(centre.x - 10, centre.y + 12, 20, 8), colors["0"])
-		centered(centre.x, centre.y + 13, cost, colors["v"] if h.edge >= float(row["cost"]) else colors["i"], colors["0"], 1, null, 7)
 		if socket.has_point(get_local_mouse_position()) or slot == hint_slot_override:
 			hint = row
 	if h.retaliate_ticks_left > 0:
 		for slot: int in range(3):
 			if not bool(rows[slot]["needs_retaliation"]):
 				continue
-			outlined(Vector2(174, 136), "%s %s READY" % [rows[slot]["key"], rows[slot]["name"]], colors["x"], colors["0"], 1, stat_font())
+			outlined(Vector2(268, 150), "%s %s READY" % [rows[slot]["key"], rows[slot]["name"]], colors["x"], colors["0"], 1, stat_font())
 			var ring: PackedVector2Array = PackedVector2Array()
+			var ring_centre: Vector2 = aspect_icon_rect(slot).get_center()
 			for point: int in range(33):
-				ring.append((sockets[slot].get_center() + Vector2.from_angle(TAU * point / 32.0) * 12.0).round())
+				ring.append((ring_centre + Vector2.from_angle(TAU * point / 32.0) * 14.0).round())
 			draw_polyline(ring, colors["x"], 1.0, false)
 	if not hint.is_empty():
 		_draw_aspect_hint(hint)
 
-## The skill hover tooltip in the shared frame (info theme): the key in a badge, the slotted Aspect's name, a divider,
-## its Edge cost, its icon on the right. No cooldown text (the icon's ring shows it).
+## The skill hover tooltip in the shared frame: the key in a badge, the slotted Aspect's name, a divider, its Edge cost,
+## its icon on the right. No cooldown text (the icon's ring shows it).
 static func aspect_hint_rect() -> Rect2:
-	return Rect2(150, 100, 160, 34)
+	return Rect2(222, 124, 160, 44)
 
 func _draw_aspect_hint(row: Dictionary) -> void:
 	var rect: Rect2 = aspect_hint_rect()
 	UiPanel.draw_panel(self, rect, &"info", colors)
-	ui(row["icon"], Rect2(rect.position + Vector2(130, 5), Vector2(24, 24)))
-	UiPanel.key_badge(self, rect.position + Vector2(5, 5), colors)
-	lettering(rect.position + Vector2(9 - text_width(row["key"]) * 0.5, 6), row["key"], colors["1"])
-	lettering(rect.position + Vector2(16, 6), row["name"], colors["1"], 1, null, 10)
-	draw_rect(Rect2(rect.position + Vector2(5, 15), Vector2(120, 1)), colors["f"])
+	ui(row["icon"], Rect2(rect.position + Vector2(130, 9), Vector2(24, 24)))
+	UiPanel.key_badge(self, rect.position + Vector2(9, 9), colors)
+	lettering(rect.position + Vector2(13.5 - text_width(row["key"]) * 0.5, 10), row["key"], colors["1"])
+	lettering(rect.position + Vector2(22, 10), row["name"], colors["1"], 1, null, 10)
+	draw_rect(Rect2(rect.position + Vector2(9, 22), Vector2(116, 1)), colors["f"])
 	var cost: String = "%d EDGE" % int(row["cost"])
 	if row["kind"] == Aspects.KIND_BUFF:
 		cost += "  BUFF %s S" % str(ceili(int(row["duration"]) * Tuning.TICK_DT))
@@ -520,13 +545,14 @@ func _draw_aspect_hint(row: Dictionary) -> void:
 		cost += "  RECALL %s S" % str(ceili(int(row["duration"]) * Tuning.TICK_DT))
 	elif row["aspect_id"] == Aspects.STONE_WARD:
 		cost += "  GUARD %s S" % str(ceili(int(row["duration"]) * Tuning.TICK_DT))
-	lettering(rect.position + Vector2(5, 19), cost, colors["v"], 1, null, 10)
+	lettering(rect.position + Vector2(9, 26), cost, colors["v"], 1, null, 10)
 
 static func weapon_label(weapon: StringName) -> String:
 	match weapon:
 		Tuning.WEAPON_BLACK_KATANA: return "BLACK"
 		Tuning.WEAPON_DUAL_DAGGER: return "DAGGER"
 		Tuning.WEAPON_CHAIN_SCYTHE: return "SCYTHE"
+		Tuning.WEAPON_STAR_STAFF: return "STAFF"
 	return "SWORD"
 
 static func weapon_status(snap: Snapshots.GameSnapshot) -> Dictionary:

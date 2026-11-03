@@ -3,14 +3,14 @@ extends RefCounted
 const Fireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const SHADER := preload("res://presentation/common/overhead_light.gdshader")
 const SHADOW_PROJECTION: Vector2 = Vector2(0.30, 0.25)
-const MAX_LIGHTS: int = 16
+const MAX_LIGHTS: int = 32
 const PROP_SHADOW_ALPHA: float = 0.30
 const ACTOR_SHADOW_ALPHA: float = 0.20
 static var _sockets: Dictionary = {}
 
 
 static func supports(scene: StringName) -> bool:
-	return scene in [&"village_layered", &"forest", &"glade", &"glade_layered", &"forest_layered"]
+	return scene in [&"woodland_layered", &"village_layered", &"glade_layered", &"forest_layered", &"root_hollow_layered", &"hollow_trial_layered"]
 
 
 static func make_material(scene: StringName, size: Vector2, placements: Array[Dictionary] = []) -> ShaderMaterial:
@@ -21,16 +21,13 @@ static func make_material(scene: StringName, size: Vector2, placements: Array[Di
 	result.set_shader_parameter("actor_shadow_alpha", ACTOR_SHADOW_ALPHA)
 	result.set_shader_parameter("world_size", size)
 	result.set_shader_parameter("shaft_slope", SHADOW_PROJECTION.x / SHADOW_PROJECTION.y)
-	result.set_shader_parameter("strength", 1.0)
+	result.set_shader_parameter("strength", 0.82 if scene in [&"root_hollow_layered", &"hollow_trial_layered"] else 1.0)
 	result.set_shader_parameter("light_colour", Vector3(0.64, 0.77, 1.0) if scene == &"village_layered" else Vector3(0.60, 0.79, 1.0))
 	var practicals: Dictionary = lamp_plan(placements)
-	if scene in [&"glade", &"glade_layered"]:
+	if scene in [&"glade_layered"]:
 		result.set_shader_parameter("lamp_colour", Vector3(0.48, 0.94, 0.86))
 		result.set_shader_parameter("lamp_core_colour", Vector3(0.8, 1.0, 1.0))
-	if scene == &"glade":
-		var painted: Array[Dictionary] = [{"type": &"_painted_glade", "feet": Vector2.ZERO, "anchor": Vector2.ZERO}]
-		practicals = lamp_plan(painted)
-	result.set_shader_parameter("mixed_lights", scene == &"forest_layered")
+	result.set_shader_parameter("mixed_lights", scene in [&"village_layered", &"forest_layered", &"woodland_layered", &"root_hollow_layered", &"hollow_trial_layered"])
 	result.set_shader_parameter("lamp_colours", practicals["colours"])
 	result.set_shader_parameter("lamp_core_colours", practicals["core_colours"])
 	result.set_shader_parameter("lamp_count", practicals["count"])
@@ -45,6 +42,7 @@ static func lamp_plan(placements: Array[Dictionary]) -> Dictionary:
 	var points: PackedVector4Array = PackedVector4Array()
 	var colours: PackedVector3Array = PackedVector3Array()
 	var core_colours: PackedVector3Array = PackedVector3Array()
+	var owners: PackedStringArray = PackedStringArray()
 	var dropped: int = 0
 	for placement: Dictionary in placements:
 		var sockets: Array = _sockets.get(String(placement["type"]), [])
@@ -63,15 +61,17 @@ static func lamp_plan(placements: Array[Dictionary]) -> Dictionary:
 			var rgb: Array = socket.get("colour", [1.0, 0.79, 0.52])
 			var core_rgb: Array = socket.get("core_colour", [1.05, 0.98, 0.88])
 			for entry: int in 2:
+				owners.append(String(placement.get("id", "")))
 				colours.append(Vector3(rgb[0], rgb[1], rgb[2]))
 				core_colours.append(Vector3(core_rgb[0], core_rgb[1], core_rgb[2]))
 	var count: int = points.size()
 	points.resize(MAX_LIGHTS)
+	owners.resize(MAX_LIGHTS)
 	colours.resize(MAX_LIGHTS)
 	core_colours.resize(MAX_LIGHTS)
 	if dropped > 0:
 		push_warning("Environment light budget: dropped %d fixture(s), limit %d entries" % [dropped, MAX_LIGHTS])
-	return {"points": points, "count": count, "colours": colours, "core_colours": core_colours, "dropped": dropped}
+	return {"points": points, "count": count, "colours": colours, "core_colours": core_colours, "dropped": dropped, "owners":owners}
 
 
 ## Projects the current animated actor silhouette onto the same ground plane.

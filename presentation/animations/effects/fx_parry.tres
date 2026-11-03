@@ -1,0 +1,34 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_parry_1.png" id="1_vytng"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_parry_2.png" id="2_qcgir"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_parry_3.png" id="3_uqea3"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_parry_4.png" id="4_ajvqr"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_parry_5.png" id="5_mroje"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_parry_6.png" id="6_wmwih"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_vytng")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_qcgir")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_uqea3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ajvqr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_mroje")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_wmwih")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 30.0
+}]

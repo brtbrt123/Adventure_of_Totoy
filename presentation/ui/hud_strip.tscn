@@ -1,0 +1,171 @@
+[gd_scene format=3 uid="uid://bao8ffit0yypf"]
+
+[ext_resource type="Script" uid="uid://d3jonrortce38" path="res://presentation/ui/hud_strip.gd" id="1_scr"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="2_fon"]
+[ext_resource type="FontFile" uid="uid://bpdmvxnu2ubib" path="res://art/ui_kit/pixel_keys.fnt" id="3_fon"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/weapon_medallion.tscn" id="piece_weapon_medallion"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/weapon_name_plate.tscn" id="piece_weapon_name_plate"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/health_bar.tscn" id="piece_health_bar"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/edge_bar.tscn" id="piece_edge_bar"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/dash_bar.tscn" id="piece_dash_bar"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/item_slot.tscn" id="piece_item_slot"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/aspect_socket.tscn" id="piece_aspect_socket"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/hud/level_pillar.tscn" id="piece_level_pillar"]
+
+[node name="HudStrip" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+script = ExtResource("1_scr")
+
+[node name="Medallion" parent="." instance=ExtResource("piece_weapon_medallion")]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 162.0
+
+[node name="WholeMedallion" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 164.0
+offset_right = 52.0
+offset_bottom = 212.0
+mouse_filter = 2
+expand_mode = 1
+
+[node name="NamePlate" parent="." instance=ExtResource("piece_weapon_name_plate")]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 203.0
+offset_right = 50.0
+offset_bottom = 215.0
+
+[node name="HealthLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 174.0
+offset_right = 98.0
+offset_bottom = 184.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 7
+text = "HEALTH"
+vertical_alignment = 1
+
+[node name="HealthValue" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 172.0
+offset_right = 145.0
+offset_bottom = 183.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("3_fon")
+theme_override_font_sizes/font_size = 8
+text = "110 / 110"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HealthBar" parent="." instance=ExtResource("piece_health_bar")]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 182.0
+offset_right = 194.0
+offset_bottom = 196.0
+
+[node name="EdgeLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 59.0
+offset_top = 196.0
+offset_right = 119.0
+offset_bottom = 204.0
+theme_override_colors/font_color = Color(0.3529, 0.3843, 0.3686, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
+text = "EDGE  --"
+vertical_alignment = 1
+
+[node name="EdgeBar" parent="." instance=ExtResource("piece_edge_bar")]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 203.0
+offset_right = 142.0
+offset_bottom = 212.0
+
+[node name="DashLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 157.0
+offset_top = 196.0
+offset_right = 187.0
+offset_bottom = 204.0
+theme_override_colors/font_color = Color(0.5412, 0.4353, 0.6588, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
+text = "DASH"
+vertical_alignment = 1
+
+[node name="DashBar" parent="." instance=ExtResource("piece_dash_bar")]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 203.0
+offset_right = 194.0
+offset_bottom = 212.0
+
+[node name="ItemSlot1" parent="." instance=ExtResource("piece_item_slot")]
+layout_mode = 0
+offset_left = 208.0
+offset_top = 184.0
+offset_right = 234.0
+offset_bottom = 210.0
+
+[node name="ItemSlot2" parent="." instance=ExtResource("piece_item_slot")]
+layout_mode = 0
+offset_left = 238.0
+offset_top = 184.0
+offset_right = 264.0
+offset_bottom = 210.0
+
+[node name="Socket1" parent="." instance=ExtResource("piece_aspect_socket")]
+layout_mode = 0
+offset_left = 268.0
+offset_top = 172.0
+
+[node name="Socket2" parent="." instance=ExtResource("piece_aspect_socket")]
+layout_mode = 0
+offset_left = 306.0
+offset_top = 172.0
+
+[node name="Socket3" parent="." instance=ExtResource("piece_aspect_socket")]
+layout_mode = 0
+offset_left = 344.0
+offset_top = 172.0
+
+[node name="LevelPillar" parent="." instance=ExtResource("piece_level_pillar")]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 36.0
+offset_right = 25.0
+offset_bottom = 154.0
+
+[node name="Down" type="Label" parent="."]
+visible = false
+layout_mode = 0
+offset_top = 178.0
+offset_right = 384.0
+offset_bottom = 198.0
+theme_override_colors/font_color = Color(0.8784, 0.9412, 0.9255, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 9
+text = "DOWN"
+horizontal_alignment = 1
+vertical_alignment = 1

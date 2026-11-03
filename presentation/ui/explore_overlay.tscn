@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://pkqluw08x66n"]
+
+[ext_resource type="Script" uid="uid://cuxipnvx2tp2f" path="res://presentation/ui/explore_overlay.gd" id="1_scr"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="9_fon"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/overlay/objective_bar.tscn" id="piece_objective_bar"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/overlay/scene_ribbon.tscn" id="piece_scene_ribbon"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/overlay/level_up_banner.tscn" id="piece_level_up_banner"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/overlay/gate_message.tscn" id="piece_gate_message"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/overlay/interact_hint.tscn" id="piece_interact_hint"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/overlay/lesson_card.tscn" id="piece_lesson_card"]
+[ext_resource type="PackedScene" path="res://presentation/ui/pieces/overlay/lesson_checklist.tscn" id="piece_lesson_checklist"]
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("9_fon")
+variation_opentype = {
+2003265652: 400.0
+}
+
+[node name="ExploreOverlay" type="Control"]
+show_behind_parent = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+script = ExtResource("1_scr")
+
+[node name="Objective" parent="." instance=ExtResource("piece_objective_bar")]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 224.0
+offset_bottom = 18.0
+
+[node name="Toast" parent="." instance=ExtResource("piece_scene_ribbon")]
+layout_mode = 0
+offset_left = 232.0
+offset_top = 3.0
+offset_right = 380.0
+offset_bottom = 19.0
+
+[node name="LevelUp" parent="." instance=ExtResource("piece_level_up_banner")]
+layout_mode = 0
+offset_left = 264.0
+offset_top = 24.0
+offset_right = 380.0
+offset_bottom = 60.0
+
+[node name="Task" type="Label" parent="."]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 22.0
+offset_right = 309.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8
+text = "TASK COMPLETE +10 EXP"
+
+[node name="Gate" parent="." instance=ExtResource("piece_gate_message")]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 44.0
+offset_right = 370.0
+offset_bottom = 78.0
+
+[node name="LockedMsg" type="Label" parent="."]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 206.0
+offset_right = 144.0
+offset_bottom = 215.0
+theme_override_colors/font_color = Color(0.6549, 0.8039, 0.8784, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7
+text = "DASH LOCKED"
+
+[node name="Hint" parent="." instance=ExtResource("piece_interact_hint")]
+layout_mode = 0
+offset_left = 165.0
+offset_top = 196.0
+offset_right = 219.0
+offset_bottom = 209.0
+
+[node name="Lesson" parent="." instance=ExtResource("piece_lesson_card")]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 128.0
+offset_right = 202.0
+offset_bottom = 162.0
+
+[node name="Checklist" parent="." instance=ExtResource("piece_lesson_checklist")]
+layout_mode = 0
+offset_left = 244.0
+offset_top = 180.0
+offset_right = 378.0
+offset_bottom = 212.0

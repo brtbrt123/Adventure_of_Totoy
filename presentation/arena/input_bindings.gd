@@ -17,16 +17,19 @@ static func register() -> void:
 		"menu_left": [KEY_A, KEY_LEFT], "menu_right": [KEY_D, KEY_RIGHT],
 		# exploration (presentation/explore/explore_scene.gd): E interacts; F2-F5 jump to a scene, F6 opens/closes the
 		# forest's root gate (debug keys for testing)
-		"explore_interact": [KEY_E],
+		"explore_interact": [KEY_E], "explore_use_herb": [], "explore_item_1": [KEY_1], "explore_item_2": [KEY_2],
 		"dialogue_next": [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE],
 		"dialogue_skip": [KEY_ESCAPE],
-		# keyboards without F-keys: the number row 1-4 jump, G toggles the gate, H shows the debug overlay
-		"debug_scene_village": [KEY_F2, KEY_1], "debug_scene_forest": [KEY_F3, KEY_2], "debug_scene_glade": [KEY_F4, KEY_3],
+		# Numeric1/2 are item slots. Other legacy debug aliases remain; G toggles gate, H shows debug.
+		"debug_scene_village": [KEY_F2], "debug_scene_forest": [KEY_F3], "debug_scene_glade": [KEY_F4, KEY_3],
 		"debug_scene_arena": [KEY_F5, KEY_4], "debug_toggle_gate": [KEY_F6, KEY_G],
 		"debug_scene_village_layered": [KEY_F7, KEY_5],
 		"debug_scene_glade_layered": [KEY_F8, KEY_6],
 		"debug_lighting_toggle": [KEY_F9, KEY_7],
 		"debug_scene_forest_layered": [KEY_F10, KEY_8],
+		"debug_scene_woodland": [KEY_F11, KEY_9],
+		"debug_scene_hollow": [KEY_F12, KEY_0],
+		"debug_scene_trial": [KEY_T],  # the Hollow Trial room, replayable (playtesting the Warden waves)
 	}
 	# Q no longer swaps weapons in the arena (2026-10-21): weapons are equipped in the character menu's inventory.
 	if InputMap.has_action("arena_weapon_swap"):
@@ -93,6 +96,7 @@ static func read_frame(_player_position: Vector2 = Vector2.ZERO, _mouse_position
 	# the core reads the aim on the press tick; no aim means "keep facing" (the last heading)
 	if (frame.attack_pressed or frame.skill_pressed > 0 or frame.weapon_active_pressed) and frame.move.length_squared() > 0.0001:
 		frame.aim = frame.move.normalized()
+	frame.use_item_slot = 1 if Input.is_action_just_pressed("explore_item_1") else (2 if Input.is_action_just_pressed("explore_item_2") else 0)
 	frame.attack_held = Input.is_action_pressed("arena_attack")
 	frame.parry_pressed = Input.is_action_just_pressed("arena_parry")
 	frame.dash_pressed = Input.is_action_just_pressed("arena_dash")

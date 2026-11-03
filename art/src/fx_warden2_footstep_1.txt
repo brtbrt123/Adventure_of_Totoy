@@ -1,0 +1,10 @@
+# kind: sprite
+# anchor: 3,5
+.0...0..
+..0c00..
+.cccc0.0
+0caaac0.
+0aaaaac.
+.caaac0.
+........
+........

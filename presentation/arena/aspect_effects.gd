@@ -1,4 +1,6 @@
 extends RefCounted
+## Per-frame tick lists marked `static var` come from the owner's effect SpriteFrames (presentation/animations/effects/, docs/ANIMATION_EDITING.md); the lists here are the fallback.
+const AnimLib := preload("res://presentation/common/anim_library.gd")
 ## Cosmetic timing and naming for the Spirit Lantern and Phantom Cut aspects (lantern prop, light pool, pulse rings,
 ## heal motes, Edge sparks, fade; Phantom Cut start/end bursts, the buff glow over the hero frame, the echo-pending
 ## marker, the phantom ghost, its arc and the landing spark). Pure functions over ticks and names taken from the
@@ -12,15 +14,15 @@ const Tuning := preload("res://core/tuning.gd")
 const MAX_LIVE: int = 32
 
 ## Spirit Lantern (frame n = entry n-1, ticks).
-const PLACE_TICKS: Array[int] = [4, 4, 4, 5]
+static var PLACE_TICKS: Array[int] = AnimLib.durations("fx_lantern_place", [4, 4, 4, 5])
 const IDLE_FRAME_TICKS: int = 7  # about 110 ms, 6 frames looping
-const PULSE_TICKS: Array[int] = [3, 4, 4, 5]  # the lantern itself flaring on a pulse
-const FADE_TICKS: Array[int] = [5, 5, 6, 7, 5, 5]
-const POOL_OPEN_TICKS: Array[int] = [3, 3, 3]
+static var PULSE_TICKS: Array[int] = AnimLib.durations("fx_lantern_pulse", [3, 4, 4, 5])  # the lantern itself flaring on a pulse
+static var FADE_TICKS: Array[int] = AnimLib.durations("fx_lantern_fade", [5, 5, 6, 7, 5, 5])
+static var POOL_OPEN_TICKS: Array[int] = AnimLib.durations("fx_lantern_pool_open", [3, 3, 3])
 const POOL_IDLE_FRAME_TICKS: int = 8  # about 140 ms, 4 frames looping
-const POOL_PULSE_TICKS: Array[int] = [3, 3, 3, 3, 3]
-const MOTES_TICKS: Array[int] = [4, 4, 4, 4, 4, 4]
-const SPARK_TICKS: Array[int] = [3, 3, 3, 3, 3, 3]
+static var POOL_PULSE_TICKS: Array[int] = AnimLib.durations("fx_lantern_pool_pulse", [3, 3, 3, 3, 3])
+static var MOTES_TICKS: Array[int] = AnimLib.durations("fx_lantern_motes", [4, 4, 4, 4, 4, 4])
+static var SPARK_TICKS: Array[int] = AnimLib.durations("fx_lantern_spark", [3, 3, 3, 3, 3, 3])
 ## The Edge sparks start this many ticks after the heal motes ("1-2 frames after motes 1").
 const SPARK_DELAY: int = 4
 ## Where the Edge sparks sit (their anchor is the chest), relative to the feet, facing right.
@@ -29,11 +31,11 @@ const CHEST: Vector2 = Vector2(2, -15)
 const POOL_RADIUS_PX: float = 44.0
 
 ## Phantom Cut.
-const START_TICKS: Array[int] = [3, 4, 4, 4, 5]
-const END_TICKS: Array[int] = [4, 4, 5, 5]
+static var START_TICKS: Array[int] = AnimLib.durations("fx_phantom_start", [3, 4, 4, 4, 5])
+static var END_TICKS: Array[int] = AnimLib.durations("fx_phantom_end", [4, 4, 5, 5])
 const GHOST_TICKS: Array[int] = [2, 4, 4, 4]
 const ARC_TICKS: Array[int] = [2, 3, 3, 4]
-const ECHO_SPARK_TICKS: Array[int] = [2, 3, 3, 3, 4]
+static var ECHO_SPARK_TICKS: Array[int] = AnimLib.durations("fx_phantom_spark", [2, 3, 3, 3, 4])
 ## The landing spark starts with arc phase 2 (the phantom hit).
 const ECHO_SPARK_DELAY: int = 2
 const GLOW_PHASE_TICKS: int = 5  # (ticks since the buff started / 5) % 6 + 1
@@ -87,7 +89,7 @@ static func lantern_key(age: int, since_pulse: int) -> String:
 	var pulse: int = sequence_frame(PULSE_TICKS, since_pulse)
 	if pulse > 0:
 		return "fx_lantern_pulse_%d" % pulse
-	return "fx_lantern_idle_%d" % (posmod((age - sequence_length(PLACE_TICKS)) / IDLE_FRAME_TICKS, 6) + 1)
+	return "fx_lantern_idle_%d" % AnimLib.effect_at("fx_lantern_idle", age - sequence_length(PLACE_TICKS), [6, IDLE_FRAME_TICKS, true])
 
 
 ## The floor pool frame `age` ticks after the placement: it opens with place 2-4, then loops.
@@ -98,7 +100,7 @@ static func pool_key(age: int) -> String:
 	var open: int = sequence_frame(POOL_OPEN_TICKS, open_age)
 	if open > 0:
 		return "fx_lantern_pool_open_%d" % open
-	return "fx_lantern_pool_idle_%d" % (posmod((open_age - sequence_length(POOL_OPEN_TICKS)) / POOL_IDLE_FRAME_TICKS, 4) + 1)
+	return "fx_lantern_pool_idle_%d" % AnimLib.effect_at("fx_lantern_pool_idle", open_age - sequence_length(POOL_OPEN_TICKS), [4, POOL_IDLE_FRAME_TICKS, true])
 
 
 ## Ticks since the lantern's latest pulse, from the snapshot alone (-1 before the first pulse).
@@ -142,7 +144,7 @@ static func since_start(phantom_ticks_left: int) -> int:
 
 
 static func marker_key(tick: int) -> String:
-	return "fx_phantom_marker_%d" % (posmod(tick / MARKER_FRAME_TICKS, 4) + 1)
+	return "fx_phantom_marker_%d" % AnimLib.effect_at("fx_phantom_marker", tick, [4, MARKER_FRAME_TICKS, true])
 
 
 static func ghost_key(weapon: String, swing: int, frame: int) -> String:

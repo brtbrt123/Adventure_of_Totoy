@@ -1,0 +1,6 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/fx_settings.gd" id="1_wjhj5"]
+
+[resource]
+script = ExtResource("1_wjhj5")

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/scene_look.gd" id="1_vltrh"]
+
+[resource]
+script = ExtResource("1_vltrh")
+vignette_strength = 0.34
+glow_strength = 0.45
+mist_density = 0.08

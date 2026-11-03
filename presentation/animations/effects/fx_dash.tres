@@ -1,0 +1,34 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_dash_1.png" id="1_4tvk7"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_dash_2.png" id="2_5cee5"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_dash_3.png" id="3_x2h0h"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_dash_4.png" id="4_ksaid"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_dash_5.png" id="5_d3jrp"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_dash_6.png" id="6_fon71"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_4tvk7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_5cee5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_x2h0h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ksaid")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_d3jrp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_fon71")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 30.0
+}]

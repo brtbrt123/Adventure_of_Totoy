@@ -1,0 +1,53 @@
+{
+  "account_tier": "free",
+  "ui_kit_id": "850bcedc-c871-4133-941f-7b5fc4c58b78",
+  "ui_kit_name": "Adventure of Totoy - fantasy HUD kit v1",
+  "ui_kit_status": "complete (finalized 2026-10-28, 31 components)",
+  "spritecook_project_id": "3c073baf-1fa6-458b-8582-27a623ec8815",
+  "review_url": "https://app.spritecook.ai/ui-kits?kitId=850bcedc-c871-4133-941f-7b5fc4c58b78",
+  "assets": [
+    {"asset_id": "ede13e1d-04c6-4163-be65-46decf7eedc8", "sha12": "4250cac71ee2", "label": "style collage upload (private)", "file": "refs/style_collage.png"},
+    {"asset_id": "f38ceb52-7f25-4383-9707-b669dc9aeadb", "sha12": "5202a9537193", "label": "concept 1, gpt-image-2 2K, selected", "file": "raw/concept_1.png"},
+    {"asset_id": "786a6cb9-09ec-427b-8081-58ba0f1d61cc", "sha12": "20a0862be722", "label": "component sheet 1, gpt-image-2.5-sunburst 2K", "file": "raw/sheet_1.png"}
+  ],
+  "finalized_components": {
+    "panel_large_ornate": "0e884665-6f09-469a-94ee-016cfdbec3db",
+    "panel_medium": "9d60d7a9-8b64-4f6c-bcb1-0b7804777bf2",
+    "panel_small": "04ebd498-d32b-43d1-915c-2d1ea7c41c5d",
+    "slot_normal": "272c0cf7-a80f-4d28-a04a-27548a3feaa8",
+    "slot_locked": "0dde27e2-d6f0-462e-b21b-32fb8c1d4442",
+    "slot_cooldown": "5eebed58-5c38-4c53-8d76-5074bb049b52",
+    "slot_empty": "a7f1a260-b835-4e4e-8178-f3f34ec595bd",
+    "aspect_socket_active": "0421433f-7f93-4ddc-9cc5-309a96570ff9",
+    "aspect_socket_locked": "0833e27d-2463-45df-bbc8-2304d7a41b14",
+    "weapon_medallion": "d102fba6-25d1-4bf2-b71c-06e080575b8d",
+    "health_bar_frame": "f4c992b9-ac5e-491d-9d08-3d9441063a66",
+    "fill_health": "b98d9548-d059-4521-9cee-13acee2ec68b",
+    "fill_ghost": "328e06dd-bd63-46e7-82a6-898c5190bcaf",
+    "fill_edge": "8399be39-1069-4252-948e-f6798a25a9b9",
+    "thin_bar_frame": "24b278b5-fb42-40aa-9178-aca0be27e039",
+    "fill_exp": "8b38c4f6-5381-40d2-8ba8-3f113a48ba06",
+    "level_pillar": "204b8430-1492-469c-8b18-43251ee2ec1c",
+    "name_ribbon": "836d91c0-de96-4f4b-9025-d94a369a628e",
+    "icon_herb": "506097c2-ca23-43de-8987-ea2a91d92a3d",
+    "icon_katana": "6ad471e2-45fc-48fa-a048-84d3dd9e8b4c",
+    "icon_sprint": "be34fdcd-b9c1-444a-9ae0-487f5a6a8e6a",
+    "level_shield": "f2e28d9f-3d5d-4afc-9802-ed81870aa7c2",
+    "tab_on": "cdcef221-04fe-4886-a19a-e30bfda58e09",
+    "tab_off": "51b1894e-3245-4716-853b-a8490d85fc7c",
+    "icon_check": "75bf048d-5e1c-4ee2-bdf2-b65b283421f4",
+    "icon_rune": "57f6c7d8-ffc6-46da-91b1-7b7ff889b75d",
+    "button_normal": "da73027e-f6b5-4bf9-bf00-baee12973139",
+    "button_pressed": "f2a72b44-99c7-4765-91be-7c6fc9439560",
+    "button_locked": "4f1c7366-ceb9-448e-b79e-297d89359f72",
+    "icon_padlock": "2e48b28b-156e-408d-89c7-b61629f8200d",
+    "key_badge": "dfdfa6db-f28b-4466-9bb3-40dc73e94cd9"
+  },
+  "credits": [
+    {"step": "concept 1 (count 1, gpt-image-2 2K medium)", "credits": 7},
+    {"step": "component sheet 1 (gpt-image-2.5-sunburst 2K medium, 14 + 8 for the concept reference)", "credits": 22},
+    {"step": "extract_ui_kit_components, finalize_ui_kit, upload", "credits": 0}
+  ],
+  "credits_total": 29,
+  "credits_left_after": 11
+}

@@ -1,0 +1,96 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_wall.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_wall_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_wall_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 6, 89, 34)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7"]
+radius = 8.0
+
+[node name="village_wall" type="Node2D"]
+metadata/w = 89
+metadata/h = 34
+metadata/base_width = 87
+metadata/solid = true
+metadata/image = "village_wall.png"
+metadata/note = "low stone wall: a row of circles along its base, the hero cannot walk through it"
+metadata/locked = true
+metadata/src_bbox = [59, 273, 646, 501]
+metadata/contact_shadow = {"core": [[44, 28, 1], [19, 29, 52], [11, 30, 68], [6, 31, 78], [4, 32, 82], [3, 33, 84], [4, 34, 82]], "edge": [[43, 28, 1], [45, 28, 1], [18, 29, 1], [71, 29, 1], [10, 30, 1], [79, 30, 1], [5, 31, 1], [84, 31, 1], [3, 32, 1], [86, 32, 1], [2, 33, 1], [87, 33, 1], [3, 34, 1], [86, 34, 1], [4, 35, 82]], "size": [89, 34]}
+metadata/flip_offset = Vector2(-44.5, -34)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-44.5, -34)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-47, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-47, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-35.5, -3.2)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-23.7, -3.2)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-11.8, -3.2)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0.0, -3.2)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(11.8, -3.2)
+shape = SubResource("CircleShape2D_5")
+
+[node name="Circle6" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(23.7, -3.2)
+shape = SubResource("CircleShape2D_6")
+
+[node name="Circle7" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(35.5, -3.2)
+shape = SubResource("CircleShape2D_7")

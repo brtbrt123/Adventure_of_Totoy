@@ -1,0 +1,92 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_breaking_edge_1.png" id="1_lnid7"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_breaking_edge_2.png" id="2_1bb8x"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_breaking_edge_3.png" id="3_dnacy"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_breaking_edge_4.png" id="4_hvovv"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_breaking_edge_5.png" id="5_kfbje"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_breaking_edge_6.png" id="6_i6fqm"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_gale_cut_1.png" id="7_w5g7x"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_gale_cut_2.png" id="8_cklvo"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_gale_cut_3.png" id="9_w2pph"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_gale_cut_4.png" id="10_7gylt"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_gale_cut_5.png" id="11_b7ck4"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_gale_cut_6.png" id="12_2fjwg"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_moon_cleave_1.png" id="13_wqom6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_moon_cleave_2.png" id="14_eenky"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_moon_cleave_3.png" id="15_6t8r1"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_moon_cleave_4.png" id="16_qfpex"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_moon_cleave_5.png" id="17_ie0r7"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_aspect2_moon_cleave_6.png" id="18_dhlo2"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_lnid7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_1bb8x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_dnacy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_hvovv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_kfbje")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_i6fqm")
+}],
+"loop": 0,
+"name": &"breaking_edge",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_w5g7x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_cklvo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_w2pph")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_7gylt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_b7ck4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_2fjwg")
+}],
+"loop": 0,
+"name": &"gale_cut",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_wqom6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_eenky")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_6t8r1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_qfpex")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_ie0r7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_dhlo2")
+}],
+"loop": 0,
+"name": &"moon_cleave",
+"speed": 20.0
+}]

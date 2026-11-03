@@ -1,0 +1,98 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_tree.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_tree_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_tree_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6"]
+radius = 4
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7"]
+radius = 4
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8"]
+radius = 4
+
+[node name="glade_tree" type="Node2D"]
+metadata/w = 93
+metadata/h = 84
+metadata/base_width = 82
+metadata/solid = true
+metadata/image = "glade_tree.png"
+metadata/note = "Trunk base and exposed ground roots; canopy remains walk-behind."
+metadata/locked = true
+metadata/contact_shadow = {"core": [[85, 73, 2], [6, 74, 2], [85, 74, 5], [5, 75, 5], [79, 75, 2], [85, 75, 5], [3, 76, 7], [15, 76, 6], [79, 76, 2], [86, 76, 4], [3, 77, 7], [14, 77, 8], [70, 77, 2], [79, 77, 5], [3, 78, 3], [13, 78, 9], [34, 78, 2], [60, 78, 2], [69, 78, 4], [80, 78, 6], [9, 79, 7], [17, 79, 2], [20, 79, 6], [33, 79, 3], [60, 79, 4], [68, 79, 5], [80, 79, 6], [9, 80, 6], [21, 80, 15], [60, 80, 15], [83, 80, 3], [9, 81, 5], [21, 81, 14], [37, 81, 2], [44, 81, 3], [50, 81, 2], [61, 81, 9], [72, 81, 5], [23, 82, 11], [35, 82, 4], [43, 82, 5], [50, 82, 4], [57, 82, 4], [63, 82, 6], [72, 82, 8], [31, 83, 2], [35, 83, 26], [74, 83, 6], [35, 84, 10], [46, 84, 15], [76, 84, 4], [38, 85, 6], [47, 85, 4], [53, 85, 5]], "edge": [[87, 73, 1], [8, 74, 1], [90, 74, 1], [10, 75, 1], [81, 75, 1], [90, 75, 1], [10, 76, 1], [21, 76, 1], [81, 76, 1], [85, 76, 1], [90, 76, 1], [10, 77, 1], [22, 77, 1], [72, 77, 1], [84, 77, 7], [6, 78, 5], [22, 78, 1], [36, 78, 1], [62, 78, 1], [73, 78, 1], [79, 78, 1], [86, 78, 5], [3, 79, 6], [16, 79, 1], [19, 79, 1], [26, 79, 1], [36, 79, 1], [64, 79, 1], [73, 79, 1], [79, 79, 1], [86, 79, 1], [3, 80, 4], [15, 80, 6], [36, 80, 1], [75, 80, 1], [80, 80, 3], [86, 80, 1], [14, 81, 7], [35, 81, 2], [39, 81, 1], [47, 81, 1], [52, 81, 1], [60, 81, 1], [70, 81, 2], [77, 81, 1], [80, 81, 7], [9, 82, 7], [21, 82, 2], [34, 82, 1], [39, 82, 1], [48, 82, 1], [54, 82, 1], [61, 82, 2], [69, 82, 3], [80, 82, 1], [83, 82, 4], [9, 83, 6], [21, 83, 10], [33, 83, 2], [61, 83, 10], [72, 83, 2], [80, 83, 1], [23, 84, 12], [45, 84, 1], [61, 84, 1], [63, 84, 7], [72, 84, 4], [80, 84, 1], [31, 85, 3], [35, 85, 3], [44, 85, 3], [51, 85, 2], [58, 85, 4], [74, 85, 7], [35, 86, 27], [76, 86, 5], [38, 87, 7], [47, 87, 5], [53, 87, 6]], "size": [93, 84]}
+metadata/flip_offset = Vector2(-52, -84)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-44, -84)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-43, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-47, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-17, -7)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-6, -7)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(6, -7)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(17, -7)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(28, -7)
+shape = SubResource("CircleShape2D_5")
+
+[node name="Circle6" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-28, -7)
+shape = SubResource("CircleShape2D_6")
+
+[node name="Circle7" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0, -10)
+shape = SubResource("CircleShape2D_7")
+
+[node name="Circle8" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(21, -11)
+shape = SubResource("CircleShape2D_8")

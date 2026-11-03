@@ -1,0 +1,383 @@
+"""Builds every Runebound Warden body pose from one detailed design (owner request 2026-10-31: "new detailed art", native size).
+
+Source: art/reference/warden_v2_detailed/b_native_totoy36.png (103x118, SpriteCook generation snapped to Totoy 36; manifest beside it).
+The sprite is cut into parts (head, far arm, near arm with the hooked root blade, two legs, torso with the stone chestplate) by fixed
+polygons, and each animation frame poses those parts: a body offset (bob, crouch, lean), rotations about the joints, and the rune
+state (lit while guarded, brighter while charging the Spore Ring or flashing on a guard hit, dark while exposed or dying). Rotations
+are sharp pixel-art rotations (each part is enlarged 4x, rotated, and brought back by a majority vote), so no blur and no new colours.
+
+It writes art/src/warden_<state>_right_<n>.txt (the frame names, counts and order presentation/explore/mob_view.gd plays) and
+presentation/explore/warden_attachments.json (per frame: the chest stone and the blade hook, in the attachment units the effects use:
+pixels from the feet / 2.5). Deterministic: the same source gives the same files.
+
+    python tools/art/rig_warden_v2.py           # write the grids and attachments, then validate/build/preview as usual
+    python tools/art/rig_warden_v2.py --sheet   # also write a labelled contact sheet of every pose to art/reference/warden_v2_detailed/
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+from collections import Counter
+from pathlib import Path
+
+from PIL import Image, ImageDraw
+
+import redraw_warden_2p5 as redraw  # the EPX Scale2x and the outline-keeping majority vote (same folder)
+
+ROOT = Path(__file__).resolve().parents[2]
+SOURCE = ROOT / "art/reference/warden_v2_detailed/b_native_totoy36.png"
+FEET = (47, 117)  # where the Warden stands in the source sprite
+MARGIN = 64  # working space around the sprite for raised arms and falls
+RUNE_BOX = (46, 39, 64, 60)  # the rune on the chestplate (x0, y0, x1, y1)
+RUNE_CENTRE = (54, 48)
+HOOK = (98, 114)  # the blade's hooked tip
+SHRINK = 1.5  # owner 2026-10-31: "too big, scale it down by 1.5x" (posed at the design's size, then drawn 2/3 as large)
+
+# part -> (polygon in source pixels, pivot)
+PARTS: dict[str, tuple[list[tuple[int, int]], tuple[int, int]]] = {
+    "head": ([(35, 0), (61, 0), (61, 33), (35, 33)], (48, 31)),
+    "near_arm": ([(62, 27), (81, 27), (87, 55), (103, 77), (103, 118), (86, 118), (71, 86), (64, 71), (60, 62)], (65, 38)),
+    "far_arm": ([(0, 17), (41, 15), (41, 42), (28, 56), (28, 99), (0, 99)], (31, 31)),
+    "leg_far": ([(0, 99), (28, 99), (28, 64), (48, 64), (48, 118), (0, 118)], (36, 67)),
+    "leg_near": ([(48, 64), (67, 64), (74, 85), (88, 118), (48, 118)], (59, 67)),
+}
+DRAW_ORDER = ["far_arm", "leg_far", "leg_near", "torso", "head", "near_arm"]
+UPPER = {"torso", "head", "near_arm", "far_arm"}  # parts the body offset moves
+
+# The rune's colours (Totoy 36 symbols) and what they become in each rune state.
+RUNE_DARK = {"p": "g", "o": "f", "n": "f", "u": "e", "t": "e", "m": "f"}
+RUNE_BRIGHT = {"t": "u", "u": "o", "n": "o", "o": "p", "m": "n"}
+# One step darker along each ramp (feet in contact shadow): bark, moss, stone.
+DARKER = {"d": "c", "c": "b", "b": "a", "a": "9", "9": "8", "8": "0", "q": "9", "6": "5", "5": "4", "4": "3", "3": "2", "2": "0",
+          "j": "i", "i": "h", "h": "g", "g": "f", "f": "e", "e": "0"}
+CREVICE = "8"  # the darkest bark: a closed gap reads as a deep fold in the roots, not as a hole
+
+
+def F(**kw) -> dict:
+    """One frame: body (dx, dy), per-part angles in degrees (positive = clockwise on screen), leg shifts, rune state, dissolve."""
+    return {"body": kw.get("body", (0, 0)), "angles": kw.get("angles", {}), "legs": kw.get("legs", {}), "rune": kw.get("rune", "lit"),
+            "dissolve": kw.get("dissolve", 0.0)}
+
+
+def poses() -> dict[str, list[dict]]:
+    """Every pose. Owner playtest 2026-10-31 ("stiff", "his movement is so little"): a heavy stomping walk (legs swing from the hips,
+    the body drops on every footfall, arms swing against the legs, the head nods), a breathing idle, and wind-ups and strikes that lean
+    back and lunge through the whole body. Angles: positive = clockwise on screen, so a negative leg angle steps forward."""
+    p: dict[str, list[dict]] = {}
+    # breathing: the chest rises and falls, the arms sway a little with it, the head settles
+    breath = ((0, 0), (0, 0.5), (1, 1), (2, 1.5), (1, 1), (0, 0.5))
+    p["idle"] = [F(body=(0, b), angles={"near_arm": a * 2, "far_arm": -a * 2, "head": a}) for b, a in breath]
+    p["wake"] = [F(body=(0, d), angles={"head": a, "near_arm": a / 2, "far_arm": -a / 2}) for d, a in ((8, 16), (5, 10), (2, 4), (0, 0))]
+    # (near leg, far leg, lift near, lift far, bob, arm swing, head) per frame; frames 1 and 4 are the footfalls (the effects stamp dust there)
+    walk = ((-11, 9, 0, 0, 3, 1.0, 3), (-4, 3, 0, 3, 0, 0.5, 0), (5, -6, 2, 1, -1, -0.5, -2),
+            (9, -11, 0, 0, 3, -1.0, 3), (3, -4, 3, 0, 0, -0.5, 0), (-6, 5, 1, 2, -1, 0.5, -2))
+    p["walk"] = [F(body=(2, bob), angles={"leg_near": ln, "leg_far": lf, "near_arm": 9 * sw, "far_arm": -12 * sw, "head": hd},
+                   legs={"leg_near": (0, -lift_n), "leg_far": (0, -lift_f)})
+                 for ln, lf, lift_n, lift_f, bob, sw, hd in walk]
+    p["cleave_tell"] = [F(body=(-l, c), angles={"near_arm": a, "far_arm": -a / 8, "head": -h, "leg_near": -l})
+                        for a, l, c, h in ((-25, 1, 0, 1), (-55, 3, 1, 3), (-85, 5, 1, 4), (-105, 6, 2, 5), (-115, 7, 2, 6))]
+    p["cleave_strike"] = [F(body=(l, d), angles={"near_arm": a, "far_arm": 12, "head": 5, "leg_near": -l})
+                          for a, l, d in ((-18, 5, 1), (22, 10, 4), (34, 9, 4))]  # the hook comes down through the cone (reach 46)
+    p["lash_tell"] = [F(body=(-l, c), angles={"near_arm": a, "far_arm": -a / 3, "head": -c * 2})
+                      for a, l, c in ((14, 1, 0), (28, 3, 1), (40, 5, 2), (48, 6, 2), (52, 7, 3))]
+    p["lash_strike"] = [F(body=(l, 1), angles={"near_arm": a, "far_arm": 10, "head": 4, "leg_near": -l})
+                        for a, l in ((-60, 6), (-88, 10), (-80, 8))]
+    p["ring_tell"] = [F(body=(0, d), angles={"far_arm": s, "near_arm": -s, "head": -d}, rune="bright")
+                      for d, s in ((1, 6), (2, 12), (4, 18), (5, 24), (6, 28))]
+    p["ring_strike"] = [F(body=(0, d), angles={"far_arm": -s, "near_arm": s, "head": 6}, rune="bright")
+                        for d, s in ((10, 14), (5, 6), (2, 0))]
+    p["recover"] = [F(body=(l, d), angles={"near_arm": a, "head": d}) for a, l, d in ((22, 4, 2), (14, 2, 1), (6, 1, 0), (0, 0, 0))]
+    p["guard_hit"] = [F(body=(-5, 0), angles={"head": -6, "near_arm": -6}, rune="bright"), F(body=(-2, 0), angles={"head": -2})]
+    p["hurt"] = [F(body=(-5, 2), angles={"head": 10, "near_arm": 10}), F(body=(-2, 1), angles={"head": 4, "near_arm": 4})]
+    p["exposed"] = [F(body=(-3, d), angles={"head": h, "near_arm": 18, "far_arm": -10}, rune="dark") for d, h in ((6, 14), (9, 20), (10, 22), (9, 20))]
+    p["death"] = [F(body=(-1 * min(i, 4), d), angles={"head": 10 + i * 6, "near_arm": 10 + i * 5, "far_arm": -6 - i * 4},
+                    legs={"leg_far": (0, min(i, 3)), "leg_near": (0, min(i, 3))}, rune="dark" if i >= 1 else "lit", dissolve=dv)
+                  for i, (d, dv) in enumerate(((3, 0.0), (7, 0.0), (11, 0.08), (15, 0.18), (19, 0.32), (23, 0.5), (26, 0.68), (28, 0.84)))]
+    return p
+
+
+# ---- images as symbol grids ---------------------------------------------------------------------------------------------------
+
+def _palette() -> tuple[dict[tuple[int, int, int], str], dict[str, tuple[int, int, int]]]:
+    colours = json.loads((ROOT / "art/palette.json").read_text(encoding="utf-8"))["colors"]
+    to_symbol = {tuple(bytes.fromhex(c["hex"][1:])): c["symbol"] for c in colours}
+    return to_symbol, {s: rgb for rgb, s in to_symbol.items()}
+
+
+def _inside(poly: list[tuple[int, int]], x: float, y: float) -> bool:
+    c = False
+    for i in range(len(poly)):
+        x1, y1 = poly[i]
+        x2, y2 = poly[(i + 1) % len(poly)]
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+            c = not c
+    return c
+
+
+def cut() -> tuple[dict[str, dict[tuple[int, int], str]], tuple[int, int]]:
+    """The source split into parts: {part: {(x, y): symbol}} (every opaque pixel in exactly one part)."""
+    to_symbol, _ = _palette()
+    im = Image.open(SOURCE).convert("RGBA")
+    parts: dict[str, dict[tuple[int, int], str]] = {name: {} for name in DRAW_ORDER}
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = im.getpixel((x, y))
+            if a < 128:
+                continue
+            symbol = to_symbol[(r, g, b)]
+            owner = "torso"
+            for name in ("head", "near_arm", "far_arm", "leg_far", "leg_near"):
+                if _inside(PARTS[name][0], x + 0.5, y + 0.5):
+                    owner = name
+                    break
+            parts[owner][(x, y)] = symbol
+    return parts, im.size
+
+
+def _rotate(pixels: dict[tuple[int, int], str], pivot: tuple[float, float], degrees: float) -> dict[tuple[int, int], str]:
+    """A sharp pixel-art rotation: 4x sample grid, rotated nearest, majority vote back to 1x (no blur, no new colours)."""
+    if abs(degrees) < 0.01 or not pixels:
+        return dict(pixels)
+    k = 4
+    rad = math.radians(degrees)
+    cos_a, sin_a = math.cos(rad), math.sin(rad)
+    xs = [x for x, _ in pixels]
+    ys = [y for _, y in pixels]
+    # bounds of the rotated part
+    corners = [(min(xs), min(ys)), (max(xs) + 1, min(ys)), (min(xs), max(ys) + 1), (max(xs) + 1, max(ys) + 1)]
+    rot = [(pivot[0] + (cx - pivot[0]) * cos_a - (cy - pivot[1]) * sin_a, pivot[1] + (cx - pivot[0]) * sin_a + (cy - pivot[1]) * cos_a) for cx, cy in corners]
+    x0, x1 = math.floor(min(p[0] for p in rot)) - 1, math.ceil(max(p[0] for p in rot)) + 1
+    y0, y1 = math.floor(min(p[1] for p in rot)) - 1, math.ceil(max(p[1] for p in rot)) + 1
+    out: dict[tuple[int, int], str] = {}
+    for oy in range(y0, y1):
+        for ox in range(x0, x1):
+            votes: Counter = Counter()
+            for sy in range(k):
+                for sx in range(k):
+                    # sample point in the output pixel, rotated back into the source
+                    px = ox + (sx + 0.5) / k - pivot[0]
+                    py = oy + (sy + 0.5) / k - pivot[1]
+                    src_x = pivot[0] + px * cos_a + py * sin_a
+                    src_y = pivot[1] - px * sin_a + py * cos_a
+                    votes[pixels.get((math.floor(src_x), math.floor(src_y)), ".")] += 1
+            best = votes.most_common()
+            pick = best[0][0]
+            if pick == "." and len(best) > 1 and best[0][1] < 10:  # keep thin edges unless the pixel is mostly empty
+                pick = best[1][0]
+            if pick != ".":
+                out[(ox, oy)] = pick
+    return out
+
+
+def _close_seams(parts: dict[str, dict[tuple[int, int], str]], canvas: dict[tuple[int, int], str], reach: int = 4) -> None:
+    """Fills the holes a pose opens inside the body: where the torso moved off the legs (a lean, a crouch, a flinch) or a rotation left
+    a pinhole. A transparent pixel is filled only when the rest pose had body there and the posed body surrounds it on all four sides
+    within `reach` pixels; it takes the rest pose's colour at that spot. The gap between the legs and the space outside stay open."""
+    rest: dict[tuple[int, int], str] = {}
+    for name in ("torso", "leg_far", "leg_near", "far_arm"):  # not the swinging blade arm: no ghost arm where it was
+        rest.update(parts[name])
+    filled = []
+    for (x, y), symbol in rest.items():
+        if (x, y) in canvas:
+            continue
+        if all(any((x + dx * k, y + dy * k) in canvas for k in range(1, reach + 1)) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            filled.append(((x, y), symbol))
+    for at, symbol in filled:
+        canvas[at] = symbol
+
+
+def _fill_slivers(canvas: dict[tuple[int, int], str], width: int = 2) -> None:
+    """Closes thin gaps inside the body: a transparent pixel with body on both sides within `width` pixels (left and right, or above
+    and below) becomes the dark outline colour, the way a pixel artist draws a crevice. The generated design has such slivers between
+    the forearm and the thigh and a few pinholes from its background removal; through them the ground showed. Wider gaps (between the
+    legs) stay open."""
+    filled = []
+    xs = [x for x, _ in canvas]
+    ys = [y for _, y in canvas]
+    for y in range(min(ys), max(ys) + 1):
+        for x in range(min(xs), max(xs) + 1):
+            if (x, y) in canvas:
+                continue
+            across = any((x - k, y) in canvas for k in range(1, width + 1)) and any((x + k, y) in canvas for k in range(1, width + 1))
+            down = any((x, y - k) in canvas for k in range(1, width + 1)) and any((x, y + k) in canvas for k in range(1, width + 1))
+            if across or down:
+                filled.append((x, y))
+    for at in filled:
+        canvas[at] = "0"
+
+
+def _fill_crevices(canvas: dict[tuple[int, int], str], width: int = 5, enclose: int = 10) -> None:
+    """Closes the narrow gaps the generated design left between the roots (forearm and thigh, the folds of the legs): through them the
+    ground showed, which read as missing pixels in play. A transparent pixel is filled when body lies within `width` px on both sides
+    (left and right, or above and below) AND within `enclose` px in all four directions. The space between the legs is open below, so
+    it stays open; so is everything outside the silhouette."""
+    filled = []
+    xs = [x for x, _ in canvas]
+    ys = [y for _, y in canvas]
+    for y in range(min(ys), max(ys) + 1):
+        for x in range(min(xs), max(xs) + 1):
+            if (x, y) in canvas:
+                continue
+            near = lambda dx, dy, reach: any((x + dx * k, y + dy * k) in canvas for k in range(1, reach + 1))
+            if not all(near(dx, dy, enclose) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                continue
+            if (near(1, 0, width) and near(-1, 0, width)) or (near(0, 1, width) and near(0, -1, width)):
+                filled.append((x, y))
+    for at in filled:
+        canvas[at] = CREVICE
+
+
+def _ground_contact(canvas: dict[tuple[int, int], str], rows: int = 6) -> None:
+    """The feet one step darker where they meet the ground (the bottom `rows` px of each column), so the Warden stands in its own
+    shadow instead of floating on the floor like paper."""
+    bottom: dict[int, int] = {}
+    for x, y in canvas:
+        bottom[x] = max(bottom.get(x, y), y)
+    for (x, y), s in list(canvas.items()):
+        if y > bottom[x] - rows and y >= FEET[1] - 14:
+            canvas[(x, y)] = DARKER.get(s, s)
+
+
+def _hash01(x: int, y: int, salt: int) -> float:
+    h = (x * 73856093) ^ (y * 19349663) ^ (salt * 83492791)
+    h = (h * 1103515245 + 12345) & 0x7FFFFFFF
+    return (h % 10000) / 10000.0
+
+
+def _point_after(part: str, frame: dict, point: tuple[float, float]) -> tuple[float, float]:
+    """Where a source point of `part` ends up in this frame (for the attachments)."""
+    x, y = point
+    angle = frame["angles"].get(part, 0.0)
+    if part in PARTS and abs(angle) > 0.01:
+        px, py = PARTS[part][1]
+        rad = math.radians(angle)
+        x, y = px + (x - px) * math.cos(rad) - (y - py) * math.sin(rad), py + (x - px) * math.sin(rad) + (y - py) * math.cos(rad)
+    if part in UPPER:
+        x, y = x + frame["body"][0], y + frame["body"][1]
+    return x, y
+
+
+def render(parts: dict[str, dict[tuple[int, int], str]], frame: dict) -> dict[tuple[int, int], str]:
+    canvas: dict[tuple[int, int], str] = {}
+    for name in DRAW_ORDER:
+        pixels = parts[name]
+        angle = frame["angles"].get(name, 0.0)
+        if name in PARTS:
+            pixels = _rotate(pixels, PARTS[name][1], angle)
+        dx, dy = frame["body"] if name in UPPER else (0, 0)
+        if name in frame["legs"]:
+            dx, dy = frame["legs"][name]
+        for (x, y), s in pixels.items():
+            if name == "torso" and RUNE_BOX[0] <= x < RUNE_BOX[2] and RUNE_BOX[1] <= y < RUNE_BOX[3]:
+                if frame["rune"] == "dark":
+                    s = RUNE_DARK.get(s, s)
+                elif frame["rune"] == "bright":
+                    s = RUNE_BRIGHT.get(s, s)
+            canvas[(x + dx, y + dy)] = s
+    _close_seams(parts, canvas)
+    for _ in range(3):  # a gap of 3 px closes in two passes; anything wider (between the legs) never starts to fill
+        size = len(canvas)
+        _fill_slivers(canvas)
+        if len(canvas) == size:
+            break
+    for _ in range(2):  # a filled crevice can enclose the next one
+        _fill_crevices(canvas)
+    _ground_contact(canvas)
+    if frame["dissolve"] > 0.0:
+        # the body crumbles from the top down into moss and root fragments
+        top = min(y for _, y in canvas)
+        bottom = max(y for _, y in canvas)
+        for (x, y) in list(canvas):
+            height = (bottom - y) / max(1, bottom - top)
+            if _hash01(x, y, 7) < frame["dissolve"] * (0.55 + 0.9 * height):
+                del canvas[(x, y)]
+    return canvas
+
+
+def shrink(canvas: dict[tuple[int, int], str]) -> tuple[dict[tuple[int, int], str], tuple[int, int]]:
+    """The posed frame at 1/SHRINK size: Scale2x (EPX: rounds diagonals, only the art's own colours) to twice the size, then a majority
+    vote over each 3x3 block (transparency must win clearly, so thin dark outlines survive). The feet land exactly on an output pixel.
+    Returns the smaller canvas and its feet."""
+    fx, fy = FEET
+    xs = [x for x, _ in canvas]
+    ys = [y for _, y in canvas]
+    kx = math.ceil((fx - min(xs)) / 3)
+    ky = math.ceil((fy - min(ys)) / 3)
+    x0, y0 = fx - 3 * kx, fy - 3 * ky
+    w = (max(max(xs), fx) + 1 - x0 + 2) // 3 * 3
+    h = (max(max(ys), fy) + 1 - y0 + 2) // 3 * 3
+    grid = [[canvas.get((x0 + i, y0 + j), ".") for i in range(w)] for j in range(h)]
+    small = redraw._vote(redraw._scale2x(grid), 3.0, w * 2 // 3, h * 2 // 3)
+    return {(i, j): s for j, row in enumerate(small) for i, s in enumerate(row) if s != "."}, (2 * kx, 2 * ky)
+
+
+def to_grid(canvas: dict[tuple[int, int], str], feet: tuple[int, int] = FEET) -> tuple[list[str], tuple[int, int]]:
+    """Trimmed rows (multiples of 8, the feet kept inside) and the anchor (feet) within them."""
+    fx, fy = feet
+    xs = [x for x, _ in canvas] + [fx]
+    ys = [y for _, y in canvas] + [fy]
+    left, top = min(xs), min(ys)
+    width = (max(xs) + 1 - left + 7) // 8 * 8
+    height = (max(ys) + 1 - top + 7) // 8 * 8
+    rows = ["".join(canvas.get((x, y), ".") for x in range(left, left + width)) for y in range(top, top + height)]
+    return rows, (fx - left, fy - top)
+
+
+def build() -> dict[str, tuple[list[str], tuple[int, int], dict]]:
+    parts, _ = cut()
+    out: dict[str, tuple[list[str], tuple[int, int], dict]] = {}
+    for state, frames in poses().items():
+        for n, frame in enumerate(frames, start=1):
+            rows, anchor = to_grid(*shrink(render(parts, frame)))
+            chest = _point_after("torso", frame, RUNE_CENTRE)
+            hook = _point_after("near_arm", frame, HOOK)
+            unit = 2.5 * SHRINK  # attachment units: world px / 2.5 (the effects' convention), and the art is drawn 1/SHRINK as large
+            attach = {"chest": [round((chest[0] - FEET[0]) / unit, 2), round((chest[1] - FEET[1]) / unit, 2)],
+                      "hook": [round((hook[0] - FEET[0]) / unit, 2), round((hook[1] - FEET[1]) / unit, 2)]}
+            out[f"warden_{state}_right_{n}"] = (rows, anchor, attach)
+    return out
+
+
+def sheet(frames: dict[str, tuple[list[str], tuple[int, int], dict]], path: Path) -> None:
+    _, from_symbol = _palette()
+    cell, scale, cols = 150, 3, 8
+    names = list(frames)
+    rows_n = (len(names) + cols - 1) // cols
+    img = Image.new("RGB", (cols * cell * scale, rows_n * (cell + 14) * scale), (24, 22, 28))
+    d = ImageDraw.Draw(img)
+    for i, name in enumerate(names):
+        rows, (ax, ay), _ = frames[name]
+        tile = Image.new("RGB", (cell, cell), (70, 74, 58))
+        ox, oy = cell // 2 - ax, cell - 8 - ay
+        for y, row in enumerate(rows):
+            for x, s in enumerate(row):
+                if s != "." and 0 <= ox + x < cell and 0 <= oy + y < cell:
+                    tile.putpixel((ox + x, oy + y), from_symbol[s])
+        cx, cy = (i % cols) * cell * scale, (i // cols) * (cell + 14) * scale
+        img.paste(tile.resize((cell * scale, cell * scale), Image.NEAREST), (cx, cy + 14 * scale))
+        d.text((cx + 6, cy + 8), name.replace("warden_", "").replace("_right", ""), fill=(240, 236, 214))
+    img.save(path)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--sheet", action="store_true")
+    args = parser.parse_args()
+    frames = build()
+    old = sorted(p.stem for p in (ROOT / "art/src").glob("warden_*.txt"))
+    for stale in set(old) - set(frames):
+        (ROOT / "art/src" / f"{stale}.txt").unlink()
+    attachments = {}
+    for name, (rows, (ax, ay), attach) in frames.items():
+        (ROOT / "art/src" / f"{name}.txt").write_text(f"# kind: sprite\n# anchor: {ax},{ay}\n" + "\n".join(rows) + "\n", encoding="utf-8", newline="\n")
+        attachments[name] = attach
+    (ROOT / "presentation/explore/warden_attachments.json").write_text(json.dumps(attachments, indent=2) + "\n", encoding="utf-8", newline="\n")
+    if args.sheet:
+        sheet(frames, ROOT / "art/reference/warden_v2_detailed/poses_contact_sheet.png")
+    print(f"Warden v2 poses: {len(frames)} frames written")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

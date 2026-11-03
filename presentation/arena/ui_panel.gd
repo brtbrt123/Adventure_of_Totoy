@@ -1,7 +1,8 @@
 extends RefCounted
+const Kit := preload("res://presentation/common/ui_kit.gd")
 ## The one shared frame for every pop-up (approved mockups 2026-10-21, docs/previews/character_menu_README.md): the
 ## character menu and its description box, the HUD skill tooltip and the DEFEAT / VICTORY panels.
-## Everything is filled rectangles and single pixels on the 320x180 grid (hard-edged at any window size); text is
+## Frames are the SpriteCook kit's 9-sliced parts on the 384x216 grid (hard-edged at any window size); text is
 ## drawn by the caller with the HUD's font helpers (decision 0004). Use: const UiPanel := preload("res://presentation/arena/ui_panel.gd").
 ##
 ## Frame layers from the outside in: 1 px ink edge, 1 px accent line, 1 px ink, a 1 px bevel (light top/left, dark
@@ -52,56 +53,27 @@ static func gem(canvas: CanvasItem, centre: Vector2, theme_name: StringName, col
 			px(canvas, centre.x - 2 + i, centre.y - 2 + j, colors[symbol])
 
 
-## The shared frame. `rect` is in whole game pixels.
+## The shared frame. `rect` is in whole game pixels. Since the SpriteCook kit (2026-10-28) it is the carved bronze frame
+## with teal corner gems from presentation/common/ui_kit.gd: the large ornate one for big pop-ups (200x90 and up), the
+## medium one otherwise. `theme_name`, `gems` and `fill` are kept for the callers but the kit has one look; keep text
+## 7 px inside the rect (Kit.inner).
 static func draw_panel(canvas: CanvasItem, rect: Rect2, theme_name: StringName, colors: Dictionary, gems: bool = true, fill: String = "0") -> void:
 	drawn += 1
-	var t: Dictionary = theme(theme_name)
-	var x: float = rect.position.x
-	var y: float = rect.position.y
-	var w: float = rect.size.x
-	var h: float = rect.size.y
-	canvas.draw_rect(rect, colors["0"])
-	outline(canvas, Rect2(x + 1, y + 1, w - 2, h - 2), colors[t["accent"]])
-	canvas.draw_rect(Rect2(x + 3, y + 3, w - 6, h - 6), colors[fill])
-	canvas.draw_rect(Rect2(x + 3, y + 3, w - 6, 1), colors[t["bevel_hi"]])
-	canvas.draw_rect(Rect2(x + 3, y + 3, 1, h - 6), colors[t["bevel_hi"]])
-	canvas.draw_rect(Rect2(x + 3, y + h - 4, w - 6, 1), colors[t["bevel_lo"]])
-	canvas.draw_rect(Rect2(x + w - 4, y + 3, 1, h - 6), colors[t["bevel_lo"]])
-	if gems:
-		for corner: Vector2 in [Vector2(x + 1, y + 1), Vector2(x + w - 2, y + 1), Vector2(x + 1, y + h - 2), Vector2(x + w - 2, y + h - 2)]:
-			gem(canvas, corner, theme_name, colors)
+	Kit.panel(canvas, rect, rect.size.x >= 200.0 and rect.size.y >= 90.0)
 
 
-## A title plate with notched ribbon ends, centred on `center_x` (the result panels' title). The caller draws the title.
+## A title plate with the swallowtail ribbon, centred on `center_x` (the result panels' title). The caller draws the title.
 static func banner(canvas: CanvasItem, center_x: int, y: int, w: int, h: int, theme_name: StringName, colors: Dictionary) -> void:
-	var t: Dictionary = theme(theme_name)
-	var x: int = center_x - w / 2
-	canvas.draw_rect(Rect2(x, y, w, h), colors["0"])
-	canvas.draw_rect(Rect2(x + 1, y + 1, w - 2, h - 2), colors[t["accent"]])
-	canvas.draw_rect(Rect2(x + 2, y + 2, w - 4, h - 4), colors[t["plate"]])
-	canvas.draw_rect(Rect2(x + 2, y + 2, w - 4, 1), colors[t["gem"]])
-	# notched ends: a V cut into both short sides
-	var mid: int = y + h / 2
-	for k: int in range(5):
-		for side: int in [x + k, x + w - 1 - k]:
-			canvas.draw_rect(Rect2(side, mid - (4 - k), 1, 1 + 2 * (4 - k)), colors["0"])
-	gem(canvas, Vector2(center_x, y + h - 1), theme_name, colors)
-	# wings: short accent lines running out of the plate
-	canvas.draw_rect(Rect2(x - 8, mid, 6, 1), colors[t["accent"]])
-	canvas.draw_rect(Rect2(x + w + 2, mid, 6, 1), colors[t["accent"]])
-	px(canvas, x - 10, mid, colors[t["gem"]])
-	px(canvas, x + w + 9, mid, colors[t["gem"]])
+	Kit.ribbon(canvas, Rect2(center_x - w / 2.0 - 24.0, y, w + 48.0, h))
 
 
-## An item/skill slot: ink fill, stone border; a highlighted one gets a cream border and teal corner brackets.
+## An item/skill slot: the kit's carved frame on its stone floor; a highlighted one also gets teal corner brackets.
 static func slot(canvas: CanvasItem, rect: Rect2, highlighted: bool, colors: Dictionary) -> void:
 	var x: float = rect.position.x
 	var y: float = rect.position.y
 	var w: float = rect.size.x
 	var h: float = rect.size.y
-	canvas.draw_rect(rect, colors["0"])
-	outline(canvas, rect, colors["1"] if highlighted else colors["f"])
-	canvas.draw_rect(Rect2(x + 1, y + 1, w - 2, 1), colors["e"])
+	Kit.slot(canvas, rect, &"normal")
 	if highlighted:
 		for corner: Array in [[x - 2, y - 2, 1, 1], [x + w + 1, y - 2, -1, 1], [x - 2, y + h + 1, 1, -1], [x + w + 1, y + h + 1, -1, -1]]:
 			var bx: float = corner[0]
@@ -110,7 +82,6 @@ static func slot(canvas: CanvasItem, rect: Rect2, highlighted: bool, colors: Dic
 			canvas.draw_rect(Rect2(bx, minf(by, by + 3 * corner[3]), 1, 4), colors["u"])
 
 
-## The key cap (8x8, lilac border) a key letter is drawn into by the caller.
-static func key_badge(canvas: CanvasItem, at: Vector2, colors: Dictionary, size: Vector2 = Vector2(8, 8)) -> void:
-	canvas.draw_rect(Rect2(at, size), colors["0"])
-	outline(canvas, Rect2(at, size), colors["v"])
+## The key cap (9x9, bronze with a teal rivet) a key letter is drawn into by the caller.
+static func key_badge(canvas: CanvasItem, at: Vector2, colors: Dictionary, size: Vector2 = Vector2(9, 9)) -> void:
+	Kit.badge(canvas, Rect2(at, size))

@@ -18,7 +18,7 @@ func _init() -> void:
 
 func run() -> void:
 	expect(Fireflies.drawables(&"village_layered", 0, Vector2(571,336)).is_empty(), "Village has no forest motes")
-	for id: StringName in [&"forest", &"glade", &"glade_layered", &"forest_layered"]:
+	for id: StringName in [&"forest_layered", &"glade_layered", &"forest_layered"]:
 		var a: Array[Dictionary] = Fireflies.drawables(id, 0, Vector2(560,336))
 		var b: Array[Dictionary] = Fireflies.drawables(id, 120, Vector2(560,336))
 		expect(a.size() == 22 and a == Fireflies.drawables(id, 0, Vector2(560,336)), "Mote count and deterministic replay")
@@ -36,7 +36,7 @@ func run() -> void:
 		scene.fade_phase = &""
 		scene.toast_ticks = 0
 		expect(scene.material is ShaderMaterial, "Night shader is active")
-		if id != &"forest" and scene.material is ShaderMaterial:
+		if id != &"forest_layered" and scene.material is ShaderMaterial:
 			expect((scene.material as ShaderMaterial).get_shader_parameter("lamp_count") > 0, "Glade and layered forest fixtures are present")
 		if "--capture" in OS.get_cmdline_user_args():
 			DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))

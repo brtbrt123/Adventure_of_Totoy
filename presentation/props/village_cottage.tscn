@@ -1,0 +1,125 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_cottage.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_cottage_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_cottage_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 3, 125, 109)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_8"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_9"]
+radius = 5.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_10"]
+radius = 5.5
+
+[node name="village_cottage" type="Node2D"]
+metadata/w = 125
+metadata/h = 109
+metadata/base_width = 79
+metadata/solid = true
+metadata/image = "village_cottage.png"
+metadata/note = "cottage: both wall bases (the front corner is at dx +12); the door (left wall, dx -35..-5) is solid, used from in front"
+metadata/locked = true
+metadata/src_bbox = [425, 75, 907, 495]
+metadata/contact_shadow = {"core": [[117, 95, 2], [116, 96, 3], [111, 97, 8], [9, 98, 2], [12, 98, 3], [108, 98, 10], [9, 99, 14], [107, 99, 10], [9, 100, 16], [28, 100, 2], [103, 100, 9], [10, 101, 3], [14, 101, 26], [99, 101, 10], [22, 102, 25], [99, 102, 9], [24, 103, 28], [93, 103, 11], [39, 104, 16], [92, 104, 8], [46, 105, 17], [85, 105, 15], [51, 106, 19], [82, 106, 12], [54, 107, 21], [80, 107, 13], [62, 108, 24], [69, 109, 14], [74, 110, 7]], "edge": [[119, 95, 1], [119, 96, 1], [119, 97, 1], [11, 98, 1], [15, 98, 1], [118, 98, 2], [23, 99, 1], [117, 99, 3], [25, 100, 1], [30, 100, 1], [112, 100, 7], [9, 101, 1], [13, 101, 1], [40, 101, 1], [109, 101, 9], [9, 102, 13], [47, 102, 1], [108, 102, 5], [10, 103, 14], [52, 103, 1], [104, 103, 6], [22, 104, 17], [55, 104, 1], [100, 104, 9], [24, 105, 22], [63, 105, 1], [100, 105, 5], [39, 106, 12], [70, 106, 1], [94, 106, 7], [46, 107, 8], [75, 107, 1], [93, 107, 8], [51, 108, 11], [86, 108, 9], [54, 109, 15], [83, 109, 11], [62, 110, 12], [81, 110, 6], [69, 111, 15], [74, 112, 8]], "size": [125, 109]}
+metadata/flip_offset = Vector2(-61.5, -109)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-63.5, -109)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-56, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-55, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-46, -12)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-35, -11)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-24, -10)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-13, -8)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-2, -6)
+shape = SubResource("CircleShape2D_5")
+
+[node name="Circle6" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(9, -4)
+shape = SubResource("CircleShape2D_6")
+
+[node name="Circle7" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(20, -5)
+shape = SubResource("CircleShape2D_7")
+
+[node name="Circle8" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(30, -8)
+shape = SubResource("CircleShape2D_8")
+
+[node name="Circle9" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(40, -11)
+shape = SubResource("CircleShape2D_9")
+
+[node name="Circle10" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(50, -15)
+shape = SubResource("CircleShape2D_10")
+
+[node name="Light1" type="Marker2D" parent="."]
+position = Vector2(-21.5, -65.0)
+metadata/socket = {"pixel": [42.0, 44.0], "halo_radius": 24.0, "energy": 1.05, "pool_radius": 37.0, "pool_energy": 0.45}
+
+[node name="Light2" type="Marker2D" parent="."]
+position = Vector2(32.5, -35.0)
+metadata/socket = {"pixel": [96.0, 74.0], "halo_radius": 27.0, "energy": 1.15, "pool_radius": 44.0, "pool_energy": 0.7}

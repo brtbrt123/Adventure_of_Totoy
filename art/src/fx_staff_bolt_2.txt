@@ -1,0 +1,10 @@
+# kind: sprite
+# anchor: 3,3
+..o.o...
+.opppo..
+op111po.
+op111p..
+op111po.
+.opppo..
+..o.o...
+........

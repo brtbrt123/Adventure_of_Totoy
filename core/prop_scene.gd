@@ -3,7 +3,8 @@ extends RefCounted
 ## places and colliders come from two plain JSON files that core and presentation both read, so what blocks the hero
 ## and what is drawn never disagree (docs/architecture.md "Layered scenes", docs/LAYERED_SCENE_PILOT.md).
 ##
-##   prop DEFS   data/props/prop_defs.json  (written by tools/art/extract_props.py; "locked" entries are hand-tuned)
+##   prop DEFS   data/props/prop_defs.json  (written by tools/art/extract_props.py; "locked" entries are hand-tuned), plus
+##               data/props/prop_defs_woodland.json (the Woodland Approach props, same format, merged by load_defs())
 ##     {"version": 1, "props": {"<type>": {"image", "w", "h", "anchor": [ax, ay], "base_width", "solid",
 ##                                         "colliders": [[dx, dy, r], ...]}}}
 ##     anchor = the middle of the base, in sprite pixels from the sprite's top left; colliders are circles relative to
@@ -18,11 +19,13 @@ extends RefCounted
 ##      target_scene, target_entry}], "checkpoints": [{id, position}], "npcs": [{id, visual, position (where the person
 ##      stands), face_left}], "objects": [{id, kind (chest, door, dummy, ...), position (its feet), stand (where the hero
 ##      uses it from, in front)}] (the props that are interactable stay ordinary props; the object row says how to use
-##      them), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
+##      them), "encounters": [{id, name, rect [x, y, w, h], leash, reward {reward_id, kind, item, name, quantity},
+##      mobs [{type, x, y}]}] (the mobs of a scene, core/mob_field.gd), "prop_margin" (props may stand this far outside the
+##      world: trees hanging over the edge), and for the Stag fight room "stag_start", "stag_radius", "fight_area" [x, y, w, h]}
 ##
-##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>",
-##     "on_type": "<type>"}. `states` = {"gate_open": bool, "lit": [switch ids]} (ExploreCore owns it; ExploreSnapshot
-##     exposes it). The two types of a pair share w, h and anchor (tools/art/normalize_state_pairs.py; validate() checks
+##   STATES  a placement may show another type while a scene state holds: {"when": "gate_open" | "lit:<switch id>" | "flag:<story flag>" | "trial:<tag>",
+##     "on_type": "<type>"}. `states` = {"gate_open": bool, "lit": [switch ids], "flags": [story flags]} (ExploreCore owns it;
+##     ExploreSnapshot exposes it; "flag:cleared_hollow_center" is how Root Hollow's root-knot barrier opens). The two types of a pair share w, h and anchor (tools/art/normalize_state_pairs.py; validate() checks
 ##     it), each has its own colliders: a closed root gate is solid across its doorway, the open one only at its trunks.
 ##
 ## No sprites are loaded here (the core stays headless): sizes and colliders are numbers in the files.
@@ -30,6 +33,8 @@ const Obstacle := preload("res://core/obstacle.gd")
 const SceneBounds := preload("res://core/scene_bounds.gd")
 
 const DEFS_PATH: String = "res://data/props/prop_defs.json"
+## Catalogues of later areas, merged into the main one by load_defs() (a type in the main file wins).
+const EXTRA_DEFS_PATHS: Array[String] = ["res://data/props/prop_defs_woodland.json", "res://data/props/prop_defs_root_hollow.json", "res://data/props/prop_defs_hollow_trial.json"]
 
 
 ## Reads a JSON file into a Dictionary; empty when it is missing or not an object (callers validate()).
@@ -41,20 +46,34 @@ static func read_json(path: String) -> Dictionary:
 
 
 static func load_defs(path: String = DEFS_PATH) -> Dictionary:
-	return read_json(path)
+	var defs: Dictionary = read_json(path)
+	if path != DEFS_PATH or defs.is_empty():
+		return defs
+	for extra: String in EXTRA_DEFS_PATHS:
+		var more: Dictionary = read_json(extra).get("props", {})
+		for type_id: Variant in more:
+			if not defs["props"].has(type_id):
+				defs["props"][type_id] = more[type_id]
+	return defs
 
 
 static func load_scene(path: String) -> Dictionary:
 	return read_json(path)
 
 
-## True when the state `when` ("gate_open" or "lit:<switch id>") holds in `states`.
+## True when the state `when` ("gate_open", "lit:<switch id>" or "flag:<story flag>") holds in `states`.
 static func state_holds(when: String, states: Dictionary) -> bool:
 	if when == "gate_open":
 		return bool(states.get("gate_open", false))
 	if when.begins_with("lit:"):
 		var lit: Array = states.get("lit", [])
 		return lit.has(when.substr(4)) or lit.has(StringName(when.substr(4)))
+	if when.begins_with("flag:"):
+		var flags: Array = states.get("flags", [])
+		return flags.has(when.substr(5)) or flags.has(StringName(when.substr(5)))
+	if when.begins_with("trial:"):  # a tag of the scene's trial (core/trial.gd), e.g. "trial:sealed" while a wave lives
+		var tags: Array = states.get("trial", [])
+		return tags.has(when.substr(6)) or tags.has(StringName(when.substr(6)))
 	return false
 
 
@@ -140,8 +159,14 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 	var exits: Array = []
 	for row: Variant in scene.get("exits", []):
 		var e: Dictionary = row
-		exits.append({"id": StringName(str(e["id"])), "rect": _rect(e["rect"]), "target_scene": StringName(str(e["target_scene"])),
-			"target_entry": StringName(str(e["target_entry"]))})
+		var exit_row: Dictionary = {"id": StringName(str(e["id"])), "rect": _rect(e["rect"]), "target_scene": StringName(str(e["target_scene"])),
+			"target_entry": StringName(str(e["target_entry"]))}
+		if e.has("gate"):  # "road": closed until the village sequence is done (core/quest_book.gd)
+			exit_row["gate"] = StringName(str(e["gate"]))
+		if e.has("requires_flag"):  # closed until this story flag is set (the glade's root arch: cleared_stag_glade)
+			exit_row["requires_flag"] = StringName(str(e["requires_flag"]))
+			exit_row["blocked_text"] = str(e.get("blocked_text", ""))
+		exits.append(exit_row)
 	var checkpoints: Array = []
 	for row: Variant in scene.get("checkpoints", []):
 		var c: Dictionary = row
@@ -159,6 +184,9 @@ static func scene_def(scene: Dictionary, id: StringName, margin: float) -> Dicti
 	var result: Dictionary = {"id": id, "name": str(scene.get("name", "")), "size": size(scene), "margin": margin, "entries": entries,
 		"default_entry": StringName(str(scene.get("default_entry", ""))), "exits": exits, "checkpoints": checkpoints,
 		"npcs": npcs, "objects": objects}
+	result["encounters"] = scene.get("encounters", []).duplicate(true)  # raw rows: core/mob_field.gd reads them
+	if scene.has("trial"):  # a trial room (core/trial.gd): waves, spawn points, the altar, the chest and its reward
+		result["trial"] = scene["trial"].duplicate(true)
 	if scene.has("puzzle"):  # {"switches": [object ids]}: lighting them all opens the gate (ExploreCore)
 		var switches: Array[StringName] = []
 		for switch_id: Variant in scene["puzzle"].get("switches", []):
@@ -247,7 +275,8 @@ static func validate(scene: Dictionary, defs: Dictionary) -> PackedStringArray:
 			errors.append_array(_validate_state_row(id, p, types, scene))
 		var x: float = float(p.get("x", -1))
 		var y: float = float(p.get("y", -1))
-		if x < 0.0 or y < 0.0 or x > world.x or y > world.y:
+		var slack: float = float(scene.get("prop_margin", 0.0))
+		if x < -slack or y < -slack or x > world.x + slack or y > world.y + slack:
 			errors.append("prop %s: anchor outside the world" % id)
 	return errors
 
@@ -257,8 +286,8 @@ static func validate(scene: Dictionary, defs: Dictionary) -> PackedStringArray:
 static func _validate_state_row(id: String, row: Dictionary, types: Dictionary, scene: Dictionary) -> PackedStringArray:
 	var errors: PackedStringArray = PackedStringArray()
 	var when: String = str(row.get("when", ""))
-	if when != "gate_open" and not when.begins_with("lit:"):
-		errors.append("prop %s: unknown state '%s' (gate_open or lit:<switch>)" % [id, when])
+	if when != "gate_open" and not when.begins_with("lit:") and not when.begins_with("flag:") and not when.begins_with("trial:"):
+		errors.append("prop %s: unknown state '%s' (gate_open, lit:<switch>, flag:<story flag> or trial:<tag>)" % [id, when])
 	elif when.begins_with("lit:") and not scene.get("puzzle", {}).get("switches", []).has(when.substr(4)):
 		errors.append("prop %s: '%s' is not a puzzle switch of the scene" % [id, when.substr(4)])
 	var base: Dictionary = types.get(row.get("type", ""), {})

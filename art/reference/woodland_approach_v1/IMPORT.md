@@ -1,3 +1,5 @@
+> Production update 2026-10-28: Claude registered woodland_layered and real base colliders. Codex merged the approved metadata and shadow manifest into production, retired the preview ID/local runtime defs, and added mobs/input/items/audio. Current evidence: presentation/review/WOODLAND_PLAYABLE_20261028.md. Earlier review-only limitations below are historical. Geometry provenance is now imported_prop_geometry.json; production uses PropScene.load_defs and no art_overrides.
+
 # Approved woodland art import / combined review
 
 Owner approvals: ground ("yes i approved") and separate prop sheet ("aight thats good"), 2026-10-27.

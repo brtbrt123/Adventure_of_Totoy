@@ -1,3 +1,5 @@
+> Codex completion, 2026-10-27: presentation retirement and active test migration completed. Full harness passes every suite. See presentation/review/LAYERED_MIGRATION_COMPLETED.md for the reference archive, official debug aliases and Claude-owned core follow-up. Legacy save-ID fixtures remain deliberately tested; original paintings and arena renderer are preserved.
+
 # Codex task: finish the layered-map migration (2026-10-27)
 
 Claude switched the core and shared data (see STATUS). `SceneDefs.START_SCENE` is `village_layered`; the layered exits lead to each other (village_layered -> forest_layered -> glade_layered -> arena and back); `SaveProfile.from_dict` migrates painted scene and checkpoint ids to their layered twins (`SceneDefs.migrate_legacy`). The painted village, forest and glade are still in `SceneDefs.IDS` and reachable by debug keys until you retire them.

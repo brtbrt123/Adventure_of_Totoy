@@ -1,0 +1,9 @@
+{
+  "title": "Returning Lights - intro sketch",
+  "origin": "Original synthesized composition for Adventure of Totoy; no external samples",
+  "seconds": 32,
+  "rate": 48000,
+  "channels": 1,
+  "notes": "Dminor/Bb/Csus/Dminor sustained sine pads and soft bell motif; quiet playback, loop; owner pacing/audio approval pending",
+  "script": "art/reference/intro_cutscene_v1/compose_music.py"
+}

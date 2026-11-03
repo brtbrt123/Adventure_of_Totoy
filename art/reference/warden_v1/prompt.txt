@@ -1,0 +1,22 @@
+Use case: stylized-concept
+Asset type: REVIEW ONLY pixel-art enemy sprite design sheet for Adventure of Totoy.
+Input images are STYLE AND PALETTE references only: the existing low wide boar, small round Mossling, large deer Stag, and teal rune stones. Do not copy their silhouette. Match their restrained clustered shading and readable pixels, not highly detailed illustration.
+
+Create one coherent Runebound Warden: an upright root-and-bark KNIGHT with a stone-grey chestplate, broad asymmetric bark shoulders, moss wedged into joints, sturdy separated rooted legs, a dark bark helmet with a narrow right-facing face profile, one heavy arm ending in a hooked root-wrapped blade that can uncoil into a root lash. A sturdy humanoid, NOT a deer, animal, mushroom, skeleton, robot, or round golem. The torso must remain readable from a right-facing three-quarter side view. Body target 24 pixels wide x32 pixels tall, inside a48x48 pixel cell, feet at native(24,42). Keep the same identity, proportions, chestplate and equipment in every pose. No left-facing poses. The CHEST rune, not the eyes, is the brightest identity feature.
+
+Composition: exact uniform FOUR COLUMNS by TWO ROWS, each equal square cell, isolated transparent backgrounds. No gutters drawn, no text, no border, no floor shadows, no scenery. The eighth bottom-right cell must be empty. Seven whole unclipped poses only:
+TOP ROW left to right:
+1 IDLE: slow heavy planted knight stance, blade arm lowered forward to the right, chest rune lit teal.
+2 RUNE CLEAVE: blade arm raised high above the right shoulder in a powerful overhead windup, feet planted, chest rune lit teal. No gold arc or warning.
+3 ROOT LASH: torso twists right, hooked root arm extends/uncoils a short visible tendril to the right inside its cell, chest rune lit teal. No red line.
+4 SPORE RING: low heavy crouch with one rooted foot ready to stamp, broad shoulders hunch, a few moss-green spores above the shoulders, chest rune lit teal. No red circle.
+BOTTOM ROW left to right:
+5 GUARDED: same planted stance as idle, clear large angular teal chest rune in intact stone inset, bright teal core plus a few pale teal highlight pixels. This must read guarded from a distance.
+6 EXPOSED: same recognizable knight and chestplate, slight stagger with the blade lowered, chest rune COMPLETELY DARK, jagged BLACK CRACK through stone inset and dark teal remnants only. No bright teal rune pixels, no glowing eyes. This must read exposed in ONE frame without reading labels.
+7 DEFEAT: collapsed root-and-bark knight on its knees or slumped apart to the right, extinguished cracked chest inset, separated settled root fragments, no glow.
+8 EMPTY.
+
+Pixel execution: strict tiny game sprite pixel art, chunky intentional single-pixel clusters, no fine painted texture, no smooth lines, no antialiasing, no gradients, no bloom. Think actual native48x48 sprite cells displayed by integer nearest-neighbour scaling; body24x32, not a detailed large painting. Feet align to the same baseline in all standing poses. Attack appendages remain inside the cell.
+
+Only these project palette HEX colours: ink #1c1824; moss #26301c #3f5226 #5a7a3a #7f9348 #a0b159; bark #2e211e #4d3a30 #62453d #765f47 #987959 #bc9c72; stone #2f3231 #444b49 #5a625e #737769 #9a9886 #c6bfaa; teal #3f7f7a #6aa89a; teal highlight #a7cde0 #e0f0ec. Transparent or fully opaque only.
+Absolutely NO gold/yellow, NO red, NO orange combat cues anywhere. No generic glowing blue outline around the whole body. Only the guarded chest rune may carry the bright teal magic. Do not generate labels; they will be added separately.

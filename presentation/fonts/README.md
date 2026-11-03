@@ -14,3 +14,7 @@
 - License: SIL Open Font License 1.1, no Reserved Font Name; full text in `OFL-Cinzel.txt`, which must ship with the game. Used unmodified.
 - SHA-256 of the downloaded file: `f4d83d34d1f6c741193e4acf4b3dff9531e5a67b6aa65228d00a7db72a4e0f34` (125,468 bytes). OFL.txt: `f2b3029aba64c378bf0963b62945eee15e564fe4330b934c8f2eb058282b5e83`.
 - Used for the menu text (and by `tools/art/make_title_logo.py` for the title logo lettering).
+
+## SpriteCook UI integration (2026-10-29)
+
+Cinzel now supplies both body (`ui_font`, weight 400) and heading (`menu_font`, weight 900) text. Numerals and input labels use the original bitmap font in `art/ui_kit/pixel_keys.fnt`, reproduced by `make_pixel_font.py` beside it. Pixelify Sans remains available for older art/tools. See decision 0005.

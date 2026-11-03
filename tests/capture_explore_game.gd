@@ -49,7 +49,7 @@ func save(label: String) -> void:
 
 func run() -> void:
 	Bindings.register()
-	Engine.set_meta(Explore.START_META, {"scene": &"village", "entry": &"arrival"})
+	Engine.set_meta(Explore.START_META, {"scene": &"village_layered", "entry": &"arrival"})
 	scene = load("res://presentation/explore/explore_scene.tscn").instantiate()
 	scene.change_scene = func(path: String) -> void:
 		scene.queue_free()

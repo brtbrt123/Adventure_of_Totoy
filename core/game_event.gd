@@ -23,6 +23,10 @@ const REAPER_COIL_MISSED: StringName = &"reaper_coil_missed"
 const REAPER_COIL_DRAG: StringName = &"reaper_coil_drag"
 const REAPER_COIL_SPIN: StringName = &"reaper_coil_spin"
 const REAPER_COIL_ENDED: StringName = &"reaper_coil_ended"
+const STAFF_BURST: StringName = &"staff_burst"  # the Star Staff's cast went off: entity_id, position, radius, combo_index, finisher
+const DISINTEGRATION_STARTED: StringName = &"disintegration_started"  # entity_id, target_id, position, radius, impact_tick, lock_tick
+const DISINTEGRATION_IMPACT: StringName = &"disintegration_impact"  # the meteor landed: entity_id, position, radius, hit_ids
+const DISINTEGRATION_ENDED: StringName = &"disintegration_ended"  # entity_id, reason (complete, death)
 const ASPECT_EQUIPPED: StringName = &"aspect_equipped"
 const LANTERN_PLACED: StringName = &"lantern_placed"
 const LANTERN_PULSE: StringName = &"lantern_pulse"
@@ -77,3 +81,46 @@ func _init(p_type: StringName = &"", p_tick: int = 0, p_data: Dictionary = {}) -
 	type = p_type
 	tick = p_tick
 	data = p_data
+## Mobs (core/mob_field.gd). `encounter_started` {scene, encounter_id}; `mob_alerted` {scene, mob_id, type, encounter_id, position} (the pack
+## woke); `mob_staggered` {scene, mob_id, reason (parry or crash), position}; `mob_defeated` {scene, mob_id, type, encounter_id, position};
+## `mob_leashed` {scene, mob_id, encounter_id} (it gave up and walks home); `encounter_reset` {scene, encounter_id, reason (leash or defeat)};
+## `encounter_cleared` {scene, encounter_id, reward_id}. A mob's warning is `attack_telegraphed` (owner_id = mob id); the hero's blows are
+## `attack_hit` {attacker_id, target_id (mob id), damage, kind (normal or counter), position, combo_index, weapon_id}; his wounds are
+## `damage_taken` {entity_id, amount, source_id (mob id)}; a parry is `parry_succeeded` {attacker_id (mob id), ...} as at the post.
+const ENCOUNTER_STARTED: StringName = &"encounter_started"
+const MOB_ALERTED: StringName = &"mob_alerted"
+const MOB_STAGGERED: StringName = &"mob_staggered"
+const MOB_DEFEATED: StringName = &"mob_defeated"
+const MOB_SUMMON_STARTED: StringName = &"mob_summon_started"  # the Stag's chant began: mob_id, attack, cast_start_tick, cast_release_tick
+const MOB_SUMMONED: StringName = &"mob_summoned"  # the chant released: mob_id (the caster), summoned_ids, positions
+const MOB_PROJECTILE_FIRED: StringName = &"mob_projectile_fired"  # projectile_id, owner_id, visual, position, direction, speed, radius
+const MOB_PROJECTILE_ENDED: StringName = &"mob_projectile_ended"  # projectile_id, owner_id, visual, position, reason (hit, prop, range, owner, reset)
+const TRIAL_STARTED: StringName = &"trial_started"  # the altar woke: scene, waves, first_wave_tick
+const TRIAL_WAVE_STARTED: StringName = &"trial_wave_started"  # wave, waves
+const TRIAL_SPAWN_WARNED: StringName = &"trial_spawn_warned"  # wave, positions, types, arrive_tick (the mobs appear then)
+const TRIAL_WAVE_CLEARED: StringName = &"trial_wave_cleared"  # wave, waves
+const TRIAL_WON: StringName = &"trial_won"
+const TRIAL_FAILED: StringName = &"trial_failed"  # wave (the one the hero fell in)
+const MOB_HEALED: StringName = &"mob_healed"  # the Stag's summon regeneration, batched once a second: mob_id, amount, hp, live_summons, source
+const MOB_LEASHED: StringName = &"mob_leashed"
+const ENCOUNTER_RESET: StringName = &"encounter_reset"
+const ENCOUNTER_CLEARED: StringName = &"encounter_cleared"
+## The hero fell (`hero_defeated` {scene, position}) and, HERO_DEFEAT_TICKS later, stood up at the last checkpoint with full health
+## (`hero_respawned` {scene, checkpoint_id, position}); every uncleared encounter of the scene is whole again.
+const HERO_DEFEATED: StringName = &"hero_defeated"
+const HERO_RESPAWNED: StringName = &"hero_respawned"
+## `exp_gained` {scene, amount, source (mob id), level, exp (inside the level), exp_to_next}; `level_up` {scene, level, max_hp, points (stat points gained)} (the hero is healed
+## to full); `mob_dropped` {scene, mob_id, item_id, position} (a felled mob's drop, always followed by its `item_received`).
+const EXP_GAINED: StringName = &"exp_gained"
+const LEVEL_UP: StringName = &"level_up"
+const MOB_DROPPED: StringName = &"mob_dropped"
+## The village sequence (core/quest_book.gd): `quest_completed` {scene, step_id, exp, items (item ids paid)} when a step's done flag is set,
+## `chest_opened` {scene, object_id} (the Elder's basket chest), `exit_blocked` {scene, exit_id, text} (the east gate is closed: say why).
+const QUEST_COMPLETED: StringName = &"quest_completed"
+const CHEST_OPENED: StringName = &"chest_opened"
+const EXIT_BLOCKED: StringName = &"exit_blocked"
+## Stat points (ExploreCore): `stat_spent` {scene, stat, value, unspent, max_hp}; `stats_reset` {scene, unspent}.
+const STAT_SPENT: StringName = &"stat_spent"
+const STATS_RESET: StringName = &"stats_reset"
+## An item was used: {scene, item_id, healed, hp, count (left)}.
+const ITEM_USED: StringName = &"item_used"

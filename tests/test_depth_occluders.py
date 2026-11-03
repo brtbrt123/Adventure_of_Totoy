@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / "tools" / "art" / "make_depth_occluders.py"
 TABLE = ROOT / "presentation" / "common" / "depth_occluders.json"
 OUT = ROOT / "presentation" / "common" / "occluders"
-SCENES = ("village", "forest", "glade", "arena")
+SCENES = ("arena",)
 MAX_GROUND_SHARE = 0.15
 
 
@@ -107,11 +107,12 @@ class DepthOccluders(unittest.TestCase):
                             self.assertTrue(tool.point_in_polygon(rx + dx + 0.5, ry + dy + 0.5, polys[occ["id"]]),
                                             f"{scene}/{occ['id']}: pixel {rx + dx},{ry + dy} outside its polygon")
 
-    def test_the_root_gate_door_hides_while_the_gate_is_open(self) -> None:
-        manifest = json.loads((OUT / "forest_occluders.json").read_text(encoding="utf-8"))
-        hide = {o["id"]: o["hide_when"] for o in manifest["occluders"]}
-        self.assertEqual(hide.get("root_gate_middle"), "gate_open")
-        self.assertEqual(hide.get("root_gate_left"), "")
+    def test_layered_gate_has_state_specific_sprites(self) -> None:
+        scene = json.loads((ROOT / 'data/scenes/forest_layered_props.json').read_text())
+        gate = next(p for p in scene['props'] if p['id'] == 'root_gate')
+        self.assertEqual(gate['when'], 'gate_open')
+        self.assertEqual(gate['type'], 'forest_gate_closed')
+        self.assertEqual(gate['on_type'], 'forest_gate_open')
 
 
 if __name__ == "__main__":

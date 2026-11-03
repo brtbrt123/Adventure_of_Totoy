@@ -82,7 +82,7 @@ func _step(frame: InputFrame) -> void:
 			_expect(Vector2(arena.hit_bursts.back()["contact"]).y < Vector2(event.data["position"]).y, "hit spark is still at feet")
 			if event.data["kind"] == &"counter":
 				_expect(int(arena.flashes[arena.snapshot.entities[0].id]) == 10, "counter flash duration")
-			_expect(not arena.particles.is_empty(), "hit has no spark")
+			_expect(not arena.impact_view.particles.items.is_empty(), "hit has no spark")  # sparks, dust: presentation/common/impact_view.gd
 			_expect(not arena.hit_bursts.is_empty(), "hit has no short bright burst")
 			if event.data["kind"] == &"counter":
 				_expect(arena.shake_left > 0, "counter has no shake")
@@ -319,10 +319,10 @@ func _flash_visuals() -> void:
 		await process_frame
 	_expect(damaged and white and normal, "hurt flash/blink paths missing")
 	_expect(not arena.hurt_blink, "hurt blink must expire")
-	for at: Vector2 in [Vector2.ZERO, Vector2(320, 0), Vector2(0, 180), Vector2(320, 180)]:
+	for at: Vector2 in [Vector2.ZERO, Vector2(384, 0), Vector2(0, 216), Vector2(384, 216)]:
 		for counter: bool in [false, true]:
 			var panel: Rect2 = arena.hud.boss_panel(at, counter)
-			_expect(Rect2(0, 0, 320, 180).encloses(panel), "boss panel left screen")
+			_expect(Rect2(0, 0, 384, 216).encloses(panel), "boss panel left screen")
 	_expect(not arena.hud.portrait_frame.is_empty(), "HUD portrait missing")
 	var source: Image = arena.sprites.get_image()
 	var image: Image = arena.white_sprites.get_image()

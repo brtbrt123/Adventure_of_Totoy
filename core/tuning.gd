@@ -311,6 +311,44 @@ const REAPER_COIL_SPIN_POSTURE: float = 10.0
 const REAPER_COIL_EDGE_PER_HIT: float = 5.0  # small, like the barrage
 const REAPER_COIL_RECOVERY_TICKS: int = 10
 
+# Star Staff (the mage weapon, owner 2026-11-01): first guesses, tune in play.
+# The swing is a cast: an Arcane Burst goes off STAFF_BURST_RANGE px away in the aim direction, or on the nearest enemy in
+# the aim cone (STAFF_AIM_CONE_DOT) within that range plus its radius; the point is fixed when the cast starts (the bolt flies
+# during the windup) and the burst hits everything within its radius (plus their radius) of it on the active tick: two
+# small bursts, then the Great Burst finisher. The dash is a blink: STAFF_BLINK_TICKS of STAFF_BLINK_SPEED px (walls stop
+# it like a dash, the core resolves every tick's move), STAFF_BLINK_INVULN_TICKS i-frames from its start.
+const WEAPON_STAR_STAFF: StringName = &"star_staff"
+const STAFF_COMBO_MAX: int = 3
+const STAFF_SWING_WINDUP_TICKS: Array[int] = [10, 10, 16]  # the cast and the bolt's flight
+const STAFF_SWING_ACTIVE_TICKS: Array[int] = [2, 2, 3]
+const STAFF_SWING_RECOVERY_TICKS: Array[int] = [12, 12, 22]
+const STAFF_SWING_DAMAGE_MULT: Array[float] = [0.8, 0.8, 1.6]  # every enemy in the burst takes it
+const STAFF_SWING_POSTURE: Array[float] = [4.0, 4.0, 10.0]
+const STAFF_BURST_RADIUS: Array[float] = [16.0, 16.0, 30.0]  # the Great Burst is the finisher
+const STAFF_BURST_RANGE: float = 96.0
+const STAFF_AIM_CONE_DOT: float = 0.5
+const STAFF_EDGE_PER_HIT: float = 15.0  # it hits from afar, so less Edge than a blade
+const STAFF_BLINK_TICKS: int = 3
+const STAFF_BLINK_SPEED: float = 15.0  # 45 px in 3 ticks
+const STAFF_BLINK_INVULN_TICKS: int = 8
+
+# Disintegration: the Star Staff's active (right click). Needs a target (the same pick as the barrage and the coil); costs
+# Edge, cooldown from the activation. A magic circle forms under the target (FORM), charges (CHARGE) while the hero is rooted
+# and invulnerable (player state staff_cast), then the meteor falls (FALL; the hero is free again) and lands at the impact:
+# everything within DISINTEGRATION_RADIUS px (plus its radius) of the circle's centre takes the hit. The circle follows the
+# target until DISINTEGRATION_LOCK_TICKS before the impact, then stays (the last moment to step out).
+const DISINTEGRATION_EDGE_COST: float = 60.0
+const DISINTEGRATION_COOLDOWN_TICKS: int = 900  # 15 seconds
+const DISINTEGRATION_FORM_TICKS: int = 24
+const DISINTEGRATION_CHARGE_TICKS: int = 30
+const DISINTEGRATION_FALL_TICKS: int = 24
+const DISINTEGRATION_AFTER_TICKS: int = 40  # the blast and smoke after the impact (presentation; the form ends with them)
+const DISINTEGRATION_LOCK_TICKS: int = 18
+const DISINTEGRATION_RADIUS: float = 58.0
+const DISINTEGRATION_DAMAGE_MULT: float = 4.0  # x ATTACK_DAMAGE to every enemy in the circle
+const DISINTEGRATION_POSTURE: float = 30.0
+const DISINTEGRATION_EDGE_PER_HIT: float = 0.0
+
 # Edge (sword mechanic): close hits and parries build it, a counter spends all of it for extra damage
 const EDGE_MAX: float = 100.0
 const EDGE_PER_HIT: float = 25.0
@@ -383,3 +421,124 @@ const CHARGE_WIDTH: float = 28.0
 const CHARGE_ACTIVE_TICKS: int = 8
 const CHARGE_DAMAGE: int = 28
 const CHARGE_RECOVER_TICKS: int = 34
+
+# Mobs (core/mob_field.gd): the regular enemies of the exploration scenes (chapter 1: Mossling, Thornback Boar). Every type
+# has at most two attacks and obeys the gold/red rule (gold lunge = parry it, red charge = dash it). No randomness.
+#   level (shown on its bar), exp (paid once, the first time the hero fells it), drop {item, chance 0-1: rolled once per mob, the same
+#   result every time), hp, radius (body circle), speed (chase px/tick), aggro (the hero this close wakes the whole encounter), tether (a mob
+#   that gets this far from home gives up), hold (it stops chasing this far from the hero), wait (it holds this far away while
+#   two others attack)
+#   attack: kind (gold or red), start_min/start_max (the hero's distance that starts it), windup (warning ticks, aim locked on the
+#   first one), strike_ticks and strike_speed (the lunge/charge: px per tick), width (warning lane), damage, recover (ticks after a
+#   miss), cooldown (ticks before it may start another), interrupt (a normal hit during the windup cancels it), crash (the
+#   charge stops at a prop and the mob is stunned and exposed this long; 0 = no crash)
+const MOBS: Dictionary = {
+	&"mossling": {
+		"level": 1, "exp": 10, "drop": {"item": &"herb", "chance": 0.4}, "hp": 30, "radius": 6.0, "speed": 0.65, "aggro": 84.0, "tether": 230.0, "hold": 24.0, "wait": 56.0,
+		"attack": {"id": &"lunge", "kind": &"gold", "start_min": 14.0, "start_max": 50.0, "windup": 36, "strike_ticks": 10, "strike_speed": 5.2,
+			"width": 18.0, "damage": 12, "recover": 36, "cooldown": 70, "interrupt": true, "crash": 0},
+	},
+	# The Thornback Stag, the glade's mini-boss: one mob with three attacks. SLAM is gold (parry it: the Stag is stunned and exposed), CHARGE is
+	# red (dash across the lane; a charge into a prop crashes it), and ROOTS (phase two only, when it falls to PHASE2_HP of its health and
+	# roars) is red too: a burst under where the hero stood. Each attack row: kind, shape (line, cone or circle), the distance band the Stag
+	# starts it from, windup (the warning), strike_ticks (the dangerous window or the run), damage, recover and cooldown.
+	&"stag": {
+		"level": 3, "exp": 60, "drop": {"item": &"herb", "chance": 1.0}, "hp": 260, "radius": 20.0, "speed": 0.6, "aggro": 130.0, "tether": 320.0, "hold": 30.0, "wait": 90.0,
+		"boss": true, "phase2_hp": 0.5, "roar_ticks": 54,
+		"summon": {"type": &"glowmoth", "count": 5, "ring_min": 44.0, "ring_max": 100.0, "regen_per_second": 0.02, "lockout": 900, "first_ready": 300},
+		"attacks": [
+			{"id": &"stag_slam", "kind": &"gold", "shape": &"cone", "reach": 125.0, "half_angle": 0.95, "start_min": 0.0, "start_max": 125.0, "windup": 54, "strike_ticks": 6,
+				"strike_speed": 0.0, "width": 0.0, "damage": 18, "recover": 48, "cooldown": 46, "interrupt": false, "crash": 0, "phase": 1},
+			{"id": &"stag_charge", "kind": &"red", "shape": &"line", "start_min": 84.0, "start_max": 210.0, "windup": 56, "strike_ticks": 24, "strike_speed": 6.6,
+				"width": 30.0, "damage": 24, "recover": 40, "cooldown": 56, "interrupt": false, "crash": 80, "phase": 1},
+			{"id": &"stag_roots", "kind": &"red", "shape": &"circle", "reach": 34.0, "start_min": 0.0, "start_max": 230.0, "windup": 50, "strike_ticks": 5,
+				"strike_speed": 0.0, "width": 0.0, "damage": 16, "recover": 40, "cooldown": 40, "interrupt": false, "crash": 0, "phase": 2,
+				"sites": 8, "site_spacing": 40.0, "escape_reach": 70.0},
+			{"id": &"stag_summon", "kind": &"none", "shape": &"none", "summon": true, "start_min": 0.0, "start_max": 400.0, "windup": 90, "strike_ticks": 10,
+				"strike_speed": 0.0, "width": 0.0, "damage": 0, "recover": 50, "cooldown": 60, "interrupt": false, "crash": 0, "phase": 1},
+		],
+		"attack": {"id": &"stag_slam", "kind": &"gold", "start_min": 0.0, "start_max": 125.0, "windup": 54, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 18,
+			"recover": 48, "cooldown": 46, "interrupt": false, "crash": 0},
+	},
+	&"boar": {
+		"level": 2, "exp": 25, "drop": {"item": &"herb", "chance": 0.6}, "hp": 70, "radius": 9.0, "speed": 0.55, "aggro": 110.0, "tether": 260.0, "hold": 100.0, "wait": 110.0,
+		"attack": {"id": &"charge", "kind": &"red", "start_min": 24.0, "start_max": 140.0, "windup": 50, "strike_ticks": 38, "strike_speed": 3.4,
+			"width": 24.0, "damage": 20, "recover": 40, "cooldown": 90, "interrupt": false, "crash": 70},
+	},
+	# The Glowmoth: the Stag's summoned moth (core/mob_field.gd _summon). It never starts an encounter and pays no EXP, drop or flag; it is removed
+	# when the Stag falls or the encounter resets. Its ORB is a real projectile: the windup warns with a red lane exactly as wide as the orb's
+	# hit (2 x radius), then the orb flies along it at `speed` px/tick until it hits the hero, a prop, or travels `reach`; a dash's
+	# invulnerability lets it pass through. The moth's death removes its orb.
+	&"glowmoth": {
+		"level": 2, "exp": 0, "drop": {"item": &"herb", "chance": 0.0}, "hp": 20, "radius": 5.0, "speed": 0.9, "aggro": 999.0, "tether": 600.0, "hold": 70.0, "wait": 90.0,
+		"summoned": true,
+		"attack": {"id": &"moth_orb", "kind": &"red", "shape": &"line", "stationary": true, "reach": 140.0, "start_min": 30.0, "start_max": 120.0, "windup": 40, "strike_ticks": 8,
+			"strike_speed": 0.0, "width": 8.0, "damage": 6, "recover": 40, "cooldown": 100, "interrupt": true, "crash": 0,
+			"projectile": {"visual": &"glowmoth_orb", "speed": 2.4, "radius": 4.0}},
+	},
+	# The Runebound Warden (the Hollow Trial's hard mob, docs/PLAN_hollow_trial.md). Its rune GUARDS it: hits do only `guard` x damage until a
+	# parried gold attack stuns it (then it is exposed like any stunned mob). Rune Cleave is gold (parry it); an unparried Cleave chains into
+	# Root Lash `chain.delay` ticks later. Root Lash is a red line that does not move the Warden (`stationary`), Spore Ring a red burst around
+	# the Warden itself (`centered`): dash out of both. Only one Warden attacks at a time (`solo_attack`).
+	# Radius 12 since the art was drawn 1.5x smaller (owner 2026-10-31: 79 px tall, was 118 px with radius 18): the body matches its legs;
+	# the Cleave cone (reach + radius) shrinks with it, as the arm does.
+	&"warden": {
+		"level": 3, "exp": 45, "drop": {"item": &"herb", "chance": 0.8}, "hp": 140, "radius": 12.0, "speed": 0.5, "aggro": 120.0, "tether": 300.0, "hold": 28.0, "wait": 90.0,
+		"guard": 0.4, "solo_attack": true,
+		"attacks": [
+			{"id": &"warden_cleave", "kind": &"gold", "shape": &"cone", "reach": 46.0, "half_angle": 0.9, "start_min": 0.0, "start_max": 56.0, "windup": 40, "strike_ticks": 6,
+				"strike_speed": 0.0, "width": 0.0, "damage": 20, "recover": 44, "cooldown": 40, "interrupt": false, "crash": 0, "chain": {"id": &"warden_lash", "delay": 12}},
+			{"id": &"warden_lash", "kind": &"red", "shape": &"line", "stationary": true, "reach": 150.0, "start_min": 40.0, "start_max": 160.0, "windup": 44, "strike_ticks": 8,
+				"strike_speed": 0.0, "width": 20.0, "damage": 18, "recover": 40, "cooldown": 50, "interrupt": false, "crash": 0},
+			{"id": &"warden_ring", "kind": &"red", "shape": &"circle", "centered": true, "reach": 48.0, "start_min": 0.0, "start_max": 40.0, "windup": 56, "strike_ticks": 5,
+				"strike_speed": 0.0, "width": 0.0, "damage": 22, "recover": 44, "cooldown": 60, "interrupt": false, "crash": 0},
+		],
+		"attack": {"id": &"warden_cleave", "kind": &"gold", "start_min": 0.0, "start_max": 56.0, "windup": 40, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 20,
+			"recover": 44, "cooldown": 40, "interrupt": false, "crash": 0},
+	},
+}
+const MOB_MAX_ATTACKERS: int = 2  # mobs of one encounter that may wind up or strike at the same time
+const MOB_FIRST_COOLDOWN: int = 30  # a woken mob waits this long, plus MOB_COOLDOWN_STAGGER x its place, before its first attack
+const MOB_COOLDOWN_STAGGER: int = 25
+const MOB_ALERT_TICKS: int = 24  # the pause when the pack wakes
+const MOB_HURT_TICKS: int = 10  # a hit that did not cancel anything staggers the mob's walk this long
+const MOB_STAGGER_TICKS: int = 90  # a mob whose lunge was parried is stunned and exposed this long
+const MOB_EXPOSED_MULT: float = 3.0  # damage multiplier on an exposed mob (parried or crashed)
+
+# Lightning Form and Reaper's Coil on the road (several mobs at once). The main target is the nearest mob in front of the hero (within
+# ROAD_TARGET_RANGE px and the cone whose cosine is ROAD_TARGET_CONE_DOT, the aim direction); mobs within CLUMP_RADIUS px of the hooked mob
+# are dragged in with it. A cast that hits `n` mobs gives each 1 - MULTI_HIT_FALLOFF * (n - 1) of its damage (never below MULTI_HIT_MIN_MULT).
+const ROAD_TARGET_RANGE: float = 220.0
+const ROAD_TARGET_CONE_DOT: float = 0.5
+const CLUMP_RADIUS: float = 44.0
+const MULTI_HIT_FALLOFF: float = 0.2
+const MULTI_HIT_MIN_MULT: float = 0.4
+const MOB_DEATH_TICKS: int = 40  # a defeated mob stays in the snapshot (state dead) this long
+const MOB_RETURN_SPEED_MULT: float = 1.6  # a mob walking home
+const MOB_LEASH_GRACE_TICKS: int = 60  # the hero outside the encounter's leash this long: the mobs give up and walk home
+const MOB_RESET_TICKS: int = 240  # ...and this long: an uncleared encounter is whole again (dead mobs return)
+const MOB_SEPARATION_PUSH: float = 0.5
+
+# Hero in exploration: death and healing items.
+const HERO_DEFEAT_TICKS: int = 120  # from the hero's death to his return at the last checkpoint
+const HERB_HEAL: int = 35
+const INVENTORY_MAX_STACK: int = 99
+
+# Hero level, EXP and stat points (exploration; ExploreCore; docs/PROGRESSION_PLAN.md). EXP comes from felling mobs (once per mob, the story flag
+# killed_<encounter>_<n>) and from the village tasks. EXP_TO_NEXT[i] is what level i+1 needs to reach level i+2. Each level above 1 gives
+# LEVEL_HP_BONUS max health on its own (a hero who ignores the menu is fine), a full heal, and STAT_POINTS_PER_LEVEL points to spend on
+# three modest stats (the design keeps stat boosts small: the real power is learning the attacks). No defence stat on purpose.
+const LEVEL_MAX: int = 10
+const EXP_TO_NEXT: Array[int] = [30, 50, 80, 120, 170, 230, 300, 380, 470]
+const LEVEL_HP_BONUS: int = 5
+const STAT_POINTS_PER_LEVEL: int = 2
+const STAT_IDS: Array[StringName] = [&"vitality", &"might", &"agility"]
+const STAT_CAP: Dictionary = {&"vitality": 10, &"might": 10, &"agility": 10}
+const VITALITY_HP_PER_POINT: int = 6  # max health
+const MIGHT_DAMAGE_PER_POINT: float = 0.03  # +3 % damage on the hero's blows (mobs and the boss alike)
+const AGILITY_DASH_COOLDOWN_TICKS_PER_POINT: int = 2  # shorter dash cooldown, for the first AGILITY_DASH_POINTS points
+const AGILITY_DASH_POINTS: int = 6
+const AGILITY_SPEED_PER_POINT: float = 0.005  # +0.5 % walking speed
+
+# Exploration: Edge (the Aspect meter) fills this much per tick while no encounter is awake (travel), so Sprint can be used on the road.
+const EXPLORE_EDGE_REGEN_PER_TICK: float = 0.25

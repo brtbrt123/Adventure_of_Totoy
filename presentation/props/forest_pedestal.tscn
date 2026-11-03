@@ -1,0 +1,62 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/forest_pedestal.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_pedestal_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_pedestal_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 7, 26, 49)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6
+
+[node name="forest_pedestal" type="Node2D"]
+metadata/w = 26
+metadata/h = 49
+metadata/base_width = 26
+metadata/solid = true
+metadata/image = "forest_pedestal.png"
+metadata/note = "unlit lantern pedestal (the puzzle switch); same canvas, anchor and colliders as forest_pedestal_lit"
+metadata/locked = true
+metadata/state_pair = ["forest_pedestal", "forest_pedestal_lit"]
+metadata/src_bbox = [195, 148, 283, 313]
+metadata/contact_shadow = {"size": [26, 49], "core": [[25, 42, 1], [23, 43, 3], [22, 44, 3], [0, 45, 4], [21, 45, 2], [0, 46, 11], [19, 46, 3], [4, 47, 10], [18, 47, 3], [11, 48, 8], [14, 49, 4]], "edge": [[24, 42, 1], [26, 42, 1], [22, 43, 1], [26, 43, 1], [21, 44, 1], [25, 44, 1], [-1, 45, 1], [4, 45, 1], [20, 45, 1], [23, 45, 2], [-1, 46, 1], [11, 46, 1], [18, 46, 1], [22, 46, 1], [0, 47, 4], [14, 47, 1], [17, 47, 1], [21, 47, 1], [4, 48, 7], [19, 48, 2], [11, 49, 3], [18, 49, 1], [14, 50, 4]]}
+metadata/flip_offset = Vector2(-13.0, -49)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-13.0, -49)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-17, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-16, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-6, -5)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(6, -5)
+shape = SubResource("CircleShape2D_2")

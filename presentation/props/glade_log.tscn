@@ -1,0 +1,85 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_log.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_log_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_log_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6"]
+radius = 6
+
+[node name="glade_log" type="Node2D"]
+metadata/w = 85
+metadata/h = 49
+metadata/base_width = 48
+metadata/solid = true
+metadata/image = "glade_log.png"
+metadata/note = "diagonal log, lower edge rises to the left"
+metadata/locked = true
+metadata/contact_shadow = {"core": [[20, 40, 2], [24, 40, 2], [31, 40, 4], [44, 40, 2], [20, 41, 6], [31, 41, 4], [39, 41, 2], [44, 41, 4], [51, 41, 5], [83, 41, 2], [20, 42, 6], [31, 42, 6], [38, 42, 21], [82, 42, 3], [21, 43, 4], [35, 43, 26], [82, 43, 3], [35, 44, 10], [47, 44, 5], [55, 44, 8], [71, 44, 4], [82, 44, 2], [36, 45, 3], [42, 45, 2], [50, 45, 2], [58, 45, 6], [71, 45, 6], [60, 46, 6], [71, 46, 12], [62, 47, 6], [74, 47, 9], [63, 48, 9], [76, 48, 7], [65, 49, 7], [67, 50, 5]], "edge": [[22, 40, 1], [26, 40, 1], [35, 40, 1], [46, 40, 1], [26, 41, 1], [35, 41, 1], [41, 41, 1], [48, 41, 1], [56, 41, 1], [85, 41, 1], [26, 42, 1], [37, 42, 1], [59, 42, 1], [85, 42, 1], [20, 43, 1], [25, 43, 2], [31, 43, 4], [61, 43, 1], [85, 43, 1], [20, 44, 7], [31, 44, 4], [45, 44, 2], [52, 44, 3], [63, 44, 1], [75, 44, 1], [84, 44, 2], [21, 45, 5], [35, 45, 1], [39, 45, 3], [44, 45, 6], [52, 45, 6], [64, 45, 1], [77, 45, 1], [82, 45, 4], [35, 46, 11], [47, 46, 6], [55, 46, 5], [66, 46, 1], [83, 46, 2], [36, 47, 4], [42, 47, 3], [50, 47, 3], [58, 47, 4], [68, 47, 1], [71, 47, 3], [83, 47, 1], [60, 48, 3], [72, 48, 4], [83, 48, 1], [62, 49, 3], [72, 49, 1], [74, 49, 10], [63, 50, 4], [72, 50, 1], [76, 50, 8], [65, 51, 8], [67, 52, 6]], "size": [85, 49]}
+metadata/sort_strips = [[0, 4, 32], [4, 4, 32], [8, 4, 35], [12, 4, 40], [16, 4, 39], [20, 4, 42], [24, 4, 41], [28, 4, 41], [32, 4, 43], [36, 4, 44], [40, 4, 44], [44, 4, 43], [48, 4, 44], [52, 4, 43], [56, 4, 44], [60, 4, 47], [64, 4, 49], [68, 4, 49], [72, 4, 46], [76, 4, 47], [80, 4, 47], [84, 1, 39]]
+metadata/flip_offset = Vector2(-29, -49)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-59, -49)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-58, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-27, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-34, -14)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-24, -12)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-14, -10)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-4, -8)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(6, -6)
+shape = SubResource("CircleShape2D_5")
+
+[node name="Circle6" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(16, -5)
+shape = SubResource("CircleShape2D_6")

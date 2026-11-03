@@ -1,0 +1,20 @@
+{
+ "generator": "Higgsfield MCP, model nano_banana_2_1 (Google), 1k, references: art/reference/staff_v1/refs (hero in-game frames at 8x, hero portrait)",
+ "date": "2026-11-01",
+ "credits": "9 images x 1.5 = 13.5 of 50 free credits; 2026-11-02: Staff_Run (2 tries x 1.5)",
+ "jobs": {
+  "Staff_Burst": "3510e448-1f1b-49b8-81e5-09861bf4b37e",
+  "Staff_Burst_Big": "1939dade-96b7-4f47-b9c1-1cc90248b3df",
+  "Hero_Staff_Poses": "8a4c5e25-e766-44dd-9bcd-f6332909d891",
+  "Staff_Weapon": "85967ba3-6535-453d-81ba-1b18c103856a",
+  "Staff_Blink": "4b8ad905-a7d7-4d0b-9259-69521f62151e",
+  "Disintegration_Circle": "17d6a577-f297-4d57-ada6-00032e268927",
+  "Disintegration_Star": "f0b0176c-6c53-4566-98e2-7f5bb7c9f6aa",
+  "Disintegration_Scorch": "da7b75f6-0876-4bf5-bb69-1e43e62bdcbe",
+  "Disintegration_Cutin": "6d5d86fd-fe1b-42d0-9cfb-fcca236a491f",
+  "Staff_Run": "abf72a3c-b081-458f-9504-6a838e6ebed1",
+  "Staff_Run_rejected_v1": "be40e826-e54d-42ce-b638-76783c2660c0 (mixed standing and copied poses, not kept)"
+ },
+ "status": "concept v1 for the owner's approval; not imported into the game",
+ "Staff_Run": "refs: refs/staff_hero_idle_8x.png (the design) and refs/katana_run_cycle_8x.png (the katana run poses to copy); top row = the 6 run poses with the staff, bottom row = in-betweens"
+}

@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/village_bush_1.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_bush_1_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_village_bush_1_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 2, 36, 30)
+
+[node name="village_bush_1" type="Node2D"]
+metadata/w = 36
+metadata/h = 30
+metadata/base_width = 27
+metadata/solid = false
+metadata/image = "village_bush_1.png"
+metadata/note = "low bush: decor (walk through)"
+metadata/locked = true
+metadata/src_bbox = [735, 611, 917, 765]
+metadata/contact_shadow = {"core": [[2, 25, 2], [5, 25, 2], [30, 25, 3], [2, 26, 5], [27, 26, 6], [2, 27, 6], [9, 27, 4], [16, 27, 2], [21, 27, 2], [27, 27, 6], [3, 28, 10], [14, 28, 5], [21, 28, 10], [6, 29, 22], [7, 30, 3], [12, 30, 16], [12, 31, 3], [18, 31, 4], [25, 31, 2]], "edge": [[4, 25, 1], [7, 25, 1], [33, 25, 1], [7, 26, 1], [33, 26, 1], [8, 27, 1], [13, 27, 1], [18, 27, 1], [23, 27, 1], [33, 27, 1], [2, 28, 1], [13, 28, 1], [19, 28, 1], [31, 28, 3], [2, 29, 4], [28, 29, 6], [3, 30, 4], [10, 30, 2], [28, 30, 4], [6, 31, 6], [15, 31, 3], [22, 31, 3], [27, 31, 2], [7, 32, 4], [12, 32, 17], [12, 33, 4], [18, 33, 5], [25, 33, 3]], "size": [36, 30]}
+metadata/flip_offset = Vector2(-19.5, -30)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-16.5, -30)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-19, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-21, -4)

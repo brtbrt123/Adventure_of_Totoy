@@ -3,6 +3,113 @@
  "sheet": "forest_props_sheet.png",
  "scale": 0.29622,
  "props": {
+  "village_fence": {
+   "w": 83,
+   "h": 35,
+   "anchor": [
+    41.5,
+    35
+   ],
+   "base_width": 75,
+   "solid": true,
+   "colliders": [
+    [
+     -29.5,
+     -3.2,
+     8.0
+    ],
+    [
+     -17.7,
+     -3.2,
+     8.0
+    ],
+    [
+     -5.9,
+     -3.2,
+     8.0
+    ],
+    [
+     5.9,
+     -3.2,
+     8.0
+    ],
+    [
+     17.7,
+     -3.2,
+     8.0
+    ],
+    [
+     29.5,
+     -3.2,
+     8.0
+    ]
+   ],
+   "image": "village_fence.png",
+   "src_bbox": [
+    781,
+    267,
+    1329,
+    495
+   ],
+   "locked": true,
+   "note": "timber fence: a row of circles along its base, the hero cannot walk through it"
+  },
+  "village_wall": {
+   "w": 89,
+   "h": 34,
+   "anchor": [
+    44.5,
+    34
+   ],
+   "base_width": 87,
+   "solid": true,
+   "colliders": [
+    [
+     -35.5,
+     -3.2,
+     8.0
+    ],
+    [
+     -23.7,
+     -3.2,
+     8.0
+    ],
+    [
+     -11.8,
+     -3.2,
+     8.0
+    ],
+    [
+     0.0,
+     -3.2,
+     8.0
+    ],
+    [
+     11.8,
+     -3.2,
+     8.0
+    ],
+    [
+     23.7,
+     -3.2,
+     8.0
+    ],
+    [
+     35.5,
+     -3.2,
+     8.0
+    ]
+   ],
+   "image": "village_wall.png",
+   "src_bbox": [
+    59,
+    273,
+    646,
+    501
+   ],
+   "locked": true,
+   "note": "low stone wall: a row of circles along its base, the hero cannot walk through it"
+  },
   "forest_sign": {
    "w": 30,
    "h": 45,

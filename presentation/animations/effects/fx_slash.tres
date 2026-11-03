@@ -1,0 +1,63 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_big_1.png" id="1_wjii5"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_big_2.png" id="2_1fxkw"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_big_3.png" id="3_0p84m"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_big_4.png" id="4_urxqa"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_big_5.png" id="5_2wwas"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_big_6.png" id="6_xuk06"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_small_1.png" id="7_sp4mg"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_small_2.png" id="8_a0e2q"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_small_3.png" id="9_2pcmc"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_small_4.png" id="10_6isqb"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_small_5.png" id="11_0coc8"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_slash_small_6.png" id="12_26b1w"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_wjii5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_1fxkw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_0p84m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_urxqa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_2wwas")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_xuk06")
+}],
+"loop": 0,
+"name": &"big",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_sp4mg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_a0e2q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_2pcmc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_6isqb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_0coc8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_26b1w")
+}],
+"loop": 0,
+"name": &"small",
+"speed": 20.0
+}]

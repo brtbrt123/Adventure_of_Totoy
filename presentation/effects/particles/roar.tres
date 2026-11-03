@@ -1,0 +1,51 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_g6m73"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_ej850"]
+
+[sub_resource type="Resource" id="Resource_el6ap"]
+script = ExtResource("1_g6m73")
+count = 32
+shape = "leaf"
+life_min = 40
+life_max = 58
+speed_min = 1.4
+speed_max = 2.4
+drag = 0.04
+gravity = 0.01
+size_min = 2.0
+flutter = 2.0
+colours = PackedStringArray("7", "6", "6", "d")
+
+[sub_resource type="Resource" id="Resource_8qufs"]
+script = ExtResource("1_g6m73")
+count = 30
+life_min = 16
+life_max = 28
+speed_min = 1.2
+speed_max = 2.2
+drag = 0.07
+gravity = 0.03
+size_min = 2.0
+size_max = 4.0
+colours = PackedStringArray("j", "d", "c")
+
+[sub_resource type="Resource" id="Resource_rkwcd"]
+script = ExtResource("1_g6m73")
+count = 10
+shape = "smoke"
+life_min = 30
+life_max = 44
+speed_min = 0.4
+speed_max = 0.8
+drag = 0.06
+up = 0.1
+gravity = -0.002
+size_min = 2.0
+size_max = 4.0
+grow = 0.1
+colours = PackedStringArray("d", "c", "b")
+
+[resource]
+script = ExtResource("2_ej850")
+layers = Array[Resource]([SubResource("Resource_el6ap"), SubResource("Resource_8qufs"), SubResource("Resource_rkwcd")])

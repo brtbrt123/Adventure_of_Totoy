@@ -20,52 +20,69 @@ const Snapshots := preload("res://core/snapshots.gd")
 const Aspects := preload("res://core/aspects.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
 const UiPanel := preload("res://presentation/arena/ui_panel.gd")
+const Kit := preload("res://presentation/common/ui_kit.gd")
+const MenuShell := preload("res://presentation/ui/menu_shell.tscn")
+const MenuStatus := preload("res://presentation/ui/menu_status.tscn")
+const MenuAspects := preload("res://presentation/ui/menu_aspects.tscn")
+const MenuQuests := preload("res://presentation/ui/menu_quests.tscn")
+const MenuItems := preload("res://presentation/ui/menu_items.tscn")
+const MenuArenaStatus := preload("res://presentation/ui/menu_arena_status.tscn")
+const MenuDescription := preload("res://presentation/ui/menu_description.tscn")
+const MenuPicker := preload("res://presentation/ui/menu_picker.tscn")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 
 const TAB_STATS: int = 0
-const TAB_INVENTORY: int = 1
-const TAB_NAMES: Array[String] = ["STATS", "INVENTORY"]
-## Tab plates on the panel's top edge (x, width), as in the mockup.
-const TAB_SPECS: Array[Vector2i] = [Vector2i(12, 54), Vector2i(68, 84)]
-const PANEL: Rect2 = Rect2(6, 16, 308, 162)
-const DESC: Rect2 = Rect2(11, 125, 298, 40)
+const TAB_ASPECTS: int = 1
+const TAB_INVENTORY: int = 2
+const TAB_QUESTS: int = 3
+const TAB_NAMES: Array[String] = ["STATUS", "ASPECTS", "ITEMS", "QUESTS"]
+## Tab plates on the panel's top edge (x, width), kit tabs.
+const TAB_SPECS: Array[Vector2i] = [Vector2i(14, 58), Vector2i(76, 60), Vector2i(140, 52), Vector2i(196, 58)]
+const PANEL: Rect2 = Rect2(6, 24, 372, 176)
+const DESC: Rect2 = Rect2(40, 149, 304, 46)
 const VEIL_ALPHA: float = 0.62
 const FOOTER: String = "TAB/ESC: CLOSE    Q/E: SWITCH TAB"
-## STATS layout
-const FIGURE: Rect2 = Rect2(11, 21, 52, 101)
-const WEAPON_SLOT: Rect2 = Rect2(85, 27, 50, 50)
-const MID_X: float = 110.0
-const STAT_X0: float = 159.0
-const STAT_X1: float = 307.0
-const STAT_TOP: float = 21.0
+## STATS layout (384x216, kit frames)
+const FIGURE: Rect2 = Rect2(16, 36, 58, 110)
+const WEAPON_SLOT: Rect2 = Rect2(110, 36, 48, 48)
+const MID_X: float = 134.0
+const STAT_X0: float = 204.0
+const STAT_X1: float = 362.0
+const STAT_TOP: float = 36.0
 const ROW_STEP: float = 8.0
 ## The STATS items of the three Aspect slots (Z, X, C); their description is the aspect slotted there.
 const ASPECT_KEYS: Array[StringName] = [&"aspect_slot_1", &"aspect_slot_2", &"aspect_slot_3"]
 const SLOT_LETTERS: Array[String] = ["Z", "X", "C"]
 ## The aspect picker (ENTER/click on an Aspect slot): every aspect in a list over the stat list, in the shared frame.
-const PICKER: Rect2 = Rect2(154, 18, 157, 104)
-const PICKER_ROW_TOP: float = 33.0
+const PICKER: Rect2 = Rect2(196, 28, 178, 118)
+const PICKER_ROW_TOP: float = 52.0
 const PICKER_ROW_STEP: float = 17.0
-## Whole rows that fit in the picker (33 + 5 x 17 <= its bottom); more aspects scroll (arrows / wheel), never a half row.
+## Whole rows that fit in the picker (52 + 5 x 17 = 137, inside its bottom bronze); more aspects scroll (arrows / wheel), never a half row.
 const PICKER_VISIBLE_ROWS: int = 5
 ## The scroll bar on the picker's right edge (shown only when the list is longer than the window).
 const PICKER_BAR_W: float = 3.0
-## INVENTORY layout: 6x3 slots of 32 px, step 33; the weapons fill the first slots in Weapons.IDS order.
-const GRID_ORIGIN: Vector2 = Vector2(13, 23)
-const GRID_STEP: float = 33.0
+## INVENTORY layout: 6x3 slots of 36 px, step 38; the weapons fill the first slots in Weapons.IDS order.
+const GRID_ORIGIN: Vector2 = Vector2(20, 38)
+const GRID_STEP: float = 38.0
 const GRID_COLS: int = 6
 const GRID_ROWS: int = 3
-const CARD: Rect2 = Rect2(216, 21, 93, 101)
+const SLOT_SIZE: float = 36.0
+const CARD: Rect2 = Rect2(260, 36, 108, 106)
 ## INVENTORY: the aspects fill the second grid row (view-only; they are slotted on STATS).
 const ASPECT_GRID_START: int = GRID_COLS
 const FEEDBACK_SECONDS: float = 1.6
 
-const WEAPON_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK KATANA", Tuning.WEAPON_DUAL_DAGGER: "DUAL DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "CHAIN SCYTHE"}
+const WEAPON_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK KATANA", Tuning.WEAPON_DUAL_DAGGER: "DUAL DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "CHAIN SCYTHE", Tuning.WEAPON_STAR_STAFF: "STAR STAFF"}
 ## The weapon's right-click active: its description key and the short name of the RMB stat row.
-const ACTIVE_KEYS: Dictionary = {Tuning.WEAPON_BLACK_KATANA: &"black_form", Tuning.WEAPON_DUAL_DAGGER: &"lightning_barrage", Tuning.WEAPON_CHAIN_SCYTHE: &"reapers_coil"}
-const ACTIVE_ROW_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK FORM", Tuning.WEAPON_DUAL_DAGGER: "BARRAGE", Tuning.WEAPON_CHAIN_SCYTHE: "REAPER'S COIL"}
-const SHORT_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "KATANA", Tuning.WEAPON_DUAL_DAGGER: "DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "SCYTHE"}
+const ACTIVE_KEYS: Dictionary = {Tuning.WEAPON_BLACK_KATANA: &"black_form", Tuning.WEAPON_DUAL_DAGGER: &"lightning_barrage", Tuning.WEAPON_CHAIN_SCYTHE: &"reapers_coil", Tuning.WEAPON_STAR_STAFF: &"disintegration"}
+const ACTIVE_ROW_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK FORM", Tuning.WEAPON_DUAL_DAGGER: "BARRAGE", Tuning.WEAPON_CHAIN_SCYTHE: "REAPER'S COIL", Tuning.WEAPON_STAR_STAFF: "DISINTEGRATION"}
+const SHORT_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "KATANA", Tuning.WEAPON_DUAL_DAGGER: "DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "SCYTHE", Tuning.WEAPON_STAR_STAFF: "STAFF"}
 
+const ExploreCore := preload("res://core/explore_core.gd")
+var progression: ExploreCore.ExploreSnapshot
+var stat_request: Callable=Callable()
+var respec_request: Callable=Callable()
+var stats_notice: String=""
 var is_open: bool = false
 var tab: int = TAB_STATS
 ## STATS: the selected item key (&"" = none yet); INVENTORY: the selected slot index.
@@ -83,6 +100,15 @@ var picker_selection: int = 0
 var picker_scroll: int = 0
 var picker_feedback: Dictionary = {}
 var snapshot: Snapshots.GameSnapshot
+## The editable scenes behind this menu's drawing (presentation/ui/menu_shell.tscn, menu_status.tscn).
+var shell: Control = null
+var status_scene: Control = null
+var aspects_scene: Control = null
+var quests_scene: Control = null
+var items_scene: Control = null
+var arena_status_scene: Control = null
+var description_scene: Control = null
+var picker_scene: Control = null
 var colors: Dictionary = {}
 var atlas: Texture2D
 var frames: Dictionary = {}
@@ -99,13 +125,31 @@ var _used_rects: Dictionary = {}
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	visible = false
+	shell = MenuShell.instantiate()
+	add_child(shell)
+	status_scene = MenuStatus.instantiate()
+	add_child(status_scene)
+	aspects_scene = MenuAspects.instantiate()
+	add_child(aspects_scene)
+	quests_scene = MenuQuests.instantiate()
+	add_child(quests_scene)
+	items_scene = MenuItems.instantiate()
+	add_child(items_scene)
+	arena_status_scene = MenuArenaStatus.instantiate()
+	add_child(arena_status_scene)
+	description_scene = MenuDescription.instantiate()
+	add_child(description_scene)
+	picker_scene = MenuPicker.instantiate()
+	picker_scene.visible = false
+	add_child(picker_scene)
 
 
 func open() -> void:
+	stats_notice=""
 	is_open = true
 	visible = true
 	tab = TAB_STATS
-	stats_selection = &""
+	stats_selection = &"stat_vitality" if progression!=null else &""
 	hover_key = &""
 	feedback = {}
 	close_picker()
@@ -192,6 +236,8 @@ func switch_tab(delta: int) -> void:
 
 func set_tab(index: int) -> void:
 	tab = clampi(index, 0, TAB_NAMES.size() - 1)
+	if tab == TAB_ASPECTS and stats_selection not in ASPECT_KEYS:
+		stats_selection = ASPECT_KEYS[0]
 	hover_key = &""
 	feedback = {}
 	close_picker()
@@ -202,6 +248,12 @@ func set_tab(index: int) -> void:
 
 ## Every selectable item of the STATS tab with its rect: the weapon slot, the three Aspect slots, the stat rows.
 func stats_items() -> Array[Dictionary]:
+	if tab == TAB_ASPECTS:
+		var sockets: Array[Dictionary] = []
+		for i: int in 3:
+			sockets.append({"key": ASPECT_KEYS[i], "rect": aspects_tab_rect(i)})
+		return sockets
+	if progression!=null:return progression_items()
 	var items: Array[Dictionary] = [{"key": &"weapon", "rect": WEAPON_SLOT}]
 	for i: int in range(3):
 		items.append({"key": ASPECT_KEYS[i], "rect": aspect_rect(i)})
@@ -214,20 +266,22 @@ func stats_items() -> Array[Dictionary]:
 
 
 static func aspect_rect(index: int) -> Rect2:
-	return Rect2(68 + index * 29, 96, 26, 26)
+	return Rect2(78 + index * 38, 107, 37, 40)
 
 
 static func inventory_rect(index: int) -> Rect2:
-	return Rect2(GRID_ORIGIN + Vector2(index % GRID_COLS, index / GRID_COLS) * GRID_STEP, Vector2(32, 32))
+	return Rect2(GRID_ORIGIN + Vector2(index % GRID_COLS, index / GRID_COLS) * GRID_STEP, Vector2(SLOT_SIZE, SLOT_SIZE))
 
 
 static func tab_rect(index: int) -> Rect2:
 	var spec: Vector2i = TAB_SPECS[index]
-	return Rect2(spec.x, 3, spec.y, PANEL.position.y - 2)
+	return Rect2(spec.x, 8, spec.y, 17)
 
 
 ## Arrow keys: on STATS the nearest item in that direction (spatial), on INVENTORY the grid neighbour (clamped).
 func move_selection(direction: Vector2i) -> void:
+	if tab == TAB_QUESTS:
+		return
 	hover_key = &""
 	feedback = {}
 	if picker_open():
@@ -249,7 +303,7 @@ func move_selection(direction: Vector2i) -> void:
 		if item["key"] == stats_selection:
 			current = item["rect"]
 	if current.size == Vector2.ZERO:
-		stats_selection = &"weapon"
+		stats_selection = items[0]["key"]
 		queue_redraw()
 		return
 	var from: Vector2 = current.get_center()
@@ -282,7 +336,7 @@ func hover_at(pos: Vector2) -> void:
 					picker_feedback = {}
 				picker_selection = index
 		return
-	if tab == TAB_STATS:
+	if tab == TAB_STATS or tab == TAB_ASPECTS:
 		for item: Dictionary in stats_items():
 			if Rect2(item["rect"]).has_point(pos):
 				hover_key = item["key"]
@@ -310,12 +364,14 @@ func click(pos: Vector2) -> void:
 		if not PICKER.has_point(pos):
 			close_picker()  # a click outside closes the picker and does nothing else
 		return
-	if tab == TAB_STATS:
+	if tab == TAB_STATS or tab == TAB_ASPECTS:
 		for item: Dictionary in stats_items():
 			if Rect2(item["rect"]).has_point(pos):
 				stats_selection = item["key"]
 				hover_key = &""
-				if item["key"] in ASPECT_KEYS:
+				if progression!=null and (String(item["key"]).begins_with("stat_") or item["key"]==&"respec"):
+					accept()
+				elif item["key"] in ASPECT_KEYS:
 					open_picker(ASPECT_KEYS.find(item["key"]) + 1)
 		return
 	for index: int in range(GRID_COLS * GRID_ROWS):
@@ -326,10 +382,22 @@ func click(pos: Vector2) -> void:
 
 ## ENTER: on INVENTORY equip the selected weapon through the core; on STATS pin the selection (first press: weapon).
 func accept() -> void:
+	if tab == TAB_QUESTS:
+		return
+	if progression!=null and not picker_open() and tab==TAB_STATS:
+		if String(stats_selection).begins_with("stat_"):
+			if stat_request.is_valid():stat_request.call(StringName(String(stats_selection).trim_prefix("stat_")))
+			queue_redraw()
+			return
+		if stats_selection==&"respec":
+			if progression.scene_id==&"village_layered" and respec_request.is_valid():respec_request.call()
+			else:stats_notice="Respec in the village"
+			queue_redraw()
+			return
 	if picker_open():
 		_equip_aspect(Aspects.ALL[picker_selection])
 		return
-	if tab == TAB_STATS:
+	if tab == TAB_STATS or tab == TAB_ASPECTS:
 		if stats_selection == &"":
 			stats_selection = &"weapon"
 		elif stats_selection in ASPECT_KEYS:
@@ -355,6 +423,13 @@ func picker_open() -> bool:
 
 ## Opens the picker for slot 1-3 with the aspect already there highlighted.
 func open_picker(slot: int) -> void:
+	if progression!=null:
+		var unlocked: bool=slot<=progression.aspect_slots.size() and bool(progression.aspect_slots[slot-1].get("unlocked",false))
+		var binding_lesson: bool=slot==1 and String(progression.objective.get("id",""))=="edda_equip"
+		if not unlocked and not binding_lesson:
+			stats_notice="Socket locked"
+			queue_redraw()
+			return
 	picker_slot = clampi(slot, 1, 3)
 	picker_selection = maxi(0, Aspects.ALL.find(slot_aspect(picker_slot)))
 	picker_scroll = 0
@@ -401,8 +476,8 @@ func scroll_picker(delta: int) -> void:
 
 ## Row `index` of the picker drawn with the window scrolled to `scroll` (whole rows, so nothing is ever half cut).
 static func picker_row_rect(index: int, scroll: int = 0) -> Rect2:
-	var width: float = PICKER.size.x - 8 - (PICKER_BAR_W + 2 if picker_max_scroll() > 0 else 0.0)
-	return Rect2(PICKER.position.x + 4, PICKER_ROW_TOP + (index - scroll) * PICKER_ROW_STEP, width, PICKER_ROW_STEP - 1)
+	var width: float = PICKER.size.x - 18 - (PICKER_BAR_W + 3 if picker_max_scroll() > 0 else 0.0)
+	return Rect2(PICKER.position.x + 9, PICKER_ROW_TOP + (index - scroll) * PICKER_ROW_STEP, width, PICKER_ROW_STEP - 1)
 
 
 ## The slotted aspects (Z, X, C) from the snapshot.
@@ -428,7 +503,11 @@ func aspect_slot_of(aspect: StringName) -> int:
 ## One core step with aspect_equip + aspect_equip_slot (the core swaps when the aspect sits in another slot); the result
 ## is read from the snapshot. The aspect already in the slot sends nothing.
 func _equip_aspect(aspect: StringName) -> void:
-	if aspect != slot_aspect(picker_slot) and aspect_request.is_valid():
+	if not aspect_owned(aspect):
+		picker_feedback={"aspect":aspect,"ok":false,"reason":"LOCKED","left":FEEDBACK_SECONDS}
+		queue_redraw()
+		return
+	if (progression!=null or aspect != slot_aspect(picker_slot)) and aspect_request.is_valid():
 		aspect_request.call(aspect, picker_slot)
 	if not is_open:
 		return  # the step ended the fight and the arena closed the menu
@@ -512,7 +591,7 @@ static func weapon_data(weapon: StringName) -> Dictionary:
 		swing_ticks.append(total)
 		combo_ticks += total
 		damage.append(roundi(Tuning.ATTACK_DAMAGE * Weapons.damage_mults(weapon)[i] * 100) / 100.0)
-		reach.append(Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[i])
+		reach.append(Tuning.STAFF_BURST_RANGE if Weapons.is_ranged(weapon) else Tuning.ATTACK_RANGE * Weapons.range_mults(weapon)[i])  # the staff casts at range
 	return {"name": WEAPON_NAMES.get(weapon, "WEAPON"), "combo": combo, "swing_ticks": swing_ticks, "combo_ticks": combo_ticks, "damage": damage, "reach": reach, "edge": Weapons.edge_per_hit(weapon), "arc_deg": rad_to_deg(acos(Weapons.arc_dot(weapon))), "cost": Weapons.active_edge_cost(weapon), "cd": Weapons.active_cooldown(weapon)}
 
 
@@ -605,6 +684,15 @@ static func descriptions(equipped: StringName, aspects: Array = Aspects.DEFAULT_
 		"SLOW, WIDE %d-HIT SWEEPS THAT ALSO HIT TO THE SIDES, %s DMG." % [scy["combo"], damage_text(scy)],
 		"RMB REAPER'S COIL: HOOK UP TO %s PX, DRAG THE BOSS IN, STUN, SPIN." % num(Tuning.REAPER_COIL_HOOK_RANGE),
 		"COIL %s EDGE  CD %s S  STUN %s S  SPIN %d X %s DMG" % [num(scy["cost"]), secs(scy["cd"]), secs(Tuning.REAPER_COIL_STAGGER_TICKS), Tuning.REAPER_COIL_SPIN_HITS, spin_damage]]]
+	var stf: Dictionary = weapon_data(Tuning.WEAPON_STAR_STAFF)
+	d[Tuning.WEAPON_STAR_STAFF] = ["STAR STAFF", "WEAPON  EQUIPPED" if equipped == Tuning.WEAPON_STAR_STAFF else "WEAPON", [
+		"CASTS AT RANGE (%s PX): %d BURSTS, %s DMG TO ALL IN THE BLAST." % [num(Tuning.STAFF_BURST_RANGE), stf["combo"], damage_text(stf)],
+		"THE THIRD IS THE GREAT BURST. DASH: A SHORT BLINK. RMB DISINTEGRATION.",
+		"RMB %s EDGE  CD %s S  BLAST %s/%s PX  +%s EDGE PER HIT" % [num(stf["cost"]), secs(stf["cd"]), num(Tuning.STAFF_BURST_RADIUS[0]), num(Tuning.STAFF_BURST_RADIUS[2]), num(stf["edge"])]]]
+	d[&"disintegration"] = ["DISINTEGRATION", "STAR STAFF  RMB", [
+		"A MAGIC CIRCLE MARKS THE TARGET; YOU CALL A METEOR DOWN ON IT.",
+		"ROOTED BUT UNTOUCHABLE WHILE YOU CALL. IT HITS ALL IN THE CIRCLE.",
+		"%s EDGE  CD %s S  %s PX  %s DMG  LANDS IN %s S" % [num(stf["cost"]), secs(stf["cd"]), num(Tuning.DISINTEGRATION_RADIUS), num(Tuning.ATTACK_DAMAGE * Tuning.DISINTEGRATION_DAMAGE_MULT), secs(Weapons.disintegration_impact_ticks())]]]
 	d[&"black_form"] = ["BLACK FORM", "BLACK KATANA  RMB", [
 		"FOR %s S YOUR SWINGS ARE X%s FASTER AND ALL YOUR HITS DEAL X%s." % [secs(Tuning.BLACK_KATANA_BUFF_DURATION_TICKS), num(Tuning.BLACK_KATANA_ATTACK_SPEED_MULT), num(Tuning.BLACK_KATANA_DAMAGE_MULT)],
 		"NO ANIMATION LOCK: USE IT EVEN MID-SWING. NO SWAP WHILE ON.",
@@ -710,7 +798,8 @@ static func stat_rows(equipped: StringName) -> Array[Array]:
 # --- drawing ---------------------------------------------------------------------------------------------------------
 
 func _text(at: Vector2, text: String, color: Color, face: Font = null, size: int = Hud.FONT_SIZE, align: int = HORIZONTAL_ALIGNMENT_LEFT) -> float:
-	var font: Font = face if face != null else Hud.ui_font()
+	var font: Font = face if face != null else Hud.text_face(text)
+	size = Hud._size_for(font, 1, size)
 	var width: float = Hud.text_width(text, 1, font, size)
 	var x: float = at.x
 	if align == HORIZONTAL_ALIGNMENT_CENTER:
@@ -740,62 +829,196 @@ func _ellipse(centre: Vector2, radii: Vector2, color: Color) -> void:
 
 func _key_badge(at: Vector2, letter: String) -> void:
 	UiPanel.key_badge(self, at, colors)
-	_text(at + Vector2(4, 1), letter, colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(at + Vector2(4.5, 1), letter, colors["1"], null, 7, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw() -> void:
 	if not is_open or colors.is_empty() or snapshot == null:
 		return
-	draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], VEIL_ALPHA))
-	UiPanel.draw_panel(self, PANEL, &"menu", colors)
-	_draw_tabs()
-	_text(Vector2(160, 168), FOOTER, colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	_sync_scenes()
 	if tab == TAB_STATS:
-		_draw_stats()
-	else:
+		if progression!=null:_draw_progression_stats()
+		else:_draw_stats()
+	elif tab == TAB_INVENTORY:
 		_draw_inventory()
-	_draw_description(description_key())
+	elif tab == TAB_ASPECTS:
+		_draw_aspects_tab()
+	else:
+		_draw_quests_tab()
+	if tab == TAB_INVENTORY or (tab == TAB_STATS and progression == null):
+		_draw_description(description_key())
 
 
-func _draw_tabs() -> void:
-	var top: float = PANEL.position.y + 1  # the panel's accent line
-	for index: int in range(TAB_NAMES.size()):
-		if index == tab:
+## The boss-fight STATUS tab's medallion, sockets and stat list.
+func _sync_arena_status_scene() -> void:
+	arena_status_scene.atlas = atlas
+	arena_status_scene.frames = frames
+	var equipped: StringName = _equipped()
+	var lit: StringName = highlighted_key()
+	var sockets: Array = []
+	for i: int in 3:
+		sockets.append({"icon": Hud.aspect_icon(slot_aspect(i + 1)), "key": SLOT_LETTERS[i]})
+	var rows: Array = []
+	for row: Array in stat_rows(equipped):
+		rows.append({"header": row[0] == "header", "name": row[1] if row[0] == "header" else row[0], "value": "" if row[0] == "header" else row[1], "lit": row[0] != "header" and lit == row[2]})
+	arena_status_scene.apply({"whole_medallion": Hud.MEDALLIONS.get(equipped, ""), "weapon_name": WEAPON_NAMES.get(equipped, "WEAPON"), "sockets": sockets, "rows": rows})
+
+
+## The Aspect picker's rows, drawn by the scene menu_picker.tscn above everything else.
+func _sync_picker_scene() -> void:
+	picker_scene.visible = picker_open()
+	if not picker_open():
+		return
+	picker_scene.atlas = atlas
+	picker_scene.frames = frames
+	var title: String = "Aspect for slot " + SLOT_LETTERS[picker_slot - 1]
+	var title_color: Color = colors["1"]
+	var show_back: bool = true
+	if not picker_feedback.is_empty():
+		show_back = false
+		if bool(picker_feedback["ok"]):
+			title = "Equipped!"
+			title_color = colors["u"]
+		else:
+			title = "Not now  " + String(picker_feedback["reason"])
+			title_color = colors["q"]
+	var rows: Array = []
+	for index: int in range(Aspects.ALL.size()):
+		if not row_visible(index):
 			continue
-		var x: float = TAB_SPECS[index].x
-		var w: float = TAB_SPECS[index].y
-		draw_rect(Rect2(x, 7, w, top - 7), colors["0"])
-		draw_rect(Rect2(x + 1, 8, w - 2, 1), colors["f"])
-		draw_rect(Rect2(x + 1, 8, 1, top - 8), colors["f"])
-		draw_rect(Rect2(x + w - 2, 8, 1, top - 8), colors["f"])
-		_text(Vector2(x + w / 2, 10), TAB_NAMES[index], colors["i"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_CENTER)
-	var ax: float = TAB_SPECS[tab].x
-	var aw: float = TAB_SPECS[tab].y
-	draw_rect(Rect2(ax, 3, aw, top), colors["0"])
-	draw_rect(Rect2(ax + 1, 4, aw - 2, 1), colors["v"])
-	draw_rect(Rect2(ax + 1, 4, 1, top - 3), colors["v"])
-	draw_rect(Rect2(ax + aw - 2, 4, 1, top - 3), colors["v"])
-	draw_rect(Rect2(ax + 3, 6, aw - 6, 1), colors["f"])
-	UiPanel.gem(self, Vector2(ax + 1, 4), &"menu", colors)
-	UiPanel.gem(self, Vector2(ax + aw - 2, 4), &"menu", colors)
-	_text(Vector2(ax + aw / 2, 8), TAB_NAMES[tab], colors["1"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_CENTER)
-	var name_width: float = _text(Vector2(308, 9), "TOTOY", colors["j"], Hud.menu_font(), 10, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(Vector2(308 - name_width - 6, 10), "WAYKEEPER", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
+		var aspect: StringName = Aspects.ALL[index]
+		var slot: int = aspect_slot_of(aspect)
+		rows.append({"icon": Hud.aspect_icon(aspect), "name": Aspects.display_name(aspect), "cost": "%sE" % num(Aspects.edge_cost(aspect)), "owned": aspect_owned(aspect), "selected": index == picker_selection, "held": SLOT_LETTERS[slot - 1] if slot > 0 else ""})
+	var data: Dictionary = {"title": title, "title_color": title_color, "show_back": show_back, "rows": rows}
+	if picker_max_scroll() > 0:
+		var track: Rect2 = picker_bar_rect()
+		var thumb: Rect2 = picker_thumb_rect()
+		data["bar"] = {"thumb_y": thumb.position.y - track.position.y, "thumb_h": thumb.size.y, "up_on": picker_scroll > 0, "down_on": picker_scroll < picker_max_scroll()}
+	picker_scene.apply(data)
 
 
-## The weapon's 48 px socket art: the katana's frame plus blade glyph, or the dagger's / scythe's whole medallion.
+## The ITEMS tab's slots and detail card.
+func _sync_items_scene() -> void:
+	items_scene.atlas = atlas
+	items_scene.frames = frames
+	var equipped: StringName = _equipped()
+	var slots: Array = []
+	for index: int in range(GRID_COLS * GRID_ROWS):
+		var weapon: StringName = slot_weapon(index)
+		var aspect: StringName = grid_aspect(index)
+		if aspect != &"":
+			var held: int = aspect_slot_of(aspect)
+			slots.append({"kind": "aspect", "frame": Hud.aspect_icon(aspect), "owned": aspect_owned(aspect), "held": SLOT_LETTERS[held - 1] if held > 0 and aspect_owned(aspect) else ""})
+		elif weapon != &"":
+			var whole: bool = Hud.MEDALLIONS.has(weapon)
+			slots.append({"kind": "weapon", "frame": Hud.MEDALLIONS[weapon] if whole else "ui_weapon_totoy_blade_1", "crop": Rect2(8, 8, 32, 32) if whole else Rect2(), "equipped": weapon == equipped})
+		else:
+			slots.append({"kind": "empty"})
+	var weapon_sel: StringName = slot_weapon(inventory_selection)
+	var aspect_sel: StringName = grid_aspect(inventory_selection)
+	var card: Dictionary = {"kind": "empty"}
+	if aspect_sel != &"":
+		if not aspect_owned(aspect_sel):
+			card = {"kind": "locked"}
+		else:
+			var slot: int = aspect_slot_of(aspect_sel)
+			var cd: int = Aspects.cooldown(aspect_sel)
+			card = {"kind": "aspect", "aspect": Hud.aspect_icon(aspect_sel), "name": Aspects.display_name(aspect_sel),
+				"status": "Slot " + SLOT_LETTERS[slot - 1] if slot > 0 else "Not slotted", "status_color": colors["v"] if slot > 0 else colors["i"],
+				"line1": "%s Edge" % num(Aspects.edge_cost(aspect_sel)) + ("  CD %s s" % secs(cd) if cd > 0 else ""), "line2": "Slot on stats", "line_color": colors["o"]}
+	elif weapon_sel != &"":
+		var lines: Array = card_lines(weapon_sel)
+		var equipped_now: bool = weapon_sel == equipped
+		card = {"kind": "weapon", "katana": not Hud.MEDALLIONS.has(weapon_sel), "medallion": Hud.MEDALLIONS.get(weapon_sel, ""),
+			"name": WEAPON_NAMES[weapon_sel], "status": "Equipped" if equipped_now else "Not equipped",
+			"status_color": colors["v"] if equipped_now else colors["i"], "line1": lines[0], "line2": lines[1], "line_color": colors[lines[2]]}
+	items_scene.apply({"slots": slots, "card": card})
+
+
+## The ASPECTS tab's numbers: the three sockets and the selected one's name and cost.
+func _sync_aspects_scene() -> void:
+	aspects_scene.atlas = atlas
+	aspects_scene.frames = frames
+	var sockets: Array = []
+	for i: int in 3:
+		var aspect: StringName = slot_aspect(i + 1)
+		var unlocked: bool = progression == null or (i < progression.aspect_slots.size() and bool(progression.aspect_slots[i].get("unlocked", false)))
+		sockets.append({"open": unlocked and aspect_owned(aspect), "icon": Hud.aspect_icon(aspect)})
+	var id: StringName = slot_aspect(maxi(0, ASPECT_KEYS.find(stats_selection)) + 1)
+	var owned: bool = aspect_owned(id)
+	aspects_scene.apply({"sockets": sockets, "name": Aspects.display_name(id) if owned else "Locked aspect",
+		"stats": "%s Edge   Cooldown %s s" % [num(Aspects.edge_cost(id)), secs(Aspects.cooldown(id))] if owned else "", "notice": stats_notice})
+
+
+## Hands the open tab and the STATUS numbers to the scenes drawn behind this menu.
+func _sync_scenes() -> void:
+	if shell == null:
+		return
+	shell.apply(tab, TAB_NAMES)
+	items_scene.visible = tab == TAB_INVENTORY
+	_sync_picker_scene()
+	arena_status_scene.visible = tab == TAB_STATS and progression == null
+	if arena_status_scene.visible:
+		_sync_arena_status_scene()
+	var describing: bool = tab == TAB_INVENTORY or (tab == TAB_STATS and progression == null)
+	description_scene.visible = describing
+	if describing:
+		var all: Dictionary = descriptions(_equipped(), equipped_aspects())
+		description_scene.apply(all.get(description_key(), all[&"none"]))
+	if tab == TAB_INVENTORY:
+		_sync_items_scene()
+	aspects_scene.visible = tab == TAB_ASPECTS
+	quests_scene.visible = tab == TAB_QUESTS
+	if tab == TAB_ASPECTS:
+		_sync_aspects_scene()
+	elif tab == TAB_QUESTS:
+		var objective: String = String(progression.objective.get("text", "Your village tasks are complete.")) if progression != null else "Defeat the Mossbound Colossus."
+		quests_scene.apply({"objective": objective, "hint": "Follow the objective marker on the road."})
+	var show_status: bool = tab == TAB_STATS and progression != null
+	status_scene.visible = show_status
+	if not show_status:
+		return
+	status_scene.atlas = atlas
+	status_scene.frames = frames
+	var rows: Array = []
+	for i: int in 3:
+		var stat: String = ["vitality", "might", "agility"][i]
+		var value: int = int(progression.stats.get(stat, 0))
+		var cap: int = int(progression.stat_caps.get(stat, 0))
+		rows.append({"value": value, "cap": cap, "enabled": progression.stat_points_unspent > 0 and value < cap})
+	var sockets: Array = []
+	for i: int in 3:
+		var slot: Dictionary = progression.aspect_slots[i] if i < progression.aspect_slots.size() else {}
+		var aspect: StringName = StringName(slot.get("aspect", &""))
+		sockets.append({"open": bool(slot.get("unlocked", false)) and aspect_owned(aspect), "icon": Hud.aspect_icon(aspect)})
+	var notice: String = stats_notice
+	if notice.is_empty() and String(progression.objective.get("id", "")) == "edda_equip":
+		notice = "Select first socket to bind Sprint"
+	status_scene.apply({"unspent": progression.stat_points_unspent, "level": progression.level, "hp": progression.hero.max_hp, "rows": rows, "sockets": sockets, "village": progression.scene_id == &"village_layered", "notice": notice})
+
+
+## The weapon's socket art: the katana's kit medallion around its blade glyph (48x52), or the dagger's / scythe's whole
+## 48 px medallion.
 func _draw_medallion(weapon: StringName, at: Vector2) -> void:
 	if Hud.MEDALLIONS.has(weapon):
 		_ui(Hud.MEDALLIONS[weapon], Rect2(at, Vector2(48, 48)))
 	else:
-		_ui("ui_weapon_frame_1", Rect2(at, Vector2(48, 48)))
-		_ui("ui_weapon_totoy_blade_1", Rect2(at + Vector2(8, 8), Vector2(32, 32)))
+		Kit.medallion(self, at - Vector2(0, 2))
+		_ui("ui_weapon_totoy_blade_1", Rect2(Kit.medallion_centre(at - Vector2(0, 2)) - Vector2(16, 16), Vector2(32, 32)))
+
+
+## Teal corner brackets round `rect` (the selection mark; the kit frames carry no highlight of their own).
+func _brackets(rect: Rect2) -> void:
+	for corner: Array in [[rect.position.x - 2, rect.position.y - 2, 1, 1], [rect.end.x + 1, rect.position.y - 2, -1, 1], [rect.position.x - 2, rect.end.y + 1, 1, -1], [rect.end.x + 1, rect.end.y + 1, -1, -1]]:
+		var bx: float = corner[0]
+		var by: float = corner[1]
+		draw_rect(Rect2(minf(bx, bx + 3 * corner[2]), by, 4, 1), colors["u"])
+		draw_rect(Rect2(bx, minf(by, by + 3 * corner[3]), 1, 4), colors["u"])
 
 
 func _equipped_badge(rect: Rect2) -> void:
-	draw_rect(rect, colors["0"])
-	UiPanel.outline(self, rect, colors["v"])
-	_text(Vector2(rect.position.x + rect.size.x * 0.5, rect.position.y + 1), "E", colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	Kit.badge(self, rect)
+	_text(Vector2(rect.position.x + rect.size.x * 0.5, rect.position.y + 1), "E", colors["1"], null, 7, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func highlighted_key() -> StringName:
@@ -805,43 +1028,16 @@ func highlighted_key() -> StringName:
 func _draw_stats() -> void:
 	var equipped: StringName = _equipped()
 	var lit: StringName = highlighted_key()
-	# the figure box: Totoy at 2x, holding the equipped weapon, on a stone strip with a shadow
-	draw_rect(FIGURE, colors["0"])
-	UiPanel.outline(self, FIGURE, colors["f"])
-	var strip_y: float = FIGURE.end.y - 16
-	draw_rect(Rect2(FIGURE.position.x + 1, strip_y, FIGURE.size.x - 2, 15), colors["e"])
-	draw_rect(Rect2(FIGURE.position.x + 1, strip_y, FIGURE.size.x - 2, 1), colors["f"])
-	var feet: Vector2 = Vector2(FIGURE.get_center().x, FIGURE.end.y - 9)
+	# the frame, medallion, sockets and stat list are the scene menu_arena_status.tscn; here only Totoy himself (a clipped
+	# sprite) and his shadow, then the selection marks and the picker
+	var feet: Vector2 = Vector2(FIGURE.get_center().x, FIGURE.end.y - 11)
 	_ellipse(feet, Vector2(13, 3), colors["0"])
 	_draw_figure(figure_frame(equipped), feet)
-	# weapon slot
-	_text(Vector2(MID_X, 20), "WEAPON", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	UiPanel.slot(self, WEAPON_SLOT, lit == &"weapon", colors)
-	_draw_medallion(equipped, WEAPON_SLOT.position + Vector2.ONE)
-	_equipped_badge(Rect2(WEAPON_SLOT.position + Vector2(41, 1), Vector2(8, 8)))
-	_text(Vector2(MID_X, 80), WEAPON_NAMES.get(equipped, "WEAPON"), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	# aspects
-	_text(Vector2(MID_X, 89), "ASPECTS", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	if lit == &"weapon":
+		_brackets(WEAPON_SLOT)
 	for i: int in range(3):
-		var rect: Rect2 = aspect_rect(i)
-		UiPanel.slot(self, rect, lit == ASPECT_KEYS[i] or picker_slot == i + 1, colors)
-		_ui(Hud.aspect_icon(slot_aspect(i + 1)), Rect2(rect.position + Vector2.ONE, Vector2(24, 24)))
-		_key_badge(rect.position + Vector2(-2, 17), SLOT_LETTERS[i])
-	# the stat list
-	var y: float = STAT_TOP
-	for row: Array in stat_rows(equipped):
-		if row[0] == "header":
-			var w: float = _text(Vector2(STAT_X0, y), row[1], colors["v"])
-			draw_rect(Rect2(STAT_X0 + w + 4, y + 3, STAT_X1 - STAT_X0 - w - 4, 1), colors["f"])
-		else:
-			var on: bool = lit == row[2]
-			if on:
-				draw_rect(Rect2(STAT_X0 - 2, y - 1, STAT_X1 - STAT_X0 + 3, 8), colors["k"])
-				draw_rect(Rect2(STAT_X0 - 2, y + 7, STAT_X1 - STAT_X0 + 3, 1), colors["1"])
-				_text(Vector2(STAT_X0 - 1, y), ">", colors["1"])
-			_text(Vector2(STAT_X0 + (5 if on else 0), y), row[0], colors["1"] if on else colors["i"])
-			_text(Vector2(STAT_X1, y), row[1], colors["1"] if on else colors["j"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-		y += ROW_STEP
+		if lit == ASPECT_KEYS[i] or picker_slot == i + 1:
+			_brackets(aspect_rect(i))
 	if picker_open():
 		_draw_picker()
 
@@ -849,42 +1045,13 @@ func _draw_stats() -> void:
 ## The aspect picker over the stat list: a title (or the request's feedback), then one row per aspect: icon, name,
 ## Edge cost, and for a slotted one its key badge and a tick.
 func _draw_picker() -> void:
-	UiPanel.draw_panel(self, PICKER, &"info", colors)
-	var x0: float = PICKER.position.x + 6
-	var title_y: float = PICKER.position.y + 6
-	if picker_feedback.is_empty():
-		_text(Vector2(x0, title_y), "ASPECT FOR SLOT " + SLOT_LETTERS[picker_slot - 1], colors["1"])
-		_text(Vector2(PICKER.end.x - 6, title_y), "ESC: BACK", colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-	elif bool(picker_feedback["ok"]):
-		_text(Vector2(x0, title_y), "EQUIPPED!", colors["u"])
-	else:
-		_text(Vector2(x0, title_y), "NOT NOW  " + String(picker_feedback["reason"]), colors["q"])
-	draw_rect(Rect2(x0, title_y + 9, PICKER.size.x - 12, 1), colors["f"])
-	if picker_max_scroll() > 0:
-		_draw_picker_bar()
-	for index: int in range(Aspects.ALL.size()):
-		if not row_visible(index):
-			continue
-		var aspect: StringName = Aspects.ALL[index]
-		var row: Rect2 = picker_row_rect(index, picker_scroll)
-		var on: bool = index == picker_selection
-		if on:
-			draw_rect(row, colors["k"])
-			draw_rect(Rect2(row.position.x, row.end.y - 1, row.size.x, 1), colors["1"])
-		# the icon's inner 16x16 (the ring cropped) at native size
-		_ui(Hud.aspect_icon(aspect), Rect2(row.position + Vector2(2, 0), Vector2(16, 16)), Vector2(4, 4), Vector2(16, 16))
-		_text(Vector2(row.position.x + 22, row.position.y + 4), Aspects.display_name(aspect), colors["1"] if on else colors["j"])
-		_text(Vector2(row.end.x - 26, row.position.y + 4), "%sE" % num(Aspects.edge_cost(aspect)), colors["v"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-		var slot: int = aspect_slot_of(aspect)
-		if slot > 0:
-			_key_badge(Vector2(row.end.x - 22, row.position.y + 4), SLOT_LETTERS[slot - 1])
-			_tick(Vector2(row.end.x - 11, row.position.y + 5), colors["u"])
+	pass  # the scene menu_picker.tscn draws it
 
 
 ## The picker's scroll bar: a dark track along the rows, a thumb sized to the window, and a small arrow at each end
 ## while more rows lie that way.
 static func picker_bar_rect() -> Rect2:
-	return Rect2(PICKER.end.x - 4 - PICKER_BAR_W, PICKER_ROW_TOP + 4, PICKER_BAR_W, PICKER_VISIBLE_ROWS * PICKER_ROW_STEP - 9)
+	return Rect2(PICKER.end.x - 10 - PICKER_BAR_W, PICKER_ROW_TOP + 4, PICKER_BAR_W, PICKER_VISIBLE_ROWS * PICKER_ROW_STEP - 9)
 
 
 func picker_thumb_rect() -> Rect2:
@@ -893,20 +1060,6 @@ func picker_thumb_rect() -> Rect2:
 	var height: float = maxf(4.0, floorf(track.size.y * PICKER_VISIBLE_ROWS / total))
 	var top: float = track.position.y + roundf((track.size.y - height) * picker_scroll / maxi(1, picker_max_scroll()))
 	return Rect2(track.position.x, top, track.size.x, height)
-
-
-func _draw_picker_bar() -> void:
-	var track: Rect2 = picker_bar_rect()
-	draw_rect(track, colors["0"])
-	draw_rect(picker_thumb_rect(), colors["o"])
-	var cx: float = track.position.x + 1
-	var up: Color = colors["1"] if picker_scroll > 0 else colors["e"]
-	var down: Color = colors["1"] if picker_scroll < picker_max_scroll() else colors["e"]
-	# 3 px wide arrowheads just outside the track
-	draw_rect(Rect2(cx, track.position.y - 3, 1, 1), up)
-	draw_rect(Rect2(cx - 1, track.position.y - 2, 3, 1), up)
-	draw_rect(Rect2(cx - 1, track.end.y + 1, 3, 1), down)
-	draw_rect(Rect2(cx, track.end.y + 2, 1, 1), down)
 
 
 ## A 7x5 pixel check mark (top-left `at`).
@@ -921,6 +1074,7 @@ static func figure_frame(weapon: StringName) -> String:
 	match weapon:
 		Tuning.WEAPON_DUAL_DAGGER: prefix = ArenaAnimation.SET_DAGGER
 		Tuning.WEAPON_CHAIN_SCYTHE: prefix = ArenaAnimation.SET_SCYTHE
+		Tuning.WEAPON_STAR_STAFF: prefix = ArenaAnimation.SET_STAFF
 	return ArenaAnimation.hero_frame(prefix, "idle", 1)
 
 
@@ -958,57 +1112,8 @@ func _used_rect(key: String) -> Rect2i:
 
 
 func _draw_inventory() -> void:
-	var equipped: StringName = _equipped()
-	for index: int in range(GRID_COLS * GRID_ROWS):
-		var rect: Rect2 = inventory_rect(index)
-		UiPanel.slot(self, rect, index == inventory_selection, colors)
-		var weapon: StringName = slot_weapon(index)
-		var grid_item: StringName = grid_aspect(index)
-		if grid_item != &"":
-			_ui(Hud.aspect_icon(grid_item), Rect2(rect.position + Vector2(4, 4), Vector2(24, 24)))
-			var held: int = aspect_slot_of(grid_item)
-			if held > 0:
-				_key_badge(rect.position + Vector2(23, 1), SLOT_LETTERS[held - 1])
-			continue
-		if weapon == &"":
-			continue
-		_draw_item_icon(weapon, rect.position)
-		if weapon == equipped:
-			_equipped_badge(Rect2(rect.position + Vector2(24, 1), Vector2(7, 8)))
-	# the detail card
-	draw_rect(CARD, colors["0"])
-	UiPanel.outline(self, CARD, colors["f"])
-	var cx: float = CARD.get_center().x
-	var weapon: StringName = slot_weapon(inventory_selection)
-	var card_aspect: StringName = grid_aspect(inventory_selection)
-	if card_aspect != &"":
-		_draw_aspect_card(card_aspect, cx)
-		return
-	if weapon == &"":
-		_text(Vector2(cx, 66), "EMPTY", colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		return
-	_draw_medallion(weapon, Vector2(cx - 24, 25))
-	_text(Vector2(cx, 76), WEAPON_NAMES[weapon], colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	var equipped_now: bool = weapon == equipped
-	_text(Vector2(cx, 85), "EQUIPPED" if equipped_now else "NOT EQUIPPED", colors["v"] if equipped_now else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	draw_rect(Rect2(CARD.position.x + 6, 95, CARD.size.x - 12, 1), colors["f"])
-	var lines: Array = card_lines(weapon)
-	_text(Vector2(cx, 99), lines[0], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(cx, 107), lines[1], colors[lines[2]], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-
-
-## An aspect's card (view-only): its icon in a slot frame, name, the slot holding it, Edge cost and cooldown.
-func _draw_aspect_card(aspect: StringName, cx: float) -> void:
-	var frame: Rect2 = Rect2(cx - 13, 33, 26, 26)
-	UiPanel.slot(self, frame, false, colors)
-	_ui(Hud.aspect_icon(aspect), Rect2(frame.position + Vector2.ONE, Vector2(24, 24)))
-	_text(Vector2(cx, 76), Aspects.display_name(aspect), colors["1"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	var slot: int = aspect_slot_of(aspect)
-	_text(Vector2(cx, 85), "SLOT " + SLOT_LETTERS[slot - 1] if slot > 0 else "NOT SLOTTED", colors["v"] if slot > 0 else colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	draw_rect(Rect2(CARD.position.x + 6, 95, CARD.size.x - 12, 1), colors["f"])
-	var cd: int = Aspects.cooldown(aspect)
-	_text(Vector2(cx, 99), "%s EDGE" % num(Aspects.edge_cost(aspect)) + ("  CD %s S" % secs(cd) if cd > 0 else ""), colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-	_text(Vector2(cx, 107), "SLOT ON STATS", colors["o"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
+	# everything but the selection mark is the scene menu_items.tscn
+	_brackets(inventory_rect(inventory_selection))
 
 
 ## The two lines under the card's divider and their colour symbol: the equip feedback, else how to equip.
@@ -1030,18 +1135,52 @@ func _draw_item_icon(weapon: StringName, at: Vector2) -> void:
 		_ui("ui_weapon_totoy_blade_1", Rect2(at, Vector2(32, 32)))
 
 
-func _draw_description(key: StringName) -> void:
-	var all: Dictionary = descriptions(_equipped(), equipped_aspects())
-	var entry: Array = all.get(key, all[&"none"])
-	UiPanel.draw_panel(self, DESC, &"info", colors, false)
-	var x0: float = DESC.position.x + 5
-	var lines: Array = entry[2]
-	if String(entry[0]).is_empty():
-		_text(Vector2(160, DESC.position.y + 9), lines[0], colors["i"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		_text(Vector2(160, DESC.position.y + 23), lines[2], colors["f"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_CENTER)
-		return
-	_text(Vector2(x0, DESC.position.y + 4), entry[0], colors["1"], Hud.menu_font(), 10)
-	_text(Vector2(DESC.end.x - 6, DESC.position.y + 4), entry[1], colors["u"], null, Hud.FONT_SIZE, HORIZONTAL_ALIGNMENT_RIGHT)
-	for i: int in range(lines.size()):
-		if not String(lines[i]).is_empty():
-			_text(Vector2(x0, DESC.position.y + 13 + i * 8), lines[i], colors["o"] if i == 2 else colors["j"])
+func _draw_description(_key: StringName) -> void:
+	pass  # the scene menu_description.tscn draws it
+
+
+func aspect_owned(aspect: StringName) -> bool:
+	return progression==null or progression.owned_aspects.has(aspect)
+
+
+static func aspects_tab_rect(index: int) -> Rect2:
+	return Rect2(30 + index * 48, 55, 37, 40)
+
+
+func _draw_aspects_tab() -> void:
+	# everything but the selection mark and the picker is the scene menu_aspects.tscn
+	for i: int in 3:
+		if stats_selection == ASPECT_KEYS[i]:
+			_brackets(aspects_tab_rect(i))
+	if picker_open():
+		_draw_picker()
+
+
+func _draw_quests_tab() -> void:
+	pass  # the scene menu_quests.tscn draws it
+
+
+static func progression_aspect_rect(i: int) -> Rect2:return Rect2(28+i*46,150,37,40)
+static func progression_row_rect(i: int) -> Rect2:return Rect2(20,56+i*30,298,28)
+static func progression_plus_rect(i: int) -> Rect2:return Rect2(292,61+i*30,18,18)
+static func respec_rect() -> Rect2:return Rect2(246,152,116,20)
+func progression_items() -> Array[Dictionary]:
+	var items: Array[Dictionary]=[]
+	for i: int in 3:items.append({"key":StringName("stat_"+["vitality","might","agility"][i]),"rect":progression_plus_rect(i)})
+	items.append({"key":&"respec","rect":respec_rect()})
+	for i: int in 3:items.append({"key":ASPECT_KEYS[i],"rect":progression_aspect_rect(i)})
+	return items
+func _draw_progression_stats() -> void:
+	# everything but the selection marks and the picker is the scene menu_status.tscn
+	for i: int in 3:
+		if stats_selection == StringName("stat_" + ["vitality", "might", "agility"][i]):
+			_brackets(progression_row_rect(i))
+		if stats_selection == ASPECT_KEYS[i]:
+			_brackets(progression_aspect_rect(i))
+	if stats_selection == &"respec":
+		_brackets(respec_rect())
+	if picker_open():_draw_picker()
+
+
+func _enter_tree() -> void:
+	add_to_group(&"mouse_cursor_menus")

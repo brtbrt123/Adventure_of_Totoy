@@ -1,0 +1,194 @@
+{
+  "status": "visual proposal only, not collision registered; do not load as production scene",
+  "props": [
+    {
+      "id": "hollow_proposal_1",
+      "type": "root_hollow_tree_ancient",
+      "feet": [
+        320,
+        112
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_2",
+      "type": "root_hollow_tree_rootwall",
+      "feet": [
+        25,
+        52
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_3",
+      "type": "woodland_tree_broad",
+      "feet": [
+        590,
+        55
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_4",
+      "type": "woodland_tree_broad",
+      "feet": [
+        30,
+        276
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_5",
+      "type": "root_hollow_tree_rootwall",
+      "feet": [
+        610,
+        328
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_6",
+      "type": "woodland_tree_broad",
+      "feet": [
+        98,
+        399
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_7",
+      "type": "woodland_tree_broad",
+      "feet": [
+        620,
+        399
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_8",
+      "type": "root_hollow_shrine",
+      "feet": [
+        43,
+        165
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_9",
+      "type": "woodland_lantern",
+      "feet": [
+        25,
+        110
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_10",
+      "type": "woodland_lantern",
+      "feet": [
+        185,
+        145
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_11",
+      "type": "root_hollow_rune_stones",
+      "feet": [
+        590,
+        158
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_12",
+      "type": "root_hollow_boulder",
+      "feet": [
+        535,
+        338
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_13",
+      "type": "root_hollow_roots",
+      "feet": [
+        178,
+        288
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_14",
+      "type": "root_hollow_mushrooms",
+      "feet": [
+        460,
+        338
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_15",
+      "type": "root_hollow_antlers",
+      "feet": [
+        546,
+        160
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_16",
+      "type": "woodland_bush",
+      "feet": [
+        244,
+        110
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_17",
+      "type": "woodland_bush",
+      "feet": [
+        423,
+        130
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_18",
+      "type": "woodland_bush",
+      "feet": [
+        111,
+        267
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_19",
+      "type": "woodland_bush",
+      "feet": [
+        312,
+        337
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_20",
+      "type": "woodland_bush",
+      "feet": [
+        560,
+        267
+      ],
+      "flip": false
+    },
+    {
+      "id": "hollow_proposal_21",
+      "type": "woodland_bush",
+      "feet": [
+        370,
+        385
+      ],
+      "flip": false
+    }
+  ]
+}

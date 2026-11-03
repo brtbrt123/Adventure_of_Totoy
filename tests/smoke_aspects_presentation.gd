@@ -296,7 +296,13 @@ func phantom(weapon: StringName) -> void:
 			check(arena.frames.has(AspectEffects.marker_key(arena.snapshot.tick)), "marker frame")
 		var echo_events: Array = arena.core.last_events.filter(func(e: GameEvent) -> bool: return e.type == GameEvent.PHANTOM_ECHO)
 		var real_hits: Array = arena.core.last_events.filter(func(e: GameEvent) -> bool: return e.type == GameEvent.ATTACK_HIT and not bool(e.data.get("echo", false)))
-		if not echo_events.is_empty():
+		if not echo_events.is_empty() and Weapons.is_ranged(weapon):
+			# the Star Staff: its echo is a phantom burst on the target (presentation/common/staff_view.gd), not a blade's ghost
+			echoes += 1
+			var phantoms: Array = arena.staff_view.effects.filter(func(e: Dictionary) -> bool: return e["kind"] == "phantom_burst")
+			check(not phantoms.is_empty(), "%s: the echo's phantom burst" % weapon)
+			check(arena.aspect_fx.filter(func(e: Dictionary) -> bool: return e["kind"] == "echo").is_empty(), "%s: no blade ghost for the staff" % weapon)
+		elif not echo_events.is_empty():
 			echoes += 1
 			var effect: Dictionary = arena.aspect_fx.filter(func(e: Dictionary) -> bool: return e["kind"] == "echo")[-1]
 			check(effect["weapon"] == label and int(effect["swing"]) == int(echo_events[0].data["swing_combo_index"]), "%s: echo effect %s" % [label, str(effect)])

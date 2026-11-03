@@ -1,0 +1,80 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/menu_quests.gd" id="1_scr"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="4_fon"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="5_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("4_fon")
+variation_opentype = {2003265652: 900.0}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("5_fon")
+variation_opentype = {2003265652: 400.0}
+
+[node name="MenuQuests" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+show_behind_parent = true
+script = ExtResource("1_scr")
+
+[node name="Heading" type="Label" parent="."]
+layout_mode = 0
+offset_left = 30
+offset_top = 38
+offset_right = 290
+offset_bottom = 54
+mouse_filter = 2
+text = "CURRENT OBJECTIVE"
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 11
+
+[node name="Card" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 24
+offset_top = 66
+offset_right = 360
+offset_bottom = 172
+mouse_filter = 2
+texture = ExtResource("3_tex")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Objective" type="Label" parent="Card"]
+layout_mode = 0
+offset_left = 14
+offset_top = 12
+offset_right = 314
+offset_bottom = 82
+mouse_filter = 2
+text = "YOUR VILLAGE TASKS ARE COMPLETE."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 10
+autowrap_mode = 3
+theme_override_constants/line_spacing = 1
+
+[node name="Hint" type="Label" parent="Card"]
+layout_mode = 0
+offset_left = 14
+offset_top = 80
+offset_right = 314
+offset_bottom = 92
+mouse_filter = 2
+text = "FOLLOW THE OBJECTIVE MARKER ON THE ROAD."
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8

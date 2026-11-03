@@ -1,0 +1,55 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_idle_right_1.png" id="1_05tcg"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_idle_right_2.png" id="2_0re1n"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_idle_right_3.png" id="3_n3c71"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_idle_right_4.png" id="4_2fg06"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_walk_right_1.png" id="5_tltq0"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_walk_right_2.png" id="6_danmk"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_walk_right_3.png" id="7_2ic4d"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_walk_right_4.png" id="8_e4chu"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_walk_right_5.png" id="9_kaire"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/npc_child_walk_right_6.png" id="10_2giym"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 3.0,
+"texture": ExtResource("1_05tcg")
+}, {
+"duration": 1.75,
+"texture": ExtResource("2_0re1n")
+}, {
+"duration": 1.75,
+"texture": ExtResource("3_n3c71")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_2fg06")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 7.5
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_tltq0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_danmk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_2ic4d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_e4chu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_kaire")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_2giym")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 8.571428571428571
+}]

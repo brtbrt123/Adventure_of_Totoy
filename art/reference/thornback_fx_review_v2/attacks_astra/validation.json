@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "native_images_checked": 794,
+  "gif_audits": {
+    "thornback_slam_fx_4x": {
+      "authored_frames": 46,
+      "encoded_frames": 46,
+      "duration_ms": 2300,
+      "fps": 20,
+      "scale": 4,
+      "all_36_palette_entries": true,
+      "decoded_pixel_parity": true
+    },
+    "thornback_charge_fx_4x": {
+      "authored_frames": 54,
+      "encoded_frames": 54,
+      "duration_ms": 2700,
+      "fps": 20,
+      "scale": 4,
+      "all_36_palette_entries": true,
+      "decoded_pixel_parity": true
+    },
+    "thornback_roots_fx_4x": {
+      "authored_frames": 42,
+      "encoded_frames": 42,
+      "duration_ms": 2100,
+      "fps": 20,
+      "scale": 4,
+      "all_36_palette_entries": true,
+      "decoded_pixel_parity": true
+    },
+    "thornback_existing_attacks_fx_4x": {
+      "authored_frames": 142,
+      "encoded_frames": 142,
+      "duration_ms": 7100,
+      "fps": 20,
+      "scale": 4,
+      "all_36_palette_entries": true,
+      "decoded_pixel_parity": true
+    }
+  },
+  "limitations": [
+    "Graphify query failed: No module named graphify; no graph updates attempted outside scoped outputs.",
+    "Review choreography only; no Godot runtime/collision/lighting or play-feel validation.",
+    "Owner art/motion approval and cross-review remain pending.",
+    "20fps samples a 60Hz timeline every three ticks: phase transitions can display up to two ticks late."
+  ],
+  "body_pose_pixel_parity": {
+    "pass": true,
+    "poses": 33,
+    "anchor": [
+      36,
+      62
+    ]
+  },
+  "protected_reference_hashes_unchanged": 393,
+  "horn_overlay_registered_to_visible_rig_parts": true,
+  "warning_pixels_unobscured": true,
+  "reserved_colors_only_in_warning_layers": true
+}

@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 25.5.1.250226 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon(TM) Graphics
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2582)
+COMPACT PREVIEW 01_training
+COMPACT PREVIEW 02_woodland
+COMPACT PREVIEW 03_dialogue
+COMPACT PREVIEW 04_welcome
+COMPACT PREVIEW 05_item_receipt
+COMPACT PREVIEW 06_level_toast
+COMPACT PREVIEW 07_stats
+COMPACT PREVIEW 08_aspects
+COMPACT PREVIEW 09_bag
+UI COMPACT REVIEW OK

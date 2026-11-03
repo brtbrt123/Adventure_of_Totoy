@@ -1,4 +1,36 @@
-# HANDOFF: Adventure of Totoy (rewritten 2026-10-22 for the next session)
+# HANDOFF: Adventure of Totoy (current checkpoint 2026-11-02)
+
+> **START HERE for the next session (Claude, 2026-11-03).** We are debugging the game from the first scene: the owner reports visual errors, Claude fixes functional bugs and shows a picture before changing how anything looks.
+>
+> **Done and committed on `agent/codex/progression` (never merge to `main`):** the village cleanup of 2026-11-03, see the top of [[STATUS]]. The hero no longer auto-walks after the intro; Edda's hut has no knock; the village standing stone glows blue (the village scene now uses per-light colours); the gate, walls and fence were tried and removed from the village scene (the owner did not like them). The wall and fence art/types stay in the project unused (`tools/art/make_village_walls.py`, Higgsfield cut-outs in `art/reference/village_wall_fence_v1/`).
+> - Open: the objective still reads "Speak to Mira by the gate." (owner said leave it). A boot icon, dagger and dark capsules once seen in the village were fixed by the owner themselves; the cause was never found.
+> - The effects redo in the Star Staff's style (phases 1-4), the mobile blueprint (`docs/MOBILE_BLUEPRINT.md`), the white-haze fix and the real-input playthrough (`presentation/review/playthrough/capture_start.gd`) are from 2026-11-02 and in STATUS.
+>
+> **Working rules this owner holds:**
+> - The owner points out visual problems; Claude chases functional bugs (console errors, broken flow).
+> - Show the owner a picture before changing how something looks.
+> - Never touch the owner's uncommitted scenes: `intro.tscn`, `dialogue_box.tscn`, `explore_overlay.tscn`, `aspect_socket.tscn`, `scene_ribbon.tscn`, `welcome_card.tscn`, `result_panel.tscn`, plus `project.godot`. Ask before committing them.
+> - Commit only your own hunks of shared docs (STATUS, INDEX).
+> - No Co-Authored-By lines. Push after each commit.
+>
+> **Gotchas:**
+> - The Godot editor is often open. It locks `art/build` files (Errno 22: retry), and it deletes and recreates `art/build/contact_sheet_*.png.import`. Restore those with `git checkout HEAD --`.
+> - `tools/godot/generate_prop_scenes.py` also reformats the `presentation/props/hollow_trial_*.tscn` scenes. Restore those after running it.
+> - Three smokes only pass with a window: `smoke_capture_hero`, `smoke_gemini_capture`, `smoke_hero_capture`.
+> - A village light colour is only used when the scene is in the `mixed_lights` list in `presentation/common/environment_light.gd`.
+> - Image generation: Higgsfield (`nano_banana_2_1`, 1.5 credits per image, about 25 left); SpriteCook is on the free tier with 1 credit.
+
+> **START HERE for the new Codex chat (2026-10-31):** read [[WARDEN_INTEGRATION]] and [[CODEX_NEXT_SESSION_warden]]. Owner authorized wiring after requesting a 2.5x body. Warden now has60 installed enlarged poses,75 attached FX, actual-core-geometry floor effects and13 recorded sound cues. Runtime review media is in `presentation/review/warden/`. See the integration note for final test status. Claude cross-review remains pending because its OAuth session expired. Trial room/waves/rewards remain separate. Branch `agent/codex/progression`; preserve the dirty worktree and never merge main.
+
+> **Thornback / Glowmoth update (2026-10-31):** Claude has finished the core mechanics, real orb projectile and presentation/particle follow-ups. Older "core still needs" entries are obsolete. Read [[CROSS_REVIEW_thornback_v3]] and newest STATUS. Most recent healing polish is `13ba25a4`: fewer motes, placed beside the Stag, once-per-second pulse and smaller glow. Preserve it when touching shared creature FX.
+
+> **Mob idles (2026-10-30):** approved Mossling hopping and Boar grazing are installed globally in mob_view.gd, with60 new sprites. Idle selection uses simulation tick (dormant state_ticks stays zero),6 ticks/frame and per-mob phase; alert/combat unchanged. Full harness passes; live GIF and rebuild instructions in art/reference/mob_idle_review_v1/.
+
+> **Root Hollow (2026-10-30):** Claude registered live colliders/placements/gate in ad118e0f; Codex finished Root Hollow-only exposure, teal pools and nearest-practical projected cast shadows. Ancient/root-wall canopy y-sort is preserved. Live gate/depth/route/warning captures and PASS cross-review: presentation/review/root_hollow_final/REVIEW.md. Full harness passes. Local shadows use a soft parallel-ray mask approximation, not physical volumetric occlusion; owner judges appearance.
+
+> **Basic attack slash (2026-11-02):** the blades' slash is drawn from the swing's hit area (reach and arc from core/weapons.gd, turned to the hero's facing) by `presentation/common/swing_arc.gd`, through the shared `hero_fx.gd` base in both arena and exploration. Future hero renderers must call `draw_hero_back`; see [[WEAPON_PATHS]]. It replaced the pose-traced trail frames of 2026-10-29.
+
+> **UI update (2026-10-29):** owner approved switching the base view to 384x216 and installing the SpriteCook bronze/teal kit with existing game icons. See decision [[0005-384x216-fantasy-ui]], newest STATUS and live captures in `presentation/review/ui_kit_live/`.
 
 > **Current owner direction (2026-10-27): the clean glade arch/bush/path layout is APPROVED ("yes thats good"). See [CODEX_NEXT_SESSION.md](CODEX_NEXT_SESSION.md) and newest STATUS. Preserve the uncommitted CHAPTER1_PLAN.md edit. Older forest/redo task lists below are historical.**
 
@@ -10,7 +42,7 @@ Read this first, then `AGENTS.md` (the rules), then `docs/CHAPTER1_PLAN.md` (wha
 
 ## What this project is
 
-A 2D top-down pixel-art action game in **Godot 4.7.2** (typed GDScript), 320x180 base resolution, private Windows build and portfolio piece. Design: `docs/GAME_DESIGN.md` (the human's document, do not rewrite it). Combat language: **gold heavy attacks can be parried, red attacks must be dodged**. Currently playable: a walkable Chapter 1 slice (village Lanternfen, forest route, Stag glade) and the **Mossbound Colossus** arena fight, with three weapons and eight aspects.
+A 2D top-down pixel-art action game in **Godot 4.7.2** (typed GDScript), 384x216 base resolution, private Windows build and portfolio piece. Design: `docs/GAME_DESIGN.md` (the human's document, do not rewrite it). Combat language: **gold heavy attacks can be parried, red attacks must be dodged**. Currently playable: a walkable Chapter 1 slice (village Lanternfen, forest route, Stag glade) and the **Mossbound Colossus** arena fight, with three weapons and eight aspects.
 
 ## Rules of the road (from the human)
 
@@ -21,7 +53,7 @@ A 2D top-down pixel-art action game in **Godot 4.7.2** (typed GDScript), 320x180
   - **Occluder/collision cleanup:** Claude = collider data and layout tests; Codex = occluder art and drawing.
   - Codex starts without memory: it reads `AGENTS.md`, this file, `docs/CHAPTER1_PLAN.md`, `docs/STATUS.md`, `docs/architecture.md`.
 - **Plain commit messages: NO Co-Authored-By / Claude attribution lines** (the human does not want "claude" as a GitHub contributor; history was rewritten once to strip them).
-- Work branch: `agent/game/chapter1-dev` (renamed from `agent/art/gemini-import`). After every commit, push it to `origin` (https://github.com/brtbrt123/Adventure_of_Totoy, public). No force-push or history rewrite without asking.
+- Current work branch: `agent/codex/progression` (older branches named elsewhere below are historical). After every commit, push it to `origin` (https://github.com/brtbrt123/Adventure_of_Totoy, public). No force-push or history rewrite without asking.
 - Short answers, honest reports (what ran, what passed, what was not verified). Show art to the human first and get approval before wiring it in. Ask before downloading files (name, source, licence, size).
 - Do not stop a long test run: `python harness/checks/run_tests.py --worktree .` takes several minutes; run it in the background.
 

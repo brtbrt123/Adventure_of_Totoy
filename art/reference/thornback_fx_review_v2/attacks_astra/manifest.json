@@ -1,0 +1,1633 @@
+{
+  "review_only": true,
+  "summoning": false,
+  "fps": 20,
+  "native_stage": [
+    288,
+    144
+  ],
+  "body_anchor": [
+    36,
+    62
+  ],
+  "facing": "right",
+  "native_source": "Totoy36, binary alpha",
+  "layer_order": [
+    "back",
+    "body",
+    "horn",
+    "front",
+    "warning"
+  ],
+  "stage_layers_anchor": [
+    0,
+    0
+  ],
+  "horn_layer_anchor": [
+    36,
+    62
+  ],
+  "clips": {
+    "slam": {
+      "phase_ticks": [
+        54,
+        6,
+        48
+      ],
+      "simulation_hz": 60,
+      "sample_step_ticks": 3,
+      "pause_ticks_requested": 30,
+      "duration_ms": 2300,
+      "frames": [
+        {
+          "tick": 0,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_1_right.png",
+          "layers_prefix": "layers/slam/000"
+        },
+        {
+          "tick": 3,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_1_right.png",
+          "layers_prefix": "layers/slam/001"
+        },
+        {
+          "tick": 6,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_1_right.png",
+          "layers_prefix": "layers/slam/002"
+        },
+        {
+          "tick": 9,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_1_right.png",
+          "layers_prefix": "layers/slam/003"
+        },
+        {
+          "tick": 12,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_1_right.png",
+          "layers_prefix": "layers/slam/004"
+        },
+        {
+          "tick": 15,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_2_right.png",
+          "layers_prefix": "layers/slam/005"
+        },
+        {
+          "tick": 18,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_2_right.png",
+          "layers_prefix": "layers/slam/006"
+        },
+        {
+          "tick": 21,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_2_right.png",
+          "layers_prefix": "layers/slam/007"
+        },
+        {
+          "tick": 24,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_2_right.png",
+          "layers_prefix": "layers/slam/008"
+        },
+        {
+          "tick": 27,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_3_right.png",
+          "layers_prefix": "layers/slam/009"
+        },
+        {
+          "tick": 30,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_3_right.png",
+          "layers_prefix": "layers/slam/010"
+        },
+        {
+          "tick": 33,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_3_right.png",
+          "layers_prefix": "layers/slam/011"
+        },
+        {
+          "tick": 36,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_3_right.png",
+          "layers_prefix": "layers/slam/012"
+        },
+        {
+          "tick": 39,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_3_right.png",
+          "layers_prefix": "layers/slam/013"
+        },
+        {
+          "tick": 42,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_4_right.png",
+          "layers_prefix": "layers/slam/014"
+        },
+        {
+          "tick": 45,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_4_right.png",
+          "layers_prefix": "layers/slam/015"
+        },
+        {
+          "tick": 48,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_4_right.png",
+          "layers_prefix": "layers/slam/016"
+        },
+        {
+          "tick": 51,
+          "phase": "WINDUP",
+          "body": "bodies/slam_raise_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_raise_4_right.png",
+          "layers_prefix": "layers/slam/017"
+        },
+        {
+          "tick": 54,
+          "phase": "STRIKE",
+          "body": "bodies/slam_strike_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_strike_1_right.png",
+          "layers_prefix": "layers/slam/018"
+        },
+        {
+          "tick": 57,
+          "phase": "STRIKE",
+          "body": "bodies/slam_strike_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_strike_2_right.png",
+          "layers_prefix": "layers/slam/019"
+        },
+        {
+          "tick": 60,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/slam/020"
+        },
+        {
+          "tick": 63,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/slam/021"
+        },
+        {
+          "tick": 66,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/slam/022"
+        },
+        {
+          "tick": 69,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/slam/023"
+        },
+        {
+          "tick": 72,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_2_right.png",
+          "layers_prefix": "layers/slam/024"
+        },
+        {
+          "tick": 75,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_2_right.png",
+          "layers_prefix": "layers/slam/025"
+        },
+        {
+          "tick": 78,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_2_right.png",
+          "layers_prefix": "layers/slam/026"
+        },
+        {
+          "tick": 81,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_2_right.png",
+          "layers_prefix": "layers/slam/027"
+        },
+        {
+          "tick": 84,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/slam/028"
+        },
+        {
+          "tick": 87,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/slam/029"
+        },
+        {
+          "tick": 90,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/slam/030"
+        },
+        {
+          "tick": 93,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/slam/031"
+        },
+        {
+          "tick": 96,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_4_right.png",
+          "layers_prefix": "layers/slam/032"
+        },
+        {
+          "tick": 99,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_4_right.png",
+          "layers_prefix": "layers/slam/033"
+        },
+        {
+          "tick": 102,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_4_right.png",
+          "layers_prefix": "layers/slam/034"
+        },
+        {
+          "tick": 105,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_4_right.png",
+          "layers_prefix": "layers/slam/035"
+        },
+        {
+          "tick": 108,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/slam/036"
+        },
+        {
+          "tick": 111,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/slam/037"
+        },
+        {
+          "tick": 114,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/slam/038"
+        },
+        {
+          "tick": 117,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/slam/039"
+        },
+        {
+          "tick": 120,
+          "phase": "RESET",
+          "body": "bodies/idle_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_3_right.png",
+          "layers_prefix": "layers/slam/040"
+        },
+        {
+          "tick": 123,
+          "phase": "RESET",
+          "body": "bodies/idle_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_3_right.png",
+          "layers_prefix": "layers/slam/041"
+        },
+        {
+          "tick": 126,
+          "phase": "RESET",
+          "body": "bodies/idle_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_3_right.png",
+          "layers_prefix": "layers/slam/042"
+        },
+        {
+          "tick": 129,
+          "phase": "RESET",
+          "body": "bodies/idle_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_3_right.png",
+          "layers_prefix": "layers/slam/043"
+        },
+        {
+          "tick": 132,
+          "phase": "RESET",
+          "body": "bodies/idle_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_4_right.png",
+          "layers_prefix": "layers/slam/044"
+        },
+        {
+          "tick": 135,
+          "phase": "RESET",
+          "body": "bodies/idle_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_4_right.png",
+          "layers_prefix": "layers/slam/045"
+        }
+      ]
+    },
+    "charge": {
+      "phase_ticks": [
+        56,
+        36,
+        40
+      ],
+      "simulation_hz": 60,
+      "sample_step_ticks": 3,
+      "pause_ticks_requested": 30,
+      "duration_ms": 2700,
+      "frames": [
+        {
+          "tick": 0,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_1_right.png",
+          "layers_prefix": "layers/charge/000"
+        },
+        {
+          "tick": 3,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_1_right.png",
+          "layers_prefix": "layers/charge/001"
+        },
+        {
+          "tick": 6,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_1_right.png",
+          "layers_prefix": "layers/charge/002"
+        },
+        {
+          "tick": 9,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_1_right.png",
+          "layers_prefix": "layers/charge/003"
+        },
+        {
+          "tick": 12,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_2_right.png",
+          "layers_prefix": "layers/charge/004"
+        },
+        {
+          "tick": 15,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_2_right.png",
+          "layers_prefix": "layers/charge/005"
+        },
+        {
+          "tick": 18,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_2_right.png",
+          "layers_prefix": "layers/charge/006"
+        },
+        {
+          "tick": 21,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_2_right.png",
+          "layers_prefix": "layers/charge/007"
+        },
+        {
+          "tick": 24,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_3_right.png",
+          "layers_prefix": "layers/charge/008"
+        },
+        {
+          "tick": 27,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_3_right.png",
+          "layers_prefix": "layers/charge/009"
+        },
+        {
+          "tick": 30,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_3_right.png",
+          "layers_prefix": "layers/charge/010"
+        },
+        {
+          "tick": 33,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_3_right.png",
+          "layers_prefix": "layers/charge/011"
+        },
+        {
+          "tick": 36,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_4_right.png",
+          "layers_prefix": "layers/charge/012"
+        },
+        {
+          "tick": 39,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_4_right.png",
+          "layers_prefix": "layers/charge/013"
+        },
+        {
+          "tick": 42,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_4_right.png",
+          "layers_prefix": "layers/charge/014"
+        },
+        {
+          "tick": 45,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_5_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_5_right.png",
+          "layers_prefix": "layers/charge/015"
+        },
+        {
+          "tick": 48,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_5_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_5_right.png",
+          "layers_prefix": "layers/charge/016"
+        },
+        {
+          "tick": 51,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_5_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_5_right.png",
+          "layers_prefix": "layers/charge/017"
+        },
+        {
+          "tick": 54,
+          "phase": "WINDUP",
+          "body": "bodies/charge_tell_5_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_tell_5_right.png",
+          "layers_prefix": "layers/charge/018"
+        },
+        {
+          "tick": 57,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_1_right.png",
+          "body_at": [
+            68,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_1_right.png",
+          "layers_prefix": "layers/charge/019"
+        },
+        {
+          "tick": 60,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_2_right.png",
+          "body_at": [
+            80,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_2_right.png",
+          "layers_prefix": "layers/charge/020"
+        },
+        {
+          "tick": 63,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_3_right.png",
+          "body_at": [
+            91,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_3_right.png",
+          "layers_prefix": "layers/charge/021"
+        },
+        {
+          "tick": 66,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_4_right.png",
+          "body_at": [
+            103,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_4_right.png",
+          "layers_prefix": "layers/charge/022"
+        },
+        {
+          "tick": 69,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_1_right.png",
+          "body_at": [
+            115,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_1_right.png",
+          "layers_prefix": "layers/charge/023"
+        },
+        {
+          "tick": 72,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_2_right.png",
+          "body_at": [
+            126,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_2_right.png",
+          "layers_prefix": "layers/charge/024"
+        },
+        {
+          "tick": 75,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_3_right.png",
+          "body_at": [
+            138,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_3_right.png",
+          "layers_prefix": "layers/charge/025"
+        },
+        {
+          "tick": 78,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_4_right.png",
+          "body_at": [
+            150,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_4_right.png",
+          "layers_prefix": "layers/charge/026"
+        },
+        {
+          "tick": 81,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_1_right.png",
+          "body_at": [
+            162,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_1_right.png",
+          "layers_prefix": "layers/charge/027"
+        },
+        {
+          "tick": 84,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_2_right.png",
+          "body_at": [
+            173,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_2_right.png",
+          "layers_prefix": "layers/charge/028"
+        },
+        {
+          "tick": 87,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_3_right.png",
+          "body_at": [
+            185,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_3_right.png",
+          "layers_prefix": "layers/charge/029"
+        },
+        {
+          "tick": 90,
+          "phase": "STRIKE",
+          "body": "bodies/charge_run_4_right.png",
+          "body_at": [
+            197,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_run_4_right.png",
+          "layers_prefix": "layers/charge/030"
+        },
+        {
+          "tick": 93,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_1_right.png",
+          "layers_prefix": "layers/charge/031"
+        },
+        {
+          "tick": 96,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_1_right.png",
+          "layers_prefix": "layers/charge/032"
+        },
+        {
+          "tick": 99,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_1_right.png",
+          "layers_prefix": "layers/charge/033"
+        },
+        {
+          "tick": 102,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_1_right.png",
+          "layers_prefix": "layers/charge/034"
+        },
+        {
+          "tick": 105,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_1_right.png",
+          "layers_prefix": "layers/charge/035"
+        },
+        {
+          "tick": 108,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_2_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_2_right.png",
+          "layers_prefix": "layers/charge/036"
+        },
+        {
+          "tick": 111,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_2_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_2_right.png",
+          "layers_prefix": "layers/charge/037"
+        },
+        {
+          "tick": 114,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_2_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_2_right.png",
+          "layers_prefix": "layers/charge/038"
+        },
+        {
+          "tick": 117,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_2_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_2_right.png",
+          "layers_prefix": "layers/charge/039"
+        },
+        {
+          "tick": 120,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_3_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_3_right.png",
+          "layers_prefix": "layers/charge/040"
+        },
+        {
+          "tick": 123,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_3_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_3_right.png",
+          "layers_prefix": "layers/charge/041"
+        },
+        {
+          "tick": 126,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_3_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_3_right.png",
+          "layers_prefix": "layers/charge/042"
+        },
+        {
+          "tick": 129,
+          "phase": "RECOVERY",
+          "body": "bodies/charge_crash_3_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/charge_crash_3_right.png",
+          "layers_prefix": "layers/charge/043"
+        },
+        {
+          "tick": 132,
+          "phase": "RESET",
+          "body": "bodies/idle_4_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_4_right.png",
+          "layers_prefix": "layers/charge/044"
+        },
+        {
+          "tick": 135,
+          "phase": "RESET",
+          "body": "bodies/idle_4_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_4_right.png",
+          "layers_prefix": "layers/charge/045"
+        },
+        {
+          "tick": 138,
+          "phase": "RESET",
+          "body": "bodies/idle_4_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_4_right.png",
+          "layers_prefix": "layers/charge/046"
+        },
+        {
+          "tick": 141,
+          "phase": "RESET",
+          "body": "bodies/idle_4_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_4_right.png",
+          "layers_prefix": "layers/charge/047"
+        },
+        {
+          "tick": 144,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/charge/048"
+        },
+        {
+          "tick": 147,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/charge/049"
+        },
+        {
+          "tick": 150,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/charge/050"
+        },
+        {
+          "tick": 153,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/charge/051"
+        },
+        {
+          "tick": 156,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/charge/052"
+        },
+        {
+          "tick": 159,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            204,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/charge/053"
+        }
+      ]
+    },
+    "roots": {
+      "phase_ticks": [
+        50,
+        5,
+        40
+      ],
+      "simulation_hz": 60,
+      "sample_step_ticks": 3,
+      "pause_ticks_requested": 30,
+      "duration_ms": 2100,
+      "frames": [
+        {
+          "tick": 0,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_1_right.png",
+          "layers_prefix": "layers/roots/000"
+        },
+        {
+          "tick": 3,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_1_right.png",
+          "layers_prefix": "layers/roots/001"
+        },
+        {
+          "tick": 6,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_1_right.png",
+          "layers_prefix": "layers/roots/002"
+        },
+        {
+          "tick": 9,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_2_right.png",
+          "layers_prefix": "layers/roots/003"
+        },
+        {
+          "tick": 12,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_2_right.png",
+          "layers_prefix": "layers/roots/004"
+        },
+        {
+          "tick": 15,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_2_right.png",
+          "layers_prefix": "layers/roots/005"
+        },
+        {
+          "tick": 18,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_3_right.png",
+          "layers_prefix": "layers/roots/006"
+        },
+        {
+          "tick": 21,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_3_right.png",
+          "layers_prefix": "layers/roots/007"
+        },
+        {
+          "tick": 24,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_3_right.png",
+          "layers_prefix": "layers/roots/008"
+        },
+        {
+          "tick": 27,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_4_right.png",
+          "layers_prefix": "layers/roots/009"
+        },
+        {
+          "tick": 30,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_4_right.png",
+          "layers_prefix": "layers/roots/010"
+        },
+        {
+          "tick": 33,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_4_right.png",
+          "layers_prefix": "layers/roots/011"
+        },
+        {
+          "tick": 36,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_5_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_5_right.png",
+          "layers_prefix": "layers/roots/012"
+        },
+        {
+          "tick": 39,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_5_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_5_right.png",
+          "layers_prefix": "layers/roots/013"
+        },
+        {
+          "tick": 42,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_6_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_6_right.png",
+          "layers_prefix": "layers/roots/014"
+        },
+        {
+          "tick": 45,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_6_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_6_right.png",
+          "layers_prefix": "layers/roots/015"
+        },
+        {
+          "tick": 48,
+          "phase": "WINDUP",
+          "body": "bodies/phase2_roar_6_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/phase2_roar_6_right.png",
+          "layers_prefix": "layers/roots/016"
+        },
+        {
+          "tick": 51,
+          "phase": "STRIKE",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/roots/017"
+        },
+        {
+          "tick": 54,
+          "phase": "STRIKE",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/roots/018"
+        },
+        {
+          "tick": 57,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/roots/019"
+        },
+        {
+          "tick": 60,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/roots/020"
+        },
+        {
+          "tick": 63,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_1_right.png",
+          "layers_prefix": "layers/roots/021"
+        },
+        {
+          "tick": 66,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_2_right.png",
+          "layers_prefix": "layers/roots/022"
+        },
+        {
+          "tick": 69,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_2_right.png",
+          "layers_prefix": "layers/roots/023"
+        },
+        {
+          "tick": 72,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_2_right.png",
+          "layers_prefix": "layers/roots/024"
+        },
+        {
+          "tick": 75,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/roots/025"
+        },
+        {
+          "tick": 78,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/roots/026"
+        },
+        {
+          "tick": 81,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/roots/027"
+        },
+        {
+          "tick": 84,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_3_right.png",
+          "layers_prefix": "layers/roots/028"
+        },
+        {
+          "tick": 87,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_4_right.png",
+          "layers_prefix": "layers/roots/029"
+        },
+        {
+          "tick": 90,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_4_right.png",
+          "layers_prefix": "layers/roots/030"
+        },
+        {
+          "tick": 93,
+          "phase": "RECOVERY",
+          "body": "bodies/slam_recover_4_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/slam_recover_4_right.png",
+          "layers_prefix": "layers/roots/031"
+        },
+        {
+          "tick": 96,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/roots/032"
+        },
+        {
+          "tick": 99,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/roots/033"
+        },
+        {
+          "tick": 102,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/roots/034"
+        },
+        {
+          "tick": 105,
+          "phase": "RESET",
+          "body": "bodies/idle_1_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_1_right.png",
+          "layers_prefix": "layers/roots/035"
+        },
+        {
+          "tick": 108,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/roots/036"
+        },
+        {
+          "tick": 111,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/roots/037"
+        },
+        {
+          "tick": 114,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/roots/038"
+        },
+        {
+          "tick": 117,
+          "phase": "RESET",
+          "body": "bodies/idle_2_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_2_right.png",
+          "layers_prefix": "layers/roots/039"
+        },
+        {
+          "tick": 120,
+          "phase": "RESET",
+          "body": "bodies/idle_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_3_right.png",
+          "layers_prefix": "layers/roots/040"
+        },
+        {
+          "tick": 123,
+          "phase": "RESET",
+          "body": "bodies/idle_3_right.png",
+          "body_at": [
+            64,
+            106
+          ],
+          "horn_mask": "horn_masks/idle_3_right.png",
+          "layers_prefix": "layers/roots/041"
+        }
+      ]
+    }
+  }
+}

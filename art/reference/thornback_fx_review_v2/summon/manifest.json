@@ -1,0 +1,1696 @@
+{
+  "review_only": true,
+  "new_attack": "chanting antler glow -> exactly five Glowmoths",
+  "gameplay_rules_not_implemented": true,
+  "frame_ms": 50,
+  "duration_ms": 8000,
+  "stag_anchor": [
+    36,
+    62
+  ],
+  "antler_fx_anchor": [
+    52,
+    78
+  ],
+  "moth_anchor": [
+    16,
+    29
+  ],
+  "spawn_positions_preview_only": [
+    [
+      37,
+      108
+    ],
+    [
+      61,
+      67
+    ],
+    [
+      135,
+      60
+    ],
+    [
+      192,
+      97
+    ],
+    [
+      171,
+      143
+    ]
+  ],
+  "moth_approval": "Owner: i approved on th glowmoth",
+  "moth_files_sha256": {
+    "glowmoth_idle_right_1.png": "4a124a056608c0602e52b86b85f6210ed61203a0b5b3b0cabeca9d54e31c5a35",
+    "glowmoth_idle_right_10.png": "304264560bfd61785bb2db200c0efb5ce0d86a5e901677466967296aab5d38ae",
+    "glowmoth_idle_right_11.png": "9b0ace7cb9008fecfa87b80084da3f0c056ae9d47c4e1f966d2408ed4836c49a",
+    "glowmoth_idle_right_12.png": "e54e3f14f033b9f3d36018dc8c1f78d5445750ff3966ada5966ae493146ce03e",
+    "glowmoth_idle_right_13.png": "94da8d5c0365ed885d9f42d6320db496f7c19104b531d4a1653bfea5b282bb21",
+    "glowmoth_idle_right_14.png": "eeb08e337a7065fa4a77285df5ff5301905f87177404917cbcd60925d7f9dd78",
+    "glowmoth_idle_right_15.png": "f812bf536dbf9fdeba7ada6272ad65b1374bafa4b61a7acf889a7883e5675876",
+    "glowmoth_idle_right_16.png": "5c2e4296edcce02767958e9203f5173d3db467b8eb05674629fb96b8dfb576bd",
+    "glowmoth_idle_right_17.png": "afe061e76af0272a09acd75fee1916f997e3cd56580d6ae52e3f35c77ce99319",
+    "glowmoth_idle_right_18.png": "e5af59e528f4035045bb45138ee567733c0492c5372c6d7e0a4887b1479b96c8",
+    "glowmoth_idle_right_19.png": "6a1ef6324cd5d11c53ad2438d92336796bce5ba16a031ebd2079ddaff2c8580d",
+    "glowmoth_idle_right_2.png": "c4c4db8db7a863d93a5a933c30d7a37b41784fa7f3d8fe12785bb190e287afc7",
+    "glowmoth_idle_right_20.png": "f533d85f6d352ce81af08b67e1cff66d39b15299f7a71b9572093614cb3bf5bc",
+    "glowmoth_idle_right_21.png": "9ca1894c72e860336bae013a1816da76ab8df3374f6cba2afe4a0c9149ee1c7c",
+    "glowmoth_idle_right_22.png": "daa318805205cbac5df759586769b9f070b81ba4177a1206c3f27baf109cd309",
+    "glowmoth_idle_right_23.png": "3e0feabda05020c480350f2c0c04403d64687679f05a783fc62e517555753c81",
+    "glowmoth_idle_right_24.png": "f96df8469f61de88ae0c3ea89a131f0745737587eb06a406875458060de27bb3",
+    "glowmoth_idle_right_3.png": "8b18436239368bcfd43f9a78ede66415e82ad6c408b9fe2d2c5bebe258eb9a3b",
+    "glowmoth_idle_right_4.png": "685715283e77941594bffa15dfa949bde00bc900d2e50967f49cbf38a8ad7943",
+    "glowmoth_idle_right_5.png": "037a6c7df9f274c9639a247ef5e551e22f9eb2389d2d265459859d588fa051ca",
+    "glowmoth_idle_right_6.png": "12017281458b8c746805ec51a1fa662a62c9bc7758ef9eaf4b8d8b9ad9067a27",
+    "glowmoth_idle_right_7.png": "143bfd2b5614004e8c6b5effeb4d20ab1c54c89dd9beaeb269f6097c4f437b65",
+    "glowmoth_idle_right_8.png": "4c5fd37196f0fb9d122175ced659a33cd86ad92b6e7c4d6914bb94a6b00848c6",
+    "glowmoth_idle_right_9.png": "6426e2d820a64cc6deb06bcce3f8c9c3ec7aa5063eb88a091f87763c90a624f5"
+  },
+  "timeline": [
+    {
+      "frame": 0,
+      "time_ms": 0,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.26,
+        74.36
+      ]
+    },
+    {
+      "frame": 1,
+      "time_ms": 50,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.27,
+        74.47
+      ]
+    },
+    {
+      "frame": 2,
+      "time_ms": 100,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.34,
+        74.65
+      ]
+    },
+    {
+      "frame": 3,
+      "time_ms": 150,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.41,
+        74.7
+      ]
+    },
+    {
+      "frame": 4,
+      "time_ms": 200,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.53,
+        74.74
+      ]
+    },
+    {
+      "frame": 5,
+      "time_ms": 250,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.47,
+        74.63
+      ]
+    },
+    {
+      "frame": 6,
+      "time_ms": 300,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.54,
+        74.59
+      ]
+    },
+    {
+      "frame": 7,
+      "time_ms": 350,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.63,
+        74.69
+      ]
+    },
+    {
+      "frame": 8,
+      "time_ms": 400,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.61,
+        74.86
+      ]
+    },
+    {
+      "frame": 9,
+      "time_ms": 450,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.68,
+        74.94
+      ]
+    },
+    {
+      "frame": 10,
+      "time_ms": 500,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.68,
+        74.94
+      ]
+    },
+    {
+      "frame": 11,
+      "time_ms": 550,
+      "phase": "IDLE",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.68,
+        74.94
+      ]
+    },
+    {
+      "frame": 12,
+      "time_ms": 600,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        108.46,
+        75.74
+      ]
+    },
+    {
+      "frame": 13,
+      "time_ms": 650,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        107.54,
+        75.51
+      ]
+    },
+    {
+      "frame": 14,
+      "time_ms": 700,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        107.52,
+        75.57
+      ]
+    },
+    {
+      "frame": 15,
+      "time_ms": 750,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        106.68,
+        75.79
+      ]
+    },
+    {
+      "frame": 16,
+      "time_ms": 800,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        106.72,
+        76.25
+      ]
+    },
+    {
+      "frame": 17,
+      "time_ms": 850,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        106.26,
+        75.95
+      ]
+    },
+    {
+      "frame": 18,
+      "time_ms": 900,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        105.38,
+        76.01
+      ]
+    },
+    {
+      "frame": 19,
+      "time_ms": 950,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        104.82,
+        75.62
+      ]
+    },
+    {
+      "frame": 20,
+      "time_ms": 1000,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        105.26,
+        75.77
+      ]
+    },
+    {
+      "frame": 21,
+      "time_ms": 1050,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        104.99,
+        75.88
+      ]
+    },
+    {
+      "frame": 22,
+      "time_ms": 1100,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        104.27,
+        76.18
+      ]
+    },
+    {
+      "frame": 23,
+      "time_ms": 1150,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        104.01,
+        76.44
+      ]
+    },
+    {
+      "frame": 24,
+      "time_ms": 1200,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        103.51,
+        76.18
+      ]
+    },
+    {
+      "frame": 25,
+      "time_ms": 1250,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        103.42,
+        76.24
+      ]
+    },
+    {
+      "frame": 26,
+      "time_ms": 1300,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        102.96,
+        76.79
+      ]
+    },
+    {
+      "frame": 27,
+      "time_ms": 1350,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        102.51,
+        76.3
+      ]
+    },
+    {
+      "frame": 28,
+      "time_ms": 1400,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        102.36,
+        76.65
+      ]
+    },
+    {
+      "frame": 29,
+      "time_ms": 1450,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        101.77,
+        76.93
+      ]
+    },
+    {
+      "frame": 30,
+      "time_ms": 1500,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        101.45,
+        77.19
+      ]
+    },
+    {
+      "frame": 31,
+      "time_ms": 1550,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        101.22,
+        77.14
+      ]
+    },
+    {
+      "frame": 32,
+      "time_ms": 1600,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        100.99,
+        77.31
+      ]
+    },
+    {
+      "frame": 33,
+      "time_ms": 1650,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        100.54,
+        77.7
+      ]
+    },
+    {
+      "frame": 34,
+      "time_ms": 1700,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        100.32,
+        77.92
+      ]
+    },
+    {
+      "frame": 35,
+      "time_ms": 1750,
+      "phase": "CHANT / HORNS BRIGHTEN",
+      "moths_visible": 0,
+      "antler_origin": [
+        100.31,
+        78.64
+      ]
+    },
+    {
+      "frame": 36,
+      "time_ms": 1800,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.92,
+        79.67
+      ]
+    },
+    {
+      "frame": 37,
+      "time_ms": 1850,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.26,
+        79.66
+      ]
+    },
+    {
+      "frame": 38,
+      "time_ms": 1900,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.57,
+        79.77
+      ]
+    },
+    {
+      "frame": 39,
+      "time_ms": 1950,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.77,
+        79.77
+      ]
+    },
+    {
+      "frame": 40,
+      "time_ms": 2000,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.91,
+        79.82
+      ]
+    },
+    {
+      "frame": 41,
+      "time_ms": 2050,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.69,
+        79.66
+      ]
+    },
+    {
+      "frame": 42,
+      "time_ms": 2100,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.63,
+        79.94
+      ]
+    },
+    {
+      "frame": 43,
+      "time_ms": 2150,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.53,
+        79.82
+      ]
+    },
+    {
+      "frame": 44,
+      "time_ms": 2200,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.45,
+        79.98
+      ]
+    },
+    {
+      "frame": 45,
+      "time_ms": 2250,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.12,
+        80.22
+      ]
+    },
+    {
+      "frame": 46,
+      "time_ms": 2300,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.25,
+        80.59
+      ]
+    },
+    {
+      "frame": 47,
+      "time_ms": 2350,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.24,
+        80.65
+      ]
+    },
+    {
+      "frame": 48,
+      "time_ms": 2400,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.3,
+        80.64
+      ]
+    },
+    {
+      "frame": 49,
+      "time_ms": 2450,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.3,
+        80.38
+      ]
+    },
+    {
+      "frame": 50,
+      "time_ms": 2500,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.5,
+        80.26
+      ]
+    },
+    {
+      "frame": 51,
+      "time_ms": 2550,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.67,
+        80.25
+      ]
+    },
+    {
+      "frame": 52,
+      "time_ms": 2600,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.68,
+        80.15
+      ]
+    },
+    {
+      "frame": 53,
+      "time_ms": 2650,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.81,
+        80.24
+      ]
+    },
+    {
+      "frame": 54,
+      "time_ms": 2700,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.81,
+        80.24
+      ]
+    },
+    {
+      "frame": 55,
+      "time_ms": 2750,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.62,
+        80.08
+      ]
+    },
+    {
+      "frame": 56,
+      "time_ms": 2800,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.5,
+        80.07
+      ]
+    },
+    {
+      "frame": 57,
+      "time_ms": 2850,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.41,
+        80.13
+      ]
+    },
+    {
+      "frame": 58,
+      "time_ms": 2900,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.2,
+        80.4
+      ]
+    },
+    {
+      "frame": 59,
+      "time_ms": 2950,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.24,
+        80.56
+      ]
+    },
+    {
+      "frame": 60,
+      "time_ms": 3000,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.27,
+        80.62
+      ]
+    },
+    {
+      "frame": 61,
+      "time_ms": 3050,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.13,
+        80.45
+      ]
+    },
+    {
+      "frame": 62,
+      "time_ms": 3100,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.37,
+        79.99
+      ]
+    },
+    {
+      "frame": 63,
+      "time_ms": 3150,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.48,
+        79.82
+      ]
+    },
+    {
+      "frame": 64,
+      "time_ms": 3200,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.71,
+        79.87
+      ]
+    },
+    {
+      "frame": 65,
+      "time_ms": 3250,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.92,
+        79.91
+      ]
+    },
+    {
+      "frame": 66,
+      "time_ms": 3300,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.82,
+        79.73
+      ]
+    },
+    {
+      "frame": 67,
+      "time_ms": 3350,
+      "phase": "CHANT / ANTLER MAGIC BUILDS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.87,
+        79.8
+      ]
+    },
+    {
+      "frame": 68,
+      "time_ms": 3400,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        99.04,
+        80.41
+      ]
+    },
+    {
+      "frame": 69,
+      "time_ms": 3450,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.92,
+        80.3
+      ]
+    },
+    {
+      "frame": 70,
+      "time_ms": 3500,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.74,
+        80.13
+      ]
+    },
+    {
+      "frame": 71,
+      "time_ms": 3550,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.55,
+        80.35
+      ]
+    },
+    {
+      "frame": 72,
+      "time_ms": 3600,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.17,
+        80.67
+      ]
+    },
+    {
+      "frame": 73,
+      "time_ms": 3650,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.25,
+        80.69
+      ]
+    },
+    {
+      "frame": 74,
+      "time_ms": 3700,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.17,
+        80.66
+      ]
+    },
+    {
+      "frame": 75,
+      "time_ms": 3750,
+      "phase": "SUMMON / 0 OF 5 GLOWMOTHS",
+      "moths_visible": 0,
+      "antler_origin": [
+        98.17,
+        80.66
+      ]
+    },
+    {
+      "frame": 76,
+      "time_ms": 3800,
+      "phase": "SUMMON / 1 OF 5 GLOWMOTHS",
+      "moths_visible": 1,
+      "antler_origin": [
+        98.18,
+        80.61
+      ]
+    },
+    {
+      "frame": 77,
+      "time_ms": 3850,
+      "phase": "SUMMON / 1 OF 5 GLOWMOTHS",
+      "moths_visible": 1,
+      "antler_origin": [
+        98.15,
+        80.65
+      ]
+    },
+    {
+      "frame": 78,
+      "time_ms": 3900,
+      "phase": "SUMMON / 2 OF 5 GLOWMOTHS",
+      "moths_visible": 2,
+      "antler_origin": [
+        98.27,
+        80.5
+      ]
+    },
+    {
+      "frame": 79,
+      "time_ms": 3950,
+      "phase": "SUMMON / 2 OF 5 GLOWMOTHS",
+      "moths_visible": 2,
+      "antler_origin": [
+        98.84,
+        80.23
+      ]
+    },
+    {
+      "frame": 80,
+      "time_ms": 4000,
+      "phase": "SUMMON / 3 OF 5 GLOWMOTHS",
+      "moths_visible": 3,
+      "antler_origin": [
+        98.93,
+        80.37
+      ]
+    },
+    {
+      "frame": 81,
+      "time_ms": 4050,
+      "phase": "SUMMON / 3 OF 5 GLOWMOTHS",
+      "moths_visible": 3,
+      "antler_origin": [
+        99.11,
+        80.49
+      ]
+    },
+    {
+      "frame": 82,
+      "time_ms": 4100,
+      "phase": "SUMMON / 4 OF 5 GLOWMOTHS",
+      "moths_visible": 4,
+      "antler_origin": [
+        99.34,
+        80.63
+      ]
+    },
+    {
+      "frame": 83,
+      "time_ms": 4150,
+      "phase": "SUMMON / 4 OF 5 GLOWMOTHS",
+      "moths_visible": 4,
+      "antler_origin": [
+        99.49,
+        80.72
+      ]
+    },
+    {
+      "frame": 84,
+      "time_ms": 4200,
+      "phase": "SUMMON / 5 OF 5 GLOWMOTHS",
+      "moths_visible": 5,
+      "antler_origin": [
+        99.15,
+        80.54
+      ]
+    },
+    {
+      "frame": 85,
+      "time_ms": 4250,
+      "phase": "SUMMON / 5 OF 5 GLOWMOTHS",
+      "moths_visible": 5,
+      "antler_origin": [
+        99.15,
+        80.58
+      ]
+    },
+    {
+      "frame": 86,
+      "time_ms": 4300,
+      "phase": "SUMMON / 5 OF 5 GLOWMOTHS",
+      "moths_visible": 5,
+      "antler_origin": [
+        98.77,
+        80.54
+      ]
+    },
+    {
+      "frame": 87,
+      "time_ms": 4350,
+      "phase": "SUMMON / 5 OF 5 GLOWMOTHS",
+      "moths_visible": 5,
+      "antler_origin": [
+        98.91,
+        81.05
+      ]
+    },
+    {
+      "frame": 88,
+      "time_ms": 4400,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        98.93,
+        80.9
+      ]
+    },
+    {
+      "frame": 89,
+      "time_ms": 4450,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        99.09,
+        80.56
+      ]
+    },
+    {
+      "frame": 90,
+      "time_ms": 4500,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        99.41,
+        80.28
+      ]
+    },
+    {
+      "frame": 91,
+      "time_ms": 4550,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        99.77,
+        79.97
+      ]
+    },
+    {
+      "frame": 92,
+      "time_ms": 4600,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        100.23,
+        79.81
+      ]
+    },
+    {
+      "frame": 93,
+      "time_ms": 4650,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        100.63,
+        79.27
+      ]
+    },
+    {
+      "frame": 94,
+      "time_ms": 4700,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        101.27,
+        79.38
+      ]
+    },
+    {
+      "frame": 95,
+      "time_ms": 4750,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        101.37,
+        78.72
+      ]
+    },
+    {
+      "frame": 96,
+      "time_ms": 4800,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        102.0,
+        78.42
+      ]
+    },
+    {
+      "frame": 97,
+      "time_ms": 4850,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        102.21,
+        78.22
+      ]
+    },
+    {
+      "frame": 98,
+      "time_ms": 4900,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        102.94,
+        78.02
+      ]
+    },
+    {
+      "frame": 99,
+      "time_ms": 4950,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        103.56,
+        76.42
+      ]
+    },
+    {
+      "frame": 100,
+      "time_ms": 5000,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        103.95,
+        76.19
+      ]
+    },
+    {
+      "frame": 101,
+      "time_ms": 5050,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        104.9,
+        75.64
+      ]
+    },
+    {
+      "frame": 102,
+      "time_ms": 5100,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        105.01,
+        75.72
+      ]
+    },
+    {
+      "frame": 103,
+      "time_ms": 5150,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        105.62,
+        75.57
+      ]
+    },
+    {
+      "frame": 104,
+      "time_ms": 5200,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        106.72,
+        76.15
+      ]
+    },
+    {
+      "frame": 105,
+      "time_ms": 5250,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.1,
+        75.93
+      ]
+    },
+    {
+      "frame": 106,
+      "time_ms": 5300,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.71,
+        75.84
+      ]
+    },
+    {
+      "frame": 107,
+      "time_ms": 5350,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.82,
+        75.4
+      ]
+    },
+    {
+      "frame": 108,
+      "time_ms": 5400,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.82,
+        75.31
+      ]
+    },
+    {
+      "frame": 109,
+      "time_ms": 5450,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.81,
+        75.32
+      ]
+    },
+    {
+      "frame": 110,
+      "time_ms": 5500,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.77,
+        75.15
+      ]
+    },
+    {
+      "frame": 111,
+      "time_ms": 5550,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.64,
+        75.06
+      ]
+    },
+    {
+      "frame": 112,
+      "time_ms": 5600,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.66,
+        75.09
+      ]
+    },
+    {
+      "frame": 113,
+      "time_ms": 5650,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.6,
+        75.02
+      ]
+    },
+    {
+      "frame": 114,
+      "time_ms": 5700,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.84,
+        75.11
+      ]
+    },
+    {
+      "frame": 115,
+      "time_ms": 5750,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.84,
+        75.11
+      ]
+    },
+    {
+      "frame": 116,
+      "time_ms": 5800,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.84,
+        75.11
+      ]
+    },
+    {
+      "frame": 117,
+      "time_ms": 5850,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.66,
+        75.05
+      ]
+    },
+    {
+      "frame": 118,
+      "time_ms": 5900,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.6,
+        75.06
+      ]
+    },
+    {
+      "frame": 119,
+      "time_ms": 5950,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.66,
+        75.09
+      ]
+    },
+    {
+      "frame": 120,
+      "time_ms": 6000,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.71,
+        75.08
+      ]
+    },
+    {
+      "frame": 121,
+      "time_ms": 6050,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.75,
+        75.2
+      ]
+    },
+    {
+      "frame": 122,
+      "time_ms": 6100,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.8,
+        75.31
+      ]
+    },
+    {
+      "frame": 123,
+      "time_ms": 6150,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.82,
+        75.33
+      ]
+    },
+    {
+      "frame": 124,
+      "time_ms": 6200,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.75,
+        75.52
+      ]
+    },
+    {
+      "frame": 125,
+      "time_ms": 6250,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.82,
+        75.94
+      ]
+    },
+    {
+      "frame": 126,
+      "time_ms": 6300,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.72,
+        75.67
+      ]
+    },
+    {
+      "frame": 127,
+      "time_ms": 6350,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.72,
+        75.68
+      ]
+    },
+    {
+      "frame": 128,
+      "time_ms": 6400,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.83,
+        75.47
+      ]
+    },
+    {
+      "frame": 129,
+      "time_ms": 6450,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.66,
+        75.51
+      ]
+    },
+    {
+      "frame": 130,
+      "time_ms": 6500,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.63,
+        75.35
+      ]
+    },
+    {
+      "frame": 131,
+      "time_ms": 6550,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.63,
+        75.35
+      ]
+    },
+    {
+      "frame": 132,
+      "time_ms": 6600,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 133,
+      "time_ms": 6650,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 134,
+      "time_ms": 6700,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 135,
+      "time_ms": 6750,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 136,
+      "time_ms": 6800,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.47,
+        75.22
+      ]
+    },
+    {
+      "frame": 137,
+      "time_ms": 6850,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 138,
+      "time_ms": 6900,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 139,
+      "time_ms": 6950,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 140,
+      "time_ms": 7000,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.53,
+        75.26
+      ]
+    },
+    {
+      "frame": 141,
+      "time_ms": 7050,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.57,
+        75.27
+      ]
+    },
+    {
+      "frame": 142,
+      "time_ms": 7100,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.63,
+        75.35
+      ]
+    },
+    {
+      "frame": 143,
+      "time_ms": 7150,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.63,
+        75.42
+      ]
+    },
+    {
+      "frame": 144,
+      "time_ms": 7200,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.65,
+        75.53
+      ]
+    },
+    {
+      "frame": 145,
+      "time_ms": 7250,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.72,
+        75.68
+      ]
+    },
+    {
+      "frame": 146,
+      "time_ms": 7300,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.77,
+        75.82
+      ]
+    },
+    {
+      "frame": 147,
+      "time_ms": 7350,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.84,
+        75.86
+      ]
+    },
+    {
+      "frame": 148,
+      "time_ms": 7400,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.71,
+        75.75
+      ]
+    },
+    {
+      "frame": 149,
+      "time_ms": 7450,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.82,
+        75.4
+      ]
+    },
+    {
+      "frame": 150,
+      "time_ms": 7500,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.82,
+        75.31
+      ]
+    },
+    {
+      "frame": 151,
+      "time_ms": 7550,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.8,
+        75.31
+      ]
+    },
+    {
+      "frame": 152,
+      "time_ms": 7600,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.69,
+        75.06
+      ]
+    },
+    {
+      "frame": 153,
+      "time_ms": 7650,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.66,
+        75.09
+      ]
+    },
+    {
+      "frame": 154,
+      "time_ms": 7700,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.66,
+        75.09
+      ]
+    },
+    {
+      "frame": 155,
+      "time_ms": 7750,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.6,
+        75.02
+      ]
+    },
+    {
+      "frame": 156,
+      "time_ms": 7800,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.84,
+        75.11
+      ]
+    },
+    {
+      "frame": 157,
+      "time_ms": 7850,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.84,
+        75.11
+      ]
+    },
+    {
+      "frame": 158,
+      "time_ms": 7900,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.84,
+        75.11
+      ]
+    },
+    {
+      "frame": 159,
+      "time_ms": 7950,
+      "phase": "FIVE GLOWMOTHS / RELEASE COMPLETE",
+      "moths_visible": 5,
+      "antler_origin": [
+        107.66,
+        75.05
+      ]
+    }
+  ],
+  "summon_fx_anchor": [
+    100,
+    118
+  ],
+  "spawn_offsets_preview_only": [
+    [
+      -63,
+      -10
+    ],
+    [
+      -39,
+      -51
+    ],
+    [
+      35,
+      -58
+    ],
+    [
+      92,
+      -21
+    ],
+    [
+      71,
+      25
+    ]
+  ]
+}

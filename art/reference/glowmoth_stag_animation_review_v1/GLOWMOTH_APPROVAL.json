@@ -1,0 +1,11 @@
+{
+  "approved": "Glowmoth visual design: idle, movement and charged-orb attack",
+  "owner_statement": "i approved on th glowmoth",
+  "date": "2026-10-30",
+  "runtime_integration": false,
+  "files_sha256": {
+    "glowmoth_idle.gif": "014253aecf3147b86f2b3f16aadacba0e607d292834609dacec5a0e760d90652",
+    "glowmoth_move.gif": "d7646128918f500f3efa5010dcac4950f90128fb17d19e454e0588b0c9584f13",
+    "glowmoth_attack.gif": "0e937ae0e17a8b04741adcd2839184ce82918d5b5047059469cdd77172f84bad"
+  }
+}

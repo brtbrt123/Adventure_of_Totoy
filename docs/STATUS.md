@@ -1,3 +1,486 @@
+## Village scene cleanup: no auto-walk, no knock, blue stone glow (2026-11-03, Claude, done while Codex is out)
+
+Owner (first words): "I report visual errors, you fix functional bugs, and you show me a picture before changing how anything looks." Asked for: the rune gate moved up-left, walls and fences, a glowing stone, the knock on Edda's hut removed, "remove the hero auto walking when the game start in village". Of the old uncommitted village work the owner kept only the knock removal; then asked for generated wall/fence art (Higgsfield nano_banana_2_1, about 5 credits; sources in art/reference/village_wall_fence_v1/), saw it wired, disliked it ("just remove the wall and gate we dont use it anymore"), and left the objective text "Speak to Mira by the gate." as it is.
+
+- **Removed:** the scripted arrival walk (`intro_arrival_ticks` setup in presentation/explore/explore_scene.gd; the controls card now opens on arrival); Edda's `edda_door` knock object; the gate, both walls and the fence from `data/scenes/village_layered_props.json` (arrival and checkpoint are back at (74,146)).
+- **Kept, unused:** the wall and fence art, types and scenes (`village_wall`, `village_fence`: art/src, prop_defs, prop_art, shadow manifest, presentation/props, `tools/art/make_village_walls.py`, cut-outs from `tools/art/extract_props.py`). The gate type is also still there. Place them in the scene data to use them.
+- **Stone glow:** the village standing stone has a blue light (`village_standing_stone` in presentation/common/local_lights.json, halo 35, energy 1.35, pool 48 / 0.7, colour 0.36/0.64/1.0). Cause of "not glowing": the village scene did not use per-light colours, so every light got the default warm colour; `village_layered` is now in the `mixed_lights` list in presentation/common/environment_light.gd. The lamp and forge looked unchanged in captures.
+- **Tests:** deleted the gate-passage core test, dropped the "gate is placed" check, objects now 2 (chest, dummy), the intro smoke checks that the hero does not walk. Core 576 passed, Python 94 passed, `smoke_intro_cutscene` OK, real-input playthrough with no script errors. NOT run: the full smoke harness.
+- **Captures:** presentation/review/village_mock/ (village_wired_v1/v2, village_no_gate, village_stone_glow_blue).
+- **Mistakes:** a scratch playthrough of mine showed a boot icon, a dagger and dark capsules that the owner then fixed themselves; I never found what drew them. I also first generated the wall diagonally, which would not have lined up with the gate.
+- **Not done:** the objective text still mentions the gate; the owner's own scene edits (intro, dialogue_box, explore_overlay, aspect_socket, scene_ribbon, welcome_card, result_panel, project.godot) were not touched or committed.
+
+## Project skills for sessions (2026-11-03, Claude)
+
+Owner: "install the game dev skill ... pick the skill that will be compatible and useful"; no catalog skill was found, and the web ones (godot-gdscript-patterns and others) were not read or installed. Instead three project skills were written in `.claude/skills/`, so every session in this repo has them:
+- `totoy-art-pipeline`: validate, build, preview, Godot import, the file-lock and stale-texture gotchas, the prop checklist, the "show a picture first" rule, the image-generator accounts.
+- `totoy-review-capture`: windowed captures, real-input playthrough, GIFs, finding which layer draws a visual bug.
+- `totoy-session-close`: what to write into STATUS, INDEX, HANDOFF, commit only own hunks, push, no force, no trailers.
+RTK (rtk-ai/rtk) was judged but not installed: a filter between the agent and the shell could hide an error line. Not done: reading and deciding on a Godot patterns skill.
+
+## Debugging from the first scene: the white haze at the top (2026-11-02, Claude, done while Codex is out)
+
+Owner: "lets start debugging starting to the first scene", then "whats this like the white" (a haze beside the objective bar).
+
+- **The start runs clean.** presentation/review/playthrough/capture_start.gd plays it from the main scene with real input events in real time: the title, NEW GAME, the intro (each panel, then a skip), the village arrival, walking about, talking to Mira. It uses a throwaway save (user://playthrough_save.json), so the owner's save is untouched. The console shows no errors or warnings.
+- **The haze.** Each weapon cut-in draws one "invisible" warm-up pass (alpha 0.01) when the scene loads, to load its textures and fonts. That pass was never cleared, so its title strings stayed on screen until the cut-in first played.
+  - Four cut-ins (Black Form, Lightning Form, Reaper's Coil, Disintegration) stack dozens of these faint passes. Together they showed as a white haze across the top of the road and the fight.
+  - Found by hiding the HUD's nodes one at a time on a frozen frame.
+  - Fix: each cut-in redraws on the next frame, which clears the warm-up (presentation/arena/*_cutin.gd). Checked on the arrival frame: the haze is gone.
+- **Tests:** Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window, as before.
+
+## Hero effects in the staff's style, phase 4: the mobs' attacks (2026-11-02, Claude, done while Codex is out)
+
+Owner: "Yes, start phase 4" (the mobs' attacks, not the golem). This ends the effects redo the owner asked for ("redo all effects, aspects, attacks of mobs and hero except the golem").
+
+- **Frames.** tools/art/make_mob_fx_art.py redraws 35 chapter 1 frames with the staff's code, at the same names, counts, sizes and anchors. Flat dithered dust and specks become solid shaded puffs, clods, stones, leaves, glowing motes and rings:
+  - the boar's crash and dust;
+  - the leaf puff;
+  - the moth trail;
+  - the purify sparkle;
+  - the stag's slam rubble;
+  - the orb pop.
+- **Kept art.** These keep their art:
+  - The Warden's attached effects are pinned pixel for pixel to its reviewed reference (tests/test_warden_art.py).
+  - The root spikes, the glowing orb and the stag's chant, horns and summon already read well.
+- **Live layer.** presentation/explore/mob_fx_view.gd, owned by creature_effects.gd, takes the same bursts the creature effects emit and adds:
+  - stones thrown up that bounce, and dust rings;
+  - rings on the ground for the stag's slam and roar and the Warden's stagger and fall;
+  - stone chips and sparks off the Warden's guard;
+  - motes and sparks for chants, releases, heals and orb pops;
+  - light for the road's lamps, and a shake for the heavy blows.
+  - The Warden's fall now says it is the Warden's (warden_effects.gd), so it lands heavier than a boar's crash.
+- **Review files:** the in-game GIFs are art/reference/mob_fx_v1/ingame/:
+  - trial_waves: mosslings and boars;
+  - warden: its blows and its fall;
+  - stag: in its glade.
+  - They were captured by presentation/review/hero_fx/capture_mobs.gd (window only; one scene per run, `-- --part=stag` for the glade). All frames are on art/reference/mob_fx_v1/frames.png.
+- **Tests:**
+  - Python 94 pass, the Warden art test included.
+  - Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+- **Mistake, fixed:** writing the new layer, I first named it presentation/explore/mob_view.gd and overwrote the existing file of that name (the mobs' poses). It was committed and unchanged, so it is restored from git, and the new layer is mob_fx_view.gd.
+- **Not done:** nobody has played phases 1 to 4.
+
+## Hero effects in the staff's style, phase 3: the aspects (2026-11-02, Claude, done while Codex is out)
+
+Owner: "Yes, start phase 3" (the aspects).
+
+- **Frames.** tools/art/make_aspect_fx_art.py redraws 139 frames with the staff's code: the faint dotted outlines become solid glowing shapes, at the same names, counts, sizes and anchors.
+  - Phantom Cut: start, end, marker, spark.
+  - Echo Step: vanish and arrive columns, the shell, dust, the recall trail.
+  - Spirit Lantern: its pool (idle, opening, pulse), motes, spark.
+  - Sprint: start, end, speed lines, wind, dust.
+  - Stone Ward: the shield (barrier, absorb, holding 1-3 blows), block, glowing cracks, the shockwave with stones.
+- **Kept art.** The lantern itself, the stone slabs, the echo's silhouettes, the Phantom ghosts and arcs, the per-pose glow outlines and the three skill strikes keep their art.
+- **Live layer.** presentation/common/aspect_view.gd adds motes, sparks, dust, rings and light for:
+  - Spirit Lantern: the pool lights the road while it burns; motes and a flash at each pulse.
+  - Phantom Cut: lilac motes and light while it runs; sparks where echoes land.
+  - Echo Step: placing, the recall streak, fading.
+  - Stone Ward: rising, blocking, and the release, which throws stones, dust and a big light.
+  - Sprint: dust and wind while running.
+  - Breaking Edge, Gale Cut and Moon Cleave: their particles.
+- **Review files:** the in-game GIFs are art/reference/aspect_fx_v1/ingame/ (one per aspect), captured by presentation/review/hero_fx/capture_aspects.gd (window only). That capture refills Edge and opens Breaking Edge's parry window by hand. All frames are on art/reference/aspect_fx_v1/frames.png.
+- **Tests:**
+  - The aspects, road-aspects, Ward/Echo/Sprint and effects smokes pass.
+  - Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+- **Not done:**
+  - Next: phase 4, the mobs' attacks (not the golem).
+  - Nobody has played it.
+
+## Hero effects in the staff's style, phase 2: the weapon forms (2026-11-02, Claude, done while Codex is out)
+
+Owner: "Yes, start phase 2" (the weapon skills and forms).
+
+- **Frames.** tools/art/make_form_fx_art.py redraws 148 frames with the staff's code (tools/art/staff_fx.py), at the same names, counts, sizes and anchors:
+  - Black Katana form: hollow black fire, swaying tongues with violet rims and a see-through core, so his dark silhouette still shows inside it.
+  - Lightning Form: crackling arcs on him and at his feet, the afterimage, the blink flash, forked sparks, the cut in 8 directions, the chain tiles, the scorch and the sky strike.
+  - Reaper's Coil: the spin crescent round him, the thrown scythe, chain links with a running glint, the hook's bite, the stagger burst, dizzy stars, dust, drag marks and speed lines.
+- **Live layer.** presentation/common/form_view.gd adds:
+  - Black Form: embers, dark wisps, a pulsing violet ring and a violet light; a burst of black fire when it starts, smoke when it ends.
+  - Lightning Form: crackling sparks and a flickering light; sparks and motes along each blink; for the sky strike, sparks, shards, smoke, a ground ring and a big flash of light.
+  - Reaper's Coil: sparks at the bite, dust, sparks on the dragged target, spin dust and a teal light.
+  - It lights the road's lamps, and replaces the old pixel bursts.
+- **The Black Form's slash** is now the hit-area crescent in black fire (swing_arc.gd), like the other blades. The detached side-view slash is no longer drawn.
+- **Review files:** the in-game GIFs are art/reference/form_fx_v1/ingame/ (black_katana, dual_dagger, chain_scythe), captured by presentation/review/hero_fx/capture_forms.gd (window only). All frames are on art/reference/form_fx_v1/frames.png.
+- **Tests:**
+  - The buff, dagger and scythe smokes check the black crescent instead of the detached slash.
+  - Core 577 pass. Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+- **Contact sheets:** 20 pages now. The 40 old trail frames are gone, so the 21st page is removed.
+- **Not done:**
+  - fx_black_slash, fx_chain_whip and fx_scythe_arc_* are no longer drawn and are left as they are.
+  - Next: phase 3, the aspects; then phase 4, the mobs' attacks (not the golem).
+  - Nobody has played it.
+
+## Mobile blueprint (2026-11-02, Claude, a proposal while Codex is out)
+
+Owner: "make a blueprint for how it is gonna look if we do a mobile".
+- art/reference/mobile_v1/mobile_blueprint.png is made from the real game:
+  - a phone-shaped capture, 20:9 with the expand aspect: 480 x 216 game px;
+  - the desktop HUD captured alone over magenta and moved to the top.
+- Touch controls in the HUD's style: a floating stick on the left; on the right, Attack (the weapon medallion) with Parry, Dash and the weapon skill on an inner ring and the Z/X/C aspect slots on an outer ring; items above the stick; pause top-right; a tap bubble for interact.
+- Also on the sheet: sizes in mm, thumb zones and safe area, the 16:9 version and what it takes.
+- Notes and open questions: docs/MOBILE_BLUEPRINT.md. Tools: tools/art/mobile_blueprint.py, presentation/review/mobile/capture_mobile_view.gd (window only).
+- Nothing in the game changed. Not done: any touch input, export or device test.
+
+## Hero effects in the staff's style, phase 1: hits, parries, dash and the basic slash (2026-11-02, Claude, done while Codex is out)
+
+Owner: "I like the effects of the staff skill, can you redo all effects, aspects, attacks of mobs and hero except the golem".
+
+Phase 1 is the hero's basic combat effects. Then, mid-phase, the owner asked:
+- "change the attack that have a turn and sharp curve and make it just a crescent slash";
+- "can you send me an attack sheet of the hero with its attack range";
+- "check the basic attack range match effects on it".
+
+Changes:
+- **Frames.** tools/art/make_hero_fx_art.py redraws them with the staff's code (tools/art/staff_fx.py). Each family has one size and one anchor, and frames are never scaled in the game any more:
+  - fx_hit: 32x32;
+  - fx_counter: 48x48, gold;
+  - fx_parry: 40x40, the gold diamond;
+  - fx_flash: 24x24;
+  - fx_dash: 48x24, anchored at the feet.
+- **Live layer.** presentation/common/impact_view.gd adds sparks, dust, ground rings and light:
+  - sparks thrown off each blow fall to the target's feet and bounce;
+  - shards and motes on heavy blows;
+  - dust at the target's feet;
+  - a ring of light on the ground under finishers, counters and parries;
+  - dust and wind for a dash;
+  - lamps on the road;
+  - sparks off the slash.
+  - The particle system is shared with the staff, renamed from staff_particles.gd to presentation/common/fx_particles.gd.
+- **The blades' basic slash is now the hit area itself.** presentation/common/swing_arc.gd draws a crescent whose outer edge is core/weapons.gd swing_reach around the hero's feet and whose ends are the swing's arc, turned to his facing (any direction).
+  - It sweeps during the swing (odd swings down, even swings up) and fades in the recovery.
+  - It replaces the pose-traced fx_weapon_path_* trails, which reached behind and above him where nothing is hit.
+  - Those frames, weapon_paths.gd, weapon_path_glow.gd and its shader, fx_weapon.tres and the old trail smoke and capture are removed. See docs/WEAPON_PATHS.md.
+- **Training post.** It no longer draws a second hit and parry picture over the shared one.
+
+Review files:
+- art/reference/hero_fx_v1/attack_ranges.png (tools/art/attack_range_sheet.py): every swing with its hit area from core/tuning.gd and the slash.
+- art/reference/hero_fx_v1/ingame/*.gif: the real game against the Warden. These are the katana, dagger and scythe combos, a dash and real parries. Captured by presentation/review/hero_fx/capture_hero_fx.gd (window only); tools/art/hero_fx_capture_gif.py makes the GIFs.
+
+Tests:
+- tests/smoke_swing_arcs.gd is new: every blade, swing and facing, every pixel inside the hit area, both scenes.
+- smoke_effects now looks for the hit's sparks in impact_view.
+- Core 577 pass. Python 94 pass.
+- Smokes: 53 of 56 pass headless; the other 3 need a window (smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture), as before.
+
+Not done:
+- The other phases: the weapon forms and skills, the aspects, then the mobs' attacks (not the golem).
+- Nobody has played it.
+
+## Star Staff run back to 6 frames (2026-11-02, Claude, done while Codex is out)
+
+Owner: "6 is enough". The 12-frame commit (6b9c6f73) is undone: every file it changed is back to the 6-frame run of 45f32861, and the files it added are removed (the in-between sheet, its frames, walk frames 7-12 and their overlays). They stay in the history if wanted later. The animation library, animation, aspects and variant atlas smokes pass. The game plays the staff run as 6 frames x 5 ticks, like the other weapons.
+
+## Star Staff run: 12 frames (2026-11-02, Claude, done while Codex is out)
+
+Owner: "try 12 frames".
+- Six in-betweens were generated from the six in-game run frames: art/reference/staff_v1/Staff_Run_Inbetween.png (2 tries x 1.5 credits; job ids in sources.json).
+  - The first try's in-betweens were near-copies and were not kept.
+  - The second describes each pose: the front foot landing, the knee coming through, the push-off, then the same with the legs swapped.
+- tools/art/import_staff_run.py cuts them like the run frames (the katana run's height and head-based anchor). make_staff_sprites.py interleaves them: totoy_staff_walk_right_1..12 = run 1, in-between 1, run 2, ... run 6, in-between 6.
+- Timing: presentation/animations/totoy_staff.tres has the 12-frame walk at 3 and 2 ticks (30 a cycle, the same pace as the 6-frame runs). The generator sets this for the staff, and its old 6-frame resource was regenerated.
+- The aspect tools take a per-set frame count (SET_COUNTS: the staff's walk has 12), so Phantom Cut's glow, Echo Step's shield and Sprint's aura cover all 12 frames.
+- Preview: art/reference/staff_v1/preview/staff_run_cycle.gif (6 frames before vs 12 now, at game pace). The animation library, animation, aspects, character menu and variant atlas smokes pass. Not watched in the game window.
+
+## Star Staff run cycle from image generation (2026-11-02, Claude, done while Codex is out)
+
+Owner: a 12-frame run sheet "as reference for more smooth animation", then "generate frames instead" (the sheet never reached a file).
+- art/reference/staff_v1/Staff_Run.png (Nano Banana 2.1, 2 tries x 1.5 credits; job ids in sources.json).
+  - The first try mixed standing poses and copies of its reference, so it was not kept.
+  - The second used the staff idle frame (the design) and the katana run cycle (the motion) as references. Its top row is the katana run's six poses with the staff held low, the crescent leading. Its bottom row of in-betweens stands more upright, which would make the lean wobble, so it is cut but not used.
+- tools/art/import_staff_run.py cuts it to game scale as tall as the katana run (31 px), with the anchor on the row's ground line and 7 px behind the head like the katana run, so the body does not jitter.
+- totoy_staff_walk_right_1..6 are now that cycle: the legs alternate, it leans forward, and the staff stays in hand. This replaces the warped single pose. The aspect overlays were regenerated for the new frames.
+- Preview: art/reference/staff_v1/preview/staff_run_cycle.gif (beside the katana run). Animation, aspects, animation library, character menu and variant atlas smokes pass.
+
+## Star Staff wired into the game (2026-11-01, Claude, done while Codex is out)
+
+Owner: "yes I like what you did, wire them".
+- Core (commit 9ed14356): the Star Staff (`star_staff`) is the fourth weapon. See docs/architecture.md "Star Staff / Disintegration".
+  - The cast bursts at range: it snaps onto the nearest enemy in the aim cone within 96 px. Two Arcane Bursts, then the bigger Great Burst.
+  - The dash is a 45 px blink.
+  - Right click is Disintegration: the circle under the target follows it until 18 ticks before the impact. The hero is rooted and invulnerable while he calls. The meteor lands 78 ticks after the press and hits everything in the 58 px circle.
+  - It works against the boss, mobs and the training post. Tests: tests/core/test_star_staff.gd. The blade-cycle tests now cycle the three blades.
+- Art: tools/art/make_staff_sprites.py writes art/src totoy_staff_* (62 hero frames from the 8 key poses: breathing idle, stepping walk, the cast poses, three Disintegration cast frames) and fx_staff_* (110 effect frames drawn by tools/art/staff_fx.py, the same code as the approved previews), plus the weapon medallion and the Disintegration slot icon.
+- Presentation:
+  - presentation/common/staff_view.gd draws the casts, the blink and Disintegration from the core's events and the hero's snapshot. Ground effects draw under the characters, the rest over them.
+  - presentation/common/staff_particles.gd is a port of the preview's particles.
+  - Both are wired through hero_fx.gd into the road and the fight.
+  - On the road, Disintegration darkens the scene (a floor overlay and a dimmer ambient), and its circle, meteor, blast and crater are moving lamps for the lighting shader.
+  - The cut-in: presentation/arena/disintegration_cutin.gd, a sibling of the Reaper's Coil one, uses the json's one pose scale.
+  - The character menu and the HUD know the staff (names, descriptions with the real numbers, medallion, slot icon).
+- Aspects with the staff (owner: "with Phantom Edge the sword is still the next attack, not a staff attack"):
+  - Phantom Cut's echo used to fall back to the katana's ghost and arc. With the staff it is now a lilac phantom burst on the target.
+  - The aspect tools now also make the staff's per-frame overlays (Phantom Cut glow, Echo Step shield, Sprint aura and afterimages) and its Stone Ward poses. Existing overlays are unchanged.
+  - The blade-only smoke tests skip the staff or cycle the three blades. The aspects smoke checks the phantom burst.
+- The run leans forward (owner: "I want him leaning forward"): the staff's walk frames go through the katana hero's lean warp (tools/art/make_hero_lean_sheet.py) at 16 degrees, with the staff as its own layer moved rigidly with the hand. It uses the stride pose with a bouncing stride, since only key poses exist. Before/after: art/reference/staff_v1/preview/staff_run_lean.gif.
+- Editable in Godot: presentation/animations/totoy_staff.tres and presentation/animations/effects/fx_staff.tres (the generator now knows the staff set).
+- In-game capture: presentation/review/staff/capture_staff.gd (window only) plays the Hollow Trial against the Warden with the staff and Phantom Cut. tools/art/staff_capture_gif.py makes art/reference/staff_v1/ingame/*.gif from the frames.
+- Not done:
+  - The hero only has the key poses (proper animation sheets are the next art step).
+  - The fight scene does not darken for Disintegration (the road does).
+  - Nobody has played it: every number is a first guess.
+- Mistake: six art/src/fx_warden2_* files (lash_crack_3/5/6, ring_2/4/5) had small uncommitted edits that were not mine. My clean-build script swapped them to the committed version and a Windows file lock broke the restore, so those edits were lost. The committed versions are intact. If those edits were wanted, they need redoing.
+
+## Staff effects redrawn with particles, the ultimate after the owner's reference, cut-in layout (2026-11-01, Claude, done while Codex is out)
+
+Owner feedback on the first previews:
+- the basic attack's frames were inconsistent and cut off, and the finisher's circle sat on top of the mob;
+- the ultimate looked small and unnatural;
+- nothing had particles;
+- the cut-in was not aligned or organised.
+
+Then a reference sheet for the ultimate: a teal rune circle with rocks lifting, a flaming meteor falling straight down, a fire and rock explosion, smoke, a cracked crater.
+
+- tools/art/staff_fx.py draws every staff effect in code at game scale (Totoy 36, hard alpha). Each has a fixed size and a ground anchor.
+  - Effects: cast flash, bolt, Arcane Burst, ground rings, light pillar, the rune circle (ground and air parts), the meteor, the fire ring, the explosion (12 frames), the crater with cooling cracks.
+  - A particle system on the ground plane (x, ground y, height): sparks, motes, embers, bouncing rocks, crystal shards, smoke, dust, wisps, sparkles, and the blink's streaks and re-forming motes.
+- Layers:
+  - Ground effects (circles, rings, crater) draw under the characters.
+  - Rocks, shards, dust and smoke sort in depth with the characters.
+  - Fire, bursts and sparks draw over them.
+- Colours: the meteor's fire uses gold and red, since AGENTS.md allows them for hit effects. The circle stays teal, so it never reads as an enemy's red warning.
+- tools/art/preview_staff.py writes staff_attack.gif, staff_blink.gif and staff_ultimate.gif to art/reference/staff_v1/preview/. staff_ultimate.gif replaces staff_disintegration.gif, which is removed.
+  - The previews add touches the game's presentation can do too: light from the fire and magic on the ground, the scene darkening while the ultimate is cast, camera shake, a hit flash, and the Hollow Trial scene look (glow, grade, vignette).
+- Cut-in:
+  - One scale for all poses, so the hero keeps his size and stays inside the banner.
+  - The burst pose is now the cast (pose 3).
+  - The backdrop strike is the meteor ultimate, drawn at x4 with the same code: it appears during the call, crashes on the cut, then the blast and smoke over the crater. The meteor breaks out over the banner's edge.
+- Not in the game and not checked in Godot. The hero still has only the 8 key poses.
+
+## Staff cut-in in the shared format and preview GIFs (2026-11-01, Claude, done while Codex is out)
+
+Owner: "why the cutout doesn't look like what we have on the other weapon", and a GIF to see the animation.
+- Why it differed: the first cut-in was a painted 3-panel illustration from the image generator. The other weapons use the shared format: the in-game pixel poses scaled x12 with a coloured rim, a slanted banner, a backdrop strike, flashes and the title.
+- tools/art/import_staff_concept.py cuts the concept sheets to game scale (review only, nothing in art/src). Output goes to art/reference/staff_v1/imported/ (PNG frames, anchors in imported.json, a 6x contact sheet).
+  - The hero is 35 px tall like hero2. The crystal's magenta centre is filled with cream, the circle is squashed to a 2:1 ground ellipse, and the scorch keeps one patch.
+- tools/art/export_staff_cutin.py writes presentation/cutin/staff_* in the shared format (copied from Reaper's Coil).
+  - Poses: concept pose 5 (plant the staff), 8 (call the star), 4 (swing down).
+  - Colours: sapphire rim, star motes, a magic circle turning in the aura.
+  - Strike: a falling star crashing into a ground circle, then a pillar of light and embers.
+  - Title "DISINTEGRATION", subtitle "MARK - CALL - STARFALL". The banner leaves to the right.
+  - Not wired into the game.
+- tools/art/preview_staff.py writes art/reference/staff_v1/preview/staff_{attack,blink,disintegration}.gif: the hero, the Warden as the target and the Hollow Trial floor, at game scale, 4x.
+  - The hero only has the 8 key poses, so his moves swap poses. Full animation sheets come after approval.
+- Not verified in Godot (nothing loads these yet). No game code changed.
+
+## Mage staff concept art v1 (2026-11-01, Claude, done while Codex is out)
+
+Owner: a new weapon, a mage staff.
+- The design so far: the dash is a short blink (teleport). The basic attack is a ranged small explosion. The right click is Disintegration: a circle under the target, then a falling object strikes it.
+- Owner asked for the art from an image generator, so I made concept sheets with the Higgsfield MCP (Nano Banana 2.1; GPT Image 2.5 needs a paid plan), using the hero's in-game frames and the portrait as references. 9 sheets, 13.5 of 50 free credits.
+- Sheets in art/reference/staff_v1/ (sources.json has the job ids; staff_concept_v1.png shows all of them):
+  - the staff with its weapon, Disintegration and Blink icons;
+  - the hero with the staff in 8 key poses;
+  - the Arcane Burst (6 frames) and the Great Burst finisher (6);
+  - the blink depart and arrive (8);
+  - the Disintegration target circle (8) and falling star with impact (8);
+  - the starburnt ground (4);
+  - a 3-panel cut-in.
+- Colour language: sapphire and pale blue with cream starlight, no red or gold, since those mean enemy warnings. So the falling object is a falling star, not a fiery meteor.
+- Not imported and not in the game. Waiting on the owner's approval and design answers (circle fixed or following the target, the name, numbers).
+- Known flaws:
+  - the starburnt ground came out as two stacked patches;
+  - the crystal centre in the pose sheet is magenta (it will key out, so fill it at import);
+  - the target circle is drawn round, not as a ground ellipse (squash at import);
+  - the pose sheet is 8 key poses, not full animations yet.
+
+## Wind sway removed (2026-11-01, Claude, done while Codex is out)
+
+Owner: "I don't like the sway, remove it". The plant wind sway is gone: its code in explore_scene.gd, the "Wind in the plants" group of scene_look.gd and its section in docs/ANIMATION_EDITING.md, and the forest wind clip. Glow, colour grade, vignette and ground mist stay. Explore smokes, the resource test and both trial checks pass.
+
+## Scene look shaders: glow, colour grade, vignette, ground mist, wind (2026-11-01, Claude, done while Codex is out)
+
+Owner: "add shaders so the scene looks good"; chose all four looks for every explore scene.
+- presentation/effects/scene_look.gd: one look per scene in presentation/effects/looks/<scene>.tres, edited in the Inspector (grade, vignette, glow, mist, wind; each switchable). Starting tunes are in tools/godot/generate_sprite_frames.gd LOOKS, written when missing.
+- Screen look: presentation/effects/scene_post.gdshader on a CanvasLayer (1) between the world and the HUD; the HUD moved to layer 2. It does the glow on bright pixels (three rings of taps), the grade and the vignette.
+- Ground mist: a new pass of overhead_light.gdshader (a rect drawn with alpha 0.985 after the floor, before warnings, props and actors). Drifting noise on the pixel grid, stepped and dithered alpha capped at half, moonlit, thicker near the floor outline (an edge mask built from the scene outline).
+- Wind: plant props (bush, fern, flowers, thorns, tree; not mushrooms or the root wall) lean by whole pixels from their base. Shear around the feet, on the game clock, own phase per plant.
+- First tune was too foggy; dimmed and made patchier after looking at captures.
+- Core 568, both trial checks pass; 52 of 55 smokes pass, the other 3 are the capture smokes that need a window.
+- Captures: presentation/review/scene_look/ (before/after for six scenes; forest GIF for wind and mist).
+- Look is the owner's call.
+
+## The rest editable: effect timing, particles, code-drawn shapes (2026-11-01, Claude, done while Codex is out)
+
+Owner: "add everything" (make the rest editable). Guide: docs/ANIMATION_EDITING.md.
+- 32 more effects that worked out their frame from their age at a steady pace now read their timing from their resource (AnimLib.effect_at / effect_length): parry, hit, counter, dash, auras, boss impacts, lantern and pool idles, Phantom marker, echo anchor, ward barrier, sprint lines, dust and wind, moth trail, orb and pop, Thornback horn glows, the Warden's spores, dust, arrival and death flash, and its Gemini guard hit, guard break, footstep, ring charge and lash roots.
+- Their starting values are the code's pace: the generator moved the untouched placeholder animations onto it (21 families); 32 sequences checked identical tick by tick, lengths too.
+- Still on the code's pace: effects timed to a strike, and sequences played at a second pace (listed in the guide).
+- Particles: 16 burst kinds as resources (presentation/effects/particles/<kind>.tres, particle_kind.gd and particle_layer.gd), read by creature_particles.gd (DEFAULT_LAYERS is the fallback). Checked identical: 4125 sampled points.
+- Code-drawn shapes: presentation/effects/fx_settings.tres (fx_settings.gd), with the Warden's shadow, foot shadow, footfall points, print and scar lives and lash clumps, the Thornback's slam timings, cracks, rim, heal and mist rates, and the burst cap. Same defaults as before.
+- smoke_anim_library covers particles and settings.
+- Core 568 and both trial checks pass; 52 of 55 smokes pass, the other 3 are the capture smokes that need a window.
+
+## Every animated effect editable in Godot (2026-11-01, Claude, done while Codex is out)
+
+Owner: "yes, effects next". 31 effect-family SpriteFrames in presentation/animations/effects/ (fx_lantern, fx_ward, fx_warden2, fx_stag, fx_lightning, ...; 193 animated sequences; the hero-frame overlays follow the hero's own frames and are left out), made by the same generator.
+- Frame order, every effect: AnimLib.remap rewrites the frame table where arena.gd and explore_scene.gd load it, so an effect asking for frame n gets the owner's frame n. No call site changed. Default: identical table (3589 entries checked).
+- Timing for the 30 effects on per-frame tick lists: the lists in aspect_effects.gd, lightning_effects.gd, scythe_effects.gd and ward_echo_sprint_effects.gd are now `static var` read from the resources (AnimLib.durations). Durations change the frames and the effect's life; added frames play. Default: identical values.
+- The other effects keep the code's pace (order editable).
+- Checked with a scratch edit that swapped two frames and doubled one duration; the game read both; restored after.
+- Test smoke_anim_library now covers all 48 resources. Core 568 and both trial checks pass; 52 of 55 smokes pass, the other 3 are the capture smokes that need a window.
+- Galleries play effects from the resources. Guide: docs/ANIMATION_EDITING.md "Effects".
+
+## Every character animation editable in Godot, frames repaintable (2026-11-01, Claude, done while Codex is out)
+
+Owner: "make all of it editable". Guide: docs/ANIMATION_EDITING.md.
+- 17 SpriteFrames resources in presentation/animations/ (the four hero weapon sets, the unarmed hero, the arena golem, Warden, Thornback, boar, mossling, glowmoth, six NPCs; 137 animations), made by tools/godot/generate_sprite_frames.gd from the built PNGs, with starting speeds from the game's own tables. The generator keeps the owner's edits and only adds new animations.
+- The game plays from them through presentation/common/anim_library.gd (arena animation.gd and arena.gd, explore mob_view.gd, the unarmed hero and NPC idles in explore_scene.gd): frame order everywhere, timing for free-running poses. Combat-paced poses keep the core's pace. A mob state that plays a pose at its own pace keeps it. Without a resource, the old tables apply.
+- Checked: the defaults reproduce the old frame choice tick for tick (hero, golem, unarmed, NPC idles; 7800 mob-state checks).
+- Pixel overrides: art/overrides/<frame>.png replaces that frame in every build_art.py (snapped to Totoy 36, hard alpha; unknown names reported). Tested by painting and restoring a Warden frame.
+- Both galleries play from the resources.
+- New test: tests/smoke_anim_library.gd.
+- Core 568, Python 94, 52 of 55 smokes pass; the other 3 are the capture smokes that need a window.
+- Effects (hero skills, creature and Warden effects) are not in this: next step.
+
+## All-animations gallery scene (2026-11-01, Claude, done while Codex is out)
+
+Owner: "make a scene for all" animations. presentation/library/animation_gallery.tscn (a @tool scene) plays every animated sequence of the built atlas in the Godot editor: 643 animations in 50 sets (characters, mobs, props, then the fx_* effects), each looping in its own labelled cell, frames placed on their anchors. Inspector: filter (comma-separated words, e.g. "hero2" or "stag_, fx_warden2"), ticks_per_frame (one speed for all; the game times each animation in code), playing, speed, facing_left, include_stills, row_width, show_labels, reload (after build_art.py). Game timings per animation are only in the Warden gallery (warden_gallery.tscn). Capture: presentation/review/warden_v2/animation_gallery.png. Still to do from docs/GODOT_EDITABLE_PLAN.md: SpriteFrames resources and effect scenes that can be edited, not only watched.
+
+## Runebound Warden gallery scene (2026-11-01, Claude, done while Codex is out)
+
+Owner: see every Warden animation and effect in the Godot editor. presentation/library/warden_gallery.tscn (a @tool scene) plays in the 2D view without running the game:
+- the 14 body animations at game timings;
+- four attack loops (Cleave pointing right and turned down-left, Lash, Spore Ring): the wind-up with its hit area outlined, the strike effect at the real hit size, the torn ground;
+- the effect frames (ring charge, guard hit, guard break, footstep, death);
+- every particle burst kind.
+It draws through the game's own code (warden_effects.gd, creature_particles.gd) and the built atlas, so it shows exactly what the game shows. Inspector: playing, speed, facing_left, show_labels. Also: the Cleave slash frames are now cut at the Warden's feet (tools/art/import_warden_fx.py), so Gemini's trailing streaks no longer sweep behind the body. Smokes, trial checks, scene audit pass; capture presentation/review/warden_v2/warden_gallery.png. First piece of the library scene in docs/GODOT_EDITABLE_PLAN.md step 6; steps 3-4 (SpriteFrames and effect scenes for everything) are still to do.
+
+## Creature particles drawn as pixel art (2026-10-31, Claude, done while Codex is out)
+
+Owner: "improve the particles, leaves and dust" (done in code, not by an image generator). presentation/explore/creature_particles.gd draws every particle as a small pixel-art shape shaded with the neighbouring steps of its own palette ramp:
+- dust and smoke: lumpy cloud puffs (side lobes, two bumps on top, a darker underside, a lit top) that break into wisps late in life; warm dust colours instead of the pale stone that read blue-grey at night;
+- leaves: 4 x 4 leaves that tumble through four turns, with a dark rim so green leaves show on grass;
+- grit and clods: irregular, by size;
+- sparks: twinkle (dot, cross, star);
+- heal motes: pulse;
+- new: grass blades flicked up by the slam, the Warden's stagger and the roots.
+The motion (positions, lives, deterministic bursts) is unchanged. Smokes, both trial checks pass; comparison in presentation/review/warden_v2/particles_compare.png. Look is the owner's call.
+
+## Runebound Warden attack effects from Gemini (2026-10-31, Claude, done while Codex is out)
+
+The owner had Gemini draw the Warden's attack effects from a prompt with the real hit sizes. tools/art/import_warden_fx.py imports the 8 sheets (art/reference/warden_fx_gemini/*.jpg): it finds the cells, keys out the magenta and the pink glow, snaps to Totoy 36 (gold only on the Cleave, red only on the dodge attacks), scales each sheet to its hit size and anchors each frame where it attaches. Result: 44 frames fx_warden2_* (contact sheet beside the sources). In game (presentation/explore/warden_effects.gd):
+- Cleave slash: its rim sits on the 58 px cone edge, turned to the attack direction.
+- Lash: the crack grows along the line during the windup, then five root clumps erupt one after another along the 150 px line.
+- Ring: its edge sits on the 48 px radius.
+- Ring charge, guard hit and guard break: drawn at the chest stone.
+- Footstep: dust at each footfall.
+Combat effects use the lighting shader's emissive pass so gold and red keep their colour at night. The code-drawn slash, roots and shock band are gone; torn-ground scars and footprints stay. Turned frames (the slash and crack at angles other than left or right) show stepped pixels; the fallback is 8 pre-turned directions. Core 568, smokes, both trial checks and the scene audit pass. Comparison: presentation/review/warden_v2/fx_gemini_compare.png. Look is the owner's call.
+
+## Runebound Warden drawn 1.5x smaller (2026-10-31, Claude, done while Codex is out)
+
+Owner: "too big, scale it down by 1.5x". tools/art/rig_warden_v2.py still poses the detailed design at its own size, then shrinks each frame by 1.5 (Scale2x, then a majority vote per 3x3 block, so outlines survive): 79 px tall (was 118), feet exact. The 75 effect frames are redrawn at 2.5/1.5 (tools/art/redraw_warden_2p5.py). Shadow, foot shadows, footprints, footfall offsets, rune lamp and halo, HP bar height (86) and draw height (81) scaled to match. Core: radius 18 -> 12, hold 34 -> 28, so the Cleave cone (reach + radius) shrinks with the arm. Core 568, Python Warden art test, smokes, both trial checks and the scene audit pass. Comparison: presentation/review/warden_v2/scale_compare.png. Feel is the owner's call.
+
+## Hollow Trial rim props re-placed and the floor cleaned (2026-10-31, Claude, done while Codex is out)
+
+From the owner's playtest ("props are not placed properly, don't align, don't match"). The eight rune rocks were spaced evenly across the upper half only, some pushed into the canopy, with none in the lower half. They now stand just inside the floor's edge all round the clearing: the top arc, the lower left and the lower right, clear of the big trees that own the left and right middle. The bushes, ferns and roots are grouped beside the rocks instead of standing alone. Moved in the editable scene (presentation/maps/hollow_trial_layered.tscn) and baked to data/scenes/hollow_trial_layered_props.json; trees, altar, chest and entry roots unchanged. The floor painting had six pasted slab pieces and two square moss patches; they are painted out by cloning nearby dirt (runtime ground and its native copy). Codex's audit pins are updated (APPROVAL.json notes the edit, not owner-approved yet). Core 568, map round trips, check_scene, check_gameplay, audit_scene and the smokes pass; captures in presentation/review/warden_v2/rim_props_*.png. Look is the owner's call.
+
+## Runebound Warden playtest fixes and the altar's slabs (2026-10-31, Claude, done while Codex is out)
+
+From the owner's playtest. Warden (tools/art/rig_warden_v2.py): bigger motion everywhere: a stomping walk (legs swing from the hips, the body drops on each footfall, arms and head counter-swing), a breathing idle, wind-ups that lean back and strikes that lunge. The gaps between roots where the floor showed through are filled with dark crevice colour, and the feet are one shade darker where they touch the ground. Presentation: a wide contact shadow plus darker foot shadows; footfalls kick dust and leave prints. Each attack is drawn at its real hit size from the core telegraph: the Cleave as gold slash lines across the cone, the Lash as roots erupting along the line, the Ring as a shock band out to its edge, then torn ground after each strike. New particles for guard-hit chips, stagger and death dust. The old chest sprites sized for the 48x48 design are dropped (the shader rune lamp lights the chest). Cleave reach is unchanged (46); the first strike frame now swings down through the cone instead of reaching past it. Altar: owner turned down a full stone platform, so worn slabs and grass at the altar's foot instead (SpriteCook, 6 credits, 1 left; tools/art/make_trial_altar_base.py snaps it to Totoy 36 and strips the generated dirt under it). It follows the altar placement and also shows in the editable map view. Core 568, Python 94, smokes and both trial checks pass; captures in presentation/review/warden_v2/. Not done: lining up the rim props (rocks, bushes, trees). Feel is the owner's call.
+
+## Runebound Warden: new detailed art (2026-10-31, Claude, done while Codex is out)
+
+Owner asked for new detailed art at native size. SpriteCook generated a detailed design from the old one (gpt-image-2 low, 2 variations, 4 credits, 7 left; manifest art/reference/warden_v2_detailed/spritecook-assets.json); variation B (103x118) snapped to Totoy 36 and approved at native size. tools/art/rig_warden_v2.py cuts it into parts (head, far arm, near arm with blade, legs, torso) and poses all 60 body frames with sharp pixel-art rotations, rune lit/bright/dark per state, a crumbling death, and writes warden_attachments.json (chest, blade hook). Effects stay redrawn at 2.5x (redraw tool now effects only). HP bar and height raised. Atlas 2048x4430. Validate/build/preview, import, core 568, Python, every headless smoke pass; captures in presentation/review/warden/v2_detailed/. Collision radius unchanged (11), so the hero can stand visually inside the bigger body. Look and feel are the owner's call.
+
+## Runebound Warden redrawn natively at 2.5x (2026-10-31, Claude, done while Codex is out)
+
+Owner asked to replace the uneven nearest-neighbour 2.5x stretch. tools/art/redraw_warden_2p5.py redraws all 135 Warden frames (60 body, 75 effects) from the 48x48 design (warden_cleave_range_v4) with an EPX pixel-art upscale (AdvMAME3x + Scale2x) and a majority vote down to exactly 2.5x: one pixel size everywhere, palette-only, hard alpha, same feet and same in-game size. Effects are no longer stretched at draw time (warden_effects.gd). Atlas widened to 2048 (now 2048x4246, was 1024x8136). tests/test_warden_art.py checks every frame against the redraw. Validate/build/preview, import, core 568, Python, every headless smoke pass; real captures in presentation/review/warden/redraw_2p5/. The Warden reads very dark under the glade's night light (owner's call). Look not judged.
+
+## Hollow Trial review fixes (2026-10-31, Claude, done while Codex is out)
+
+Fixed the cross-review findings in Codex's Hollow Trial presentation: altar ring, pulses and progress marks follow the altar's placement; the ring is now a broken course of worn flagstones in ground colours (no longer looks like an indicator); a wide rune-light pool from the altar lifts the fight floor (about 13 percent brighter at the centre; far-edge mobs still dark); hint needs an armed hero; anchor override removed; arrival pulses only for trial mobs. The blocky shape near the top edge is the Warden drawn at a non-integer 2.5x scale, not a trial bug: left for the owner. Core 568, Python, all headless smokes and Codex's two trial checks pass; captures redone. docs/CROSS_REVIEW_hollow_trial.md.
+
+## Hollow Trial props registered (2026-10-31, Claude)
+
+Codex's 22 props are in data/props/prop_defs_hollow_trial.json and placed in the room (chest on top of the altar, not solid; the altar holds the body). Walkable outline traced from Codex's floor painting. Tests: altar, spawn points and way out reachable, fight floor open apart from the altar, entry roots seal and open (test_hollow_trial.gd, 14). Core 568 pass, Python pass. smoke_profile and smoke_variant_atlases fail on Codex's uncommitted atlas rebuild (art/build), not on this change. Codex: re-canvas the chest to sit on the altar, merge the light sockets, the owner's review list (docs/CODEX_TASK_hollow_trial.md).
+
+## Hollow Trial core (2026-10-31, Claude)
+
+The trial room exists in the core: hollow_trial_layered (512x352, dead end behind Root Hollow's upper-left exit, which now leads here instead of the village), core/trial.gd (E at the altar seals the entry, three warned waves of Mossling, Boar and Warden with up to four attackers, win sets cleared_hollow_trial and lights the altar, the chest pays once, falling resets the try), managed encounters in core/mob_field.gd, prop state trial:sealed, ExploreSnapshot.trial and trial_* events (docs/architecture.md "Trial rooms"). Stand-in props until Codex's art; no ground painting yet (pending in the tests). Chest reward is a 3-herb placeholder until the owner picks the Aspect. Tests: test_hollow_trial.gd (10), core 564 pass, Python and the map round trip pass, 50 of 54 smokes headless (3 need a window). Not play-tested; numbers are first guesses.
+
+## Thornback effects finished and the Glowmoth orb (2026-10-31, Claude, owner-approved crossing of the split)
+
+Fixed the flat-line slam warning (snapshot lacked the cone angle), made the Glowmoth orb a real projectile (core, events, snapshot, 8 tests), and finished the creature effects: slam shock, cracks and rubble reach the real 145 px edge, visible healing links and heal pulses, orb, trail and pop, moth reveal, readable moth bars, chant release frames. Core 554 pass, 51 of 54 smokes pass headless (3 need a window). Details: docs/CROSS_REVIEW_thornback_v3.md (Follow-up). Captures: docs/previews/thornback_v3_real/ (not committed). Look and feel are the owner's call.
+
+## Thornback balance v3 core mechanics and cross-review (2026-10-31, Claude)
+
+Slam reach 125, charge 6.6 px/tick over 24 ticks, eight root bursts (eight telegraphs, deterministic valid sites, an escape rule), the chant that calls exactly five Glowmoths, and the 2 percent per second summon regeneration (per Stag, never per moth) are in the core, with new events mob_summon_started, mob_summoned, mob_healed and mob view fields summoner_id, regen_active, live_summons, cast_start_tick, cast_release_tick. tests/core/test_stag_v3.gd (22), core suite 546 pass, three smokes pass. Cross-review of Codex 8ae4d9df: PASS with four small comments, see docs/CROSS_REVIEW_thornback_v3.md. Not verified: real renderer captures, the feel of eight roots, all numbers (first guesses).
+
+## Godot-editable migration, phases 0 and 1 (2026-10-30, Claude)
+
+Python generators write editable scenes, a headless Godot baker writes the core JSON back: all five data/scenes/*_props.json round-trip byte for byte, the three prop_defs files value for value (tests/test_godot_scenes.py, 7 tests). presentation/props/ has 100 prop scenes (colliders as visible circles, cast-shadow masks, light sockets); presentation/maps/glade_layered.tscn is the spike map; neither is used by the renderer yet. Codex task: docs/CODEX_TASK_prop_scenes.md. Details in docs/GODOT_EDITABLE_PLAN.md (Progress). Not verified: the look in the editor, pixel parity of a renderer wired to them.
+
+## Root Hollow props registered (2026-10-30, Claude)
+Codex's 12 new props (`root_hollow_*`) have real colliders in `data/props/prop_defs_root_hollow.json` and replace the blockout props in `data/scenes/root_hollow_layered_props.json` (21 proposed placements, the root clump moved off the trail, plus the root-knot barrier in the shortcut). New core rule: a prop state can follow a story flag (`"when": "flag:cleared_hollow_center"`), so the barrier opens, colliders and sprite, when the central fight is cleared. The shortcut entry moved to (62,17). Art and shadow catalogues merged. Tests: `tests/core/test_root_hollow.gd` (floors, Boar lane, exits, seal and opening, core rebuild). Handoff for Codex's lighting, shadows and visual checks: `docs/CODEX_HANDOFF_root_hollow_props.md`. Also fixed the cross-review finding (`fx_spin_contacts` sparks on already dead mobs). Python 85 tests, core 515 and the smoke tests pass; not play-tested.
+
+## Codex task: real art for Root Hollow (2026-10-30, Claude)
+The owner's visual test of the Root Hollow blockout failed (generated floor, borrowed props). `docs/CODEX_TASK_root_hollow.md` is Codex's brief: ground painting first, then a new prop sheet (root-arch tree, root-knot barrier in two states, shrine altar, stone circle, glow mushrooms, ...), owner approval at each step, then import and wiring. Layout guide and the failed look: `art/reference/root_hollow_v1/`. **Review note for Codex:** the same day, at the owner's direct request, Claude also edited presentation/ and art/ (shared hero effects `presentation/common/hero_fx.gd`, Stag frame import and `mob_view.gd`, Root Hollow registrations and placeholder floor, earlier the UI-as-scenes work): please review those diffs. Nothing is merged to main.
+
+## Root Hollow built as a playable blockout (2026-10-30, Claude)
+The route is now village -> woodland -> forest -> **Root Hollow** -> glade -> arena (`SceneDefs.ROOT_HOLLOW_LAYERED`, `data/scenes/root_hollow_layered_props.json`, 640x400). It has the layout of `presentation/review/chapter1_expansion/LAYOUT.md`: a broad central clearing (2 Boars + 2 Mosslings, Glowmoths to come), an optional shrine fork (3 Mosslings, 2 herbs), a south loop with a pocket to escape through, and a shortcut north to the village that stays shut until `cleared_hollow_center` (exit field `requires_flag`). The forest's root-gate exit now leads here and the glade's back exit returns here. **The ground is a generated placeholder** (`tools/art/make_root_hollow_blockout.py`, palette-only, hard pixels) and the props reuse the woodland and forest sets: the owner's approved painting and props replace `presentation/forest/root_hollow_layered_ground.png` later; keep the walkable shape or re-run the tool's outline. Debug jump: F12 / 0. Positions, mob choice and the shortcut are first guesses for the owner. Tests: `tests/core/test_root_hollow.gd`, `tests/smoke_root_hollow.gd`; the route tests (chapter route, explore core, forest, explore bot) were updated for the new link.
+
+## Thornback Stag in the glade (2026-10-30, Claude)
+The glade's mini-boss is built: `Tuning.MOBS[stag]` (260 hp, radius 20, first-guess numbers for the owner) with a gold antler slam (cone, parry it), a red charge (line, dash it; crashes into props) and, after it roars at half health, red roots (a burst where the hero stood). `core/mob_field.gd` now supports many-attack mobs, cone and circle warnings and a phase two; `data/scenes/glade_layered_props.json` has the encounter `stag_glade` (3 herbs on clearing) and the root arch to the arena stays shut until `cleared_stag_glade` (new exit field `requires_flag`). The 58 reference frames of the Stag are imported by `art/reference/chapter1_creatures/install_mob_frames.py` into `art/src/stag_*` and drawn by `presentation/explore/mob_view.gd`. Not built yet: Edda's binding scene and the `freed` pose after the defeat (the Stag just dies), the root and slam effects (`fx_ch1_*`), and a screen-top boss bar (it has a wider bar over its head). Sprint is already given by Edda in the village, so the Stag gives herbs and opens the arch, not an Aspect. Tests: `tests/core/test_stag.gd`, `tests/smoke_stag_glade.gd`. The contact sheets were not regenerated.
+
+## Forest route has its mobs (2026-10-30, Claude)
+`data/scenes/forest_layered_props.json` now has two encounters: `forest_mossling_trail` (3 Mosslings, x 136-190) and `forest_boar_bend` (2 Boars, x 268-285) before the lantern puzzle; the lantern puzzle, root gate, chest and exits are unchanged. Same rules as the Woodland Approach (`core/mob_field.gd`, `Tuning.MOBS`), so every hero skill works on them. Positions are a first guess for the owner to review: the two packs wake each other if the hero stands between them, and the second checkpoint (332,148) is inside the boars' wake radius (it is only reached by walking through them). Glowmoths are not built (no core behaviour yet; art only). Tests: `tests/core/test_forest_mobs.gd`, `tests/smoke_forest_mobs.gd`.
+
+## Small hand cursor only for menus (2026-10-30, Codex)
+
+Replaced blade pointer with original 16x16 hand at crisp 2x (32x32 OS pixels), fingertip hotspot (10,2). Global presentation autoload shows it on title/menu screens and when the shared TAB character menu is open; hides during gameplay and cutscenes. Group lookup covers both arena and exploration and always processes while paused. Art validate/build/preview, texture load and title/TAB/gameplay policy checks passed. Headless backend does not expose actual OS cursor visibility; policy checked directly. Graphify unavailable.
+
+## Smaller blade cursor (2026-10-30, Codex)
+
+Reduced approved cursor from 48x48 to 40x40 OS pixels by shortening the native blade, preserving crisp 2x pixels and tip hotspot (4,4). Art validate/build/preview and cursor smoke passed.
+
+## Global blade cursor (2026-10-30, Codex)
+
+Owner requested a blade mouse pointer. Added original Totoy36/hard-alpha 24x24 sprite source, crisp 48x48 OS cursor and tip hotspot (4,4) through global display settings, covering gameplay and menus. Art validation/build/preview and Godot cursor load/hotspot smoke passed. Preview in art/reference/blade_cursor/preview.png; owner appearance judgement pending. Graphify unavailable in this environment.
+
+## Blade-trace alignment correction (2026-10-30, Codex)
+
+Dagger and scythe regular trails now follow straight traced blade-tip displacement between authored poses instead of an invented rotation about moving grips. Both dagger tips emit paths; katana overhead fix preserved. Rebuilt sources, atlas and contact sheets; palette validation and shared-weapon Godot smoke passed. Review trace diagnostics distinguish discrete measured positions from unknown in-between motion. Runtime scene captures refreshed for owner judgement.
+
+## Shared weapon trails integrated (2026-10-29, Codex)
+
+Owner approved runtime integration for all three weapons and requested glow and particles. Arena and exploration now use the same hero FX entry point, pose-based trail selection, additive halo and capped blade-edge particles. No boss dependency or core changes. Corrected the third katana swing to follow its forward overhead rotation after owner feedback. Forty palette/hard-alpha sprite sources, regenerated atlas/contact sheets, original review assets and real runtime previews are included. Full harness passed all suites, including 479 core tests and the new weapon-path regression. Live capture checks passed all three weapons, both facings and both scenes, including third swings. See WEAPON_PATHS.md and art/reference/weapon_paths_review_v1/ingame/katana_alignment_v2.gif. No generation credits used. Claude cross-review and owner visual judgement remain pending; no merge. Graphify unavailable (No module named graphify).
+
+## Weapon path effects for owner review (2026-10-29, Codex)
+
+Requested previews before integration. `art/reference/weapon_paths_review_v1/` has a combined GIF and individual loops for Black Katana, Dual Daggers and Chain Scythe, 40 transparent FX frames for all 10 combo swings, sheets, measured blade-path metadata and a local rebuild script. Existing game sprites are displayed unchanged, with proposed violet/pale-blue/teal traces fitted to the original blade/hand geometry. Whole-pixel taper and dissolve, no reserved gold/red. FX palette/hard-alpha/unclipped checks and GIF timing checks pass; active-pose contact sheet inspected. Deliberately slowed preview cadence, no gameplay timing/range/damage changes. No runtime files changed and no generation credits used. Owner approval/integration pending; local review only. Graphify unavailable.
+
+## Mob idle loops for owner review (2026-10-29, Codex)
+
+Owner requested playful Mossling hopping and boar grazing, to review here before integration. Review-only files in `art/reference/mob_idle_review_v1/`: combined GIF, individual loops, 60 native transparent frames, sprite sheets and timing/pose metadata. Reuses the existing editable creature rigs without modifying their tool or runtime assets. Mossling 24x100 ms (2.4 s), boar 36x100 ms (3.6 s); combined preview 7.2 s at 6x nearest-neighbour. All frames pass Totoy 36/no reserved colours/hard-alpha/unclipped checks; pose sheets inspected. No generator credits used. Runtime integration, core wandering/movement changes and art approval remain pending. Graphify unavailable in this environment; no graph refresh claimed. Review changes remain local pending owner feedback.
+
+## Hero effects shared by the fight and the road (2026-10-29, Claude)
+The hero's combat effects (hit burst, particles and dust, parry ring, screen shake and flash, dash afterimages, and the Sprint, Echo Step and Stone Ward looks) now live in one base script, `presentation/common/hero_fx.gd`; `arena.gd` and `explore_scene.gd` both extend it, so the road shows the same effects as the fight. Mob and boss effects stay in each scene. The ExploreSnapshot hero now carries `sprint_ticks_left`. On 2026-10-29 the owner asked for the rest too: every Aspect (Breaking Edge, Gale Cut, Moon Cleave, Spirit Lantern, Phantom Cut, Sprint, Echo Step, Stone Ward) now works on the road against mobs (`core/explore_skills.gd`, hits go through `MobField.hit_mob`), with the same effects, and the katana's Black Form runs with its cut-in. Lightning Form (Dual Dagger) and Reaper's Coil (Chain Scythe) work on the road too (2026-10-30): they start on the nearest mob in front of the hero (aim direction, `Tuning.ROAD_TARGET_*`), hit every mob clumped within reach, each for less the more are hit (`Tuning.MULTI_HIT_*`), and the coil drags the mobs within `Tuning.CLUMP_RADIUS` of the hooked one in with it. Their effects and cut-ins come from the shared `hero_fx.gd`. Aiming stays on the walking direction (mouse aim was tried and reverted). The damage numbers against mobs reuse the fight's skill numbers and the mob exposed multiplier and are not balanced. Smoke tests and 479 core tests pass; the road look was checked by one capture only.
+
+## 384x216 SpriteCook UI installed (2026-10-29, Codex)
+
+Owner approved the bronze/teal kit and explicitly chose the 384x216 base view. Completed the saved WIP: project/camera/title/intro layouts, runtime kit frames/bars/pillar/sockets, Status/Aspects/Items/Quests tabs with matching input hitboxes, dialogue/receipt/result cards, existing katana/herb/Sprint/other Aspect icons, original crisp bitmap numeral/key font and delayed exploration health ghost. Fixed duplicate inherited constants that prevented exploration from compiling. Checked single- and double-digit level labels (3 and 10), text/container insets and screen-edge boss name. Intro panels and weapon cut-ins keep their existing composition centred in the larger view. Default window 1152x648 (3x); 1536x864 supports 4x. Decision 0005 supersedes the old resolution.
+
+Validation: full harness passed Python tests, import, core tests and every smoke suite (`art/build/arena_ui_final_regression.log`, ignored); focused menu/progression/profile/title/weapon/cut-in checks repeated after layout corrections. Standard art validate/build/preview passed; separate validation confirms all 32 runtime UI PNGs use non-reserved Totoy 36 colours and hard alpha. Inspected live 1152x648 captures in `presentation/review/ui_kit_live/` (reproducible with `tests/capture_ui_kit.gd`, isolated save). No added generation credits. Graphify unavailable in the current Python environment (`No module named graphify`); no graph refresh claimed.
+
+Interface gap handed to Claude: `docs/CLAUDE_TASK_explore_hud_values.md` requests Edge and Aspect timers in ExploreSnapshot. Road Edge currently displays unavailable, rather than an invented amount; arena values use the existing HUD snapshot. No core edits or modifications to the owner's pending `docs/architecture.md` change. Claude cross-review and owner playtest remain pending; no merge to main.
+
+## Village sequence, unlocks, stat points and Sprint (core and data, 2026-10-28, Claude)
+
+Built from the owner's approved `docs/PROGRESSION_PLAN.md`. Quest data `data/quests/chapter1.json` (12 steps, 95 EXP) + `core/quest_book.gd`; `ExploreCore` pays each step once when its done flag is set, unlocks dash/attack/parry/herb slot when their task begins, filters the inputs, exposes `objective`, `unlocked`, gates the village east exit until `lesson_aspect` (`exit_blocked`), opens the Elder's chest once (`chest_opened`), and migrates older saves. Training order is now attack, dash (ring), parry, dodge. Dialogue: 10 new lines (57 of 60): "not yet" lines for Tovan, Elder, Edda, the Elder's basket talk, Edda binds Sprint (`item_received` kind `aspect`). Stat points option B: 2 per level, Vitality/Might/Agility, free respec in the village, `SaveProfile.stats`; level gives +5 health. Sprint works in the woodland once owned, socketed and unlocked; Edge refills on the road. Tests: `test_quests.gd` (9), `test_stats.gd` (11), `test_cutscene.gd`, yard, dialogue and save tests updated; mutation-checked. Codex task: `docs/CODEX_TASK_progression.md` (objective line, locks, gate banner, stats panel, debug flag `debug_all_unlocked` in every debug jump); the presentation smokes that fight need it. Not judged: pacing, numbers, feel, the texts.
+
+## New Game intro cutscene: data and rules (2026-10-28, Claude)
+
+Draft story in `data/cutscenes/intro.json` (7 beats: the Night of Returning Lights, one beacon answering, the failed Heartloom, strange weather, Totoy waking on the road with the broken key, Lanternfen's lantern, the rune gate opening), readable copy `docs/CUTSCENE_intro.md`, loaded and checked by `core/cutscene_book.gd`, tested in `tests/core/test_cutscene.gd` (4). The flag `intro_seen` records it (saved with the story flags, cleared by NEW GAME, so it plays on every New Game and never on Continue). The scene and the seven panels are Codex's: `docs/CODEX_TASK_intro_cutscene.md`. The text is placeholder; the owner rewrites it. Not judged: the story, art, pacing.
+
+## Painted maps retired, Woodland Approach playable, mobs (core and data, 2026-10-28, Claude)
+
+The owner approved the layered route. (1) Core: the painted village, forest and glade layouts, their tests and ground tools are deleted; `SceneDefs.IDS` is `[arena]`, `ALL`/`LAYERED` list the chapter; `migrate_legacy` (in `SaveProfile.record_scene`) keeps old saves loading. (2) `woodland_layered` (640x400) is the route village -> woodland -> forest: entries `west`/`east`, checkpoints, outline traced from the approved ground, 31 props with sprite-base colliders (`data/props/prop_defs_woodland.json`), both clearings (85 % free of the reserved 180x112, a 160x100 box fits) and the camp loop open and reachable from both ends. (3) Mobs: `core/mob_field.gd` + `core/mob.gd`, numbers in `Tuning.MOBS`: Mossling (gold lunge, parry it) x3 west and x2 at the camp, Thornback Boar (red charge, dash it, crashes into props) x2 east; one wake for the whole pack, 2 attackers at a time, leash and reset, hero defeat and respawn at the checkpoint, `cleared_<id>` flags, herb rewards (2/3/2) into a saved inventory, `use_herb_pressed` heals 35. Tests: `test_woodland.gd` (9), `test_mobs.gd` (20), save and route tests updated; mutation-checked. Contract: `docs/architecture.md` "Chapter route, mobs and encounters". For Codex: `docs/CODEX_TASK_woodland.md` (renderer registration, prop art merge, mob sprites, input, inventory save, sounds). Not judged: how the fights feel (first-guess numbers), pacing, whether herbs are the right reward, the look and sound of everything.
+
+## Layered migration cleanup (2026-10-27, Codex)
+
+Owner authorized finishing docs/CODEX_TASK_layered_migration.md. Corrected stale route/checkpoint tests, moved active scene/receipt/tutorial/bot coverage to layered maps, made all debug jumps official layered destinations, and retired painted render/lighting branches. Converted grounds, obsolete painted occluders and old capture scripts are preserved in art/reference/retired_painted_maps; original paintings and arena renderer/occluders remain. Audit of active presentation is clean of painted scene IDs. Core/save migration and core legacy layouts remain Claude-owned. Details and exact follow-up: presentation/review/LAYERED_MIGRATION_COMPLETED.md. Focused checks, editor import and windowed current-map captures pass. Final full harness passes every suite (Python, import, core and all smoke tests), including all three previously failing route suites. Log: art/build/arena_layered_migration_final.log (ignored). No core/data/tools/harness or chapter-plan edits. Unrelated architecture edit preserved; no merge.
+
 ## Approved woodland floor + props combined (2026-10-27, Codex)
 
 Owner approved both sources. Imported ground at 640x400 and 12 props at consistent scale, hard alpha and Totoy36, with 24 separate shadow sprites, anchors and regenerated atlases/contact sheets. Combined captures: presentation/review/chapter1_expansion/woodland_full.png and woodland_view_*.png. Reproduction/limitations: art/reference/woodland_approach_v1/IMPORT.md. Standard art pipeline, Godot editor import, focused woodland smoke, windowed capture, palette/hard-alpha checks and unchanged-existing-light checks pass. Final full harness: Python, import, core and all presentation checks pass, including the new woodland smoke. The same three pre-existing routing suites fail (smoke_explore_scenes, smoke_forest_layered, smoke_layered_scenes); no full-pass claim. An initial Python catalogue check failure was fixed by keeping the review-only prop metadata local; the fresh full run passes Python. Review-only scene: no core/shared-data changes, mobs, rewards, collisions or live routes; Claude integration and cross-review remain pending. Existing chapter plan and unrelated architecture edit preserved.

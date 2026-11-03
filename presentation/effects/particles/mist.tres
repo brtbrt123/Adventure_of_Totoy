@@ -1,0 +1,22 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_ochye"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_ycfql"]
+
+[sub_resource type="Resource" id="Resource_7qc5k"]
+script = ExtResource("1_ochye")
+count = 1
+shape = "mote"
+life_min = 26
+life_max = 38
+speed_min = 0.05
+speed_max = 0.2
+drag = 0.02
+gravity = -0.003
+size_min = 2.0
+flutter = 1.0
+colours = PackedStringArray("6", "5")
+
+[resource]
+script = ExtResource("2_ycfql")
+layers = Array[Resource]([SubResource("Resource_7qc5k")])

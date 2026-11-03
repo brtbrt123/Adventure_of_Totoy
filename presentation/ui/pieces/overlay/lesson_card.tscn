@@ -1,0 +1,79 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://cd5ohkqft00a6" path="res://art/ui_kit/panel_medium.png" id="5_tex"]
+[ext_resource type="Texture2D" uid="uid://b7cjht10qtx7j" path="res://art/ui_kit/button_normal.png" id="6_tex"]
+[ext_resource type="FontFile" uid="uid://bxa12or38dv8m" path="res://presentation/fonts/Cinzel.ttf" id="8_fon"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="9_fon"]
+
+[sub_resource type="FontVariation" id="cinzel"]
+base_font = ExtResource("8_fon")
+variation_opentype = {
+2003265652: 900.0
+}
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("9_fon")
+variation_opentype = {
+2003265652: 400.0
+}
+
+[node name="Lesson" type="NinePatchRect"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 196
+offset_bottom = 34
+texture = ExtResource("5_tex")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 7.0
+offset_right = 134.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1)
+theme_override_fonts/font = SubResource("cinzel")
+theme_override_font_sizes/font_size = 8
+text = "DASH"
+
+[node name="Detail" type="Label" parent="."]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 17.0
+offset_right = 183.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8
+text = "DASH THROUGH THE MARKED RING."
+
+[node name="KeyButton" type="NinePatchRect" parent="."]
+layout_mode = 0
+offset_left = 144.0
+offset_top = 6.0
+offset_right = 187.0
+offset_bottom = 19.0
+texture = ExtResource("6_tex")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Text" type="Label" parent="KeyButton"]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 44.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 8
+text = "SHIFT"
+horizontal_alignment = 1

@@ -1,0 +1,52 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_2kvb0"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_odghd"]
+
+[sub_resource type="Resource" id="Resource_jxe3j"]
+script = ExtResource("1_2kvb0")
+count = 26
+life_min = 14
+life_max = 26
+speed_min = 0.8
+speed_max = 1.8
+drag = 0.07
+up = 0.7
+gravity = 0.09
+size_min = 2.0
+size_max = 3.0
+colours = PackedStringArray("d", "c", "b", "9")
+
+[sub_resource type="Resource" id="Resource_phsae"]
+script = ExtResource("1_2kvb0")
+count = 10
+shape = "leaf"
+life_min = 30
+life_max = 46
+speed_min = 0.8
+speed_max = 1.6
+drag = 0.04
+up = 0.6
+gravity = 0.02
+size_min = 2.0
+flutter = 2.0
+colours = PackedStringArray("7", "6", "6", "d")
+
+[sub_resource type="Resource" id="Resource_7pu0p"]
+script = ExtResource("1_2kvb0")
+shape = "smoke"
+life_min = 26
+life_max = 38
+speed_min = 0.2
+speed_max = 0.5
+drag = 0.06
+up = 0.1
+gravity = -0.003
+size_min = 2.0
+size_max = 3.0
+grow = 0.1
+colours = PackedStringArray("d", "c", "b")
+
+[resource]
+script = ExtResource("2_odghd")
+layers = Array[Resource]([SubResource("Resource_jxe3j"), SubResource("Resource_phsae"), SubResource("Resource_7pu0p")])

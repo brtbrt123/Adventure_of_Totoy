@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/scene_look.gd" id="1_pmgmb"]
+
+[resource]
+script = ExtResource("1_pmgmb")
+vignette_strength = 0.48
+glow_strength = 0.7
+mist_density = 0.17
+mist_edge_boost = 2.3

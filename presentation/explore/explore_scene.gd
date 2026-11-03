@@ -1,36 +1,40 @@
-extends Node2D
-## Exploration mode (chapter 1): draws any scene of core/scene_defs.gd from an ExploreCore snapshot and sends it the
-## player's intents. The core decides movement, collisions, exits, checkpoints and interactions; this node draws the
-## painted ground, the y-sorted actors (hero with the katana frames, NPCs with idle loops facing the hero when near,
-## the village chest) on the shared soft ground shadow (presentation/common/actor_shadow.gd) with a per-scene ambient
-## tint, the painted tall props drawn again over actors standing behind them (depth occluders,
-## presentation/common/depth_occluders.gd), a 320x180 camera clamped to the scene, the HUD-lite (scene toast, interact
-## hint), the 0.3 s fade between scenes, the "..." speech bubble on E, the character menu (TAB) and the debug keys
-## (F1/H colliders, F2-F5 or 1-4 jump, F6/G forest gate).
-##
-## Start: Engine meta START_META (set by the title screen) = {scene, entry, checkpoint, gate_open}; without it the
-## village arrival. Progress (scene, checkpoint, gate) is saved only when started from the title (Engine meta
-## totoy_persist), through core/save_store.gd. Entering the arena (the glade's root arch or F5) loads the Colossus
-## fight (presentation/arena/arena.tscn).
+extends "res://presentation/common/hero_fx.gd"
+const LocalPropShadows := preload("res://presentation/common/local_prop_shadows.gd")
+## Chapter 1 layered-ground/prop renderer. Core owns movement, collisions, transitions and rewards.
+## F2/1 village, F3/2 forest, F4/3 glade, F5/4 arena; F7/5, F8/6 and F10/8 remain layered aliases; F11/9 woodland.
+## The arena uses its own renderer. Save migration stays in core/SaveProfile.
 const ExploreCore := preload("res://core/explore_core.gd")
 const SceneDefs := preload("res://core/scene_defs.gd")
 const InputFrame := preload("res://core/input_frame.gd")
-const GameEvent := preload("res://core/game_event.gd")
 const GameCore := preload("res://core/game_core.gd")
-const Snapshots := preload("res://core/snapshots.gd")
-const Tuning := preload("res://core/tuning.gd")
 const SaveStore := preload("res://core/save_store.gd")
 const SaveProfile := preload("res://core/save_profile.gd")
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
-const ArenaAnimation := preload("res://presentation/arena/animation.gd")
 const CharacterMenu := preload("res://presentation/arena/character_menu.gd")
 const ExploreHud := preload("res://presentation/explore/explore_hud.gd")
 const ActorShadow := preload("res://presentation/common/actor_shadow.gd")
-const DepthOccluders := preload("res://presentation/common/depth_occluders.gd")
 const PropScene := preload("res://core/prop_scene.gd")
+const MobView := preload("res://presentation/explore/mob_view.gd")
+const CreatureEffects := preload("res://presentation/explore/creature_effects.gd")
+const CreatureGlow := preload("res://presentation/explore/creature_glow.gd")
+var creature_effects: CreatureEffects = CreatureEffects.new()
+var creature_glow: CreatureGlow
+const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
+var _static_lamps: Dictionary = {}  # the props' lamp plan of the scene (EnvironmentLight.lamp_plan)
+var _moving_lamps: int = 0  # lamps added for moving mobs last snapshot
+const TrialArt := preload("res://presentation/explore/trial_scene_art.gd")
+const TrialFX := preload("res://presentation/explore/trial_scene_fx.gd")
+var trial_fx: TrialFX = TrialFX.new()
+var displayed_trial_seal: bool = false
 const PropsLayer := preload("res://presentation/common/props_layer.gd")
 const AmbientFireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const EnvironmentLight := preload("res://presentation/common/environment_light.gd")
+const SceneLook := preload("res://presentation/effects/scene_look.gd")  # the scene's grade, vignette, glow and mist (looks/<scene>.tres)
+const SCENE_POST := preload("res://presentation/effects/scene_post.gdshader")
+const MIST_PASS_ALPHA: float = 0.985  # a rect drawn with this alpha is the lighting shader's mist pass (overhead_light.gdshader)
+var look: Resource = null  # SceneLook of the current scene
+var post_rect: ColorRect = null  # the screen look, between the world and the HUD
+var _mist_edges: Dictionary = {}  # scene id -> ImageTexture (1 near the floor's edge)
 
 const RewardPopup := preload("res://presentation/explore/reward_popup.gd")
 var reward_popup: RewardPopup
@@ -38,27 +42,30 @@ const PracticeView := preload("res://presentation/explore/practice_view.gd")
 var practice_view: PracticeView
 const ConversationView := preload("res://presentation/explore/conversation_view.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
-const CombatEffects := preload("res://presentation/arena/combat_effects.gd")
 var conversation: ConversationView
 var practice_effects: Array[Dictionary] = []
+var hero_hit_tick: int = -1000
+var defeat_started_tick: int = -1
+var world_cues: Array[Dictionary] = []
+const EncounterEffects := preload("res://presentation/explore/encounter_effects.gd")
+var encounter_effects: EncounterEffects
+const ProgressionView := preload("res://presentation/explore/progression_view.gd")
+var progression_view: ProgressionView
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
 const TITLE_SCENE: String = "res://presentation/menu/title.tscn"
 const START_META: StringName = &"totoy_explore_start"
 const PERSIST_META: StringName = &"totoy_persist"
-const VIEW_SIZE: Vector2 = Vector2(320.0, 180.0)
+const VIEW_SIZE: Vector2 = Vector2(384.0, 216.0)
 
 const GROUNDS: Dictionary = {
-	&"village": "res://presentation/village/village_ground.png",
-	&"forest": "res://presentation/forest/forest_route_ground.png",
-	&"glade": "res://presentation/forest/stag_glade_ground.png",
 	&"arena": "res://presentation/arena/arena_ground.png",
 }
 ## Per-scene ambient multiplied onto the actors (not the ground) so the sprites sit in the dusk paintings.
 const AMBIENT: Dictionary = {
-	&"village": Color(0.93, 0.89, 0.84),
-	&"forest": Color(0.9, 0.94, 0.88),
-	&"glade": Color(0.88, 0.95, 0.94),
+	&"woodland_layered": Color(0.9, 0.94, 0.88),
+	&"root_hollow_layered": Color(0.88, 0.93, 0.87),
+	&"hollow_trial_layered": Color(0.88, 0.93, 0.87),
 	&"arena": Color(1, 1, 1),
 	&"village_layered": Color(0.93, 0.89, 0.84),
 	&"glade_layered": Color(0.88, 0.95, 0.94),
@@ -81,20 +88,16 @@ const HINTS: Dictionary = {&"npc": "[E] TALK", &"chest": "[E] OPEN", &"sign": "[
 const HINT_OVERRIDES: Dictionary = {&"root_gate": "[E] LOOK"}
 ## The hint floats this far above an object's feet (people: their height + 8).
 const OBJECT_HINT_HEIGHT: float = 30.0
-const DEBUG_SCENES: Dictionary = {"debug_scene_village": &"village", "debug_scene_forest": &"forest", "debug_scene_glade": &"glade", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered"}
+const DEBUG_SCENES: Dictionary = {"debug_scene_woodland": &"woodland_layered", "debug_scene_hollow": &"root_hollow_layered", "debug_scene_village": &"village_layered", "debug_scene_forest": &"forest_layered", "debug_scene_glade": &"glade_layered", "debug_scene_arena": &"arena", "debug_scene_village_layered": &"village_layered", "debug_scene_glade_layered": &"glade_layered", "debug_scene_forest_layered": &"forest_layered", "debug_scene_trial": &"hollow_trial_layered"}
 
 var core: ExploreCore
 var snapshot: ExploreCore.ExploreSnapshot
-var colors: Dictionary = {}
-var frames: Dictionary = {}
-var sprites: Texture2D
 var grounds: Dictionary = {}
 var prop_placements: Array[Dictionary] = []
 var lighting_enabled: bool = true
 var npc_idle_ticks: Dictionary = {}
 var camera: Camera2D
 var view_origin: Vector2 = Vector2.ZERO
-var facing_left: bool = false
 var previous_hero_position: Vector2 = Vector2.INF
 var hero_frame: String = ""
 var npc_frames: Dictionary = {}  # npc id -> frame name drawn this tick
@@ -114,6 +117,16 @@ var profile: SaveProfile = null
 var loadout_core: GameCore
 var character_menu: CharacterMenu
 var missing_frames: Dictionary = {}
+## The katana's Black Form cut-in (drawn on the HUD layer). While it plays the road does not step the core.
+const BlackFormCutIn := preload("res://presentation/arena/black_form_cutin.gd")
+var cutin: BlackFormCutIn
+const LightningFormCutIn := preload("res://presentation/arena/lightning_form_cutin.gd")
+const ReapersCoilCutIn := preload("res://presentation/arena/reapers_coil_cutin.gd")
+const DisintegrationCutIn := preload("res://presentation/arena/disintegration_cutin.gd")
+var lightning_cutin: LightningFormCutIn
+var coil_cutin: ReapersCoilCutIn
+var disint_cutin: DisintegrationCutIn
+var intro_arrival_ticks: int = 0
 var transitions: int = 0  # scene changes done (tests)
 var change_scene: Callable = func(path: String) -> void: get_tree().change_scene_to_file(path)
 @onready var hud: ExploreHud = $HUD/Display
@@ -121,13 +134,47 @@ var change_scene: Callable = func(path: String) -> void: get_tree().change_scene
 
 func _ready() -> void:
 	Bindings.register()
+	progression_view=ProgressionView.new()
+	add_child(progression_view)
+	encounter_effects = EncounterEffects.new()
+	add_child(encounter_effects)
 	practice_view = PracticeView.new()
 	add_child(practice_view)
+	creature_glow = CreatureGlow.new()  # the healing particles' additive glow, over the world and under the HUD
+	add_child(creature_glow)
+	# The screen look (grade, vignette, glow): a full-screen rect on its own layer over the world and under the HUD.
+	var post_layer: CanvasLayer = CanvasLayer.new()
+	post_layer.name = "SceneLook"
+	post_layer.layer = 1
+	get_node("HUD").layer = 2
+	post_rect = ColorRect.new()
+	post_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	post_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var post_material: ShaderMaterial = ShaderMaterial.new()
+	post_material.shader = SCENE_POST
+	post_rect.material = post_material
+	post_layer.add_child(post_rect)
+	add_child(post_layer)
 	var palette: Dictionary = _read_json("res://art/palette.json")
 	for entry: Dictionary in palette.get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
 	frames = _read_json("res://art/build/sprites.json").get("frames", {})
+	frames = ArenaAnimation.AnimLib.remap(frames)  # every effect plays in the owner's frame order (presentation/animations/effects)
 	sprites = load("res://art/build/sprites.png") as Texture2D
+	load_variant_atlases()
+	cutin = BlackFormCutIn.new()
+	cutin.position = Vector2(32, 18)
+	$HUD.add_child(cutin)
+	lightning_cutin = LightningFormCutIn.new()
+	lightning_cutin.position = Vector2(32, 18)
+	$HUD.add_child(lightning_cutin)
+	coil_cutin = ReapersCoilCutIn.new()
+	coil_cutin.position = Vector2(32, 18)
+	$HUD.add_child(coil_cutin)
+	disint_cutin = DisintegrationCutIn.new()
+	disint_cutin.position = Vector2(32, 18)
+	$HUD.add_child(disint_cutin)
+	_load_chain_origins()
 	var manifest: Dictionary = _read_json(NPC_MANIFEST)
 	var states: Dictionary = manifest.get("states", {})
 	for npc_name: String in states:
@@ -143,6 +190,8 @@ func _ready() -> void:
 	character_menu = CharacterMenu.new()
 	character_menu.equip_request = request_equip
 	character_menu.aspect_request = request_aspect_equip
+	character_menu.stat_request=request_stat_spend
+	character_menu.respec_request=request_stats_reset
 	$HUD.add_child(character_menu)
 	conversation = ConversationView.new()
 	$HUD.add_child(conversation)
@@ -154,9 +203,10 @@ func _ready() -> void:
 		Engine.remove_meta(START_META)
 	gate_open = bool(start.get("gate_open", profile.gate_open if persist else false))
 	var scene: StringName = StringName(start.get("scene", SceneDefs.START_SCENE))
-	if not SceneDefs.is_known(scene) or scene == SceneDefs.ARENA:
+	if not SceneDefs.LAYERED.has(scene):
 		scene = SceneDefs.START_SCENE
 	enter_scene(scene, StringName(start.get("entry", &"")), StringName(start.get("checkpoint", &"")))
+	# no scripted arrival walk any more (owner 2026-11-03): the hero stands still where the entry puts them
 	fade_phase = &"in"
 	fade_ticks = 0
 	_update_hud()
@@ -191,12 +241,47 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 		core = ExploreCore.at_checkpoint(scene, checkpoint, gate_open) as ExploreCore
 	else:
 		core = ExploreCore.new(scene, entry, gate_open)
+	hud.reset_combat_feedback()
 	core.set_story_flags(profile.story_flags)
+	core.set_inventory(profile.inventory)
+	core.set_exp(profile.exp_total)
+	core.set_stats(profile.stats)
+	core.set_loadout(profile.weapon_id,profile.equipped_aspects)
 	snapshot = core.snapshot()
 	practice_effects.clear()
+	particles.clear()
+	hit_bursts.clear()
+	parry_impacts.clear()
+	dash_ghosts.clear()
+	sprint_trail.clear()
+	wes_fx.clear()
+	aspect_fx.clear()
+	buff_events.clear()
+	buff_transition.clear()
+	for playing: Node in [cutin, lightning_cutin, coil_cutin, disint_cutin]:
+		if playing != null:
+			playing.stop()
+	staff_view.clear()
+	impact_view.clear()
+	form_view.clear()
+	aspect_view.clear()
+	lightning_fx.clear()
+	coil_fx.clear()
+	coil_hook_tick = -1
+	drag_started.clear()
+	hero_hidden_until = -1
+	_motion_seen = false
+	previous_player_position = snapshot.hero.position
+	hero_hit_tick = -1000
+	world_cues.clear()
+	encounter_effects.clear()
+	creature_effects.clear()
+	trial_fx.clear()
+	progression_view.clear()
+	defeat_started_tick = -1
 	practice_view.enter_scene(scene)
 	conversation.sync(snapshot.dialogue)
-	conversation.controls_open = scene in [SceneDefs.VILLAGE, SceneDefs.VILLAGE_LAYERED] and not snapshot.story_flags.has(&"seen_controls")
+	conversation.controls_open = scene == SceneDefs.VILLAGE_LAYERED and not snapshot.story_flags.has(&"seen_controls")
 	gate_open = snapshot.gate_open
 	_refresh_props()
 	facing_left = snapshot.hero.facing.x < 0.0
@@ -209,6 +294,11 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	_save_progress(scene, core.last_checkpoint)
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
+	encounter_effects.sync(snapshot, colors, frames, sprites)
+	creature_effects.sync(snapshot)
+	trial_fx.sync(snapshot.scene_id,snapshot.tick)
+	progression_view.sync(snapshot, colors, frames, sprites)
+	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
 	queue_redraw()
 
@@ -218,17 +308,47 @@ func _save_progress(scene: StringName, checkpoint: StringName) -> void:
 	profile.gate_open = gate_open
 	if snapshot != null:
 		profile.story_flags = snapshot.story_flags.duplicate()
+		profile.inventory = snapshot.inventory.duplicate(true)
+		profile.exp_total = snapshot.exp_total
+		profile.stats = snapshot.stats.duplicate()
 	if persist:
 		SaveStore.save(profile)
 
 
-func _physics_process(_delta: float) -> void:
+## True while any weapon cut-in plays (the road does not step).
+func cutin_playing() -> bool:
+	return (cutin != null and cutin.active) or (lightning_cutin != null and lightning_cutin.active) or (coil_cutin != null and coil_cutin.active) or (disint_cutin != null and disint_cutin.active)
+
+
+func _physics_process(delta: float) -> void:
+	if cutin_playing():
+		if cutin.active:
+			cutin.advance(delta)
+		if lightning_cutin.active:
+			lightning_cutin.advance(delta)
+		if coil_cutin.active:
+			coil_cutin.advance(delta)
+		if disint_cutin.active:
+			disint_cutin.advance(delta)
+		return
+	if snapshot != null and snapshot.defeated:
+		advance(InputFrame.new())
+		return
 	if character_menu.is_open:
 		if not character_menu.poll_input():
 			_update_hud()
 		return
 	if fade_phase != &"":
 		advance_fade()
+		return
+	if intro_arrival_ticks>0:
+		var arrival: InputFrame = InputFrame.new()
+		arrival.move = Vector2.DOWN
+		advance(arrival)
+		intro_arrival_ticks -= 1
+		if intro_arrival_ticks==0:
+			conversation.controls_open = not snapshot.story_flags.has(&"seen_controls") and snapshot.dialogue.is_empty()
+			_update_hud()
 		return
 	if conversation.controls_open:
 		if Input.is_action_just_pressed("explore_interact") or Input.is_action_just_pressed("dialogue_next") or Input.is_action_just_pressed("menu_back"):
@@ -268,11 +388,24 @@ func advance(intent: InputFrame) -> void:
 		conversation.finish_typing()
 		intent = InputFrame.new()
 		intent.interact_pressed = false
+	for ability: String in ["attack","dash","parry"]:
+		var pressed: bool=intent.attack_pressed if ability=="attack" else (intent.dash_pressed if ability=="dash" else intent.parry_pressed)
+		if pressed and not bool(snapshot.unlocked.get(ability,false)):
+			hud.locked_hint(ability.capitalize()+" locked")
+			practice_view.audio.cue("slot_locked",snapshot.tick,0.4)
+	if intent.use_item_slot>0 and intent.use_item_slot<=snapshot.item_slots.size() and not bool(snapshot.item_slots[intent.use_item_slot-1].get("unlocked",false)):
+		practice_view.audio.cue("slot_locked",snapshot.tick,0.4)
+		hud.locked_hint("Item slot locked")
+	if intent.skill_pressed>0 and intent.skill_pressed<=snapshot.aspect_slots.size() and not bool(snapshot.aspect_slots[intent.skill_pressed-1].get("unlocked",false)):
+		practice_view.audio.cue("slot_locked",snapshot.tick,0.4)
+		hud.locked_hint("Aspect socket locked")
 	core.step(intent)
 	snapshot = core.snapshot()
+	trial_fx.sync(snapshot.scene_id,snapshot.tick)
 	gate_open = snapshot.gate_open
 	conversation.sync(snapshot.dialogue)
 	conversation.tick()
+	world_cues = world_cues.filter(func(cue: Dictionary) -> bool: return snapshot.tick-int(cue["tick"]) < 24)
 	practice_effects = practice_effects.filter(func(effect: Dictionary) -> bool: return snapshot.tick - int(effect["tick"]) < 12)
 	for event: GameEvent in core.last_events:
 		_on_event(event)
@@ -282,16 +415,73 @@ func advance(intent: InputFrame) -> void:
 		bubbles[id] = int(bubbles[id]) - 1
 		if int(bubbles[id]) <= 0:
 			bubbles.erase(id)
+	age_hero_fx()
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
+	encounter_effects.sync(snapshot, colors, frames, sprites)
+	creature_effects.sync(snapshot)
+	shake_left = maxi(shake_left, creature_effects.fx.take_shake())  # the mobs' heavy blows shake the view
+	progression_view.sync(snapshot, colors, frames, sprites)
+	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
 	_update_hud()
 	queue_redraw()
 
 
 func _on_event(event: GameEvent) -> void:
+	if snapshot.scene_id == &"hollow_trial_layered":
+		trial_fx.sync(snapshot.scene_id,snapshot.tick)
+		trial_fx.handle_event(event)
+		if bool(snapshot.trial.get("sealed",false)) != displayed_trial_seal:
+			_refresh_props()
+		match event.type:
+			&"trial_started":
+				toast_message = "THE HOLLOW TRIAL"
+				toast_ticks = 100
+				practice_view.audio.cue("aspect_bind",event.tick,.4)
+			&"trial_wave_started":
+				toast_message = "FINAL WAVE" if int(event.data["wave"]) == int(event.data["waves"]) else "WAVE %d / %d" % [event.data["wave"],event.data["waves"]]
+				toast_ticks = 100
+			&"trial_wave_cleared":
+				toast_message = "WAVE CLEARED"
+				toast_ticks = 100
+				practice_view.audio.cue("lesson_complete",event.tick,.4)
+			&"trial_won":
+				toast_message = "TRIAL COMPLETE"
+				toast_ticks = 130
+				practice_view.audio.cue("root_gate_open",event.tick,.5)
+			&"trial_failed":
+				toast_message = "TRIAL ENDED"
+				toast_ticks = 100
+	creature_effects.warden.sync(snapshot)
+	creature_effects.warden.handle_event(event, snapshot)
+	# Events can announce a newly spawned Warden before the HUD's next refresh.
+	for mob: Dictionary in snapshot.mobs:
+		practice_view.audio.mob_types[int(mob["id"])] = String(mob["type"])
+	hud.combat_event(event)
+	encounter_effects.handle_event(event, snapshot)
 	practice_view.audio.handle_event(event, snapshot.scene_id)
+	if event.type in [GameEvent.MOB_DEFEATED,GameEvent.ITEM_USED,GameEvent.HERO_RESPAWNED]:
+		world_cues.append({"type":event.type,"tick":snapshot.tick,"at":event.data.get("position",snapshot.hero.position)})
+	if event.type == GameEvent.ENCOUNTER_CLEARED:
+		toast_message = "CLEARING CLEARED"
+		toast_ticks = 110
 	match event.type:
+		GameEvent.QUEST_COMPLETED, GameEvent.STAT_SPENT, GameEvent.STATS_RESET:
+			_save_progress(core.scene_id,core.last_checkpoint)
+		GameEvent.EXIT_BLOCKED:
+			hud.gate_message=String(event.data.get("text",""))
+			hud.gate_tick=snapshot.tick
+		GameEvent.CHEST_OPENED:
+			progression_view.chest_tick=snapshot.tick
+			hud.task_message="The trial chest." if snapshot.scene_id == &"hollow_trial_layered" else "The Elder's basket."
+			hud.task_tick=snapshot.tick
+			practice_view.audio.cue("chest_open",snapshot.tick,0.7)
+		GameEvent.HERO_DEFEATED:
+			character_menu.close()
+			defeat_started_tick = snapshot.tick
+		GameEvent.HERO_RESPAWNED:
+			defeat_started_tick = -1
 		GameEvent.SCENE_EXIT:
 			begin_transition(event.data["target_scene"], event.data["target_entry"])
 		GameEvent.CHECKPOINT:
@@ -306,10 +496,17 @@ func _on_event(event: GameEvent) -> void:
 		GameEvent.INTERACT:
 			if event.data["kind"] == &"npc" and snapshot.dialogue.is_empty():
 				bubbles[event.data["target_id"]] = BUBBLE_TICKS
+		GameEvent.EXP_GAINED:
+			_save_progress(core.scene_id, core.last_checkpoint)
+		GameEvent.ITEM_USED:
+			_save_progress(core.scene_id, core.last_checkpoint)
 		GameEvent.ITEM_RECEIVED:
-			var icons: Dictionary = {&"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1"}
+			_save_progress(core.scene_id, core.last_checkpoint)
+			var icons: Dictionary = {&"sprint": "ui_aspect_sprint_1", &"herb": "hud_copper_herb", &"black_katana": "ui_weapon_totoy_blade_1", &"dual_dagger": "ui_weapon_dual_dagger_1", &"chain_scythe": "ui_weapon_chain_scythe_1", &"star_staff": "ui_weapon_star_staff_1"}
 			show_reward({"kind": event.data["kind"], "name": event.data["name"], "quantity": event.data["quantity"], "icon": icons.get(StringName(event.data["item_id"]), "")})
 		GameEvent.FLAG_SET, GameEvent.DIALOGUE_ENDED:
+			if event.type == GameEvent.FLAG_SET:
+				_refresh_props()  # a prop may change state with a story flag (Root Hollow's root-knot barrier opens on cleared_hollow_center)
 			_save_progress(core.scene_id, core.last_checkpoint)
 			if event.type == GameEvent.FLAG_SET:
 				var flag: String = String(event.data.get("flag", ""))
@@ -317,8 +514,65 @@ func _on_event(event: GameEvent) -> void:
 					practice_message("TRAINING COMPLETE")
 				elif flag.begins_with("lesson_"):
 					practice_message(flag.trim_prefix("lesson_").to_upper() + " LEARNED")
-		GameEvent.TRAINING_POST_HIT, GameEvent.PARRY_SUCCEEDED:
+		GameEvent.DAMAGE_TAKEN:
+			hero_hit_tick = snapshot.tick
+			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": snapshot.hero.position + Vector2(0,-14), "perfect": false})
+		GameEvent.ATTACK_HIT:
+			# the hero's swing: the same burst, sparks and shake as in the fight (presentation/common/hero_fx.gd)
+			if bool(event.data.get("echo", false)):
+				return  # a Phantom echo is not a swing: its own light effects come from phantom_echo
+			var counter: bool = event.data.get("kind", &"") == &"counter"
+			var finisher: bool = (int(event.data.get("combo_index", 0)) >= snapshot.hero.combo_max and snapshot.hero.combo_max > 0) or event.data.get("skill_id", &"") == &"moon_cleave" or bool(event.data.get("ward_release", false))
+			if bool(event.data.get("lightning_strike", false)):
+				return  # the sky strike draws its own burst (lightning_strike)
+			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -12), counter, finisher, event.data.get("skill_id", event.data.get("aspect_id", &"")))
+			if snapshot.hero.weapon_form == Weapons.FORM_LIGHTNING:
+				_add_lightning_fx({"kind": "spark", "tick": event.tick, "at": Vector2(event.data["position"]) + Vector2(0, -12), "life": LightningEffects.sequence_length(LightningEffects.SPARK_TICKS)})
+		GameEvent.MOB_STAGGERED:
+			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": false})
+		GameEvent.TRAINING_POST_HIT:
+			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": false})
+			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -8), false, false)
+		GameEvent.PARRY_SUCCEEDED:
+			# kept for the brief parry pose; the picture, sparks and shake come from the shared layer
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": event.data.get("quality", &"") == &"perfect"})
+			on_hero_parry(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -8), event.data.get("quality", &"") == &"perfect")
+		&"lantern_placed", &"lantern_pulse", &"lantern_expired", &"phantom_cut_started", &"phantom_cut_ended", &"phantom_echo":
+			_on_aspect_event(event)
+		&"weapon_buff_started", &"weapon_buff_ended":
+			var buff: Dictionary = on_hero_weapon_buff(event)
+			if not buff.is_empty():
+				if buff["started"]:
+					if buff["form"] == Weapons.FORM_LIGHTNING and lightning_cutin != null:
+						lightning_cutin.start()
+					elif buff["form"] == Weapons.FORM_REAPER_COIL and coil_cutin != null:
+						coil_cutin.start()
+					elif buff["form"] == Weapons.FORM_DISINTEGRATION and disint_cutin != null:
+						disint_cutin.start()
+					elif cutin != null:
+						cutin.start()
+				practice_view.audio.cue("weapon_buff_start" if buff["started"] else "weapon_buff_end", event.tick)
+		&"lightning_blink":
+			_on_lightning_blink(event)
+		&"lightning_strike":
+			_on_lightning_strike(event)
+		&"reaper_coil_started", &"reaper_coil_hooked", &"reaper_coil_missed", &"reaper_coil_drag", &"reaper_coil_spin", &"reaper_coil_ended":
+			_on_reaper_coil(event)
+		&"staff_burst", &"disintegration_started", &"disintegration_impact", &"disintegration_ended":
+			on_staff_event(event)
+		&"dash_started":
+			on_staff_event(event)  # the Star Staff's blink (staff_view ignores a plain dash)
+		&"lightning_barrage_ended":
+			if event.data.get("reason", &"") == &"complete":
+				_burst(snapshot.hero.position - Vector2(0, 12), 8, colors["o"], 0.7)
+		&"skill_started":
+			on_hero_skill_event(event)
+			practice_view.audio.cue("skill_" + String(event.data["skill_id"]), event.tick)
+		&"skill_released":
+			if on_hero_skill_event(event):
+				practice_view.audio.cue("release_" + String(event.data["skill_id"]), event.tick)
+		&"sprint_started", &"sprint_ended", &"echo_placed", &"echo_recall", &"echo_expired", &"ward_raised", &"ward_blocked", &"ward_released":
+			_on_ward_echo_sprint(event)
 		GameEvent.TRAINING_HERO_HIT:
 			practice_message("TRY AGAIN")
 		GameEvent.TRAINING_DODGED:
@@ -354,6 +608,8 @@ func advance_fade() -> void:
 
 ## 0..1, how dark the screen is.
 func fade_alpha() -> float:
+	if snapshot != null and snapshot.defeated and defeat_started_tick >= 0:
+		return clampf(float(snapshot.tick - defeat_started_tick) / 35.0, 0.0, 0.9)
 	match fade_phase:
 		&"out":
 			return clampf(float(fade_ticks) / FADE_TICKS, 0.0, 1.0)
@@ -362,8 +618,15 @@ func fade_alpha() -> float:
 	return 0.0
 
 
-## Debug jump (F2-F5 or 1-4): to the scene's default entry, with the fade.
+## Debug jump (F2-F5 or 1-4, T for the Hollow Trial): to the scene's default entry, with the fade.
 func jump_to(scene: StringName) -> void:
+	core.set_flag(&"received_first_sword")  # debug combat needs an armed hero as well as ability unlocks
+	core.set_flag(&"debug_all_unlocked")
+	if scene == &"hollow_trial_layered":  # T: the trial can be played again (debug only: the won flag and the opened chest are cleared)
+		var replay: Array[StringName] = core.story_flags.filter(func(f: StringName) -> bool: return f != &"cleared_hollow_trial" and f != &"trial_chest_opened")
+		core.set_story_flags(replay)
+	snapshot=core.snapshot()
+	_save_progress(core.scene_id,core.last_checkpoint)
 	begin_transition(scene, &"")
 
 
@@ -389,6 +652,10 @@ func toast_text() -> String:
 func hint_text() -> String:
 	if snapshot == null or not snapshot.dialogue.is_empty() or bool(snapshot.training.get("active", false)) or snapshot.interact_target == &"" or snapshot.exiting or bubbles.has(snapshot.interact_target):
 		return ""
+	if snapshot.interact_target==&"chest" and snapshot.story_flags.has(&"basket_found"):return "[E] LOOK"
+	if snapshot.scene_id == &"hollow_trial_layered" and snapshot.interact_target == &"altar":
+		if snapshot.story_flags.has(&"trial_chest_opened"): return ""
+		return "[E] OPEN CHEST" if snapshot.trial.get("state",&"") == &"won" else ("[E] BEGIN TRIAL" if snapshot.trial.get("state",&"") == &"idle" and snapshot.armed else "")
 	return HINT_OVERRIDES.get(snapshot.interact_target, HINTS.get(snapshot.interact_kind, "[E] LOOK"))
 
 
@@ -422,31 +689,45 @@ func request_equip(weapon: StringName) -> void:
 
 
 func request_aspect_equip(aspect: StringName, slot: int) -> void:
+	if not snapshot.owned_aspects.has(aspect):return
 	var frame: InputFrame = InputFrame.new()
 	frame.aspect_equip = aspect
 	frame.aspect_equip_slot = slot
 	loadout_core.step(frame)
 	for event: GameEvent in loadout_core.last_events:
 		practice_view.audio.handle_event(event, snapshot.scene_id)
-	if slot >= 1 and slot <= loadout_core.snapshot().player.equipped_aspects.size() and loadout_core.snapshot().player.equipped_aspects[slot - 1] == aspect:
+	if aspect==&"sprint" and slot==1 and loadout_core.snapshot().player.equipped_aspects[0]==aspect:
 		core.set_flag(&"lesson_aspect")
-		snapshot = core.snapshot()
-		_save_progress(core.scene_id, core.last_checkpoint)
+		advance(InputFrame.new())
 	_save_loadout()
 	_update_hud()
+
+
+func request_stat_spend(stat: StringName) -> void:
+	var frame: InputFrame=InputFrame.new()
+	frame.spend_stat=stat
+	advance(frame)
+
+
+func request_stats_reset() -> void:
+	var frame: InputFrame=InputFrame.new()
+	frame.respec_stats=true
+	advance(frame)
 
 
 func _save_loadout() -> void:
 	var player: Snapshots.EntitySnapshot = loadout_core.snapshot().player
 	profile.weapon_id = player.weapon_id
 	profile.equipped_aspects = player.equipped_aspects.duplicate()
+	core.set_loadout(profile.weapon_id,profile.equipped_aspects)
+	snapshot=core.snapshot()
 	if persist:
 		SaveStore.save(profile)
 
 
 # --- drawing ---
 
-## Follows the hero on a fixed 320x180 screen, locked to his rounded position and clamped to the scene (the arena's rule).
+## Follows the hero on a fixed 384x216 screen, locked to his rounded position and clamped to the scene (the arena's rule).
 func _update_camera() -> void:
 	if camera == null or snapshot == null:
 		return
@@ -456,12 +737,77 @@ func _update_camera() -> void:
 	camera.force_update_scroll()
 
 
+var _previous_hero_state: StringName = &""
+
+
+## The hooks of presentation/common/hero_fx.gd.
+func fx_hero() -> Snapshots.EntitySnapshot:
+	return snapshot.hero
+
+
+func fx_tick() -> int:
+	return snapshot.tick
+
+
+func fx_hero_frame() -> String:
+	return hero_frame
+
+
+func fx_snapshot() -> RefCounted:
+	return snapshot
+
+
+func fx_view_origin() -> Vector2:
+	return view_origin
+
+
+func fx_target_position(target_id: int, fallback: Vector2) -> Vector2:
+	for mob: Dictionary in snapshot.mobs:
+		if int(mob["id"]) == target_id:
+			return mob["position"]
+	return fallback
+
+
+## The mobs held by the chain: [{id, position}].
+func fx_dragged() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for mob: Dictionary in snapshot.mobs:
+		if bool(mob.get("dragged", false)):
+			out.append({"id": mob["id"], "position": mob["position"]})
+	return out
+
+
+## Where a connecting spin hit lands: every mob within the spin radius.
+func fx_spin_contacts(event: GameEvent) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for mob: Dictionary in snapshot.mobs:
+		if mob["state"] == &"dead" and int(mob["state_ticks"]) > 1:
+			continue  # already down before this spin (one felled by it has state_ticks 1): no false hit sparks
+		if Vector2(event.data["position"]).distance_to(mob["position"]) - float(mob["radius"]) <= float(event.data.get("radius", Tuning.REAPER_COIL_SPIN_RADIUS)):
+			out.append(Vector2(mob["position"]) + Vector2(0, -14))
+	return out
+
+
+## A mob's body: a little above its feet.
+func fx_target_contact(_target_id: int, fallback: Vector2) -> Vector2:
+	return fallback + Vector2(0, -14)
+
+
+func fx_cue(key: String, tick: int, strength: float = 1.0) -> void:
+	practice_view.audio.cue(key, tick, strength)
+
+
 func _choose_frames() -> void:
 	var hero: Snapshots.EntitySnapshot = snapshot.hero
+	var was_left: bool = facing_left
 	if absf(hero.facing.x) > 0.3:
 		facing_left = hero.facing.x < 0.0
+	track_hero_motion(not hero.position.is_equal_approx(previous_player_position), _previous_hero_state, was_left)
+	_previous_hero_state = hero.state
 	previous_hero_position = hero.position
 	hero_frame = hero_frame_for(hero, snapshot.armed)
+	if snapshot.armed and snapshot.tick - hero_hit_tick >= 0 and snapshot.tick - hero_hit_tick < 8:
+		hero_frame = ArenaAnimation.hero_frame(ArenaAnimation.SET_KATANA, "hurt", mini(4, (snapshot.tick - hero_hit_tick) / 2 + 1))
 	# Core returns to idle on success; hold the same brief contact pose as the arena.
 	for effect: Dictionary in practice_effects:
 		if snapshot.armed and effect["type"] == GameEvent.PARRY_SUCCEEDED and snapshot.tick - int(effect["tick"]) < 3 and hero.state in [&"idle", &"walk", &"parry"]:
@@ -479,7 +825,7 @@ static func hero_frame_for(hero: Snapshots.EntitySnapshot, armed: bool = true) -
 	if not armed:
 		var state: String = String(hero.state) if UNARMED_FRAMES.has(String(hero.state)) else "idle"
 		var ticks: int = ArenaAnimation.walk_ticks(hero.state_ticks, hero.move_speed_mult) if state == "walk" else hero.state_ticks
-		return ArenaAnimation.hero_frame("totoy_unarmed", state, ArenaAnimation.frame_index(UNARMED_FRAMES[state], ticks))
+		return ArenaAnimation.hero_frame("totoy_unarmed", state, ArenaAnimation.AnimLib.at("totoy_unarmed", state, ticks, UNARMED_FRAMES[state]))
 	var view: Snapshots.GameSnapshot = Snapshots.GameSnapshot.new()
 	return ArenaAnimation.choose(hero, view, {})
 
@@ -487,6 +833,8 @@ static func hero_frame_for(hero: Snapshots.EntitySnapshot, armed: bool = true) -
 ## The NPC's idle loop frame (4 frames, the source ticks 24/14/14/8) at `tick`.
 func npc_frame_for(npc: Dictionary, tick: int) -> String:
 	var visual: String = String(npc["visual"])
+	if ArenaAnimation.AnimLib.has(visual, "idle"):  # the owner's npc_<name>.tres (its per-frame durations carry the source ticks)
+		return ArenaAnimation.AnimLib.key(visual, "idle", ArenaAnimation.AnimLib.at(visual, "idle", tick, [4, 8, true]), "")
 	var ticks: Array = npc_idle_ticks.get(visual.trim_prefix("npc_"), NPC_IDLE_TICKS_DEFAULT)
 	var total: int = 0
 	for t: Variant in ticks:
@@ -502,7 +850,11 @@ func npc_frame_for(npc: Dictionary, tick: int) -> String:
 
 
 func ambient() -> Color:
-	return AMBIENT.get(snapshot.scene_id, Color.WHITE) if snapshot != null else Color.WHITE
+	var base: Color = AMBIENT.get(snapshot.scene_id, Color.WHITE) if snapshot != null else Color.WHITE
+	var night: float = staff_dim() if snapshot != null else 0.0
+	if night <= 0.0:
+		return base
+	return Color(base.r * (1.0 - night * 0.75), base.g * (1.0 - night * 0.7), base.b * (1.0 - night * 0.55), base.a)
 
 
 func _visible_world_rect() -> Rect2:
@@ -516,62 +868,120 @@ func drawables() -> Array[Dictionary]:
 	for npc: Dictionary in snapshot.npcs:
 		var height: float = float(NPC_HEIGHTS.get(npc["visual"], 30.0))
 		out.append({"kind": &"npc", "id": npc["id"], "at": npc["position"], "frame": String(npc_frames.get(npc["id"], "")), "left": bool(npc["facing_left"]), "shadow": HERO_SHADOW_RADIUS * height / HERO_HEIGHT, "tint": tint, "height": height})
-	if snapshot.scene_id == SceneDefs.VILLAGE:
-		for object: Dictionary in snapshot.objects:
-			if object["kind"] == &"chest":  # the village chest is not painted (the forest's is, in its nook)
-				out.append({"kind": &"object", "id": object["id"], "at": object["position"], "frame": "obj_chest_closed_1", "left": false, "shadow": 0.0, "tint": Color.WHITE})
-	if snapshot.scene_id == SceneDefs.VILLAGE:
-		for object: Dictionary in snapshot.objects:
-			if object["kind"] == &"dummy":
-				var age: int = int(snapshot.training.get("since_hit", 1000))
-				var key: String = "obj_dummy_hit_%d" % (1 + mini(1, age / 4)) if age >= 0 and age < 8 else "obj_dummy_1"
-				var offset: Vector2 = Vector2(1 if age % 2 == 0 else -1, 0) if age >= 0 and age < 8 else Vector2.ZERO
-				out.append({"kind": &"object", "id": object["id"], "at": Vector2(object["position"]) + offset, "frame": key, "left": false, "shadow": 6.0, "tint": tint})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
+	for mob: Dictionary in snapshot.mobs:
+		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": WardenEffects.SHADOW_RADIUS if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 81.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
-		return PropsLayer.sorted_with_actors(PropsLayer.drawables(prop_placements, frames, _visible_world_rect().grow(8)), out)
-	out.append_array(DepthOccluders.drawables(snapshot.scene_id, {&"gate_open": snapshot.gate_open}, _visible_world_rect().grow(8.0)))
-	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Vector2(a["at"]).y < Vector2(b["at"]).y)
+		var props: Array[Dictionary]=PropsLayer.drawables(prop_placements,frames,_visible_world_rect().grow(8))
+		if snapshot.story_flags.has(&"basket_found"):
+			var age: int=snapshot.tick-progression_view.chest_tick
+			var n: int=mini(6,age/5+1) if progression_view.chest_tick>=0 and age>=0 else 6
+			var f: Dictionary=frames["progress_chest_open_%d" % n]
+			for item: Dictionary in props:
+				if item["type"]==&"village_chest":
+					item["rect"]=Rect2((Vector2(item["at"])-Vector2(f["ax"],f["ay"])).round(),Vector2(f["w"],f["h"]))
+					item["src"]=Rect2(f["x"],f["y"],f["w"],f["h"])
+		return PropsLayer.sorted_with_actors(props,out)
 	return out
+
 
 
 func _draw() -> void:
 	if snapshot == null or colors.is_empty():
 		return
+	_sync_moving_lights()  # every drawn snapshot (stepped, paused or set by a capture) carries its moving lights
+	draw_set_transform(shake_offset())
 	draw_rect(Rect2(Vector2(-8, -8), snapshot.size + Vector2(16, 16)), colors["2"])
 	var ground: Texture2D = ground_texture(snapshot.scene_id)
 	if ground != null:
 		draw_texture(ground, Vector2.ZERO)
+	if snapshot.scene_id == &"hollow_trial_layered":
+		var altar: Vector2 = TrialArt.altar_at(prop_placements)
+		TrialArt.draw_altar_base(self, altar, frames, sprites)
+		TrialArt.draw_floor(self,prop_placements,frames,sprites,shake_offset())
+		trial_fx.draw_ground(self,snapshot.tick,colors,altar)
+	# the ground mist: over the floor, under the warnings, props and characters (the lighting shader draws it)
+	if material is ShaderMaterial and look != null and bool(look.get("mist_enabled")):
+		draw_rect(Rect2(Vector2.ZERO, snapshot.size), Color(1, 1, 1, MIST_PASS_ALPHA))
+	var night: float = staff_dim()  # Disintegration darkens the floor (and ambient() the props and characters); its magic stays lit
+	if night > 0.0:
+		draw_rect(Rect2(Vector2(-8, -8), snapshot.size + Vector2(16, 16)), Color(0.02, 0.03, 0.09, night * 0.65))
+	var ring: Dictionary = snapshot.training.get("ring",{})
+	if bool(ring.get("active",false)):
+		var at: Vector2=ring["center"]
+		var f: Dictionary=frames["progress_ring_%d" % (posmod(snapshot.tick/10,4)+1)]
+		var diameter: float=float(ring["radius"])*2.0
+		draw_texture_rect_region(sprites,Rect2((at-Vector2.ONE*diameter/2).round(),Vector2.ONE*diameter),Rect2(f["x"]+6,f["y"]+6,28,28))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
+	_draw_lightning_ground()
+	_draw_coil_ground()
+	_draw_staff_ground()
+	_draw_impact_ground()
+	_draw_lantern_ground()
+	_draw_ward_echo_ground()
+	creature_effects.draw_ground(self, snapshot, frames, sprites, colors)
+	draw_dash_fx()
+	for prop: Dictionary in lantern_drawables() + echo_drawables():
+		_draw_imported(prop["name"], prop["at"], prop["scale"])
 	var items: Array[Dictionary] = drawables()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
+		if snapshot.scene_id == &"root_hollow_layered" and lighting_enabled:
+			LocalPropShadows.draw(self, items, prop_placements, sprites, shake_offset())
 		# All shadows lie on the floor, never on a lower-sorted prop or actor.
 		for item: Dictionary in items:
 			if item["kind"] == &"prop":
 				PropsLayer.draw_shadow(self, item, shadow_strength(), sprites)
-			elif item["kind"] in [&"hero", &"npc", &"object"]:
+			elif item["kind"] in [&"hero", &"npc", &"object", &"mob"]:
 				_draw_actor_cast(item)
 				ActorShadow.draw(self, item["at"], item["shadow"], shadow_strength())
 	for item: Dictionary in items:
 		_draw_item(item)
-	if snapshot.hero.state == &"dash":
-		_draw_imported("fx_dash_%d" % (mini(5, snapshot.hero.state_ticks / 2) + 1), snapshot.hero.position - Vector2(0, 10), Vector2(-1 if facing_left else 1, 1))
+	_draw_ward_echo_front(shake_offset())
+	_draw_aspects_front()
 	for item: Dictionary in items:
 		if item["kind"] == &"npc" and bubbles.has(item["id"]):
 			_draw_bubble(Vector2(item["at"]) - Vector2(0, float(item["height"]) + 6.0))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		if TelegraphView.warning_visible(tell, snapshot.tick):
 			TelegraphView.draw_marker(self, tell, colors["x"] if tell.kind == &"gold" else colors["z"], colors["0"])
+	draw_hero_impacts()
+	_draw_skill_effect(shake_offset())
+	_draw_skill_projectiles(shake_offset())
+	_draw_skill_contacts()
+	_draw_buff_transition()
+	_draw_lightning(shake_offset())
+	_draw_scythe(shake_offset())
+	_draw_staff(shake_offset())
 	for effect: Dictionary in practice_effects:
+		if effect["type"] in [GameEvent.PARRY_SUCCEEDED, GameEvent.TRAINING_POST_HIT]:
+			continue  # drawn by the shared layer
 		var age: int = snapshot.tick - int(effect["tick"])
 		var plan: Array[Dictionary] = CombatEffects.parry_impact(effect["at"], age, effect["perfect"], colors) if effect["type"] == GameEvent.PARRY_SUCCEEDED else CombatEffects.hit_impact(effect["at"], age, false, colors)
 		CombatEffects.draw_plan(self, plan)
 	if not snapshot.training.is_empty() and int(snapshot.training["since_hit"]) < 8:
 		draw_arc(snapshot.training["center"], 10.0 + float(snapshot.training["since_hit"]) * 0.5, 0, TAU, 24, colors["1"], 1.0)
+	for mob: Dictionary in snapshot.mobs:
+		MobView.decorate(self, mob, colors, snapshot.hero.position, frames, sprites)
+	creature_effects.draw_overlay(self, snapshot, frames, sprites, colors)
+	if snapshot.scene_id == &"hollow_trial_layered":
+		TrialFX.draw_altar_progress(self,snapshot.trial,colors,TrialArt.altar_at(prop_placements))
+	for cue: Dictionary in world_cues:
+		var age: int = snapshot.tick-int(cue["tick"])
+		var at: Vector2 = cue["at"]
+		var color: Color = colors["g"] if cue["type"] == GameEvent.MOB_DEFEATED else colors["u"]
+		if age < 18:
+			draw_arc(at,4.0+age*0.5,0.0,TAU,16,color,1.0)
 	if debug_enabled:
 		_draw_debug()
+	draw_set_transform(Vector2.ZERO)
+	draw_hero_screen_flashes(view_origin, VIEW_SIZE)
+
+
+func hero_hit_flash() -> bool:
+	var age: int = snapshot.tick - hero_hit_tick
+	return age >= 0 and age < 12 and (age < 4 or age % 4 < 2)
 
 
 func _draw_item(item: Dictionary) -> void:
@@ -588,9 +998,6 @@ func _draw_item(item: Dictionary) -> void:
 			drawn["rect"] = rect
 		PropsLayer.draw(self, drawn, sprites, ambient())
 		return
-	if item["kind"] == &"occluder":
-		DepthOccluders.draw(self, snapshot.scene_id, item)
-		return
 	var at: Vector2 = Vector2(item["at"]).round()
 	var radius: float = float(item["shadow"])
 	if radius > 0.0 and not SceneDefs.LAYERED.has(snapshot.scene_id):
@@ -603,7 +1010,25 @@ func _draw_item(item: Dictionary) -> void:
 		draw_rect(Rect2(at - Vector2(6, 24), Vector2(12, 24)), colors["g"])
 		return
 	var frame: Dictionary = frames[key]
-	draw_texture_rect_region(sprites, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
+	if item["kind"] == &"hero" and hero_hidden():
+		return  # an Echo Step arrival's first frame: only the echo flares
+	if item["kind"] == &"hero":
+		draw_hero_back(snapshot.hero, key, at, bool(item["left"]))
+		_draw_spin_ring(snapshot.hero, false)
+	var white: bool = hero_hit_flash() if item["kind"] == &"hero" else (item["kind"] == &"mob" and int(item["mob"]["since_hit"]) < 4)
+	if item["kind"] == &"mob" and item["mob"]["type"] == &"warden" and bool(item["mob"].get("guarded", false)):
+		white = false  # a reduced guard hit flashes the rune/sparks, preserving readable bark and stone
+	var sheet: Texture2D = MobView.WHITE if white else (empowered_sprites if item["kind"] == &"hero" and empowered_sprites != null and black_form_look(snapshot.hero) else sprites)
+	if item["kind"] == &"mob" and item["mob"]["type"] == &"warden":
+		creature_effects.draw_actor(self, item["mob"], key, snapshot.tick, frames, sprites, colors)
+	draw_texture_rect_region(sheet, ArenaAnimation.destination(at, frame, bool(item["left"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), item["tint"])
+	if item["kind"] == &"mob" and item["mob"]["type"] != &"warden":
+		creature_effects.draw_actor(self, item["mob"], key, snapshot.tick, frames, sprites, colors)
+	if item["kind"] == &"hero":
+		_draw_phantom_glow(snapshot.hero, key, at, bool(item["left"]))
+		_draw_buff_aura(snapshot.hero, true)
+		_draw_spin_ring(snapshot.hero, true)
+		_draw_hero_aspect_overlays(snapshot.hero, key, at, bool(item["left"]))
 
 
 func _draw_actor_cast(item: Dictionary) -> void:
@@ -612,41 +1037,120 @@ func _draw_actor_cast(item: Dictionary) -> void:
 	var frame: Dictionary = frames[item["frame"]]
 	draw_set_transform_matrix(EnvironmentLight.actor_transform(item["at"], frame, bool(item["left"])))
 	draw_texture_rect_region(sprites, Rect2(Vector2.ZERO, Vector2(frame["w"], frame["h"])), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]), Color(0, 0, 0, EnvironmentLight.ACTOR_SHADOW_ALPHA))
-	draw_set_transform_matrix(Transform2D.IDENTITY)
+	draw_set_transform(shake_offset())
 
 
 func shadow_strength() -> float:
-	var scene: StringName = snapshot.scene_id
-	if scene == &"village_layered":
-		scene = &"village"
-	elif scene == &"forest_layered":
-		scene = &"forest"
-	elif scene == &"glade_layered":
-		scene = &"glade"
-	return ActorShadow.strength_for(scene)
+	return ActorShadow.strength_for(snapshot.scene_id)
+
 
 
 func _refresh_props() -> void:
 	prop_placements.clear()
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
-		prop_placements = PropScene.placements(SceneDefs.layered_data(snapshot.scene_id), PropScene.load_defs(), {"gate_open": snapshot.gate_open, "lit": snapshot.lit_switches})
+		displayed_trial_seal = bool(snapshot.trial.get("sealed",false))
+		prop_placements = PropScene.placements(SceneDefs.layered_data(snapshot.scene_id), PropScene.load_defs(), {"gate_open": snapshot.gate_open, "lit": snapshot.lit_switches, "flags": snapshot.story_flags, "trial":[&"sealed"] if displayed_trial_seal else []})
+		if snapshot.scene_id == &"hollow_trial_layered":
+			prop_placements = TrialArt.visual_placements(prop_placements,frames)
 	_update_lighting()
 
 
 func _update_lighting() -> void:
 	material = EnvironmentLight.make_material(snapshot.scene_id, snapshot.size, prop_placements) if lighting_enabled and EnvironmentLight.supports(snapshot.scene_id) else null
+	_static_lamps = EnvironmentLight.lamp_plan(prop_placements) if material != null else {}
+	_moving_lamps = 0
+	_sync_moving_lights()
+	_apply_look()
 
 
-func _draw_imported(key: String, at: Vector2, size_scale: Vector2 = Vector2.ONE) -> void:
-	if not frames.has(key):
+## The scene's look (presentation/effects/looks/<scene>.tres): the screen shader's grade, vignette and glow, and the lighting shader's
+## mist. Read when the scene is entered.
+func _apply_look() -> void:
+	if snapshot == null:
 		return
-	var frame: Dictionary = frames[key]
-	var anchor: Vector2 = Vector2(frame.get("ax", float(frame["w"]) / 2), frame.get("ay", float(frame["h"]) / 2))
-	var extent: Vector2 = Vector2(frame["w"], frame["h"])
-	var origin: Vector2 = at - anchor * size_scale.abs()
-	if size_scale.x < 0:
-		origin.x = at.x - (extent.x - anchor.x) * absf(size_scale.x)
-	draw_texture_rect_region(sprites, Rect2(origin.round(), extent * size_scale), Rect2(frame["x"], frame["y"], frame["w"], frame["h"]))
+	look = SceneLook.for_scene(snapshot.scene_id)
+	if post_rect != null:
+		var post: ShaderMaterial = post_rect.material
+		var scale_px: float = get_viewport().get_final_transform().get_scale().x if is_inside_tree() else 3.0
+		post.set_shader_parameter("pixel_scale", maxf(1.0, scale_px))
+		for name: String in ["grade_enabled", "exposure", "contrast", "saturation", "vignette_enabled", "vignette_strength", "vignette_radius",
+				"vignette_softness", "glow_enabled", "glow_strength", "glow_threshold", "glow_radius"]:
+			post.set_shader_parameter(name, look.get(name))
+		for name: String in ["shadow_tint", "highlight_tint", "vignette_colour", "glow_tint"]:
+			var c: Color = look.get(name)
+			post.set_shader_parameter(name, Vector3(c.r, c.g, c.b))
+	if material is ShaderMaterial:
+		var shader: ShaderMaterial = material
+		shader.set_shader_parameter("mist_pass_alpha", MIST_PASS_ALPHA)
+		shader.set_shader_parameter("mist_enabled", bool(look.get("mist_enabled")))
+		for name: String in ["mist_density", "mist_edge_boost", "mist_scale", "mist_speed"]:
+			shader.set_shader_parameter(name, look.get(name))
+		var mc: Color = look.get("mist_colour")
+		shader.set_shader_parameter("mist_colour", Vector3(mc.r, mc.g, mc.b))
+		shader.set_shader_parameter("mist_edge", _mist_edge(float(look.get("mist_edge_width"))))
+
+
+## How near each spot is to the edge of the walkable floor (1 at the edge, 0 from `width` px in), at a quarter of the scene's size:
+## the mist thickens there, where the forest begins.
+func _mist_edge(width: float) -> Texture2D:
+	var cache_key: String = "%s/%d" % [snapshot.scene_id, int(width)]
+	if _mist_edges.has(cache_key):
+		return _mist_edges[cache_key]
+	var outline: PackedVector2Array = []
+	for point: Variant in Array(SceneDefs.layered_data(snapshot.scene_id).get("outline", [])):
+		outline.append(Vector2(point[0], point[1]))
+	var w: int = maxi(1, int(snapshot.size.x) / 4)
+	var h: int = maxi(1, int(snapshot.size.y) / 4)
+	var image: Image = Image.create(w, h, false, Image.FORMAT_L8)
+	for y: int in h:
+		for x: int in w:
+			var at: Vector2 = Vector2(x * 4 + 2, y * 4 + 2)
+			var near: float = 1.0
+			if outline.size() >= 3 and Geometry2D.is_point_in_polygon(at, outline):
+				var dist: float = INF
+				for i: int in outline.size():
+					dist = minf(dist, at.distance_to(Geometry2D.get_closest_point_to_segment(at, outline[i], outline[(i + 1) % outline.size()])))
+				near = clampf(1.0 - dist / maxf(1.0, width), 0.0, 1.0)
+			image.set_pixel(x, y, Color(near, near, near))
+	var texture: ImageTexture = ImageTexture.create_from_image(image)
+	_mist_edges[cache_key] = texture
+	return texture
+
+
+## Lights that move with mobs (the Warden's chest stone): the props' lamps plus one halo and one pool per living Warden, written into
+## the scene's lighting shader every snapshot. Nothing changes while no Warden is present.
+func _sync_moving_lights() -> void:
+	if not (material is ShaderMaterial) or _static_lamps.is_empty():
+		return
+	var keys: Dictionary = {}
+	for mob: Dictionary in snapshot.mobs:
+		if mob["type"] == &"warden":
+			keys[int(mob["id"])] = MobView.frame(mob, snapshot.telegraphs, snapshot.tick)
+	var moving: Array[Dictionary] = WardenEffects.lamps(snapshot.mobs, keys)
+	moving.append_array(staff_lamps())  # the Star Staff's circle, meteor, blast and crater light the ground
+	moving.append_array(impact_lamps())  # hits, parries, the weapon forms and the aspects flash on the ground
+	moving.append_array(creature_effects.fx.lamps(snapshot.tick))  # the mobs' slams, releases and pops
+	if moving.is_empty() and _moving_lamps == 0:
+		return
+	var points: PackedVector4Array = (_static_lamps["points"] as PackedVector4Array).duplicate()
+	var colours: PackedVector3Array = (_static_lamps["colours"] as PackedVector3Array).duplicate()
+	var cores: PackedVector3Array = (_static_lamps["core_colours"] as PackedVector3Array).duplicate()
+	var count: int = int(_static_lamps["count"])
+	for lamp: Dictionary in moving:
+		if count >= EnvironmentLight.MAX_LIGHTS:
+			break
+		points[count] = lamp["point"]
+		colours[count] = lamp["colour"]
+		cores[count] = lamp["core"]
+		count += 1
+	var shader: ShaderMaterial = material
+	shader.set_shader_parameter("lamps", points)
+	shader.set_shader_parameter("lamp_colours", colours)
+	shader.set_shader_parameter("lamp_core_colours", cores)
+	shader.set_shader_parameter("lamp_count", count)
+	if not moving.is_empty():
+		shader.set_shader_parameter("mixed_lights", true)  # per-lamp colours, so the teal rune light keeps its colour in any scene
+	_moving_lamps = moving.size()
 
 
 ## The placeholder speech bubble "..." (cream, ink edge, a tail) with its bottom centre at `tip`.
@@ -685,12 +1189,23 @@ func _update_hud() -> void:
 	reward_popup.colors = colors
 	reward_popup.atlas = sprites
 	reward_popup.frames = frames
-	reward_popup.blocked = conversation.controls_open or not snapshot.dialogue.is_empty() or character_menu.is_open or fade_phase != &""
+	reward_popup.blocked = conversation.controls_open or not snapshot.dialogue.is_empty() or character_menu.is_open or fade_phase != &"" or snapshot.defeated
 	conversation.colors = colors
 	conversation.visible = not character_menu.is_open and fade_phase == &""
 	hud.training = snapshot.training if snapshot.dialogue.is_empty() and not conversation.controls_open and not character_menu.is_open else {}
 	hud.training_feedback = toast_message if toast_ticks > 0 else ""
 	hud.training_at = Vector2(snapshot.training.get("center", Vector2.INF)) - view_origin
+	hud.sync_combat(snapshot)
+	practice_view.audio.mob_types.clear()
+	for mob: Dictionary in snapshot.mobs: practice_view.audio.mob_types[int(mob["id"])] = String(mob["type"])
+	practice_view.audio.sync_wardens(snapshot.mobs, snapshot.telegraphs, snapshot.tick, snapshot.scene_id)
+	hud.explore_hp = snapshot.hero.hp
+	hud.explore_max_hp = snapshot.hero.max_hp
+	hud.herb_count = int(snapshot.inventory.get("herb",0))
+	hud.fight_hud = not snapshot.encounters.is_empty() and not character_menu.is_open and snapshot.dialogue.is_empty()
+	hud.visible = not character_menu.is_open
+	hud.portrait_atlas = sprites
+	hud.ui_frames = frames
 	hud.colors = colors
 	hud.toast_text = toast_text()
 	hud.toast_alpha = clampf(float(toast_ticks) / TOAST_FADE_TICKS, 0.0, 1.0)
@@ -701,6 +1216,7 @@ func _update_hud() -> void:
 	if debug_enabled:
 		hud.debug_lines = ["SCENE %s  TICK %d" % [String(snapshot.scene_id).to_upper(), snapshot.tick], "HERO %d,%d %s" % [int(snapshot.hero.position.x), int(snapshot.hero.position.y), String(snapshot.hero.state).to_upper()], "CHECKPOINT %s" % String(snapshot.last_checkpoint).to_upper(), "GATE %s (F6/G)" % ("OPEN" if snapshot.gate_open else "CLOSED")]
 	hud.queue_redraw()
+	character_menu.progression=snapshot
 	character_menu.snapshot = loadout_core.snapshot()
 	character_menu.colors = colors
 	character_menu.atlas = sprites

@@ -1,0 +1,29 @@
+{
+ "spritecook_assets": [
+  {
+   "asset_id": "98eb0cd7-1f85-41e0-b159-06e7eeb9b9a4",
+   "sha12": "2ad93a90c9b6",
+   "label": "uploaded reference: the 48x48 Warden design at 4x"
+  },
+  {
+   "asset_id": "4f6c39e6-0df0-476d-8187-ab0c81d5663e",
+   "sha12": "0f1885a1b1f1",
+   "label": "variation A (222x222)"
+  },
+  {
+   "asset_id": "f7ea7528-d06a-451e-a5c9-5a8f6deab158",
+   "sha12": "2e19945c2df5",
+   "label": "variation B (118x118) - proposed"
+  }
+ ],
+ "generation": {
+  "model": "gpt-image-2",
+  "quality": "low",
+  "variations": 2,
+  "credits_used": 4,
+  "credits_left": 7,
+  "date": "2026-10-31",
+  "project_id": "3c073baf-1fa6-458b-8582-27a623ec8815"
+ },
+ "status": "approved by the owner (native size, 2026-10-31) and installed: tools/art/rig_warden_v2.py poses variation B into the 60 body frames"
+}

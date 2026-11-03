@@ -1,0 +1,44 @@
+{
+  "status": "review_only_not_installed",
+  "date": "2026-10-28",
+  "native_ui": [
+    320,
+    180
+  ],
+  "palette": "Totoy36",
+  "source_type": "native text grids + Godot UI drawings",
+  "effects": {
+    "heal": 6,
+    "alert": 6,
+    "hit": 6,
+    "parry": 6,
+    "dust": 6,
+    "stagger": 6,
+    "death": 6,
+    "exposed": 6
+  },
+  "reserved_use": "gold only in parry sparks; no gold/red in plain numbers, herb, slots, gauge or plates",
+  "fixtures": "sample levels/unlocked slots/EXP are art fixtures, never injected into core snapshots",
+  "core_commit": "d4ac13a",
+  "contract_status": "level/EXP/unlocks/mob levels now available; live Edge meter missing",
+  "captures": [
+    "drop.png",
+    "effects_a.png",
+    "effects_b.png",
+    "gauges.png",
+    "hud_down.png",
+    "hud_gain.png",
+    "hud_locked.png",
+    "hud_proposal.png",
+    "hud_snapshot.png",
+    "mob_bars_100.png",
+    "mob_bars_15.png",
+    "mob_bars_55.png",
+    "numbers.png",
+    "review_contact.png",
+    "slots.png",
+    "states_boar.png",
+    "states_mossling.png"
+  ],
+  "review_tests": "2 pass; windowed captures pass; baseline full harness has the known stale herb reward expectations in smoke_woodland_encounters"
+}

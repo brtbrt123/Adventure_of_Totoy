@@ -1,3 +1,5 @@
+> Update 2026-10-27: painted presentation retirement is complete; the older route/debug instructions below are historical. Read newest STATUS and presentation/review/LAYERED_MIGRATION_COMPLETED.md first. All debug scene jumps select layered maps or the arena; converted painted art/captures are archived. Claude owns the remaining core-layout retirement. Woodland Approach remains a review scene, not a live chapter route.
+
 # Codex next session — 2026-10-27
 
 ## Latest owner instruction takes priority

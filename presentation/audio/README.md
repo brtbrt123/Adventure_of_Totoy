@@ -54,3 +54,9 @@ Active copies are in `presentation/audio/owner/`. They come from the owner's cle
 | dialogue typewriter | Kenney Interface Sounds tick_001.ogg (CC0), copied as dialogue_blip.ogg; one quiet cue per3non-space typed characters, no burst on instant reveal |
 
 The original20s ambience had a0.512 full-scale endpoint jump. A0.5s equal-power tail/head overlap produces a19.5s loop with0.0264 endpoint sample difference (source unchanged). Technical seam measurements are in `art/reference/batch_20261027/job3/ambience_seam.json`; they do not prove an inaudible click. Human listening approval of loop, levels and all cues is still pending. Normal one-shots use the existing-10dB voice baseline with strength gains; hum is-25dB, ambience-34dB, major releases/parries duck music. Typewriter blip is-24dB.
+
+## Runebound Warden recorded foley (2026-10-31)
+
+Thirteen original project remixes of the existing credited recorded cues; no synthetic sound generators or new downloads. Rebuild: python presentation/audio/build_warden_audio.py. Exact layer filenames, playback rates, gains, delays and hashes are in sources.json under warden_recorded_remixes. These inherit the retained Kenney/artisticdude/StarNinjas/Brian MacIntosh CC0 recording provenance; this is a remix credit, not a claim of newly recorded foley.
+
+warden_preview.wav listening order: wake; step1; step2; Cleave tell; Cleave strike; Lash tell; Lash strike; Ring tell; Ring strike; guard hit1; guard hit2; guard break; death. Runtime maps mob_alerted to wake, a full walk cycle to one quiet step, attack_telegraphed to that attack's tell plus the existing gold/red warning, a live strike's hit_tick to its strike, reduced attack_hit to guard hit, parry mob_staggered to guard break alongside the normal perfect parry, and mob_defeated to death. Two dedicated foley voices are below warning levels, second overlapping voice quieter. Optional exposed loop and trial wave sounds deferred. Owner listening judgement pending.

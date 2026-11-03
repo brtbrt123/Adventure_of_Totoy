@@ -1,4 +1,6 @@
 extends RefCounted
+## Per-frame tick lists marked `static var` come from the owner's effect SpriteFrames (presentation/animations/effects/, docs/ANIMATION_EDITING.md); the lists here are the fallback.
+const AnimLib := preload("res://presentation/common/anim_library.gd")
 ## Cosmetic timing and naming for the Dual Dagger's lightning (blink, cut, chain, sparks, sky strike, scorch).
 ## Pure functions over ticks and positions taken from core events; no rules, no damage, no hit decisions.
 ## Art and anchors: art/reference/dual_dagger/README.md ("In-game import").
@@ -7,13 +9,13 @@ extends RefCounted
 const CUT_DIRECTIONS: Array[String] = ["e", "se", "s", "sw", "w", "nw", "n", "ne"]
 ## Ticks each frame shows (frame n = entry n-1). About 33/50/50/66 ms for the cut, 40 ms per spark.
 const CUT_TICKS: Array[int] = [2, 3, 3, 4]
-const SPARK_TICKS: Array[int] = [2, 2, 2, 3, 3, 3]
-const BLINK_TICKS: Array[int] = [2, 2, 2, 3, 3]
+static var SPARK_TICKS: Array[int] = AnimLib.durations("fx_lightning_spark", [2, 2, 2, 3, 3, 3])
+static var BLINK_TICKS: Array[int] = AnimLib.durations("fx_lightning_blink", [2, 2, 2, 3, 3])
 ## Departure plays from the star (frame 2): the hero is already gone, only the burst and the fading ring remain.
 const DEPART_TICKS: Array[int] = [0, 2, 2, 3, 3]
 ## 1 sky flash + leader, 2 leader halfway, 3-4 full bolt, 5 burst, 6 wide ring, 7 fragments, 8 embers.
-const STRIKE_TICKS: Array[int] = [1, 1, 3, 3, 3, 3, 3, 4]
-const GROUND_TICKS: Array[int] = [20, 25, 25, 30]
+static var STRIKE_TICKS: Array[int] = AnimLib.durations("fx_lightning_strike", [1, 1, 3, 3, 3, 3, 3, 4])
+static var GROUND_TICKS: Array[int] = AnimLib.durations("fx_lightning_ground", [20, 25, 25, 30])
 ## Blink afterimages: frames 1-3 (dash pose fading), 3 ticks each.
 const AFTERIMAGE_TICKS: Array[int] = [3, 3, 3]
 const CHAIN_TICKS: int = 8

@@ -168,16 +168,22 @@ func tabs_and_selection() -> void:
 	fixture()
 	check(arena.open_menu(), "open")
 	await menu_with("menu_tab_next")
-	check(menu.tab == Menu.TAB_INVENTORY, "E did not switch to INVENTORY")
+	check(menu.tab == Menu.TAB_ASPECTS, "E did not switch to ASPECTS")
+	check(menu.stats_selection == Menu.ASPECT_KEYS[0], "Aspects starts with a keyboard-selectable socket")
+	await menu_with("menu_tab_next")
+	check(menu.tab == Menu.TAB_INVENTORY, "E did not switch to ITEMS")
+	await menu_with("menu_tab_next")
+	check(menu.tab == Menu.TAB_QUESTS, "E did not switch to QUESTS")
 	await menu_with("menu_tab_next")
 	check(menu.tab == Menu.TAB_STATS, "E does not wrap")
 	await menu_with("menu_tab_prev")
-	check(menu.tab == Menu.TAB_INVENTORY, "Q did not switch the tab")
+	check(menu.tab == Menu.TAB_QUESTS, "Q did not switch the tab")
 	menu.click(Menu.tab_rect(Menu.TAB_STATS).get_center())
 	check(menu.tab == Menu.TAB_STATS, "a click on the STATS tab")
 	menu.click(Menu.tab_rect(Menu.TAB_INVENTORY).get_center())
 	check(menu.tab == Menu.TAB_INVENTORY, "a click on the INVENTORY tab")
 	menu.set_tab(Menu.TAB_STATS)
+	menu.stats_selection = &""  # reset the Aspects tab's focus before testing an untouched Status selection
 	# STATS: nothing selected shows the hint; the first move selects the weapon; every item is reachable
 	check(menu.description_key() == &"none", "an untouched STATS tab shows the hint")
 	await menu_with("menu_down")
@@ -234,7 +240,7 @@ func tabs_and_selection() -> void:
 
 ## Every hoverable thing has a description with real numbers, for every equipped weapon; every line fits.
 func descriptions() -> void:
-	var limit: float = Menu.DESC.size.x - 10.0
+	var limit: float = Menu.DESC.size.x - 20.0
 	for weapon: StringName in Weapons.IDS:
 		fixture()
 		arena.core.player.weapon_id = weapon
@@ -252,7 +258,7 @@ func descriptions() -> void:
 			var lines: Array = entry[2]
 			check(lines.size() == 3, "description %s has %d lines" % [key, lines.size()])
 			for line: String in lines:
-				check(Hud.text_width(line) <= limit, "%s (%s) line too wide (%.0f > %.0f): %s" % [key, weapon, Hud.text_width(line), limit, line])
+				check(Hud.text_width(line, 1, Hud.ui_font(), 7) <= limit, "%s (%s) description exceeds its inset: %s" % [key, weapon, line])
 			if not String(entry[0]).is_empty():
 				check(not String(lines[2]).is_empty() and String(lines[2]).contains(" "), "description %s has no numbers line" % key)
 				var title_w: float = Hud.text_width(entry[0], 1, Hud.menu_font(), 10)
@@ -366,12 +372,12 @@ func shared_frame() -> void:
 	check(UiPanel.drawn > before, "the skill tooltip does not use the shared frame")
 	await save("tooltip")
 	arena.hud.hint_slot_override = -1
-	check(Hud.aspect_hint_rect().end.x <= 320 and Hud.aspect_hint_rect().end.y <= Hud.aspect_rects()[1].position.y + 30, "tooltip rect")
+	check(Hud.aspect_hint_rect().end.x <= 384 and Hud.aspect_hint_rect().end.y <= Hud.aspect_rects()[1].position.y + 30, "tooltip rect")
 	# the menu: every tab and a hover each
 	check(arena.open_menu(), "open")
 	before = UiPanel.drawn
 	await process_frame
-	check(UiPanel.drawn >= before + 2, "the menu does not use the shared frame (panel + description)")
+	check(arena.character_menu.shell != null and arena.character_menu.shell.visible and arena.character_menu.shell.get_node("Panel") is NinePatchRect and arena.character_menu.description_scene.visible, "the menu does not show its frame and description scenes (menu_shell.tscn, menu_description.tscn)")
 	await save("stats")
 	menu.hover_key = &"weapon"
 	await save("stats_weapon")
@@ -412,9 +418,9 @@ func shared_frame() -> void:
 		before = UiPanel.drawn
 		arena.hud.queue_redraw()
 		await process_frame
-		check(UiPanel.drawn > before, "the %s panel does not use the shared frame" % result)
+		check(arena.hud.result_node != null and arena.hud.result_node.visible and arena.hud.result_node.get_node("Panel") is NinePatchRect, "the %s panel is not the result_panel.tscn scene" % result)
 		var rect: Rect2 = Hud.result_panel_rect(arena.hud.result_lines.size(), true)
-		check(rect.position.y - 8 >= 0 and rect.end.y <= 180, "%s panel off screen: %s" % [result, rect])
+		check(rect.position.y - 8 >= 0 and rect.end.y <= 216, "%s panel off screen: %s" % [result, rect])
 		await save(String(result))
 	arena.hud.result_lines = []
 	arena.hud.result_hint = ""

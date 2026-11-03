@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://b7cjht10qtx7j" path="res://art/ui_kit/button_normal.png" id="6_tex"]
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="9_fon"]
+
+[sub_resource type="FontVariation" id="pixel"]
+base_font = ExtResource("9_fon")
+variation_opentype = {
+2003265652: 400.0
+}
+
+[node name="Hint" type="NinePatchRect"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 54
+offset_bottom = 13
+texture = ExtResource("6_tex")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Text" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 55.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = SubResource("pixel")
+theme_override_font_sizes/font_size = 7
+text = "[E] TALK"
+horizontal_alignment = 1

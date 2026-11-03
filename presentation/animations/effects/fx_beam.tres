@@ -1,0 +1,68 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_body_1.png" id="1_7m3gq"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_body_2.png" id="2_4shnu"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_body_3.png" id="3_ko1n3"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_body_4.png" id="4_5l6m6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_end_1.png" id="5_ccwna"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_end_2.png" id="6_1um8e"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_end_3.png" id="7_fft62"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_end_4.png" id="8_gtpt3"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_start_1.png" id="9_14cr7"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_start_2.png" id="10_0xgsf"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_start_3.png" id="11_m0wlp"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_beam_start_4.png" id="12_huele"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_7m3gq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_4shnu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ko1n3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_5l6m6")
+}],
+"loop": 0,
+"name": &"body",
+"speed": 30.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_ccwna")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_1um8e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_fft62")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_gtpt3")
+}],
+"loop": 0,
+"name": &"end",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_14cr7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_0xgsf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_m0wlp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_huele")
+}],
+"loop": 0,
+"name": &"start",
+"speed": 20.0
+}]

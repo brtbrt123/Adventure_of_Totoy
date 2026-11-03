@@ -54,12 +54,12 @@ func _title_screen() -> void:
 	title.change_scene = func(path: String) -> void: changed_to.append(path)
 	_expect(title.screen == Title.SCREEN_TITLE and title.index == 0, "starts on the menu with NEW GAME selected")
 	_expect(Array(Title.ITEMS) == ["NEW GAME", "CONTINUE", "BOSS FIGHT", "CONTROLS", "CREDITS", "QUIT"], "the menu items")
-	_expect(Title.MENU_TOP + (Title.ITEMS.size() - 1) * Title.MENU_STEP + Title.MENU_STEP <= 178, "the last menu line fits the screen")
+	_expect(Title.MENU_TOP + (Title.ITEMS.size() - 1) * Title.MENU_STEP + Title.MENU_STEP <= 214, "the last menu line fits the screen")
 	title.move_selection(-1)
 	_expect(title.index == Title.ITEMS.size() - 1, "up from the first item wraps to the last")
 	title.move_selection(1)
 	_expect(title.index == 0, "down from the last wraps to the first")
-	_expect(title.item_at(Vector2(160, Title.MENU_TOP + 4)) == 0 and title.item_at(Vector2(160, Title.MENU_TOP + Title.MENU_STEP + 4)) == 1 and title.item_at(Vector2(10, 10)) == -1, "mouse hit boxes line up with the menu rows")
+	_expect(title.item_at(Vector2(192, Title.MENU_TOP + 4)) == 0 and title.item_at(Vector2(192, Title.MENU_TOP + Title.MENU_STEP + 4)) == 1 and title.item_at(Vector2(10, 10)) == -1, "mouse hit boxes line up with the menu rows")
 	title.index = 3
 	title.activate()
 	_expect(title.screen == Title.SCREEN_CONTROLS, "CONTROLS opens the controls page")
@@ -92,8 +92,10 @@ func _title_screen() -> void:
 	title.started = false
 	changed_to.clear()
 	_expect(title.can_continue(), "a saved chapter can be continued")
+	Engine.set_meta(Title.SKIP_INTRO_META,true)
 	title.index = 0
 	title.activate()
+	Engine.remove_meta(Title.SKIP_INTRO_META)
 	_expect(changed_to == [Title.EXPLORE_SCENE], "NEW GAME opens the exploration scene: %s" % str(changed_to))
 	var start: Dictionary = Engine.get_meta(Title.EXPLORE_START_META, {})
 	_expect(start.get("scene", &"") == &"village_layered" and start.get("entry", &"") == &"arrival" and not bool(start.get("gate_open", true)), "NEW GAME starts at the village arrival: %s" % str(start))
@@ -153,7 +155,7 @@ func _title_screen() -> void:
 	_expect(Title.ui_font() is FontVariation and (Title.ui_font() as FontVariation).base_font is FontFile, "the in-game HUD still uses the pixel font")
 	# the logo: a smooth sprite centred at the top, only on the menu screen
 	_expect(title.logo_sprite != null and absf(title.logo_sprite.texture.get_width() * title.logo_sprite.scale.x - Title.LOGO_WIDTH) < 0.01, "the title logo is shown at its width")
-	_expect(title.logo_sprite != null and absf(title.logo_sprite.position.x * 2.0 + Title.LOGO_WIDTH - 320.0) < 0.01, "and centred")
+	_expect(title.logo_sprite != null and absf(title.logo_sprite.position.x * 2.0 + Title.LOGO_WIDTH - 384.0) < 0.01, "and centred")
 	_expect(title.logo_sprite != null and title.logo_sprite.position.y + title.logo_sprite.texture.get_height() * title.logo_sprite.scale.y < Title.MENU_TOP - 2, "and it ends above the first menu line")
 	# nothing runs off the page: credit lines fit, control keys and actions stay in their columns (menu font)
 	var face: Font = Title.menu_font()
@@ -173,7 +175,7 @@ func _title_screen() -> void:
 	for item: String in Title.ITEMS:
 		_expect(Title.text_width(item, 1, face, Title.MENU_SIZE) <= 100.0, "menu item fits its plate: " + item)
 	# the lettering is a 320x180 layer cut to hard palette pixels; the painting and logo stay smooth
-	_expect(title.text_viewport != null and title.text_viewport.size == Vector2i(320, 180) and title.text_viewport.transparent_bg, "the menu lettering has its own transparent 320x180 layer")
+	_expect(title.text_viewport != null and title.text_viewport.size == Vector2i(384, 216) and title.text_viewport.transparent_bg, "the menu lettering has its own transparent 384x216 layer")
 	_expect(title.text_display != null and title.text_display.material is ShaderMaterial, "shown through the pixel text shader")
 	if title.text_display != null and title.text_display.material is ShaderMaterial:
 		var material: ShaderMaterial = title.text_display.material as ShaderMaterial
@@ -205,7 +207,7 @@ func _title_screen() -> void:
 	_expect(title.has_method("draw_text_layer") and title.text_layer != null and title.text_layer.view == title, "the lettering layer draws what the title screen says")
 	# the background: the owner's painting, graded; a smooth sprite behind everything
 	_expect(title.painted and title.background != null and title.background.get_size() == Vector2(1920, 1080), "the painted menu background loads at 1920x1080")
-	_expect(title.background_sprite != null and title.background_sprite.show_behind_parent and absf(title.background_sprite.scale.x * 1920.0 - 320.0) < 0.01, "it fills the 320x180 canvas, behind everything")
+	_expect(title.background_sprite != null and title.background_sprite.show_behind_parent and absf(title.background_sprite.scale.x * 1920.0 - 384.0) < 0.01, "it fills the 384x216 canvas, behind everything")
 	_expect(FileAccess.file_exists("res://art/reference/menu_background_source.jpg"), "the original painting is kept in art/reference")
 	# the pixel-art fallback (composed from the game's own tiles) stays palette-bound
 	var fallback: Image = (load(Title.BACKGROUND_PATH) as Texture2D).get_image()

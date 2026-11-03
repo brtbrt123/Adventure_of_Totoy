@@ -1,0 +1,31 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://presentation/effects/particle_layer.gd" id="1_fm7fd"]
+[ext_resource type="Script" path="res://presentation/effects/particle_kind.gd" id="2_onhvl"]
+
+[sub_resource type="Resource" id="Resource_ias4i"]
+script = ExtResource("1_fm7fd")
+life_max = 22
+speed_min = 0.4
+drag = 0.06
+up = 0.4
+size_min = 2.0
+size_max = 4.0
+colours = PackedStringArray("j", "d", "c")
+
+[sub_resource type="Resource" id="Resource_rls7l"]
+script = ExtResource("1_fm7fd")
+count = 2
+shape = "leaf"
+life_min = 24
+life_max = 36
+drag = 0.04
+up = 0.5
+gravity = 0.03
+size_min = 2.0
+flutter = 1.5
+colours = PackedStringArray("7", "6")
+
+[resource]
+script = ExtResource("2_onhvl")
+layers = Array[Resource]([SubResource("Resource_ias4i"), SubResource("Resource_rls7l")])

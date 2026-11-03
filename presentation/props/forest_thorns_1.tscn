@@ -1,0 +1,82 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/forest_thorns_1.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_thorns_1_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_thorns_1_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 4, 64, 44)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 7
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 7
+
+[node name="forest_thorns_1" type="Node2D"]
+metadata/w = 64
+metadata/h = 44
+metadata/base_width = 61
+metadata/solid = true
+metadata/image = "forest_thorns_1.png"
+metadata/note = "thorn bush (solid)"
+metadata/locked = true
+metadata/src_bbox = [1087, 706, 1307, 856]
+metadata/contact_shadow = {"size": [64, 44], "core": [[63, 32, 1], [63, 33, 1], [2, 37, 4], [2, 38, 5], [8, 38, 3], [59, 38, 4], [6, 39, 5], [20, 39, 1], [33, 39, 1], [46, 39, 1], [59, 39, 4], [7, 40, 1], [16, 40, 1], [19, 40, 2], [29, 40, 1], [32, 40, 2], [39, 40, 3], [46, 40, 1], [50, 40, 2], [14, 41, 6], [24, 41, 2], [29, 41, 4], [34, 41, 1], [39, 41, 4], [49, 41, 4], [54, 41, 2], [11, 42, 5], [17, 42, 2], [23, 42, 4], [30, 42, 2], [34, 42, 2], [38, 42, 1], [42, 42, 4], [47, 42, 3], [52, 42, 5], [58, 42, 1], [11, 43, 3], [21, 43, 3], [26, 43, 3], [35, 43, 4], [43, 43, 3], [47, 43, 2], [53, 43, 1], [56, 43, 3], [21, 44, 2], [27, 44, 2], [36, 44, 2], [57, 44, 1]], "edge": [[62, 32, 1], [64, 32, 1], [62, 33, 1], [64, 33, 1], [63, 34, 1], [1, 37, 1], [6, 37, 1], [1, 38, 1], [7, 38, 1], [11, 38, 1], [58, 38, 1], [63, 38, 1], [2, 39, 4], [11, 39, 1], [19, 39, 1], [21, 39, 1], [32, 39, 1], [34, 39, 1], [45, 39, 1], [47, 39, 1], [58, 39, 1], [63, 39, 1], [6, 40, 1], [8, 40, 3], [15, 40, 1], [17, 40, 2], [21, 40, 1], [28, 40, 1], [30, 40, 2], [34, 40, 1], [38, 40, 1], [42, 40, 1], [45, 40, 1], [47, 40, 1], [49, 40, 1], [52, 40, 1], [59, 40, 4], [7, 41, 1], [13, 41, 1], [20, 41, 1], [23, 41, 1], [26, 41, 1], [28, 41, 1], [33, 41, 1], [35, 41, 1], [38, 41, 1], [43, 41, 1], [46, 41, 1], [48, 41, 1], [53, 41, 1], [56, 41, 1], [10, 42, 1], [16, 42, 1], [19, 42, 1], [22, 42, 1], [27, 42, 1], [29, 42, 1], [32, 42, 2], [36, 42, 2], [39, 42, 3], [46, 42, 1], [50, 42, 2], [57, 42, 1], [59, 42, 1], [10, 43, 1], [14, 43, 2], [17, 43, 2], [20, 43, 1], [24, 43, 2], [29, 43, 3], [34, 43, 1], [39, 43, 1], [42, 43, 1], [46, 43, 1], [49, 43, 1], [52, 43, 1], [54, 43, 2], [59, 43, 1], [11, 44, 3], [20, 44, 1], [23, 44, 1], [26, 44, 1], [29, 44, 1], [35, 44, 1], [38, 44, 1], [43, 44, 3], [47, 44, 2], [53, 44, 1], [56, 44, 1], [58, 44, 1], [21, 45, 2], [27, 45, 2], [36, 45, 2], [57, 45, 1]]}
+metadata/flip_offset = Vector2(-31.5, -44)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-32.5, -44)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-33, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-33, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-22, -4)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-11, -4)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0, -4)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(11, -4)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(22, -4)
+shape = SubResource("CircleShape2D_5")

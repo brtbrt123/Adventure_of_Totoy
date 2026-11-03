@@ -1,0 +1,330 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack1_right_1.png" id="1_ayecv"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack1_right_2.png" id="2_cy2f1"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack1_right_3.png" id="3_u3gfh"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack1_right_4.png" id="4_2pqde"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack1_right_5.png" id="5_vqyrl"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack1_right_6.png" id="6_dgufm"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack2_right_1.png" id="7_31x3c"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack2_right_2.png" id="8_7k53j"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack2_right_3.png" id="9_1vns6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack2_right_4.png" id="10_nej1o"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack2_right_5.png" id="11_ufc6p"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack2_right_6.png" id="12_ilp8h"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack3_right_1.png" id="13_qh8cb"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack3_right_2.png" id="14_kfcc1"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack3_right_3.png" id="15_457av"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack3_right_4.png" id="16_uujob"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack3_right_5.png" id="17_8m01i"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack3_right_6.png" id="18_sw2un"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack4_right_1.png" id="19_xkss6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack4_right_2.png" id="20_aqj8w"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack4_right_3.png" id="21_sclf6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack4_right_4.png" id="22_m0u18"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack4_right_5.png" id="23_74n37"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_attack4_right_6.png" id="24_vbuvd"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_dash_right_1.png" id="25_wwu3m"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_dash_right_2.png" id="26_km8id"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_dash_right_3.png" id="27_5jnp6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_dash_right_4.png" id="28_10w6u"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_hurt_right_1.png" id="29_dopvq"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_hurt_right_2.png" id="30_x3vse"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_hurt_right_3.png" id="31_7ui4o"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_hurt_right_4.png" id="32_jhsw0"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_idle_right_1.png" id="33_bxin0"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_idle_right_2.png" id="34_iyf5x"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_idle_right_3.png" id="35_xrnn2"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_idle_right_4.png" id="36_ysy3o"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_parry_right_1.png" id="37_csbwr"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_parry_right_2.png" id="38_m2ie1"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_parry_right_3.png" id="39_4n8mo"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_parry_right_4.png" id="40_yx0ux"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_parry_right_5.png" id="41_3b7di"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_parry_right_6.png" id="42_oxwkv"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_victory_right_1.png" id="43_ji24o"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_victory_right_2.png" id="44_4aj2n"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_victory_right_3.png" id="45_1xbv7"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_victory_right_4.png" id="46_j6lns"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_victory_right_5.png" id="47_24yiy"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_victory_right_6.png" id="48_qi4vl"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_walk_right_1.png" id="49_x1lx6"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_walk_right_2.png" id="50_a407m"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_walk_right_3.png" id="51_h3coe"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_walk_right_4.png" id="52_5jrio"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_walk_right_5.png" id="53_o3efd"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_walk_right_6.png" id="54_llihd"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_drop_right_1.png" id="55_m2pga"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_drop_right_2.png" id="56_6px24"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_drop_right_3.png" id="57_5wlyh"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_hold_right_1.png" id="58_3kj3n"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_hold_right_2.png" id="59_mtlvx"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_hold_right_3.png" id="60_en5i7"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_hold_right_4.png" id="61_1ehe8"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_raise_right_1.png" id="62_pa4jb"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_raise_right_2.png" id="63_naj5p"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_raise_right_3.png" id="64_nqr7o"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/totoy_dagger_ward_raise_right_4.png" id="65_kmi80"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ayecv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_cy2f1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_u3gfh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_2pqde")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_vqyrl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_dgufm")
+}],
+"loop": 0,
+"name": &"attack1",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_31x3c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_7k53j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_1vns6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_nej1o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_ufc6p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_ilp8h")
+}],
+"loop": 0,
+"name": &"attack2",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_qh8cb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_kfcc1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_457av")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_uujob")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_8m01i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_sw2un")
+}],
+"loop": 0,
+"name": &"attack3",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("19_xkss6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_aqj8w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_sclf6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_m0u18")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_74n37")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_vbuvd")
+}],
+"loop": 0,
+"name": &"attack4",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("25_wwu3m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_km8id")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_5jnp6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_10w6u")
+}],
+"loop": 0,
+"name": &"dash",
+"speed": 60.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("29_dopvq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_x3vse")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_7ui4o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_jhsw0")
+}],
+"loop": 0,
+"name": &"hurt",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("33_bxin0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_iyf5x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_xrnn2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_ysy3o")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("37_csbwr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_m2ie1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_4n8mo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_yx0ux")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_3b7di")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_oxwkv")
+}],
+"loop": 0,
+"name": &"parry",
+"speed": 30.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("43_ji24o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_4aj2n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_1xbv7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_j6lns")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_24yiy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_qi4vl")
+}],
+"loop": 0,
+"name": &"victory",
+"speed": 7.5
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("49_x1lx6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_a407m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_h3coe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("52_5jrio")
+}, {
+"duration": 1.0,
+"texture": ExtResource("53_o3efd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("54_llihd")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("55_m2pga")
+}, {
+"duration": 1.0,
+"texture": ExtResource("56_6px24")
+}, {
+"duration": 1.0,
+"texture": ExtResource("57_5wlyh")
+}],
+"loop": 0,
+"name": &"ward_drop",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("58_3kj3n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("59_mtlvx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("60_en5i7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("61_1ehe8")
+}],
+"loop": 1,
+"name": &"ward_hold",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("62_pa4jb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("63_naj5p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("64_nqr7o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("65_kmi80")
+}],
+"loop": 0,
+"name": &"ward_raise",
+"speed": 10.0
+}]

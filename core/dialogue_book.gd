@@ -107,8 +107,8 @@ static func validate(book: Dictionary, npc_ids: Array[StringName]) -> Array[Stri
 			for key: String in ["reward_id", "kind", "item", "name", "flag"]:
 				if String(grant.get(key, "")).strip_edges() == "":
 					problems.append("dialogue %s has a grant without %s" % [id, key])
-			if not ["weapon", "item"].has(String(grant.get("kind", ""))):
-				problems.append("dialogue %s grant kind must be weapon or item" % id)
+			if not ["weapon", "item", "aspect"].has(String(grant.get("kind", ""))):
+				problems.append("dialogue %s grant kind must be weapon, item or aspect" % id)
 			if int(grant.get("quantity", 1)) < 1:
 				problems.append("dialogue %s grant quantity must be at least 1" % id)
 		var lines: Array = def.get("lines", [])

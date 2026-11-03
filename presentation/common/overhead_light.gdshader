@@ -6,15 +6,25 @@ uniform vec3 light_colour = vec3(0.64, 0.77, 1.0);
 uniform float shaft_slope = 1.2;
 uniform float strength : hint_range(0.0, 1.0) = 1.0;
 uniform int lamp_count = 0;
-uniform vec4 lamps[16];
+uniform vec4 lamps[32];
 uniform vec3 lamp_colour = vec3(1.0, 0.79, 0.52);
 uniform float emissive_pass_alpha = 0.99;
 uniform float prop_shadow_alpha = 0.30;
 uniform float actor_shadow_alpha = 0.20;
 uniform bool mixed_lights = false;
-uniform vec3 lamp_colours[16];
-uniform vec3 lamp_core_colours[16];
+uniform vec3 lamp_colours[32];
+uniform vec3 lamp_core_colours[32];
 uniform vec3 lamp_core_colour = vec3(1.05, 0.98, 0.88);
+// The ground mist (owner 2026-11-01, presentation/effects/scene_look.gd): a full-scene rect drawn with this alpha between the floor
+// and the characters becomes drifting, moonlit mist, thicker toward the forest edge (mist_edge: 1 near the floor's edge).
+uniform float mist_pass_alpha = 0.985;
+uniform bool mist_enabled = false;
+uniform float mist_density = 0.13;
+uniform float mist_edge_boost = 2.0;
+uniform float mist_scale = 54.0;
+uniform float mist_speed = 6.0;
+uniform vec3 mist_colour = vec3(0.44, 0.48, 0.52);
+uniform sampler2D mist_edge : filter_linear, repeat_disable;
 varying vec2 world_position;
 varying vec4 draw_colour;
 
@@ -54,7 +64,7 @@ void fragment() {
 	vec3 pool_rgb = vec3(0.0);
 	vec3 halo_rgb = vec3(0.0);
 	vec3 core_rgb = vec3(0.0);
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 32; i++) {
 		if (i >= lamp_count) { break; }
 		vec4 lamp = lamps[i];
 		vec2 delta = p - lamp.xy;
@@ -74,7 +84,22 @@ void fragment() {
 	}
 	bool shadow_pass = max(draw_colour.r, max(draw_colour.g, draw_colour.b)) < 0.001
 		&& (abs(draw_colour.a - prop_shadow_alpha) < 0.0001 || abs(draw_colour.a - actor_shadow_alpha) < 0.0001);
-	if (abs(draw_colour.a - emissive_pass_alpha) < 0.0001) {
+	if (abs(draw_colour.a - mist_pass_alpha) < 0.0001) {
+		if (!mist_enabled) {
+			COLOR = vec4(0.0);
+		} else {
+			// two layers of soft noise drifting different ways, on the world's pixel grid; the alpha comes in hard steps with a
+			// dither, so the mist stays pixel art
+			float drift = TIME * mist_speed;
+			vec2 q = p / mist_scale;
+			float n = canopy_noise(q + vec2(drift / mist_scale, drift * 0.3 / mist_scale)) * 0.6
+				+ canopy_noise(q * 2.1 + vec2(-drift * 0.7 / mist_scale, 3.0)) * 0.4;
+			float edge = texture(mist_edge, (p + 0.5) / max(world_size, vec2(1.0))).r;
+			float amount = smoothstep(0.42, 0.85, n) * mist_density * mix(1.0, mist_edge_boost, edge);  // patches, with clear floor between
+			amount = clamp(floor(amount * 6.0 + hash_point(p) * 0.999) / 6.0, 0.0, 0.5);  // never more than half over the floor
+			COLOR = vec4(mist_colour * (0.6 + moonlight * 0.4), amount);
+		}
+	} else if (abs(draw_colour.a - emissive_pass_alpha) < 0.0001) {
 		COLOR = vec4(texture(TEXTURE, UV).rgb * draw_colour.rgb, texture(TEXTURE, UV).a);
 	} else if (shadow_pass) {
 		float radius = abs(draw_colour.a - prop_shadow_alpha) < 0.0001 ? 2.0 : 0.65;

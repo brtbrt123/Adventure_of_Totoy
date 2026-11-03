@@ -23,13 +23,20 @@ const DIRECTIONS: Array[Vector2] = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vect
 const SOLID_TYPES: Array[String] = ["village_gate", "village_cottage", "village_forge", "village_big_tree", "village_east_tree",
 	"village_shrine", "village_standing_stone", "village_lamp_post", "village_dummy", "village_shelf", "village_barrel_a",
 	"village_barrel_b", "village_barrel_c", "village_barrel_tipped", "village_crate_a", "village_crate_b", "village_pile",
-	"village_rocks", "village_stump", "village_slab", "village_slab_tilted", "village_rubble", "village_chest"]
+	"village_rocks", "village_stump", "village_slab", "village_slab_tilted", "village_rubble", "village_chest", "village_wall", "village_fence"]
 const DECOR_TYPES: Array[String] = ["village_bush_1", "village_bush_2", "village_fern_1", "village_fern_2",
 	"village_mushrooms", "village_mushrooms_small", "village_bucket", "village_rope"]
 
 var _scene: Dictionary = SceneDefs.layered_data(SCENE)
 var _defs: Dictionary = PropScene.load_defs()
 
+
+
+## A core with every ability unlocked and the village road open (these tests are about movement, not about the village sequence).
+func _new(scene_id: StringName, entry: StringName = &"", gate: bool = false) -> ExploreCore:
+	var core: ExploreCore = ExploreCore.new(scene_id, entry, gate)
+	core.set_story_flags([&"debug_all_unlocked"] as Array[StringName])
+	return core
 
 func _frame(move: Vector2, dash: bool = false) -> InputFrame:
 	var f: InputFrame = InputFrame.new()
@@ -72,7 +79,7 @@ func test_the_data_is_valid_and_every_type_is_classified() -> void:
 		if String(p["type"]) == "village_forge":
 			forges += 1
 	assert_eq(forges, 1, "exactly one forge")
-	for t: String in ["village_gate", "village_cottage", "village_forge", "village_big_tree", "village_east_tree", "village_shrine",
+	for t: String in ["village_cottage", "village_forge", "village_big_tree", "village_east_tree", "village_shrine",
 			"village_standing_stone", "village_lamp_post", "village_dummy", "village_chest"]:
 		assert_true(used.has(t), "%s is placed" % t)
 
@@ -93,36 +100,27 @@ func test_the_renderer_takes_the_placements_as_they_are() -> void:
 		assert_eq(landed, p["feet"].round(), "%s: the anchor lands on the feet" % item["id"])
 
 
-func test_the_cast_and_spots_match_the_painted_village() -> void:
-	var painted: Dictionary = SceneDefs.get_def(SceneDefs.VILLAGE)
+func test_the_cast_and_spots() -> void:
 	var layered: Dictionary = SceneDefs.get_def(SCENE)
 	assert_eq(layered["id"], SCENE)
 	assert_true(SceneDefs.is_known(SCENE), "known to the scene table")
-	assert_false(SCENE in SceneDefs.IDS, "not in the painted IDS (the painted village is the retired twin)")
-	assert_eq(layered["size"], Vector2(571, 336), "the ground's size is the painted village's")
-	assert_eq(layered["name"], painted["name"], "same display name")
-	# sort Strings, not StringNames (Godot orders StringNames by address: the order changes with what else is loaded)
-	var painted_ids: Array = []
-	for n: Dictionary in painted["npcs"]:
-		painted_ids.append(String(n["id"]))
+	assert_false(SCENE in SceneDefs.IDS, "not among the non-layered scenes")
+	assert_eq(layered["size"], Vector2(571, 336), "the ground's size")
+	assert_eq(layered["name"], "LANTERNFEN", "the display name")
+	var visuals: Dictionary = {"mira": "npc_mira", "tovan": "npc_tovan", "edda": "npc_edda", "elder": "npc_elder", "child": "npc_child", "worker": "npc_worker"}
 	var ids: Array = []
 	for n: Dictionary in layered["npcs"]:
 		ids.append(String(n["id"]))
-		for pn: Dictionary in painted["npcs"]:
-			if pn["id"] == n["id"]:
-				assert_eq(n["visual"], pn["visual"], "%s keeps its sprite" % n["id"])
-	painted_ids.sort()
+		assert_eq(String(n["visual"]), visuals[String(n["id"])], "%s keeps its sprite" % n["id"])
 	ids.sort()
-	assert_eq(ids, painted_ids, "the same six people")
-	var painted_objects: Array = []
-	for o: Dictionary in painted["objects"]:
-		painted_objects.append(String(o["id"]) + ":" + String(o["kind"]))
+	var expected: Array = visuals.keys()
+	expected.sort()
+	assert_eq(ids, expected, "the six people")
 	var objects: Array = []
 	for o: Dictionary in layered["objects"]:
 		objects.append(String(o["id"]) + ":" + String(o["kind"]))
-	painted_objects.sort()
 	objects.sort()
-	assert_eq(objects, painted_objects, "the same chest, door and training dummy interactions")
+	assert_eq(objects, ["chest:chest", "training_dummy:dummy"], "the chest and training dummy interactions (Edda's door has no knock: owner 2026-11-02)")
 	var keys: Array = []
 	for key: Variant in layered["entries"]:
 		keys.append(String(key))
@@ -130,8 +128,8 @@ func test_the_cast_and_spots_match_the_painted_village() -> void:
 	assert_eq(keys, ["arrival", "return"], "the same entries")
 	assert_eq(layered["default_entry"], &"arrival")
 	assert_eq(layered["exits"].size(), 1, "one exit")
-	assert_eq(layered["exits"][0]["target_scene"], SceneDefs.FOREST_LAYERED, "the east exit leads to the layered forest")
-	assert_eq(layered["exits"][0]["target_entry"], painted["exits"][0]["target_entry"], "and the same entry")
+	assert_eq(layered["exits"][0]["target_scene"], SceneDefs.WOODLAND_LAYERED, "the east exit leads to the woodland approach")
+	assert_eq(layered["exits"][0]["target_entry"], &"west", "at its west end")
 	assert_true(SceneDefs.get_def(layered["exits"][0]["target_scene"])["entries"].has(layered["exits"][0]["target_entry"]), "that entry exists")
 	assert_eq(SceneDefs.scene_of_checkpoint(&"village_layered_gate"), SCENE, "the checkpoint belongs to the scene")
 	assert_true(layered["entries"][&"return"].x > 500.0, "the return entry is by the east road")
@@ -160,19 +158,15 @@ func test_every_spot_is_free_and_reachable() -> void:
 		assert_true(Collision.fits(obstacles, o["stand"], HERO), "%s: the use spot is free" % o["id"])
 		assert_true(grid.reaches(o["stand"]), "%s: the use spot is reachable" % o["id"])
 		assert_true((o["stand"] as Vector2).y > (o["position"] as Vector2).y + 8.0, "%s: used from in front (south of it)" % o["id"])
-		var core: ExploreCore = ExploreCore.new(SCENE)
+		var core: ExploreCore = _new(SCENE)
 		core.place_at(o["stand"])
 		core.step(InputFrame.new())
 		assert_eq(core.interact_target.get("id", &""), o["id"], "%s: standing on the use spot targets it" % o["id"])
 	# the door and the chest are solid props: the hero cannot walk onto them
 	assert_false(Collision.fits(obstacles, _placement("chest")["feet"], HERO), "the chest is solid")
-	var door: Vector2 = Vector2(0, 0)
-	for o: Dictionary in def["objects"]:
-		if o["id"] == &"edda_door":
-			door = o["position"]
-	assert_false(Collision.fits(obstacles, door, HERO), "the cottage door is solid, as in the painted village")
+	assert_false(Collision.fits(obstacles, Vector2(428, 106), HERO), "the cottage door is solid, as in the painted village")
 	for n: Dictionary in def["npcs"]:
-		var near: ExploreCore = ExploreCore.new(SCENE)
+		var near: ExploreCore = _new(SCENE)
 		var placed: bool = false
 		for dir: Vector2 in DIRECTIONS:
 			var at: Vector2 = n["position"] + dir.normalized() * 14.0
@@ -196,7 +190,7 @@ func test_the_hero_cannot_enter_a_solid_prop_walking_or_dashing_and_reaches_ever
 			for circle: Vector3 in circles:
 				for dir: Vector2 in DIRECTIONS:
 					var centre: Vector2 = Vector2(circle.x, circle.y)
-					var core: ExploreCore = ExploreCore.new(SCENE)
+					var core: ExploreCore = _new(SCENE)
 					var start: Vector2 = centre - dir.normalized() * (circle.z + 34.0)
 					if not Collision.fits(core.obstacles, start, HERO):
 						continue
@@ -220,52 +214,8 @@ func test_decor_is_walkable() -> void:
 		assert_true(Collision.fits(obstacles, p["feet"], HERO), "%s: the hero can stand on the decor prop's anchor" % p["id"])
 
 
-func test_the_rune_gate_passage_is_open_and_the_pillars_are_solid() -> void:
-	var gate: Vector2 = _placement("gate")["feet"]
-	var obstacles: Array[Obstacle] = SceneDefs.build_obstacles(SCENE)
-	var gap_x: float = gate.x + 26.0  # between the left pillar (dx -14..13) and the door leaf + right pillar (dx 40..77)
-	for dir: Vector2 in [Vector2.UP, Vector2.DOWN]:
-		var pos: Vector2 = Vector2(gap_x, gate.y + (28.0 if dir == Vector2.UP else -28.0))
-		var crossed: bool = false
-		for i: int in 120:
-			pos = Collision.move_resolved(obstacles, pos, pos + dir * 1.0, HERO)
-			if (dir == Vector2.UP and pos.y < gate.y - 24.0) or (dir == Vector2.DOWN and pos.y > gate.y + 24.0):
-				crossed = true
-				break
-		assert_true(crossed, "the hero walks %s through the gate's opening (ended at %s)" % [str(dir), str(pos)])
-	var core: ExploreCore = ExploreCore.new(SCENE)
-	core.place_at(Vector2(gap_x, gate.y + 30.0))
-	for i: int in 40:
-		core.step(_frame(Vector2.UP, i == 2))
-		core.exiting = false
-	assert_true(core.player.position.y < gate.y - 12.0, "a dash north goes through the opening (at %s)" % str(core.player.position))
-	# the left pillar and the door leaf / right pillar stop him from the south
-	for foot_x: float in [0.0, 58.0]:
-		var p: Vector2 = Vector2(gate.x + foot_x, gate.y + 24.0)
-		for i: int in 80:
-			p = Collision.move_resolved(obstacles, p, p + Vector2.UP, HERO)
-		assert_true(p.y > gate.y - 22.0, "the gate's solid part at dx %.0f stops the hero from the south (y %.1f)" % [foot_x, p.y])
-	# the clear width of the passage is a comfortable multiple of the hero (12 px) at its narrowest row
-	var widest_gap: float = 0.0
-	var y: float = gate.y - 12.0
-	while y <= gate.y + 12.0:
-		var run: float = 0.0
-		var best: float = 0.0
-		var x: float = gate.x - 10.0
-		while x <= gate.x + 90.0:
-			if Collision.fits(obstacles, Vector2(x, y), HERO):
-				run += 1.0
-				best = maxf(best, run)
-			else:
-				run = 0.0
-			x += 1.0
-		widest_gap = maxf(widest_gap, best)
-		y += 4.0
-	assert_true(widest_gap >= 14.0, "a hero-wide strip is free in the gate rows (%.0f px)" % widest_gap)
-
-
 func test_the_bot_walks_arrival_to_the_exit_and_back() -> void:
-	var core: ExploreCore = ExploreCore.new(SCENE)
+	var core: ExploreCore = _new(SCENE)
 	var rect: Rect2 = core.def["exits"][0]["rect"]
 	var bot: ExploreBot = ExploreBot.new()
 	assert_true(bot.plan(core.size, core.obstacles, core.player.position, Vector2.ZERO, rect), "a path exists from the arrival to the east exit")
@@ -274,7 +224,7 @@ func test_the_bot_walks_arrival_to_the_exit_and_back() -> void:
 		if core.exiting:
 			break
 	assert_true(core.exiting and core.pending_exit.get("exit_id", &"") == &"to_forest", "the hero reaches the exit (at %s)" % str(core.player.position))
-	var back: ExploreCore = ExploreCore.new(SCENE, &"return")
+	var back: ExploreCore = _new(SCENE, &"return")
 	var gate: Dictionary = SceneDefs.checkpoint(SCENE, &"village_layered_gate")
 	var bot2: ExploreBot = ExploreBot.new()
 	assert_true(bot2.plan(back.size, back.obstacles, back.player.position, gate["position"]), "the way back from the forest to the gate checkpoint")
@@ -288,7 +238,7 @@ func test_the_bot_walks_arrival_to_the_exit_and_back() -> void:
 func test_walking_is_deterministic_and_never_inside_a_collider() -> void:
 	var runs: Array = []
 	for r: int in 2:
-		var core: ExploreCore = ExploreCore.new(SCENE)
+		var core: ExploreCore = _new(SCENE)
 		var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.seed = 5
 		var dir: Vector2 = Vector2.RIGHT

@@ -1,0 +1,75 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/forest_rocks.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_rocks_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_forest_rocks_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_art"]
+atlas = ExtResource("1_art")
+region = Rect2(0, 1, 43, 31)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 6
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 8
+
+[node name="forest_rocks" type="Node2D"]
+metadata/w = 43
+metadata/h = 31
+metadata/base_width = 29
+metadata/solid = true
+metadata/image = "forest_rocks.png"
+metadata/note = "Rock-pile footprint covers the central and side rocks, not only the bottom row."
+metadata/locked = true
+metadata/src_bbox = [1196, 895, 1342, 999]
+metadata/contact_shadow = {"size": [43, 31], "core": [[41, 20, 2], [39, 21, 4], [33, 22, 8], [0, 23, 1], [33, 23, 6], [0, 24, 2], [19, 24, 1], [1, 25, 3], [15, 25, 5], [2, 26, 6], [13, 26, 6], [4, 27, 11], [32, 27, 1], [8, 28, 5], [20, 28, 2], [31, 28, 2], [20, 29, 4], [28, 29, 4], [22, 30, 9], [24, 31, 4]], "edge": [[40, 20, 1], [43, 20, 1], [38, 21, 1], [43, 21, 1], [32, 22, 1], [41, 22, 2], [-1, 23, 1], [1, 23, 1], [32, 23, 1], [39, 23, 2], [-1, 24, 1], [2, 24, 1], [18, 24, 1], [20, 24, 1], [33, 24, 6], [0, 25, 1], [4, 25, 1], [14, 25, 1], [20, 25, 1], [1, 26, 1], [8, 26, 1], [12, 26, 1], [19, 26, 1], [2, 27, 2], [15, 27, 4], [31, 27, 1], [33, 27, 1], [4, 28, 4], [13, 28, 2], [19, 28, 1], [22, 28, 1], [30, 28, 1], [33, 28, 1], [8, 29, 5], [19, 29, 1], [24, 29, 1], [27, 29, 1], [32, 29, 1], [20, 30, 2], [31, 30, 1], [22, 31, 2], [28, 31, 3], [24, 32, 4]]}
+metadata/flip_offset = Vector2(-24.5, -31)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = SubResource("AtlasTexture_art")
+centered = false
+offset = Vector2(-18.5, -31)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-21, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-26, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-9, -6)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(1, -5)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(12, -9)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(1, -17)
+shape = SubResource("CircleShape2D_4")

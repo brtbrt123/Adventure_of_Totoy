@@ -1,3 +1,5 @@
+> Runtime update 2026-10-28: Mossling and Thornback Boar frames are imported unchanged through install_mob_frames.py into art/src and wired to core mob snapshots. Other creatures remain reference-only. Runtime mapping: presentation/explore/mob_view.gd. Native sprite pixels/anchors are checked against these original PNGs. Art and motion approval remain for the owner; no source sheet was redrawn.
+
 # Chapter 1 creatures (reference art, v1)
 
 Status: **for the human's review only.** Nothing here is imported into `art/src` or wired into the game, and nothing is committed. HP, damage, ranges, telegraph lengths and state durations are core decisions. The tick numbers below are suggestions only.

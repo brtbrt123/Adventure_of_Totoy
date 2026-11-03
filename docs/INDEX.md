@@ -11,13 +11,21 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[GAME_DESIGN]]: the human's design (do not rewrite)
 - [[architecture]]: the core/presentation interface, including "Layered scenes"
 - [[ROUTING]] and [[HARNESS]]: who builds what, checks and the review loop
-- Decisions: [[0001-stage1-setup-choices]], [[0002-totoy36-palette]], [[0003-core-test-runner-and-preload]], [[0004-sharp-ui-text]]
+- Decisions: [[0001-stage1-setup-choices]], [[0002-totoy36-palette]], [[0003-core-test-runner-and-preload]], [[0004-sharp-ui-text]], [[0005-384x216-fantasy-ui]]
 - The rules for agents live in `AGENTS.md` at the project root (not in the vault)
+
+## Shared presentation
+- [[ANIMATION_EDITING]]: edit every character animation in Godot (SpriteFrames in presentation/animations), repaint frames (art/overrides), the animation galleries
+- [[WEAPON_PATHS]]: the blades' basic slash, drawn from the swing's hit area (reach and arc) and turned with the hero
+- [[MOBILE_BLUEPRINT]]: proposal for a phone version (touch layout, HUD moved up, screen sizes, open questions)
+- [[EFFECTS_REDO]]: the staff-style effects redo: every layer and its file, the generators, the captures, the image-generator accounts
+- Project skills (`.claude/skills/`): totoy-art-pipeline, totoy-review-capture, totoy-session-close: the exact steps for art, captures and closing a session
 
 ## Work in progress
 - [[CLAUDE_TASK_village_playtest_polish]]: roomier training yard, Tovan first sword/unarmed state and reward event; Codex presentation ready
 - [[LAYERED_SCENE_PILOT]]: floor painting plus separate props; prompts for the images
 - [[CODEX_TASK_layered_pilot]]: Codex's side of the pilot
+- [[CODEX_TASK_root_hollow]]: the real art for Root Hollow (ground painting and new props), Codex's task
 - [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, who does what)
 
 ## Art references

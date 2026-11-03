@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_bush_2.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_bush_2_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_bush_2_flipped_1.png" id="cast_flipped"]
+
+[node name="glade_bush_2" type="Node2D"]
+metadata/w = 50
+metadata/h = 26
+metadata/base_width = 34
+metadata/solid = false
+metadata/image = "glade_bush_2.png"
+metadata/note = "low bush: decor (walk through)"
+metadata/locked = true
+metadata/contact_shadow = {"core": [[0, 21, 2], [6, 21, 3], [10, 21, 2], [17, 21, 3], [22, 21, 3], [38, 21, 2], [48, 21, 3], [0, 22, 2], [6, 22, 3], [10, 22, 10], [21, 22, 4], [26, 22, 3], [33, 22, 2], [38, 22, 5], [48, 22, 3], [0, 23, 2], [6, 23, 3], [10, 23, 20], [32, 23, 5], [38, 23, 8], [48, 23, 3], [11, 24, 7], [19, 24, 4], [24, 24, 22], [12, 25, 2], [19, 25, 3], [24, 25, 3], [28, 25, 11], [42, 25, 4], [29, 26, 4], [36, 26, 3], [30, 27, 2]], "edge": [[2, 21, 1], [9, 21, 1], [12, 21, 1], [20, 21, 1], [25, 21, 1], [40, 21, 1], [51, 21, 1], [2, 22, 1], [9, 22, 1], [20, 22, 1], [25, 22, 1], [29, 22, 1], [35, 22, 1], [43, 22, 1], [51, 22, 1], [2, 23, 1], [9, 23, 1], [30, 23, 1], [37, 23, 1], [46, 23, 1], [51, 23, 1], [0, 24, 3], [6, 24, 5], [18, 24, 1], [23, 24, 1], [46, 24, 1], [48, 24, 4], [0, 25, 3], [6, 25, 6], [14, 25, 5], [22, 25, 2], [27, 25, 1], [39, 25, 3], [46, 25, 1], [48, 25, 4], [11, 26, 18], [33, 26, 3], [39, 26, 8], [12, 27, 3], [19, 27, 4], [24, 27, 6], [32, 27, 8], [42, 27, 5], [29, 28, 5], [36, 28, 4], [30, 29, 3]], "size": [50, 26]}
+metadata/flip_offset = Vector2(-28, -26)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-28, -26)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-31, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-25, -4)

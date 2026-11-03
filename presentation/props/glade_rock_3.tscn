@@ -1,0 +1,56 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/glade_rock_3.png" id="1_art"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_rock_3_1.png" id="cast_normal"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_shadow_glade_rock_3_flipped_1.png" id="cast_flipped"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 5
+
+[node name="glade_rock_3" type="Node2D"]
+metadata/w = 39
+metadata/h = 26
+metadata/base_width = 12
+metadata/solid = true
+metadata/image = "glade_rock_3.png"
+metadata/note = "rock with pebbles: the rock, not the pebbles"
+metadata/locked = true
+metadata/contact_shadow = {"core": [[6, 21, 5], [6, 22, 5], [6, 23, 5], [17, 23, 2], [28, 23, 2], [17, 24, 4], [26, 24, 4], [17, 25, 13], [18, 26, 11], [20, 27, 7]], "edge": [[11, 21, 1], [11, 22, 1], [11, 23, 1], [19, 23, 1], [30, 23, 1], [6, 24, 6], [21, 24, 1], [30, 24, 1], [6, 25, 6], [30, 25, 1], [17, 26, 1], [29, 26, 2], [17, 27, 3], [27, 27, 4], [18, 28, 12], [20, 29, 8]], "size": [39, 26]}
+metadata/flip_offset = Vector2(-17, -26)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-23, -26)
+
+[node name="CastShadow" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_normal")
+centered = false
+offset = Vector2(-25, -4)
+
+[node name="CastShadowFlipped" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0, 0, 0, 0.35)
+texture_filter = 1
+texture = ExtResource("cast_flipped")
+centered = false
+offset = Vector2(-18, -4)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-14, -5)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-5, -5)
+shape = SubResource("CircleShape2D_2")

@@ -26,8 +26,8 @@ func _expect(condition: bool, message: String) -> void:
 
 
 func _check_settings() -> void:
-	_expect(ProjectSettings.get_setting("display/window/size/viewport_width") == 320, "viewport width is not 320")
-	_expect(ProjectSettings.get_setting("display/window/size/viewport_height") == 180, "viewport height is not 180")
+	_expect(ProjectSettings.get_setting("display/window/size/viewport_width") == 384, "viewport width is not 384")
+	_expect(ProjectSettings.get_setting("display/window/size/viewport_height") == 216, "viewport height is not 216")
 	_expect(ProjectSettings.get_setting("display/window/stretch/mode") == "canvas_items", "stretch mode is not canvas_items (decision 0004: sharp UI text)")
 	_expect(ProjectSettings.get_setting("display/window/stretch/scale_mode") == "integer", "scale mode is not integer")
 	_expect(ProjectSettings.get_setting("rendering/textures/canvas_textures/default_texture_filter") == 0, "default texture filter is not nearest")

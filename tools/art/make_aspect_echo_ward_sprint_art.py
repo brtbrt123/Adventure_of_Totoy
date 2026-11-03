@@ -57,7 +57,7 @@ BAYER = LP.BAYER
 BG_DARK, BG_GRASS = LP.BG_DARK, LP.BG_GRASS
 SW_, SH_ = LP.SW_, LP.SH_  # GIF scene 192x120 game pixels, shown at 4x
 
-HERO_SETS = {"katana": "hero2", "dagger": "totoy_dagger", "scythe": "totoy_scythe"}
+HERO_SETS = {"katana": "hero2", "dagger": "totoy_dagger", "scythe": "totoy_scythe", "staff": "totoy_staff"}
 MOVE_STATES = [("idle", 4), ("walk", 6), ("dash", 4)]  # the frames Sprint and the Echo Step shield cover
 
 

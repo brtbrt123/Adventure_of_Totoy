@@ -18,7 +18,7 @@ const Y_RATIO: float = 0.25
 const OFFSET_Y: int = 1
 const INK: Color = Color(0.110, 0.094, 0.141)  # palette "0" (ink, #1c1824)
 ## Per-scene strength (the dark forest floor needs a little more to read, the bright village dirt a little less).
-const STRENGTH: Dictionary = {&"village": 0.22, &"forest": 0.25, &"glade": 0.23, &"arena": 0.25}
+const STRENGTH: Dictionary = {&"village_layered": 0.22, &"forest_layered": 0.25, &"glade_layered": 0.23, &"arena": 0.25}
 
 
 ## The shadow's pixels for feet at `feet` (rounded) and `radius`: {"core": [Rect2 row spans], "ring": [Vector2i pixels]}.

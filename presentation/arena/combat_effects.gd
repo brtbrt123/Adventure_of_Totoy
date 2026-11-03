@@ -1,4 +1,5 @@
 extends RefCounted
+const AnimLib := preload("res://presentation/common/anim_library.gd")  # the owner's effect timing (presentation/animations/effects, docs/ANIMATION_EDITING.md)
 ## Snapshot-only drawing plans. Built headless too, so smoke tests exercise geometry.
 const Snapshots := preload("res://core/snapshots.gd")
 const TelegraphView := preload("res://presentation/arena/telegraph_view.gd")
@@ -134,7 +135,9 @@ static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapsh
 	var age: int = tick - tell.hit_tick
 	var pose: String = {&"gold_slam": "slam", &"gold_combo": "slam", &"red_sweep": "sweep", &"red_stomp": "stomp", &"red_charge": "charge", &"red_shards": "beam_body"}.get(tell.attack, "slam")
 	var count: int = 4 if pose == "beam_body" else 6
-	var key: String = "fx_%s_%d" % [pose, mini(count - 1, age / 2) + 1]
+	# fx_charge also loops on the boss's charge (charge_plan below, the owner's timing); its impact keeps the code's pace
+	var n: int = mini(count - 1, age / 2) + 1 if pose == "charge" else AnimLib.effect_at("fx_" + pose, age, [count, 2, false])
+	var key: String = "fx_%s_%d" % [pose, n]
 	if not frames.has(key):
 		return
 	var frame: Dictionary = frames[key]
@@ -159,7 +162,7 @@ static func draw_imported_impact(canvas: Node2D, tell: Snapshots.TelegraphSnapsh
 static func charge_plan(tell: Snapshots.TelegraphSnapshot, tick: int, position: Vector2, frames: Dictionary, atlas_size: Vector2) -> Dictionary:
 	if tick < tell.hit_tick or tick > tell.end_tick:
 		return {}
-	var key: String = "fx_charge_%d" % (posmod((tick - tell.hit_tick) / 2, 6) + 1)
+	var key: String = "fx_charge_%d" % AnimLib.effect_at("fx_charge", tick - tell.hit_tick, [6, 2, true])
 	var f: Dictionary = frames[key]
 	var at: Vector2 = position - tell.direction * 14.0 + Vector2(0, 2)
 	var pixels: PackedVector2Array = PackedVector2Array([Vector2.ZERO, Vector2(f["w"] - 1, 0), Vector2(f["w"] - 1, f["h"] - 1), Vector2(0, f["h"] - 1)])

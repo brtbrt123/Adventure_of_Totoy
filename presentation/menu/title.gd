@@ -2,12 +2,19 @@ extends "res://presentation/arena/hud.gd"
 ## Title screen: NEW GAME (chapter 1 from the village), CONTINUE (the saved scene and checkpoint), BOSS FIGHT (the
 ## Colossus arena directly, for testing), CONTROLS, CREDITS, QUIT. (The saved record is kept and can be shown with record_text(),
 ## but the menu no longer displays it.) Presentation only: it reads
-## the save profile through the core's save store and starts the arena; it holds no game rules. It reuses the
-## HUD's 3x5 bitmap lettering and draws on the 320x180 canvas.
+## the save profile through the core's save store and starts the arena; it holds no game rules.
+## The screen is the editable scene title.tscn: the painting (Background), the logo (Logo), the lettering (Labels inside
+## TextViewport/Screens: the menu, the Controls page, the Credits page) and TextDisplay, which shows that lettering as hard
+## palette pixels through pixel_text.gdshader. Open the scene in Godot to move or restyle anything. The words of the Controls and
+## Credits pages come from CONTROL_LINES / CREDIT_LINES below; the click areas of the six menu lines are item_at(), whose numbers
+## (MENU_TOP, MENU_STEP) must match the Item labels' positions in the scene.
 const Bindings := preload("res://presentation/arena/input_bindings.gd")
 const SaveStore := preload("res://core/save_store.gd")
+const CutsceneBook := preload("res://core/cutscene_book.gd")
 
 const ARENA_SCENE: String = "res://presentation/arena/arena.tscn"
+const INTRO_SCENE: String = "res://presentation/cutscene/intro.tscn"
+const SKIP_INTRO_META: StringName = &"totoy_skip_intro"
 const EXPLORE_SCENE: String = "res://presentation/explore/explore_scene.tscn"
 ## Read by presentation/explore/explore_scene.gd: where the chapter starts ({scene, entry, checkpoint, gate_open}).
 const SceneDefs := preload("res://core/scene_defs.gd")
@@ -16,7 +23,7 @@ const EXPLORE_START_META: StringName = &"totoy_explore_start"
 ## not set it and never touch the player's save).
 const PERSIST_META: StringName = &"totoy_persist"
 
-const MENU_TOP: int = 103  # y of the first menu line, in game pixels
+const MENU_TOP: int = 134  # y of the first menu line, in game pixels
 const MENU_STEP: int = 12
 const MENU_SIZE: int = 13  # menu item font size (Cinzel capitals)
 const PAGE_SIZE: int = 10  # body text on the controls and credits pages
@@ -64,7 +71,7 @@ const CREDIT_LINES: Array[String] = [
 	"SPRITES AND TILES: GENERATED WITH GEMINI",
 	"FROM THE OWNER'S DESIGNS",
 	"BUILT WITH GODOT 4, CLAUDE CODE AND CODEX",
-	"",
+	"INTRO MUSIC: ORIGINAL CODEX COMPOSITION",
 	"SOUND AND MUSIC (CC0):",
 	"STARNINJAS, ARTISTICDUDE, KENNEY,",
 	"BRIAN MACINTOSH (BMACZERO), MINTODOG",
@@ -97,38 +104,30 @@ func _ready() -> void:
 	var palette: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))
 	for entry: Dictionary in (palette as Dictionary).get("colors", []):
 		colors[entry["symbol"]] = Color.html(entry["hex"])
-	if ResourceLoader.exists(PAINTED_PATH):
-		background = load(PAINTED_PATH) as Texture2D
+	background_sprite = get_node_or_null("Background") as Sprite2D
+	if background_sprite != null and background_sprite.texture != null:
+		background = background_sprite.texture
 		painted = true
-		background_sprite = Sprite2D.new()
-		background_sprite.texture = background
-		background_sprite.centered = false
-		background_sprite.scale = Vector2(320.0, 180.0) / background.get_size()
-		background_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-		background_sprite.show_behind_parent = true
-		add_child(background_sprite)
 	elif ResourceLoader.exists(BACKGROUND_PATH):
 		background = load(BACKGROUND_PATH) as Texture2D
-	var logo_path: String = LOGO_PIXEL_PATH if ResourceLoader.exists(LOGO_PIXEL_PATH) else LOGO_PATH
-	if ResourceLoader.exists(logo_path):
-		var logo: Texture2D = load(logo_path) as Texture2D
-		logo_pixel = logo_path == LOGO_PIXEL_PATH
-		logo_sprite = Sprite2D.new()
-		logo_sprite.texture = logo
-		logo_sprite.centered = false
-		logo_sprite.scale = Vector2.ONE * (LOGO_WIDTH / logo.get_width())
-		logo_sprite.position = Vector2(floorf((320.0 - LOGO_WIDTH) * 0.5), 2.0)
-		logo_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST if logo_pixel else CanvasItem.TEXTURE_FILTER_LINEAR
-		logo_sprite.show_behind_parent = true
-		add_child(logo_sprite)
-	_add_text_layer()
+	logo_sprite = get_node_or_null("Logo") as Sprite2D
+	if logo_sprite != null and logo_sprite.texture == null:
+		logo_sprite = null  # no logo image: the plain-lettering title is shown instead
+	if logo_sprite != null:
+		logo_pixel = logo_sprite.texture.resource_path == LOGO_PIXEL_PATH
+	text_viewport = $TextViewport
+	text_layer = $TextViewport/TitleText
+	text_layer.view = self
+	text_layer.colors = colors
+	text_display = $TextDisplay
+	_set_pixel_palette()
+	_fill_pages()
 	profile = SaveStore.load_profile()
 	queue_redraw()
 
 
-## The menu lettering: drawn at game resolution in its own transparent viewport, then cut to hard pixels in the
-## Totoy palette, so the text looks like pixel art while the painting behind it stays smooth.
-func _add_text_layer() -> void:
+## The lettering is cut to hard pixels in the Totoy palette (reserved gold and red excluded) by the shader on TextDisplay.
+func _set_pixel_palette() -> void:
 	var palette_vectors: PackedVector3Array = PackedVector3Array()
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/palette.json"))
 	var reserved: Array = (data as Dictionary).get("reserved", [])
@@ -139,29 +138,37 @@ func _add_text_layer() -> void:
 	var count: int = palette_vectors.size()
 	while palette_vectors.size() < 36:
 		palette_vectors.append(palette_vectors[count - 1])
-	text_viewport = SubViewport.new()
-	text_viewport.size = Vector2i(320, 180)
-	text_viewport.transparent_bg = true
-	text_viewport.disable_3d = true
-	text_viewport.gui_disable_input = true
-	text_viewport.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
-	text_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	text_layer = TitleText.new()
-	text_layer.view = self
-	text_layer.colors = colors
-	text_viewport.add_child(text_layer)
-	add_child(text_viewport)
-	text_display = Sprite2D.new()
-	text_display.texture = text_viewport.get_texture()
-	text_display.centered = false
-	text_display.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	if ResourceLoader.exists(PIXEL_TEXT_SHADER):
-		var material: ShaderMaterial = ShaderMaterial.new()
-		material.shader = load(PIXEL_TEXT_SHADER) as Shader
+	var material: ShaderMaterial = text_display.material as ShaderMaterial
+	if material != null:
 		material.set_shader_parameter("palette", palette_vectors)
 		material.set_shader_parameter("palette_size", count)
-		text_display.material = material
-	add_child(text_display)
+
+
+## Puts the page words (CONTROL_LINES, CONTROL_FOOTER, CREDIT_LINES) into the scene's labels; extra labels are hidden.
+func _fill_pages() -> void:
+	var controls: Node = text_viewport.get_node("Screens/Controls")
+	for i: int in range(11):
+		var key: Label = controls.get_node_or_null("Key%d" % (i + 1)) as Label
+		var action: Label = controls.get_node_or_null("Action%d" % (i + 1)) as Label
+		var line: String = CONTROL_LINES[i] if i < CONTROL_LINES.size() else ""
+		var split: int = line.find(":")
+		if key != null:
+			key.visible = not line.is_empty()
+			key.text = line.substr(0, split)
+		if action != null:
+			action.visible = not line.is_empty()
+			action.text = line.substr(split + 1)
+	for i: int in range(2):
+		var footer: Label = controls.get_node_or_null("Footer%d" % (i + 1)) as Label
+		if footer != null:
+			footer.visible = i < CONTROL_FOOTER.size()
+			footer.text = CONTROL_FOOTER[i] if i < CONTROL_FOOTER.size() else ""
+	var credits: Node = text_viewport.get_node("Screens/Credits")
+	for i: int in range(13):
+		var label: Label = credits.get_node_or_null("Line%d" % (i + 1)) as Label
+		if label != null:
+			label.visible = i < CREDIT_LINES.size()
+			label.text = CREDIT_LINES[i] if i < CREDIT_LINES.size() else ""
 
 
 func _process(delta: float) -> void:
@@ -231,19 +238,24 @@ func start_game() -> void:
 	change_scene.call(ARENA_SCENE)
 
 
-## NEW GAME: chapter 1 from the village arrival. The chapter progress in the save is cleared (the fight record and the
+## NEW GAME: the story intro, then village arrival. Explicit debug/test bypass goes straight to arrival.
+## The chapter progress in the save is cleared (the fight record and the
 ## loadout stay).
 func new_game() -> void:
 	if started:
 		return
+	var bypass_intro: bool = "--skip-intro" in OS.get_cmdline_user_args() or bool(Engine.get_meta(SKIP_INTRO_META,false)) or Engine.has_meta(EXPLORE_START_META)
 	started = true
 	Engine.set_meta(PERSIST_META, true)
 	if profile == null:
 		profile = SaveStore.load_profile()
 	profile.reset_progress()
+	if bypass_intro:
+		var flag: StringName = CutsceneBook.flag_of(CutsceneBook.default_book(),CutsceneBook.INTRO)
+		if flag != &"" and not profile.story_flags.has(flag):profile.story_flags.append(flag)
 	SaveStore.save(profile)
 	Engine.set_meta(EXPLORE_START_META, {"scene": SceneDefs.START_SCENE, "entry": SceneDefs.START_ENTRY, "checkpoint": &"", "gate_open": false})
-	change_scene.call(EXPLORE_SCENE)
+	change_scene.call(EXPLORE_SCENE if bypass_intro else INTRO_SCENE)
 
 
 ## True when the save has a chapter game to resume.
@@ -267,7 +279,7 @@ func continue_game() -> void:
 ## The menu line under a canvas point, or -1.
 func item_at(point: Vector2) -> int:
 	for i: int in ITEMS.size():
-		if Rect2(100, MENU_TOP + i * MENU_STEP - 2, 120, MENU_STEP - 1).has_point(point):
+		if Rect2(132, MENU_TOP + i * MENU_STEP - 2, 120, MENU_STEP - 1).has_point(point):
 			return i
 	return -1
 
@@ -287,24 +299,49 @@ func _draw() -> void:
 	_draw_background()
 
 
-## Called by the lettering layer (title_text.gd) to draw the current screen's text onto `canvas`.
-func draw_text_layer(canvas: Object) -> void:
-	match screen:
-		SCREEN_CONTROLS:
-			_draw_page(canvas, "CONTROLS", CONTROL_LINES, CONTROL_FOOTER)
-		SCREEN_CREDITS:
-			_draw_page(canvas, "CREDITS", CREDIT_LINES, [])
-		_:
-			_draw_title(canvas)
+## Called every frame by the lettering layer (title_text.gd): shows the current screen's labels and moves the selection plate.
+func draw_text_layer(_canvas: Object) -> void:
+	var screens: Node = text_viewport.get_node("Screens")
+	screens.get_node("Title").visible = screen == SCREEN_TITLE
+	screens.get_node("Controls").visible = screen == SCREEN_CONTROLS
+	screens.get_node("Credits").visible = screen == SCREEN_CREDITS
+	if screen != SCREEN_TITLE:
+		return
+	var menu: Node = screens.get_node("Title")
+	for i: int in ITEMS.size():
+		var label: Label = menu.get_node_or_null("Item%d" % (i + 1)) as Label
+		if label == null:
+			continue
+		var selected: bool = i == index
+		label.text = ITEMS[i]
+		var tone: Color = colors["1"] if selected else colors["p"]
+		if ITEMS[i] == "CONTINUE" and not can_continue():
+			tone = colors["h"]  # nothing saved to continue
+		label.add_theme_color_override("font_color", tone)
+		if selected:
+			# an opaque dark plate behind the chosen item with a cream line under it (the layer is hard pixels:
+			# translucent fills would be cut away)
+			var y: float = MENU_TOP + i * MENU_STEP
+			menu.get_node("Plate").position = Vector2(128, y - 3)
+			menu.get_node("PlateLine").position = Vector2(128, y - 3 + MENU_STEP - 2)
+			var arrow: Control = menu.get_node("Arrow")
+			arrow.position = Vector2(arrow.position.x, label.position.y)
+	var note: String = String(profile.load_note) if profile != null else ""
+	var note_label: Label = menu.get_node_or_null("SaveNote") as Label
+	if note_label != null:
+		note_label.text = ("SAVE RESET: " + note) if note != "" else ""
+	var fallback: Control = menu.get_node_or_null("FallbackTitle") as Control
+	if fallback != null:
+		fallback.visible = logo_sprite == null
 
 
 ## The dusk arena picture (made from the game's own tiles and props), drifting mist and fireflies. On the pages
 ## (controls, credits) the picture is dimmed so the lettering reads.
 func _draw_background() -> void:
 	if background == null:
-		draw_rect(Rect2(0, 0, 320, 180), colors["2"])
+		draw_rect(Rect2(0, 0, 384, 216), colors["2"])
 	elif not painted:
-		draw_texture_rect(background, Rect2(0, 0, 320, 180), false)
+		draw_texture_rect(background, Rect2(0, 0, 384, 216), false)
 	# mist: thin pale bands that drift sideways at different speeds (pixel rows; only over the pixel-art fallback)
 	var mist: Color = colors["p"]
 	for band: int in (0 if painted else 6):
@@ -320,7 +357,7 @@ func _draw_background() -> void:
 	var rnd: RandomNumberGenerator = RandomNumberGenerator.new()
 	rnd.seed = 77
 	for i: int in FIREFLIES:
-		var home: Vector2 = Vector2(rnd.randf_range(14.0, 306.0), rnd.randf_range(60.0, 172.0))
+		var home: Vector2 = Vector2(rnd.randf_range(14.0, 370.0), rnd.randf_range(70.0, 206.0))
 		var rate: Vector2 = Vector2(rnd.randf_range(0.25, 0.6), rnd.randf_range(0.2, 0.5))
 		var phase: float = rnd.randf_range(0.0, TAU)
 		var at: Vector2 = home + Vector2(sin(time * rate.x + phase) * 9.0, cos(time * rate.y + phase * 1.3) * 5.0)
@@ -330,45 +367,4 @@ func _draw_background() -> void:
 		draw_rect(Rect2(dot - Vector2(0, 1), Vector2(1, 3)), Color(colors["1"], 0.18 * pulse))
 		draw_rect(Rect2(dot, Vector2(1, 1)), Color(colors["p"], 0.55 + 0.45 * pulse))
 	if screen != SCREEN_TITLE:
-		draw_rect(Rect2(0, 0, 320, 180), Color(colors["0"], 0.74))
-
-
-func _draw_title(canvas: Object) -> void:
-	if logo_sprite == null:  # without the logo image the title is plain lettering
-		canvas.centered(160, 30, "ADVENTURE OF TOTOY", colors["1"], colors["0"], 1, canvas.menu_font(), FALLBACK_TITLE_SIZE)
-	var face: Font = canvas.menu_font()
-	for i: int in ITEMS.size():
-		var selected: bool = i == index
-		var y: float = MENU_TOP + i * MENU_STEP
-		if selected:
-			# an opaque dark plate behind the chosen item with a cream line under it (the layer is hard pixels:
-			# translucent fills would be cut away)
-			canvas.draw_rect(Rect2(96, y - 3, 128, MENU_STEP - 1), colors["k"])
-			canvas.draw_rect(Rect2(96, y - 3 + MENU_STEP - 2, 128, 1), colors["1"])
-			canvas.outlined(Vector2(100, y), ">", colors["1"], colors["0"], 1, face, MENU_SIZE)
-		var tone: Color = colors["1"] if selected else colors["p"]
-		if ITEMS[i] == "CONTINUE" and not can_continue():
-			tone = colors["h"]  # nothing saved to continue
-		canvas.centered(160, y, ITEMS[i], tone, colors["0"], 1, face, MENU_SIZE)
-	var note: String = String(profile.load_note) if profile != null else ""
-	if note != "":
-		canvas.centered(160, 175, "SAVE RESET: " + note, colors["o"], colors["0"], 1, face, 8)
-
-
-func _draw_page(canvas: Object, heading: String, lines: Array[String], footer: Array[String]) -> void:
-	var face: Font = canvas.menu_font()
-	canvas.centered(160, 4, heading, colors["1"], colors["0"], 1, face, 20)
-	var y: int = 26
-	for line: String in lines:
-		var split: int = line.find(":")
-		if split > 0 and lines == CONTROL_LINES:
-			canvas.outlined(Vector2(20, y), line.substr(0, split), colors["1"], colors["0"], 1, face, PAGE_SIZE)
-			canvas.outlined(Vector2(104, y), line.substr(split + 1), colors["j"], colors["0"], 1, face, PAGE_SIZE)
-		else:
-			canvas.outlined(Vector2(20, y), line, colors["j"], colors["0"], 1, face, PAGE_SIZE)
-		y += 10
-	y += 4
-	for line: String in footer:
-		canvas.outlined(Vector2(20, y), line, colors["o"], colors["0"], 1, face, PAGE_SIZE)
-		y += 10
-	canvas.outlined(Vector2(20, 168), "ESC OR ENTER: BACK", colors["1"], colors["0"], 1, face, PAGE_SIZE)
+		draw_rect(Rect2(0, 0, 384, 216), Color(colors["0"], 0.74))

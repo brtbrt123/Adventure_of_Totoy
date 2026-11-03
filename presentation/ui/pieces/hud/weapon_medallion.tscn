@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://ldwvoh6kfrav" path="res://art/ui_kit/weapon_medallion.png" id="4_tex"]
+
+[node name="Medallion" type="TextureRect"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+texture = ExtResource("4_tex")
+
+[node name="WeaponGlyph" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 9.0
+offset_right = 40.0
+offset_bottom = 41.0
+mouse_filter = 2
+expand_mode = 1

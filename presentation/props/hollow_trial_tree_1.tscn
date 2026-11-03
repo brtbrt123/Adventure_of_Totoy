@@ -1,0 +1,67 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/hollow_trial_tree_1.png" id="art"]
+
+[sub_resource type="CircleShape2D" id="C0"]
+
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="C1"]
+
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="C2"]
+
+radius = 9.0
+
+[node name="hollow_trial_tree_1" type="Node2D"]
+
+metadata/w = 104
+
+metadata/h = 120
+
+metadata/base_width = 30
+
+metadata/solid = true
+
+metadata/image = "hollow_trial_tree_1.png"
+
+metadata/anchor = Vector2(52, 120)
+
+metadata/locked = true
+
+metadata/registration_pending = true
+
+[node name="Sprite" type="Sprite2D" parent="."]
+
+texture_filter = 1
+
+texture = ExtResource("art")
+
+centered = false
+
+offset = Vector2(-52, -120)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+
+collision_layer = 0
+
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+
+position = Vector2(-6.0, -9.0)
+
+shape = SubResource("C0")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+
+position = Vector2(0.0, -9.0)
+
+shape = SubResource("C1")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+
+position = Vector2(6.0, -9.0)
+
+shape = SubResource("C2")

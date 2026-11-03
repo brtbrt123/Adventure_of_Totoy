@@ -513,6 +513,9 @@ WEAPONS = {  # weapon -> (hero frame set, metal symbols, brighten map, swings)
     "katana": ("hero2", BLADE, BRIGHTEN, 3),
     "dagger": ("totoy_dagger", set("jnop"), {"j": "p", "n": "o", "o": "p", "p": "1"}, 4),
     "scythe": ("totoy_scythe", set("1tupj"), {"t": "u", "u": "p", "p": "1", "1": "1", "j": "p"}, 3),
+    # 2026-11-01: the Star Staff's crystal and its blue wrap (m n o p 1) glow; it has no ghost or arc (its echo is a phantom
+    # burst, presentation/common/staff_view.gd), so the ghost loop below skips it
+    "staff": ("totoy_staff", set("mnop1"), {"m": "n", "n": "o", "o": "p", "p": "1", "1": "1"}, 3),
 }
 GLOW_STATES = [("idle", 4), ("walk", 6), ("dash", 4), ("parry", 6), ("hurt", 4)]  # + attack<s> 1-6 per swing
 GLOW_PHASES = 6  # shimmer loop, about 80 ms per phase, independent of the hero frame
@@ -1156,6 +1159,8 @@ def build() -> dict:
     a["end"] = [phantom_end(k) for k in range(1, 5)]
     a["ghost"], a["arcs"] = {}, {}
     for w, (vid, metal, _, swings) in WEAPONS.items():
+        if w == "staff":
+            continue
         a["ghost"][w], a["arcs"][w] = {}, {}
         for s in range(1, swings + 1):
             out = []
@@ -1202,11 +1207,11 @@ def phantom_sprites(a: dict) -> list[tuple[str, Grid, tuple[int, int], dict]]:
             out += [(f"fx_phantom_glow_{frame}_{ph + 1}", g, oa, {"hero_frame": frame, "phase": ph + 1, "ms": 80}) for ph, g in enumerate(ovs)]
     out += [(f"fx_phantom_start_{k + 1}", g, START_A, {"ms": (50, 60, 60, 70, 80)[k]}) for k, g in enumerate(a["start"])]
     out += [(f"fx_phantom_end_{k + 1}", g, START_A, {"ms": (70, 70, 80, 90)[k]}) for k, g in enumerate(a["end"])]
-    for w in WEAPONS:
+    for w in a["ghost"]:  # the blades only (the staff has none)
         for s, frames in a["ghost"][w].items():
             out += [(f"fx_phantom_ghost_{w}_{s}_{i + 1}", gg, anc, {"source": src, "mode": GHOST_MODES[i], "ms": (40, 60, 60, 70)[i]})
                     for i, (gg, anc, src) in enumerate(frames)]
-    for w in WEAPONS:
+    for w in a["arcs"]:
         for s, arcs in a["arcs"][w].items():
             out += [(f"fx_phantom_arc_{w}_{s}_{ph + 1}", g, ARC_ANCHORS[w], {"swing": s, "phase": ("lead", "peak", "follow", "fragments")[ph], "ms": (35, 55, 55, 70)[ph]})
                     for ph, g in enumerate(arcs)]
@@ -1375,7 +1380,7 @@ def make_previews(a: dict) -> None:
         paste(c, g, 0, 0)
         st_cells.append(im(c))
     groups.append(("over Totoy: start 1-5 (glow on) | end 1-4 (glow off after end 1)", st_cells))
-    for w in WEAPONS:
+    for w in a["ghost"]:
         ghosts = [im(gg) for s in a["ghost"][w] for gg, _, _ in a["ghost"][w][s]]
         groups.append((f"{w} phantom ghosts: swing 1-{WEAPONS[w][3]} x form/full/fade/fragments (from attack frames 3,4,4,5)", ghosts))
         aa = ARC_ANCHORS[w]

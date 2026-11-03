@@ -91,6 +91,8 @@ func run() -> void:
 	scene = (load("res://presentation/explore/explore_scene.tscn") as PackedScene).instantiate() as Explore
 	scene.set_physics_process(false)
 	root.add_child(scene)
+	scene.core.set_flag(&"debug_all_unlocked")
+	scene.advance(InputFrame.new())
 	await process_frame
 	finish_fade()
 	expect(scene.snapshot.scene_id == &"village_layered", "Loads via START_META")
@@ -156,9 +158,9 @@ func run() -> void:
 		scene.advance(bot.next_input(scene.snapshot.hero.position))
 		if scene.fade_phase != &"":
 			break
-	expect(scene.pending_scene == &"forest", "East exit requests forest")
+	expect(scene.pending_scene == &"woodland_layered", "East exit requests woodland")
 	finish_fade()
-	expect(scene.snapshot.scene_id == &"forest", "East exit loads forest")
+	expect(scene.snapshot.scene_id == &"woodland_layered", "East exit loads woodland")
 	# New debug bindings use the existing fade path.
 	for key: String in ["debug_scene_village_layered", "debug_scene_glade_layered"]:
 		expect(InputMap.has_action(key), "Debug binding " + key)

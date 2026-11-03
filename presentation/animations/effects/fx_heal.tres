@@ -1,0 +1,26 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_heal_1.png" id="1_gq3sc"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_heal_2.png" id="2_vhjpv"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_heal_3.png" id="3_t6mkn"]
+[ext_resource type="Texture2D" path="res://art/build/sprites/fx_heal_4.png" id="4_hgw8d"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_gq3sc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_vhjpv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_t6mkn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_hgw8d")
+}],
+"loop": 0,
+"name": &"play",
+"speed": 20.0
+}]

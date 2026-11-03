@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="FontFile" uid="uid://du7ymphjpifam" path="res://presentation/fonts/PixelifySans.ttf" id="2_fon"]
+[ext_resource type="Texture2D" uid="uid://b7cjht10qtx7j" path="res://art/ui_kit/button_normal.png" id="5_tex"]
+
+[node name="NamePlate" type="NinePatchRect"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 44
+offset_bottom = 12
+texture = ExtResource("5_tex")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="Name" type="Label" parent="."]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 44.0
+offset_bottom = 11.0
+theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1)
+theme_override_colors/font_outline_color = Color(0.1098, 0.0941, 0.1412, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_fon")
+theme_override_font_sizes/font_size = 6
+text = "BLACK"
+horizontal_alignment = 1
+vertical_alignment = 1

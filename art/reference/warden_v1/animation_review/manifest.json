@@ -1,0 +1,1125 @@
+{
+  "review_only": true,
+  "body_anchor": [
+    20,
+    44
+  ],
+  "body_cell": [
+    48,
+    48
+  ],
+  "states": {
+    "idle": 6,
+    "wake": 4,
+    "walk": 6,
+    "cleave_tell": 5,
+    "cleave_strike": 3,
+    "lash_tell": 5,
+    "lash_strike": 3,
+    "ring_tell": 5,
+    "ring_strike": 3,
+    "recover": 4,
+    "guard_hit": 2,
+    "exposed": 4,
+    "hurt": 2,
+    "death": 8
+  },
+  "body_frames": 60,
+  "fx_frames": 100,
+  "fx_families": {
+    "rune_glow": 6,
+    "idle_spores": 6,
+    "wake_flare": 4,
+    "arrival": 6,
+    "guard_hit": 4,
+    "guard_break": 8,
+    "exposed_dust": 6,
+    "cleave_arc": 6,
+    "lash_creep": 5,
+    "lash_strike": 6,
+    "lash_splinters": 6,
+    "ring_charge": 6,
+    "ring_burst": 8,
+    "scorch": 6,
+    "death_flash": 4,
+    "death_debris": 8,
+    "hit_burst": 5
+  },
+  "fx_assets": {
+    "fx_warden_rune_glow_1": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_rune_glow_2": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        21
+      ]
+    },
+    "fx_warden_rune_glow_3": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        22
+      ]
+    },
+    "fx_warden_rune_glow_4": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        2,
+        23
+      ]
+    },
+    "fx_warden_rune_glow_5": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        3,
+        23
+      ]
+    },
+    "fx_warden_rune_glow_6": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        4,
+        24
+      ]
+    },
+    "fx_warden_idle_spores_1": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        12,
+        26
+      ]
+    },
+    "fx_warden_idle_spores_2": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        13,
+        26
+      ]
+    },
+    "fx_warden_idle_spores_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        14,
+        25
+      ]
+    },
+    "fx_warden_idle_spores_4": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        15,
+        27
+      ]
+    },
+    "fx_warden_idle_spores_5": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        27
+      ]
+    },
+    "fx_warden_idle_spores_6": {
+      "size": [
+        40,
+        32
+      ],
+      "anchor": [
+        17,
+        27
+      ]
+    },
+    "fx_warden_wake_flare_1": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_wake_flare_2": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        22
+      ]
+    },
+    "fx_warden_wake_flare_3": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        2,
+        23
+      ]
+    },
+    "fx_warden_wake_flare_4": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        4,
+        25
+      ]
+    },
+    "fx_warden_arrival_1": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        15,
+        35
+      ]
+    },
+    "fx_warden_arrival_2": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        15,
+        35
+      ]
+    },
+    "fx_warden_arrival_3": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        15,
+        35
+      ]
+    },
+    "fx_warden_arrival_4": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        15,
+        35
+      ]
+    },
+    "fx_warden_arrival_5": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        15,
+        35
+      ]
+    },
+    "fx_warden_arrival_6": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        15,
+        35
+      ]
+    },
+    "fx_warden_guard_hit_1": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_guard_hit_2": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        22
+      ]
+    },
+    "fx_warden_guard_hit_3": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        2,
+        23
+      ]
+    },
+    "fx_warden_guard_hit_4": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        4,
+        25
+      ]
+    },
+    "fx_warden_guard_break_1": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_guard_break_2": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        22
+      ]
+    },
+    "fx_warden_guard_break_3": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        3,
+        23
+      ]
+    },
+    "fx_warden_guard_break_4": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        5,
+        25
+      ]
+    },
+    "fx_warden_guard_break_5": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        7,
+        27
+      ]
+    },
+    "fx_warden_guard_break_6": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        9,
+        29
+      ]
+    },
+    "fx_warden_guard_break_7": {
+      "size": [
+        40,
+        32
+      ],
+      "anchor": [
+        12,
+        31
+      ]
+    },
+    "fx_warden_guard_break_8": {
+      "size": [
+        40,
+        40
+      ],
+      "anchor": [
+        14,
+        33
+      ]
+    },
+    "fx_warden_exposed_dust_1": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        12,
+        25
+      ]
+    },
+    "fx_warden_exposed_dust_2": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        13,
+        25
+      ]
+    },
+    "fx_warden_exposed_dust_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        14,
+        25
+      ]
+    },
+    "fx_warden_exposed_dust_4": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        15,
+        22
+      ]
+    },
+    "fx_warden_exposed_dust_5": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        16,
+        23
+      ]
+    },
+    "fx_warden_exposed_dust_6": {
+      "size": [
+        40,
+        24
+      ],
+      "anchor": [
+        17,
+        23
+      ]
+    },
+    "fx_warden_cleave_arc_1": {
+      "size": [
+        16,
+        40
+      ],
+      "anchor": [
+        0,
+        34
+      ]
+    },
+    "fx_warden_cleave_arc_2": {
+      "size": [
+        16,
+        40
+      ],
+      "anchor": [
+        0,
+        34
+      ]
+    },
+    "fx_warden_cleave_arc_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        0,
+        27
+      ]
+    },
+    "fx_warden_cleave_arc_4": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        0,
+        27
+      ]
+    },
+    "fx_warden_cleave_arc_5": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        0,
+        19
+      ]
+    },
+    "fx_warden_cleave_arc_6": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        0,
+        19
+      ]
+    },
+    "fx_warden_lash_creep_1": {
+      "size": [
+        8,
+        8
+      ],
+      "anchor": [
+        4,
+        4
+      ]
+    },
+    "fx_warden_lash_creep_2": {
+      "size": [
+        40,
+        8
+      ],
+      "anchor": [
+        0,
+        2
+      ]
+    },
+    "fx_warden_lash_creep_3": {
+      "size": [
+        80,
+        8
+      ],
+      "anchor": [
+        0,
+        2
+      ]
+    },
+    "fx_warden_lash_creep_4": {
+      "size": [
+        112,
+        8
+      ],
+      "anchor": [
+        0,
+        2
+      ]
+    },
+    "fx_warden_lash_creep_5": {
+      "size": [
+        152,
+        8
+      ],
+      "anchor": [
+        0,
+        2
+      ]
+    },
+    "fx_warden_lash_strike_1": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        18
+      ]
+    },
+    "fx_warden_lash_strike_2": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        18
+      ]
+    },
+    "fx_warden_lash_strike_3": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        18
+      ]
+    },
+    "fx_warden_lash_strike_4": {
+      "size": [
+        152,
+        32
+      ],
+      "anchor": [
+        0,
+        28
+      ]
+    },
+    "fx_warden_lash_strike_5": {
+      "size": [
+        152,
+        32
+      ],
+      "anchor": [
+        0,
+        29
+      ]
+    },
+    "fx_warden_lash_strike_6": {
+      "size": [
+        152,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_lash_splinters_1": {
+      "size": [
+        144,
+        24
+      ],
+      "anchor": [
+        0,
+        17
+      ]
+    },
+    "fx_warden_lash_splinters_2": {
+      "size": [
+        144,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_lash_splinters_3": {
+      "size": [
+        144,
+        24
+      ],
+      "anchor": [
+        0,
+        23
+      ]
+    },
+    "fx_warden_lash_splinters_4": {
+      "size": [
+        144,
+        32
+      ],
+      "anchor": [
+        0,
+        26
+      ]
+    },
+    "fx_warden_lash_splinters_5": {
+      "size": [
+        144,
+        32
+      ],
+      "anchor": [
+        0,
+        29
+      ]
+    },
+    "fx_warden_lash_splinters_6": {
+      "size": [
+        144,
+        40
+      ],
+      "anchor": [
+        0,
+        32
+      ]
+    },
+    "fx_warden_ring_charge_1": {
+      "size": [
+        8,
+        8
+      ],
+      "anchor": [
+        0,
+        0
+      ]
+    },
+    "fx_warden_ring_charge_2": {
+      "size": [
+        24,
+        24
+      ],
+      "anchor": [
+        10,
+        11
+      ]
+    },
+    "fx_warden_ring_charge_3": {
+      "size": [
+        40,
+        48
+      ],
+      "anchor": [
+        19,
+        23
+      ]
+    },
+    "fx_warden_ring_charge_4": {
+      "size": [
+        64,
+        64
+      ],
+      "anchor": [
+        29,
+        34
+      ]
+    },
+    "fx_warden_ring_charge_5": {
+      "size": [
+        80,
+        88
+      ],
+      "anchor": [
+        38,
+        45
+      ]
+    },
+    "fx_warden_ring_charge_6": {
+      "size": [
+        104,
+        112
+      ],
+      "anchor": [
+        48,
+        56
+      ]
+    },
+    "fx_warden_ring_burst_1": {
+      "size": [
+        8,
+        8
+      ],
+      "anchor": [
+        0,
+        0
+      ]
+    },
+    "fx_warden_ring_burst_2": {
+      "size": [
+        16,
+        16
+      ],
+      "anchor": [
+        7,
+        8
+      ]
+    },
+    "fx_warden_ring_burst_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        14,
+        16
+      ]
+    },
+    "fx_warden_ring_burst_4": {
+      "size": [
+        48,
+        48
+      ],
+      "anchor": [
+        21,
+        24
+      ]
+    },
+    "fx_warden_ring_burst_5": {
+      "size": [
+        56,
+        64
+      ],
+      "anchor": [
+        27,
+        32
+      ]
+    },
+    "fx_warden_ring_burst_6": {
+      "size": [
+        72,
+        80
+      ],
+      "anchor": [
+        34,
+        40
+      ]
+    },
+    "fx_warden_ring_burst_7": {
+      "size": [
+        88,
+        96
+      ],
+      "anchor": [
+        41,
+        48
+      ]
+    },
+    "fx_warden_ring_burst_8": {
+      "size": [
+        104,
+        112
+      ],
+      "anchor": [
+        48,
+        56
+      ]
+    },
+    "fx_warden_scorch_1": {
+      "size": [
+        72,
+        72
+      ],
+      "anchor": [
+        36,
+        34
+      ]
+    },
+    "fx_warden_scorch_2": {
+      "size": [
+        72,
+        72
+      ],
+      "anchor": [
+        36,
+        34
+      ]
+    },
+    "fx_warden_scorch_3": {
+      "size": [
+        72,
+        72
+      ],
+      "anchor": [
+        34,
+        34
+      ]
+    },
+    "fx_warden_scorch_4": {
+      "size": [
+        72,
+        64
+      ],
+      "anchor": [
+        31,
+        32
+      ]
+    },
+    "fx_warden_scorch_5": {
+      "size": [
+        64,
+        64
+      ],
+      "anchor": [
+        26,
+        29
+      ]
+    },
+    "fx_warden_scorch_6": {
+      "size": [
+        64,
+        56
+      ],
+      "anchor": [
+        26,
+        24
+      ]
+    },
+    "fx_warden_death_flash_1": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        20
+      ]
+    },
+    "fx_warden_death_flash_2": {
+      "size": [
+        16,
+        24
+      ],
+      "anchor": [
+        0,
+        23
+      ]
+    },
+    "fx_warden_death_flash_3": {
+      "size": [
+        16,
+        32
+      ],
+      "anchor": [
+        2,
+        26
+      ]
+    },
+    "fx_warden_death_flash_4": {
+      "size": [
+        8,
+        8
+      ],
+      "anchor": [
+        4,
+        4
+      ]
+    },
+    "fx_warden_death_debris_1": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        12,
+        25
+      ]
+    },
+    "fx_warden_death_debris_2": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        13,
+        25
+      ]
+    },
+    "fx_warden_death_debris_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        14,
+        25
+      ]
+    },
+    "fx_warden_death_debris_4": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        15,
+        22
+      ]
+    },
+    "fx_warden_death_debris_5": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        16,
+        23
+      ]
+    },
+    "fx_warden_death_debris_6": {
+      "size": [
+        40,
+        24
+      ],
+      "anchor": [
+        17,
+        23
+      ]
+    },
+    "fx_warden_death_debris_7": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        14,
+        24
+      ]
+    },
+    "fx_warden_death_debris_8": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        15,
+        24
+      ]
+    },
+    "fx_warden_hit_burst_1": {
+      "size": [
+        24,
+        32
+      ],
+      "anchor": [
+        12,
+        25
+      ]
+    },
+    "fx_warden_hit_burst_2": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        13,
+        25
+      ]
+    },
+    "fx_warden_hit_burst_3": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        14,
+        25
+      ]
+    },
+    "fx_warden_hit_burst_4": {
+      "size": [
+        32,
+        24
+      ],
+      "anchor": [
+        15,
+        23
+      ]
+    },
+    "fx_warden_hit_burst_5": {
+      "size": [
+        32,
+        32
+      ],
+      "anchor": [
+        16,
+        24
+      ]
+    }
+  },
+  "preview_canvas": [
+    256,
+    176
+  ],
+  "preview_mob_feet": [
+    66,
+    108
+  ],
+  "simulation_hz": 60,
+  "preview_sample_ticks": 3,
+  "gif_frame_ms": 50,
+  "core_attack_timings": {
+    "cleave": [
+      40,
+      6,
+      44
+    ],
+    "lash": [
+      44,
+      8,
+      40
+    ],
+    "ring": [
+      56,
+      5,
+      44
+    ]
+  },
+  "warning_geometry": {
+    "cleave": {
+      "radius": 57,
+      "half_angle": 0.9
+    },
+    "lash": {
+      "length": 150,
+      "width": 20
+    },
+    "ring": {
+      "radius": 48
+    }
+  },
+  "chain_delay_ticks": 12,
+  "exposed_ticks": 90,
+  "blade_trace": {
+    "pivot": [
+      26,
+      25
+    ],
+    "hook_tip": [
+      37,
+      35
+    ],
+    "cleave_angles": [
+      -105,
+      -15,
+      18
+    ],
+    "lash_angles": [
+      -28,
+      -72,
+      -35
+    ]
+  },
+  "protected_design_hashes": {
+    "defeat.png": "bbe487a165b521ccd81ee4657549503a1671f35ecc13fba8a9fdaa92276c71ef",
+    "exposed.png": "fd21598816c207d14642cb7d9198b21125d654e3af325f7883736dba3cdce78c",
+    "guarded.png": "fdcfdf37f9ac31a122cc463465f82e5260e16cee3af7e769f2438192e798bf52",
+    "idle.png": "7af7056abe82818f6463fa29b319052b65950c7ffa4741444ea2565e4701d2a3",
+    "root_lash.png": "241e7e6aee70a29c931ea1e2a225485e8b9c2d9604297b9765e6f2aa56df79fd",
+    "rune_cleave.png": "5edfa798a2f433e9a4a3913dc92dce69a9ed2bca6132dbd42aaf905db2f49936",
+    "spore_ring.png": "0e133b79abd09511638564d9507bf62fc0ea418eea2c22b62cb3e40a12b36803"
+  },
+  "validation": "PASS: palette,hard alpha,no body/FX reserved colours,no clipped limbs,GIF durations,palette round-trip,design hashes",
+  "runtime_installed": false,
+  "generated_with": "deterministic articulated rig of approved native design; no new imagegen call"
+}

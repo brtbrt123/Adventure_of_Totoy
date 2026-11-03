@@ -1,0 +1,7 @@
+extends "res://presentation/explore/explore_scene.gd"
+## Historical preview entry now opens the production scene and catalogue.
+func _ready() -> void:
+	Engine.set_meta(START_META, {"scene": SceneDefs.WOODLAND_LAYERED})
+	super._ready()
+	set_physics_process(false)
+	fade_phase = &""

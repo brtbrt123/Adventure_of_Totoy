@@ -1,0 +1,602 @@
+{
+  "warden_idle_right_1": {
+    "chest": [
+      1.87,
+      -18.4
+    ],
+    "hook": [
+      13.6,
+      -0.8
+    ]
+  },
+  "warden_idle_right_2": {
+    "chest": [
+      1.87,
+      -18.4
+    ],
+    "hook": [
+      13.24,
+      -0.65
+    ]
+  },
+  "warden_idle_right_3": {
+    "chest": [
+      1.87,
+      -18.13
+    ],
+    "hook": [
+      12.89,
+      -0.24
+    ]
+  },
+  "warden_idle_right_4": {
+    "chest": [
+      1.87,
+      -17.87
+    ],
+    "hook": [
+      12.53,
+      0.17
+    ]
+  },
+  "warden_idle_right_5": {
+    "chest": [
+      1.87,
+      -18.13
+    ],
+    "hook": [
+      12.89,
+      -0.24
+    ]
+  },
+  "warden_idle_right_6": {
+    "chest": [
+      1.87,
+      -18.4
+    ],
+    "hook": [
+      13.24,
+      -0.65
+    ]
+  },
+  "warden_wake_right_1": {
+    "chest": [
+      1.87,
+      -16.27
+    ],
+    "hook": [
+      10.69,
+      2.36
+    ]
+  },
+  "warden_wake_right_2": {
+    "chest": [
+      1.87,
+      -17.07
+    ],
+    "hook": [
+      11.8,
+      1.22
+    ]
+  },
+  "warden_wake_right_3": {
+    "chest": [
+      1.87,
+      -17.87
+    ],
+    "hook": [
+      12.89,
+      0.03
+    ]
+  },
+  "warden_wake_right_4": {
+    "chest": [
+      1.87,
+      -18.4
+    ],
+    "hook": [
+      13.6,
+      -0.8
+    ]
+  },
+  "warden_walk_right_1": {
+    "chest": [
+      2.4,
+      -17.6
+    ],
+    "hook": [
+      10.85,
+      1.13
+    ]
+  },
+  "warden_walk_right_2": {
+    "chest": [
+      2.4,
+      -18.4
+    ],
+    "hook": [
+      12.52,
+      -0.17
+    ]
+  },
+  "warden_walk_right_3": {
+    "chest": [
+      2.4,
+      -18.67
+    ],
+    "hook": [
+      15.7,
+      -1.82
+    ]
+  },
+  "warden_walk_right_4": {
+    "chest": [
+      2.4,
+      -17.6
+    ],
+    "hook": [
+      17.2,
+      -1.63
+    ]
+  },
+  "warden_walk_right_5": {
+    "chest": [
+      2.4,
+      -18.4
+    ],
+    "hook": [
+      15.7,
+      -1.55
+    ]
+  },
+  "warden_walk_right_6": {
+    "chest": [
+      2.4,
+      -18.67
+    ],
+    "hook": [
+      12.52,
+      -0.44
+    ]
+  },
+  "warden_cleave_tell_right_1": {
+    "chest": [
+      1.6,
+      -18.4
+    ],
+    "hook": [
+      21.07,
+      -6.42
+    ]
+  },
+  "warden_cleave_tell_right_2": {
+    "chest": [
+      1.07,
+      -18.13
+    ],
+    "hook": [
+      25.65,
+      -16.38
+    ]
+  },
+  "warden_cleave_tell_right_3": {
+    "chest": [
+      0.53,
+      -18.13
+    ],
+    "hook": [
+      24.42,
+      -27.8
+    ]
+  },
+  "warden_cleave_tell_right_4": {
+    "chest": [
+      0.27,
+      -17.87
+    ],
+    "hook": [
+      20.5,
+      -34.28
+    ]
+  },
+  "warden_cleave_tell_right_5": {
+    "chest": [
+      0.0,
+      -17.87
+    ],
+    "hook": [
+      17.58,
+      -37.07
+    ]
+  },
+  "warden_cleave_strike_right_1": {
+    "chest": [
+      3.2,
+      -18.13
+    ],
+    "hook": [
+      20.77,
+      -4.24
+    ]
+  },
+  "warden_cleave_strike_right_2": {
+    "chest": [
+      4.53,
+      -17.33
+    ],
+    "hook": [
+      8.03,
+      2.09
+    ]
+  },
+  "warden_cleave_strike_right_3": {
+    "chest": [
+      4.27,
+      -17.33
+    ],
+    "hook": [
+      3.16,
+      1.72
+    ]
+  },
+  "warden_lash_tell_right_1": {
+    "chest": [
+      1.6,
+      -18.4
+    ],
+    "hook": [
+      8.17,
+      0.73
+    ]
+  },
+  "warden_lash_tell_right_2": {
+    "chest": [
+      1.07,
+      -18.13
+    ],
+    "hook": [
+      2.26,
+      1.23
+    ]
+  },
+  "warden_lash_tell_right_3": {
+    "chest": [
+      0.53,
+      -17.87
+    ],
+    "hook": [
+      -2.82,
+      0.65
+    ]
+  },
+  "warden_lash_tell_right_4": {
+    "chest": [
+      0.27,
+      -17.87
+    ],
+    "hook": [
+      -5.97,
+      -0.43
+    ]
+  },
+  "warden_lash_tell_right_5": {
+    "chest": [
+      0.0,
+      -17.6
+    ],
+    "hook": [
+      -7.62,
+      -0.85
+    ]
+  },
+  "warden_lash_strike_right_1": {
+    "chest": [
+      3.47,
+      -18.13
+    ],
+    "hook": [
+      28.35,
+      -18.29
+    ]
+  },
+  "warden_lash_strike_right_2": {
+    "chest": [
+      4.53,
+      -18.13
+    ],
+    "hook": [
+      28.03,
+      -28.89
+    ]
+  },
+  "warden_lash_strike_right_3": {
+    "chest": [
+      4.0,
+      -18.13
+    ],
+    "hook": [
+      28.42,
+      -25.95
+    ]
+  },
+  "warden_ring_tell_right_1": {
+    "chest": [
+      1.87,
+      -18.13
+    ],
+    "hook": [
+      15.67,
+      -1.56
+    ]
+  },
+  "warden_ring_tell_right_2": {
+    "chest": [
+      1.87,
+      -17.87
+    ],
+    "hook": [
+      17.62,
+      -2.54
+    ]
+  },
+  "warden_ring_tell_right_3": {
+    "chest": [
+      1.87,
+      -17.33
+    ],
+    "hook": [
+      19.43,
+      -3.44
+    ]
+  },
+  "warden_ring_tell_right_4": {
+    "chest": [
+      1.87,
+      -17.07
+    ],
+    "hook": [
+      21.08,
+      -4.8
+    ]
+  },
+  "warden_ring_tell_right_5": {
+    "chest": [
+      1.87,
+      -16.8
+    ],
+    "hook": [
+      22.08,
+      -5.7
+    ]
+  },
+  "warden_ring_strike_right_1": {
+    "chest": [
+      1.87,
+      -15.73
+    ],
+    "hook": [
+      8.44,
+      3.39
+    ]
+  },
+  "warden_ring_strike_right_2": {
+    "chest": [
+      1.87,
+      -17.07
+    ],
+    "hook": [
+      11.43,
+      1.34
+    ]
+  },
+  "warden_ring_strike_right_3": {
+    "chest": [
+      1.87,
+      -17.87
+    ],
+    "hook": [
+      13.6,
+      -0.27
+    ]
+  },
+  "warden_recover_right_1": {
+    "chest": [
+      2.93,
+      -17.87
+    ],
+    "hook": [
+      6.43,
+      1.55
+    ]
+  },
+  "warden_recover_right_2": {
+    "chest": [
+      2.4,
+      -18.13
+    ],
+    "hook": [
+      8.97,
+      0.99
+    ]
+  },
+  "warden_recover_right_3": {
+    "chest": [
+      2.13,
+      -18.4
+    ],
+    "hook": [
+      11.7,
+      0.01
+    ]
+  },
+  "warden_recover_right_4": {
+    "chest": [
+      1.87,
+      -18.4
+    ],
+    "hook": [
+      13.6,
+      -0.8
+    ]
+  },
+  "warden_guard_hit_right_1": {
+    "chest": [
+      0.53,
+      -18.4
+    ],
+    "hook": [
+      14.34,
+      -1.83
+    ]
+  },
+  "warden_guard_hit_right_2": {
+    "chest": [
+      1.33,
+      -18.4
+    ],
+    "hook": [
+      13.07,
+      -0.8
+    ]
+  },
+  "warden_hurt_right_1": {
+    "chest": [
+      0.53,
+      -17.87
+    ],
+    "hook": [
+      8.61,
+      0.95
+    ]
+  },
+  "warden_hurt_right_2": {
+    "chest": [
+      1.33,
+      -18.13
+    ],
+    "hook": [
+      11.63,
+      0.03
+    ]
+  },
+  "warden_exposed_right_1": {
+    "chest": [
+      1.07,
+      -16.8
+    ],
+    "hook": [
+      6.11,
+      2.53
+    ]
+  },
+  "warden_exposed_right_2": {
+    "chest": [
+      1.07,
+      -16.0
+    ],
+    "hook": [
+      6.11,
+      3.33
+    ]
+  },
+  "warden_exposed_right_3": {
+    "chest": [
+      1.07,
+      -15.73
+    ],
+    "hook": [
+      6.11,
+      3.59
+    ]
+  },
+  "warden_exposed_right_4": {
+    "chest": [
+      1.07,
+      -16.0
+    ],
+    "hook": [
+      6.11,
+      3.33
+    ]
+  },
+  "warden_death_right_1": {
+    "chest": [
+      1.87,
+      -17.6
+    ],
+    "hook": [
+      9.95,
+      1.22
+    ]
+  },
+  "warden_death_right_2": {
+    "chest": [
+      1.6,
+      -16.53
+    ],
+    "hook": [
+      7.79,
+      2.65
+    ]
+  },
+  "warden_death_right_3": {
+    "chest": [
+      1.33,
+      -15.47
+    ],
+    "hook": [
+      5.6,
+      3.92
+    ]
+  },
+  "warden_death_right_4": {
+    "chest": [
+      1.07,
+      -14.4
+    ],
+    "hook": [
+      3.41,
+      5.02
+    ]
+  },
+  "warden_death_right_5": {
+    "chest": [
+      0.8,
+      -13.33
+    ],
+    "hook": [
+      1.22,
+      5.95
+    ]
+  },
+  "warden_death_right_6": {
+    "chest": [
+      0.8,
+      -12.27
+    ],
+    "hook": [
+      -0.68,
+      6.72
+    ]
+  },
+  "warden_death_right_7": {
+    "chest": [
+      0.8,
+      -11.47
+    ],
+    "hook": [
+      -2.55,
+      7.05
+    ]
+  },
+  "warden_death_right_8": {
+    "chest": [
+      0.8,
+      -10.93
+    ],
+    "hook": [
+      -4.37,
+      6.95
+    ]
+  }
+}

@@ -32,11 +32,19 @@ func _activate(aim: Vector2 = Vector2.ZERO) -> InputFrame:
 	return frame
 
 
-## The old Q press: an equip request for the weapon after the one `core`'s player holds (Weapons.IDS order).
+## The old Q press: an equip request for the next blade after the one `core`'s player holds.
 func _swap_frame(core: GameCore) -> InputFrame:
 	var frame: InputFrame = InputFrame.new()
-	frame.weapon_equip = Weapons.next(core.player.weapon_id)
+	frame.weapon_equip = _next_blade(core.player.weapon_id)
 	return frame
+
+
+## The next of the three blades (katana -> dagger -> scythe -> katana): these tests were written for them; the Star Staff has
+## its own tests (test_star_staff.gd).
+static func _next_blade(weapon: StringName) -> StringName:
+	var blades: Array[StringName] = [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, Tuning.WEAPON_CHAIN_SCYTHE]
+	var i: int = blades.find(weapon)
+	return weapon if i < 0 else blades[(i + 1) % blades.size()]
 
 
 ## Step `ticks` ticks (idle input unless `frame`) and return every event, in order.
@@ -110,7 +118,7 @@ func _arena_ok(p: Vector2, radius: float, core: GameCore) -> String:
 # --- tuning ---
 
 func test_tuning_is_sane() -> void:
-	assert_eq(Weapons.IDS, [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, SCYTHE] as Array[StringName], "swap order")
+	assert_eq(Weapons.IDS, [Tuning.WEAPON_BLACK_KATANA, Tuning.WEAPON_DUAL_DAGGER, SCYTHE, Tuning.WEAPON_STAR_STAFF] as Array[StringName], "swap order")
 	assert_eq(Tuning.WEAPON_CHAIN_SCYTHE, SCYTHE)
 	assert_eq(Weapons.combo_max(SCYTHE), 3)
 	assert_true(Tuning.SCYTHE_ARC_DOT < Tuning.ATTACK_ARC_DOT - 0.2, "clearly wider than the katana")
@@ -217,7 +225,7 @@ func test_three_weapons_keep_their_own_cooldowns() -> void:
 	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_DUAL_DAGGER], Tuning.LIGHTNING_FORM_COOLDOWN_TICKS - (now - dagger_at), "dagger counts from its activation")
 	assert_eq(snap.hud.weapon_cooldowns[SCYTHE], Tuning.REAPER_COIL_COOLDOWN_TICKS - (now - scythe_at), "scythe counts from its activation")
 	assert_eq(snap.hud.weapon_cooldowns[Tuning.WEAPON_BLACK_KATANA], Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS - (now - katana_at), "katana counts from its activation")
-	assert_eq(snap.hud.weapon_cooldowns.size(), 3, "every weapon listed")
+	assert_eq(snap.hud.weapon_cooldowns.size(), Weapons.IDS.size(), "every weapon listed")
 	assert_eq(snap.hud.weapon_buff_cooldown_max, Tuning.BLACK_KATANA_BUFF_COOLDOWN_TICKS, "HUD shows the equipped weapon")
 
 

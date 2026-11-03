@@ -1,0 +1,226 @@
+{
+  "status": "PASS",
+  "review_only": true,
+  "cell": [
+    48,
+    48
+  ],
+  "feet_anchor": [
+    20,
+    44
+  ],
+  "source_sha256": "657de1c98db3dfaa2e470cd056d03e373ddf31e0a1e9b196fe3a0a3ee322b191",
+  "frames": {
+    "idle": {
+      "bbox": [
+        8,
+        11,
+        39,
+        44
+      ],
+      "palette_symbols": [
+        "0",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "o",
+        "p",
+        "u"
+      ],
+      "alpha": "0 or 255"
+    },
+    "rune_cleave": {
+      "bbox": [
+        7,
+        2,
+        32,
+        44
+      ],
+      "palette_symbols": [
+        "0",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "o",
+        "p",
+        "u"
+      ],
+      "alpha": "0 or 255"
+    },
+    "root_lash": {
+      "bbox": [
+        8,
+        14,
+        46,
+        44
+      ],
+      "palette_symbols": [
+        "0",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "o",
+        "p",
+        "t",
+        "u"
+      ],
+      "alpha": "0 or 255"
+    },
+    "spore_ring": {
+      "bbox": [
+        6,
+        18,
+        35,
+        44
+      ],
+      "palette_symbols": [
+        "0",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "o",
+        "t",
+        "u"
+      ],
+      "alpha": "0 or 255"
+    },
+    "guarded": {
+      "bbox": [
+        9,
+        11,
+        39,
+        44
+      ],
+      "palette_symbols": [
+        "0",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "o",
+        "p",
+        "t",
+        "u"
+      ],
+      "alpha": "0 or 255"
+    },
+    "exposed": {
+      "bbox": [
+        8,
+        14,
+        38,
+        44
+      ],
+      "palette_symbols": [
+        "0",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i"
+      ],
+      "alpha": "0 or 255"
+    },
+    "defeat": {
+      "bbox": [
+        8,
+        21,
+        46,
+        44
+      ],
+      "palette_symbols": [
+        "0",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h"
+      ],
+      "alpha": "0 or 255"
+    }
+  },
+  "runtime_files_unchanged": [
+    "presentation/explore/mob_view.gd",
+    "art/build/sprites.json",
+    "art/build/sprites.png"
+  ]
+}
