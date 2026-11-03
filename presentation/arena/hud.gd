@@ -41,9 +41,12 @@ static func form_icon_rect() -> Rect2:
 var counter_max: int = 1
 ## Tests and captures: draw this Aspect socket's (0-2) hover tooltip as if the mouse were on it; -1 = off.
 var hint_slot_override: int = -1
-## True while the character menu is open: the boss panel (which follows the boss and can sit above the menu panel,
-## under only the thin veil) is not drawn.
-var menu_open: bool = false
+## True while the TAB menu covers the fight: the strip, the sockets and the boss panel are hidden under it.
+var menu_open: bool = false:
+	set(value):
+		menu_open = value
+		if arena_strip != null:
+			arena_strip.visible = not value
 var portrait_atlas: Texture2D
 var portrait_frame: Dictionary = {}
 var profile_frame: Dictionary = {}
@@ -288,6 +291,11 @@ func _draw() -> void:
 	if snapshot == null or colors.is_empty():
 		return
 	var h: Snapshots.HudSnapshot = snapshot.hud
+	if arena_strip != null:
+		arena_strip.visible = not menu_open
+	if menu_open:
+		_sync_boss_panel(h)  # the TAB menu covers the fight: no strip, sockets or boss bars under it
+		return
 	_draw_profile(h)
 	_draw_skills(h)
 	_sync_boss_panel(h)

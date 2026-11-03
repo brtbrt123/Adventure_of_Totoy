@@ -20,8 +20,11 @@ func _init() -> void:
 	var plan: Dictionary = Light.lamp_plan(placements)
 	assert(plan["dropped"]==0 and plan["count"]==18,"all four lamps and five teal fixtures get light slots")
 	var sockets: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://presentation/common/local_lights.json"))
+	# every glowing stone shares the village stone's blue glow (owner 2026-11-03: "make all glowing stone like in the village")
+	var village: Dictionary = sockets["village_standing_stone"][0]
 	for key: String in ["glade_stone_1","glade_stone_2","glade_stone_3","glade_stone_4","glade_stone_5","forest_standing_stone","forest_pedestal_lit","root_hollow_shrine","root_hollow_rune_stones"]:
-		assert(sockets[key][0]["energy"]==1.35 and sockets[key][0]["halo_radius"]==35.0,"consistent magical stone glow")
+		for field: String in ["energy","halo_radius","pool_radius","pool_energy","colour"]:
+			assert(sockets[key][0][field]==village[field],"consistent magical stone glow: %s %s"%[key,field])
 	assert(sockets["root_hollow_rune_stones"].size()==3,"each stone in the cluster has its own glow")
 	assert(not sockets.has("forest_pedestal"),"unlit puzzle state stays distinct")
 	assert(Shadows.plan(Vector2(20,0),PackedVector4Array([Vector4(0,0,60,-1)]),1,"stone",PackedStringArray(["stone"])).is_empty(),"multi-stone fixtures never shadow their own cluster")

@@ -679,6 +679,7 @@ func hint_anchor() -> Vector2:
 func open_menu() -> bool:
 	if character_menu.is_open or fade_phase != &"" or not snapshot.dialogue.is_empty():
 		return false
+	character_menu.progression = snapshot  # the menu picks its first tab from the current quest step (Edda's lesson opens on GEAR)
 	character_menu.open()
 	_update_hud()
 	return true
@@ -1258,7 +1259,6 @@ func _update_hud() -> void:
 	hud.queue_redraw()
 	character_menu.progression=snapshot
 	character_menu.snapshot = loadout_core.snapshot()
-	character_menu.colors = colors
 	character_menu.atlas = sprites
 	character_menu.frames = frames
 	character_menu.queue_redraw()

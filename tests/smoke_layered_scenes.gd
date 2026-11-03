@@ -97,14 +97,14 @@ func run() -> void:
 	finish_fade()
 	expect(scene.snapshot.scene_id == &"village_layered", "Loads via START_META")
 	expect(scene.ground_texture(&"village_layered").get_size() == Vector2(571, 336), "Converted village ground")
-	expect(scene.prop_placements.size() == 34, "All shared placements")
+	expect(scene.prop_placements.size() == 33, "All shared placements")  # the rune gate was removed (owner 2026-11-03)
 	expect(scene.snapshot.npcs.size() == 6, "Six NPCs")
 	expect(scene.material is ShaderMaterial, "Overhead lighting material active")
 	var light_material: ShaderMaterial = scene.material as ShaderMaterial
 	expect(is_equal_approx(light_material.get_shader_parameter("shaft_slope"), EnvironmentLight.SHADOW_PROJECTION.x / EnvironmentLight.SHADOW_PROJECTION.y), "Light direction matches separate shadows")
 	var moon_colour: Vector3 = light_material.get_shader_parameter("light_colour")
 	expect(moon_colour.z > moon_colour.x + 0.2, "Night key light is cool moonlight")
-	expect(light_material.get_shader_parameter("lamp_count") == 10, "Five visible fixtures plus their floor pools")
+	expect(light_material.get_shader_parameter("lamp_count") == 12, "Six visible fixtures (the standing stone too) plus their floor pools")
 	var lamp_plan: Dictionary = EnvironmentLight.lamp_plan(scene.prop_placements)
 	var lamp_points: PackedVector4Array = lamp_plan["points"]
 	var found_post: bool = false
@@ -135,7 +135,7 @@ func run() -> void:
 	for p: Dictionary in scene.drawables():
 		if p["kind"] == &"prop":
 			expect(not Dictionary(p["cast_frame"]).is_empty(), "Separate shadow asset " + String(p["id"]))
-	for id: StringName in [&"gate", &"forge", &"cottage", &"big_tree", &"east_tree"]:
+	for id: StringName in [&"forge", &"cottage", &"big_tree", &"east_tree"]:
 		await review_side(id, true)
 		await review_side(id, false)
 	expect(walk_to(Vector2(104, 168)), "Walk to Mira")

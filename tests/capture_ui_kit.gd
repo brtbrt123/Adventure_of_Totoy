@@ -57,18 +57,15 @@ func run() -> void:
 	# the TAB menu over it
 	scene.open_menu()
 	await frames(4)
-	await save("menu_stats")
+	await save("menu_hero")
 	scene.character_menu.set_tab(1)
 	await frames(4)
-	await save("menu_aspects")
+	await save("menu_gear")
+	scene.character_menu.open_weapon_list()
+	await frames(4)
+	await save("menu_gear_weapons")
+	scene.character_menu.close_list()
 	scene.character_menu.set_tab(2)
-	scene.character_menu.inventory_selection = 0
-	await frames(4)
-	await save("menu_items")
-	scene.character_menu.inventory_selection = 6
-	await frames(4)
-	await save("menu_items_aspect")
-	scene.character_menu.set_tab(3)
 	await frames(4)
 	await save("menu_quests")
 	scene.character_menu.close()
@@ -125,14 +122,11 @@ func run() -> void:
 	await save("arena_hud")
 	arena.open_menu()
 	await frames(4)
-	await save("arena_menu_status")
-	arena.character_menu.stats_selection = &"stat_damage"
+	await save("arena_menu_hero")
+	arena.character_menu.set_tab(1)
+	arena.character_menu.open_aspect_list(1)
 	await frames(4)
-	await save("arena_menu_status_row")
-	arena.character_menu.open_picker(1)
-	await frames(4)
-	await save("arena_picker")
-	arena.character_menu.close_picker()
+	await save("arena_menu_aspects")
 	arena.character_menu.close()
 	arena.snapshot.result = &"victory"
 	var result_lines: Array[String] = ["TIME 1:05.3", "BEST 0:59.1"]

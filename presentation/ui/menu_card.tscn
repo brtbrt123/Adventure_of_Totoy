@@ -1,0 +1,549 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/menu_card.gd" id="1_uigad"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="2_64lkt"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="3_exlmc"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/key_badge.png" id="4_35qql"]
+[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="5_ypwv5"]
+
+[sub_resource type="FontVariation" id="FontVariation_41aom"]
+resource_name = "cinzel"
+base_font = ExtResource("2_64lkt")
+variation_opentype = {
+2003265652: 900.0
+}
+
+[sub_resource type="FontVariation" id="FontVariation_6jlej"]
+resource_name = "pixel"
+base_font = ExtResource("3_exlmc")
+variation_opentype = {
+2003265652: 400.0
+}
+
+[node name="MenuCard" type="Control" unique_id=1976178199]
+show_behind_parent = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+script = ExtResource("1_uigad")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=897591274]
+layout_mode = 0
+offset_left = 240.0
+offset_top = 40.0
+offset_right = 260.0
+offset_bottom = 60.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="." unique_id=672879999]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 41.0
+offset_right = 358.0
+offset_bottom = 64.0
+theme_override_fonts/font = SubResource("FontVariation_41aom")
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "YOUR STATS"
+
+[node name="Sub" type="Label" parent="." unique_id=1699094887]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 53.0
+offset_right = 522.0
+offset_bottom = 76.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+text = "WHAT YOUR POINTS GIVE YOU NOW"
+
+[node name="Stat0" type="Control" parent="." unique_id=205218875]
+anchors_preset = 0
+offset_left = 242.0
+offset_top = 68.0
+offset_right = 358.0
+offset_bottom = 77.0
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="Stat0" unique_id=1273082062]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Value" type="Label" parent="Stat0" unique_id=2047801730]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 90.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 2
+
+[node name="Extra" type="Label" parent="Stat0" unique_id=832095982]
+layout_mode = 0
+offset_left = 94.0
+offset_right = 116.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Stat1" type="Control" parent="." unique_id=2088077223]
+anchors_preset = 0
+offset_left = 242.0
+offset_top = 80.0
+offset_right = 358.0
+offset_bottom = 89.0
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="Stat1" unique_id=194759471]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Value" type="Label" parent="Stat1" unique_id=1387702692]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 90.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 2
+
+[node name="Extra" type="Label" parent="Stat1" unique_id=1350380413]
+layout_mode = 0
+offset_left = 94.0
+offset_right = 116.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Stat2" type="Control" parent="." unique_id=650354451]
+anchors_preset = 0
+offset_left = 242.0
+offset_top = 92.0
+offset_right = 358.0
+offset_bottom = 101.0
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="Stat2" unique_id=1395976893]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Value" type="Label" parent="Stat2" unique_id=509027305]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 90.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 2
+
+[node name="Extra" type="Label" parent="Stat2" unique_id=1282666506]
+layout_mode = 0
+offset_left = 94.0
+offset_right = 116.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Stat3" type="Control" parent="." unique_id=850945447]
+anchors_preset = 0
+offset_left = 242.0
+offset_top = 104.0
+offset_right = 358.0
+offset_bottom = 113.0
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="Stat3" unique_id=362354553]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Value" type="Label" parent="Stat3" unique_id=1567711922]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 90.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 2
+
+[node name="Extra" type="Label" parent="Stat3" unique_id=225063839]
+layout_mode = 0
+offset_left = 94.0
+offset_right = 116.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Stat4" type="Control" parent="." unique_id=575447726]
+anchors_preset = 0
+offset_left = 242.0
+offset_top = 116.0
+offset_right = 358.0
+offset_bottom = 125.0
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="Stat4" unique_id=1430783211]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Value" type="Label" parent="Stat4" unique_id=700692349]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 90.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 2
+
+[node name="Extra" type="Label" parent="Stat4" unique_id=818619389]
+layout_mode = 0
+offset_left = 94.0
+offset_right = 116.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Body" type="Label" parent="." unique_id=235424202]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 70.0
+offset_right = 358.0
+offset_bottom = 140.0
+theme_override_constants/line_spacing = -1
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+autowrap_mode = 3
+
+[node name="Reward" type="Control" parent="." unique_id=1832111689]
+anchors_preset = 0
+offset_left = 242.0
+offset_top = 102.0
+offset_right = 358.0
+offset_bottom = 111.0
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="Reward" unique_id=1940242009]
+layout_mode = 0
+offset_right = 67.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+text = "REWARD"
+
+[node name="Value" type="Label" parent="Reward" unique_id=2096615740]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 116.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.5411765, 0.43529412, 0.65882355, 1)
+horizontal_alignment = 2
+
+[node name="Line" type="ColorRect" parent="." unique_id=1857847705]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 132.0
+offset_right = 358.0
+offset_bottom = 133.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Foot" type="Label" parent="." unique_id=52896191]
+layout_mode = 0
+offset_left = 242.0
+offset_top = 138.0
+offset_right = 358.0
+offset_bottom = 188.0
+theme_override_constants/line_spacing = -1
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.5411765, 0.43529412, 0.65882355, 1)
+autowrap_mode = 3
+
+[node name="ListRow0" type="Control" parent="." unique_id=371589331]
+visible = false
+anchors_preset = 0
+offset_left = 239.0
+offset_top = 64.0
+offset_right = 355.0
+offset_bottom = 81.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="ListRow0" unique_id=1339475259]
+visible = false
+layout_mode = 0
+offset_right = 116.0
+offset_bottom = 17.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="ListRow0" unique_id=1335151945]
+layout_mode = 0
+offset_left = 3.0
+offset_right = 19.0
+offset_bottom = 16.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="ListRow0" unique_id=2124515735]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 102.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+
+[node name="Sub" type="Label" parent="ListRow0" unique_id=1998627058]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 8.0
+offset_right = 102.0
+offset_bottom = 31.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Badge" type="NinePatchRect" parent="ListRow0" unique_id=704870611]
+layout_mode = 0
+offset_left = 102.0
+offset_top = 3.0
+offset_right = 113.0
+offset_bottom = 14.0
+texture = ExtResource("4_35qql")
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+
+[node name="Letter" type="Label" parent="ListRow0/Badge" unique_id=1869068917]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 11.0
+offset_bottom = 24.0
+theme_override_fonts/font = ExtResource("5_ypwv5")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 1
+
+[node name="ListRow1" type="Control" parent="." unique_id=1115951243]
+visible = false
+anchors_preset = 0
+offset_left = 239.0
+offset_top = 82.0
+offset_right = 355.0
+offset_bottom = 99.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="ListRow1" unique_id=1350744734]
+visible = false
+layout_mode = 0
+offset_right = 116.0
+offset_bottom = 17.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="ListRow1" unique_id=737888273]
+layout_mode = 0
+offset_left = 3.0
+offset_right = 19.0
+offset_bottom = 16.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="ListRow1" unique_id=840794055]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 102.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+
+[node name="Sub" type="Label" parent="ListRow1" unique_id=205426923]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 8.0
+offset_right = 102.0
+offset_bottom = 31.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Badge" type="NinePatchRect" parent="ListRow1" unique_id=85827584]
+layout_mode = 0
+offset_left = 102.0
+offset_top = 3.0
+offset_right = 113.0
+offset_bottom = 14.0
+texture = ExtResource("4_35qql")
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+
+[node name="Letter" type="Label" parent="ListRow1/Badge" unique_id=1011228195]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 11.0
+offset_bottom = 24.0
+theme_override_fonts/font = ExtResource("5_ypwv5")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 1
+
+[node name="ListRow2" type="Control" parent="." unique_id=2684983]
+visible = false
+anchors_preset = 0
+offset_left = 239.0
+offset_top = 100.0
+offset_right = 355.0
+offset_bottom = 117.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="ListRow2" unique_id=1140932438]
+visible = false
+layout_mode = 0
+offset_right = 116.0
+offset_bottom = 17.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="ListRow2" unique_id=2069035122]
+layout_mode = 0
+offset_left = 3.0
+offset_right = 19.0
+offset_bottom = 16.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="ListRow2" unique_id=398172350]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 102.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+
+[node name="Sub" type="Label" parent="ListRow2" unique_id=502332015]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 8.0
+offset_right = 102.0
+offset_bottom = 31.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Badge" type="NinePatchRect" parent="ListRow2" unique_id=1686062299]
+layout_mode = 0
+offset_left = 102.0
+offset_top = 3.0
+offset_right = 113.0
+offset_bottom = 14.0
+texture = ExtResource("4_35qql")
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+
+[node name="Letter" type="Label" parent="ListRow2/Badge" unique_id=1600872865]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 11.0
+offset_bottom = 24.0
+theme_override_fonts/font = ExtResource("5_ypwv5")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+horizontal_alignment = 1
+
+[node name="Track" type="ColorRect" parent="." unique_id=1226762616]
+visible = false
+layout_mode = 0
+offset_left = 358.0
+offset_top = 64.0
+offset_right = 360.0
+offset_bottom = 117.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Thumb" type="ColorRect" parent="Track" unique_id=1892953765]
+layout_mode = 0
+offset_right = 2.0
+offset_bottom = 18.0
+mouse_filter = 2
+color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Note" type="Label" parent="." unique_id=1079821976]
+visible = false
+layout_mode = 0
+offset_left = 242.0
+offset_top = 119.0
+offset_right = 358.0
+offset_bottom = 142.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.3529412, 0.38431373, 0.36862746, 1)
+
+[node name="ListLine" type="ColorRect" parent="." unique_id=581549673]
+visible = false
+layout_mode = 0
+offset_left = 242.0
+offset_top = 130.0
+offset_right = 358.0
+offset_bottom = 131.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="ListBody" type="Label" parent="." unique_id=473427676]
+visible = false
+layout_mode = 0
+offset_left = 242.0
+offset_top = 134.0
+offset_right = 358.0
+offset_bottom = 190.0
+theme_override_constants/line_spacing = -1
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+autowrap_mode = 3

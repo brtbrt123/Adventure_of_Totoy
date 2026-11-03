@@ -1,0 +1,615 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://presentation/ui/menu_hero.gd" id="1_y3es4"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/slot_frame.png" id="2_8ri3m"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="3_pjv6k"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/thin_bar_frame.png" id="4_2qlc1"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/fill_exp_thin.png" id="5_y0u06"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="6_h8w50"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/button_normal.png" id="7_xgfxn"]
+
+[sub_resource type="FontVariation" id="FontVariation_41aom"]
+resource_name = "cinzel"
+base_font = ExtResource("3_pjv6k")
+variation_opentype = {
+2003265652: 900.0
+}
+
+[sub_resource type="FontVariation" id="FontVariation_6jlej"]
+resource_name = "pixel"
+base_font = ExtResource("6_h8w50")
+variation_opentype = {
+2003265652: 400.0
+}
+
+[node name="MenuHero" type="Control" unique_id=1500083130]
+show_behind_parent = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 384.0
+offset_bottom = 216.0
+mouse_filter = 2
+script = ExtResource("1_y3es4")
+
+[node name="FigureBox" type="NinePatchRect" parent="." unique_id=2022776910]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 34.0
+offset_right = 52.0
+offset_bottom = 78.0
+texture = ExtResource("2_8ri3m")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+
+[node name="Figure" type="TextureRect" parent="FigureBox" unique_id=1805787896]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 33.0
+offset_bottom = 42.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="." unique_id=1941339869]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 34.0
+offset_right = 220.0
+offset_bottom = 57.0
+theme_override_fonts/font = SubResource("FontVariation_41aom")
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "LEVEL 3"
+
+[node name="ExpFrame" type="NinePatchRect" parent="." unique_id=1169142014]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 48.0
+offset_right = 172.0
+offset_bottom = 57.0
+texture = ExtResource("4_2qlc1")
+patch_margin_left = 4
+patch_margin_right = 4
+
+[node name="ExpFill" type="NinePatchRect" parent="." unique_id=2098696948]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 50.0
+offset_right = 116.0
+offset_bottom = 55.0
+texture = ExtResource("5_y0u06")
+patch_margin_left = 1
+patch_margin_right = 2
+
+[node name="ExpText" type="Label" parent="." unique_id=651645956]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 47.0
+offset_right = 261.0
+offset_bottom = 70.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.5411765, 0.43529412, 0.65882355, 1)
+text = "40 / 80 EXP"
+
+[node name="Points" type="Label" parent="." unique_id=1299477699]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 62.0
+offset_right = 224.0
+offset_bottom = 85.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+text = "2 POINTS TO SPEND"
+
+[node name="LineTop" type="ColorRect" parent="." unique_id=1520502438]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 82.0
+offset_right = 224.0
+offset_bottom = 83.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Row0" type="Control" parent="." unique_id=636120230]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 85.0
+offset_right = 224.0
+offset_bottom = 108.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row0" unique_id=1207402843]
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 23.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Name" type="Label" parent="Row0" unique_id=1618995262]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 2.0
+offset_right = 102.0
+offset_bottom = 25.0
+theme_override_fonts/font = SubResource("FontVariation_41aom")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "VITALITY"
+
+[node name="Hint" type="Label" parent="Row0" unique_id=729000085]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 12.0
+offset_right = 158.0
+offset_bottom = 35.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+text = "MORE MAX HEALTH"
+
+[node name="Pips" type="Control" parent="Row0" unique_id=1356389552]
+anchors_preset = 0
+offset_left = 100.0
+offset_top = 8.0
+offset_right = 170.0
+offset_bottom = 13.0
+mouse_filter = 2
+
+[node name="Pip0" type="ColorRect" parent="Row0/Pips" unique_id=385987518]
+layout_mode = 0
+offset_right = 5.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Pip1" type="ColorRect" parent="Row0/Pips" unique_id=1331295571]
+layout_mode = 0
+offset_left = 7.0
+offset_right = 12.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Pip2" type="ColorRect" parent="Row0/Pips" unique_id=1953557341]
+layout_mode = 0
+offset_left = 14.0
+offset_right = 19.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip3" type="ColorRect" parent="Row0/Pips" unique_id=1652785657]
+layout_mode = 0
+offset_left = 21.0
+offset_right = 26.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip4" type="ColorRect" parent="Row0/Pips" unique_id=1620734092]
+layout_mode = 0
+offset_left = 28.0
+offset_right = 33.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip5" type="ColorRect" parent="Row0/Pips" unique_id=1532871100]
+layout_mode = 0
+offset_left = 35.0
+offset_right = 40.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip6" type="ColorRect" parent="Row0/Pips" unique_id=906607070]
+layout_mode = 0
+offset_left = 42.0
+offset_right = 47.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip7" type="ColorRect" parent="Row0/Pips" unique_id=1496192870]
+layout_mode = 0
+offset_left = 49.0
+offset_right = 54.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip8" type="ColorRect" parent="Row0/Pips" unique_id=578641157]
+layout_mode = 0
+offset_left = 56.0
+offset_right = 61.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip9" type="ColorRect" parent="Row0/Pips" unique_id=1048015485]
+layout_mode = 0
+offset_left = 63.0
+offset_right = 68.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Plus" type="NinePatchRect" parent="Row0" unique_id=1424881237]
+layout_mode = 0
+offset_left = 182.0
+offset_top = 4.0
+offset_right = 198.0
+offset_bottom = 19.0
+texture = ExtResource("7_xgfxn")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+
+[node name="Sign" type="Label" parent="Row0/Plus" unique_id=906311186]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 16.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "+"
+horizontal_alignment = 1
+
+[node name="Row1" type="Control" parent="." unique_id=274299967]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 110.0
+offset_right = 224.0
+offset_bottom = 133.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row1" unique_id=980365691]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 23.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Name" type="Label" parent="Row1" unique_id=408276304]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 2.0
+offset_right = 102.0
+offset_bottom = 25.0
+theme_override_fonts/font = SubResource("FontVariation_41aom")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "MIGHT"
+
+[node name="Hint" type="Label" parent="Row1" unique_id=1421247274]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 12.0
+offset_right = 125.0
+offset_bottom = 35.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+text = "MORE DAMAGE"
+
+[node name="Pips" type="Control" parent="Row1" unique_id=365003941]
+anchors_preset = 0
+offset_left = 100.0
+offset_top = 8.0
+offset_right = 170.0
+offset_bottom = 13.0
+mouse_filter = 2
+
+[node name="Pip0" type="ColorRect" parent="Row1/Pips" unique_id=440939053]
+layout_mode = 0
+offset_right = 5.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Pip1" type="ColorRect" parent="Row1/Pips" unique_id=1776908582]
+layout_mode = 0
+offset_left = 7.0
+offset_right = 12.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Pip2" type="ColorRect" parent="Row1/Pips" unique_id=683809200]
+layout_mode = 0
+offset_left = 14.0
+offset_right = 19.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip3" type="ColorRect" parent="Row1/Pips" unique_id=537991583]
+layout_mode = 0
+offset_left = 21.0
+offset_right = 26.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip4" type="ColorRect" parent="Row1/Pips" unique_id=832760262]
+layout_mode = 0
+offset_left = 28.0
+offset_right = 33.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip5" type="ColorRect" parent="Row1/Pips" unique_id=1814536077]
+layout_mode = 0
+offset_left = 35.0
+offset_right = 40.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip6" type="ColorRect" parent="Row1/Pips" unique_id=353792226]
+layout_mode = 0
+offset_left = 42.0
+offset_right = 47.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip7" type="ColorRect" parent="Row1/Pips" unique_id=418067303]
+layout_mode = 0
+offset_left = 49.0
+offset_right = 54.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip8" type="ColorRect" parent="Row1/Pips" unique_id=451811681]
+layout_mode = 0
+offset_left = 56.0
+offset_right = 61.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip9" type="ColorRect" parent="Row1/Pips" unique_id=961445321]
+layout_mode = 0
+offset_left = 63.0
+offset_right = 68.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Plus" type="NinePatchRect" parent="Row1" unique_id=1328843754]
+layout_mode = 0
+offset_left = 182.0
+offset_top = 4.0
+offset_right = 198.0
+offset_bottom = 19.0
+texture = ExtResource("7_xgfxn")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+
+[node name="Sign" type="Label" parent="Row1/Plus" unique_id=783522429]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 16.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "+"
+horizontal_alignment = 1
+
+[node name="Row2" type="Control" parent="." unique_id=1256538502]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 135.0
+offset_right = 224.0
+offset_bottom = 158.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row2" unique_id=1777957328]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 23.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Name" type="Label" parent="Row2" unique_id=1995824041]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 2.0
+offset_right = 102.0
+offset_bottom = 25.0
+theme_override_fonts/font = SubResource("FontVariation_41aom")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "AGILITY"
+
+[node name="Hint" type="Label" parent="Row2" unique_id=1115268572]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 12.0
+offset_right = 198.0
+offset_bottom = 35.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+text = "FASTER DASH AND STEPS"
+
+[node name="Pips" type="Control" parent="Row2" unique_id=1429954789]
+anchors_preset = 0
+offset_left = 100.0
+offset_top = 8.0
+offset_right = 170.0
+offset_bottom = 13.0
+mouse_filter = 2
+
+[node name="Pip0" type="ColorRect" parent="Row2/Pips" unique_id=1406609926]
+layout_mode = 0
+offset_right = 5.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Pip1" type="ColorRect" parent="Row2/Pips" unique_id=896230961]
+layout_mode = 0
+offset_left = 7.0
+offset_right = 12.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+
+[node name="Pip2" type="ColorRect" parent="Row2/Pips" unique_id=2090678717]
+layout_mode = 0
+offset_left = 14.0
+offset_right = 19.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip3" type="ColorRect" parent="Row2/Pips" unique_id=701567122]
+layout_mode = 0
+offset_left = 21.0
+offset_right = 26.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip4" type="ColorRect" parent="Row2/Pips" unique_id=474094324]
+layout_mode = 0
+offset_left = 28.0
+offset_right = 33.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip5" type="ColorRect" parent="Row2/Pips" unique_id=1710330682]
+layout_mode = 0
+offset_left = 35.0
+offset_right = 40.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip6" type="ColorRect" parent="Row2/Pips" unique_id=145362833]
+layout_mode = 0
+offset_left = 42.0
+offset_right = 47.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip7" type="ColorRect" parent="Row2/Pips" unique_id=533892506]
+layout_mode = 0
+offset_left = 49.0
+offset_right = 54.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip8" type="ColorRect" parent="Row2/Pips" unique_id=252961812]
+layout_mode = 0
+offset_left = 56.0
+offset_right = 61.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Pip9" type="ColorRect" parent="Row2/Pips" unique_id=1483678533]
+layout_mode = 0
+offset_left = 63.0
+offset_right = 68.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Plus" type="NinePatchRect" parent="Row2" unique_id=352288990]
+layout_mode = 0
+offset_left = 182.0
+offset_top = 4.0
+offset_right = 198.0
+offset_bottom = 19.0
+texture = ExtResource("7_xgfxn")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+
+[node name="Sign" type="Label" parent="Row2/Plus" unique_id=1637959167]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 16.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "+"
+horizontal_alignment = 1
+
+[node name="LineBottom" type="ColorRect" parent="." unique_id=314857579]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 164.0
+offset_right = 224.0
+offset_bottom = 165.0
+mouse_filter = 2
+color = Color(0.26666668, 0.29411766, 0.28627452, 1)
+
+[node name="Respec" type="NinePatchRect" parent="." unique_id=1774165797]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 170.0
+offset_right = 78.0
+offset_bottom = 186.0
+texture = ExtResource("7_xgfxn")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
+
+[node name="Name" type="Label" parent="Respec" unique_id=608747371]
+layout_mode = 0
+offset_top = 3.0
+offset_right = 58.0
+offset_bottom = 26.0
+theme_override_fonts/font = SubResource("FontVariation_41aom")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.95686275, 0.9254902, 0.8392157, 1)
+text = "RESPEC"
+horizontal_alignment = 1
+
+[node name="RespecNote" type="Label" parent="." unique_id=153100735]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 174.0
+offset_right = 393.0
+offset_bottom = 197.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+text = "FREE IN LANTERNFEN: ALL POINTS BACK"
+
+[node name="Note" type="Label" parent="." unique_id=1875830380]
+visible = false
+layout_mode = 0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = 220.0
+offset_bottom = 150.0
+theme_override_constants/line_spacing = -1
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+autowrap_mode = 3

@@ -1,7 +1,7 @@
 extends SceneTree
 ## Windowed only (regular Godot exe): plays the real arena like a player, with real key events through the input map
-## and the arena's own _physics_process (nothing is stepped by hand): TAB opens the character menu, the arrows and ENTER
-## slot Sprint (Z), Echo Step (X) and Stone Ward (C) through the scrolling aspect picker, TAB closes it, then Z / X / C
+## and the arena's own _physics_process (nothing is stepped by hand): TAB opens the character menu, E goes to GEAR, the arrows
+## and ENTER set Sprint (Z), Echo Step (X) and Stone Ward (C) through the card's scrolling Aspect list, TAB closes it, then Z / X / C
 ## are pressed in the fight. Saves art/build/arena_game_*.png for a visual check (delete them afterwards) and prints
 ## what happened. Not a harness test (the boss AI runs freely).
 ## Godot_v4.7.2-stable_win64.exe --path . --script res://tests/capture_ward_echo_sprint_game.gd
@@ -52,13 +52,13 @@ func slots() -> String:
 	return str(arena.snapshot.player.equipped_aspects)
 
 
-## In the open picker: arrows down `count` times, ENTER, then ESC (back to STATS).
+## In the open Aspect list: arrows down `count` times, ENTER, then ESC (back to the sockets).
 func pick(count: int, label: String) -> void:
 	for i: int in range(count):
 		await tap(KEY_DOWN)
 	await save("picker_" + label)
 	await tap(KEY_ENTER)
-	note("picker %s: selection %d scroll %d feedback %s -> slots %s" % [label, arena.character_menu.picker_selection, arena.character_menu.picker_scroll, str(arena.character_menu.picker_feedback), slots()])
+	note("list %s: selection %d scroll %d feedback %s -> slots %s" % [label, arena.character_menu.list_selection, arena.character_menu.list_scroll, str(arena.character_menu.feedback), slots()])
 	await tap(KEY_ESCAPE)
 
 
@@ -71,20 +71,19 @@ func run() -> void:
 	var menu: Object = arena.character_menu
 	await tap(KEY_TAB)
 	note("menu open: %s" % menu.is_open)
-	await tap(KEY_ENTER)  # first ENTER selects the weapon slot
-	await tap(KEY_DOWN)
-	await tap(KEY_LEFT)
-	note("stats selection: %s" % menu.stats_selection)
+	await tap(KEY_E)  # HERO -> GEAR (the weapon socket)
+	await tap(KEY_DOWN)  # socket Z
+	note("gear selection: %s" % menu.gear_selection)
 	await tap(KEY_ENTER)
-	note("picker open on slot %d" % menu.picker_slot)
+	note("list open on socket %d" % menu.list_slot)
 	await pick(5, "z_sprint")  # breaking_edge (0) -> sprint (5)
 	await tap(KEY_RIGHT)
 	await tap(KEY_ENTER)
-	note("picker open on slot %d" % menu.picker_slot)
+	note("list open on socket %d" % menu.list_slot)
 	await pick(5, "x_echo")  # gale_cut (1) -> echo_step (6)
 	await tap(KEY_RIGHT)
 	await tap(KEY_ENTER)
-	note("picker open on slot %d" % menu.picker_slot)
+	note("list open on socket %d" % menu.list_slot)
 	await pick(5, "c_ward")  # moon_cleave (2) -> stone_ward (7)
 	await save("menu_stats_new_three")
 	await tap(KEY_TAB)

@@ -489,7 +489,6 @@ func _update_hud() -> void:
 	hud.queue_redraw()
 	if character_menu != null:
 		character_menu.snapshot = snapshot
-		character_menu.colors = colors
 		character_menu.atlas = sprites
 		character_menu.frames = frames
 		character_menu.queue_redraw()

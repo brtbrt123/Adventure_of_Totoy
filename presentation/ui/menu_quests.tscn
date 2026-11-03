@@ -1,80 +1,472 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://presentation/ui/menu_quests.gd" id="1_scr"]
-[ext_resource type="FontFile" path="res://art/ui_kit/pixel_keys.fnt" id="2_fon"]
-[ext_resource type="Texture2D" path="res://art/ui_kit/panel_medium.png" id="3_tex"]
-[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="4_fon"]
-[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="5_fon"]
+[ext_resource type="Script" path="res://presentation/ui/menu_quests.gd" id="1_d4m1d"]
+[ext_resource type="FontFile" path="res://presentation/fonts/Cinzel.ttf" id="2_3gqlk"]
+[ext_resource type="Texture2D" path="res://art/ui_kit/icon_check.png" id="3_0a00q"]
+[ext_resource type="FontFile" path="res://presentation/fonts/PixelifySans.ttf" id="4_4ym8s"]
 
-[sub_resource type="FontVariation" id="cinzel"]
-base_font = ExtResource("4_fon")
-variation_opentype = {2003265652: 900.0}
+[sub_resource type="FontVariation" id="FontVariation_41aom"]
+resource_name = "cinzel"
+base_font = ExtResource("2_3gqlk")
+variation_opentype = {
+2003265652: 900.0
+}
 
-[sub_resource type="FontVariation" id="pixel"]
-base_font = ExtResource("5_fon")
-variation_opentype = {2003265652: 400.0}
+[sub_resource type="FontVariation" id="FontVariation_6jlej"]
+resource_name = "pixel"
+base_font = ExtResource("4_4ym8s")
+variation_opentype = {
+2003265652: 400.0
+}
 
-[node name="MenuQuests" type="Control"]
+[node name="MenuQuests" type="Control" unique_id=1133299401]
+show_behind_parent = true
 layout_mode = 3
 anchors_preset = 0
 offset_right = 384.0
 offset_bottom = 216.0
 mouse_filter = 2
-show_behind_parent = true
-script = ExtResource("1_scr")
+script = ExtResource("1_d4m1d")
 
-[node name="Heading" type="Label" parent="."]
+[node name="Heading" type="Label" parent="." unique_id=196603653]
 layout_mode = 0
-offset_left = 30
-offset_top = 38
-offset_right = 290
-offset_bottom = 54
-mouse_filter = 2
-text = "CURRENT OBJECTIVE"
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.4157, 0.6588, 0.6039, 1.0)
-theme_override_fonts/font = SubResource("cinzel")
-theme_override_font_sizes/font_size = 11
-
-[node name="Card" type="NinePatchRect" parent="."]
-layout_mode = 0
-offset_left = 24
-offset_top = 66
-offset_right = 360
-offset_bottom = 172
-mouse_filter = 2
-texture = ExtResource("3_tex")
-patch_margin_left = 10
-patch_margin_top = 10
-patch_margin_right = 10
-patch_margin_bottom = 10
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[node name="Objective" type="Label" parent="Card"]
-layout_mode = 0
-offset_left = 14
-offset_top = 12
-offset_right = 314
-offset_bottom = 82
-mouse_filter = 2
-text = "YOUR VILLAGE TASKS ARE COMPLETE."
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.9569, 0.9255, 0.8392, 1.0)
-theme_override_fonts/font = SubResource("pixel")
-theme_override_font_sizes/font_size = 10
-autowrap_mode = 3
-theme_override_constants/line_spacing = 1
-
-[node name="Hint" type="Label" parent="Card"]
-layout_mode = 0
-offset_left = 14
-offset_top = 80
-offset_right = 314
-offset_bottom = 92
-mouse_filter = 2
-text = "FOLLOW THE OBJECTIVE MARKER ON THE ROAD."
-horizontal_alignment = 0
-theme_override_colors/font_color = Color(0.6039, 0.5961, 0.5255, 1.0)
-theme_override_fonts/font = SubResource("pixel")
+offset_left = 20.0
+offset_top = 34.0
+offset_right = 224.0
+offset_bottom = 57.0
+theme_override_fonts/font = SubResource("FontVariation_41aom")
 theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.41568628, 0.65882355, 0.6039216, 1)
+text = "CHAPTER 1   LANTERNFEN"
+
+[node name="Row0" type="Control" parent="." unique_id=1336283834]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 45.0
+offset_right = 224.0
+offset_bottom = 57.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row0" unique_id=1537868425]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row0" unique_id=1931833039]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row0" unique_id=793633055]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row1" type="Control" parent="." unique_id=1738892466]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 56.0
+offset_right = 224.0
+offset_bottom = 68.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row1" unique_id=316627628]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row1" unique_id=471048114]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row1" unique_id=1485930892]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row2" type="Control" parent="." unique_id=668015126]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 67.0
+offset_right = 224.0
+offset_bottom = 79.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row2" unique_id=2035786772]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row2" unique_id=689857223]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row2" unique_id=1069722000]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row3" type="Control" parent="." unique_id=1731277630]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 78.0
+offset_right = 224.0
+offset_bottom = 90.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row3" unique_id=1612225134]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row3" unique_id=1437159904]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row3" unique_id=1473661316]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row4" type="Control" parent="." unique_id=503497484]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 89.0
+offset_right = 224.0
+offset_bottom = 101.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row4" unique_id=279673274]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row4" unique_id=1959252610]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row4" unique_id=1967722815]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row5" type="Control" parent="." unique_id=1140399987]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 100.0
+offset_right = 224.0
+offset_bottom = 112.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row5" unique_id=1643764254]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row5" unique_id=1316901727]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row5" unique_id=832527968]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row6" type="Control" parent="." unique_id=1224725392]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 111.0
+offset_right = 224.0
+offset_bottom = 123.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row6" unique_id=852356054]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row6" unique_id=1528341953]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row6" unique_id=972089137]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row7" type="Control" parent="." unique_id=1183054732]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 122.0
+offset_right = 224.0
+offset_bottom = 134.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row7" unique_id=1319911503]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row7" unique_id=1081138249]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row7" unique_id=1124848195]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row8" type="Control" parent="." unique_id=793640466]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 133.0
+offset_right = 224.0
+offset_bottom = 145.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row8" unique_id=209243136]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row8" unique_id=1882341616]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row8" unique_id=1175306824]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row9" type="Control" parent="." unique_id=1308784985]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 144.0
+offset_right = 224.0
+offset_bottom = 156.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row9" unique_id=2058975715]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row9" unique_id=766331141]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row9" unique_id=412989804]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row10" type="Control" parent="." unique_id=1396872006]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 155.0
+offset_right = 224.0
+offset_bottom = 167.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row10" unique_id=780500478]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row10" unique_id=1697882014]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row10" unique_id=1021570200]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)
+
+[node name="Row11" type="Control" parent="." unique_id=1133728390]
+anchors_preset = 0
+offset_left = 18.0
+offset_top = 166.0
+offset_right = 224.0
+offset_bottom = 178.0
+mouse_filter = 2
+
+[node name="Fill" type="ColorRect" parent="Row11" unique_id=1804255109]
+visible = false
+layout_mode = 0
+offset_right = 206.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.141, 0.212, 0.361, 0.9)
+
+[node name="Icon" type="TextureRect" parent="Row11" unique_id=676315897]
+layout_mode = 0
+offset_left = 4.0
+offset_right = 16.0
+offset_bottom = 12.0
+mouse_filter = 2
+texture = ExtResource("3_0a00q")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row11" unique_id=766044209]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 1.0
+offset_right = 206.0
+offset_bottom = 24.0
+theme_override_fonts/font = SubResource("FontVariation_6jlej")
+theme_override_font_sizes/font_size = 7
+theme_override_colors/font_color = Color(0.6039216, 0.59607846, 0.5254902, 1)

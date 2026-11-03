@@ -18,6 +18,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[ANIMATION_EDITING]]: edit every character animation in Godot (SpriteFrames in presentation/animations), repaint frames (art/overrides), the animation galleries
 - [[WEAPON_PATHS]]: the blades' basic slash, drawn from the swing's hit area (reach and arc) and turned with the hero
 - [[MOBILE_BLUEPRINT]]: proposal for a phone version (touch layout, HUD moved up, screen sizes, open questions)
+- [[TAB_MENU]]: the TAB menu (HERO, GEAR, QUESTS): layout, scenes, controller, generator, rules, tests
 - [[EFFECTS_REDO]]: the staff-style effects redo: every layer and its file, the generators, the captures, the image-generator accounts
 - Project skills (`.claude/skills/`): totoy-art-pipeline, totoy-review-capture, totoy-session-close: the exact steps for art, captures and closing a session
 
@@ -27,6 +28,8 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[CODEX_TASK_layered_pilot]]: Codex's side of the pilot
 - [[CODEX_TASK_root_hollow]]: the real art for Root Hollow (ground painting and new props), Codex's task
 - [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, who does what)
+- [[FINAL_SCENE_chapter1]]: draft plan for the chapter's final scene and boss (Beacon Hill), replacing the old arena; waiting on the owner
+- [[STORY_ROAD_chapter1]]: draft story for the road from Lanternfen to the Stag Glade (follow the blue light); to be revised after the final-scene plan
 
 ## Art references
 - [[ART_PROMPTS_GEMINI]], [[GEMINI_PROMPT_PACK]]

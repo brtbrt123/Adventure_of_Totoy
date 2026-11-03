@@ -1,3 +1,28 @@
+## Story drafts: the road to the Stag Glade and the final scene (2026-11-03, Claude, proposals only)
+
+Owner: "why the story is only to the village then on other scene its all fighting", "write a proposal upto stag glade", then
+"we will create the finals scene with a boss matching our story we will not use the arena that we have make a draft or plan on
+this first then after we will fix the story line and nariation". Nothing is built.
+
+- [[STORY_ROAD_chapter1]]: "follow the blue light" from Lanternfen to the Stag Glade: Totoy's own camp and note (Woodland Approach),
+  a memory flash at the lanterns (Forest Route), a Waykeeper shrine that reads the key (Root Hollow), the trial's meaning, the
+  Stag holding the forest beacon's song and Edda's binding (Stag Glade); draft lines, objectives, a build list, six questions.
+- [[FINAL_SCENE_chapter1]]: a new final scene (Beacon Hill, name open) replacing the old arena: the Colossus as the guardian that holds
+  the beacon's song and must let go; beats from the climb to the credits; options A (the Colossus moved into the road's fight engine,
+  recommended: same HUD and menu, stat points count), B (a new boss), C (the Colossus in the old arena mode on a new map).
+- **Order the owner set:** the final-scene plan first (waiting on A/B/C and four more questions), then the road story and narration.
+
+## TAB menu redesign: HERO, GEAR, QUESTS (2026-11-03, Claude, done while Codex is out)
+
+Owner: "fix the tab menu improve the layout, and design, make it consistent in layout and design, make sure every function is usefull and needed". Audit and mockups first (`presentation/review/menu_redesign/`: `0_menu_now.png` is the old menu; `build_mockup.gd` made the pictures), then the owner's changes ("make the waepon slot like the aspect slot only 1 slot then weapon name then information ... scroll down to find more", "make the item 2 slot but the other 1 is empty") and "Yes, build it". Full description: [[TAB_MENU]].
+
+- **Three tabs, one layout:** content on the left, a detail card on the right that always describes the selection, one selection mark, Cinzel titles, Pixelify text, a footer of only the keys that work now. HERO (level, EXP, points, the three stats with "+", Respec; the card shows what the points give now and what one more adds), GEAR (one weapon socket with its numbers, sockets Z X C, item slots 1 and 2; ENTER opens a scrolling weapon or Aspect list inside the card), QUESTS (the chapter's done tasks and the current one; the card shows its reward and why the road is closed).
+- **Removed:** the ASPECTS tab, Aspect tiles in ITEMS, 8 empty slots, the second description box, the floating picker, the boss fight's separate STATUS layout, unused description entries. Bugs fixed: the katana shown "IN YOUR HANDS" before Tovan gives it, "COOLDOWN 0 S", the boss fight's QUESTS pointing at the road, the fight HUD strip showing through the menu (`hud.gd` `menu_open` now hides it).
+- **Files:** `presentation/arena/character_menu.gd` rewritten (1186 -> about 1040 lines); new editable scenes `presentation/ui/menu_hero.tscn`, `menu_gear.tscn`, `menu_card.tscn` with scripts, `menu_icons.gd`; `menu_shell` and `menu_quests` rebuilt; the old `menu_status`, `menu_aspects`, `menu_items`, `menu_arena_status`, `menu_description`, `menu_picker` deleted. The scenes were made once by `tools/godot/build_menu_scenes.gd` (running it again overwrites editor edits). `explore_scene.gd` and `arena.gd` no longer pass `colors` to the menu.
+- **Tests:** `tests/smoke_character_menu.gd` rewritten for the new menu, `tests/smoke_progression.gd` (Edda's lesson opens on socket Z, owned-only list, herb count, finished quest list), `tests/capture_ui_kit.gd` and `tests/capture_ward_echo_sprint_game.gd` moved to the new API. Full harness: everything passed except two smokes that today's earlier village and lighting commits had broken, `smoke_layered_scenes` (34 -> 33 props without the gate, 5 -> 6 lit fixtures with the stone, no walk round the gate) and `smoke_marked_lamps` (the stones now share the village stone's glow); both updated and passing. After one last change (`explore_scene.gd` hands the menu the current quest step before it opens) the road smokes were re-run: progression, explore scenes, village tutorial, layered scenes all pass.
+- **Pictures:** `presentation/review/menu_redesign/ingame_*.png` (`capture_ingame.gd` there; window only).
+- **Open (owner's call):** both pixel fonts draw B like G ("TAB" reads "TAG"); the menu uses Cinzel for key names. The boss fight ignores stat points (`GameCore` applies only the weapon and Aspects); HERO says so there. Item slot 2 is shown empty while the core keeps it locked.
+
 ## Village lighting: stronger glow, lamp shadows, one stone look everywhere (2026-11-03, Claude, done while Codex is out)
 
 Owner: "can we make the glow of the lamp and stone like this [a reference with a big warm lamp pool and a bright blue stone] also when we walk it cast a dynamic shadow?", then "make the shadow more natural it move too fast when i change direction ... when i move to the center of the light it should be smaller", "make all lamps and stone glow like that in all scene", "we cant see the runes", "why the glow is clump not spread", "its too bright" (the glade) and "make all glowing stone like in the village". Pictures first: presentation/review/village_mock/glow_*.png.

@@ -1,125 +1,112 @@
 extends Node2D
-## The character menu (approved mockups 2026-10-21, docs/previews/character_menu_*.png): a pop-up over the frozen arena
-## with the tabs STATS and INVENTORY, drawn in the shared frame (ui_panel.gd) on the HUD layer.
+## The character menu (TAB), redesigned with the owner on 2026-11-03 (mockups: presentation/review/menu_redesign/): a pop-up
+## over the frozen world with three tabs. HERO: Totoy, his level and EXP, the stat points to spend and Respec. GEAR: the
+## weapon, the Aspect sockets Z X C and the item slots 1 2. QUESTS: the chapter's tasks. Every tab has its content on the left
+## and the detail card on the right, which always describes what is selected; choosing a weapon or an Aspect happens in that
+## card, as a short list that scrolls. The road (explore_scene.gd) and the boss fight (arena.gd) both use it: in the boss
+## fight HERO has no stat points (the fight runs on base stats) and QUESTS shows the fight's goal.
 ##
-## Presentation only: it shows snapshot data and numbers read (read-only) from core/tuning.gd, core/weapons.gd and
-## core/aspects.gd, and its two actions, equipping a weapon and slotting an aspect, are requests to the core
-## (InputFrame.weapon_equip, InputFrame.aspect_equip + aspect_equip_slot) sent through `equip_request` and
-## `aspect_request` (the arena steps the core once with each). The core decides; the menu shows EQUIPPED or NOT NOW
-## from the snapshot.
+## Presentation only: it shows snapshot data and numbers read (read-only) from core/tuning.gd, core/weapons.gd,
+## core/aspects.gd and the quest book. Its four actions are requests its owner sends to the core: equip a weapon
+## (`equip_request`), set an Aspect in a socket (`aspect_request`), spend a stat point (`stat_request`) and take every point
+## back (`respec_request`). The core decides; the menu reads the result from the snapshot (EQUIPPED or NOT NOW).
 ##
-## Controls: TAB (gamepad Back) opens and closes, ESC closes (or only the aspect picker when it is open), Q/E
-## (shoulders) or a click on a tab switches tabs, arrows/WASD move the selection, ENTER/click selects (STATS), opens the
-## aspect picker on an Aspect slot, equips the picked aspect (picker) or equips a weapon (INVENTORY); the mouse hover
-## shows descriptions.
-## The arena does not step the core while the menu is open (see arena.gd), except once per equip request.
+## The drawing is the editable scenes presentation/ui/menu_shell.tscn (frame, tabs, the card's frame, footer),
+## menu_hero.tscn, menu_gear.tscn, menu_quests.tscn and menu_card.tscn (the card's text and lists); this script fills them in
+## and draws only the teal selection corners on top.
+##
+## Controls: TAB (gamepad Back) opens and closes, ESC closes (or only the card's list when one is open), Q/E (shoulders) or a
+## click on a tab switches tabs, arrows/WASD move the selection, ENTER/click acts on it (add a point, Respec, open the weapon
+## or Aspect list, equip from the list), the mouse wheel scrolls a list, and moving the mouse over something selects it.
+## The owner of the menu does not step the core while it is open, except once per request.
 const Tuning := preload("res://core/tuning.gd")
 const Weapons := preload("res://core/weapons.gd")
-const PlayerState := preload("res://core/player.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const Aspects := preload("res://core/aspects.gd")
+const QuestBook := preload("res://core/quest_book.gd")
+const ExploreCore := preload("res://core/explore_core.gd")
 const Hud := preload("res://presentation/arena/hud.gd")
-const UiPanel := preload("res://presentation/arena/ui_panel.gd")
-const Kit := preload("res://presentation/common/ui_kit.gd")
-const MenuShell := preload("res://presentation/ui/menu_shell.tscn")
-const MenuStatus := preload("res://presentation/ui/menu_status.tscn")
-const MenuAspects := preload("res://presentation/ui/menu_aspects.tscn")
-const MenuQuests := preload("res://presentation/ui/menu_quests.tscn")
-const MenuItems := preload("res://presentation/ui/menu_items.tscn")
-const MenuArenaStatus := preload("res://presentation/ui/menu_arena_status.tscn")
-const MenuDescription := preload("res://presentation/ui/menu_description.tscn")
-const MenuPicker := preload("res://presentation/ui/menu_picker.tscn")
 const ArenaAnimation := preload("res://presentation/arena/animation.gd")
+const MenuShell := preload("res://presentation/ui/menu_shell.tscn")
+const MenuHero := preload("res://presentation/ui/menu_hero.tscn")
+const MenuGear := preload("res://presentation/ui/menu_gear.tscn")
+const MenuQuests := preload("res://presentation/ui/menu_quests.tscn")
+const MenuCard := preload("res://presentation/ui/menu_card.tscn")
 
-const TAB_STATS: int = 0
-const TAB_ASPECTS: int = 1
-const TAB_INVENTORY: int = 2
-const TAB_QUESTS: int = 3
-const TAB_NAMES: Array[String] = ["STATUS", "ASPECTS", "ITEMS", "QUESTS"]
-## Tab plates on the panel's top edge (x, width), kit tabs.
-const TAB_SPECS: Array[Vector2i] = [Vector2i(14, 58), Vector2i(76, 60), Vector2i(140, 52), Vector2i(196, 58)]
-const PANEL: Rect2 = Rect2(6, 24, 372, 176)
-const DESC: Rect2 = Rect2(40, 149, 304, 46)
-const VEIL_ALPHA: float = 0.62
-const FOOTER: String = "TAB/ESC: CLOSE    Q/E: SWITCH TAB"
-## STATS layout (384x216, kit frames)
-const FIGURE: Rect2 = Rect2(16, 36, 58, 110)
-const WEAPON_SLOT: Rect2 = Rect2(110, 36, 48, 48)
-const MID_X: float = 134.0
-const STAT_X0: float = 204.0
-const STAT_X1: float = 362.0
-const STAT_TOP: float = 36.0
-const ROW_STEP: float = 8.0
-## The STATS items of the three Aspect slots (Z, X, C); their description is the aspect slotted there.
+const TAB_HERO: int = 0
+const TAB_GEAR: int = 1
+const TAB_QUESTS: int = 2
+const TAB_NAMES: Array[String] = ["HERO", "GEAR", "QUESTS"]
+## The tab plates (menu_shell.tscn Tab0..Tab2) and the detail card (menu_shell.tscn Card), in the game's 384x216 pixels.
+const TAB_RECTS: Array[Rect2] = [Rect2(14, 9, 60, 16), Rect2(78, 9, 54, 16), Rect2(136, 9, 64, 16)]
+const CARD: Rect2 = Rect2(232, 32, 136, 162)
+const STAT_IDS: Array[StringName] = [&"vitality", &"might", &"agility"]
+const STAT_KEYS: Array[StringName] = [&"stat_vitality", &"stat_might", &"stat_agility"]
 const ASPECT_KEYS: Array[StringName] = [&"aspect_slot_1", &"aspect_slot_2", &"aspect_slot_3"]
+const ITEM_KEYS: Array[StringName] = [&"item_1", &"item_2"]
 const SLOT_LETTERS: Array[String] = ["Z", "X", "C"]
-## The aspect picker (ENTER/click on an Aspect slot): every aspect in a list over the stat list, in the shared frame.
-const PICKER: Rect2 = Rect2(196, 28, 178, 118)
-const PICKER_ROW_TOP: float = 52.0
-const PICKER_ROW_STEP: float = 17.0
-## Whole rows that fit in the picker (52 + 5 x 17 = 137, inside its bottom bronze); more aspects scroll (arrows / wheel), never a half row.
-const PICKER_VISIBLE_ROWS: int = 5
-## The scroll bar on the picker's right edge (shown only when the list is longer than the window).
-const PICKER_BAR_W: float = 3.0
-## INVENTORY layout: 6x3 slots of 36 px, step 38; the weapons fill the first slots in Weapons.IDS order.
-const GRID_ORIGIN: Vector2 = Vector2(20, 38)
-const GRID_STEP: float = 38.0
-const GRID_COLS: int = 6
-const GRID_ROWS: int = 3
-const SLOT_SIZE: float = 36.0
-const CARD: Rect2 = Rect2(260, 36, 108, 106)
-## INVENTORY: the aspects fill the second grid row (view-only; they are slotted on STATS).
-const ASPECT_GRID_START: int = GRID_COLS
+## The card's list: LIST_ROWS rows in view (menu_card.tscn ListRow0..2), more scroll; the scroll bar's track (Track) height.
+const LIST_ROWS: int = 3
+const LIST_TOP: float = 64.0
+const LIST_STEP: float = 18.0
+const TRACK_H: float = 53.0
 const FEEDBACK_SECONDS: float = 1.6
+const VILLAGE: StringName = &"village_layered"
+const UNARMED_FIGURE: String = "totoy_unarmed_idle_right_1"
+const KATANA_GLYPH: String = "ui_weapon_totoy_blade_1"
+const HERB_ICON: String = "hud_copper_herb"
+## The inner 32x32 of a 48 px weapon medallion (its picture without the ring), for the small weapon icons.
+const MEDALLION_INNER: Rect2 = Rect2(8, 8, 32, 32)
+const CREAM: Color = Color("f4ecd6")
+const STONE: Color = Color("9a9886")
+const DIM: Color = Color("5a625e")
+const TEAL: Color = Color("6aa89a")
+const LILAC: Color = Color("8a6fa8")
+const WARN: Color = Color("c28a6c")
 
 const WEAPON_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK KATANA", Tuning.WEAPON_DUAL_DAGGER: "DUAL DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "CHAIN SCYTHE", Tuning.WEAPON_STAR_STAFF: "STAR STAFF"}
-## The weapon's right-click active: its description key and the short name of the RMB stat row.
-const ACTIVE_KEYS: Dictionary = {Tuning.WEAPON_BLACK_KATANA: &"black_form", Tuning.WEAPON_DUAL_DAGGER: &"lightning_barrage", Tuning.WEAPON_CHAIN_SCYTHE: &"reapers_coil", Tuning.WEAPON_STAR_STAFF: &"disintegration"}
+## The weapon's right-click active, by name.
 const ACTIVE_ROW_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BLACK FORM", Tuning.WEAPON_DUAL_DAGGER: "BARRAGE", Tuning.WEAPON_CHAIN_SCYTHE: "REAPER'S COIL", Tuning.WEAPON_STAR_STAFF: "DISINTEGRATION"}
-const SHORT_NAMES: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "KATANA", Tuning.WEAPON_DUAL_DAGGER: "DAGGER", Tuning.WEAPON_CHAIN_SCYTHE: "SCYTHE", Tuning.WEAPON_STAR_STAFF: "STAFF"}
+## One word for how the weapon fights (the start of its description).
+const WEAPON_TAGS: Dictionary = {Tuning.WEAPON_BLACK_KATANA: "BALANCED", Tuning.WEAPON_DUAL_DAGGER: "FAST", Tuning.WEAPON_CHAIN_SCYTHE: "WIDE SWEEPS", Tuning.WEAPON_STAR_STAFF: "RANGED CASTS"}
 
-const ExploreCore := preload("res://core/explore_core.gd")
+## Set by the road (the exploration snapshot: level, stats, quests, items); null in the boss fight.
 var progression: ExploreCore.ExploreSnapshot
-var stat_request: Callable=Callable()
-var respec_request: Callable=Callable()
-var stats_notice: String=""
-var is_open: bool = false
-var tab: int = TAB_STATS
-## STATS: the selected item key (&"" = none yet); INVENTORY: the selected slot index.
-var stats_selection: StringName = &""
-var inventory_selection: int = 0
-## The item under the mouse (STATS), set on mouse motion, cleared by keyboard navigation.
-var hover_key: StringName = &""
-## {"slot": int, "ok": bool, "reason": String, "left": float} after an equip request, else empty.
-var feedback: Dictionary = {}
-## The aspect picker: the slot (1-3) it fills, 0 when closed; the highlighted row (an Aspects.ALL index); its feedback
-## {"aspect", "ok", "reason", "left"} after a request.
-var picker_slot: int = 0
-var picker_selection: int = 0
-## The first Aspects.ALL index shown in the picker window (0 .. size - PICKER_VISIBLE_ROWS).
-var picker_scroll: int = 0
-var picker_feedback: Dictionary = {}
+## The fight's snapshot (the road passes its loadout core's): the weapon and the Aspects in the sockets.
 var snapshot: Snapshots.GameSnapshot
-## The editable scenes behind this menu's drawing (presentation/ui/menu_shell.tscn, menu_status.tscn).
-var shell: Control = null
-var status_scene: Control = null
-var aspects_scene: Control = null
-var quests_scene: Control = null
-var items_scene: Control = null
-var arena_status_scene: Control = null
-var description_scene: Control = null
-var picker_scene: Control = null
-var colors: Dictionary = {}
 var atlas: Texture2D
 var frames: Dictionary = {}
-## Called with a weapon id; the arena steps the core once with InputFrame.weapon_equip and returns nothing (the menu
-## reads the result from `snapshot`, which the arena refreshes).
+## Called with a weapon id; the owner steps the core once with InputFrame.weapon_equip.
 var equip_request: Callable = Callable()
-## Called with (aspect id, slot 1-3); the arena steps the core once with InputFrame.aspect_equip / aspect_equip_slot.
+## Called with (aspect id, socket 1-3); the owner steps the core once with InputFrame.aspect_equip / aspect_equip_slot.
 var aspect_request: Callable = Callable()
+## Called with a stat id (the road only).
+var stat_request: Callable = Callable()
+## Called with nothing (the road only, in Lanternfen).
+var respec_request: Callable = Callable()
+var is_open: bool = false
+var tab: int = TAB_HERO
+## The selected thing on HERO (a STAT_KEYS entry or &"respec") and on GEAR (&"weapon", an ASPECT_KEYS or ITEM_KEYS entry).
+var hero_selection: StringName = STAT_KEYS[0]
+var gear_selection: StringName = &"weapon"
+## The card's list: &"weapons" or &"aspects" while it shows one, else &"". `list_slot` is the socket (1-3) the Aspect list
+## fills; `list_selection` the highlighted entry of list_ids(); `list_scroll` the first one in view.
+var list_kind: StringName = &""
+var list_slot: int = 0
+var list_selection: int = 0
+var list_scroll: int = 0
+## After a request from a list: {ok, reason, left}; shown in the card under its title.
+var feedback: Dictionary = {}
+## A short refusal shown in the card ("SOCKET LOCKED", "ONLY IN LANTERNFEN"), for FEEDBACK_SECONDS.
+var notice: String = ""
+var notice_left: float = 0.0
+var shell: Control = null
+var hero_scene: Control = null
+var gear_scene: Control = null
+var quests_scene: Control = null
+var card_scene: Control = null
 var _last_mouse: Vector2 = Vector2(-1000, -1000)
-var _atlas_image: Image = null
-var _used_rects: Dictionary = {}
+static var _book: Dictionary = {}
 
 
 func _ready() -> void:
@@ -127,33 +114,31 @@ func _ready() -> void:
 	visible = false
 	shell = MenuShell.instantiate()
 	add_child(shell)
-	status_scene = MenuStatus.instantiate()
-	add_child(status_scene)
-	aspects_scene = MenuAspects.instantiate()
-	add_child(aspects_scene)
+	hero_scene = MenuHero.instantiate()
+	add_child(hero_scene)
+	gear_scene = MenuGear.instantiate()
+	add_child(gear_scene)
 	quests_scene = MenuQuests.instantiate()
 	add_child(quests_scene)
-	items_scene = MenuItems.instantiate()
-	add_child(items_scene)
-	arena_status_scene = MenuArenaStatus.instantiate()
-	add_child(arena_status_scene)
-	description_scene = MenuDescription.instantiate()
-	add_child(description_scene)
-	picker_scene = MenuPicker.instantiate()
-	picker_scene.visible = false
-	add_child(picker_scene)
+	card_scene = MenuCard.instantiate()
+	add_child(card_scene)
+
+
+func _enter_tree() -> void:
+	add_to_group(&"mouse_cursor_menus")
 
 
 func open() -> void:
-	stats_notice=""
 	is_open = true
 	visible = true
-	tab = TAB_STATS
-	stats_selection = &"stat_vitality" if progression!=null else &""
-	hover_key = &""
-	feedback = {}
-	close_picker()
-	inventory_selection = maxi(0, Weapons.IDS.find(_equipped()))
+	tab = TAB_HERO
+	hero_selection = STAT_KEYS[0]
+	gear_selection = &"weapon"
+	if progression != null and String(progression.objective.get("id", "")) == "edda_equip":
+		tab = TAB_GEAR  # Edda's lesson: setting Sprint in socket Z is the task, so the menu opens there
+		gear_selection = ASPECT_KEYS[0]
+	close_list()
+	notice = ""
 	_last_mouse = get_local_mouse_position()
 	queue_redraw()
 
@@ -161,9 +146,8 @@ func open() -> void:
 func close() -> void:
 	is_open = false
 	visible = false
-	hover_key = &""
-	feedback = {}
-	close_picker()
+	close_list()
+	notice = ""
 
 
 func _process(delta: float) -> void:
@@ -173,10 +157,10 @@ func _process(delta: float) -> void:
 		feedback["left"] = float(feedback["left"]) - delta
 		if float(feedback["left"]) <= 0.0:
 			feedback = {}
-	if not picker_feedback.is_empty():
-		picker_feedback["left"] = float(picker_feedback["left"]) - delta
-		if float(picker_feedback["left"]) <= 0.0:
-			picker_feedback = {}
+	if notice_left > 0.0:
+		notice_left -= delta
+		if notice_left <= 0.0:
+			notice = ""
 	var mouse: Vector2 = get_local_mouse_position()
 	if mouse.distance_squared_to(_last_mouse) > 0.01:
 		_last_mouse = mouse
@@ -192,20 +176,20 @@ func _input(event: InputEvent) -> void:
 		if button == MOUSE_BUTTON_LEFT:
 			click(get_local_mouse_position())
 			get_viewport().set_input_as_handled()
-		elif (button == MOUSE_BUTTON_WHEEL_UP or button == MOUSE_BUTTON_WHEEL_DOWN) and picker_open():
-			scroll_picker(-1 if button == MOUSE_BUTTON_WHEEL_UP else 1)
+		elif (button == MOUSE_BUTTON_WHEEL_UP or button == MOUSE_BUTTON_WHEEL_DOWN) and list_open():
+			scroll_list(-1 if button == MOUSE_BUTTON_WHEEL_UP else 1)
 			get_viewport().set_input_as_handled()
 
 
-## Keyboard / gamepad, once per physics frame while open (the arena calls it instead of stepping the core).
-## TAB and ESC close the menu (returns false then).
+## Keyboard / gamepad, once per physics frame while open (the owner calls it instead of stepping the core).
+## TAB and ESC close the menu (returns false then); ESC with a list open closes only the list.
 func poll_input() -> bool:
 	if Input.is_action_just_pressed("menu_toggle"):
 		close()
 		return false
 	if Input.is_action_just_pressed("menu_back"):
-		if picker_open():
-			close_picker()
+		if list_open():
+			close_list()
 			queue_redraw()
 			return true
 		close()
@@ -236,82 +220,110 @@ func switch_tab(delta: int) -> void:
 
 func set_tab(index: int) -> void:
 	tab = clampi(index, 0, TAB_NAMES.size() - 1)
-	if tab == TAB_ASPECTS and stats_selection not in ASPECT_KEYS:
-		stats_selection = ASPECT_KEYS[0]
-	hover_key = &""
-	feedback = {}
-	close_picker()
+	close_list()
+	notice = ""
 	queue_redraw()
+
+
+# --- where things are (the scenes' layout; change these with the scenes) ---------------------------------------------
+
+static func tab_rect(index: int) -> Rect2:
+	return TAB_RECTS[index]
+
+
+## HERO: a stat row, its "+" button and Respec (menu_hero.tscn Row0..2, Row*/Plus, Respec).
+static func row_rect(index: int) -> Rect2:
+	return Rect2(18, 85 + index * 25, 206, 23)
+
+
+static func plus_rect(index: int) -> Rect2:
+	return Rect2(200, 89 + index * 25, 16, 15)
+
+
+static func respec_rect() -> Rect2:
+	return Rect2(20, 170, 58, 16)
+
+
+## GEAR: the weapon socket, an Aspect socket and an item slot with room for the selection corners (menu_gear.tscn).
+static func weapon_rect() -> Rect2:
+	return Rect2(20, 44, 52, 56)
+
+
+static func socket_rect(index: int) -> Rect2:
+	return Rect2(19 + index * 44, 114, 43, 49)
+
+
+static func item_rect(index: int) -> Rect2:
+	return Rect2(160 + index * 34, 118, 34, 34)
+
+
+## The card's list row `index` places below the first row in view (menu_card.tscn ListRow0..2).
+static func list_row_rect(index: int) -> Rect2:
+	return Rect2(CARD.position.x + 7, LIST_TOP + index * LIST_STEP, 116, LIST_STEP - 1)
 
 
 # --- selection -------------------------------------------------------------------------------------------------------
 
-## Every selectable item of the STATS tab with its rect: the weapon slot, the three Aspect slots, the stat rows.
-func stats_items() -> Array[Dictionary]:
-	if tab == TAB_ASPECTS:
-		var sockets: Array[Dictionary] = []
+## The selected thing on the open tab (&"" on QUESTS, which has nothing to choose).
+func selection() -> StringName:
+	if tab == TAB_HERO:
+		return hero_selection
+	if tab == TAB_GEAR:
+		return gear_selection
+	return &""
+
+
+func _select(key: StringName) -> void:
+	if key != selection():
+		notice = ""
+	if tab == TAB_HERO:
+		hero_selection = key
+	elif tab == TAB_GEAR:
+		gear_selection = key
+
+
+## Every selectable thing of the open tab with its rect.
+func items() -> Array[Dictionary]:
+	var list: Array[Dictionary] = []
+	if tab == TAB_HERO and progression != null:
 		for i: int in 3:
-			sockets.append({"key": ASPECT_KEYS[i], "rect": aspects_tab_rect(i)})
-		return sockets
-	if progression!=null:return progression_items()
-	var items: Array[Dictionary] = [{"key": &"weapon", "rect": WEAPON_SLOT}]
-	for i: int in range(3):
-		items.append({"key": ASPECT_KEYS[i], "rect": aspect_rect(i)})
-	var y: float = STAT_TOP
-	for row: Array in stat_rows(_equipped()):
-		if row[0] != "header":
-			items.append({"key": row[2], "rect": Rect2(STAT_X0 - 2, y - 1, STAT_X1 - STAT_X0 + 3, ROW_STEP)})
-		y += ROW_STEP
-	return items
+			list.append({"key": STAT_KEYS[i], "rect": row_rect(i)})
+		list.append({"key": &"respec", "rect": respec_rect()})
+	elif tab == TAB_GEAR:
+		list.append({"key": &"weapon", "rect": weapon_rect()})
+		for i: int in 3:
+			list.append({"key": ASPECT_KEYS[i], "rect": socket_rect(i)})
+		for i: int in 2:
+			list.append({"key": ITEM_KEYS[i], "rect": item_rect(i)})
+	return list
 
 
-static func aspect_rect(index: int) -> Rect2:
-	return Rect2(78 + index * 38, 107, 37, 40)
-
-
-static func inventory_rect(index: int) -> Rect2:
-	return Rect2(GRID_ORIGIN + Vector2(index % GRID_COLS, index / GRID_COLS) * GRID_STEP, Vector2(SLOT_SIZE, SLOT_SIZE))
-
-
-static func tab_rect(index: int) -> Rect2:
-	var spec: Vector2i = TAB_SPECS[index]
-	return Rect2(spec.x, 8, spec.y, 17)
-
-
-## Arrow keys: on STATS the nearest item in that direction (spatial), on INVENTORY the grid neighbour (clamped).
+## Arrow keys: in a list up and down; otherwise the nearest thing in that direction.
 func move_selection(direction: Vector2i) -> void:
-	if tab == TAB_QUESTS:
-		return
-	hover_key = &""
-	feedback = {}
-	if picker_open():
+	if list_open():
 		if direction.y != 0:
-			picker_selection = clampi(picker_selection + direction.y, 0, Aspects.ALL.size() - 1)
-			picker_feedback = {}
+			list_selection = clampi(list_selection + direction.y, 0, maxi(0, list_ids().size() - 1))
+			feedback = {}
 			_scroll_to_selection()
 		queue_redraw()
 		return
-	if tab == TAB_INVENTORY:
-		var col: int = clampi(inventory_selection % GRID_COLS + direction.x, 0, GRID_COLS - 1)
-		var row: int = clampi(inventory_selection / GRID_COLS + direction.y, 0, GRID_ROWS - 1)
-		inventory_selection = row * GRID_COLS + col
-		queue_redraw()
+	var choices: Array[Dictionary] = items()
+	if choices.is_empty():
 		return
-	var items: Array[Dictionary] = stats_items()
 	var current: Rect2 = Rect2()
-	for item: Dictionary in items:
-		if item["key"] == stats_selection:
+	for item: Dictionary in choices:
+		if item["key"] == selection():
 			current = item["rect"]
 	if current.size == Vector2.ZERO:
-		stats_selection = items[0]["key"]
+		_select(choices[0]["key"])
 		queue_redraw()
 		return
 	var from: Vector2 = current.get_center()
 	var dir: Vector2 = Vector2(direction)
-	var best: StringName = stats_selection
+	var best: StringName = selection()
 	var best_score: float = INF
-	for item: Dictionary in items:
-		if item["key"] == stats_selection:
+	for item: Dictionary in choices:
+		if item["key"] == selection():
 			continue
 		var offset: Vector2 = Rect2(item["rect"]).get_center() - from
 		var along: float = offset.dot(dir)
@@ -322,165 +334,217 @@ func move_selection(direction: Vector2i) -> void:
 		if score < best_score:
 			best_score = score
 			best = item["key"]
-	stats_selection = best
+	_select(best)
 	queue_redraw()
 
 
-## Mouse hover: STATS shows the hovered item's description; INVENTORY moves the selection to the hovered slot.
+## The mouse over something selects it (a list row in a list).
 func hover_at(pos: Vector2) -> void:
-	hover_key = &""
-	if picker_open():
-		for index: int in range(Aspects.ALL.size()):
-			if row_visible(index) and picker_row_rect(index, picker_scroll).has_point(pos):
-				if index != picker_selection:
-					picker_feedback = {}
-				picker_selection = index
-		return
-	if tab == TAB_STATS or tab == TAB_ASPECTS:
-		for item: Dictionary in stats_items():
-			if Rect2(item["rect"]).has_point(pos):
-				hover_key = item["key"]
-	else:
-		for index: int in range(GRID_COLS * GRID_ROWS):
-			if inventory_rect(index).has_point(pos):
-				if index != inventory_selection:
+	if list_open():
+		for row: int in range(LIST_ROWS):
+			var index: int = list_scroll + row
+			if index < list_ids().size() and list_row_rect(row).has_point(pos):
+				if index != list_selection:
 					feedback = {}
-				inventory_selection = index
+				list_selection = index
+		return
+	for item: Dictionary in items():
+		if Rect2(item["rect"]).has_point(pos):
+			_select(item["key"])
 
 
-## A left click: a tab plate switches the tab; an item selects it (STATS) or selects and equips it (INVENTORY).
+## A left click: a tab switches the tab; a list row is chosen; outside the card a click closes the list. A stat's "+",
+## Respec, the weapon socket and an Aspect socket act at once; anything else is only selected.
 func click(pos: Vector2) -> void:
 	for index: int in range(TAB_NAMES.size()):
 		if tab_rect(index).has_point(pos):
 			if index != tab:
 				set_tab(index)
 			return
-	if picker_open():
-		for index: int in range(Aspects.ALL.size()):
-			if row_visible(index) and picker_row_rect(index, picker_scroll).has_point(pos):
-				picker_selection = index
+	if list_open():
+		for row: int in range(LIST_ROWS):
+			var index: int = list_scroll + row
+			if index < list_ids().size() and list_row_rect(row).has_point(pos):
+				list_selection = index
 				accept()
 				return
-		if not PICKER.has_point(pos):
-			close_picker()  # a click outside closes the picker and does nothing else
+		if not CARD.has_point(pos):
+			close_list()
 		return
-	if tab == TAB_STATS or tab == TAB_ASPECTS:
-		for item: Dictionary in stats_items():
-			if Rect2(item["rect"]).has_point(pos):
-				stats_selection = item["key"]
-				hover_key = &""
-				if progression!=null and (String(item["key"]).begins_with("stat_") or item["key"]==&"respec"):
-					accept()
-				elif item["key"] in ASPECT_KEYS:
-					open_picker(ASPECT_KEYS.find(item["key"]) + 1)
-		return
-	for index: int in range(GRID_COLS * GRID_ROWS):
-		if inventory_rect(index).has_point(pos):
-			inventory_selection = index
-			accept()
+	if tab == TAB_HERO and progression != null:
+		for i: int in 3:
+			if plus_rect(i).has_point(pos):
+				_select(STAT_KEYS[i])
+				accept()
+				return
+	for item: Dictionary in items():
+		if Rect2(item["rect"]).has_point(pos):
+			_select(item["key"])
+			if item["key"] == &"respec" or item["key"] == &"weapon" or item["key"] in ASPECT_KEYS:
+				accept()
+			return
 
 
-## ENTER: on INVENTORY equip the selected weapon through the core; on STATS pin the selection (first press: weapon).
+## ENTER: a stat point, Respec, open the weapon or Aspect list, or equip what the list highlights.
 func accept() -> void:
-	if tab == TAB_QUESTS:
+	if list_open():
+		var ids: Array[StringName] = list_ids()
+		if list_selection >= 0 and list_selection < ids.size():
+			if list_kind == &"weapons":
+				_equip_weapon(ids[list_selection])
+			else:
+				_equip_aspect(ids[list_selection])
 		return
-	if progression!=null and not picker_open() and tab==TAB_STATS:
-		if String(stats_selection).begins_with("stat_"):
-			if stat_request.is_valid():stat_request.call(StringName(String(stats_selection).trim_prefix("stat_")))
-			queue_redraw()
-			return
-		if stats_selection==&"respec":
-			if progression.scene_id==&"village_layered" and respec_request.is_valid():respec_request.call()
-			else:stats_notice="Respec in the village"
-			queue_redraw()
-			return
-	if picker_open():
-		_equip_aspect(Aspects.ALL[picker_selection])
-		return
-	if tab == TAB_STATS or tab == TAB_ASPECTS:
-		if stats_selection == &"":
-			stats_selection = &"weapon"
-		elif stats_selection in ASPECT_KEYS:
-			open_picker(ASPECT_KEYS.find(stats_selection) + 1)
+	if tab == TAB_HERO and progression != null:
+		if hero_selection == &"respec":
+			if can_respec():
+				if respec_request.is_valid():
+					respec_request.call()
+			else:
+				_notice("ONLY IN LANTERNFEN" if progression.scene_id != VILLAGE else "NO POINTS TO TAKE BACK")
+		else:
+			var stat: StringName = STAT_IDS[maxi(0, STAT_KEYS.find(hero_selection))]
+			if can_add(stat):
+				if stat_request.is_valid():
+					stat_request.call(stat)
+			else:
+				_notice("NO POINTS TO SPEND" if progression.stat_points_unspent <= 0 else "%s IS FULL" % String(stat).to_upper())
 		queue_redraw()
 		return
-	var weapon: StringName = slot_weapon(inventory_selection)
-	if weapon == &"":
-		feedback = {}  # an empty slot or an aspect (aspects are slotted on STATS)
+	if tab == TAB_GEAR:
+		if gear_selection == &"weapon":
+			open_weapon_list()
+		elif gear_selection in ASPECT_KEYS:
+			open_aspect_list(ASPECT_KEYS.find(gear_selection) + 1)
+	queue_redraw()
+
+
+func _notice(text: String) -> void:
+	notice = text
+	notice_left = FEEDBACK_SECONDS
+
+
+# --- the card's lists ------------------------------------------------------------------------------------------------
+
+func list_open() -> bool:
+	return list_kind != &""
+
+
+## The weapons, or the Aspects he owns (in the game's order), that the open list offers.
+func list_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	if list_kind == &"weapons":
+		ids.append_array(Weapons.IDS)
+	elif list_kind == &"aspects":
+		for aspect: StringName in Aspects.ALL:
+			if aspect_owned(aspect):
+				ids.append(aspect)
+	return ids
+
+
+## Opens the weapon list with the equipped weapon highlighted (not before he has a weapon).
+func open_weapon_list() -> void:
+	if not armed():
+		_notice("NO WEAPON YET")
 		return
+	list_kind = &"weapons"
+	list_slot = 0
+	list_selection = maxi(0, Weapons.IDS.find(_equipped()))
+	list_scroll = 0
+	feedback = {}
+	_scroll_to_selection()
+	queue_redraw()
+
+
+## Opens the Aspect list for socket 1-3 with the Aspect already there highlighted (not on a locked socket).
+func open_aspect_list(slot: int) -> void:
+	if not socket_open(slot):
+		_notice("SOCKET LOCKED")
+		queue_redraw()
+		return
+	list_kind = &"aspects"
+	list_slot = clampi(slot, 1, 3)
+	list_selection = maxi(0, list_ids().find(slot_aspect(list_slot)))
+	list_scroll = 0
+	feedback = {}
+	_scroll_to_selection()
+	queue_redraw()
+
+
+func close_list() -> void:
+	list_kind = &""
+	list_slot = 0
+	list_selection = 0
+	list_scroll = 0
+	feedback = {}
+
+
+## The largest scroll offset (0 when every entry fits).
+func list_max_scroll() -> int:
+	return maxi(0, list_ids().size() - LIST_ROWS)
+
+
+## True when list entry `index` is in view (only those are drawn, hovered or clicked).
+func row_visible(index: int) -> bool:
+	return index >= list_scroll and index < list_scroll + LIST_ROWS
+
+
+## Keeps the highlighted entry in view (keyboard moves and opening).
+func _scroll_to_selection() -> void:
+	if list_selection < list_scroll:
+		list_scroll = list_selection
+	elif list_selection >= list_scroll + LIST_ROWS:
+		list_scroll = list_selection - LIST_ROWS + 1
+	list_scroll = clampi(list_scroll, 0, list_max_scroll())
+
+
+## Mouse wheel: scrolls by whole rows; the highlighted entry is pulled along so it never leaves the view.
+func scroll_list(delta: int) -> void:
+	if not list_open():
+		return
+	list_scroll = clampi(list_scroll + delta, 0, list_max_scroll())
+	list_selection = clampi(list_selection, list_scroll, list_scroll + LIST_ROWS - 1)
+	feedback = {}
+	queue_redraw()
+
+
+## The scroll bar's thumb inside the track: {thumb_y, thumb_h}, or {} when everything fits.
+func scroll_bar() -> Dictionary:
+	var count: int = list_ids().size()
+	if count <= LIST_ROWS:
+		return {}
+	var height: float = maxf(4.0, roundf(TRACK_H * LIST_ROWS / count))
+	return {"thumb_y": roundf((TRACK_H - height) * list_scroll / maxi(1, list_max_scroll())), "thumb_h": height}
+
+
+## One core step with weapon_equip; the result is read from the snapshot. The weapon already in hand sends nothing.
+func _equip_weapon(weapon: StringName) -> void:
 	if weapon != _equipped() and equip_request.is_valid():
 		equip_request.call(weapon)
+	if not is_open:
+		return  # the step ended the fight and its owner closed the menu
 	var ok: bool = _equipped() == weapon
-	feedback = {"slot": inventory_selection, "ok": ok, "reason": "" if ok else refusal_reason(snapshot), "left": FEEDBACK_SECONDS}
+	feedback = {"ok": ok, "reason": "" if ok else refusal_reason(snapshot), "left": FEEDBACK_SECONDS}
 	queue_redraw()
 
 
-# --- the aspect picker -----------------------------------------------------------------------------------------------
-
-func picker_open() -> bool:
-	return picker_slot > 0
-
-
-## Opens the picker for slot 1-3 with the aspect already there highlighted.
-func open_picker(slot: int) -> void:
-	if progression!=null:
-		var unlocked: bool=slot<=progression.aspect_slots.size() and bool(progression.aspect_slots[slot-1].get("unlocked",false))
-		var binding_lesson: bool=slot==1 and String(progression.objective.get("id",""))=="edda_equip"
-		if not unlocked and not binding_lesson:
-			stats_notice="Socket locked"
-			queue_redraw()
-			return
-	picker_slot = clampi(slot, 1, 3)
-	picker_selection = maxi(0, Aspects.ALL.find(slot_aspect(picker_slot)))
-	picker_scroll = 0
-	_scroll_to_selection()
-	picker_feedback = {}
-	hover_key = &""
-	queue_redraw()
-
-
-func close_picker() -> void:
-	picker_slot = 0
-	picker_scroll = 0
-	picker_feedback = {}
-
-
-## The largest scroll offset (0 when every aspect fits).
-static func picker_max_scroll() -> int:
-	return maxi(0, Aspects.ALL.size() - PICKER_VISIBLE_ROWS)
-
-
-## True when picker row `index` is inside the scrolled window (only those are drawn, hovered or clicked).
-func row_visible(index: int) -> bool:
-	return index >= picker_scroll and index < picker_scroll + PICKER_VISIBLE_ROWS
-
-
-## Keeps the highlighted row inside the window (keyboard moves and opening).
-func _scroll_to_selection() -> void:
-	if picker_selection < picker_scroll:
-		picker_scroll = picker_selection
-	elif picker_selection >= picker_scroll + PICKER_VISIBLE_ROWS:
-		picker_scroll = picker_selection - PICKER_VISIBLE_ROWS + 1
-	picker_scroll = clampi(picker_scroll, 0, picker_max_scroll())
-
-
-## Mouse wheel: scrolls the window by whole rows; the highlighted row is pulled along so it never leaves the view.
-func scroll_picker(delta: int) -> void:
-	if not picker_open():
+## One core step with aspect_equip + aspect_equip_slot (the core swaps when the Aspect sits in another socket); the result
+## is read from the snapshot. The Aspect already in the socket sends nothing in the boss fight.
+func _equip_aspect(aspect: StringName) -> void:
+	if not aspect_owned(aspect):
 		return
-	picker_scroll = clampi(picker_scroll + delta, 0, picker_max_scroll())
-	picker_selection = clampi(picker_selection, picker_scroll, picker_scroll + PICKER_VISIBLE_ROWS - 1)
-	picker_feedback = {}
+	if (progression != null or aspect != slot_aspect(list_slot)) and aspect_request.is_valid():
+		aspect_request.call(aspect, list_slot)
+	if not is_open:
+		return
+	var ok: bool = slot_aspect(list_slot) == aspect
+	feedback = {"ok": ok, "reason": "" if ok else aspect_refusal_reason(snapshot), "left": FEEDBACK_SECONDS}
 	queue_redraw()
 
 
-## Row `index` of the picker drawn with the window scrolled to `scroll` (whole rows, so nothing is ever half cut).
-static func picker_row_rect(index: int, scroll: int = 0) -> Rect2:
-	var width: float = PICKER.size.x - 18 - (PICKER_BAR_W + 3 if picker_max_scroll() > 0 else 0.0)
-	return Rect2(PICKER.position.x + 9, PICKER_ROW_TOP + (index - scroll) * PICKER_ROW_STEP, width, PICKER_ROW_STEP - 1)
+# --- facts from the snapshots ----------------------------------------------------------------------------------------
 
-
-## The slotted aspects (Z, X, C) from the snapshot.
+## The slotted Aspects (Z, X, C) from the snapshot.
 func equipped_aspects() -> Array[StringName]:
 	var list: Array[StringName] = []
 	if snapshot != null and snapshot.player != null and snapshot.player.equipped_aspects.size() == 3:
@@ -495,35 +559,58 @@ func slot_aspect(slot: int) -> StringName:
 	return list[slot - 1] if slot >= 1 and slot <= list.size() else &""
 
 
-## The slot (1-3) holding `aspect`, 0 when it is not slotted.
+## The socket (1-3) holding `aspect`, 0 when it is not in one.
 func aspect_slot_of(aspect: StringName) -> int:
 	return equipped_aspects().find(aspect) + 1
 
 
-## One core step with aspect_equip + aspect_equip_slot (the core swaps when the aspect sits in another slot); the result
-## is read from the snapshot. The aspect already in the slot sends nothing.
-func _equip_aspect(aspect: StringName) -> void:
-	if not aspect_owned(aspect):
-		picker_feedback={"aspect":aspect,"ok":false,"reason":"LOCKED","left":FEEDBACK_SECONDS}
-		queue_redraw()
-		return
-	if (progression!=null or aspect != slot_aspect(picker_slot)) and aspect_request.is_valid():
-		aspect_request.call(aspect, picker_slot)
-	if not is_open:
-		return  # the step ended the fight and the arena closed the menu
-	var ok: bool = slot_aspect(picker_slot) == aspect
-	picker_feedback = {"aspect": aspect, "ok": ok, "reason": "" if ok else aspect_refusal_reason(snapshot), "left": FEEDBACK_SECONDS}
-	queue_redraw()
+func aspect_owned(aspect: StringName) -> bool:
+	return progression == null or progression.owned_aspects.has(aspect)
 
 
-## Why the core most likely refused an aspect equip (display text from snapshot facts; aspects have no lockout).
+func _equipped() -> StringName:
+	return snapshot.player.weapon_id if snapshot != null and snapshot.player != null else Tuning.WEAPON_BLACK_KATANA
+
+
+## On the road he is unarmed until Tovan gives him the Black Katana; in the boss fight he is always armed.
+func armed() -> bool:
+	return progression == null or progression.armed
+
+
+## Socket 1-3 may be filled: always in the boss fight; on the road once unlocked, and socket 1 during Edda's binding lesson.
+func socket_open(slot: int) -> bool:
+	if progression == null:
+		return true
+	if slot >= 1 and slot <= progression.aspect_slots.size() and bool(progression.aspect_slots[slot - 1].get("unlocked", false)):
+		return true
+	return slot == 1 and String(progression.objective.get("id", "")) == "edda_equip"
+
+
+func can_add(stat: StringName) -> bool:
+	return progression != null and progression.stat_points_unspent > 0 and int(progression.stats.get(stat, 0)) < int(progression.stat_caps.get(stat, 0))
+
+
+func points_spent() -> int:
+	var total: int = 0
+	if progression != null:
+		for stat: StringName in STAT_IDS:
+			total += int(progression.stats.get(stat, 0))
+	return total
+
+
+## Respec is free and only in Lanternfen, when points have been spent.
+func can_respec() -> bool:
+	return progression != null and progression.scene_id == VILLAGE and points_spent() > 0
+
+
+## Why the core most likely refused an Aspect (display text from snapshot facts; Aspects have no lockout).
 static func aspect_refusal_reason(snap: Snapshots.GameSnapshot) -> String:
 	if snap != null and snap.player.weapon_buff_active:
 		return "ACTIVE RUNNING"
 	return "TRY WHEN IDLE"
 
 
-## Why the core most likely refused, from snapshot facts only (display text; the core made the decision).
+## Why the core most likely refused a weapon (display text from snapshot facts; the core made the decision).
 static func refusal_reason(snap: Snapshots.GameSnapshot) -> String:
 	if snap == null:
 		return "TRY WHEN IDLE"
@@ -534,39 +621,23 @@ static func refusal_reason(snap: Snapshots.GameSnapshot) -> String:
 	return "TRY WHEN IDLE"
 
 
-static func slot_weapon(index: int) -> StringName:
-	return Weapons.IDS[index] if index >= 0 and index < Weapons.IDS.size() else &""
+## The equipped weapon's idle frame (the fight's frame sets).
+static func figure_frame(weapon: StringName) -> String:
+	var prefix: String = ArenaAnimation.SET_KATANA
+	match weapon:
+		Tuning.WEAPON_DUAL_DAGGER: prefix = ArenaAnimation.SET_DAGGER
+		Tuning.WEAPON_CHAIN_SCYTHE: prefix = ArenaAnimation.SET_SCYTHE
+		Tuning.WEAPON_STAR_STAFF: prefix = ArenaAnimation.SET_STAFF
+	return ArenaAnimation.hero_frame(prefix, "idle", 1)
 
 
-## The aspect shown in an INVENTORY slot (the second grid row), else empty.
-static func grid_aspect(index: int) -> StringName:
-	var i: int = index - ASPECT_GRID_START
-	return Aspects.ALL[i] if i >= 0 and i < Aspects.ALL.size() else &""
+static func book() -> Dictionary:
+	if _book.is_empty():
+		_book = QuestBook.default_book()
+	return _book
 
 
-func _equipped() -> StringName:
-	return snapshot.player.weapon_id if snapshot != null and snapshot.player != null else Tuning.WEAPON_BLACK_KATANA
-
-
-## The key of the description shown now: the hovered item, else the selection (STATS); the selected slot (INVENTORY).
-func description_key() -> StringName:
-	if tab == TAB_INVENTORY:
-		var weapon: StringName = slot_weapon(inventory_selection)
-		if weapon != &"":
-			return weapon
-		var aspect: StringName = grid_aspect(inventory_selection)
-		return aspect if aspect != &"" else &"empty"
-	if picker_open():
-		return Aspects.ALL[picker_selection]
-	var key: StringName = hover_key if hover_key != &"" else stats_selection
-	if key == &"weapon":
-		return _equipped()
-	if key in ASPECT_KEYS:
-		return slot_aspect(ASPECT_KEYS.find(key) + 1)
-	return key if key != &"" else &"none"
-
-
-# --- numbers and texts (read from core/tuning.gd and core/weapons.gd; the formulas of the approved mockup script) ----
+# --- numbers and texts (read from core/tuning.gd and core/weapons.gd) ------------------------------------------------
 
 static func secs(ticks: float, digits: int = 2) -> String:
 	var text: String = ("%." + str(digits) + "f") % (ticks / 60.0)
@@ -611,33 +682,21 @@ static func reach_text(w: Dictionary) -> String:
 	return "/".join(parts) if distinct.size() > 1 else parts[0]
 
 
-## The Black Form combo time: every phase scaled with Player.scaled_ticks.
-static func black_form_combo_ticks() -> int:
-	var total: int = 0
-	for i: int in range(Tuning.COMBO_MAX):
-		for phase: int in Weapons.swing_phases(Tuning.WEAPON_BLACK_KATANA, i + 1):
-			total += PlayerState.scaled_ticks(phase, Tuning.BLACK_KATANA_ATTACK_SPEED_MULT)
-	return total
 
-
-## The tag of an aspect's description: its key when slotted ("ASPECT  KEY X"), else "ASPECT".
 static func aspect_tag(aspect: StringName, aspects: Array) -> String:
 	var index: int = aspects.find(aspect)
 	return "ASPECT  KEY %s" % SLOT_LETTERS[index] if index >= 0 and index < 3 else "ASPECT"
 
 
-## Every description: key -> [title, tag, [body line, body line, numbers line]]. Weapon-dependent ones (the stat rows
-## under the weapon header) follow `equipped`; the aspects' tags follow the slotted `aspects` (Z, X, C).
+## The description of every weapon and Aspect: key -> [title, tag, [body line, body line, numbers line]]. The weapon tags
+## say which one is `equipped`; the Aspects' tags follow the slotted `aspects` (Z, X, C).
 static func descriptions(equipped: StringName, aspects: Array = Aspects.DEFAULT_EQUIPPED) -> Dictionary:
 	var kat: Dictionary = weapon_data(Tuning.WEAPON_BLACK_KATANA)
 	var dag: Dictionary = weapon_data(Tuning.WEAPON_DUAL_DAGGER)
 	var scy: Dictionary = weapon_data(Tuning.WEAPON_CHAIN_SCYTHE)
-	var cur: Dictionary = weapon_data(equipped)
 	var barrage_slashes: int = Weapons.barrage_slashes()
 	var barrage_ticks: int = Weapons.barrage_total_ticks()
-	var dash_px: float = Tuning.DASH_TICKS * Tuning.DASH_SPEED
 	var move_px_s: float = Tuning.PLAYER_SPEED * 60.0
-	var armor_pct: int = roundi(Tuning.ARMOR_DAMAGE_FACTOR * 100)
 	var spin_damage: String = num(Tuning.ATTACK_DAMAGE * Tuning.REAPER_COIL_SPIN_DAMAGE_MULT)
 	var d: Dictionary = {}
 	d[&"breaking_edge"] = ["BREAKING EDGE", aspect_tag(&"breaking_edge", aspects), [
@@ -689,498 +748,296 @@ static func descriptions(equipped: StringName, aspects: Array = Aspects.DEFAULT_
 		"CASTS AT RANGE (%s PX): %d BURSTS, %s DMG TO ALL IN THE BLAST." % [num(Tuning.STAFF_BURST_RANGE), stf["combo"], damage_text(stf)],
 		"THE THIRD IS THE GREAT BURST. DASH: A SHORT BLINK. RMB DISINTEGRATION.",
 		"RMB %s EDGE  CD %s S  BLAST %s/%s PX  +%s EDGE PER HIT" % [num(stf["cost"]), secs(stf["cd"]), num(Tuning.STAFF_BURST_RADIUS[0]), num(Tuning.STAFF_BURST_RADIUS[2]), num(stf["edge"])]]]
-	d[&"disintegration"] = ["DISINTEGRATION", "STAR STAFF  RMB", [
-		"A MAGIC CIRCLE MARKS THE TARGET; YOU CALL A METEOR DOWN ON IT.",
-		"ROOTED BUT UNTOUCHABLE WHILE YOU CALL. IT HITS ALL IN THE CIRCLE.",
-		"%s EDGE  CD %s S  %s PX  %s DMG  LANDS IN %s S" % [num(stf["cost"]), secs(stf["cd"]), num(Tuning.DISINTEGRATION_RADIUS), num(Tuning.ATTACK_DAMAGE * Tuning.DISINTEGRATION_DAMAGE_MULT), secs(Weapons.disintegration_impact_ticks())]]]
-	d[&"black_form"] = ["BLACK FORM", "BLACK KATANA  RMB", [
-		"FOR %s S YOUR SWINGS ARE X%s FASTER AND ALL YOUR HITS DEAL X%s." % [secs(Tuning.BLACK_KATANA_BUFF_DURATION_TICKS), num(Tuning.BLACK_KATANA_ATTACK_SPEED_MULT), num(Tuning.BLACK_KATANA_DAMAGE_MULT)],
-		"NO ANIMATION LOCK: USE IT EVEN MID-SWING. NO SWAP WHILE ON.",
-		"%s EDGE  CD %s S FROM ACTIVATION  COMBO %s S" % [num(kat["cost"]), secs(kat["cd"]), secs(black_form_combo_ticks())]]]
-	d[&"lightning_barrage"] = ["LIGHTNING BARRAGE", "DUAL DAGGER  RMB", [
-		"BLINK AROUND THE BOSS: %d AUTOMATIC SLASHES, ONE PER SIDE;" % barrage_slashes,
-		"THE LAST CALLS SKY LIGHTNING. YOU CANNOT BE HIT WHILE IT RUNS.",
-		"%s EDGE  CD %s S  %d X %s DMG  %s S" % [num(dag["cost"]), secs(dag["cd"]), barrage_slashes, num(Tuning.ATTACK_DAMAGE * Tuning.LIGHTNING_BARRAGE_DAMAGE_MULT), secs(barrage_ticks)]]]
-	d[&"reapers_coil"] = ["REAPER'S COIL", "CHAIN SCYTHE  RMB", [
-		"THROW THE CHAIN: A HOOKED BOSS IS DRAGGED IN, STUNNED AND HIT BY",
-		"A SPIN. A MISS PULLS YOU TO THE HOOK. YOU CANNOT BE HIT.",
-		"%s EDGE  CD %s S  %s PX  STUN %s S  %d X %s DMG" % [num(scy["cost"]), secs(scy["cd"]), num(Tuning.REAPER_COIL_HOOK_RANGE), secs(Tuning.REAPER_COIL_STAGGER_TICKS), Tuning.REAPER_COIL_SPIN_HITS, spin_damage]]]
-	d[&"stat_health"] = ["HEALTH", "TOTOY", [
-		"DAMAGE YOU CAN TAKE. AFTER A HIT YOU ARE BRIEFLY UNTOUCHABLE.",
-		"DASH THROUGH RED ATTACKS, PARRY GOLD ONES.",
-		"%d HP  %s S INVULNERABLE AFTER A HIT" % [Tuning.PLAYER_MAX_HP, secs(Tuning.PLAYER_HURT_INVULN_TICKS)]]]
-	d[&"stat_edge"] = ["EDGE", "TOTOY", [
-		"PAYS FOR ASPECTS AND WEAPON ACTIVES. HITS AND PARRIES",
-		"FILL IT; A COUNTER ON A BROKEN BOSS SPENDS ALL OF IT FOR DAMAGE.",
-		"MAX %s  +%s PER PARRY  HITS: SEE THE WEAPON" % [num(Tuning.EDGE_MAX), num(Tuning.EDGE_PER_PARRY)]]]
-	d[&"stat_move"] = ["MOVE SPEED", "TOTOY", [
-		"WALKING SPEED. SWINGING SLOWS YOU TO A SHUFFLE.",
-		"",
-		"%s PX/S  X%s WHILE ATTACKING  X%s AFTER A MISSED PARRY" % [num(move_px_s), num(Tuning.ATTACK_MOVE_FACTOR), num(Tuning.PARRY_RECOVERY_MOVE_FACTOR)]]]
-	d[&"stat_dash"] = ["DASH", "TOTOY", [
-		"A SHORT BURST WITH INVULNERABILITY. THE ANSWER TO RED ATTACKS.",
-		"WORKS WITH EVERY WEAPON.",
-		"%s PX IN %s S  %s S INVULNERABLE  CD %s S" % [num(dash_px), secs(Tuning.DASH_TICKS), secs(Tuning.DASH_INVULN_TICKS), secs(Tuning.DASH_COOLDOWN_TICKS)]]]
-	d[&"stat_parry"] = ["PARRY", "TOTOY", [
-		"CATCH A GOLD ATTACK IN THE WINDOW. EARLY IN IT IS PERFECT: THE",
-		"BOSS'S POSTURE BREAKS AT ONCE. LATER ONLY ADDS POSTURE.",
-		"WINDOW %s S  PERFECT %s S  LATE %s POSTURE  MISS %s S" % [secs(Tuning.PARRY_ACTIVE_TICKS), secs(Tuning.PARRY_PERFECT_TICKS), num(Tuning.PARRY_EARLY_POSTURE), secs(Tuning.PARRY_WHIFF_RECOVERY_TICKS)]]]
-	d[&"stat_counter"] = ["COUNTER", "TOTOY", [
-		"HITS ON A POSTURE-BROKEN BOSS DEAL X%s PLUS HALF YOUR EDGE." % num(Tuning.COUNTER_DAMAGE_MULT),
-		"OTHERWISE ITS ARMOR LETS ONLY %d%% THROUGH." % armor_pct,
-		"X%s +%s PER EDGE  BREAK LASTS %s S  ARMOR X%s" % [num(Tuning.COUNTER_DAMAGE_MULT), num(Tuning.EDGE_COUNTER_BONUS), secs(Tuning.BOSS_BREAK_TICKS), num(Tuning.ARMOR_DAMAGE_FACTOR)]]]
-	# the stats under the weapon header follow the equipped weapon
-	var armored: PackedStringArray = PackedStringArray()
-	for dmg: float in cur["damage"]:
-		armored.append(str(maxi(1, roundi(dmg * Tuning.ARMOR_DAMAGE_FACTOR))))
-	var damage_extra: String = ""
-	var speed_extra: String = ""
-	match equipped:
-		Tuning.WEAPON_BLACK_KATANA:
-			damage_extra = "  BLACK FORM X%s" % num(Tuning.BLACK_KATANA_DAMAGE_MULT)
-			speed_extra = "  BLACK FORM %s S" % secs(black_form_combo_ticks())
-		Tuning.WEAPON_DUAL_DAGGER:
-			damage_extra = "  SKY LIGHTNING %s" % num(Tuning.LIGHTNING_STRIKE_DAMAGE)
-	d[&"stat_damage"] = ["DAMAGE", cur["name"], [
-		"BASE DAMAGE OF EACH SWING OF THE COMBO.",
-		"ARMOR CUTS IT TO %d%%; A COUNTER DOES X%s." % [armor_pct, num(Tuning.COUNTER_DAMAGE_MULT)],
-		"%s  ARMORED %s%s" % [damage_text(cur), "/".join(armored), damage_extra]]]
-	var swings: PackedStringArray = PackedStringArray()
-	for t: int in cur["swing_ticks"]:
-		swings.append(secs(t) + " S")
-	d[&"stat_speed"] = ["ATTACK SPEED", cur["name"], [
-		"TIME OF EACH SWING: WIND-UP, STRIKE AND RECOVERY.",
-		"THE FINISHER IS SLOWEST AND LEAVES THE LONGEST OPENING.",
-		"SWINGS %s  COMBO %s S%s" % [" / ".join(swings), secs(cur["combo_ticks"]), speed_extra]]]
-	var others: String = ""
-	for weapon: StringName in Weapons.IDS:
-		if weapon == equipped:
-			continue
-		var other: Dictionary = weapon_data(weapon)
-		others += "  %s %s" % [SHORT_NAMES[weapon], reach_text(other)]
-		if weapon == Tuning.WEAPON_CHAIN_SCYTHE:
-			others += " (%d DEG)" % roundi(other["arc_deg"])
-	var uniform: bool = not reach_text(cur).contains("/")
-	d[&"stat_reach"] = ["REACH", cur["name"], [
-		"HOW FAR EACH SWING REACHES, IN A %d DEGREE ARC EACH SIDE" % roundi(cur["arc_deg"]),
-		"OF WHERE YOU FACE. " + ("EVERY SWING REACHES AS FAR." if uniform else "THE FINISHER REACHES FURTHEST."),
-		"%s PX%s" % [reach_text(cur), others]]]
-	d[&"stat_edge_gain"] = ["EDGE GAIN", cur["name"], [
-		"EDGE EARNED BY EACH SWING THAT LANDS ON AN UNBROKEN BOSS.",
-		"",
-		"KATANA +%s  DAGGER +%s  SCYTHE +%s  PARRY +%s" % [num(kat["edge"]), num(dag["edge"]), num(scy["edge"]), num(Tuning.EDGE_PER_PARRY)]]]
-	d[&"none"] = ["", "", ["HOVER OR SELECT A SLOT OR A STAT TO READ ABOUT IT.", "", "ARROWS/WASD: MOVE   ENTER/CLICK: SELECT"]]
-	d[&"empty"] = ["", "", ["AN EMPTY SLOT.", "", "ARROWS/WASD: MOVE   ENTER/CLICK: EQUIP"]]
 	return d
 
 
-## The STATS list: [label, value, description key], or ["header", text, &""]. The second block follows `equipped`.
-static func stat_rows(equipped: StringName) -> Array[Array]:
-	var w: Dictionary = weapon_data(equipped)
-	var rows: Array[Array] = [
-		["header", "BASE", &""],
-		["HEALTH", str(Tuning.PLAYER_MAX_HP), &"stat_health"],
-		["EDGE", "%s MAX" % num(Tuning.EDGE_MAX), &"stat_edge"],
-		["MOVE SPEED", "%s PX/S" % num(Tuning.PLAYER_SPEED * 60.0), &"stat_move"],
-		["DASH", "%s PX  %sS" % [num(Tuning.DASH_TICKS * Tuning.DASH_SPEED), secs(Tuning.DASH_COOLDOWN_TICKS, 1)], &"stat_dash"],
-		["PARRY", "%s S" % secs(Tuning.PARRY_ACTIVE_TICKS), &"stat_parry"],
-		["COUNTER", "X%s +EDGE" % num(Tuning.COUNTER_DAMAGE_MULT), &"stat_counter"],
-		["header", w["name"], &""],
-		["DAMAGE", damage_text(w), &"stat_damage"],
-		["ATTACK SPEED", "%s S" % secs(w["combo_ticks"]), &"stat_speed"],
-		["REACH", "%s PX" % reach_text(w), &"stat_reach"],
-		["EDGE GAIN", "+%s/HIT" % num(w["edge"]), &"stat_edge_gain"],
-		["RMB " + String(ACTIVE_ROW_NAMES.get(equipped, "ACTIVE")), "%sE %sS" % [num(w["cost"]), secs(w["cd"])], ACTIVE_KEYS.get(equipped, &"black_form")],
+## A weapon's small icon: [atlas frame, crop] (a medallion's inner picture, or the katana's glyph).
+static func weapon_icon(weapon: StringName) -> Array:
+	if Hud.MEDALLIONS.has(weapon):
+		return [Hud.MEDALLIONS[weapon], MEDALLION_INNER]
+	return [KATANA_GLYPH, Rect2()]
+
+
+## What his points give him now ([name, value, what one more point of the selected stat adds]): health, damage, dash
+## cooldown, walking speed and Edge. The boss fight shows the base numbers.
+func stat_lines() -> Array:
+	var hp: int = Tuning.PLAYER_MAX_HP
+	var might: int = 0
+	var agility: int = 0
+	if progression != null:
+		hp = progression.hero.max_hp
+		might = int(progression.stats.get(&"might", 0))
+		agility = int(progression.stats.get(&"agility", 0))
+	elif snapshot != null and snapshot.player != null:
+		hp = snapshot.player.max_hp
+	var dash: int = Tuning.DASH_COOLDOWN_TICKS - Tuning.AGILITY_DASH_COOLDOWN_TICKS_PER_POINT * mini(agility, Tuning.AGILITY_DASH_POINTS)
+	var speed: float = Tuning.PLAYER_SPEED * 60.0 * (1.0 + Tuning.AGILITY_SPEED_PER_POINT * agility)
+	var lines: Array = [
+		["HEALTH", str(hp), ""],
+		["DAMAGE", "+%d%%" % roundi(Tuning.MIGHT_DAMAGE_PER_POINT * 100.0 * might), ""],
+		["DASH COOLDOWN", "%s S" % secs(dash), ""],
+		["MOVE SPEED", "%s PX/S" % num(roundf(speed * 10.0) / 10.0), ""],
+		["EDGE", "%s MAX" % num(Tuning.EDGE_MAX), ""],
 	]
-	return rows
+	var index: int = STAT_KEYS.find(hero_selection)
+	if index >= 0 and can_add(STAT_IDS[index]):
+		match STAT_IDS[index]:
+			&"vitality":
+				lines[0][2] = "+%d" % Tuning.VITALITY_HP_PER_POINT
+			&"might":
+				lines[1][2] = "+%d%%" % roundi(Tuning.MIGHT_DAMAGE_PER_POINT * 100.0)
+			&"agility":
+				if agility < Tuning.AGILITY_DASH_POINTS:
+					lines[2][2] = "-%s" % secs(Tuning.AGILITY_DASH_COOLDOWN_TICKS_PER_POINT)
+				lines[3][2] = "+%s%%" % num(Tuning.AGILITY_SPEED_PER_POINT * 100.0)
+	return lines
 
 
-# --- drawing ---------------------------------------------------------------------------------------------------------
-
-func _text(at: Vector2, text: String, color: Color, face: Font = null, size: int = Hud.FONT_SIZE, align: int = HORIZONTAL_ALIGNMENT_LEFT) -> float:
-	var font: Font = face if face != null else Hud.text_face(text)
-	size = Hud._size_for(font, 1, size)
-	var width: float = Hud.text_width(text, 1, font, size)
-	var x: float = at.x
-	if align == HORIZONTAL_ALIGNMENT_CENTER:
-		x -= width * 0.5
-	elif align == HORIZONTAL_ALIGNMENT_RIGHT:
-		x -= width
-	draw_string(font, Vector2(floorf(x), at.y + Hud._cap_ratio(font) * size), text.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
-	return width
-
-
-func _ui(key: String, rect: Rect2, source_offset: Vector2 = Vector2.ZERO, source_size: Vector2 = Vector2.ZERO) -> void:
-	if atlas == null or not frames.has(key):
-		return
-	var f: Dictionary = frames[key]
-	var size: Vector2 = source_size if source_size != Vector2.ZERO else Vector2(f["w"], f["h"])
-	draw_texture_rect_region(atlas, rect, Rect2(Vector2(f["x"], f["y"]) + source_offset, size))
+## What a stat (or Respec) does, for the card under the stat list.
+static func stat_text(key: StringName) -> String:
+	match key:
+		&"stat_vitality":
+			return "VITALITY: +%d MAX HEALTH A POINT, AND THE POINT HEALS YOU AT ONCE. UP TO %d POINTS." % [Tuning.VITALITY_HP_PER_POINT, int(Tuning.STAT_CAP[&"vitality"])]
+		&"stat_might":
+			return "MIGHT: +%d%% DAMAGE A POINT ON EVERY BLOW YOU LAND. UP TO %d POINTS." % [roundi(Tuning.MIGHT_DAMAGE_PER_POINT * 100.0), int(Tuning.STAT_CAP[&"might"])]
+		&"stat_agility":
+			return "AGILITY: %s S OFF THE DASH COOLDOWN A POINT FOR THE FIRST %d POINTS, AND +%s%% WALKING SPEED EVERY POINT. UP TO %d POINTS." % [secs(Tuning.AGILITY_DASH_COOLDOWN_TICKS_PER_POINT), Tuning.AGILITY_DASH_POINTS, num(Tuning.AGILITY_SPEED_PER_POINT * 100.0), int(Tuning.STAT_CAP[&"agility"])]
+		&"respec":
+			return "RESPEC TAKES EVERY POINT BACK SO YOU CAN SPEND THEM AGAIN. FREE, BUT ONLY IN LANTERNFEN."
+	return ""
 
 
-## A filled ellipse as whole-pixel rows (stays hard-edged).
-func _ellipse(centre: Vector2, radii: Vector2, color: Color) -> void:
-	for row: int in range(int(radii.y * 2)):
-		var y: float = centre.y - radii.y + row
-		var t: float = (y + 0.5 - centre.y) / radii.y
-		var half: float = radii.x * sqrt(maxf(0.0, 1.0 - t * t))
-		draw_rect(Rect2(roundf(centre.x - half), y, roundf(centre.x + half) - roundf(centre.x - half), 1), color)
+## Item slot 1 holds the herbs once that slot is open and the herb is set in it: {icon, count}; {} when empty.
+func herb_slot() -> Dictionary:
+	if progression == null:
+		return {}
+	for value: Dictionary in progression.item_slots:
+		if int(value.get("slot", 0)) == 1 and bool(value.get("unlocked", false)) and String(value.get("item", "")) == "herb":
+			return {"icon": HERB_ICON, "count": int(value.get("count", 0))}
+	return {}
 
 
-func _key_badge(at: Vector2, letter: String) -> void:
-	UiPanel.key_badge(self, at, colors)
-	_text(at + Vector2(4.5, 1), letter, colors["1"], null, 7, HORIZONTAL_ALIGNMENT_CENTER)
+# --- what the scenes show --------------------------------------------------------------------------------------------
+
+func _hero_data() -> Dictionary:
+	var figure: String = figure_frame(_equipped()) if armed() else UNARMED_FIGURE
+	if progression == null:
+		return {"figure": figure, "title": "BOSS FIGHT", "exp": {}, "points": "", "rows": [], "respec": {},
+			"note": "STAT POINTS ARE SPENT ON THE ROAD. THIS FIGHT USES BASE STATS."}
+	var bar: Dictionary = {"fraction": 1.0, "text": "MAX LEVEL"}
+	if progression.exp_to_next > 0:
+		bar = {"fraction": float(progression.exp) / float(progression.exp_to_next), "text": "%d / %d EXP" % [progression.exp, progression.exp_to_next]}
+	var unspent: int = progression.stat_points_unspent
+	var points: String = "NO POINTS TO SPEND"
+	if unspent > 0:
+		points = ("%d POINT TO SPEND" if unspent == 1 else "%d POINTS TO SPEND") % unspent
+	var rows: Array = []
+	for stat: StringName in STAT_IDS:
+		rows.append({"value": int(progression.stats.get(stat, 0)), "cap": int(progression.stat_caps.get(stat, 10)), "can_add": can_add(stat)})
+	return {"figure": figure, "title": "LEVEL %d" % progression.level, "exp": bar, "points": points, "points_color": TEAL if unspent > 0 else STONE,
+		"rows": rows, "selected": 3 if hero_selection == &"respec" else STAT_KEYS.find(hero_selection),
+		"respec": {"enabled": can_respec(), "note": "FREE IN LANTERNFEN: ALL POINTS BACK" if progression.scene_id == VILLAGE else "ONLY IN LANTERNFEN"}}
 
 
-func _draw() -> void:
-	if not is_open or colors.is_empty() or snapshot == null:
-		return
-	_sync_scenes()
-	if tab == TAB_STATS:
-		if progression!=null:_draw_progression_stats()
-		else:_draw_stats()
-	elif tab == TAB_INVENTORY:
-		_draw_inventory()
-	elif tab == TAB_ASPECTS:
-		_draw_aspects_tab()
+func _hero_card() -> Dictionary:
+	var card: Dictionary = {"mode": "info", "title": "YOUR STATS", "stats": stat_lines(), "foot_color": CREAM,
+		"sub": "WHAT YOUR POINTS GIVE YOU NOW" if progression != null else "BASE STATS IN THIS FIGHT", "sub_color": STONE,
+		"foot": stat_text(hero_selection) if progression != null else ""}
+	return _with_notice(card)
+
+
+func _gear_data() -> Dictionary:
+	var weapon: Dictionary = {"glyph": "", "whole": "", "name": "NO WEAPON", "tag": "UNARMED", "lines": ["TOVAN AT THE FORGE", "HAS A SWORD FOR YOU.", ""]}
+	if armed():
+		var id: StringName = _equipped()
+		var w: Dictionary = weapon_data(id)
+		weapon = {"glyph": "" if Hud.MEDALLIONS.has(id) else KATANA_GLYPH, "whole": Hud.MEDALLIONS.get(id, ""), "name": WEAPON_NAMES.get(id, "WEAPON"),
+			"tag": "%s  %d-HIT COMBO" % [WEAPON_TAGS.get(id, ""), int(w["combo"])],
+			"lines": ["DAMAGE  %s" % damage_text(w), "REACH  %s PX" % reach_text(w), "RMB  %s  %sE" % [ACTIVE_ROW_NAMES.get(id, "ACTIVE"), num(w["cost"])]]}
+	var sockets: Array = []
+	for slot: int in range(1, 4):
+		var aspect: StringName = slot_aspect(slot)
+		sockets.append({"locked": not socket_open(slot), "icon": Hud.aspect_icon(aspect) if aspect_owned(aspect) else ""})
+	return {"weapon": weapon, "sockets": sockets, "items": [herb_slot(), {}]}
+
+
+func _gear_card() -> Dictionary:
+	if list_open():
+		return _list_card()
+	var all: Dictionary = descriptions(_equipped(), equipped_aspects())
+	var card: Dictionary = {}
+	if gear_selection == &"weapon":
+		if armed():
+			var id: StringName = _equipped()
+			var icon: Array = weapon_icon(id)
+			var entry: Array = all[id]
+			card = {"icon": icon[0], "icon_crop": icon[1], "title": entry[0], "sub": "EQUIPPED   ENTER: CHANGE", "sub_color": TEAL,
+				"body": "%s %s" % [entry[2][0], entry[2][1]], "foot": entry[2][2]}
+		else:
+			card = {"title": "NO WEAPON", "sub": "UNARMED", "body": "TOVAN AT THE FORGE HAS A SWORD FOR YOU. UNTIL THEN YOU CANNOT FIGHT."}
+	elif gear_selection in ASPECT_KEYS:
+		var slot: int = ASPECT_KEYS.find(gear_selection) + 1
+		var aspect: StringName = slot_aspect(slot)
+		var key: String = "KEY %s" % SLOT_LETTERS[slot - 1]
+		if not socket_open(slot):
+			card = {"title": "LOCKED SOCKET", "sub": key, "body": "IT OPENS AS YOUR STORY GOES ON."}
+		elif aspect_owned(aspect) and all.has(aspect):
+			var entry: Array = all[aspect]
+			card = {"icon": Hud.aspect_icon(aspect), "title": entry[0], "sub": key + "   ENTER: CHANGE", "sub_color": TEAL,
+				"body": "%s %s" % [entry[2][0], entry[2][1]], "foot": entry[2][2]}
+		else:
+			var none: bool = Aspects.ALL.filter(func(a: StringName) -> bool: return aspect_owned(a)).is_empty()
+			card = {"title": "EMPTY SOCKET", "sub": key, "body": "YOU HAVE NO ASPECTS YET." if none else "PRESS ENTER TO CHOOSE AN ASPECT."}
 	else:
-		_draw_quests_tab()
-	if tab == TAB_INVENTORY or (tab == TAB_STATS and progression == null):
-		_draw_description(description_key())
+		var index: int = ITEM_KEYS.find(gear_selection)
+		var herb: Dictionary = herb_slot() if index == 0 else {}
+		if not herb.is_empty():
+			card = {"icon": HERB_ICON, "title": "HERB", "sub": "X%d   KEY 1" % int(herb["count"]), "sub_color": TEAL,
+				"body": "PRESS 1 TO EAT ONE AND HEAL %d HEALTH. CREATURES ON THE ROAD SOMETIMES DROP THEM." % Tuning.HERB_HEAL}
+		elif index == 0:
+			card = {"title": "EMPTY SLOT", "sub": "KEY 1", "body": "HERBS GO HERE ONCE YOU CARRY SOME."}
+		else:
+			card = {"title": "EMPTY SLOT", "sub": "KEY 2", "body": "FOR YOUR NEXT KIND OF ITEM."}
+	card["mode"] = "info"
+	return _with_notice(card)
 
 
-## The boss-fight STATUS tab's medallion, sockets and stat list.
-func _sync_arena_status_scene() -> void:
-	arena_status_scene.atlas = atlas
-	arena_status_scene.frames = frames
-	var equipped: StringName = _equipped()
-	var lit: StringName = highlighted_key()
-	var sockets: Array = []
-	for i: int in 3:
-		sockets.append({"icon": Hud.aspect_icon(slot_aspect(i + 1)), "key": SLOT_LETTERS[i]})
+## The card as the weapon or Aspect list: the rows in view, the scroll bar, the result of the last request under the
+## title, and the highlighted entry's text.
+func _list_card() -> Dictionary:
+	var ids: Array[StringName] = list_ids()
+	var all: Dictionary = descriptions(_equipped(), equipped_aspects())
 	var rows: Array = []
-	for row: Array in stat_rows(equipped):
-		rows.append({"header": row[0] == "header", "name": row[1] if row[0] == "header" else row[0], "value": "" if row[0] == "header" else row[1], "lit": row[0] != "header" and lit == row[2]})
-	arena_status_scene.apply({"whole_medallion": Hud.MEDALLIONS.get(equipped, ""), "weapon_name": WEAPON_NAMES.get(equipped, "WEAPON"), "sockets": sockets, "rows": rows})
-
-
-## The Aspect picker's rows, drawn by the scene menu_picker.tscn above everything else.
-func _sync_picker_scene() -> void:
-	picker_scene.visible = picker_open()
-	if not picker_open():
-		return
-	picker_scene.atlas = atlas
-	picker_scene.frames = frames
-	var title: String = "Aspect for slot " + SLOT_LETTERS[picker_slot - 1]
-	var title_color: Color = colors["1"]
-	var show_back: bool = true
-	if not picker_feedback.is_empty():
-		show_back = false
-		if bool(picker_feedback["ok"]):
-			title = "Equipped!"
-			title_color = colors["u"]
+	for index: int in range(list_scroll, mini(ids.size(), list_scroll + LIST_ROWS)):
+		var id: StringName = ids[index]
+		if list_kind == &"weapons":
+			var on: bool = id == _equipped()
+			var icon: Array = weapon_icon(id)
+			rows.append({"icon": icon[0], "crop": icon[1], "name": WEAPON_NAMES.get(id, ""), "selected": index == list_selection,
+				"sub": "EQUIPPED" if on else "%s  %d-HIT" % [WEAPON_TAGS.get(id, ""), int(weapon_data(id)["combo"])], "sub_color": TEAL if on else STONE, "badge": "E" if on else ""})
 		else:
-			title = "Not now  " + String(picker_feedback["reason"])
-			title_color = colors["q"]
+			var slot: int = aspect_slot_of(id)
+			var cd: int = Aspects.cooldown(id)
+			rows.append({"icon": Hud.aspect_icon(id), "name": Aspects.display_name(id), "selected": index == list_selection,
+				"sub": "%s EDGE" % num(Aspects.edge_cost(id)) + ("  CD %s S" % secs(cd) if cd > 0 else ""), "sub_color": LILAC, "badge": SLOT_LETTERS[slot - 1] if slot > 0 else ""})
+	var hint: String = "CHOOSE ONE TO EQUIP" if list_kind == &"weapons" else "CHOOSE AN ASPECT"
+	var hint_color: Color = STONE
+	if not feedback.is_empty():
+		hint = "EQUIPPED!" if bool(feedback["ok"]) else "NOT NOW  " + String(feedback["reason"])
+		hint_color = TEAL if bool(feedback["ok"]) else WARN
+	var note: String = ""
+	if list_kind == &"aspects" and progression != null:
+		var missing: int = Aspects.ALL.size() - ids.size()
+		if ids.is_empty():
+			note = "NO ASPECTS YET"
+		elif missing > 0:
+			note = "%d MORE TO FIND" % missing
+	var body: String = ""
+	if list_selection < ids.size() and all.has(ids[list_selection]):
+		var entry: Array = all[ids[list_selection]]
+		body = "%s %s" % [entry[2][0], entry[2][1]]
+	return {"mode": "list", "title": "WEAPONS" if list_kind == &"weapons" else "SOCKET  %s" % SLOT_LETTERS[list_slot - 1],
+		"sub": hint, "sub_color": hint_color, "rows": rows, "scroll": scroll_bar(), "note": note, "list_body": body}
+
+
+func _quests_data() -> Dictionary:
+	if progression == null:
+		return {"heading": "BOSS FIGHT", "rows": [{"text": "DEFEAT THE MOSSBOUND COLOSSUS.", "now": true}]}
 	var rows: Array = []
-	for index: int in range(Aspects.ALL.size()):
-		if not row_visible(index):
-			continue
-		var aspect: StringName = Aspects.ALL[index]
-		var slot: int = aspect_slot_of(aspect)
-		rows.append({"icon": Hud.aspect_icon(aspect), "name": Aspects.display_name(aspect), "cost": "%sE" % num(Aspects.edge_cost(aspect)), "owned": aspect_owned(aspect), "selected": index == picker_selection, "held": SLOT_LETTERS[slot - 1] if slot > 0 else ""})
-	var data: Dictionary = {"title": title, "title_color": title_color, "show_back": show_back, "rows": rows}
-	if picker_max_scroll() > 0:
-		var track: Rect2 = picker_bar_rect()
-		var thumb: Rect2 = picker_thumb_rect()
-		data["bar"] = {"thumb_y": thumb.position.y - track.position.y, "thumb_h": thumb.size.y, "up_on": picker_scroll > 0, "down_on": picker_scroll < picker_max_scroll()}
-	picker_scene.apply(data)
+	var now: String = String(progression.objective.get("id", ""))
+	for step: Dictionary in QuestBook.steps(book()):
+		var done: bool = progression.story_flags.has(StringName(String(step.get("done_flag", ""))))
+		if done or String(step.get("id", "")) == now:
+			rows.append({"text": String(step.get("objective", "")), "now": not done})
+	return {"heading": "CHAPTER 1   LANTERNFEN", "rows": rows}
 
 
-## The ITEMS tab's slots and detail card.
-func _sync_items_scene() -> void:
-	items_scene.atlas = atlas
-	items_scene.frames = frames
-	var equipped: StringName = _equipped()
-	var slots: Array = []
-	for index: int in range(GRID_COLS * GRID_ROWS):
-		var weapon: StringName = slot_weapon(index)
-		var aspect: StringName = grid_aspect(index)
-		if aspect != &"":
-			var held: int = aspect_slot_of(aspect)
-			slots.append({"kind": "aspect", "frame": Hud.aspect_icon(aspect), "owned": aspect_owned(aspect), "held": SLOT_LETTERS[held - 1] if held > 0 and aspect_owned(aspect) else ""})
-		elif weapon != &"":
-			var whole: bool = Hud.MEDALLIONS.has(weapon)
-			slots.append({"kind": "weapon", "frame": Hud.MEDALLIONS[weapon] if whole else "ui_weapon_totoy_blade_1", "crop": Rect2(8, 8, 32, 32) if whole else Rect2(), "equipped": weapon == equipped})
-		else:
-			slots.append({"kind": "empty"})
-	var weapon_sel: StringName = slot_weapon(inventory_selection)
-	var aspect_sel: StringName = grid_aspect(inventory_selection)
-	var card: Dictionary = {"kind": "empty"}
-	if aspect_sel != &"":
-		if not aspect_owned(aspect_sel):
-			card = {"kind": "locked"}
-		else:
-			var slot: int = aspect_slot_of(aspect_sel)
-			var cd: int = Aspects.cooldown(aspect_sel)
-			card = {"kind": "aspect", "aspect": Hud.aspect_icon(aspect_sel), "name": Aspects.display_name(aspect_sel),
-				"status": "Slot " + SLOT_LETTERS[slot - 1] if slot > 0 else "Not slotted", "status_color": colors["v"] if slot > 0 else colors["i"],
-				"line1": "%s Edge" % num(Aspects.edge_cost(aspect_sel)) + ("  CD %s s" % secs(cd) if cd > 0 else ""), "line2": "Slot on stats", "line_color": colors["o"]}
-	elif weapon_sel != &"":
-		var lines: Array = card_lines(weapon_sel)
-		var equipped_now: bool = weapon_sel == equipped
-		card = {"kind": "weapon", "katana": not Hud.MEDALLIONS.has(weapon_sel), "medallion": Hud.MEDALLIONS.get(weapon_sel, ""),
-			"name": WEAPON_NAMES[weapon_sel], "status": "Equipped" if equipped_now else "Not equipped",
-			"status_color": colors["v"] if equipped_now else colors["i"], "line1": lines[0], "line2": lines[1], "line_color": colors[lines[2]]}
-	items_scene.apply({"slots": slots, "card": card})
+func _quests_card() -> Dictionary:
+	if progression == null:
+		return {"mode": "info", "title": "BOSS FIGHT", "sub": "THE RUINS", "body_size": 7,
+			"body": "DEFEAT THE MOSSBOUND COLOSSUS. PARRY ITS GOLD ATTACKS AND DASH THROUGH THE RED ONES."}
+	var road_open: bool = QuestBook.road_open(book(), progression.story_flags)
+	if progression.objective.is_empty():
+		return {"mode": "info", "title": "ALL TASKS DONE", "sub": "LANTERNFEN", "body_size": 7,
+			"body": "YOUR VILLAGE TASKS ARE COMPLETE." + (" THE ROAD EAST IS OPEN." if road_open else "")}
+	var step: Dictionary = {}
+	for row: Dictionary in QuestBook.steps(book()):
+		if String(row.get("id", "")) == String(progression.objective.get("id", "")):
+			step = row
+	var reward: Dictionary = step.get("reward", {})
+	var parts: PackedStringArray = PackedStringArray()
+	if int(reward.get("exp", 0)) > 0:
+		parts.append("+%d EXP" % int(reward["exp"]))
+	for item: Dictionary in reward.get("items", []):
+		parts.append("%d %s" % [int(item.get("quantity", 1)), String(item.get("name", item.get("item", "")))])
+	return {"mode": "info", "title": "CURRENT TASK", "sub": "FOLLOW THE MARKER", "body": String(progression.objective.get("text", "")), "body_size": 7,
+		"reward": ["REWARD", "  ".join(parts)] if not parts.is_empty() else [], "foot": "" if road_open else QuestBook.blocked_text(book()), "foot_color": DIM}
 
 
-## The ASPECTS tab's numbers: the three sockets and the selected one's name and cost.
-func _sync_aspects_scene() -> void:
-	aspects_scene.atlas = atlas
-	aspects_scene.frames = frames
-	var sockets: Array = []
-	for i: int in 3:
-		var aspect: StringName = slot_aspect(i + 1)
-		var unlocked: bool = progression == null or (i < progression.aspect_slots.size() and bool(progression.aspect_slots[i].get("unlocked", false)))
-		sockets.append({"open": unlocked and aspect_owned(aspect), "icon": Hud.aspect_icon(aspect)})
-	var id: StringName = slot_aspect(maxi(0, ASPECT_KEYS.find(stats_selection)) + 1)
-	var owned: bool = aspect_owned(id)
-	aspects_scene.apply({"sockets": sockets, "name": Aspects.display_name(id) if owned else "Locked aspect",
-		"stats": "%s Edge   Cooldown %s s" % [num(Aspects.edge_cost(id)), secs(Aspects.cooldown(id))] if owned else "", "notice": stats_notice})
+## A refusal from the last ENTER replaces the card's short line for a moment.
+func _with_notice(card: Dictionary) -> Dictionary:
+	if not notice.is_empty():
+		card["sub"] = notice
+		card["sub_color"] = WARN
+	return card
 
 
-## Hands the open tab and the STATUS numbers to the scenes drawn behind this menu.
+## The keys that work right now, for the footer: [[key, what it does], ...].
+func footer() -> Array:
+	var keys: Array = []
+	if list_open():
+		keys = [["UP / DOWN", "SCROLL"], ["ENTER", "EQUIP" if list_kind == &"weapons" else "SET IN %s" % SLOT_LETTERS[list_slot - 1]], ["ESC", "BACK"]]
+	else:
+		if tab == TAB_HERO and progression != null:
+			keys = [["ARROWS", "CHOOSE"], ["ENTER", "RESPEC" if hero_selection == &"respec" else "ADD A POINT"]]
+		elif tab == TAB_GEAR:
+			keys = [["ARROWS", "CHOOSE"]]
+			if gear_selection == &"weapon":
+				keys.append(["ENTER", "CHANGE WEAPON"])
+			elif gear_selection in ASPECT_KEYS:
+				keys.append(["ENTER", "CHANGE ASPECT"])
+		keys.append(["Q / E", "SWITCH"])
+	keys.append(["TAB", "CLOSE"])
+	return keys
+
+
 func _sync_scenes() -> void:
 	if shell == null:
 		return
-	shell.apply(tab, TAB_NAMES)
-	items_scene.visible = tab == TAB_INVENTORY
-	_sync_picker_scene()
-	arena_status_scene.visible = tab == TAB_STATS and progression == null
-	if arena_status_scene.visible:
-		_sync_arena_status_scene()
-	var describing: bool = tab == TAB_INVENTORY or (tab == TAB_STATS and progression == null)
-	description_scene.visible = describing
-	if describing:
-		var all: Dictionary = descriptions(_equipped(), equipped_aspects())
-		description_scene.apply(all.get(description_key(), all[&"none"]))
-	if tab == TAB_INVENTORY:
-		_sync_items_scene()
-	aspects_scene.visible = tab == TAB_ASPECTS
+	shell.apply(tab, TAB_NAMES, footer())
+	for scene: Control in [hero_scene, gear_scene, quests_scene, card_scene]:
+		scene.set("atlas", atlas)
+		scene.set("frames", frames)
+	hero_scene.visible = tab == TAB_HERO
+	gear_scene.visible = tab == TAB_GEAR
 	quests_scene.visible = tab == TAB_QUESTS
-	if tab == TAB_ASPECTS:
-		_sync_aspects_scene()
-	elif tab == TAB_QUESTS:
-		var objective: String = String(progression.objective.get("text", "Your village tasks are complete.")) if progression != null else "Defeat the Mossbound Colossus."
-		quests_scene.apply({"objective": objective, "hint": "Follow the objective marker on the road."})
-	var show_status: bool = tab == TAB_STATS and progression != null
-	status_scene.visible = show_status
-	if not show_status:
-		return
-	status_scene.atlas = atlas
-	status_scene.frames = frames
-	var rows: Array = []
-	for i: int in 3:
-		var stat: String = ["vitality", "might", "agility"][i]
-		var value: int = int(progression.stats.get(stat, 0))
-		var cap: int = int(progression.stat_caps.get(stat, 0))
-		rows.append({"value": value, "cap": cap, "enabled": progression.stat_points_unspent > 0 and value < cap})
-	var sockets: Array = []
-	for i: int in 3:
-		var slot: Dictionary = progression.aspect_slots[i] if i < progression.aspect_slots.size() else {}
-		var aspect: StringName = StringName(slot.get("aspect", &""))
-		sockets.append({"open": bool(slot.get("unlocked", false)) and aspect_owned(aspect), "icon": Hud.aspect_icon(aspect)})
-	var notice: String = stats_notice
-	if notice.is_empty() and String(progression.objective.get("id", "")) == "edda_equip":
-		notice = "Select first socket to bind Sprint"
-	status_scene.apply({"unspent": progression.stat_points_unspent, "level": progression.level, "hp": progression.hero.max_hp, "rows": rows, "sockets": sockets, "village": progression.scene_id == &"village_layered", "notice": notice})
-
-
-## The weapon's socket art: the katana's kit medallion around its blade glyph (48x52), or the dagger's / scythe's whole
-## 48 px medallion.
-func _draw_medallion(weapon: StringName, at: Vector2) -> void:
-	if Hud.MEDALLIONS.has(weapon):
-		_ui(Hud.MEDALLIONS[weapon], Rect2(at, Vector2(48, 48)))
+	var card: Dictionary = {}
+	if tab == TAB_HERO:
+		hero_scene.apply(_hero_data())
+		card = _hero_card()
+	elif tab == TAB_GEAR:
+		gear_scene.apply(_gear_data())
+		card = _gear_card()
 	else:
-		Kit.medallion(self, at - Vector2(0, 2))
-		_ui("ui_weapon_totoy_blade_1", Rect2(Kit.medallion_centre(at - Vector2(0, 2)) - Vector2(16, 16), Vector2(32, 32)))
+		quests_scene.apply(_quests_data())
+		card = _quests_card()
+	card_scene.apply(card)
 
 
-## Teal corner brackets round `rect` (the selection mark; the kit frames carry no highlight of their own).
-func _brackets(rect: Rect2) -> void:
-	for corner: Array in [[rect.position.x - 2, rect.position.y - 2, 1, 1], [rect.end.x + 1, rect.position.y - 2, -1, 1], [rect.position.x - 2, rect.end.y + 1, 1, -1], [rect.end.x + 1, rect.end.y + 1, -1, -1]]:
-		var bx: float = corner[0]
-		var by: float = corner[1]
-		draw_rect(Rect2(minf(bx, bx + 3 * corner[2]), by, 4, 1), colors["u"])
-		draw_rect(Rect2(bx, minf(by, by + 3 * corner[3]), 1, 4), colors["u"])
-
-
-func _equipped_badge(rect: Rect2) -> void:
-	Kit.badge(self, rect)
-	_text(Vector2(rect.position.x + rect.size.x * 0.5, rect.position.y + 1), "E", colors["1"], null, 7, HORIZONTAL_ALIGNMENT_CENTER)
-
-
-func highlighted_key() -> StringName:
-	return hover_key if hover_key != &"" else stats_selection
-
-
-func _draw_stats() -> void:
-	var equipped: StringName = _equipped()
-	var lit: StringName = highlighted_key()
-	# the frame, medallion, sockets and stat list are the scene menu_arena_status.tscn; here only Totoy himself (a clipped
-	# sprite) and his shadow, then the selection marks and the picker
-	var feet: Vector2 = Vector2(FIGURE.get_center().x, FIGURE.end.y - 11)
-	_ellipse(feet, Vector2(13, 3), colors["0"])
-	_draw_figure(figure_frame(equipped), feet)
-	if lit == &"weapon":
-		_brackets(WEAPON_SLOT)
-	for i: int in range(3):
-		if lit == ASPECT_KEYS[i] or picker_slot == i + 1:
-			_brackets(aspect_rect(i))
-	if picker_open():
-		_draw_picker()
-
-
-## The aspect picker over the stat list: a title (or the request's feedback), then one row per aspect: icon, name,
-## Edge cost, and for a slotted one its key badge and a tick.
-func _draw_picker() -> void:
-	pass  # the scene menu_picker.tscn draws it
-
-
-## The picker's scroll bar: a dark track along the rows, a thumb sized to the window, and a small arrow at each end
-## while more rows lie that way.
-static func picker_bar_rect() -> Rect2:
-	return Rect2(PICKER.end.x - 10 - PICKER_BAR_W, PICKER_ROW_TOP + 4, PICKER_BAR_W, PICKER_VISIBLE_ROWS * PICKER_ROW_STEP - 9)
-
-
-func picker_thumb_rect() -> Rect2:
-	var track: Rect2 = picker_bar_rect()
-	var total: int = Aspects.ALL.size()
-	var height: float = maxf(4.0, floorf(track.size.y * PICKER_VISIBLE_ROWS / total))
-	var top: float = track.position.y + roundf((track.size.y - height) * picker_scroll / maxi(1, picker_max_scroll()))
-	return Rect2(track.position.x, top, track.size.x, height)
-
-
-## A 7x5 pixel check mark (top-left `at`).
-func _tick(at: Vector2, color: Color) -> void:
-	for p: Vector2i in [Vector2i(0, 2), Vector2i(1, 3), Vector2i(2, 4), Vector2i(3, 3), Vector2i(4, 2), Vector2i(5, 1), Vector2i(6, 0), Vector2i(1, 2), Vector2i(2, 3), Vector2i(3, 2), Vector2i(4, 1), Vector2i(5, 0)]:
-		draw_rect(Rect2(at + Vector2(p), Vector2.ONE), color)
-
-
-## The equipped weapon's idle frame (the arena's own frame sets).
-static func figure_frame(weapon: StringName) -> String:
-	var prefix: String = ArenaAnimation.SET_KATANA
-	match weapon:
-		Tuning.WEAPON_DUAL_DAGGER: prefix = ArenaAnimation.SET_DAGGER
-		Tuning.WEAPON_CHAIN_SCYTHE: prefix = ArenaAnimation.SET_SCYTHE
-		Tuning.WEAPON_STAR_STAFF: prefix = ArenaAnimation.SET_STAFF
-	return ArenaAnimation.hero_frame(prefix, "idle", 1)
-
-
-## Draws `key` at 2x with its visible pixels centred on `feet.x` and its anchor's feet on `feet.y`.
-func _draw_figure(key: String, feet: Vector2) -> void:
-	if atlas == null or not frames.has(key):
-		key = "hero2_idle_right_1"
-		if not frames.has(key):
-			return
-	var f: Dictionary = frames[key]
-	var used: Rect2i = _used_rect(key)
-	var centre_offset: float = (used.position.x + used.size.x * 0.5) - float(f.get("ax", f["w"] / 2))
-	var left: float = roundf(feet.x - centre_offset * 2.0) - float(f.get("ax", 0)) * 2.0
-	var top: float = feet.y - float(f.get("ay", f["h"])) * 2.0
-	# clipped to the inside of the figure box in whole source pixels (the scythe's chain is wider than the box)
-	var clip: Rect2 = FIGURE.grow(-1)
-	var x0: int = maxi(0, ceili((clip.position.x - left) / 2.0))
-	var y0: int = maxi(0, ceili((clip.position.y - top) / 2.0))
-	var x1: int = mini(int(f["w"]), floori((clip.end.x - left) / 2.0))
-	var y1: int = mini(int(f["h"]), floori((clip.end.y - top) / 2.0))
-	if x1 <= x0 or y1 <= y0:
+func _draw() -> void:
+	if not is_open or snapshot == null:
 		return
-	draw_texture_rect_region(atlas, Rect2(left + x0 * 2, top + y0 * 2, (x1 - x0) * 2, (y1 - y0) * 2), Rect2(float(f["x"]) + x0, float(f["y"]) + y0, x1 - x0, y1 - y0))
+	_sync_scenes()
+	for item: Dictionary in items():
+		if item["key"] == selection():
+			_corners(item["rect"])
+	if list_open() and row_visible(list_selection):
+		_corners(list_row_rect(list_selection - list_scroll))
 
 
-func _used_rect(key: String) -> Rect2i:
-	if not _used_rects.has(key):
-		var f: Dictionary = frames[key]
-		if _atlas_image == null:
-			_atlas_image = atlas.get_image()
-		var region: Image = _atlas_image.get_region(Rect2i(int(f["x"]), int(f["y"]), int(f["w"]), int(f["h"])))
-		var used: Rect2i = region.get_used_rect()
-		_used_rects[key] = used if used.size != Vector2i.ZERO else Rect2i(0, 0, int(f["w"]), int(f["h"]))
-	return _used_rects[key]
-
-
-func _draw_inventory() -> void:
-	# everything but the selection mark is the scene menu_items.tscn
-	_brackets(inventory_rect(inventory_selection))
-
-
-## The two lines under the card's divider and their colour symbol: the equip feedback, else how to equip.
-func card_lines(weapon: StringName) -> Array:
-	if not feedback.is_empty() and int(feedback["slot"]) == inventory_selection:
-		if bool(feedback["ok"]):
-			return ["EQUIPPED!", "READY TO FIGHT", "u"]
-		return ["NOT NOW", String(feedback["reason"]), "q"]
-	if weapon == _equipped():
-		return ["IN YOUR HANDS", "", "o"]
-	return ["ENTER / CLICK", "TO EQUIP", "o"]
-
-
-## Inventory icon: the katana's 32 px blade glyph; the dagger and scythe show the centre 32x32 of their medallion.
-func _draw_item_icon(weapon: StringName, at: Vector2) -> void:
-	if Hud.MEDALLIONS.has(weapon):
-		_ui(Hud.MEDALLIONS[weapon], Rect2(at, Vector2(32, 32)), Vector2(8, 8), Vector2(32, 32))
-	else:
-		_ui("ui_weapon_totoy_blade_1", Rect2(at, Vector2(32, 32)))
-
-
-func _draw_description(_key: StringName) -> void:
-	pass  # the scene menu_description.tscn draws it
-
-
-func aspect_owned(aspect: StringName) -> bool:
-	return progression==null or progression.owned_aspects.has(aspect)
-
-
-static func aspects_tab_rect(index: int) -> Rect2:
-	return Rect2(30 + index * 48, 55, 37, 40)
-
-
-func _draw_aspects_tab() -> void:
-	# everything but the selection mark and the picker is the scene menu_aspects.tscn
-	for i: int in 3:
-		if stats_selection == ASPECT_KEYS[i]:
-			_brackets(aspects_tab_rect(i))
-	if picker_open():
-		_draw_picker()
-
-
-func _draw_quests_tab() -> void:
-	pass  # the scene menu_quests.tscn draws it
-
-
-static func progression_aspect_rect(i: int) -> Rect2:return Rect2(28+i*46,150,37,40)
-static func progression_row_rect(i: int) -> Rect2:return Rect2(20,56+i*30,298,28)
-static func progression_plus_rect(i: int) -> Rect2:return Rect2(292,61+i*30,18,18)
-static func respec_rect() -> Rect2:return Rect2(246,152,116,20)
-func progression_items() -> Array[Dictionary]:
-	var items: Array[Dictionary]=[]
-	for i: int in 3:items.append({"key":StringName("stat_"+["vitality","might","agility"][i]),"rect":progression_plus_rect(i)})
-	items.append({"key":&"respec","rect":respec_rect()})
-	for i: int in 3:items.append({"key":ASPECT_KEYS[i],"rect":progression_aspect_rect(i)})
-	return items
-func _draw_progression_stats() -> void:
-	# everything but the selection marks and the picker is the scene menu_status.tscn
-	for i: int in 3:
-		if stats_selection == StringName("stat_" + ["vitality", "might", "agility"][i]):
-			_brackets(progression_row_rect(i))
-		if stats_selection == ASPECT_KEYS[i]:
-			_brackets(progression_aspect_rect(i))
-	if stats_selection == &"respec":
-		_brackets(respec_rect())
-	if picker_open():_draw_picker()
-
-
-func _enter_tree() -> void:
-	add_to_group(&"mouse_cursor_menus")
+## The selection mark: teal corners on `rect`'s edges (the kit frames carry no highlight of their own).
+func _corners(rect: Rect2) -> void:
+	for corner: Vector2 in [rect.position, Vector2(rect.end.x - 4, rect.position.y), Vector2(rect.position.x, rect.end.y - 1), Vector2(rect.end.x - 4, rect.end.y - 1)]:
+		draw_rect(Rect2(corner, Vector2(4, 1)), TEAL)
+	for corner: Vector2 in [rect.position, Vector2(rect.end.x - 1, rect.position.y), Vector2(rect.position.x, rect.end.y - 4), Vector2(rect.end.x - 1, rect.end.y - 4)]:
+		draw_rect(Rect2(corner, Vector2(1, 4)), TEAL)

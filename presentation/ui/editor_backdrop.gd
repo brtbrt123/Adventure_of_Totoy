@@ -1,12 +1,12 @@
 @tool
 extends RefCounted
-## Editor-only helper: when you open a TAB-menu piece (the Status tab, the Items tab, the description box...) on its own in
+## Editor-only helper: when you open a TAB-menu piece (the HERO, GEAR or QUESTS tab, the detail card) on its own in
 ## Godot, this puts the menu's frame (menu_shell.tscn: veil, big panel, tabs) behind it so it looks like it does in the game.
 ## The frame is an internal child: it is shown in the editor but never saved into the scene you are editing, and it does nothing
 ## in the running game. To change the frame itself, open presentation/ui/menu_shell.tscn.
 
 const Shell := preload("res://presentation/ui/menu_shell.tscn")
-const TAB_NAMES: Array = ["STATUS", "ASPECTS", "ITEMS", "QUESTS"]
+const TAB_NAMES: Array = ["HERO", "GEAR", "QUESTS"]
 
 
 static func add(piece: Node, tab: int) -> void:
