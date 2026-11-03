@@ -9,21 +9,24 @@
 > - A real-input playthrough of the game's start: `presentation/review/playthrough/capture_start.gd`. The title, intro, village arrival and Mira all ran with no console errors.
 > - Details are in the newest sections of [[STATUS]].
 >
-> **NOT committed: village work in progress that the owner did not like the look of.** The owner asked, looking at the rune gate: "move the gate more on upper left", "it doesn't have any wall and fences add it", "the glowing stone is not glowing", "remove the knock on the hut". What is in the working tree:
-> - **Gate.** Moved from (48,128) to (42,108) up the painted path, so its arch is now cut off at the top of the arrival view. The arrival entry and its checkpoint moved to (68,126). File: `data/scenes/village_layered_props.json`.
-> - **Walls and fences, drawn in code.** These are probably what the owner disliked: plain grey blocks next to the painted props.
->   - Two `village_wall` beside the gate and three `village_fence_side` down the west edge.
->   - New types in `data/props/prop_defs.json`, contact shadows in `presentation/common/prop_art.json`, cast shadows in `art/reference/shadow_layers/manifest.json`.
->   - Art in `art/src/village_wall*.txt`, `village_fence*.txt` and `fx_shadow_village_wall*/fence*`, made by `tools/art/make_village_walls.py`.
->   - Scenes `presentation/props/village_wall.tscn`, `village_fence.tscn` and `village_fence_side.tscn`.
-> - **Glowing stone.** A teal light socket for `village_standing_stone` in `presentation/common/local_lights.json`, and its `Light1` marker in `presentation/props/village_standing_stone.tscn`. In game it glowed correctly.
-> - **Knock.** The `edda_door` object (the [E] KNOCK on Edda's cottage) is removed from the village data.
-> - **Tests** adjusted: `tests/core/test_village_layered.gd`, `tests/core/test_explore_core.gd`, `tests/test_village_extraction.py`. At the last run, core 577 and Python 94 passed. The full smoke run was stopped by the owner.
-> - **Art build.** `art/build/*` was rebuilt with these sprites, and the contact sheets may be stale.
+> **Village request, REVERTED (2026-11-03).** Nothing of it is left in the repo or the working tree. The owner asked, looking at the rune gate in the village (screenshot: the gate at the top left of the arrival view, with the objective banner above it):
+> - move the gate more to the upper left;
+> - add walls and fences (the gate has none);
+> - make the glowing standing stone glow;
+> - remove the knock ([E] KNOCK on Edda's cottage door; it has no purpose).
 >
-> **First step:** ask the owner which of the four village changes to keep. The stone light and the knock removal match what was asked. If the walls and fences are redone, they need art that matches the painted village (`art/reference/layered_village/`), not code-drawn blocks. The gate may need to come back down so its arch shows.
+> A first attempt was made and the owner rejected how it looked ("your work is not good"), so everything was reverted:
+> - **Gate** moved up-left: its arch got cut off at the top of the arrival view.
+> - **Walls and fences** drawn in code: plain grey blocks that clashed with the painted props. Code-drawn props must not be used for this.
+> - **Stone light:** a teal light socket for `village_standing_stone` (`presentation/common/local_lights.json`, the `Light1` marker in its prop scene). It did glow in game.
+> - **Knock:** the `edda_door` object removed from `data/scenes/village_layered_props.json`, plus the two tests that count objects (`tests/core/test_explore_core.gd` expects 2, `tests/core/test_village_layered.gd`).
 >
-> To drop all of it: run `git checkout HEAD --` on the tracked files listed above and delete the new untracked ones (`art/src/village_wall*`, `art/src/village_fence*`, `art/src/fx_shadow_village_wall*`, `art/src/fx_shadow_village_fence*`, `presentation/props/village_wall*.tscn`, `presentation/props/village_fence*.tscn`, `tools/art/make_village_walls.py`). Then rebuild the art (validate, build, preview).
+> Redo it from scratch: all four requests are still open. Show the owner a picture first ([[feedback-show-before-visual-changes]]). Walls and fences need art in the painted village's style (`art/reference/layered_village/`), made through the import pipeline or image generation with the village props as references. The first and last requests are plain data edits.
+>
+> **Also reported by the owner (2026-11-03), not investigated yet** (screenshots in the chat, not in the repo):
+> - A segmented dark post standing in the forest at the village's west edge. It was probably the rejected fence, now gone, so check it is.
+> - "DASH LOCKED" with a boot icon is the tutorial lock text (expected). Two dark rings next to the lamp post are unexplained: a prop, a debug overlay (the window title says DEBUG) or a UI piece.
+> - The Z, X, C aspect sockets in the HUD look wrong. `presentation/ui/pieces/hud/aspect_socket.tscn` has the owner's own uncommitted edits (cost label moved, font 7 to 5), so ask what is wrong before touching it.
 >
 > **Working rules this owner holds:**
 > - The owner points out visual problems; Claude chases functional bugs (console errors, broken flow).
