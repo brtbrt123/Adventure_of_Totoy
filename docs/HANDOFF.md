@@ -2,6 +2,8 @@
 
 > **START HERE for the next session (Claude, 2026-11-02).** The owner stopped the last session: "I don't like what it looks, your work is not good". The session was too long, so this is a fresh start.
 >
+> **Read [[EFFECTS_REDO]] (every effects layer, its file, the generators, the image-generator accounts) and [[INDEX]] first.**
+>
 > **Committed and pushed** on `agent/codex/progression` (last commit `d5d4cdcf`; never merge to `main`):
 > - The effects redo in the Star Staff's style, in four phases: hero hits, parries and the basic slash on the hit area; the weapon forms; the aspects; the mobs (not the golem). The owner has not played them.
 > - A mobile layout blueprint: `docs/MOBILE_BLUEPRINT.md`.
