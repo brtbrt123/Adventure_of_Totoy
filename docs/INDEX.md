@@ -19,6 +19,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[WEAPON_PATHS]]: the blades' basic slash, drawn from the swing's hit area (reach and arc) and turned with the hero
 - [[MOBILE_BLUEPRINT]]: proposal for a phone version (touch layout, HUD moved up, screen sizes, open questions)
 - [[EFFECTS_REDO]]: the staff-style effects redo: every layer and its file, the generators, the captures, the image-generator accounts
+- Project skills (`.claude/skills/`): totoy-art-pipeline, totoy-review-capture, totoy-session-close: the exact steps for art, captures and closing a session
 
 ## Work in progress
 - [[CLAUDE_TASK_village_playtest_polish]]: roomier training yard, Tovan first sword/unarmed state and reward event; Codex presentation ready

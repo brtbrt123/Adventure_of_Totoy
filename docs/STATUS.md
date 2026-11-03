@@ -1,3 +1,11 @@
+## Project skills for sessions (2026-11-03, Claude)
+
+Owner: "install the game dev skill ... pick the skill that will be compatible and useful"; no catalog skill was found, and the web ones (godot-gdscript-patterns and others) were not read or installed. Instead three project skills were written in `.claude/skills/`, so every session in this repo has them:
+- `totoy-art-pipeline`: validate, build, preview, Godot import, the file-lock and stale-texture gotchas, the prop checklist, the "show a picture first" rule, the image-generator accounts.
+- `totoy-review-capture`: windowed captures, real-input playthrough, GIFs, finding which layer draws a visual bug.
+- `totoy-session-close`: what to write into STATUS, INDEX, HANDOFF, commit only own hunks, push, no force, no trailers.
+RTK (rtk-ai/rtk) was judged but not installed: a filter between the agent and the shell could hide an error line. Not done: reading and deciding on a Godot patterns skill.
+
 ## Debugging from the first scene: the white haze at the top (2026-11-02, Claude, done while Codex is out)
 
 Owner: "lets start debugging starting to the first scene", then "whats this like the white" (a haze beside the objective bar).
