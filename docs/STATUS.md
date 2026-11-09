@@ -1,3 +1,60 @@
+## Rootcrown playtest: look and size rejected (2026-11-09, Claude)
+
+Owner, after playing it with key Y: "i dont like the looks since it doesnt match our other scene and the stage is too small", then
+asked for the notes to be written so the work can move to a new session. So step 2 of [[FINAL_SCENE_chapter1]] is open again: the
+map needs a bigger stage and art that matches the other forest scenes. Mistakes: the floor and props were cut from a new Higgsfield
+painting instead of being built from the existing scenes' art, and the open floor (264x120 inside a 456x192 plateau) is smaller than
+the plan's own "about 300x180", far smaller than the old arena (800x480, 744x424 walkable) and barely a screen (the view is 384x216);
+it was never checked against what a 3x Colossus needs. The in-game captures were not taken (the owner played it first). What stays
+usable: the scene's registration and wiring, debug key Y, the glade entry `rootcrown_side`, the beacon state pair on `cleared_rootcrown`,
+the tower's light sockets, the tests (their numbers change with the new layout) and `tools/art/make_rootcrown_art.py` (new inputs).
+The redo proposal for the next session is in [[FINAL_SCENE_chapter1]] ("Redo after the playtest"); pictures first. Full harness
+passed before the playtest (Python, import, core, 53 smokes). The Rootcrown work, first build included, is committed (owner: "Yes, commit"), with the art contact sheets regenerated (`preview_art.py`; it deletes the pages' `.import` files, restored from HEAD) and a clean Godot import.
+
+## Rootcrown built as a scene (2026-11-09, Claude)
+
+Owner: "Approve, build it" (the map pieces). The chapter's final map is in the game as `rootcrown_layered` (ROOTCROWN, 640x360),
+reached only by debug key **Y** for now: the glade's root arch still leads to the old arena until the redesigned Colossus lives here,
+so the story never reaches a map without its fight. `tools/art/make_rootcrown_art.py` converts the approved floor and props sheet
+(floor `presentation/forest/rootcrown_layered_ground.png`; 14 props `art/src/rootcrown_*.txt` in `data/props/prop_defs_rootcrown.json`,
+prop scenes `presentation/props/rootcrown_*.tscn`; the tower's dark and lit states share one canvas). Scene data
+`data/scenes/rootcrown_layered_props.json` and its editable map `presentation/maps/rootcrown_layered.tscn` (round trip identical):
+clockwise outline (plateau oval plus stair corridor), entry `glade_side` at the top of the stair, checkpoint `rootcrown_layered_stair`
+on the landing, the stair's bottom edge exits to the glade's new entry `rootcrown_side` (516,36) under the arch, a 264x120 open fight
+floor, the beacon prop dark until the story flag `cleared_rootcrown`, then lit (same place and body). Registered in `core/scene_defs.gd`
+and `core/prop_scene.gd` (and the prop-scene generator, baker and Python test lists); night light at the Root Hollow strength with
+per-light colours, light sockets for the tower (faint blue dark, big blue-white lit), fireflies, a look copied from Root Hollow, forest
+ambience. 14 existing prop scenes got their light sockets regenerated (stale since the lighting commit). Tests: `tests/core/test_rootcrown.gd`
+(5), the route and layered-progress tests extended; the full harness passed (Python tests, Godot import, core tests, 53 smokes). Capture script `presentation/review/rootcrown_v1/capture_rootcrown.gd`. Details:
+[[FINAL_SCENE_chapter1]] ("The map as built"). Committed with the playtest notes.
+
+## Rootcrown map pieces (2026-11-09, Claude, for the owner's approval)
+
+Owner approved both concepts ("Approve both"). Made from the approved Rootcrown concept with Higgsfield (8 credits so far, 19.5 left):
+`art/reference/rootcrown_v1/ground_raw.png` (the concept with every tall object removed: the plateau, the cliff edge, the stair, the
+tower's flagstone platform) and `props_raw.png` (the tower dark and lit, 3 standing stones, 2 stone lanterns, 2 rubble piles, 3 root
+clusters, 2 briar clumps on magenta). Review composite: `map_preview_2x.png` (floor at 640x360 in the palette, props cut with
+`tools/art/extract_props.py` at 0.3 scale after a 1.35x brightness lift so the dark bricks survive the palette, Totoy for scale; no
+night lighting). Draft layout `docs/previews/rootcrown_v1/layout.json` (its outline polygon still needs redoing). Not in the game.
+
+## Final scene concept pictures (2026-11-04, Claude, for the owner's approval)
+
+Owner: "Yes, generate them" (build step 1 of [[FINAL_SCENE_chapter1]]). Two pictures with Higgsfield nano_banana_2_1 (3 credits,
+24.5 left), references from the game's own art: `art/reference/rootcrown_v1/colossus_concept_1.png` (the redesigned Colossus: the old
+golem's square stone face and mossy head kept, a cracked chest with the blue song, blue cracks, root legs, boulder fists, Totoy at
+about a third of its height) and `rootcrown_concept_1.png` (the hilltop: a ruined beacon tower crowned by roots, blue light in its
+cracks, the stair between two stone lanterns, standing stones, roots and briars round an open floor). Provenance:
+`art/reference/rootcrown_v1/sources.json`. Not imported; waiting on the owner's yes before the map and the pose sheets.
+
+## Final scene plan v2: the owner's decisions (2026-11-03, Claude, plan only)
+
+Owner: "lets go with the mossbound collosal we will just improve the design make it bigger, improve the effects, add more attacks
+we will also make the new scene or map taht match our story", "the guardian is destryoed", the old arena "keep it for now", the
+scene name and the second memory left to Claude. [[FINAL_SCENE_chapter1]] v2: the Colossus at about 3x (144 px frames, a 46 px
+body), 3 phases, 11 attacks (the 6 kept plus Root Snare, Boulder Toss, Heartroot Grab, Briar Ring, Song Flare), fighting in the road
+engine; the new map ROOTCROWN (the beacon hill whose roots crown the beacon); the death beat and a Stone Ward fragment; a proposed
+second memory; a build order that starts with concept pictures; two picture prompts. Nothing built; not committed.
+
 ## Story drafts: the road to the Stag Glade and the final scene (2026-11-03, Claude, proposals only)
 
 Owner: "why the story is only to the village then on other scene its all fighting", "write a proposal upto stag glade", then

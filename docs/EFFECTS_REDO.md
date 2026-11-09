@@ -30,7 +30,7 @@ Run validate, build and preview after changing art, then `godot --headless --imp
 `presentation/review/hero_fx/capture_*.gd` play the real game and save frames; `tools/art/hero_fx_capture_gif.py` makes the GIFs in `art/reference/{hero_fx,form_fx,aspect_fx,mob_fx}_v1/ingame/`. `tools/art/attack_range_sheet.py` draws every swing's hit area.
 
 ## Image generators (accounts, as last seen)
-- **Higgsfield** (MCP `mcp__88e42e...`): model `nano_banana_2_1`, 1.5 credits per image, about 30 credits left on 2026-11-02. Used for the Star Staff's run frames (`art/reference/staff_v1/sources.json`).
+- **Higgsfield** (MCP `mcp__88e42e...`): model `nano_banana_2_1`, 1.5 credits per image, about 30 credits left on 2026-11-02, 19.5 left on 2026-11-09. Used for the Star Staff's run frames (`art/reference/staff_v1/sources.json`), the village wall and fence (`art/reference/village_wall_fence_v1/`) and the Rootcrown concepts, floor and props (`art/reference/rootcrown_v1/sources.json`). Upload a reference with `media_upload`, then PUT the file with curl (Python's urllib gets 403), then `media_confirm`; one generation at a time (a second one at once gets 429).
 - **SpriteCook** (plugin `spritecook`): free tier, 1 credit left on 2026-11-03. Not enough for a generation.
 - Uploading a reference image sends it off the machine: ask the owner first.
 

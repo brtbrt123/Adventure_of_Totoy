@@ -1,0 +1,22 @@
+{
+ "what": "Concept pictures for the chapter 1 final scene (docs/FINAL_SCENE_chapter1.md, build step 1): the redesigned Mossbound Colossus and the Rootcrown hilltop. For the owner's approval; not imported into the game.",
+ "date": "2026-11-04",
+ "generator": "Higgsfield MCP, model nano_banana_2_1 (Google), 1k, 16:9",
+ "credits": "4 images, 8 credits in all (27.5 -> 24.5 for the two concepts, 24.5 -> 19.5 for the floor and props sheets)",
+ "references": {
+  "colossus": "a sheet of the game's own sprites at 5x/3x: the current Colossus (idle, slam windup, sweep strike, posture broken), the katana hero, the Thornback Stag",
+  "rootcrown": "presentation/forest/glade_layered_ground.png and presentation/forest/root_hollow_layered_ground.png (style)"
+ },
+ "jobs": {
+  "colossus_concept_1": "b2257e40-97b7-4d1b-bce3-a7d05c47171b",
+  "rootcrown_concept_1": "80de11fb-fa75-4d40-a06b-6910ca1a26fa",
+  "ground_raw": "4103999d-7543-4176-b0ed-651c93d5d8ab",
+  "props_raw": "7bc9f963-5ade-4600-b5ab-5be73bde4df9"
+ },
+ "prompts": "the two prompts are in docs/FINAL_SCENE_chapter1.md (Picture prompts), extended with the identity of the current golem and the layout of the hilltop",
+ "derived": {
+  "ground_raw.png": "an edit of rootcrown_concept_1 (job 80de11fb) with every tall object removed: the floor painting",
+  "props_raw.png": "the tower (dark, lit), 3 standing stones, 2 stone lanterns, 2 rubble piles, 3 root clusters, 2 briar clumps on magenta, from the same concept",
+  "map_preview_2x.png": "review only: the floor converted to the palette at 640x360 and the props cut (extract_props, a 1.35x brightness lift so the dark bricks keep detail) placed at game scale, Totoy on the stair for scale; no night lighting"
+ }
+}

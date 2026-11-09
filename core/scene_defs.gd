@@ -17,8 +17,13 @@ extends RefCounted
 ##   root_hollow_layered north shortcut (once the hollow is cleared) -> hollow_trial_layered "south"
 ##   hollow_trial_layered bottom exit (shut while a trial wave lives) -> root_hollow_layered "shortcut"   (a dead end: the trial room)
 ##   glade_layered     bottom-left entrance               -> root_hollow_layered "glade_side"
-##   glade_layered     root arch                          -> arena            "start"      (the Colossus fight)
+##   glade_layered     root arch                          -> arena            "start"      (the Colossus fight, for now)
+##   rootcrown_layered bottom of the stair                -> glade_layered    "rootcrown_side"
 ##   arena             no exits (the fight's victory screen returns to the title)
+##
+## Rootcrown (2026-11-09, docs/FINAL_SCENE_chapter1.md) is the chapter's new final map, the beacon hill where the Colossus will be
+## fought. Until the boss lives there the glade's arch still leads to the arena, so the story keeps its fight; Rootcrown is reached
+## by the debug jump only.
 ##
 ## The forest's root gate is solid until the lantern puzzle opens it; `gate_open` (a scene state flag, saved in
 ## SaveProfile.gate_open, toggled by the debug key F6 or G) builds the forest with the gate open.
@@ -38,9 +43,10 @@ const FOREST_LAYERED: StringName = &"forest_layered"
 const WOODLAND_LAYERED: StringName = &"woodland_layered"
 const ROOT_HOLLOW_LAYERED: StringName = &"root_hollow_layered"
 const HOLLOW_TRIAL_LAYERED: StringName = &"hollow_trial_layered"
-const LAYERED: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, HOLLOW_TRIAL_LAYERED, GLADE_LAYERED]
+const ROOTCROWN_LAYERED: StringName = &"rootcrown_layered"
+const LAYERED: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, HOLLOW_TRIAL_LAYERED, GLADE_LAYERED, ROOTCROWN_LAYERED]
 ## Every scene the game knows, in route order (the layered chapter, then the arena).
-const ALL: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, HOLLOW_TRIAL_LAYERED, GLADE_LAYERED, ARENA]
+const ALL: Array[StringName] = [VILLAGE_LAYERED, WOODLAND_LAYERED, FOREST_LAYERED, ROOT_HOLLOW_LAYERED, HOLLOW_TRIAL_LAYERED, GLADE_LAYERED, ROOTCROWN_LAYERED, ARENA]
 const LAYERED_PATHS: Dictionary = {
 	GLADE_LAYERED: "res://data/scenes/glade_layered_props.json",
 	VILLAGE_LAYERED: "res://data/scenes/village_layered_props.json",
@@ -48,6 +54,7 @@ const LAYERED_PATHS: Dictionary = {
 	WOODLAND_LAYERED: "res://data/scenes/woodland_layered_props.json",
 	ROOT_HOLLOW_LAYERED: "res://data/scenes/root_hollow_layered_props.json",
 	HOLLOW_TRIAL_LAYERED: "res://data/scenes/hollow_trial_layered_props.json",
+	ROOTCROWN_LAYERED: "res://data/scenes/rootcrown_layered_props.json",
 }
 
 ## Where a new game starts.

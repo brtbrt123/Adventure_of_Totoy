@@ -1,0 +1,453 @@
+{
+ "version": 1,
+ "props": {
+  "rootcrown_tower_dark": {
+   "w": 184,
+   "h": 120,
+   "anchor": [
+    94,
+    120
+   ],
+   "base_width": 108,
+   "solid": true,
+   "colliders": [
+    [
+     -28.0,
+     -10.0,
+     10.0
+    ],
+    [
+     -14.0,
+     -12.0,
+     11.0
+    ],
+    [
+     0.0,
+     -12.0,
+     11.0
+    ],
+    [
+     14.0,
+     -12.0,
+     11.0
+    ],
+    [
+     28.0,
+     -10.0,
+     10.0
+    ]
+   ],
+   "image": "rootcrown_tower_dark.png",
+   "locked": true,
+   "note": "the forest beacon, dark, crowned by the Colossus's roots; lit once the guardian falls (state pair)",
+   "state_pair": [
+    "rootcrown_tower_dark",
+    "rootcrown_tower_lit"
+   ]
+  },
+  "rootcrown_tower_lit": {
+   "w": 184,
+   "h": 120,
+   "anchor": [
+    94,
+    120
+   ],
+   "base_width": 108,
+   "solid": true,
+   "colliders": [
+    [
+     -28.0,
+     -10.0,
+     10.0
+    ],
+    [
+     -14.0,
+     -12.0,
+     11.0
+    ],
+    [
+     0.0,
+     -12.0,
+     11.0
+    ],
+    [
+     14.0,
+     -12.0,
+     11.0
+    ],
+    [
+     28.0,
+     -10.0,
+     10.0
+    ]
+   ],
+   "image": "rootcrown_tower_lit.png",
+   "locked": true,
+   "note": "the forest beacon lit: a blue-white flame and blue light in its cracks (state pair)",
+   "state_pair": [
+    "rootcrown_tower_dark",
+    "rootcrown_tower_lit"
+   ]
+  },
+  "rootcrown_stone_1": {
+   "w": 24,
+   "h": 56,
+   "anchor": [
+    12,
+    56
+   ],
+   "base_width": 23,
+   "solid": true,
+   "colliders": [
+    [
+     -6.4,
+     -2.0,
+     5.1
+    ],
+    [
+     0.0,
+     -2.0,
+     5.1
+    ],
+    [
+     6.4,
+     -2.0,
+     5.1
+    ]
+   ],
+   "image": "rootcrown_stone_1.png",
+   "locked": true,
+   "note": "stone 1"
+  },
+  "rootcrown_stone_2": {
+   "w": 24,
+   "h": 48,
+   "anchor": [
+    10,
+    48
+   ],
+   "base_width": 19,
+   "solid": true,
+   "colliders": [
+    [
+     -5.3,
+     -1.7,
+     4.2
+    ],
+    [
+     0.0,
+     -1.7,
+     4.2
+    ],
+    [
+     5.3,
+     -1.7,
+     4.2
+    ]
+   ],
+   "image": "rootcrown_stone_2.png",
+   "locked": true,
+   "note": "stone 2"
+  },
+  "rootcrown_stone_3": {
+   "w": 24,
+   "h": 32,
+   "anchor": [
+    10,
+    32
+   ],
+   "base_width": 20,
+   "solid": true,
+   "colliders": [
+    [
+     -5.6,
+     -1.8,
+     4.4
+    ],
+    [
+     0.0,
+     -1.8,
+     4.4
+    ],
+    [
+     5.6,
+     -1.8,
+     4.4
+    ]
+   ],
+   "image": "rootcrown_stone_3.png",
+   "locked": true,
+   "note": "stone 3"
+  },
+  "rootcrown_lantern_1": {
+   "w": 24,
+   "h": 40,
+   "anchor": [
+    10,
+    40
+   ],
+   "base_width": 15,
+   "solid": true,
+   "colliders": [
+    [
+     -4.2,
+     -1.3,
+     3.3
+    ],
+    [
+     0.0,
+     -1.3,
+     3.3
+    ],
+    [
+     4.2,
+     -1.3,
+     3.3
+    ]
+   ],
+   "image": "rootcrown_lantern_1.png",
+   "locked": true,
+   "note": "a dead stone lantern beside the stair"
+  },
+  "rootcrown_lantern_2": {
+   "w": 24,
+   "h": 40,
+   "anchor": [
+    8,
+    40
+   ],
+   "base_width": 16,
+   "solid": true,
+   "colliders": [
+    [
+     -4.5,
+     -1.4,
+     3.5
+    ],
+    [
+     0.0,
+     -1.4,
+     3.5
+    ],
+    [
+     4.5,
+     -1.4,
+     3.5
+    ]
+   ],
+   "image": "rootcrown_lantern_2.png",
+   "locked": true,
+   "note": "a dead stone lantern beside the stair"
+  },
+  "rootcrown_rubble_1": {
+   "w": 64,
+   "h": 48,
+   "anchor": [
+    20,
+    48
+   ],
+   "base_width": 24,
+   "solid": true,
+   "colliders": [
+    [
+     -6.7,
+     -2.1,
+     5.3
+    ],
+    [
+     0.0,
+     -2.1,
+     5.3
+    ],
+    [
+     6.7,
+     -2.1,
+     5.3
+    ]
+   ],
+   "image": "rootcrown_rubble_1.png",
+   "locked": true,
+   "note": "rubble 1"
+  },
+  "rootcrown_rubble_2": {
+   "w": 64,
+   "h": 48,
+   "anchor": [
+    42,
+    48
+   ],
+   "base_width": 29,
+   "solid": true,
+   "colliders": [
+    [
+     -8.1,
+     -2.6,
+     6.4
+    ],
+    [
+     0.0,
+     -2.6,
+     6.4
+    ],
+    [
+     8.1,
+     -2.6,
+     6.4
+    ]
+   ],
+   "image": "rootcrown_rubble_2.png",
+   "locked": true,
+   "note": "rubble 2"
+  },
+  "rootcrown_roots_1": {
+   "w": 40,
+   "h": 48,
+   "anchor": [
+    20,
+    48
+   ],
+   "base_width": 33,
+   "solid": true,
+   "colliders": [
+    [
+     -9.2,
+     -2.9,
+     7.3
+    ],
+    [
+     0.0,
+     -2.9,
+     7.3
+    ],
+    [
+     9.2,
+     -2.9,
+     7.3
+    ]
+   ],
+   "image": "rootcrown_roots_1.png",
+   "locked": true,
+   "note": "roots 1"
+  },
+  "rootcrown_roots_2": {
+   "w": 40,
+   "h": 48,
+   "anchor": [
+    18,
+    48
+   ],
+   "base_width": 31,
+   "solid": true,
+   "colliders": [
+    [
+     -8.7,
+     -2.7,
+     6.8
+    ],
+    [
+     0.0,
+     -2.7,
+     6.8
+    ],
+    [
+     8.7,
+     -2.7,
+     6.8
+    ]
+   ],
+   "image": "rootcrown_roots_2.png",
+   "locked": true,
+   "note": "roots 2"
+  },
+  "rootcrown_roots_3": {
+   "w": 40,
+   "h": 56,
+   "anchor": [
+    18,
+    56
+   ],
+   "base_width": 36,
+   "solid": true,
+   "colliders": [
+    [
+     -10.1,
+     -3.2,
+     7.9
+    ],
+    [
+     0.0,
+     -3.2,
+     7.9
+    ],
+    [
+     10.1,
+     -3.2,
+     7.9
+    ]
+   ],
+   "image": "rootcrown_roots_3.png",
+   "locked": true,
+   "note": "roots 3"
+  },
+  "rootcrown_briars_1": {
+   "w": 56,
+   "h": 40,
+   "anchor": [
+    28,
+    40
+   ],
+   "base_width": 37,
+   "solid": true,
+   "colliders": [
+    [
+     -10.5,
+     -3.2,
+     8.0
+    ],
+    [
+     0.0,
+     -3.2,
+     8.0
+    ],
+    [
+     10.5,
+     -3.2,
+     8.0
+    ]
+   ],
+   "image": "rootcrown_briars_1.png",
+   "locked": true,
+   "note": "briars 1"
+  },
+  "rootcrown_briars_2": {
+   "w": 48,
+   "h": 32,
+   "anchor": [
+    20,
+    32
+   ],
+   "base_width": 29,
+   "solid": true,
+   "colliders": [
+    [
+     -8.1,
+     -2.6,
+     6.4
+    ],
+    [
+     0.0,
+     -2.6,
+     6.4
+    ],
+    [
+     8.1,
+     -2.6,
+     6.4
+    ]
+   ],
+   "image": "rootcrown_briars_2.png",
+   "locked": true,
+   "note": "briars 2"
+  }
+ }
+}

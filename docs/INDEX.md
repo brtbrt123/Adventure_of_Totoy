@@ -28,7 +28,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[CODEX_TASK_layered_pilot]]: Codex's side of the pilot
 - [[CODEX_TASK_root_hollow]]: the real art for Root Hollow (ground painting and new props), Codex's task
 - [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, who does what)
-- [[FINAL_SCENE_chapter1]]: draft plan for the chapter's final scene and boss (Beacon Hill), replacing the old arena; waiting on the owner
+- [[FINAL_SCENE_chapter1]]: the chapter's final scene and boss (plan v2 with the owner's decisions): the Rootcrown map's first build (debug key Y) was rejected in the playtest (look does not match the other scenes, stage too small); redo it, then the redesigned Colossus
 - [[STORY_ROAD_chapter1]]: draft story for the road from Lanternfen to the Stag Glade (follow the blue light); to be revised after the final-scene plan
 
 ## Art references

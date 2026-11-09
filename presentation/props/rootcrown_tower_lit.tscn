@@ -1,0 +1,63 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/rootcrown_tower_lit.png" id="1_art"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 10.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5"]
+radius = 10.0
+
+[node name="rootcrown_tower_lit" type="Node2D"]
+metadata/w = 184
+metadata/h = 120
+metadata/base_width = 108
+metadata/solid = true
+metadata/image = "rootcrown_tower_lit.png"
+metadata/note = "the forest beacon lit: a blue-white flame and blue light in its cracks (state pair)"
+metadata/locked = true
+metadata/state_pair = ["rootcrown_tower_dark", "rootcrown_tower_lit"]
+metadata/flip_offset = Vector2(-90, -120)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-94, -120)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-28.0, -10.0)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-14.0, -12.0)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0.0, -12.0)
+shape = SubResource("CircleShape2D_3")
+
+[node name="Circle4" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(14.0, -12.0)
+shape = SubResource("CircleShape2D_4")
+
+[node name="Circle5" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(28.0, -10.0)
+shape = SubResource("CircleShape2D_5")
+
+[node name="Light1" type="Marker2D" parent="."]
+position = Vector2(-1.5, -89.5)
+metadata/socket = {"pixel": [92.5, 30.5], "halo_radius": 90.0, "energy": 1.6, "pool_radius": 170.0, "pool_energy": 1.6, "colour": [0.6, 0.82, 1.0], "core_colour": [0.9, 0.97, 1.0]}

@@ -55,4 +55,4 @@ shape = SubResource("CircleShape2D_1")
 
 [node name="Light1" type="Marker2D" parent="."]
 position = Vector2(-9.5, -29.0)
-metadata/socket = {"pixel": [5.0, 25.0], "halo_radius": 25.0, "energy": 1.05, "pool_radius": 40.0, "pool_energy": 0.6, "colour": [1.0, 0.79, 0.52], "core_colour": [1.05, 0.98, 0.88]}
+metadata/socket = {"pixel": [5.0, 25.0], "halo_radius": 45.0, "energy": 1.68, "pool_radius": 96.0, "pool_energy": 1.2, "colour": [1.0, 0.79, 0.52], "core_colour": [1.05, 0.98, 0.88]}

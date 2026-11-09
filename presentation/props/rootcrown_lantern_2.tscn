@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/rootcrown_lantern_2.png" id="1_art"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 3.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 3.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 3.5
+
+[node name="rootcrown_lantern_2" type="Node2D"]
+metadata/w = 24
+metadata/h = 40
+metadata/base_width = 16
+metadata/solid = true
+metadata/image = "rootcrown_lantern_2.png"
+metadata/note = "a dead stone lantern beside the stair"
+metadata/locked = true
+metadata/flip_offset = Vector2(-16, -40)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-8, -40)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-4.5, -1.4)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0.0, -1.4)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(4.5, -1.4)
+shape = SubResource("CircleShape2D_3")

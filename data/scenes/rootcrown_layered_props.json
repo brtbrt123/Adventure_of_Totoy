@@ -1,0 +1,365 @@
+{
+ "version": 1,
+ "scene": "rootcrown_layered",
+ "name": "ROOTCROWN",
+ "size": [
+  640,
+  360
+ ],
+ "ground": "res://presentation/forest/rootcrown_layered_ground.png",
+ "outline": [
+  [
+   280,
+   360
+  ],
+  [
+   280,
+   293
+  ],
+  [
+   250,
+   290
+  ],
+  [
+   221,
+   287
+  ],
+  [
+   193,
+   281
+  ],
+  [
+   167,
+   274
+  ],
+  [
+   144,
+   266
+  ],
+  [
+   123,
+   256
+  ],
+  [
+   106,
+   246
+  ],
+  [
+   92,
+   234
+  ],
+  [
+   82,
+   222
+  ],
+  [
+   76,
+   210
+  ],
+  [
+   74,
+   197
+  ],
+  [
+   76,
+   184
+  ],
+  [
+   82,
+   171
+  ],
+  [
+   93,
+   159
+  ],
+  [
+   107,
+   148
+  ],
+  [
+   124,
+   137
+  ],
+  [
+   145,
+   127
+  ],
+  [
+   168,
+   119
+  ],
+  [
+   194,
+   112
+  ],
+  [
+   222,
+   107
+  ],
+  [
+   251,
+   103
+  ],
+  [
+   282,
+   101
+  ],
+  [
+   312,
+   101
+  ],
+  [
+   343,
+   103
+  ],
+  [
+   372,
+   106
+  ],
+  [
+   401,
+   110
+  ],
+  [
+   427,
+   117
+  ],
+  [
+   452,
+   125
+  ],
+  [
+   473,
+   134
+  ],
+  [
+   492,
+   144
+  ],
+  [
+   507,
+   155
+  ],
+  [
+   519,
+   167
+  ],
+  [
+   526,
+   180
+  ],
+  [
+   530,
+   192
+  ],
+  [
+   529,
+   205
+  ],
+  [
+   524,
+   218
+  ],
+  [
+   516,
+   230
+  ],
+  [
+   503,
+   242
+  ],
+  [
+   487,
+   253
+  ],
+  [
+   468,
+   263
+  ],
+  [
+   445,
+   272
+  ],
+  [
+   420,
+   279
+  ],
+  [
+   393,
+   285
+  ],
+  [
+   364,
+   289
+  ],
+  [
+   364,
+   360
+  ]
+ ],
+ "boundary_radius": 25,
+ "boundary_spacing": 17,
+ "prop_margin": 40,
+ "entries": {
+  "glade_side": [
+   322,
+   338
+  ]
+ },
+ "default_entry": "glade_side",
+ "exits": [
+  {
+   "id": "to_glade",
+   "rect": [
+    280,
+    354,
+    84,
+    6
+   ],
+   "target_scene": "glade_layered",
+   "target_entry": "rootcrown_side"
+  }
+ ],
+ "checkpoints": [
+  {
+   "id": "rootcrown_layered_stair",
+   "position": [
+    322,
+    280
+   ]
+  }
+ ],
+ "npcs": [],
+ "objects": [],
+ "props": [
+  {
+   "id": "beacon",
+   "type": "rootcrown_tower_dark",
+   "x": 321,
+   "y": 108,
+   "flip": false,
+   "shadow_radius": 40,
+   "when": "flag:cleared_rootcrown",
+   "on_type": "rootcrown_tower_lit"
+  },
+  {
+   "id": "stone_nw",
+   "type": "rootcrown_stone_1",
+   "x": 128,
+   "y": 132,
+   "flip": false
+  },
+  {
+   "id": "stone_ne",
+   "type": "rootcrown_stone_2",
+   "x": 508,
+   "y": 108,
+   "flip": true
+  },
+  {
+   "id": "stone_e",
+   "type": "rootcrown_stone_3",
+   "x": 548,
+   "y": 150,
+   "flip": false
+  },
+  {
+   "id": "stone_se",
+   "type": "rootcrown_stone_1",
+   "x": 488,
+   "y": 246,
+   "flip": true
+  },
+  {
+   "id": "stone_sw",
+   "type": "rootcrown_stone_2",
+   "x": 150,
+   "y": 238,
+   "flip": false
+  },
+  {
+   "id": "lantern_w",
+   "type": "rootcrown_lantern_1",
+   "x": 260,
+   "y": 270,
+   "flip": false
+  },
+  {
+   "id": "lantern_e",
+   "type": "rootcrown_lantern_2",
+   "x": 384,
+   "y": 270,
+   "flip": false
+  },
+  {
+   "id": "rubble_w",
+   "type": "rootcrown_rubble_1",
+   "x": 98,
+   "y": 206,
+   "flip": false
+  },
+  {
+   "id": "rubble_e",
+   "type": "rootcrown_rubble_2",
+   "x": 548,
+   "y": 206,
+   "flip": false
+  },
+  {
+   "id": "roots_nw",
+   "type": "rootcrown_roots_1",
+   "x": 196,
+   "y": 112,
+   "flip": false
+  },
+  {
+   "id": "roots_ne",
+   "type": "rootcrown_roots_2",
+   "x": 446,
+   "y": 110,
+   "flip": false
+  },
+  {
+   "id": "roots_e",
+   "type": "rootcrown_roots_3",
+   "x": 586,
+   "y": 250,
+   "flip": true
+  },
+  {
+   "id": "roots_w",
+   "type": "rootcrown_roots_3",
+   "x": 60,
+   "y": 262,
+   "flip": false
+  },
+  {
+   "id": "briars_w",
+   "type": "rootcrown_briars_1",
+   "x": 36,
+   "y": 170,
+   "flip": false
+  },
+  {
+   "id": "briars_e",
+   "type": "rootcrown_briars_2",
+   "x": 608,
+   "y": 180,
+   "flip": false
+  },
+  {
+   "id": "briars_sw",
+   "type": "rootcrown_briars_1",
+   "x": 150,
+   "y": 302,
+   "flip": true
+  },
+  {
+   "id": "briars_se",
+   "type": "rootcrown_briars_2",
+   "x": 492,
+   "y": 304,
+   "flip": true
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://art/build/sprites/rootcrown_briars_2.png" id="1_art"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6.4
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 6.4
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3"]
+radius = 6.4
+
+[node name="rootcrown_briars_2" type="Node2D"]
+metadata/w = 48
+metadata/h = 32
+metadata/base_width = 29
+metadata/solid = true
+metadata/image = "rootcrown_briars_2.png"
+metadata/note = "briars 2"
+metadata/locked = true
+metadata/flip_offset = Vector2(-28, -32)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("1_art")
+centered = false
+offset = Vector2(-20, -32)
+
+[node name="Colliders" type="StaticBody2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="Circle1" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(-8.1, -2.6)
+shape = SubResource("CircleShape2D_1")
+
+[node name="Circle2" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(0.0, -2.6)
+shape = SubResource("CircleShape2D_2")
+
+[node name="Circle3" type="CollisionShape2D" parent="Colliders"]
+position = Vector2(8.1, -2.6)
+shape = SubResource("CircleShape2D_3")

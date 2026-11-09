@@ -2,7 +2,7 @@
 extends Resource
 ## How an explore scene looks on screen (owner 2026-11-01: "add shaders so the scene looks good"): a colour grade, a vignette, a glow on
 ## bright things and drifting ground mist (the wind sway was tried and removed at the owner's request). One per scene, presentation/effects/looks/<scene id>.tres
-## (village_layered, forest_layered, glade_layered, woodland_layered, root_hollow_layered, hollow_trial_layered), every value editable in
+## (village_layered, forest_layered, glade_layered, woodland_layered, root_hollow_layered, hollow_trial_layered, rootcrown_layered), every value editable in
 ## the Inspector; a scene without a file uses these defaults. Read when the scene is entered (presentation/explore/explore_scene.gd);
 ## the shaders are presentation/effects/scene_post.gdshader (grade, vignette, glow) and presentation/common/overhead_light.gdshader
 ## (the mist pass). Nothing here touches the game state. Distances are game pixels.

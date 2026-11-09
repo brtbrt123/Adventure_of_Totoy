@@ -1,80 +1,143 @@
-# Chapter 1 final scene and boss (PLAN, draft)
+# Chapter 1 final scene and boss (PLAN, v2)
 
-Status: **draft for the owner** (2026-11-03, Claude). The owner: "we will create the finals scene with a boss matching our story
-we will not use the arena that we have make a draft or plan on this first then after we will fix the story line and nariation".
-So: this plan comes first; the road story (`docs/STORY_ROAD_chapter1.md`) and its narration are revised after it.
-Nothing here is built. Words marked **(new)** are proposals the owner renames freely.
+Status: **plan with the owner's decisions** (2026-11-03, Claude). History: v1 offered three boss options; the owner chose:
+"lets go with the mossbound collosal we will just improve the design make it bigger, improve the effects, add more attacks
+we will also make the new scene or map taht match our story", and answered the questions: "the guardian is destryoed", the
+scene name and the second memory are Claude's to propose, the old arena: "keep it for now". After this plan the road story and
+narration (`docs/STORY_ROAD_chapter1.md`) are revised to lead into it. Pictures come before wiring.
 
-## Where it sits in the chapter
+Progress: step 1 done (both concept pictures approved 2026-11-09: "Approve both"); step 2 done as a scene (owner: "Approve, build it"):
+the map `rootcrown_layered` is in the game, reached only by debug key **Y** until the boss lives there (the glade's arch still leads
+to the old arena, so the story never reaches a map without a fight). **The owner played it and rejected it** (2026-11-09):
+"i dont like the looks since it doesnt match our other scene and the stage is too small". Next: redo step 2 (see "Redo after the
+playtest" below, pictures first), then step 3, the boss in the road engine.
 
-Lanternfen -> Woodland Approach -> Forest Route -> Root Hollow (-> Hollow Trial, optional) -> Stag Glade -> **the final scene** ->
-ending. The Stag Glade's root arch, which today leads to the old arena (`glade_layered` exit `to_arena`), leads here instead.
+## Decisions
 
-## The story it has to finish
+| Question | Answer |
+|---|---|
+| Boss | The **Mossbound Colossus**, redesigned: bigger body, better effects, more attacks |
+| Engine | Option A: it fights in the road's fight engine (like the Stag and the Warden): same HUD, TAB menu, herbs, checkpoints, and the stat points count |
+| Scene | A new layered map that matches the story (name below) |
+| The guardian's fate | **Destroyed** |
+| The old arena | Kept for now (the title screen's BOSS FIGHT practice mode); out of the story |
+| Scene name, second memory | Proposed below (the owner can rename) |
 
-From the road draft: the blue light is the **forest beacon's song**. When the beacon went dark the song fled into living hearts;
-the Stag held one thread of it, and Edda bound it into Totoy's cracked key. The rest of the song is caught in the roots of the
-ruins, where something huge sleeps. GAME_DESIGN gives chapter 1 its world change: **the forest beacon is restored and the paths
-through the briars open**, and its boss: the **Mossbound Colossus**, one of the six guardians, twisted by a failure of the valley.
+## The scene: ROOTCROWN (proposed name)
 
-The twist that fits both: **the Colossus is not guarding the beacon from Totoy. It is holding the song so it cannot leave.** When
-the Heartloom failed, the forest's guardian wrapped its roots round the dying beacon and would not let go; the holding is what keeps
-the beacon dark. Beating it means making it let go, not killing it (Edda's rule: bind without destroying what remains). This also
-seeds the chapter 6 question (a guardian holding on too hard; the Regent's choice) without telling it.
-
-## The scene: Beacon Hill **(new name)**
+The forest beacon's hill, where the Colossus's roots have grown over the beacon tower like a crown. "Roots" is the chapter's
+name, the roots hold the song, and the name says both. The scene banner reads **ROOTCROWN**.
 
 | | |
 |---|---|
-| Place | Past the glade's root arch: an old stone stair climbs a hill to the forest beacon, a dark stone lantern-tower wrapped in roots as thick as houses. |
-| Size | About 640x384 at the game's scale (a little bigger than the glade, 560x336): a short approach path, then an open fight floor on the hilltop. |
-| Floor | One open ring for the fight (no pillars to snag the boss, the old arena's problem), roots and broken stones at its edge as the wall, the beacon at the top as the backdrop. |
-| Art | A layered scene like the others (one floor painting + separate props): the owner's images, converted with the existing pipeline (`tools/art/extract_props.py`, the shadow and light tools). |
-| Light | Night; the beacon dark until the end; the key's blue and the song's blue in the boss's cracks; the lighting tools from today (stone glow, lamp shadows). |
+| Way in | The Stag Glade's root arch opens onto a stone stair that climbs the hill (the glade's exit `to_arena` points here once the boss lives here) |
+| Layout | South: the stair and a small landing (checkpoint). North: the open hilltop ring, about 300x180 px of clear floor, no pillars (the old arena's boss snagged on them). Around the ring: a wall of roots and broken stones. At the top: the beacon tower, dark, wrapped in roots. |
+| Size | 640x360 as built (the glade is 560x336) |
+| Night | Moonlight; the song's blue leaking from the roots and the Colossus's cracks; the beacon dark until the end, then blue-white |
+| Props | the beacon tower (dark, lit), root walls (pieces), broken standing stones, rubble, roots, a few dead lanterns on the stair, thorn briars round the edge (before and after they draw back) |
+| Art | The owner's images, generated and converted like the other layered scenes; prompts at the end of this page |
 
-## The boss: three options
+## The Colossus, redesigned
 
-| | A. Mossbound Colossus, new home (**recommended**) | B. A new boss | C. Colossus, arena mode, new map |
-|---|---|---|---|
-| Who | The existing Colossus, recast as the forest's guardian holding the song | Something new built for this story (e.g. the beacon's roots themselves come alive) | The existing Colossus |
-| Story fit | Good: GAME_DESIGN's own chapter 1 boss, with the twist above | Best, but it leaves GAME_DESIGN's chapter 1 boss behind | Good |
-| Fight | Its 6 attacks kept (gold slam, gold combo: parry; red sweep, red shards, red stomp, red charge: dodge), posture break and counter, phase 2 at half health | All new attacks under the gold/red rule | Unchanged |
-| Engine | Moved into the road's fight engine (`core/mob_field.gd`, like the Stag and the Warden): same HUD, TAB menu, checkpoints and herbs as the road, **and the stat points count** | Road engine | Stays in the separate arena mode: its own HUD and menu, base stats, a separate result screen |
-| Art | Exists (its body frames and effects) | All new: body, every attack, effects (the biggest job) | Exists; only the new map |
-| Work | Medium: port the boss into the road engine (core) and draw it in the road renderer (presentation) | Large | Small, but it keeps the split the owner wants to leave |
-
-## The beats (draft; the narration gets fixed after this plan)
-
-1. **The climb.** Narration: the hill, the dark beacon, the roots that breathe. The key hums louder at every step.
-2. **The entrance** (short cutscene: camera pan up the hill, title card **MOSSBOUND COLOSSUS / GUARDIAN OF THE FOREST BEACON**).
-   The roots part; the Colossus rises from them, the song's blue showing through its cracks.
-3. **Phase 1.** Gold slam, red sweep, red shards: the chapter's colour lessons, one at a time.
-4. **Phase shift at half health** (a short moment, no long cutscene): it tears a root from the hill; the blue flares; Totoy's key
-   answers. Phase 2 adds the gold combo, the red stomp and the red charge.
-5. **It lets go.** Posture broken for the last time, the Colossus kneels (like the Stag). The song pours out of its roots, along
-   Totoy's key, into the beacon.
-6. **The beacon lights.** Blue-white fire on the hilltop; the briars around the hill draw back (the chapter's world change).
-   The Colossus settles into the hill as moss and stone, the beacon burning on its back (freed, not destroyed: the owner's call).
-7. **The memory.** One image, no dialogue (CHAPTER1_PLAN step 7): a second piece of the night the Heartloom failed.
-8. **Home.** Back in Lanternfen: one of the dark hills now answers; Mira marks the next region (Tides). Credits; the title screen
-   shows "Chapter 1 complete".
-
-## Build plan (after the owner chooses A, B or C)
-
-| Step | What | Who (AGENTS.md split; Claude covers presentation while Codex is out) |
+| | Now | Proposed |
 |---|---|---|
-| 1 | The owner's images for Beacon Hill (floor painting and props; the beacon dark and lit) | owner (image generation, Claude writes the prompts) |
-| 2 | The layered scene: conversion, props, colliders, entry from the glade, checkpoint at the foot of the hill | Claude (tools, core data) + presentation |
-| 3 | The boss in the road engine (option A): attack table, telegraphs, posture break and counter window, phase 2, Reaper's Coil drag and stun, deterministic core tests | Claude (core) |
-| 4 | Drawing it in the road renderer: its frames, attack effects and the boss panel (reuse `boss_panel.tscn`) | presentation |
-| 5 | Story moments: the climb narration, the entrance card, the phase-shift moment, the letting-go, the beacon lighting, the memory image, the return home | presentation + data (cutscene and dialogue files) |
-| 6 | Retire the old arena from the story path (the title's BOSS FIGHT mode: keep or remove, the owner's call) | presentation |
-| 7 | Tests, in-game captures, the owner's playtest | all |
+| Size | 48x48 frames, a 20 px body (smaller than the Stag's 96x64) | **About 3x: 144x144 frames, a 46 px body**: two thirds of the screen's height, three and a half times Totoy |
+| Look | moss golem | A hill of mossy stone on legs of root; its chest is a cracked hollow where the stolen song burns blue; roots trail from its back into the ground (and, at the start, into the beacon) |
+| Phases | 2 (phase 2 at half health) | **3**: 100-60 %, 60-25 %, under 25 % (the song tears loose) |
+| Attacks | 6 | **11**: the 6 kept and 5 new, below |
+| Effects | small sprite effects | stone chunks and dust, root tearing, ground cracks, blue light leaking from cracks (real lights, like the lamps), shockwave rings, screen shake, the old effects redrawn in the staff style of the hero effects redo |
 
-## Questions for the owner
+### The attacks (gold = parry it, red = dodge it)
 
-1. **A, B or C?** (Recommended: A, the Colossus in its new home, run by the road engine.)
-2. **The guardian's fate**: freed and settling into the hill (as drafted), or destroyed?
-3. **The scene's name**: Beacon Hill, or another.
-4. **The old arena**: remove it entirely, or keep it only as the title screen's BOSS FIGHT practice mode.
-5. **What the second memory shows** (step 7), so the road's first memory can lead into it.
+| # | Attack | Colour | What it does | Phase |
+|---|---|---|---|---|
+| 1 | Gold Slam (kept) | gold | overhead fist into the ground in front | 1, 2, 3 |
+| 2 | Red Sweep (kept) | red | wide arm swing, a cone | 1, 2, 3 |
+| 3 | Red Shards (kept) | red | stone shards in three lanes | 1, 2, 3 |
+| 4 | Red Stomp (kept) | red | a ring round its feet (stand inside the gap or far out) | 1, 2, 3 |
+| 5 | Gold Combo (kept) | gold | two blows then a third, each parryable | 2, 3 |
+| 6 | Red Charge (kept) | red | a straight rush across the ring | 2, 3 |
+| 7 | **Root Snare** (new) | red | roots burst from the ground in a line toward Totoy, then a second line where he dodged to | 1, 2, 3 |
+| 8 | **Boulder Toss** (new) | red | tears a stone from the hill and throws it at where Totoy stands; it lands with a small shockwave | 2, 3 |
+| 9 | **Heartroot Grab** (new) | gold | a root-arm lunges to seize Totoy; parried, the arm snaps back and its posture cracks wide | 2, 3 |
+| 10 | **Briar Ring** (new, once per phase change) | red | thorns rise round the edge of the ring, the floor shrinks for a while; telegraphed before they rise | 2, 3 |
+| 11 | **Song Flare** (new, phase 3) | red then gold | the blue song bursts out in waves (dash through), and the last wave is a gold blow that can be parried for the final posture break | 3 |
+
+Every attack keeps the game's rules: a readable windup, gold or red, at most two things to watch at once, nothing from off screen.
+Numbers (damage, timings, health, posture) go in `core/tuning.gd` and are the owner's to tune after the first playtest.
+
+## The beats (draft; the narration is rewritten with the road story)
+
+1. **The climb.** Up the stair; dead lanterns; the key hums louder at every step. A checkpoint on the landing.
+2. **The entrance.** Short cutscene: the camera climbs to the hilltop; the roots round the beacon tighten; the Colossus pulls itself
+   out of them. Title card: **MOSSBOUND COLOSSUS / GUARDIAN OF THE FOREST BEACON**.
+3. **Phase 1.** Slam, sweep, shards, stomp, the root snare: the chapter's colour lessons one at a time.
+4. **Phase 2 at 60 %.** It tears its roots out of the beacon; the briars rise round the ring; boulders, the grab, the combo, the charge.
+5. **Phase 3 at 25 %.** The song tears loose from its chest: the song flare. It is losing itself.
+6. **The end: destroyed.** The last posture break and Totoy's finishing blow. It does not kneel like the Stag: it breaks apart into
+   stone and moss. Edda's rule (bind without destroying) could not be kept this time; the guardian had become the roots that held
+   the song. The song pours out of the rubble, along the cracked key, into the beacon.
+7. **The beacon lights.** Blue-white fire on the hilltop; the briars draw back; the forest's paths open (the chapter's world change).
+   Something is left in the rubble: a stone fragment of the guardian (an Aspect for Edda to bind at home: **Stone Ward** fits).
+8. **The second memory** (proposed, one or two pictures, no dialogue): night, the beacon hill, a beacon still lit behind him; Totoy
+   runs down the slope with the key in both hands. Someone calls his name from the dark, a voice he trusts. The beacon goes out
+   behind him, and the key cracks in his hands. (It answers nothing yet: did he run to save the key, or from something?
+   It sets up the later chapters without naming the Regent.)
+9. **Home.** Lanternfen: a second hill answers the first; Edda binds the guardian's fragment; Mira marks the next region (Tides).
+   Credits; "Chapter 1 complete" on the title screen.
+
+## The map as built (2026-11-09, first build: look and size rejected in the owner's playtest)
+
+| | |
+|---|---|
+| Scene | `rootcrown_layered`, title ROOTCROWN, 640x360 (the glade is 560x336): `data/scenes/rootcrown_layered_props.json`, editable `presentation/maps/rootcrown_layered.tscn` (the source of truth; `tools/godot/bake_maps.gd` writes the JSON back) |
+| Art | `python tools/art/make_rootcrown_art.py` turns the approved `art/reference/rootcrown_v1/ground_raw.png` into the floor `presentation/forest/rootcrown_layered_ground.png` and `props_raw.png` into 14 props (`art/src/rootcrown_*.txt`, `data/props/prop_defs_rootcrown.json`, `presentation/props/rootcrown_*.tscn`): the beacon tower dark and lit (one canvas, a state pair), 3 standing stones, 2 dead stone lanterns, 2 rubble piles, 3 root clusters, 2 briar clumps |
+| Walkable | The plateau oval (centre 302,197, radii 228x96) and the stair corridor x 280..364 down to the bottom edge; the outline is clockwise like every scene's |
+| Way in and out | Entry `glade_side` (322,338) at the top of the stair; exit `to_glade` (the bottom edge of the stair) goes to the glade's new entry `rootcrown_side` (516,36), just under its root arch. The glade's arch exit still leads to the arena. |
+| Checkpoint | `rootcrown_layered_stair` (322,280), on the landing |
+| Fight floor | 264x120 open floor from (190,132); the Colossus starts at (322,168) (`docs/previews/rootcrown_v1/layout.json`) |
+| Beacon | prop `beacon` at (321,108): `rootcrown_tower_dark` until the story flag `cleared_rootcrown`, then `rootcrown_tower_lit` (same place, same body); a faint blue glow when dark, a big blue-white light when lit (`presentation/common/local_lights.json`) |
+| Light | the game's night light with the Root Hollow strength (0.82), per-light colours, fireflies at the edges, the Root Hollow look (`presentation/effects/looks/rootcrown_layered.tres`), the forest ambience |
+| Tests | `tests/core/test_rootcrown.gd` (5), plus the route and layered-progress tests; capture: `presentation/review/rootcrown_v1/capture_rootcrown.gd` |
+
+## Redo after the playtest (a proposal for the next session; the owner decides, pictures first)
+
+The owner's words: the looks "doesnt match our other scene" and "the stage is too small". Neither agent can judge the look, so the
+next session shows pictures (the new floor and props next to the Stag Glade and Root Hollow) before anything is wired.
+
+| | Proposal |
+|---|---|
+| Size | About the old arena's size (800x480; its walkable floor is 744x424) or bigger, with an open fight floor of at least about 560x300 (well over one 384x216 screen in both directions), the stair at the bottom and the beacon at the top. Measure the floor against the 3x Colossus's reach before building. |
+| Floor | Made the way the other forest floors were made, with the Stag Glade's and Root Hollow's own ground paintings as the base or the only style references (same grass, dirt and stone, same texture density and light), converted with the same pipeline. |
+| Props | Reuse the existing forest props where they fit, so they match by construction: `glade_stone_*`, `glade_rock_*`, `glade_thorns`, `root_hollow_rune_stones`, `root_hollow_boulder`, `root_hollow_roots`, `root_hollow_tree_rootwall`, `forest_standing_stone`, lantern posts. New art only for the beacon tower (dark and lit), made with those props as references. |
+| Keep | The scene id `rootcrown_layered`, its registration and wiring, debug key Y, the glade entry `rootcrown_side`, the beacon state pair on `cleared_rootcrown` and its light sockets, `tests/core/test_rootcrown.gd` (new numbers), `tools/art/make_rootcrown_art.py` (new inputs). |
+| Remove when replaced | the 14 `rootcrown_*` props (art/src, art/build/sprites, presentation/props, prop_defs_rootcrown.json) and the floor painting, unless the owner wants some kept |
+
+## Build order (each step shows the owner pictures before anything is wired)
+
+| Step | What | Notes |
+|---|---|---|
+| 1 | **Concept pictures**: the redesigned Colossus (one sheet, idle from the side, the size next to Totoy) and the Rootcrown hilltop | image generation (Higgsfield, about 23 credits left at 1.5 an image) or the owner's own; the owner approves the look |
+| 2 | The **Rootcrown map**: floor painting and props from the approved pictures, converted (`tools/art/extract_props.py`, shadows, lights), colliders, the stair, the checkpoint, the glade's exit pointing here | layered scene like the others; first build 2026-11-09 **rejected in the playtest** (look and size): redo, see "Redo after the playtest"; the glade's exit switches when step 3 lands |
+| 3 | The **boss in the road engine**: the 6 kept attacks at the new size, the posture break and counter window, Reaper's Coil drag and stun, three phases, then the 5 new attacks; deterministic core tests for each | core (`core/mob_field.gd` or a boss module it drives) |
+| 4 | The **body frames** at 144 px: one pose sheet per attack (windup, strike, recover), idle, walk, hurt, posture broken, death | generated references, converted like the Warden's 2.5x poses; the owner approves the sheets |
+| 5 | The **effects**: the attack effects in the staff style, the blue cracks as real lights, shockwaves, debris, shake; the boss panel (`boss_panel.tscn`) | presentation |
+| 6 | The **story moments**: the climb, the entrance card, the phase changes, the death, the beacon lighting, the second memory, home and credits | cutscene and dialogue data, presentation |
+| 7 | Tests, in-game captures and GIFs, the owner's playtest and tuning | all |
+
+## Picture prompts (step 1, for the owner's review before generating)
+
+- **Colossus concept**: "Pixel art game boss concept sheet, dark fantasy forest, side view facing right, a huge golem of mossy grey
+  stone standing on thick tree-root legs, its chest a cracked hollow with a glowing blue light inside, blue light leaking through
+  cracks in its arms, roots trailing from its back into the ground, moss and small ferns on its shoulders, muted greens browns and
+  greys, dark outlines, 3/4 top-down game view, a small human hero at its feet for scale, plain flat background, no text."
+- **Rootcrown hilltop**: "Pixel art top-down 3/4 game map, night, a round open hilltop clearing in a dark forest, a ruined stone
+  beacon tower at the top wrapped in enormous tree roots, a stone stair climbing from the bottom of the image, roots and broken
+  standing stones round the edge of the clearing, thorn briars, faint blue light glowing between the roots, muted greens browns and
+  greys, same art style as the reference, no characters, no text."
+  (with the village and glade paintings as style references, as before)
+
+## Still open (after the pictures)
+
+- The Colossus's numbers (health, damage, timings) for the first playtest.
+- Whether the title screen's BOSS FIGHT later uses the new Colossus too (the owner said keep the old arena for now).

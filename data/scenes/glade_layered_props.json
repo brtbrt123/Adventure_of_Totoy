@@ -163,6 +163,10 @@
   "entrance": [
    24,
    318
+  ],
+  "rootcrown_side": [
+   516,
+   36
   ]
  },
  "default_entry": "entrance",

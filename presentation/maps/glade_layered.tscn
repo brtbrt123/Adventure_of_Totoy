@@ -55,6 +55,9 @@ polygon = PackedVector2Array(0, 296, 22, 290, 40, 270, 26, 258, 16, 244, 18, 222
 [node name="entrance" type="Marker2D" parent="Entries"]
 position = Vector2(24, 318)
 
+[node name="rootcrown_side" type="Marker2D" parent="Entries"]
+position = Vector2(516, 36)
+
 [node name="Exits" type="Node2D" parent="."]
 
 [node name="to_forest" type="Area2D" parent="Exits"]

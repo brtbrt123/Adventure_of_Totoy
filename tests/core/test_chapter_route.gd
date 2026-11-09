@@ -36,6 +36,7 @@ func test_the_layered_exits_form_the_chapter_route() -> void:
 		[SceneDefs.HOLLOW_TRIAL_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED, &"shortcut"],
 		[SceneDefs.GLADE_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED, &"glade_side"],
 		[SceneDefs.GLADE_LAYERED, SceneDefs.ARENA, &"start"],
+		[SceneDefs.ROOTCROWN_LAYERED, SceneDefs.GLADE_LAYERED, &"rootcrown_side"],  # not entered from the glade yet: its arch leads to the arena until the Colossus lives in Rootcrown
 	]
 	for link: Array in chain:
 		var exit: Dictionary = _exit_to(link[0], link[1])
@@ -48,7 +49,7 @@ func test_the_layered_exits_form_the_chapter_route() -> void:
 
 
 func test_walking_through_every_exit_hands_over_to_the_next_scene() -> void:
-	for link: Array in [[SceneDefs.VILLAGE_LAYERED, SceneDefs.WOODLAND_LAYERED], [SceneDefs.WOODLAND_LAYERED, SceneDefs.VILLAGE_LAYERED], [SceneDefs.WOODLAND_LAYERED, SceneDefs.FOREST_LAYERED], [SceneDefs.FOREST_LAYERED, SceneDefs.WOODLAND_LAYERED], [SceneDefs.FOREST_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED], [SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.FOREST_LAYERED], [SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.GLADE_LAYERED], [SceneDefs.GLADE_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED], [SceneDefs.GLADE_LAYERED, SceneDefs.ARENA]]:
+	for link: Array in [[SceneDefs.VILLAGE_LAYERED, SceneDefs.WOODLAND_LAYERED], [SceneDefs.WOODLAND_LAYERED, SceneDefs.VILLAGE_LAYERED], [SceneDefs.WOODLAND_LAYERED, SceneDefs.FOREST_LAYERED], [SceneDefs.FOREST_LAYERED, SceneDefs.WOODLAND_LAYERED], [SceneDefs.FOREST_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED], [SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.FOREST_LAYERED], [SceneDefs.ROOT_HOLLOW_LAYERED, SceneDefs.GLADE_LAYERED], [SceneDefs.GLADE_LAYERED, SceneDefs.ROOT_HOLLOW_LAYERED], [SceneDefs.GLADE_LAYERED, SceneDefs.ARENA], [SceneDefs.ROOTCROWN_LAYERED, SceneDefs.GLADE_LAYERED]]:
 		var core: ExploreCore = ExploreCore.new(link[0], &"", true)  # gate open so the forest's north exit is reachable
 		core.set_story_flags([&"debug_all_unlocked"] as Array[StringName])  # and the village road is open
 		var exit: Dictionary = _exit_to(link[0], link[1])

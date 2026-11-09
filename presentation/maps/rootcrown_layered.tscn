@@ -1,0 +1,145 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Texture2D" path="res://presentation/forest/rootcrown_layered_ground.png" id="ground"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_tower_dark.tscn" id="p_rootcrown_tower_dark"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_stone_1.tscn" id="p_rootcrown_stone_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_stone_2.tscn" id="p_rootcrown_stone_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_stone_3.tscn" id="p_rootcrown_stone_3"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_lantern_1.tscn" id="p_rootcrown_lantern_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_lantern_2.tscn" id="p_rootcrown_lantern_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_rubble_1.tscn" id="p_rootcrown_rubble_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_rubble_2.tscn" id="p_rootcrown_rubble_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_roots_1.tscn" id="p_rootcrown_roots_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_roots_2.tscn" id="p_rootcrown_roots_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_roots_3.tscn" id="p_rootcrown_roots_3"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_briars_1.tscn" id="p_rootcrown_briars_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_briars_2.tscn" id="p_rootcrown_briars_2"]
+
+[sub_resource type="RectangleShape2D" id="Exit_1"]
+size = Vector2(84, 6)
+
+[node name="rootcrown_layered" type="Node2D"]
+metadata/version = 1
+metadata/title = "ROOTCROWN"
+metadata/size = [640, 360]
+metadata/boundary_radius = 25
+metadata/boundary_spacing = 17
+metadata/prop_margin = 40
+metadata/default_entry = "glade_side"
+
+[node name="Ground" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("ground")
+centered = false
+
+[node name="Walkable" type="Polygon2D" parent="."]
+color = Color(0.25, 0.85, 0.45, 0.22)
+polygon = PackedVector2Array(280, 360, 280, 293, 250, 290, 221, 287, 193, 281, 167, 274, 144, 266, 123, 256, 106, 246, 92, 234, 82, 222, 76, 210, 74, 197, 76, 184, 82, 171, 93, 159, 107, 148, 124, 137, 145, 127, 168, 119, 194, 112, 222, 107, 251, 103, 282, 101, 312, 101, 343, 103, 372, 106, 401, 110, 427, 117, 452, 125, 473, 134, 492, 144, 507, 155, 519, 167, 526, 180, 530, 192, 529, 205, 524, 218, 516, 230, 503, 242, 487, 253, 468, 263, 445, 272, 420, 279, 393, 285, 364, 289, 364, 360)
+
+[node name="Entries" type="Node2D" parent="."]
+
+[node name="glade_side" type="Marker2D" parent="Entries"]
+position = Vector2(322, 338)
+
+[node name="Exits" type="Node2D" parent="."]
+
+[node name="to_glade" type="Area2D" parent="Exits"]
+position = Vector2(280, 354)
+metadata/target_scene = "glade_layered"
+metadata/target_entry = "rootcrown_side"
+
+[node name="Rect" type="CollisionShape2D" parent="Exits/to_glade"]
+position = Vector2(42.0, 3.0)
+shape = SubResource("Exit_1")
+
+[node name="Checkpoints" type="Node2D" parent="."]
+
+[node name="rootcrown_layered_stair" type="Marker2D" parent="Checkpoints"]
+position = Vector2(322, 280)
+
+[node name="Npcs" type="Node2D" parent="."]
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="Props" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="beacon" parent="Props" instance=ExtResource("p_rootcrown_tower_dark")]
+position = Vector2(321, 108)
+metadata/flip = false
+metadata/shadow_radius = 40
+metadata/when = "flag:cleared_rootcrown"
+metadata/on_type = "rootcrown_tower_lit"
+
+[node name="stone_nw" parent="Props" instance=ExtResource("p_rootcrown_stone_1")]
+position = Vector2(128, 132)
+metadata/flip = false
+
+[node name="stone_ne" parent="Props" instance=ExtResource("p_rootcrown_stone_2")]
+position = Vector2(508, 108)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="stone_e" parent="Props" instance=ExtResource("p_rootcrown_stone_3")]
+position = Vector2(548, 150)
+metadata/flip = false
+
+[node name="stone_se" parent="Props" instance=ExtResource("p_rootcrown_stone_1")]
+position = Vector2(488, 246)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="stone_sw" parent="Props" instance=ExtResource("p_rootcrown_stone_2")]
+position = Vector2(150, 238)
+metadata/flip = false
+
+[node name="lantern_w" parent="Props" instance=ExtResource("p_rootcrown_lantern_1")]
+position = Vector2(260, 270)
+metadata/flip = false
+
+[node name="lantern_e" parent="Props" instance=ExtResource("p_rootcrown_lantern_2")]
+position = Vector2(384, 270)
+metadata/flip = false
+
+[node name="rubble_w" parent="Props" instance=ExtResource("p_rootcrown_rubble_1")]
+position = Vector2(98, 206)
+metadata/flip = false
+
+[node name="rubble_e" parent="Props" instance=ExtResource("p_rootcrown_rubble_2")]
+position = Vector2(548, 206)
+metadata/flip = false
+
+[node name="roots_nw" parent="Props" instance=ExtResource("p_rootcrown_roots_1")]
+position = Vector2(196, 112)
+metadata/flip = false
+
+[node name="roots_ne" parent="Props" instance=ExtResource("p_rootcrown_roots_2")]
+position = Vector2(446, 110)
+metadata/flip = false
+
+[node name="roots_e" parent="Props" instance=ExtResource("p_rootcrown_roots_3")]
+position = Vector2(586, 250)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="roots_w" parent="Props" instance=ExtResource("p_rootcrown_roots_3")]
+position = Vector2(60, 262)
+metadata/flip = false
+
+[node name="briars_w" parent="Props" instance=ExtResource("p_rootcrown_briars_1")]
+position = Vector2(36, 170)
+metadata/flip = false
+
+[node name="briars_e" parent="Props" instance=ExtResource("p_rootcrown_briars_2")]
+position = Vector2(608, 180)
+metadata/flip = false
+
+[node name="briars_sw" parent="Props" instance=ExtResource("p_rootcrown_briars_1")]
+position = Vector2(150, 302)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="briars_se" parent="Props" instance=ExtResource("p_rootcrown_briars_2")]
+position = Vector2(492, 304)
+scale = Vector2(-1, 1)
+metadata/flip = true

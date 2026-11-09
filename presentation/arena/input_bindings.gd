@@ -30,6 +30,7 @@ static func register() -> void:
 		"debug_scene_woodland": [KEY_F11, KEY_9],
 		"debug_scene_hollow": [KEY_F12, KEY_0],
 		"debug_scene_trial": [KEY_T],  # the Hollow Trial room, replayable (playtesting the Warden waves)
+		"debug_scene_rootcrown": [KEY_Y],  # Rootcrown, the chapter's final map (not on the story path until the boss lives there)
 	}
 	# Q no longer swaps weapons in the arena (2026-10-21): weapons are equipped in the character menu's inventory.
 	if InputMap.has_action("arena_weapon_swap"):
