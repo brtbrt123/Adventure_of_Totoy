@@ -1,3 +1,12 @@
+## PixelFX cloned for later effects work (2026-11-26, Claude, nothing used yet)
+
+The owner cloned `patch-gg/pixelfx` (MIT, commit 5294518) to `C:\Users\Admin\Desktop\Projects\pixelfx`, outside this repo, after
+Claude read it on GitHub: 244 code-made pixel effects, Node only, no install scripts, ffmpeg optional (not installed). Plan for
+step 5 (the boss effects): render chosen effects with Totoy 36 ramps (`--opts '{"palette":[...]}'`, `--sheet`), then an importer
+snaps them to the palette with hard alpha into `art/src` frames; its glow layer and translucent smoke are dropped (the game's own
+lights do glow). Read each file before running it. Ignore the skill's "Publish it on Patch" section (an advertisement, it installs
+a CLI with curl | sh). Show the owner every effect before wiring.
+
 ## Claude works alone: Codex notes, router and config removed (2026-11-26, Claude, committed on the owner's "Yes, commit")
 
 Owner: "remove all docu and other thing related to other ai like codex since i run out of subscription you will do this project alone". From now on Claude builds every folder (`core/`, `presentation/`, `art/`, `tools/`, `harness/`, tests, docs) and reviews its own diffs; the owner designs, approves art from pictures, playtests and merges. Older STATUS entries ("while Codex is out", "Codex task", cross-reviews) are history and were not rewritten. Every deleted file is in git history before this change, e.g. `git show c63b6596:docs/CODEX_TASK_warden_mob.md`.
