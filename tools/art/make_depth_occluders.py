@@ -31,7 +31,7 @@ unique ids, every cut pixel an opaque palette colour (the grounds are palette-on
 Deterministic: same input = byte-identical output.
 
 Run from the project root:  python tools/art/make_depth_occluders.py [--preview DIR] [--scene NAME] [--out DIR]
-After a change run Godot's import (AGENTS.md section 6) so the game loads the new atlas, then look at the scenes.
+After a change run Godot's import (CLAUDE.md section 6) so the game loads the new atlas, then look at the scenes.
 --preview writes <scene>_occluders_check.png into DIR: the ground 3x with the cut pixels tinted magenta, the polygons
 outlined and the base lines red (for authoring; not committed).
 """

@@ -1,9 +1,10 @@
-"""Run the Python tests and every headless Godot suite inside a task worktree.
+"""Run the Python tests and every headless Godot suite on a checkout (the full test run).
 
 Order: python unittest, Godot import, tests/run_tests.gd, then every tests/smoke_*.gd (capture scripts that need a
 window are skipped). Each Godot run has a hard time limit and the whole process tree is killed on timeout.
 
-Usage: python harness/checks/run_tests.py --worktree DIR [--timeout 300]
+Usage: python harness/checks/run_tests.py --worktree . [--timeout 400]
+Godot: HARNESS_GODOT if set, else the installed console build (see _common.py).
 """
 from __future__ import annotations
 

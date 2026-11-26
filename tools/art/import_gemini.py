@@ -9,7 +9,7 @@ Visual ids are `hero2` (right-facing side view, left is mirrored at runtime) and
 The hero2 frames are written UPRIGHT to art/reference/hero_lean/upright/ and then leaned into art/src by
 tools/art/make_hero_lean_sheet.py (the lean step runs automatically at the end when a hero sheet was imported).
 They are new names on purpose: the old `totoy_*` / `mossbound_colossus_*` frames stay until presentation
-(Codex) has switched `presentation/arena/animation.gd` over to the new frames.
+has switched `presentation/arena/animation.gd` over to the new frames.
 
 Usage:
   python tools/art/import_gemini.py [--only Hero_Walk,Golem_Idle] [--replace]

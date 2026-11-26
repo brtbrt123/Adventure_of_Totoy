@@ -8,12 +8,12 @@ description: Use when changing or adding art in Adventure of Totoy (art/src text
 Rules first (from the owner): show a picture (mock-up or in-game capture) and get a yes BEFORE changing how anything looks or placing new art in a map. Painted props need art in the painted style (`art/reference/layered_village/`), never code-drawn blocks. Palette is Totoy 36; gold and red are combat cues.
 
 ## Steps (project root, PowerShell or Git Bash)
-1. Change `art/src/*.txt` (or run a generator: `tools/art/make_hero_fx_art.py`, `make_form_fx_art.py`, `make_aspect_fx_art.py`, `make_mob_fx_art.py`; toolkit `tools/art/staff_fx.py`). Never hand-edit generated `totoy_*`, `hero2_*` frames (see AGENTS.md section 5).
+1. Change `art/src/*.txt` (or run a generator: `tools/art/make_hero_fx_art.py`, `make_form_fx_art.py`, `make_aspect_fx_art.py`, `make_mob_fx_art.py`; toolkit `tools/art/staff_fx.py`). Never hand-edit generated `totoy_*`, `hero2_*` frames (see CLAUDE.md section 5).
 2. `python tools/art/validate_art.py`
 3. `python tools/art/build_art.py`: if it fails with `Errno 22` or `Access is denied`, the Godot editor holds a file. Retry in a loop (4 s pause). A killed build leaves ~1300 built PNGs deleted: always rerun it to completion.
 4. `python tools/art/preview_art.py` (contact sheets; the page count can shrink when frames are removed: delete the obsolete last sheet and its .import).
 5. `Godot_v4.7.2-stable_win64_console.exe --headless --path . --import --quit`, THEN restore the `art/build/contact_sheet_*.png.import` files the editor recreated: `git checkout HEAD -- <file>` (retry on locks).
-6. Tests: core `--headless --path . --script res://tests/run_tests.gd` (577 expected), `python -m unittest discover -s tests` (94), smokes via `tests/smoke_*.gd`. Three smokes only pass with a window: smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture.
+6. Tests: core `--headless --path . --script res://tests/run_tests.gd` (577 expected), `python -m unittest discover -s tests` (55 since the router tests were removed on 2026-11-26), smokes via `tests/smoke_*.gd`. Three smokes only pass with a window: smoke_capture_hero, smoke_gemini_capture, smoke_hero_capture.
 7. Commit `art/src` and `art/build` together. Do not run Python tests while build_art.py runs.
 
 ## Gotchas

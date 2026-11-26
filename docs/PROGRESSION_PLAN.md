@@ -7,7 +7,7 @@ Status: a plan, nothing in this file is built yet. Written 2026-10-28 by Claude 
 - Order Mira, Tovan, Elder, Edda: **approved**. The Elder's basket errand and the closed east road: **approved**. Quests pay EXP and rewards that fit the task: **approved**. Stat points **option B**: **approved**.
 - **Sprint** is the first Aspect, bound by Edda as the reward for the village tasks (it is the only Aspect that works without a boss, so it is usable in the woodland at once).
 - Defaults I used for what was not answered (change any of them): abilities stay unlocked for good; 2 points per level; Vitality +6 health, Might +3 %, Agility -2 dash ticks (first 6 points) and +0.5 % speed; free respec in Lanternfen; level gap rule off; 95 village EXP.
-- Built: quest data and gating, the new training order, the stat points and Sprint in exploration (`docs/architecture.md` "The village sequence, unlocks and stat points"). Codex task: `docs/CODEX_TASK_progression.md`.
+- Built: quest data and gating, the new training order, the stat points and Sprint in exploration (`docs/architecture.md` "The village sequence, unlocks and stat points"). The presentation side is built too (STATUS, 2026-10-28 to 2026-10-31).
 
 ## Part A. The village sequence (one task unlocks the next)
 
@@ -47,7 +47,7 @@ Core (Claude), data first:
 - A gated exit (`requires` flag on the exit row; blocked line event) and an openable chest object (event `item_received` once, flag).
 - Debug: a flag `debug_all_unlocked` (the debug jumps set it) so every scene stays testable.
 
-Presentation (Codex), after the data exists: objective line and NPC marker, locked HUD slots, blocked-exit message, the yard's new order. A task file will follow once the owner approves this plan.
+Presentation, after the data exists: objective line and NPC marker, locked HUD slots, blocked-exit message, the yard's new order. A task file will follow once the owner approves this plan.
 
 ### A4. Open questions for A
 
@@ -127,7 +127,7 @@ So the hero meets the Colossus at **level 5** with 8 points spent (B). A player 
 
 ### B5. What changes in the game for Part B
 
-If Option B is chosen: `SaveProfile` gets the three stats and the unspent points (optional fields, old saves start at zero); `ExploreCore` exposes them in the snapshot and applies them (`hero_max_hp`, `damage_mult`, dash cooldown); the character menu gets a stats panel and a respec button (Codex draws it, Claude supplies `spend_point(stat)` and `respec()`); new tests for the maths and the save. If Option A stays: nothing to build, only the numbers in B3.
+If Option B is chosen: `SaveProfile` gets the three stats and the unspent points (optional fields, old saves start at zero); `ExploreCore` exposes them in the snapshot and applies them (`hero_max_hp`, `damage_mult`, dash cooldown); the character menu gets a stats panel and a respec button (drawn by presentation from `spend_point(stat)` and `respec()` in the core); new tests for the maths and the save. If Option A stays: nothing to build, only the numbers in B3.
 
 ### B6. Open questions for B
 
@@ -140,6 +140,6 @@ If Option B is chosen: `SaveProfile` gets the three stats and the unspent points
 
 ## Suggested order of work after approval
 
-1. Claude: quest data, objective and unlock snapshot, input filter, gated exit, openable chest, the training order change, "not yet" dialogue, tests. Then a Codex task for the objective line, locks, exit message and the yard prompts.
-2. Claude (if Option B): stat points core and save. Codex: stats panel in the menu.
+1. Claude: quest data, objective and unlock snapshot, input filter, gated exit, openable chest, the training order change, "not yet" dialogue, tests. Then the objective line, locks, exit message and the yard prompts in presentation.
+2. Claude (if Option B): stat points core and save, and the stats panel in the menu.
 3. Claude: forest and Stag encounter data once the EXP table is approved.

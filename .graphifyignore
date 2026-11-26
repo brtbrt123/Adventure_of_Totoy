@@ -5,7 +5,6 @@ art/reference/
 art/src/
 docs/previews/
 presentation/**/occluders/
-harness/logs/
 graphify-out/
 *.png
 *.jpg

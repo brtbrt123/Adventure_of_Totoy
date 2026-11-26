@@ -455,7 +455,7 @@ def contact_sheet(frames, poses, strikes, flashes, aura) -> Image.Image:
 # ------------------------------------------------------------------------------------------------------- main
 def save(img: Image.Image, name: str, written: list, fire: bool = False) -> None:
     """Hard alpha and palette colours only. The strike frames may use gold and red: the meteor's fire is the skill's hit effect
-    (AGENTS.md lists hit effects among the combat cues those colours are kept for); everything else keeps them out."""
+    (CLAUDE.md lists hit effects among the combat cues those colours are kept for); everything else keeps them out."""
     if fire:
         allowed = set(PAL.by_symbol.values())
         for _, (r, g, b, a) in img.getcolors(1 << 20):

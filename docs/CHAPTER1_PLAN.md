@@ -93,7 +93,7 @@ same rules where possible; several enemies on screen; drops (herb heals).
   existing aspects are already owned. (Open question below.)
 - Weapons: the three existing ones are all available from the start for the slice, or unlocked at Tovan (open question).
 
-## Systems to build (in order), with the owner under the current Codex-limit arrangement
+## Systems to build (in order)
 
 | # | System | Layer | Notes |
 |---|---|---|---|

@@ -1,4 +1,4 @@
-"""Run the art validator (palette, sizes, transparency, seams) inside a task worktree.
+"""Run the art validator (palette, sizes, transparency, seams) on a checkout.
 
 Usage: python harness/checks/validate_art.py --worktree DIR
 """

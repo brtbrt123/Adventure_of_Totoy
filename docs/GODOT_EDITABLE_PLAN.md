@@ -36,30 +36,27 @@ Owner request: **convert all tiles, props, scenes (maps), animations, effects, U
 3. **Characters, mobs, NPCs, boss to `SpriteFrames`/`AnimatedSprite2D`**, generated from `sprites.json` and the animation tables; characters gallery with every animation playable.
 4. **Effects to scenes**: group the 2143 fx frames into effects (hit, parry, dash, aspects, lightning, scythe, ward/echo/sprint, mobs), one scene each, effects gallery; `hero_fx.gd` shrinks to the spawner.
 5. **UI leftovers and cut-ins**: arena rings and tooltip, selection brackets, the three cut-ins as timeline scenes; UI gallery.
-6. **Pipeline and docs**: `build_art.py` emits the resources, AGENTS.md/architecture.md/HARNESS.md updated, the library scene, a "how to edit X in Godot" guide for the owner, full harness green.
+6. **Pipeline and docs**: `build_art.py` emits the resources, CLAUDE.md/architecture.md updated, the library scene, a "how to edit X in Godot" guide for the owner, full harness green.
 
 ## Decisions made by the owner (2026-10-30)
 
 1. **Maps:** the `.tscn` is the source of truth, the baker writes the JSON the core reads. **Yes.**
 2. **Art source:** the text-grid pipeline stays, `build_art.py` also writes the Godot resources. **Yes.**
 3. **Order:** props, maps, characters/mobs/NPCs/boss, effects, UI leftovers and cut-ins, pipeline and docs (the order above). **Yes.**
-4. **Who does it: option B, the split stays.**
-   - **Claude** (`tools/`, `core/`, `data/`, `harness/`, `docs/architecture.md`): the generators (`tools/godot/generate_prop_scenes.gd`, the SpriteFrames and effect-scene generators), the map baker (`tools/godot/bake_maps.gd`), the JSON-to-`.tscn` converters, the round-trip tests (current JSON -> scene -> baked JSON must be identical), the `build_art.py` additions that write Godot resources, and any `core/` or `data/` change. Claude does not edit `presentation/` or `art/` assets by hand in this migration.
-   - **Codex** (`presentation/`, `art/`, UI, effects, presentation tests): takes the generated scenes and resources into the renderer (instance prop and map scenes instead of `props_layer.gd` and `draw_*` calls, play SpriteFrames by animation name, spawn effect scenes from events), builds the galleries and the library scene, keeps captures matching today's look, and ports the smoke tests that inspect plans and arrays.
-   - Each phase is a hand-off: Claude pushes the generator, its output and the round-trip test, then writes the phase's Codex task note in `docs/` (what to wire, what must look identical); Codex wires it and reports; Claude cross-reviews the interface. Nothing merges to main.
+4. **Who does it:** the owner first chose option B (Claude the generators, baker and round-trip tests; a second agent the renderer wiring). Since 2026-11-26 Claude works on the project alone and does every part: generators, baker, tests, `core/`/`data/` changes, the renderer wiring, the galleries and the capture comparisons. Nothing merges to main.
 
 ## Decisions that were open (answered above)
 
 1. **Source of truth for maps:** `.tscn` + baker (recommended) vs keeping the JSON as the source and only generating read-only `.tscn` for viewing. Recommended because "edit in Godot" is the goal.
 2. **Art source:** keep the text-grid pipeline and generate Godot resources from it (recommended: nothing in the art workflow changes), or move to PNG-first.
 3. **Order:** the plan above (props, maps, characters, effects, UI) or another order (for example maps first).
-4. **Who does it:** this touches `presentation/` and `art/` (Codex's folders) as well as `tools/` and a baker (Claude's). Either the owner lifts the split for the migration and tells Codex to review, or Claude builds the generators and baker (`tools/`, `core/` tests) and Codex converts the presentation side. Say it explicitly; the previous session crossed the split on request and Codex has to review those diffs (see `docs/STATUS.md`).
+4. **Who does it:** answered above (Claude alone since 2026-11-26).
 
 ## Risks
 
 - Size: thousands of generated files and large `.tscn`/`.tres` diffs; generate deterministically so reruns are clean, and keep generated files under clear folders.
 - Pixel exactness: nearest filtering, integer positions, same y-sort and shadow rules as today; every phase compares captures against the current ones.
-- Concurrency: Codex edits the same presentation files; announce the migration, agree on folders, avoid merging old and new drawing paths for long.
+- Old and new drawing paths: do not keep both for long; delete the old one once the captures match.
 - Tests: many smoke tests inspect plans and arrays (`ward_echo_front_plan`, `lantern_drawables`, `skill_effect`, ...); keep those APIs or port the tests together with each phase.
 - `.tscn` merge conflicts when two sessions edit one map: one owner per map at a time.
 
@@ -76,13 +73,30 @@ Owner request: **convert all tiles, props, scenes (maps), animations, effects, U
 - **Done this session:** every Aspect and the three weapon actives on the road (multi-target Lightning Form and Reaper's Coil, `core/explore_skills.gd`), shared hero effects (`presentation/common/hero_fx.gd`), forest mobs, the Thornback Stag, Root Hollow, UI as scenes (34 `.tscn`), the intro cutscene as a scene.
 - **Open gameplay items (not part of the migration):** Glowmoth (art only, no core behaviour), Edda's binding scene and the Stag's freed pose, the Colossus entrance cutscene, the beacon ending on the restored arena ground (`art/reference/beacon_epilogue/`, not wired), credits, balance and a full playtest. Damage numbers against mobs, the Stag and the multi-target falloff are first guesses.
 - **Owner's uncommitted scene edits** (edited in the Godot editor, not on the branch): `presentation/cutscene/intro.tscn`, `presentation/ui/dialogue_box.tscn`, `presentation/ui/explore_overlay.tscn`, `presentation/ui/pieces/hud/aspect_socket.tscn`, `presentation/ui/pieces/overlay/scene_ribbon.tscn`, `presentation/ui/welcome_card.tscn`. Ask before committing them; scripts must keep honouring those layouts (the intro, the toast ribbon and the reward card were fixed so they do; the pieces the game positions by design are listed in the answer given on 2026-10-30: the `E` hint, fight chips, TAB reminder, locked message, title selection plate).
-- **Shared working copy:** Claude and Codex edit the same folder. A `build_art.py` run by one side can briefly delete files under `art/build/sprites/` while the other runs tests (it caused false Python failures once): do not run the Python tests while the other agent builds art. `docs/STATUS.md`, `docs/INDEX.md` and `docs/architecture.md` often carry the other agent's uncommitted edits: commit only your own hunk.
-- **Role split stays** (owner decision 4B): Claude does generators, baker, round-trip tests, core/data; Codex wires presentation. Cross-reviews are in `art/reference/root_hollow_v1/CROSS_REVIEW.md` style.
+- (Superseded on 2026-11-26: Claude works alone now.) **Shared working copy:** Claude and Codex edit the same folder. A `build_art.py` run by one side can briefly delete files under `art/build/sprites/` while the other runs tests (it caused false Python failures once): do not run the Python tests while the other agent builds art. `docs/STATUS.md`, `docs/INDEX.md` and `docs/architecture.md` often carry the other agent's uncommitted edits: commit only your own hunk.
+- (Superseded on 2026-11-26: Claude works alone now.) **Role split stays** (owner decision 4B): Claude does generators, baker, round-trip tests, core/data; Codex wires presentation. Cross-reviews are in `art/reference/root_hollow_v1/CROSS_REVIEW.md` style.
 
 
 ## Progress (Claude, 2026-10-30)
 
 - **Phase 0 done (spike).** Design: Python generators write the `.tscn` text (deterministic, keeps `22` vs `6.0` number spelling, keeps editor values), a headless Godot baker (`tools/godot/bake_lib.gd`, `bake_props.gd`, `bake_maps.gd`) reads the scenes through `PackedScene` and writes the JSON. Result: all five `data/scenes/*_props.json` come back **byte for byte** from their generated scenes; the three `prop_defs*.json` come back value for value (whole numbers return as integers). `presentation/maps/glade_layered.tscn` is the spike map (the other four: `python tools/godot/generate_map_scenes.py`, phase 2).
-- **Phase 1 Claude side done.** `presentation/props/<type>.tscn` for all **100** types (the main catalogue has 76, woodland and Root Hollow add 24), generator `tools/godot/generate_prop_scenes.py`, round-trip tests in `tests/test_godot_scenes.py` (7). Codex wiring and the props gallery: `docs/CODEX_TASK_prop_scenes.md`.
+- **Phase 1 Claude side done.** `presentation/props/<type>.tscn` for all **100** types (the main catalogue has 76, woodland and Root Hollow add 24), generator `tools/godot/generate_prop_scenes.py`, round-trip tests in `tests/test_godot_scenes.py` (7). Renderer wiring and the props gallery: still to do, see "Phase 1 renderer wiring" below.
 - Rule kept: generators never overwrite a position, offset, size or radius found in an existing scene (`--reset` is the only way to drop editor values); tested.
 - Not verified: how the scenes look in the editor (no window in this session), and that the renderer output stays pixel-identical (that is the wiring step).
+
+## Phase 1 renderer wiring (to do)
+
+Moved here on 2026-11-26 from the retired task note for the renderer side (it is in git history before that date). Nothing in `core/` or `data/` changes for it. Do not hand-edit `presentation/props/*.tscn` with scripts: the owner edits them in Godot, and `python tools/godot/generate_prop_scenes.py` refreshes them (it keeps every position, offset and radius already in a scene).
+
+What a prop scene holds: the root `Node2D` stands on the prop's feet (its anchor). Children: `Sprite` (`Sprite2D`, `centered = false`, `offset = -anchor`; an `AtlasTexture` region where `prop_art.json` has a `trim`); `CastShadow` and `CastShadowFlipped` (hidden black-modulated `Sprite2D`s, the moon cast-shadow masks, offset by the mask frame's anchor); `Colliders` (a `StaticBody2D` with no layers, display only: the core still reads `data/props/prop_defs*.json`); `Light1..` (`Marker2D` with `socket` metadata, from `local_lights.json`). Root metadata: `w`, `h`, `base_width`, `solid`, `image`, `note`, `locked`, `state_pair`, `src_bbox`, `contact_shadow`, `sort_strips`, `flip_offset`.
+
+Steps:
+1. **Draw props by instancing the scenes** in the explore scene (and wherever `PropsLayer.drawables/draw` draws props): one instance per placement from `PropScene.placements(...)` (type already resolved for states), `position = feet`, `y_sort_enabled` on the container so props and actors sort by `feet.y` as today (actors in front on a tie; `sort_strips` props split into strips with their own `at.y`, see `PropsLayer.drawables`).
+2. **Flip.** Today a flipped prop mirrors around the feet x: `origin.x = feet.x - (size.x - anchor.x)`. In the scene: `scale.x = -1` on the root, or (to keep the pixel rounding) `Sprite.flip_h = true` with `Sprite.offset = root.get_meta("flip_offset")`.
+3. **Pixel exactness.** `PropsLayer` draws at `feet.round() - anchor` and rounds the origin, so half-pixel anchors land on whole pixels; a `Sprite2D` at `offset = -13.5` would not. Round the sprite's global position in the instancer or use `snap_2d_transforms_to_pixel`, and compare captures.
+4. **Shadows and lighting keep their look**: contact shadows from `contact_shadow`, cast shadows from the two hidden sprites, light sockets from `Light*`; depth occluders stay per scene. The JSON files stay the generator's input for now.
+5. **State pairs** (`forest_gate_closed/open`, `forest_pedestal/lit`, `root_hollow_barrier_*`, the trial altar and chest, the Rootcrown tower): swap the instance when `PropScene.type_of` says so; a pair shares size and anchor.
+6. **Props gallery** (`presentation/library/props_gallery.tscn` or similar): every `presentation/props/*.tscn` in a grid with its name, collider circles visible and a shadow toggle; groups come from the type prefix.
+7. **Keep the plan/array APIs** the smoke tests use (`ward_echo_front_plan`, `lantern_drawables`, `PropsLayer.drawables`) until their tests are ported with the drawing change.
+
+Must look identical: same pixels as today in every layered scene (prop positions, sort order against actors, contact and cast shadows, light pools, mirrored props). Baking: `godot --headless --path . --script res://tools/godot/bake_props.gd` writes `anchor`, `solid` and `colliders` back into `data/props/prop_defs*.json` when the owner has changed a scene; bake before regenerating.

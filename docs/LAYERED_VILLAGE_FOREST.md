@@ -9,7 +9,7 @@ The Stag glade proved the layered method (floor painting + separate prop sprites
 | Who | Work |
 |---|---|
 | **Human** | Generates the images below, saves the ORIGINALS (not screenshots) into `art/reference/layered_village/` and `art/reference/layered_forest/`, approves the look. |
-| **Codex** | Palette conversion of the ground, cleaning the prop sprites into `art/src`, drawing the scene with `props_layer.gd`, the debug jump key, review captures (exactly as for the glade). |
+| **Presentation and art** (Claude since 2026-11-26) | Palette conversion of the ground, cleaning the prop sprites into `art/src`, drawing the scene with `props_layer.gd`, the debug jump key, review captures (exactly as for the glade). |
 | **Claude** | Runs `tools/art/extract_props.py` (use `--merge --prefix village`), writes `data/props/prop_defs.json` entries (hand-tuned, locked) and `data/scenes/<scene>_props.json` (placements, outline, entries, exits, checkpoints, NPC stand points), tests, and the extra scene-format fields these two scenes need: NPCs and interactables (the village), the forest's root gate with an open and a closed state. |
 
 Sizes: village world **571x336** (the hero is 34 px tall, a door about 39 px), forest **480x288**. The human judges the prop scale on the contact sheet (the glade's first extraction was too big and was redone at `--world-width 400` for a 1619 px sheet; expect to pick the width per sheet).

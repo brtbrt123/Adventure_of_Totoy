@@ -9,7 +9,7 @@ explosion, smoke, a cracked crater). Everything here is drawn in code so every f
     ground sprites (circles, rings, the crater) are drawn under the characters, air sprites (bursts, fire, the meteor) over them
 
 Colours: the staff's magic is teal and pale blue with cream starlight (t, u, o, p, 1, deep k); the meteor's fire uses the combat
-colours gold and red (x, y, z, A) because it is the skill's hit effect (AGENTS.md: gold and red are reserved for combat cues, hit effects
+colours gold and red (x, y, z, A) because it is the skill's hit effect (CLAUDE.md: gold and red are reserved for combat cues, hit effects
 included); the circle stays teal so it never reads as an enemy's red warning.
 
 Particles (Particles below) live on the ground plane with a height: x, gy (the ground y they stand over) and z (height above it), so

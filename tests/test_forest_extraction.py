@@ -1,6 +1,6 @@
 """The forest cut-outs (data/props/cutouts_forest) and tools/art/normalize_state_pairs.py.
 
-The cut-outs are generated sources, not palette-converted art: Codex converts and cleans them. These tests check that
+The cut-outs are generated sources, not palette-converted art: they are converted and cleaned into art/src. These tests check that
 the extraction output is consistent with the shared defs and that the two states of a prop share one canvas and anchor.
 """
 import json

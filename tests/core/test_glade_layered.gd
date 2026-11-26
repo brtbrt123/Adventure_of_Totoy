@@ -101,7 +101,7 @@ func test_the_renderer_takes_the_placements_as_they_are() -> void:
 
 
 func test_the_presentation_fixture_does_not_drift_from_the_authoritative_arrangement() -> void:
-	# data/scenes/glade_layered_props.json is the one arrangement; presentation/forest/glade_props.json (Codex's
+	# data/scenes/glade_layered_props.json is the one arrangement; presentation/forest/glade_props.json (the
 	# review fixture) must either be gone or say the same thing
 	var fixture: Dictionary = PropScene.read_json("res://presentation/forest/glade_props.json")
 	if fixture.is_empty():

@@ -1,5 +1,7 @@
 # Project Brief: 16x16 Pixel Game (Claude Code + Codex)
 
+> **Historical (2026-11-26):** this is the original kickoff brief from 2026-10-15, written for two AI agents. Since 2026-11-26 Claude Code works on the project alone; the current rules are in `CLAUDE.md`. The agent roles (Appendix A), the routing plan (Appendix B), the harness router and review loop (Appendices C and F) and everything about Codex no longer apply; the router was removed (see `docs/HARNESS.md`, "History"). Do not follow the instructions below.
+
 Read this whole file before doing anything. It is the kickoff brief for this project.
 Your job in this session is **Stage 1 only** (see "Your task now"). Do not build the router, CI, or Graphify yet.
 Start with the environment pre-flight check in Appendix E, then follow Section 6 in order. The human is working with you in this session, so ask your questions in chat.

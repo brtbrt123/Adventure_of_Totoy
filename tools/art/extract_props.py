@@ -6,7 +6,7 @@ such as a glowing rune are merged), scale each to the world (default: sheet widt
 Totoy 36 palette (no reserved gold/red), hard alpha, then work out the prop's base line and its colliders.
 
 Output:
-  <out>/<id>.png                 one cut-out per prop, tight to the opaque pixels (review art for Codex, NOT art/src)
+  <out>/<id>.png                 one cut-out per prop, tight to the opaque pixels (review art, NOT art/src)
   <out>/props_contact.png        every prop on a grey board, base line and colliders marked (for the human's eyes)
   <defs>                         data/props/prop_defs.json, the shared prop data (see docs/architecture.md "Layered
                                  scenes"): per prop id the size, the anchor (base middle, in sprite pixels), the base

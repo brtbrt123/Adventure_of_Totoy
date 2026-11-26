@@ -1,16 +1,12 @@
-"""Shared helpers for the check scripts. A check exits 0 on success, non-zero on failure, and prints
-plain-text errors that are fed back to the builder as they are."""
+"""Shared helpers for the check scripts. A check exits 0 on success, non-zero on failure, and prints plain-text errors."""
 from __future__ import annotations
 
 import os
 import subprocess
-import sys
 from pathlib import Path
 
-HARNESS_DIR = Path(__file__).resolve().parents[1]
-REPO_ROOT = HARNESS_DIR.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+# The console build prints to a terminal on Windows (the regular build does not reliably). Not on PATH.
+DEFAULT_GODOT = r"C:\Tools\Godot\Godot_v4.7.2-stable_win64_console.exe"
 
 
 def kill_tree(process: subprocess.Popen) -> None:
@@ -34,9 +30,5 @@ def run_limited(command: list[str], cwd: Path, timeout: int) -> tuple[int, str]:
 
 
 def godot_path() -> str:
-    explicit = os.environ.get("HARNESS_GODOT", "")
-    if explicit:
-        return explicit
-    from harness.lib.config import load_config  # imported lazily so the path hack above has run
-
-    return str(load_config().get("godot", ""))
+    """The Godot console executable: HARNESS_GODOT if set, else the installed 4.7.2 console build."""
+    return os.environ.get("HARNESS_GODOT", "") or DEFAULT_GODOT

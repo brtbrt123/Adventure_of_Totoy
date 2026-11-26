@@ -11,7 +11,7 @@ A dead-end room off the top of Root Hollow. An altar in the middle, a chest besi
 
 ## The room (scene `root_hollow_trial_layered`)
 
-About 560x336 like the glade, one entry at the bottom, **no other exit**. A wide round arena floor, with a **clear fight floor of about 300x200 around the altar** (nothing on it hides an attack). Trees along the edges, bushes and many glowing rocks (teal rune light as in the Hollow shrine) around the rim; the chest stands behind the altar. The altar is a two-state prop (dark, lit), the same way the root barrier is a flag-keyed pair. Needs: ground painting, a few new props (altar dark/lit, chest closed/open or reuse the forest chest), colliders, lighting. Art and wiring are Codex's; the map data, colliders and rules are Claude's.
+About 560x336 like the glade, one entry at the bottom, **no other exit**. A wide round arena floor, with a **clear fight floor of about 300x200 around the altar** (nothing on it hides an attack). Trees along the edges, bushes and many glowing rocks (teal rune light as in the Hollow shrine) around the rim; the chest stands behind the altar. The altar is a two-state prop (dark, lit), the same way the root barrier is a flag-keyed pair. Needs: ground painting, a few new props (altar dark/lit, chest closed/open or reuse the forest chest), colliders, lighting. Claude builds all of it (art and wiring, map data, colliders and rules).
 
 ## The trial rules (core, new `core/trial.gd` + ExploreCore hooks)
 
@@ -24,7 +24,7 @@ About 560x336 like the glade, one entry at the bottom, **no other exit**. A wide
 
 The Stag stays the glade's mini-boss and is **not** in the trial. The trial gets its own hard mob. Mossling and Boar are melee rushers; the Warden is the first mob that mixes a guard, a ranged line and an area attack, so it asks for a different answer.
 
-Look (Codex draws it): a root-and-stone knight, about 24x32, moss on bark plates, a teal rune glowing in the chest (the same rune light as the Hollow stones). Sprites needed: idle, walk, three attack windups and strikes, guard hit (blocked), exposed (stunned, rune dark), hurt, defeat.
+Look: a root-and-stone knight, about 24x32, moss on bark plates, a teal rune glowing in the chest (the same rune light as the Hollow stones). Sprites needed: idle, walk, three attack windups and strikes, guard hit (blocked), exposed (stunned, rune dark), hurt, defeat.
 
 Numbers (first guess, `Tuning.MOBS[&"warden"]`): level 3, HP 140, speed 0.5 (slower than the hero), radius 18 (11 until the detailed art, 2026-10-31), aggro 120, exp 45, herb drop 0.8.
 
@@ -49,19 +49,19 @@ Hard on purpose: mobs in a wave wake together, boars charge across the whole flo
 
 ## Build order
 
-1. Claude: the Warden mob (Tuning, guard, chain, tests), map data (outline, entry, one exit in the Hollow, checkpoint, trial encounter markers), `core/trial.gd` (waves, spawn points, win/lose), `ExploreCore` flag/chest/reward hooks, tests (wave progression, no spawn near the hero, lose and retry, reward once, save/load), contract in `docs/architecture.md`, a Codex task note.
-2. Codex: Warden sprites, ground painting, altar and chest props, wave banner ("WAVE 2"), altar lit effect, chest-open effect and reward card, lighting.
+1. Claude: the Warden mob (Tuning, guard, chain, tests), map data (outline, entry, one exit in the Hollow, checkpoint, trial encounter markers), `core/trial.gd` (waves, spawn points, win/lose), `ExploreCore` flag/chest/reward hooks, tests (wave progression, no spawn near the hero, lose and retry, reward once, save/load), contract in `docs/architecture.md`.
+2. Presentation and art (Claude since 2026-11-26): Warden sprites, ground painting, altar and chest props, wave banner ("WAVE 2"), altar lit effect, chest-open effect and reward card, lighting.
 3. Owner: confirm the Warden's name and look, pick the Aspect, play and say if it is hard enough; numbers are first guesses and are not judged.
 
 Note: this room should be built as a map **scene** (`presentation/maps/*.tscn` + baker) once the phase 2 migration lands; until then it is a normal `data/scenes` file.
 
 ## Layout fixed (2026-10-31)
 
-Scene `hollow_trial_layered`, 512x352, entered from Root Hollow's upper-left exit at its bottom edge (x 228-284), dead end. Altar at (256, 180), chest at (256, 136), fight floor [112, 92, 288x184], twelve spawn points on the rim (all at least 109 px from the entry and 122 px from the altar, 57 px apart). Exact numbers: `docs/previews/hollow_trial_v1/layout.json`, guide `walkable_guide.png`. Codex's art and presentation task: `docs/CODEX_TASK_hollow_trial.md`.
+Scene `hollow_trial_layered`, 512x352, entered from Root Hollow's upper-left exit at its bottom edge (x 228-284), dead end. Altar at (256, 180), chest at (256, 136), fight floor [112, 92, 288x184], twelve spawn points on the rim (all at least 109 px from the entry and 122 px from the altar, 57 px apart). Exact numbers: `docs/previews/hollow_trial_v1/layout.json`, guide `walkable_guide.png`.
 
 ## Core built (2026-10-31, Claude)
 
-`core/trial.gd` + a managed encounter in `core/mob_field.gd` + ExploreCore hooks; the room `hollow_trial_layered` is registered with stand-in props (forest pedestal as the altar, forest chest, rune stones, rim trees, the root knot at the entry); Root Hollow's upper-left exit now leads here (the village's `return` entry stays: the Woodland uses it). Tests: `tests/core/test_hollow_trial.gd` (10). Still open: the ground painting and real props (Codex), the chest's Aspect (owner; a 3-herb placeholder for now), the presentation wiring (Codex), the feel and numbers (owner, by play).
+`core/trial.gd` + a managed encounter in `core/mob_field.gd` + ExploreCore hooks; the room `hollow_trial_layered` is registered with stand-in props (forest pedestal as the altar, forest chest, rune stones, rim trees, the root knot at the entry); Root Hollow's upper-left exit now leads here (the village's `return` entry stays: the Woodland uses it). Tests: `tests/core/test_hollow_trial.gd` (10). Still open then: the ground painting and real props, the chest's Aspect (owner; a 3-herb placeholder for now), the presentation wiring, the feel and numbers (owner, by play). The painting, props and wiring were done on 2026-10-31 (STATUS).
 
 ## Chest on top of the altar (owner, 2026-10-31)
 

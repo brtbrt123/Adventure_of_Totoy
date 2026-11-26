@@ -257,7 +257,7 @@ func test_the_same_play_spawns_the_same_way() -> void:
 	assert_true(runs[0] != "", "and something spawned")
 
 
-# ---- the registered room (Codex's props, 2026-10-31) -------------------------------------------------------------------------------
+# ---- the registered room (its props, 2026-10-31) --------------------------------------------------------------------------------------
 
 const LayoutFlood := preload("res://tests/layout_flood.gd")
 const HERO: float = 6.0
@@ -270,7 +270,7 @@ func _flood_room(tags: Array = [], flags: Array = []) -> LayoutFlood:
 	return flood
 
 
-func test_the_room_uses_codexs_registered_props() -> void:
+func test_the_room_uses_the_registered_props() -> void:
 	var defs: Dictionary = PropScene.load_defs()
 	for type_id: String in ["hollow_trial_altar_dark", "hollow_trial_altar_lit", "hollow_trial_chest_closed", "hollow_trial_chest_open", "hollow_trial_tree_1"]:
 		assert_true(defs["props"].has(type_id), "%s is in the catalogue" % type_id)

@@ -20,10 +20,6 @@ venv/
 *.pem
 .claude/settings.local.json
 
-# Harness run logs are local; keep the folder
-harness/logs/*
-!harness/logs/.gitkeep
-
 # OS / editors
 Thumbs.db
 Desktop.ini
@@ -39,7 +35,7 @@ docs/.trash/
 # Godot user data redirected into the project by some headless runs
 /Godot/
 
-# Run logs written by agent check scripts
+# Run logs written by check scripts
 art/build/*.log
 art/build/arena_weapon_paths_motion/
 art/build/arena_weapon_contact_pages/
