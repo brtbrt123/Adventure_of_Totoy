@@ -3,7 +3,10 @@ extends RefCounted
 const Fireflies := preload("res://presentation/common/ambient_fireflies.gd")
 const SHADER := preload("res://presentation/common/overhead_light.gdshader")
 const SHADOW_PROJECTION: Vector2 = Vector2(0.30, 0.25)
-const MAX_LIGHTS: int = 32
+## Light entries the overhead shader takes (two per light socket: its halo and its floor pool), shared by the props' glows and
+## the fight's moving lights. 48 since 2026-11-26: Rootcrown v2 has 21 glowing props (42 entries) and dropped 5 at 32; 48 keeps
+## the shader's uniforms well inside GLES3's minimum (lamps, lamp_colours, lamp_core_colours: 144 of 224 vectors).
+const MAX_LIGHTS: int = 48  # must match the arrays in presentation/common/overhead_light.gdshader
 const PROP_SHADOW_ALPHA: float = 0.30
 const ACTOR_SHADOW_ALPHA: float = 0.20
 const LAMP_SHADOW_ALPHA: float = 0.85  # the shader's lamp_shadow_alpha

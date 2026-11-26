@@ -5209,6 +5209,108 @@
         }
       },
       "object_rgba_sha256": "3032b6dc894fe4efa38c2f292256f7a57498a9d7dc336058738d26ea8b9d3a92"
+    },
+    "rootcrown_tower_dark": {
+      "object": "rootcrown_tower_dark",
+      "object_source": "art/reference/rootcrown_v2/tower_dark.png",
+      "object_size": [
+        123,
+        152
+      ],
+      "object_anchor": [
+        63,
+        152
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_rootcrown_tower_dark_1",
+          "size": [
+            136,
+            48
+          ],
+          "anchor": [
+            60,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -56,
+            0,
+            72,
+            36
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_rootcrown_tower_dark_flipped_1",
+          "size": [
+            136,
+            48
+          ],
+          "anchor": [
+            54,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -50,
+            0,
+            72,
+            36
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "3473099c027efdd565dbfbad9884548d3d054ef654b44df3152c197c62153702"
+    },
+    "rootcrown_tower_lit": {
+      "object": "rootcrown_tower_lit",
+      "object_source": "art/reference/rootcrown_v2/tower_lit.png",
+      "object_size": [
+        123,
+        152
+      ],
+      "object_anchor": [
+        63,
+        152
+      ],
+      "shadows": {
+        "normal": {
+          "sprite": "fx_shadow_rootcrown_tower_lit_1",
+          "size": [
+            136,
+            48
+          ],
+          "anchor": [
+            60,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -56,
+            0,
+            72,
+            36
+          ],
+          "blur_padding": 4
+        },
+        "flipped": {
+          "sprite": "fx_shadow_rootcrown_tower_lit_flipped_1",
+          "size": [
+            136,
+            48
+          ],
+          "anchor": [
+            54,
+            4
+          ],
+          "bounds_relative_to_feet": [
+            -50,
+            0,
+            72,
+            36
+          ],
+          "blur_padding": 4
+        }
+      },
+      "object_rgba_sha256": "d5b98d8d12000baac742b62cc0f39df469c296b59799a3baba7b86056b86e56c"
     }
   }
 }

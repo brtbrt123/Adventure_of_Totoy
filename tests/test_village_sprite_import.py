@@ -49,6 +49,7 @@ class VillageSpriteImportTests(unittest.TestCase):
         defs = json.loads((ROOT / 'data/props/prop_defs.json').read_text())['props']
         defs.update(json.loads((ROOT / 'data/props/prop_defs_woodland.json').read_text())['props'])
         defs.update(json.loads((ROOT / 'data/props/prop_defs_root_hollow.json').read_text())['props'])
+        defs.update(json.loads((ROOT / 'data/props/prop_defs_rootcrown.json').read_text())['props'])
         self.assertEqual(set(defs), set(art))
         for name, metadata in art.items():
             with self.subTest(prop=name):

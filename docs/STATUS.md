@@ -1,3 +1,106 @@
+## Rootcrown v2 built into the game (2026-11-26, Claude, debug key Y)
+
+Owner: "Yes, build it" (tower kept as approved, shown whole by a camera pan in the story moments). `rootcrown_layered` is now
+v2 (the first build stays in git history, d002faac). `python tools/art/make_rootcrown_art.py` (rewritten for v2) installs:
+- the floor `presentation/forest/rootcrown_layered_ground.png` (1024x720) = the approved `docs/previews/rootcrown_v2/floor.png`,
+  checked in Totoy 36 without gold/red (22 colours);
+- the tower as the state pair `rootcrown_tower_dark`/`_lit` (art/src 128x152, defs 123x152 with the padding trimmed in
+  `presentation/common/prop_art.json`, anchor 63,152, four colliders on the stone drum only: roots, shed stones and ferns are
+  walkable), each state its own moonlight cast shadow `fx_shadow_rootcrown_tower_{dark,lit}_1` (+ `_flipped_1`, both cast by the
+  unlit silhouette) and contact shadow in prop_art.json and `art/reference/shadow_layers/manifest.json`; light sockets moved
+  onto the new art in `presentation/common/local_lights.json` (lit: the flame, pixel 61.5,30.5; dark: the runes, 59.5,90);
+- removes the 12 first-build props (`rootcrown_stone_*`, `_lantern_*`, `_rubble_*`, `_roots_*`, `_briars_*`: art/src,
+  art/build/sprites, presentation/props);
+- writes `data/scenes/rootcrown_layered_props.json`: 100 placements (the beacon plus 99 existing forest props, as in the approved
+  pictures), the walkable outline traced from the floor's own earth (68 points: the clearing, the tower's forecourt and grass
+  mound, the climb; 8 px kept round the fight floor), entry `glade_side` (512,698), exit `to_glade` on the bottom edge
+  (x 476..562) to the glade's `rootcrown_side`, checkpoint `rootcrown_layered_stair` (512,656), the beacon at (512,204) on
+  `flag:cleared_rootcrown`.
+Then: validate/build/preview art, `generate_prop_scenes.py` (the two tower scenes deleted first so they are written fresh; the
+22 `hollow_trial_*` scenes it reformats restored from git), `generate_map_scenes.py --only rootcrown_layered --reset`, Godot
+import, `bake_maps.gd` and `bake_props.gd` (round trip identical). Also: firefly regions for the new layout
+(`presentation/common/ambient_regions.json`), the actors' ambient matched to Root Hollow's (`explore_scene.gd` AMBIENT).
+Tests: `tests/core/test_rootcrown.gd` (1024x720, boss start 512,378, the 624x344 fight floor open with and without the flag);
+the two shadow-catalogue tests (`tests/test_separate_shadow_layers.py`, `tests/test_village_sprite_import.py`) now include
+`prop_defs_rootcrown.json`, as they did Root Hollow's. Capture script: `presentation/review/rootcrown_v2/capture_rootcrown.gd`. Full harness passed (Python 94 tests, Godot import, 581 core
+tests, 53 smokes).
+
+Owner's first play of v2 (2026-11-26): "can you place this lamp more on the grass, also our dirt ground looks empty", then "move
+the lamp more down". Owner: "yes put it in and remove the post light". In the game now (`make_rootcrown_art.py`, map scene regenerated, bake
+round trip identical): the two stone lanterns (`forest_pedestal`) moved off the climb's dirt onto the grass beside the
+lamp posts at its foot (PATH_X-100, 690 and PATH_X+108, 692), and 62 small grass islands stitched into the earth
+(`grass_islands` in `make_rootcrown_v2_preview.py`: 12..30 px across, a few up to 48 near the edge, more towards the edge; flat
+walkable ground; the walkable outline ignores them). Functional fix from the console of that play: the scene dropped 5 of its
+21 light sockets ("Environment light budget: dropped 5 fixture(s), limit 32 entries"). The light limit is now 48 entries
+(`EnvironmentLight.MAX_LIGHTS` and the arrays and loop in `presentation/common/overhead_light.gdshader`); every other scene uses at
+most 18, and the same slots carry the fight's moving lights, so the boss step must keep an eye on the budget. Smokes for scenes
+and lights passed with no budget warning. The two lamp posts (`forest_lantern_post`) at the foot of the climb are removed (read
+as "the post light" = the posts; 98 placements, 19 light sockets). In-game captures with the night light:
+`presentation/review/rootcrown_v2/rootcrown_*.png` (climb, tower_front, tower_side, fight_middle, west_edge, east_edge, map_dark,
+map_lit, tower_lit), no light warning in the console. (The "TASK COMPLETE +0 EXP" line in them comes from the capture setting the
+debug flags directly, not from play.) Not committed.
+
+## Rootcrown v2: the beacon tower pictures (2026-11-25, Claude, nothing wired)
+
+Owner: "Yes, do tower picture". Two Higgsfield pictures (nano_banana_2_1, 3 credits, 16.5 left), the only reference a sheet of
+existing forest props (`art/reference/rootcrown_v2/tower_refs.png`): the tower dark (`tower_dark_raw.png`) and the same picture
+edited with the beacon burning (`tower_lit_raw.png`). `python tools/art/make_rootcrown_tower.py` cuts both from one box at one
+scale (123x152, a state pair that lines up pixel for pixel), snapped to Totoy 36 without gold/red: `tower_dark.png`, `tower_lit.png`,
+anchor in `tower_cut.json`, review `tower_review_3x.png` (beside the standing stones, the root-wall tree and the stone lantern).
+`tools/art/make_rootcrown_v2_preview.py` now draws the tower in the v2 map (placeholder only if the cut-outs are missing) and adds
+`docs/previews/rootcrown_v2/rootcrown_v2_tower_end.png` (one screen before and after the fight). Provenance and prompts:
+`art/reference/rootcrown_v2/sources.json`. Not committed.
+
+Owner on the tower end: "this looks off". Fixed in the preview: the Hollow Trial slab ring under the tower is gone (two slabs
+stuck out at its sides like dark mats, three lay loose in front) and the map grew 48 px at the top (now 1024x720, the tower's feet at
+(512,204) on a dirt forecourt) so the trees behind it show their crowns instead of trunk bottoms cut by the map edge. Before/after:
+`docs/previews/rootcrown_v2/rootcrown_v2_tower_end_fix.png`. Found while checking: the game camera centres on the hero and stops
+only at the map edge (`explore_scene._update_camera`), so a 152 px tower at the top edge is cut in every view a player can get and
+off screen during the fight; `rootcrown_v2_tower_end.png` now shows those real views (hero beside it, in front, at the fight floor).
+The same holds for a 130 px Colossus seen from the south (step 3). Open for the owner: keep the tower at the top and show it whole in
+the story moments with a camera pan, or a shorter tower. Waiting on the owner before the map is built.
+
+Owner next (2026-11-26): "the ground look plain on the tower part it has no depth, and details also other props on the side like
+the stone and bush looks off it look like it just got put in there". Fixed in the preview, with existing art and the game's own
+shadow rules only:
+- the game's prop shadows are now drawn in every picture (the plain previews had none): each prop's moonlight cast shadow
+  (`fx_shadow_*`, alpha 0.30) and contact shadow rows from `presentation/common/prop_art.json`, the actor ellipse for props without
+  that data, as `presentation/common/props_layer.gd` draws them; the tower's own pair made by `make_rootcrown_tower.py` with the
+  shadow makers of `tools/art/make_village_walls.py` (`tower_cast*.png`, rows in `tower_cut.json`). The Stag Glade, Root Hollow
+  and the Hollow Trial get the same shadows in the comparison picture.
+- depth in the ground: `tools/art/quilt_ground.py` takes an optional brightness wish (`shade`) and picks patches by their mean
+  brightness too (the sources' grass runs from deep shade to sunlit; their dirt is flat). The map wishes light grass at the
+  clearing's edge, darker deeper under the trees, darkest behind the tower and at the map's rim (`shade_map`).
+- the tower grows out of a grass mound that frays onto the dirt, with roots running on into the ground, shed stones
+  (`glade_rocks_small`, `forest_rocks`), ferns and mushrooms at its foot (placed from the tower, 99 props now).
+- the stones, rocks, briars, flowers and loose roots at the clearing's edge each stand in a seat of grass (`SEATED`), with fern
+  and bush tufts at their feet.
+Pictures: `rootcrown_v2_tower_depth.png` (the flagged view, before and now), `rootcrown_v2_tower_end.png` (the real camera views),
+`rootcrown_v2_compare.png`. The night light, glow, mist and vignette are still not in the pictures (only an in-game capture shows
+them). Not committed.
+
+**Owner approved the look (2026-11-26): "Yes, looks right".** Next: build v2 into the game in place of the first build
+(`rootcrown_layered`, debug key Y), on the owner's go-ahead, then in-game captures with the night light before the playtest.
+Still open: the tower stays 152 px tall at the top edge and is shown whole in the story moments by a camera pan (proposed), or
+a shorter tower.
+
+## Rootcrown v2: pictures for the owner (2026-11-09, Claude, nothing wired)
+
+Owner: "We're redoing the Rootcrown map ... show me pictures before building anything." Three pictures in
+`docs/previews/rootcrown_v2/` (made by `python tools/art/make_rootcrown_v2_preview.py`, about 20 s): `rootcrown_v2_compare.png`
+(one 384x216 screen each of the Stag Glade, Root Hollow, the Hollow Trial and three spots of the new map, plain art for all),
+`rootcrown_v2_map_2x.png` (the whole map) and `rootcrown_v2_size.png` (the sizes). Built only from the existing scenes' art:
+the floor is stitched from the Root Hollow, Woodland Approach and Hollow Trial floor pixels by the new
+`tools/art/quilt_ground.py` (texture by numbers: a dirt/grass label map, patches chosen by label and overlap, min-cut seams;
+every pixel is copied, so the palette, grass, dirt and fringe are theirs); the slab ring under the tower is the trial's
+`hollow_trial_altar_base`; all 81 props are existing forest props. Only the beacon tower is new art (a marked placeholder in the
+pictures; its prompt waits on the owner). Size: map 1024x672 (first build 640x360), walkable clearing about 331k square px (old
+arena 744x424 = 315k with pillars, first build about 69k), an open fight floor of 624x344 with no props in it (checked by the
+script). The Colossus is drawn at about 130 px with a body radius of 46; the red reaches in the size picture assume the old reaches
+x1.5 (step 3 sets them). No stone stair (no existing art for one): the climb is a path between two dark stone lanterns
+(`forest_pedestal`, which could light with the beacon). The numbers and placements are in `docs/previews/rootcrown_v2/layout.json`.
+Waiting on the owner's yes before anything is wired. Not committed.
+
 ## Rootcrown playtest: look and size rejected (2026-11-09, Claude)
 
 Owner, after playing it with key Y: "i dont like the looks since it doesnt match our other scene and the stage is too small", then
@@ -491,6 +594,14 @@ Codex's 22 props are in data/props/prop_defs_hollow_trial.json and placed in the
 
 The trial room exists in the core: hollow_trial_layered (512x352, dead end behind Root Hollow's upper-left exit, which now leads here instead of the village), core/trial.gd (E at the altar seals the entry, three warned waves of Mossling, Boar and Warden with up to four attackers, win sets cleared_hollow_trial and lights the altar, the chest pays once, falling resets the try), managed encounters in core/mob_field.gd, prop state trial:sealed, ExploreSnapshot.trial and trial_* events (docs/architecture.md "Trial rooms"). Stand-in props until Codex's art; no ground painting yet (pending in the tests). Chest reward is a 3-herb placeholder until the owner picks the Aspect. Tests: test_hollow_trial.gd (10), core 564 pass, Python and the map round trip pass, 50 of 54 smokes headless (3 need a window). Not play-tested; numbers are first guesses.
 
+## Warden 2.5x presentation integrated (2026-10-31, Codex)
+
+Owner authorized continuation through sources, shared mob rendering, FX/telegraphs, sounds, tests and captures. Installed60 enlarged bodies and75 attached FX (135 exact atlas/feet parity checks), dynamic core-geometry ground effects, guarded/exposed glow and recoil policy,13 credited recorded foley remixes with separate two-voice cap. Atlas1024x8086; validate/build/standard18-page contact sheet PASS after trimming/replacing frozen ground textures; no tooling changes. Focused Warden/art/audio/creature checks and real OpenGL test-encounter captures PASS, including core parry/exposure and all three attacks/both facings. Harness Python/import and52 smokes PASS; initial90s core timeout resolved by standalone standard300s rerun:554 tests,0 failed,exit0. Focused9 Warden core tests also PASS. Original harness invocation retains its timeout failure; combined constituent-suite verification is green. Claude review authorized but blocked by expired OAuth; no cross-review PASS claimed. Details [[WARDEN_INTEGRATION]] and presentation/review/warden/README.md. Preserve existing dirty work; no core/data edits or main merge. Human appearance/sound/feel judgement pending; trial map/waves/rewards separate.
+
+## Codex session handoff: Warden full-range Cleave preview (2026-10-31)
+
+New-session starting point: [[CODEX_NEXT_SESSION_warden]]. Work branch agent/codex/progression; never merge to main. Current Warden review package is art/reference/warden_cleave_range_v4/: 60 body frames, 120 compact FX frames, 11 GIFs. Owner asked for all animations/FX, requested Astra polish, found attacks too faint, then found Cleave range mismatch. V3 improves contrast; V4 retains the attached blade trace and adds a separate active-only sweep covering the full core cone (reach46 + radius11 =57, half-angle0.9). Original body, warning geometry and timings preserved; exact-cone/alpha/palette/anchor/GIF/dark-exposure audit PASS. Project validator checked191 PNGs. No Warden runtime import/wiring, engine playtest, audio or new full harness run; latest look approval remains pending. Do not use the older V1/V2/V3 Cleave as the final review. Core Warden interface already exists; preserve Claude's completed Thornback/Glowmoth/projectile/particle/glow updates. Handoff records commits, rebuild/check commands, approval boundary and dirty-worktree cautions.
+
 ## Thornback effects finished and the Glowmoth orb (2026-10-31, Claude, owner-approved crossing of the split)
 
 Fixed the flat-line slam warning (snapshot lacked the cone angle), made the Glowmoth orb a real projectile (core, events, snapshot, 8 tests), and finished the creature effects: slam shock, cracks and rubble reach the real 145 px edge, visible healing links and heal pulses, orb, trail and pop, moth reveal, readable moth bars, chant release frames. Core 554 pass, 51 of 54 smokes pass headless (3 need a window). Details: docs/CROSS_REVIEW_thornback_v3.md (Follow-up). Captures: docs/previews/thornback_v3_real/ (not committed). Look and feel are the owner's call.
@@ -499,24 +610,53 @@ Fixed the flat-line slam warning (snapshot lacked the cone angle), made the Glow
 
 Slam reach 125, charge 6.6 px/tick over 24 ticks, eight root bursts (eight telegraphs, deterministic valid sites, an escape rule), the chant that calls exactly five Glowmoths, and the 2 percent per second summon regeneration (per Stag, never per moth) are in the core, with new events mob_summon_started, mob_summoned, mob_healed and mob view fields summoner_id, regen_active, live_summons, cast_start_tick, cast_release_tick. tests/core/test_stag_v3.gd (22), core suite 546 pass, three smokes pass. Cross-review of Codex 8ae4d9df: PASS with four small comments, see docs/CROSS_REVIEW_thornback_v3.md. Not verified: real renderer captures, the feel of eight roots, all numbers (first guesses).
 
+## Thornback / Glowmoth visual wiring (2026-10-30, Codex)
+
+Owner approved V3 and said wire them. Installed344 approved pixel/anchor-identical body/FX sprites; atlas/variants and17 contact pages rebuilt. Shared Explore renderer now syncs creature_effects on every map, places shock/roots/dust below actors and pose-matched horns within actor y-sort, uses actual core telegraph geometry, supports independent multiple root IDs, and cleans up on interruption/death/transition. Approved Stag breath/walk and Glowmoth pose tables installed. Future summon uses explicit non-damaging cast_start_tick/cast_release_tick progress; regeneration links require core regen_active plus caster-owned live moths, pulses require actual HP gain. Core still needs reach125, charge6.6/24ticks, eight real hazards, five real summons, Glowmoth combat/projectiles and2%max-HP/second healing. Handoff docs/CLAUDE_TASK_thornback_balance_v3.md. No core/data/tools/harness edits. Validator/build/preview,344 parity checks, focused effect/Stag smokes, real OpenGL captures and full harness PASS (save-dependent sandbox failures resolved by normal filesystem access to isolated test saves). Live captures distinguish natural attacks from future-rule fixtures; new rules not playtested/implemented. Details art/reference/thornback_fx_review_v3/LIVE_INTEGRATION.md. Graphify unavailable; Claude cross-review and final owner judgement pending.
+
+## Thornback V3 balance previews â€” review only (2026-10-30, Codex)
+
+Owner requested slam x2.5, faster charge, eight eruption sites, and 2% HP/second while any summoned Glowmoth survives. New offline review clips in art/reference/thornback_fx_review_v3/: revised_attacks.gif and moth_regeneration.gif. Slam125px; charge proposed6.6px/tick,24strike ticks (1.5x speed, same travel); eight independently warned radius34 sites; healing fixed2%max/second total, stops when last summoned moth dies. Native384x216, GIF3x, palette/hard-alpha/GIF timing/eight-site/healing-stop/approved-moth hashes pass. Visually inspected contact, temporal samples and final healing state. No runtime/core/data changes or Godot/full-harness run; real collision/renderer verification pending approved integration. Handoff docs/CLAUDE_TASK_thornback_balance_v3.md distinguishes owner requirements from proposals.
+
+## Thornback richer FX + five-moth chant â€” review only (2026-10-30, Codex/Astra)
+
+Owner approved Glowmoth visuals; approval and hashes recorded without changing approved GIFs. Owner requested richer Thornback FX with Astra and a new chant making antlers glow then spawning5 moths, to review before wiring. Astra sidecar gpt-6-astra produced strengthened existing slam/charge/root FX at art/reference/thornback_fx_review_v2/attacks_astra/thornback_existing_attacks_fx_4x.gif; technical review PASS (horn registration, body/telegraph protection, palette/hard alpha, decoded GIF timing). Parent produced summon/chant_summon_five.gif:8s,160 review frames, pose-following antler glow, runes/energy seeds, five portals and exactly5 unchanged approved moths visible after frame84. Native body/FX layers and anchors/timeline supplied; source palettes, unclipped bodies, duration and moth-hash/count audits pass. No runtime integration or gameplay/core/data changes by this work; other agents may be editing runtime concurrently. New summon state/cooldown/spawn limits/clear positions need core support after art approval; do not treat visual replicas as actual mobs. Existing moth approval does not approve the revised Stag FX. No generator credits; Astra account usage not exposed. No full runtime harness for reference-only work. README has reproduction/limitations; owner judgement pending.
+
+## Glowmoth / Stag animation proposals â€” review only (2026-10-30, Codex)
+
+Owner requested idle, movement, attacks and effects, shown here before wiring. art/reference/glowmoth_stag_animation_review_v1/ contains6 animated GIFs,132 independent native pose frames and52 separate FX frames, rebuild script, anchors/timing manifest and attack contact sheet. Reuses existing creature rigs read-only; new moth hover/banked flight, new stag breathing/walk loops, charged spirit orb/trail/burst and Stag slam/charge/root FX. Stag core phase lengths retained in preview; Glowmoth combat and root-cast gesture remain art proposals. Native Totoy36/hard-alpha/body-no-reserved checks and encoded GIF duration audit pass. No runtime/art src/build/core/data/tools edits; no credits. Owner approval and future real-renderer/collision review required before wiring. No full harness rerun for reference-only output; Graphify unavailable.
+
 ## Godot-editable migration, phases 0 and 1 (2026-10-30, Claude)
 
 Python generators write editable scenes, a headless Godot baker writes the core JSON back: all five data/scenes/*_props.json round-trip byte for byte, the three prop_defs files value for value (tests/test_godot_scenes.py, 7 tests). presentation/props/ has 100 prop scenes (colliders as visible circles, cast-shadow masks, light sockets); presentation/maps/glade_layered.tscn is the spike map; neither is used by the renderer yet. Codex task: docs/CODEX_TASK_prop_scenes.md. Details in docs/GODOT_EDITABLE_PLAN.md (Progress). Not verified: the look in the editor, pixel parity of a renderer wired to them.
 
-## Root Hollow props registered (2026-10-30, Claude)
-Codex's 12 new props (`root_hollow_*`) have real colliders in `data/props/prop_defs_root_hollow.json` and replace the blockout props in `data/scenes/root_hollow_layered_props.json` (21 proposed placements, the root clump moved off the trail, plus the root-knot barrier in the shortcut). New core rule: a prop state can follow a story flag (`"when": "flag:cleared_hollow_center"`), so the barrier opens, colliders and sprite, when the central fight is cleared. The shortcut entry moved to (62,17). Art and shadow catalogues merged. Tests: `tests/core/test_root_hollow.gd` (floors, Boar lane, exits, seal and opening, core rebuild). Handoff for Codex's lighting, shadows and visual checks: `docs/CODEX_HANDOFF_root_hollow_props.md`. Also fixed the cross-review finding (`fx_spin_contacts` sparks on already dead mobs). Python 85 tests, core 515 and the smoke tests pass; not play-tested.
+## Owner-marked Root Hollow lamps and shared rune glow (2026-10-30, Codex)
 
-## Codex task: real art for Root Hollow (2026-10-30, Claude)
-The owner's visual test of the Root Hollow blockout failed (generated floor, borrowed props). `docs/CODEX_TASK_root_hollow.md` is Codex's brief: ground painting first, then a new prop sheet (root-arch tree, root-knot barrier in two states, shrine altar, stone circle, glow mushrooms, ...), owner approval at each step, then import and wiring. Layout guide and the failed look: `art/reference/root_hollow_v1/`. **Review note for Codex:** the same day, at the owner's direct request, Claude also edited presentation/ and art/ (shared hero effects `presentation/common/hero_fx.gd`, Stag frame import and `mob_view.gd`, Root Hollow registrations and placeholder floor, earlier the UI-as-scenes work): please review those diffs. Nothing is merged to main.
+Owner explicitly allowed editing only the props array in data/scenes/root_hollow_layered_props.json. Removed old2 lamps; added4 at marked locations/facings (187,62 left;199,180 right;455,138 left;391,279 right), with real mirrored colliders/light sockets. Top cap kept within world. All other props and non-props fields unchanged by audit. Shared magical rune-stone glow now matches Stag glade; Root3-stone cluster has3 emitters; raised shader/planner light slots to32 (Root18 used, no drops), excludes self-owned shadow sources. Unlit puzzle pedestals stay unlit. Full harness passed; final11 Root collision/route tests and marked-lamp/night/local-shadow checks passed. Captures and limitations in presentation/review/root_hollow_final/LAMP_REVISION.md. No core changes; Graphify unavailable.
 
-## Root Hollow built as a playable blockout (2026-10-30, Claude)
-The route is now village -> woodland -> forest -> **Root Hollow** -> glade -> arena (`SceneDefs.ROOT_HOLLOW_LAYERED`, `data/scenes/root_hollow_layered_props.json`, 640x400). It has the layout of `presentation/review/chapter1_expansion/LAYOUT.md`: a broad central clearing (2 Boars + 2 Mosslings, Glowmoths to come), an optional shrine fork (3 Mosslings, 2 herbs), a south loop with a pocket to escape through, and a shortcut north to the village that stays shut until `cleared_hollow_center` (exit field `requires_flag`). The forest's root-gate exit now leads here and the glade's back exit returns here. **The ground is a generated placeholder** (`tools/art/make_root_hollow_blockout.py`, palette-only, hard pixels) and the props reuse the woodland and forest sets: the owner's approved painting and props replace `presentation/forest/root_hollow_layered_ground.png` later; keep the walkable shape or re-run the tool's outline. Debug jump: F12 / 0. Positions, mob choice and the shortcut are first guesses for the owner. Tests: `tests/core/test_root_hollow.gd`, `tests/smoke_root_hollow.gd`; the route tests (chapter route, explore core, forest, explore bot) were updated for the new link.
+## Root Hollow lighting/depth finish (2026-10-30, Codex)
 
-## Thornback Stag in the glade (2026-10-30, Claude)
-The glade's mini-boss is built: `Tuning.MOBS[stag]` (260 hp, radius 20, first-guess numbers for the owner) with a gold antler slam (cone, parry it), a red charge (line, dash it; crashes into props) and, after it roars at half health, red roots (a burst where the hero stood). `core/mob_field.gd` now supports many-attack mobs, cone and circle warnings and a phase two; `data/scenes/glade_layered_props.json` has the encounter `stag_glade` (3 herbs on clearing) and the root arch to the arena stays shut until `cleared_stag_glade` (new exit field `requires_flag`). The 58 reference frames of the Stag are imported by `art/reference/chapter1_creatures/install_mob_frames.py` into `art/src/stag_*` and drawn by `presentation/explore/mob_view.gd`. Not built yet: Edda's binding scene and the `freed` pose after the defeat (the Stag just dies), the root and slam effects (`fx_ch1_*`), and a screen-top boss bar (it has a wider bar over its head). Sprint is already given by Edda in the village, so the Stag gives herbs and opens the arch, not an Aspect. Tests: `tests/core/test_stag.gd`, `tests/smoke_stag_glade.gd`. The contact sheets were not regenerated.
+Reviewed Claude ad118e0f presentation changes: PASS, with flag-refresh/spark/catalogue checks. Added Root Hollow-only local-light projected silhouette shadows, adjusted night exposure and teal fixture pools; retained moon/contact shadows and existing native prop y-sort canopy occlusion. Live registered map captures cover full map, trails, centre, Boar red lane, Mossling gold lunge, shrine, pocket, barrier closed/open and tree front/behind. No core/data/outline/placement edits. Focused tests and fresh full harness PASSED (Python/import/core including Root Hollow route/collision tests/every smoke). Review and reproduction/limitations in presentation/review/root_hollow_final/REVIEW.md. Owner judges final appearance; no manual full-route playthrough claimed.
 
-## Forest route has its mobs (2026-10-30, Claude)
-`data/scenes/forest_layered_props.json` now has two encounters: `forest_mossling_trail` (3 Mosslings, x 136-190) and `forest_boar_bend` (2 Boars, x 268-285) before the lantern puzzle; the lantern puzzle, root gate, chest and exits are unchanged. Same rules as the Woodland Approach (`core/mob_field.gd`, `Tuning.MOBS`), so every hero skill works on them. Positions are a first guess for the owner to review: the two packs wake each other if the hero stands between them, and the second checkpoint (332,148) is inside the boars' wake radius (it is only reached by walking through them). Glowmoths are not built (no core behaviour yet; art only). Tests: `tests/core/test_forest_mobs.gd`, `tests/smoke_forest_mobs.gd`.
+## Mob idle loops installed globally (2026-10-30, Codex)
+
+Owner said "wire them". Installed24 Mossling playful-hop and36 Boar grazing frames from reviewed native sources,64x48 cells anchored32,40, with standard rebuilt atlas/contact sheets. Shared mob_view idle table selects new state names only for idle,100ms per frame. Dormant idle state_ticks is frozen, so selection uses simulation tick plus deterministic mob-id phase; pause holds frame and combat interrupts immediately. Core positions/collisions/AI unchanged. Actual Woodland renderer GIF/captures in art/reference/mob_idle_review_v1/ingame_idle.gif. Focused smoke and fresh full harness PASSED (Python/import/core/every smoke). All60 imported frames preserve the approved visible pixels. Original alert/combat states and Stag untouched. No credits; Graphify unavailable. Claude cross-review and owner in-game visual check pending.
+
+## Root Hollow separate sprites prepared â€” collision registration pending (2026-10-30, Codex)
+
+Owner approved no-cave v2 and asked to build it. Generated and imported 12 independent prop sprites (solid landmark tree), 24 separate cast-shadow masks and contact masks; native-size reductions preserve whole pixels and Totoy36/hard alpha. Regenerated atlas and14 contact pages. New type art/shadow metadata lives in pending_prop_art.json and pending_shadow_manifest.json because production catalogue tests require registered collision definitions; original production catalogues unchanged. Three teal light sockets prepared, existing bushes/lanterns reused. Static real-engine sparse preview: art/reference/root_hollow_v1/props_engine_review.png and props_renderer_{central,shrine,pocket}.png. Preview has21 proposed objects, open combat centre, no cave and existing y-sort/contact/moon-cast shadows/local light pools. Local lights do not yet ray-cast per-lamp prop occlusion. Live map still has blockout props/colliders; no core/data changes or collision certification. Handoff with exact dimensions/anchors/suggested bases, marked-up floor and placement list: docs/CLAUDE_TASK_root_hollow_prop_registration.md. Need Claude to register types/gate states and replace placement data before final collision/playable verification. Fresh full harness PASSED after deferring unregistered catalogues (Python/import/core/every smoke); focused catalogue and12-sprite/24-shadow audits also pass. Graphify unavailable.
+
+## Sparse Root Hollow props/lighting concept â€” confirmation pending (2026-10-30, Codex)
+
+Owner requested trees, bushes, roots, glowing stones/lamps and light spill/cast shadows with spacious fight floors, to preview before integration. Saved built-in imagegen composite at art/reference/root_hollow_v1/props_lighting_concept.png with exact prompt and limitations in PROPS_LIGHTING_PREVIEW.md. Visual concept only: no runtime, core, data, collision or lighting changes. Not a flattened ground replacement. New prop assets still need separate approval/import and anchors/base sizes for Claude collision registration. Wait for owner confirmation.
+
+## Root Hollow ground proposal â€” owner approval pending (2026-10-30, Codex)
+
+Step 1 only: generated ground painting with forest, woodland, glade and walkable guide attached; untouched raw, prompt, palette importer, 2x full map, three gameplay views, live Boar charge warning and neighbour comparison in art/reference/root_hollow_v1/. Ground temporarily installed for the real renderer. Capture fixture uses the F12 debug jump handler and hides borrowed props only for ground approval. No core/, data/, outline or prop changes. Forest/village palette helper scripts referenced by task are missing; used existing arena Lab palette snap/cleanup with 640x400 override. Ground palette/hard alpha and 58 Stag atlas/PNG/anchor audits pass. Root Hollow/Stag focused smokes pass; full harness PASSED (Python, import, core and every smoke, including Root Hollow, Stag and road Aspects). Read CROSS_REVIEW.md: FAIL, P2 false scythe sparks on previously dead nearby mobs; no other blocking finding in reviewed Claude presentation/art portions. OpenGL capture exits report one static texture leak; no successful-capture script errors. Owner judges style; no props until ground approved. Graphify unavailable.
+
+## Fantasy gauntlet cursor (2026-10-30, Codex)
+
+Restyled small menu hand with shaded stone-ramp metal fingers, bronze cuff and teal inset gem to match the fantasy UI. Native size, hotspot and visibility unchanged. Art validation/build/preview and cursor load/visibility smokes passed. Owner visual judgement pending. Graphify unavailable.
 
 ## Small hand cursor only for menus (2026-10-30, Codex)
 
@@ -547,7 +687,7 @@ Requested previews before integration. `art/reference/weapon_paths_review_v1/` h
 Owner requested playful Mossling hopping and boar grazing, to review here before integration. Review-only files in `art/reference/mob_idle_review_v1/`: combined GIF, individual loops, 60 native transparent frames, sprite sheets and timing/pose metadata. Reuses the existing editable creature rigs without modifying their tool or runtime assets. Mossling 24x100 ms (2.4 s), boar 36x100 ms (3.6 s); combined preview 7.2 s at 6x nearest-neighbour. All frames pass Totoy 36/no reserved colours/hard-alpha/unclipped checks; pose sheets inspected. No generator credits used. Runtime integration, core wandering/movement changes and art approval remain pending. Graphify unavailable in this environment; no graph refresh claimed. Review changes remain local pending owner feedback.
 
 ## Hero effects shared by the fight and the road (2026-10-29, Claude)
-The hero's combat effects (hit burst, particles and dust, parry ring, screen shake and flash, dash afterimages, and the Sprint, Echo Step and Stone Ward looks) now live in one base script, `presentation/common/hero_fx.gd`; `arena.gd` and `explore_scene.gd` both extend it, so the road shows the same effects as the fight. Mob and boss effects stay in each scene. The ExploreSnapshot hero now carries `sprint_ticks_left`. On 2026-10-29 the owner asked for the rest too: every Aspect (Breaking Edge, Gale Cut, Moon Cleave, Spirit Lantern, Phantom Cut, Sprint, Echo Step, Stone Ward) now works on the road against mobs (`core/explore_skills.gd`, hits go through `MobField.hit_mob`), with the same effects, and the katana's Black Form runs with its cut-in. Lightning Form (Dual Dagger) and Reaper's Coil (Chain Scythe) work on the road too (2026-10-30): they start on the nearest mob in front of the hero (aim direction, `Tuning.ROAD_TARGET_*`), hit every mob clumped within reach, each for less the more are hit (`Tuning.MULTI_HIT_*`), and the coil drags the mobs within `Tuning.CLUMP_RADIUS` of the hooked one in with it. Their effects and cut-ins come from the shared `hero_fx.gd`. Aiming stays on the walking direction (mouse aim was tried and reverted). The damage numbers against mobs reuse the fight's skill numbers and the mob exposed multiplier and are not balanced. Smoke tests and 479 core tests pass; the road look was checked by one capture only.
+The hero's combat effects (hit burst, particles and dust, parry ring, screen shake and flash, dash afterimages, and the Sprint, Echo Step and Stone Ward looks) now live in one base script, `presentation/common/hero_fx.gd`; `arena.gd` and `explore_scene.gd` both extend it, so the road shows the same effects as the fight. Mob and boss effects stay in each scene. The ExploreSnapshot hero now carries `sprint_ticks_left`. On 2026-10-29 the owner asked for the rest too: every Aspect (Breaking Edge, Gale Cut, Moon Cleave, Spirit Lantern, Phantom Cut, Sprint, Echo Step, Stone Ward) now works on the road against mobs (`core/explore_skills.gd`, hits go through `MobField.hit_mob`), with the same effects, and the katana's Black Form runs with its cut-in. Lightning Form (Dual Dagger) and Reaper's Coil (Chain Scythe) still need a boss to aim at and refuse on the road; they need a target rule for mobs (the owner's call). The damage numbers against mobs reuse the fight's skill numbers and the mob exposed multiplier and are not balanced. Smoke tests and 479 core tests pass; the road look was checked by one capture only.
 
 ## 384x216 SpriteCook UI installed (2026-10-29, Codex)
 
@@ -753,7 +893,7 @@ Generated ground-only and 20-prop sheet with built-in ImageGen using the current
 
 Claude tasks before integration: promote approved shared defs/placements, split arch colliders so the opening stays free, classify antler/mushrooms/ferns deliberately (extractor currently marks every prop solid), define walkable outline, audit hero approaches and radius-20 Stag >=80% reachability. Human judges style, relative bush/mushroom sizes, shadow/tint and gameplay feel. No merge.
 
-Last updated: 2026-10-16 Â· Branch: `main` Â· **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
+Last updated: 2026-10-16 Ã‚Â· Branch: `main` Ã‚Â· **Everything described below is merged into `main`** (the human approved the merge on 2026-10-16: the playable combat arena, boss patterns, the hero from the human's reference art, the HUD, the Stage 2 harness and the harness-built test). Verified on `main` after the merge: validator, 57 Python tests, Godot import, 38 core tests and every smoke suite pass. The section names below still mention the feature branches they were built on; those branches and their worktrees still exist and were not deleted. Next likely steps: the human's new art from Gemini (see `docs/GEMINI_PROMPT_PACK.md`), then importer support for those sheets; more real harness runs.
 
 ## Follow-ups: glade spring and slabs removed; occluder floor tightening PARTLY done (2026-10-22, NOT committed)
 
@@ -1371,3 +1511,7 @@ Generated six chronological aura steps, split into back/front rows, at art/refer
 ## Black katana sword trail concept (2026-10-17, NOT merged)
 
 Added the missing black sword swing effect as sword_trail_v1.png and a six-frame sword_swing_preview.gif over hero attack1 frames under art/reference/black_katana_form. Built-in imagegen supplied the artwork. Source provenance, preview processing and timing notes are in sword_trail_v1.json. Raw source margins need isolation/alignment before runtime import. This is an inactive concept, no game effect or core rules changed, and no full regression rerun. Human motion/art approval and Claude buff-state interface are still required for integration.
+
+## Warden body size proposal 2.5x (2026-10-31, Codex)
+
+Owner requested2.5x current size. art/reference/warden_size_2p5 contains60 nearest-neighbour120x120 bodies (anchor50,110), side-by-side idle/walk and all-body GIFs, comparison PNG and reproducible script. V4 hashes unchanged; source palette/hard alpha preserved. Review only, no runtime/core/range edits. Weapon-attached effects need re-registration before integration; ground hit geometry remains core-owned. Graphify unavailable. Existing dirty files preserved.

@@ -1,0 +1,21 @@
+{
+ "what": "The beacon tower for Rootcrown v2 (docs/FINAL_SCENE_chapter1.md, Redo after the playtest): the only new art of the v2 map. For the owner's approval; not in art/src and not in the game.",
+ "date": "2026-11-25",
+ "owner": "\"Yes, do tower picture\"",
+ "generator": "Higgsfield MCP, model nano_banana_2_1 (Google), 1:1, 1024x1024",
+ "credits": "2 images, 3 credits (19.5 -> 16.5)",
+ "reference": "tower_refs.png: existing forest props only, 3x on grey (root_hollow_tree_rootwall, forest_standing_stone, glade_stone_2, root_hollow_rune_stones, forest_pedestal, forest_pedestal_lit, forest_rock_root, root_hollow_barrier_closed, hollow_trial_altar_dark, root_hollow_boulder, glade_arch, glade_rocks_small); Higgsfield media 66ae11ff-c1ff-4826-b3db-cd43ac4a660f",
+ "jobs": {
+  "tower_dark_raw": "105390c2-a236-4cfc-8486-2a3fcfb58c01",
+  "tower_lit_raw": "2c82ad64-ef66-4816-9d0f-93feb212a279 (an edit of the dark job)"
+ },
+ "prompts": {
+  "tower_dark_raw": "Pixel art game prop, top-down 3/4 view like the reference props, a ruined round stone beacon tower about three times the height of the standing stones, mossy grey stone blocks with the same stone and moss as the standing stones, its top broken open, thick tree roots with the same bark as the root-wall tree wrapping it and spreading onto the ground, fern and grass tufts at its foot, faint cyan rune light in a few cracks like the rune stones, unlit, same pixel size, outline and palette as the references, single object centred on a flat magenta (#FF00FF) background, no shadow, no text. The reference image only shows the art style: copy its pixel density, dark outlines, colours, stone, moss, roots and leaves; do not draw the reference props themselves.",
+  "tower_lit_raw": "Edit this exact pixel art image. Keep the tower, every stone, root, fern, the framing, the pixel size, the outline and the flat magenta (#FF00FF) background exactly the same. Only change: the beacon is lit. A tall blue-white flame burns inside the broken open top of the tower, the cracks in the stone and the runes glow bright cyan-blue, with a little blue-white light on the nearby stones and roots. Hard pixel edges only, no soft glow or haze over the magenta background, no shadow, no text."
+ },
+ "derived": {
+  "tower_dark.png, tower_lit.png, tower_cut.json": "python tools/art/make_rootcrown_tower.py: keyed, one shared box and scale for both (123x152, the dark tower 152 px tall with roots), snapped to Totoy 36 without gold/red; anchor in tower_cut.json",
+  "tower_review_3x.png": "both towers beside the props they were made from",
+  "docs/previews/rootcrown_v2/*": "python tools/art/make_rootcrown_v2_preview.py draws the tower at (512,156) in the v2 map"
+ }
+}

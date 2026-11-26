@@ -3,198 +3,282 @@
  "scene": "rootcrown_layered",
  "name": "ROOTCROWN",
  "size": [
-  640,
-  360
+  1024,
+  720
  ],
  "ground": "res://presentation/forest/rootcrown_layered_ground.png",
  "outline": [
   [
-   280,
-   360
+   494,
+   182
   ],
   [
-   280,
-   293
+   538,
+   182
   ],
   [
-   250,
-   290
-  ],
-  [
-   221,
-   287
-  ],
-  [
-   193,
-   281
-  ],
-  [
-   167,
-   274
-  ],
-  [
-   144,
-   266
-  ],
-  [
-   123,
-   256
-  ],
-  [
-   106,
-   246
-  ],
-  [
-   92,
-   234
-  ],
-  [
-   82,
-   222
-  ],
-  [
-   76,
-   210
-  ],
-  [
-   74,
-   197
-  ],
-  [
-   76,
-   184
-  ],
-  [
-   82,
-   171
-  ],
-  [
-   93,
-   159
-  ],
-  [
-   107,
-   148
-  ],
-  [
-   124,
-   137
-  ],
-  [
-   145,
-   127
-  ],
-  [
-   168,
-   119
-  ],
-  [
-   194,
-   112
-  ],
-  [
-   222,
-   107
-  ],
-  [
-   251,
-   103
-  ],
-  [
-   282,
-   101
-  ],
-  [
-   312,
-   101
-  ],
-  [
-   343,
-   103
-  ],
-  [
-   372,
-   106
-  ],
-  [
-   401,
-   110
-  ],
-  [
-   427,
-   117
-  ],
-  [
-   452,
-   125
-  ],
-  [
-   473,
-   134
-  ],
-  [
-   492,
-   144
-  ],
-  [
-   507,
-   155
-  ],
-  [
-   519,
-   167
-  ],
-  [
-   526,
-   180
-  ],
-  [
-   530,
+   564,
    192
   ],
   [
-   529,
-   205
+   620,
+   186
   ],
   [
-   524,
-   218
+   724,
+   184
   ],
   [
-   516,
-   230
+   778,
+   192
   ],
   [
-   503,
-   242
+   818,
+   210
   ],
   [
-   487,
-   253
+   874,
+   252
+  ],
+  [
+   898,
+   276
+  ],
+  [
+   906,
+   298
+  ],
+  [
+   904,
+   320
+  ],
+  [
+   886,
+   360
+  ],
+  [
+   880,
+   380
+  ],
+  [
+   888,
+   442
+  ],
+  [
+   902,
+   498
+  ],
+  [
+   902,
+   518
+  ],
+  [
+   892,
+   536
+  ],
+  [
+   874,
+   550
+  ],
+  [
+   832,
+   572
+  ],
+  [
+   832,
+   590
+  ],
+  [
+   806,
+   590
+  ],
+  [
+   774,
+   612
+  ],
+  [
+   750,
+   622
+  ],
+  [
+   702,
+   634
+  ],
+  [
+   570,
+   646
+  ],
+  [
+   572,
+   656
+  ],
+  [
+   560,
+   662
+  ],
+  [
+   558,
+   666
+  ],
+  [
+   566,
+   674
+  ],
+  [
+   562,
+   682
+  ],
+  [
+   562,
+   686
+  ],
+  [
+   576,
+   696
+  ],
+  [
+   568,
+   704
+  ],
+  [
+   570,
+   714
+  ],
+  [
+   562,
+   720
+  ],
+  [
+   476,
+   720
+  ],
+  [
+   472,
+   716
+  ],
+  [
+   474,
+   704
+  ],
+  [
+   466,
+   694
+  ],
+  [
+   480,
+   686
+  ],
+  [
+   478,
+   674
+  ],
+  [
+   484,
+   666
   ],
   [
    468,
-   263
+   654
   ],
   [
-   445,
-   272
+   472,
+   644
   ],
   [
-   420,
-   279
+   398,
+   646
   ],
   [
-   393,
-   285
+   366,
+   642
   ],
   [
-   364,
-   289
+   334,
+   634
   ],
   [
-   364,
-   360
+   258,
+   590
+  ],
+  [
+   192,
+   590
+  ],
+  [
+   192,
+   562
+  ],
+  [
+   162,
+   540
+  ],
+  [
+   118,
+   498
+  ],
+  [
+   104,
+   470
+  ],
+  [
+   106,
+   450
+  ],
+  [
+   116,
+   414
+  ],
+  [
+   116,
+   398
+  ],
+  [
+   106,
+   354
+  ],
+  [
+   110,
+   338
+  ],
+  [
+   122,
+   316
+  ],
+  [
+   166,
+   262
+  ],
+  [
+   192,
+   238
+  ],
+  [
+   192,
+   230
+  ],
+  [
+   204,
+   230
+  ],
+  [
+   274,
+   202
+  ],
+  [
+   332,
+   184
+  ],
+  [
+   388,
+   184
+  ],
+  [
+   454,
+   196
+  ],
+  [
+   468,
+   188
   ]
  ],
  "boundary_radius": 25,
@@ -202,8 +286,8 @@
  "prop_margin": 40,
  "entries": {
   "glade_side": [
-   322,
-   338
+   512,
+   698
   ]
  },
  "default_entry": "glade_side",
@@ -211,9 +295,9 @@
   {
    "id": "to_glade",
    "rect": [
-    280,
-    354,
-    84,
+    476,
+    714,
+    86,
     6
    ],
    "target_scene": "glade_layered",
@@ -224,8 +308,8 @@
   {
    "id": "rootcrown_layered_stair",
    "position": [
-    322,
-    280
+    512,
+    656
    ]
   }
  ],
@@ -235,131 +319,691 @@
   {
    "id": "beacon",
    "type": "rootcrown_tower_dark",
-   "x": 321,
-   "y": 108,
+   "x": 512,
+   "y": 204,
    "flip": false,
    "shadow_radius": 40,
    "when": "flag:cleared_rootcrown",
    "on_type": "rootcrown_tower_lit"
   },
   {
-   "id": "stone_nw",
-   "type": "rootcrown_stone_1",
-   "x": 128,
-   "y": 132,
+   "id": "tree_ancient_1",
+   "type": "root_hollow_tree_ancient",
+   "x": 94,
+   "y": 199,
    "flip": false
   },
   {
-   "id": "stone_ne",
-   "type": "rootcrown_stone_2",
-   "x": 508,
+   "id": "tree_ancient_2",
+   "type": "root_hollow_tree_ancient",
+   "x": 932,
+   "y": 195,
+   "flip": true
+  },
+  {
+   "id": "tree_rootwall_1",
+   "type": "root_hollow_tree_rootwall",
+   "x": 316,
+   "y": 141,
+   "flip": false
+  },
+  {
+   "id": "tree_rootwall_2",
+   "type": "root_hollow_tree_rootwall",
+   "x": 708,
+   "y": 143,
+   "flip": true
+  },
+  {
+   "id": "tree_broad_1",
+   "type": "woodland_tree_broad",
+   "x": 207,
+   "y": 113,
+   "flip": false
+  },
+  {
+   "id": "tree_broad_2",
+   "type": "woodland_tree_broad",
+   "x": 828,
    "y": 108,
    "flip": true
   },
   {
-   "id": "stone_e",
-   "type": "rootcrown_stone_3",
-   "x": 548,
-   "y": 150,
+   "id": "tree_2_1",
+   "type": "hollow_trial_tree_2",
+   "x": 403,
+   "y": 93,
    "flip": false
   },
   {
-   "id": "stone_se",
-   "type": "rootcrown_stone_1",
-   "x": 488,
-   "y": 246,
+   "id": "tree_1_1",
+   "type": "hollow_trial_tree_1",
+   "x": 627,
+   "y": 91,
    "flip": true
   },
   {
-   "id": "stone_sw",
-   "type": "rootcrown_stone_2",
-   "x": 150,
-   "y": 238,
+   "id": "tree_1_2",
+   "type": "hollow_trial_tree_1",
+   "x": 50,
+   "y": 362,
    "flip": false
   },
   {
-   "id": "lantern_w",
-   "type": "rootcrown_lantern_1",
-   "x": 260,
-   "y": 270,
-   "flip": false
-  },
-  {
-   "id": "lantern_e",
-   "type": "rootcrown_lantern_2",
-   "x": 384,
-   "y": 270,
-   "flip": false
-  },
-  {
-   "id": "rubble_w",
-   "type": "rootcrown_rubble_1",
-   "x": 98,
-   "y": 206,
-   "flip": false
-  },
-  {
-   "id": "rubble_e",
-   "type": "rootcrown_rubble_2",
-   "x": 548,
-   "y": 206,
-   "flip": false
-  },
-  {
-   "id": "roots_nw",
-   "type": "rootcrown_roots_1",
-   "x": 196,
-   "y": 112,
-   "flip": false
-  },
-  {
-   "id": "roots_ne",
-   "type": "rootcrown_roots_2",
-   "x": 446,
-   "y": 110,
-   "flip": false
-  },
-  {
-   "id": "roots_e",
-   "type": "rootcrown_roots_3",
-   "x": 586,
-   "y": 250,
+   "id": "tree_2_2",
+   "type": "hollow_trial_tree_2",
+   "x": 982,
+   "y": 362,
    "flip": true
   },
   {
-   "id": "roots_w",
-   "type": "rootcrown_roots_3",
-   "x": 60,
-   "y": 262,
+   "id": "tree_rootwall_3",
+   "type": "root_hollow_tree_rootwall",
+   "x": 55,
+   "y": 514,
    "flip": false
   },
   {
-   "id": "briars_w",
-   "type": "rootcrown_briars_1",
-   "x": 36,
-   "y": 170,
+   "id": "tree_rootwall_4",
+   "type": "root_hollow_tree_rootwall",
+   "x": 974,
+   "y": 521,
+   "flip": true
+  },
+  {
+   "id": "tree_broad_3",
+   "type": "woodland_tree_broad",
+   "x": 120,
+   "y": 688,
    "flip": false
   },
   {
-   "id": "briars_e",
-   "type": "rootcrown_briars_2",
+   "id": "tree_broad_4",
+   "type": "woodland_tree_broad",
+   "x": 911,
+   "y": 692,
+   "flip": true
+  },
+  {
+   "id": "tree_1_3",
+   "type": "hollow_trial_tree_1",
+   "x": 283,
+   "y": 720,
+   "flip": false
+  },
+  {
+   "id": "tree_2_3",
+   "type": "hollow_trial_tree_2",
+   "x": 752,
+   "y": 720,
+   "flip": true
+  },
+  {
+   "id": "tree_slender_1",
+   "type": "woodland_tree_slender",
+   "x": 22,
+   "y": 254,
+   "flip": false
+  },
+  {
+   "id": "tree_slender_2",
+   "type": "woodland_tree_slender",
+   "x": 1009,
+   "y": 269,
+   "flip": true
+  },
+  {
+   "id": "tree_slender_3",
+   "type": "woodland_tree_slender",
+   "x": 381,
+   "y": 720,
+   "flip": false
+  },
+  {
+   "id": "tree_slender_4",
+   "type": "woodland_tree_slender",
+   "x": 654,
+   "y": 720,
+   "flip": true
+  },
+  {
+   "id": "bush_1",
+   "type": "woodland_bush",
+   "x": 153,
+   "y": 293,
+   "flip": false
+  },
+  {
+   "id": "bush_2",
+   "type": "woodland_bush",
+   "x": 882,
+   "y": 288,
+   "flip": true
+  },
+  {
+   "id": "bush_1_1",
+   "type": "glade_bush_1",
+   "x": 103,
+   "y": 440,
+   "flip": false
+  },
+  {
+   "id": "bush_1_2",
+   "type": "glade_bush_1",
+   "x": 928,
+   "y": 438,
+   "flip": true
+  },
+  {
+   "id": "bush_1_3",
+   "type": "hollow_trial_bush_1",
+   "x": 174,
+   "y": 592,
+   "flip": false
+  },
+  {
+   "id": "bush_3_1",
+   "type": "hollow_trial_bush_3",
+   "x": 860,
+   "y": 597,
+   "flip": false
+  },
+  {
+   "id": "bush_3",
+   "type": "woodland_bush",
+   "x": 240,
+   "y": 677,
+   "flip": false
+  },
+  {
+   "id": "bush_4",
+   "type": "woodland_bush",
+   "x": 799,
+   "y": 675,
+   "flip": true
+  },
+  {
+   "id": "bush_2_1",
+   "type": "glade_bush_2",
+   "x": 262,
+   "y": 178,
+   "flip": false
+  },
+  {
+   "id": "bush_2_2",
+   "type": "glade_bush_2",
+   "x": 769,
+   "y": 175,
+   "flip": true
+  },
+  {
+   "id": "bush_2_3",
+   "type": "hollow_trial_bush_2",
+   "x": 33,
+   "y": 601,
+   "flip": false
+  },
+  {
+   "id": "bush_4_1",
+   "type": "hollow_trial_bush_4",
+   "x": 1002,
+   "y": 612,
+   "flip": false
+  },
+  {
+   "id": "fern_1_1",
+   "type": "forest_fern_1",
+   "x": 349,
+   "y": 688,
+   "flip": false
+  },
+  {
+   "id": "fern_2_1",
+   "type": "forest_fern_2",
+   "x": 686,
+   "y": 688,
+   "flip": true
+  },
+  {
+   "id": "fern_1_2",
+   "type": "glade_fern_1",
+   "x": 9,
+   "y": 449,
+   "flip": false
+  },
+  {
+   "id": "fern_2_2",
+   "type": "glade_fern_2",
+   "x": 1017,
+   "y": 471,
+   "flip": true
+  },
+  {
+   "id": "standing_stone_1",
+   "type": "forest_standing_stone",
+   "x": 172,
+   "y": 362,
+   "flip": false
+  },
+  {
+   "id": "standing_stone_2",
+   "type": "forest_standing_stone",
+   "x": 854,
+   "y": 364,
+   "flip": true
+  },
+  {
+   "id": "stone_2_1",
+   "type": "glade_stone_2",
+   "x": 416,
+   "y": 199,
+   "flip": false
+  },
+  {
+   "id": "stone_4_1",
+   "type": "glade_stone_4",
    "x": 608,
-   "y": 180,
+   "y": 199,
+   "flip": true
+  },
+  {
+   "id": "rune_stones_1",
+   "type": "root_hollow_rune_stones",
+   "x": 164,
+   "y": 547,
    "flip": false
   },
   {
-   "id": "briars_sw",
-   "type": "rootcrown_briars_1",
-   "x": 150,
-   "y": 302,
+   "id": "rune_stones_2",
+   "type": "root_hollow_rune_stones",
+   "x": 860,
+   "y": 545,
    "flip": true
   },
   {
-   "id": "briars_se",
-   "type": "rootcrown_briars_2",
-   "x": 492,
-   "y": 304,
+   "id": "rune_rock_5_1",
+   "type": "hollow_trial_rune_rock_5",
+   "x": 262,
+   "y": 230,
+   "flip": false
+  },
+  {
+   "id": "rune_rock_1_1",
+   "type": "hollow_trial_rune_rock_1",
+   "x": 767,
+   "y": 228,
    "flip": true
+  },
+  {
+   "id": "rune_rock_3_1",
+   "type": "hollow_trial_rune_rock_3",
+   "x": 129,
+   "y": 475,
+   "flip": false
+  },
+  {
+   "id": "rune_rock_4_1",
+   "type": "hollow_trial_rune_rock_4",
+   "x": 897,
+   "y": 482,
+   "flip": true
+  },
+  {
+   "id": "rune_rock_2_1",
+   "type": "hollow_trial_rune_rock_2",
+   "x": 316,
+   "y": 623,
+   "flip": false
+  },
+  {
+   "id": "rune_rock_6_1",
+   "type": "hollow_trial_rune_rock_6",
+   "x": 710,
+   "y": 625,
+   "flip": false
+  },
+  {
+   "id": "thorns_1",
+   "type": "glade_thorns",
+   "x": 142,
+   "y": 265,
+   "flip": false
+  },
+  {
+   "id": "thorns_1_1",
+   "type": "forest_thorns_1",
+   "x": 889,
+   "y": 249,
+   "flip": true
+  },
+  {
+   "id": "thorns_2_1",
+   "type": "forest_thorns_2",
+   "x": 240,
+   "y": 618,
+   "flip": false
+  },
+  {
+   "id": "thorns_2",
+   "type": "glade_thorns",
+   "x": 789,
+   "y": 623,
+   "flip": true
+  },
+  {
+   "id": "thorns_2_2",
+   "type": "forest_thorns_2",
+   "x": 107,
+   "y": 564,
+   "flip": true
+  },
+  {
+   "id": "thorns_1_2",
+   "type": "forest_thorns_1",
+   "x": 926,
+   "y": 566,
+   "flip": false
+  },
+  {
+   "id": "roots_1",
+   "type": "root_hollow_roots",
+   "x": 338,
+   "y": 199,
+   "flip": false
+  },
+  {
+   "id": "roots_2",
+   "type": "root_hollow_roots",
+   "x": 686,
+   "y": 202,
+   "flip": true
+  },
+  {
+   "id": "rock_root_1",
+   "type": "forest_rock_root",
+   "x": 168,
+   "y": 308,
+   "flip": false
+  },
+  {
+   "id": "rock_root_2",
+   "type": "forest_rock_root",
+   "x": 856,
+   "y": 310,
+   "flip": true
+  },
+  {
+   "id": "roots_1_1",
+   "type": "hollow_trial_roots_1",
+   "x": 153,
+   "y": 406,
+   "flip": false
+  },
+  {
+   "id": "roots_2_1",
+   "type": "hollow_trial_roots_2",
+   "x": 882,
+   "y": 408,
+   "flip": false
+  },
+  {
+   "id": "rocks_small_1",
+   "type": "glade_rocks_small",
+   "x": 294,
+   "y": 223,
+   "flip": false
+  },
+  {
+   "id": "rock_2_1",
+   "type": "glade_rock_2",
+   "x": 741,
+   "y": 223,
+   "flip": true
+  },
+  {
+   "id": "boulder_1",
+   "type": "root_hollow_boulder",
+   "x": 137,
+   "y": 319,
+   "flip": false
+  },
+  {
+   "id": "boulder_2",
+   "type": "root_hollow_boulder",
+   "x": 893,
+   "y": 325,
+   "flip": true
+  },
+  {
+   "id": "rock_1_1",
+   "type": "glade_rock_1",
+   "x": 259,
+   "y": 601,
+   "flip": false
+  },
+  {
+   "id": "rock_3_1",
+   "type": "glade_rock_3",
+   "x": 767,
+   "y": 599,
+   "flip": true
+  },
+  {
+   "id": "rocks_1",
+   "type": "forest_rocks",
+   "x": 403,
+   "y": 631,
+   "flip": false
+  },
+  {
+   "id": "rocks_2",
+   "type": "woodland_rocks",
+   "x": 630,
+   "y": 636,
+   "flip": true
+  },
+  {
+   "id": "mushrooms_1",
+   "type": "root_hollow_mushrooms",
+   "x": 153,
+   "y": 471,
+   "flip": false
+  },
+  {
+   "id": "mushrooms_2",
+   "type": "glade_mushrooms",
+   "x": 874,
+   "y": 469,
+   "flip": true
+  },
+  {
+   "id": "flowers_1",
+   "type": "forest_flowers",
+   "x": 316,
+   "y": 228,
+   "flip": false
+  },
+  {
+   "id": "branches_1",
+   "type": "root_hollow_branches",
+   "x": 654,
+   "y": 225,
+   "flip": false
+  },
+  {
+   "id": "antler_1",
+   "type": "glade_antler",
+   "x": 911,
+   "y": 645,
+   "flip": false
+  },
+  {
+   "id": "fern_1_3",
+   "type": "hollow_trial_fern_1",
+   "x": 192,
+   "y": 369,
+   "flip": false
+  },
+  {
+   "id": "fern_2_3",
+   "type": "hollow_trial_fern_2",
+   "x": 834,
+   "y": 371,
+   "flip": false
+  },
+  {
+   "id": "fern_2_4",
+   "type": "glade_fern_2",
+   "x": 436,
+   "y": 206,
+   "flip": false
+  },
+  {
+   "id": "fern_2_5",
+   "type": "hollow_trial_fern_2",
+   "x": 590,
+   "y": 206,
+   "flip": false
+  },
+  {
+   "id": "fern_1_4",
+   "type": "hollow_trial_fern_1",
+   "x": 183,
+   "y": 551,
+   "flip": false
+  },
+  {
+   "id": "fern_2_6",
+   "type": "hollow_trial_fern_2",
+   "x": 843,
+   "y": 549,
+   "flip": false
+  },
+  {
+   "id": "fern_small_1",
+   "type": "forest_fern_small",
+   "x": 279,
+   "y": 234,
+   "flip": false
+  },
+  {
+   "id": "fern_small_2",
+   "type": "forest_fern_small",
+   "x": 752,
+   "y": 234,
+   "flip": false
+  },
+  {
+   "id": "fern_1_5",
+   "type": "hollow_trial_fern_1",
+   "x": 275,
+   "y": 605,
+   "flip": false
+  },
+  {
+   "id": "fern_2_7",
+   "type": "hollow_trial_fern_2",
+   "x": 754,
+   "y": 603,
+   "flip": false
+  },
+  {
+   "id": "bush_4_2",
+   "type": "hollow_trial_bush_4",
+   "x": 421,
+   "y": 636,
+   "flip": false
+  },
+  {
+   "id": "bush_4_3",
+   "type": "hollow_trial_bush_4",
+   "x": 612,
+   "y": 640,
+   "flip": false
+  },
+  {
+   "id": "pedestal_1",
+   "type": "forest_pedestal",
+   "x": 412,
+   "y": 690,
+   "flip": false
+  },
+  {
+   "id": "pedestal_2",
+   "type": "forest_pedestal",
+   "x": 620,
+   "y": 692,
+   "flip": false
+  },
+  {
+   "id": "roots_1_2",
+   "type": "hollow_trial_roots_1",
+   "x": 466,
+   "y": 216,
+   "flip": false
+  },
+  {
+   "id": "roots_2_2",
+   "type": "hollow_trial_roots_2",
+   "x": 560,
+   "y": 217,
+   "flip": false
+  },
+  {
+   "id": "branches_2",
+   "type": "root_hollow_branches",
+   "x": 424,
+   "y": 222,
+   "flip": false
+  },
+  {
+   "id": "rocks_small_2",
+   "type": "glade_rocks_small",
+   "x": 582,
+   "y": 214,
+   "flip": false
+  },
+  {
+   "id": "rocks_3",
+   "type": "forest_rocks",
+   "x": 438,
+   "y": 210,
+   "flip": false
+  },
+  {
+   "id": "fern_1_6",
+   "type": "hollow_trial_fern_1",
+   "x": 476,
+   "y": 208,
+   "flip": false
+  },
+  {
+   "id": "fern_2_8",
+   "type": "hollow_trial_fern_2",
+   "x": 542,
+   "y": 209,
+   "flip": false
+  },
+  {
+   "id": "fern_small_3",
+   "type": "forest_fern_small",
+   "x": 412,
+   "y": 206,
+   "flip": false
+  },
+  {
+   "id": "fern_2_9",
+   "type": "glade_fern_2",
+   "x": 612,
+   "y": 208,
+   "flip": true
+  },
+  {
+   "id": "mushrooms_3",
+   "type": "root_hollow_mushrooms",
+   "x": 552,
+   "y": 224,
+   "flip": false
   }
  ]
 }

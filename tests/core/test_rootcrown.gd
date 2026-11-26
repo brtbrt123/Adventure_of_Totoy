@@ -1,9 +1,10 @@
 extends "res://tests/test_case.gd"
-## Rootcrown (data/scenes/rootcrown_layered_props.json, docs/FINAL_SCENE_chapter1.md): the chapter's final map, a plateau at the
-## top of a stair behind the Stag Glade's root arch, crowned by the dark forest beacon. It is not on the story path yet (the
-## arch still leads to the arena until the Colossus lives here; debug key Y jumps in). Checked: it is registered and valid, the
-## stair leads up to the checkpoint and the fight floor, the fight floor is open, its one exit goes back down to an open spot
-## under the glade's arch, and the beacon lights once `cleared_rootcrown` is set without moving or changing its body.
+## Rootcrown (data/scenes/rootcrown_layered_props.json, docs/FINAL_SCENE_chapter1.md): the chapter's final map, v2 (2026-11-26): a
+## forest clearing about the old arena's size at the top of the climb behind the Stag Glade's root arch, the dark forest beacon at
+## its head. It is not on the story path yet (the arch still leads to the arena until the Colossus lives here; debug key Y jumps
+## in). Checked: it is registered and valid, the climb leads up to the checkpoint and the fight floor, the 624x344 fight floor is
+## open, its one exit goes back down to an open spot under the glade's arch, and the beacon lights once `cleared_rootcrown` is set
+## without moving or changing its body.
 
 const SceneDefs := preload("res://core/scene_defs.gd")
 const PropScene := preload("res://core/prop_scene.gd")
@@ -14,9 +15,10 @@ const LayoutFlood := preload("res://tests/layout_flood.gd")
 const SCENE: StringName = SceneDefs.ROOTCROWN_LAYERED
 const HERO: float = 6.0  # Tuning.PLAYER_RADIUS
 const CLEARED: StringName = &"cleared_rootcrown"
-## docs/previews/rootcrown_v1/layout.json: where the Colossus starts and the floor its fight needs open.
-const BOSS_START: Vector2 = Vector2(322, 168)
-const FIGHT_FLOOR: Rect2 = Rect2(190, 132, 264, 120)
+## docs/previews/rootcrown_v2/layout.json: where the Colossus starts and the floor its fight needs open (the owner: the first
+## build's 264x120 was "too small"; this is 624x344, the clearing's walkable ground about the old arena's 744x424).
+const BOSS_START: Vector2 = Vector2(512, 378)
+const FIGHT_FLOOR: Rect2 = Rect2(200, 238, 624, 344)
 
 
 func _flood(flags: Array = []) -> LayoutFlood:
@@ -46,14 +48,14 @@ func test_the_map_is_a_registered_valid_layered_scene() -> void:
 	assert_eq(PropScene.validate(data, PropScene.load_defs()), PackedStringArray(), "the data is valid")
 	var def: Dictionary = SceneDefs.get_def(SCENE)
 	assert_eq(def["name"], "ROOTCROWN", "its title")
-	assert_eq(def["size"], Vector2(640, 360), "the floor painting's size")
-	assert_eq(def["default_entry"], &"glade_side", "the hero arrives up the stair")
+	assert_eq(def["size"], Vector2(1024, 720), "the floor painting's size")
+	assert_eq(def["default_entry"], &"glade_side", "the hero arrives up the climb")
 	assert_eq(def["npcs"].size() + def["objects"].size() + def["encounters"].size(), 0, "nobody and nothing to use yet: the Colossus comes later")
 
 
-func test_its_one_exit_goes_down_the_stair_to_an_open_spot_under_the_glade_arch() -> void:
+func test_its_one_exit_goes_down_the_climb_to_an_open_spot_under_the_glade_arch() -> void:
 	var def: Dictionary = SceneDefs.get_def(SCENE)
-	assert_eq(def["exits"].size(), 1, "one way in and out: the stair")
+	assert_eq(def["exits"].size(), 1, "one way in and out: the climb")
 	var exit: Dictionary = def["exits"][0]
 	assert_eq([exit["target_scene"], exit["target_entry"]], [SceneDefs.GLADE_LAYERED, &"rootcrown_side"], "down to the glade, under its root arch")
 	assert_false(exit.has("requires_flag"), "the way back is never closed")
@@ -66,10 +68,10 @@ func test_its_one_exit_goes_down_the_stair_to_an_open_spot_under_the_glade_arch(
 	assert_true(flood.reaches(arrival), "and joined to the rest of the glade")
 
 
-func test_the_stair_leads_up_to_the_checkpoint_and_the_boss_and_back_down() -> void:
+func test_the_climb_leads_up_to_the_checkpoint_and_the_boss_and_back_down() -> void:
 	var def: Dictionary = SceneDefs.get_def(SCENE)
 	var flood: LayoutFlood = _flood()
-	assert_true(flood.reaches(def["checkpoints"][0]["position"]), "the checkpoint at the top of the stair")
+	assert_true(flood.reaches(def["checkpoints"][0]["position"]), "the checkpoint at the top of the climb")
 	assert_true(flood.reaches(BOSS_START), "where the Colossus starts")
 	assert_true(flood.reaches(Rect2(def["exits"][0]["rect"]).get_center() + Vector2(0, -6)), "and the way back down")
 

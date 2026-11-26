@@ -1,27 +1,65 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=54 format=3]
 
 [ext_resource type="Texture2D" path="res://presentation/forest/rootcrown_layered_ground.png" id="ground"]
 [ext_resource type="PackedScene" path="res://presentation/props/rootcrown_tower_dark.tscn" id="p_rootcrown_tower_dark"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_stone_1.tscn" id="p_rootcrown_stone_1"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_stone_2.tscn" id="p_rootcrown_stone_2"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_stone_3.tscn" id="p_rootcrown_stone_3"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_lantern_1.tscn" id="p_rootcrown_lantern_1"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_lantern_2.tscn" id="p_rootcrown_lantern_2"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_rubble_1.tscn" id="p_rootcrown_rubble_1"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_rubble_2.tscn" id="p_rootcrown_rubble_2"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_roots_1.tscn" id="p_rootcrown_roots_1"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_roots_2.tscn" id="p_rootcrown_roots_2"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_roots_3.tscn" id="p_rootcrown_roots_3"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_briars_1.tscn" id="p_rootcrown_briars_1"]
-[ext_resource type="PackedScene" path="res://presentation/props/rootcrown_briars_2.tscn" id="p_rootcrown_briars_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_tree_ancient.tscn" id="p_root_hollow_tree_ancient"]
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_tree_rootwall.tscn" id="p_root_hollow_tree_rootwall"]
+[ext_resource type="PackedScene" path="res://presentation/props/woodland_tree_broad.tscn" id="p_woodland_tree_broad"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_tree_2.tscn" id="p_hollow_trial_tree_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_tree_1.tscn" id="p_hollow_trial_tree_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/woodland_tree_slender.tscn" id="p_woodland_tree_slender"]
+[ext_resource type="PackedScene" path="res://presentation/props/woodland_bush.tscn" id="p_woodland_bush"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_bush_1.tscn" id="p_glade_bush_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_1.tscn" id="p_hollow_trial_bush_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_3.tscn" id="p_hollow_trial_bush_3"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_bush_2.tscn" id="p_glade_bush_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_2.tscn" id="p_hollow_trial_bush_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_bush_4.tscn" id="p_hollow_trial_bush_4"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_fern_1.tscn" id="p_forest_fern_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_fern_2.tscn" id="p_forest_fern_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_fern_1.tscn" id="p_glade_fern_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_fern_2.tscn" id="p_glade_fern_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_standing_stone.tscn" id="p_forest_standing_stone"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stone_2.tscn" id="p_glade_stone_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_stone_4.tscn" id="p_glade_stone_4"]
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_rune_stones.tscn" id="p_root_hollow_rune_stones"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_5.tscn" id="p_hollow_trial_rune_rock_5"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_1.tscn" id="p_hollow_trial_rune_rock_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_3.tscn" id="p_hollow_trial_rune_rock_3"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_4.tscn" id="p_hollow_trial_rune_rock_4"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_2.tscn" id="p_hollow_trial_rune_rock_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_rune_rock_6.tscn" id="p_hollow_trial_rune_rock_6"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_thorns.tscn" id="p_glade_thorns"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_thorns_1.tscn" id="p_forest_thorns_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_thorns_2.tscn" id="p_forest_thorns_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_roots.tscn" id="p_root_hollow_roots"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_rock_root.tscn" id="p_forest_rock_root"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_roots_1.tscn" id="p_hollow_trial_roots_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_roots_2.tscn" id="p_hollow_trial_roots_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rocks_small.tscn" id="p_glade_rocks_small"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rock_2.tscn" id="p_glade_rock_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_boulder.tscn" id="p_root_hollow_boulder"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rock_1.tscn" id="p_glade_rock_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_rock_3.tscn" id="p_glade_rock_3"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_rocks.tscn" id="p_forest_rocks"]
+[ext_resource type="PackedScene" path="res://presentation/props/woodland_rocks.tscn" id="p_woodland_rocks"]
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_mushrooms.tscn" id="p_root_hollow_mushrooms"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_mushrooms.tscn" id="p_glade_mushrooms"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_flowers.tscn" id="p_forest_flowers"]
+[ext_resource type="PackedScene" path="res://presentation/props/root_hollow_branches.tscn" id="p_root_hollow_branches"]
+[ext_resource type="PackedScene" path="res://presentation/props/glade_antler.tscn" id="p_glade_antler"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_fern_1.tscn" id="p_hollow_trial_fern_1"]
+[ext_resource type="PackedScene" path="res://presentation/props/hollow_trial_fern_2.tscn" id="p_hollow_trial_fern_2"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_fern_small.tscn" id="p_forest_fern_small"]
+[ext_resource type="PackedScene" path="res://presentation/props/forest_pedestal.tscn" id="p_forest_pedestal"]
 
 [sub_resource type="RectangleShape2D" id="Exit_1"]
-size = Vector2(84, 6)
+size = Vector2(86, 6)
 
 [node name="rootcrown_layered" type="Node2D"]
 metadata/version = 1
 metadata/title = "ROOTCROWN"
-metadata/size = [640, 360]
+metadata/size = [1024, 720]
 metadata/boundary_radius = 25
 metadata/boundary_spacing = 17
 metadata/prop_margin = 40
@@ -34,28 +72,28 @@ centered = false
 
 [node name="Walkable" type="Polygon2D" parent="."]
 color = Color(0.25, 0.85, 0.45, 0.22)
-polygon = PackedVector2Array(280, 360, 280, 293, 250, 290, 221, 287, 193, 281, 167, 274, 144, 266, 123, 256, 106, 246, 92, 234, 82, 222, 76, 210, 74, 197, 76, 184, 82, 171, 93, 159, 107, 148, 124, 137, 145, 127, 168, 119, 194, 112, 222, 107, 251, 103, 282, 101, 312, 101, 343, 103, 372, 106, 401, 110, 427, 117, 452, 125, 473, 134, 492, 144, 507, 155, 519, 167, 526, 180, 530, 192, 529, 205, 524, 218, 516, 230, 503, 242, 487, 253, 468, 263, 445, 272, 420, 279, 393, 285, 364, 289, 364, 360)
+polygon = PackedVector2Array(494, 182, 538, 182, 564, 192, 620, 186, 724, 184, 778, 192, 818, 210, 874, 252, 898, 276, 906, 298, 904, 320, 886, 360, 880, 380, 888, 442, 902, 498, 902, 518, 892, 536, 874, 550, 832, 572, 832, 590, 806, 590, 774, 612, 750, 622, 702, 634, 570, 646, 572, 656, 560, 662, 558, 666, 566, 674, 562, 682, 562, 686, 576, 696, 568, 704, 570, 714, 562, 720, 476, 720, 472, 716, 474, 704, 466, 694, 480, 686, 478, 674, 484, 666, 468, 654, 472, 644, 398, 646, 366, 642, 334, 634, 258, 590, 192, 590, 192, 562, 162, 540, 118, 498, 104, 470, 106, 450, 116, 414, 116, 398, 106, 354, 110, 338, 122, 316, 166, 262, 192, 238, 192, 230, 204, 230, 274, 202, 332, 184, 388, 184, 454, 196, 468, 188)
 
 [node name="Entries" type="Node2D" parent="."]
 
 [node name="glade_side" type="Marker2D" parent="Entries"]
-position = Vector2(322, 338)
+position = Vector2(512, 698)
 
 [node name="Exits" type="Node2D" parent="."]
 
 [node name="to_glade" type="Area2D" parent="Exits"]
-position = Vector2(280, 354)
+position = Vector2(476, 714)
 metadata/target_scene = "glade_layered"
 metadata/target_entry = "rootcrown_side"
 
 [node name="Rect" type="CollisionShape2D" parent="Exits/to_glade"]
-position = Vector2(42.0, 3.0)
+position = Vector2(43.0, 3.0)
 shape = SubResource("Exit_1")
 
 [node name="Checkpoints" type="Node2D" parent="."]
 
 [node name="rootcrown_layered_stair" type="Marker2D" parent="Checkpoints"]
-position = Vector2(322, 280)
+position = Vector2(512, 656)
 
 [node name="Npcs" type="Node2D" parent="."]
 
@@ -65,81 +103,428 @@ position = Vector2(322, 280)
 y_sort_enabled = true
 
 [node name="beacon" parent="Props" instance=ExtResource("p_rootcrown_tower_dark")]
-position = Vector2(321, 108)
+position = Vector2(512, 204)
 metadata/flip = false
 metadata/shadow_radius = 40
 metadata/when = "flag:cleared_rootcrown"
 metadata/on_type = "rootcrown_tower_lit"
 
-[node name="stone_nw" parent="Props" instance=ExtResource("p_rootcrown_stone_1")]
-position = Vector2(128, 132)
+[node name="tree_ancient_1" parent="Props" instance=ExtResource("p_root_hollow_tree_ancient")]
+position = Vector2(94, 199)
 metadata/flip = false
 
-[node name="stone_ne" parent="Props" instance=ExtResource("p_rootcrown_stone_2")]
-position = Vector2(508, 108)
+[node name="tree_ancient_2" parent="Props" instance=ExtResource("p_root_hollow_tree_ancient")]
+position = Vector2(932, 195)
 scale = Vector2(-1, 1)
 metadata/flip = true
 
-[node name="stone_e" parent="Props" instance=ExtResource("p_rootcrown_stone_3")]
-position = Vector2(548, 150)
+[node name="tree_rootwall_1" parent="Props" instance=ExtResource("p_root_hollow_tree_rootwall")]
+position = Vector2(316, 141)
 metadata/flip = false
 
-[node name="stone_se" parent="Props" instance=ExtResource("p_rootcrown_stone_1")]
-position = Vector2(488, 246)
+[node name="tree_rootwall_2" parent="Props" instance=ExtResource("p_root_hollow_tree_rootwall")]
+position = Vector2(708, 143)
 scale = Vector2(-1, 1)
 metadata/flip = true
 
-[node name="stone_sw" parent="Props" instance=ExtResource("p_rootcrown_stone_2")]
-position = Vector2(150, 238)
+[node name="tree_broad_1" parent="Props" instance=ExtResource("p_woodland_tree_broad")]
+position = Vector2(207, 113)
 metadata/flip = false
 
-[node name="lantern_w" parent="Props" instance=ExtResource("p_rootcrown_lantern_1")]
-position = Vector2(260, 270)
-metadata/flip = false
-
-[node name="lantern_e" parent="Props" instance=ExtResource("p_rootcrown_lantern_2")]
-position = Vector2(384, 270)
-metadata/flip = false
-
-[node name="rubble_w" parent="Props" instance=ExtResource("p_rootcrown_rubble_1")]
-position = Vector2(98, 206)
-metadata/flip = false
-
-[node name="rubble_e" parent="Props" instance=ExtResource("p_rootcrown_rubble_2")]
-position = Vector2(548, 206)
-metadata/flip = false
-
-[node name="roots_nw" parent="Props" instance=ExtResource("p_rootcrown_roots_1")]
-position = Vector2(196, 112)
-metadata/flip = false
-
-[node name="roots_ne" parent="Props" instance=ExtResource("p_rootcrown_roots_2")]
-position = Vector2(446, 110)
-metadata/flip = false
-
-[node name="roots_e" parent="Props" instance=ExtResource("p_rootcrown_roots_3")]
-position = Vector2(586, 250)
+[node name="tree_broad_2" parent="Props" instance=ExtResource("p_woodland_tree_broad")]
+position = Vector2(828, 108)
 scale = Vector2(-1, 1)
 metadata/flip = true
 
-[node name="roots_w" parent="Props" instance=ExtResource("p_rootcrown_roots_3")]
-position = Vector2(60, 262)
+[node name="tree_2_1" parent="Props" instance=ExtResource("p_hollow_trial_tree_2")]
+position = Vector2(403, 93)
 metadata/flip = false
 
-[node name="briars_w" parent="Props" instance=ExtResource("p_rootcrown_briars_1")]
-position = Vector2(36, 170)
-metadata/flip = false
-
-[node name="briars_e" parent="Props" instance=ExtResource("p_rootcrown_briars_2")]
-position = Vector2(608, 180)
-metadata/flip = false
-
-[node name="briars_sw" parent="Props" instance=ExtResource("p_rootcrown_briars_1")]
-position = Vector2(150, 302)
+[node name="tree_1_1" parent="Props" instance=ExtResource("p_hollow_trial_tree_1")]
+position = Vector2(627, 91)
 scale = Vector2(-1, 1)
 metadata/flip = true
 
-[node name="briars_se" parent="Props" instance=ExtResource("p_rootcrown_briars_2")]
-position = Vector2(492, 304)
+[node name="tree_1_2" parent="Props" instance=ExtResource("p_hollow_trial_tree_1")]
+position = Vector2(50, 362)
+metadata/flip = false
+
+[node name="tree_2_2" parent="Props" instance=ExtResource("p_hollow_trial_tree_2")]
+position = Vector2(982, 362)
 scale = Vector2(-1, 1)
 metadata/flip = true
+
+[node name="tree_rootwall_3" parent="Props" instance=ExtResource("p_root_hollow_tree_rootwall")]
+position = Vector2(55, 514)
+metadata/flip = false
+
+[node name="tree_rootwall_4" parent="Props" instance=ExtResource("p_root_hollow_tree_rootwall")]
+position = Vector2(974, 521)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="tree_broad_3" parent="Props" instance=ExtResource("p_woodland_tree_broad")]
+position = Vector2(120, 688)
+metadata/flip = false
+
+[node name="tree_broad_4" parent="Props" instance=ExtResource("p_woodland_tree_broad")]
+position = Vector2(911, 692)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="tree_1_3" parent="Props" instance=ExtResource("p_hollow_trial_tree_1")]
+position = Vector2(283, 720)
+metadata/flip = false
+
+[node name="tree_2_3" parent="Props" instance=ExtResource("p_hollow_trial_tree_2")]
+position = Vector2(752, 720)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="tree_slender_1" parent="Props" instance=ExtResource("p_woodland_tree_slender")]
+position = Vector2(22, 254)
+metadata/flip = false
+
+[node name="tree_slender_2" parent="Props" instance=ExtResource("p_woodland_tree_slender")]
+position = Vector2(1009, 269)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="tree_slender_3" parent="Props" instance=ExtResource("p_woodland_tree_slender")]
+position = Vector2(381, 720)
+metadata/flip = false
+
+[node name="tree_slender_4" parent="Props" instance=ExtResource("p_woodland_tree_slender")]
+position = Vector2(654, 720)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="bush_1" parent="Props" instance=ExtResource("p_woodland_bush")]
+position = Vector2(153, 293)
+metadata/flip = false
+
+[node name="bush_2" parent="Props" instance=ExtResource("p_woodland_bush")]
+position = Vector2(882, 288)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="bush_1_1" parent="Props" instance=ExtResource("p_glade_bush_1")]
+position = Vector2(103, 440)
+metadata/flip = false
+
+[node name="bush_1_2" parent="Props" instance=ExtResource("p_glade_bush_1")]
+position = Vector2(928, 438)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="bush_1_3" parent="Props" instance=ExtResource("p_hollow_trial_bush_1")]
+position = Vector2(174, 592)
+metadata/flip = false
+
+[node name="bush_3_1" parent="Props" instance=ExtResource("p_hollow_trial_bush_3")]
+position = Vector2(860, 597)
+metadata/flip = false
+
+[node name="bush_3" parent="Props" instance=ExtResource("p_woodland_bush")]
+position = Vector2(240, 677)
+metadata/flip = false
+
+[node name="bush_4" parent="Props" instance=ExtResource("p_woodland_bush")]
+position = Vector2(799, 675)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="bush_2_1" parent="Props" instance=ExtResource("p_glade_bush_2")]
+position = Vector2(262, 178)
+metadata/flip = false
+
+[node name="bush_2_2" parent="Props" instance=ExtResource("p_glade_bush_2")]
+position = Vector2(769, 175)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="bush_2_3" parent="Props" instance=ExtResource("p_hollow_trial_bush_2")]
+position = Vector2(33, 601)
+metadata/flip = false
+
+[node name="bush_4_1" parent="Props" instance=ExtResource("p_hollow_trial_bush_4")]
+position = Vector2(1002, 612)
+metadata/flip = false
+
+[node name="fern_1_1" parent="Props" instance=ExtResource("p_forest_fern_1")]
+position = Vector2(349, 688)
+metadata/flip = false
+
+[node name="fern_2_1" parent="Props" instance=ExtResource("p_forest_fern_2")]
+position = Vector2(686, 688)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="fern_1_2" parent="Props" instance=ExtResource("p_glade_fern_1")]
+position = Vector2(9, 449)
+metadata/flip = false
+
+[node name="fern_2_2" parent="Props" instance=ExtResource("p_glade_fern_2")]
+position = Vector2(1017, 471)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="standing_stone_1" parent="Props" instance=ExtResource("p_forest_standing_stone")]
+position = Vector2(172, 362)
+metadata/flip = false
+
+[node name="standing_stone_2" parent="Props" instance=ExtResource("p_forest_standing_stone")]
+position = Vector2(854, 364)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="stone_2_1" parent="Props" instance=ExtResource("p_glade_stone_2")]
+position = Vector2(416, 199)
+metadata/flip = false
+
+[node name="stone_4_1" parent="Props" instance=ExtResource("p_glade_stone_4")]
+position = Vector2(608, 199)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="rune_stones_1" parent="Props" instance=ExtResource("p_root_hollow_rune_stones")]
+position = Vector2(164, 547)
+metadata/flip = false
+
+[node name="rune_stones_2" parent="Props" instance=ExtResource("p_root_hollow_rune_stones")]
+position = Vector2(860, 545)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="rune_rock_5_1" parent="Props" instance=ExtResource("p_hollow_trial_rune_rock_5")]
+position = Vector2(262, 230)
+metadata/flip = false
+
+[node name="rune_rock_1_1" parent="Props" instance=ExtResource("p_hollow_trial_rune_rock_1")]
+position = Vector2(767, 228)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="rune_rock_3_1" parent="Props" instance=ExtResource("p_hollow_trial_rune_rock_3")]
+position = Vector2(129, 475)
+metadata/flip = false
+
+[node name="rune_rock_4_1" parent="Props" instance=ExtResource("p_hollow_trial_rune_rock_4")]
+position = Vector2(897, 482)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="rune_rock_2_1" parent="Props" instance=ExtResource("p_hollow_trial_rune_rock_2")]
+position = Vector2(316, 623)
+metadata/flip = false
+
+[node name="rune_rock_6_1" parent="Props" instance=ExtResource("p_hollow_trial_rune_rock_6")]
+position = Vector2(710, 625)
+metadata/flip = false
+
+[node name="thorns_1" parent="Props" instance=ExtResource("p_glade_thorns")]
+position = Vector2(142, 265)
+metadata/flip = false
+
+[node name="thorns_1_1" parent="Props" instance=ExtResource("p_forest_thorns_1")]
+position = Vector2(889, 249)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="thorns_2_1" parent="Props" instance=ExtResource("p_forest_thorns_2")]
+position = Vector2(240, 618)
+metadata/flip = false
+
+[node name="thorns_2" parent="Props" instance=ExtResource("p_glade_thorns")]
+position = Vector2(789, 623)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="thorns_2_2" parent="Props" instance=ExtResource("p_forest_thorns_2")]
+position = Vector2(107, 564)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="thorns_1_2" parent="Props" instance=ExtResource("p_forest_thorns_1")]
+position = Vector2(926, 566)
+metadata/flip = false
+
+[node name="roots_1" parent="Props" instance=ExtResource("p_root_hollow_roots")]
+position = Vector2(338, 199)
+metadata/flip = false
+
+[node name="roots_2" parent="Props" instance=ExtResource("p_root_hollow_roots")]
+position = Vector2(686, 202)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="rock_root_1" parent="Props" instance=ExtResource("p_forest_rock_root")]
+position = Vector2(168, 308)
+metadata/flip = false
+
+[node name="rock_root_2" parent="Props" instance=ExtResource("p_forest_rock_root")]
+position = Vector2(856, 310)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="roots_1_1" parent="Props" instance=ExtResource("p_hollow_trial_roots_1")]
+position = Vector2(153, 406)
+metadata/flip = false
+
+[node name="roots_2_1" parent="Props" instance=ExtResource("p_hollow_trial_roots_2")]
+position = Vector2(882, 408)
+metadata/flip = false
+
+[node name="rocks_small_1" parent="Props" instance=ExtResource("p_glade_rocks_small")]
+position = Vector2(294, 223)
+metadata/flip = false
+
+[node name="rock_2_1" parent="Props" instance=ExtResource("p_glade_rock_2")]
+position = Vector2(741, 223)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="boulder_1" parent="Props" instance=ExtResource("p_root_hollow_boulder")]
+position = Vector2(137, 319)
+metadata/flip = false
+
+[node name="boulder_2" parent="Props" instance=ExtResource("p_root_hollow_boulder")]
+position = Vector2(893, 325)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="rock_1_1" parent="Props" instance=ExtResource("p_glade_rock_1")]
+position = Vector2(259, 601)
+metadata/flip = false
+
+[node name="rock_3_1" parent="Props" instance=ExtResource("p_glade_rock_3")]
+position = Vector2(767, 599)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="rocks_1" parent="Props" instance=ExtResource("p_forest_rocks")]
+position = Vector2(403, 631)
+metadata/flip = false
+
+[node name="rocks_2" parent="Props" instance=ExtResource("p_woodland_rocks")]
+position = Vector2(630, 636)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="mushrooms_1" parent="Props" instance=ExtResource("p_root_hollow_mushrooms")]
+position = Vector2(153, 471)
+metadata/flip = false
+
+[node name="mushrooms_2" parent="Props" instance=ExtResource("p_glade_mushrooms")]
+position = Vector2(874, 469)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="flowers_1" parent="Props" instance=ExtResource("p_forest_flowers")]
+position = Vector2(316, 228)
+metadata/flip = false
+
+[node name="branches_1" parent="Props" instance=ExtResource("p_root_hollow_branches")]
+position = Vector2(654, 225)
+metadata/flip = false
+
+[node name="antler_1" parent="Props" instance=ExtResource("p_glade_antler")]
+position = Vector2(911, 645)
+metadata/flip = false
+
+[node name="fern_1_3" parent="Props" instance=ExtResource("p_hollow_trial_fern_1")]
+position = Vector2(192, 369)
+metadata/flip = false
+
+[node name="fern_2_3" parent="Props" instance=ExtResource("p_hollow_trial_fern_2")]
+position = Vector2(834, 371)
+metadata/flip = false
+
+[node name="fern_2_4" parent="Props" instance=ExtResource("p_glade_fern_2")]
+position = Vector2(436, 206)
+metadata/flip = false
+
+[node name="fern_2_5" parent="Props" instance=ExtResource("p_hollow_trial_fern_2")]
+position = Vector2(590, 206)
+metadata/flip = false
+
+[node name="fern_1_4" parent="Props" instance=ExtResource("p_hollow_trial_fern_1")]
+position = Vector2(183, 551)
+metadata/flip = false
+
+[node name="fern_2_6" parent="Props" instance=ExtResource("p_hollow_trial_fern_2")]
+position = Vector2(843, 549)
+metadata/flip = false
+
+[node name="fern_small_1" parent="Props" instance=ExtResource("p_forest_fern_small")]
+position = Vector2(279, 234)
+metadata/flip = false
+
+[node name="fern_small_2" parent="Props" instance=ExtResource("p_forest_fern_small")]
+position = Vector2(752, 234)
+metadata/flip = false
+
+[node name="fern_1_5" parent="Props" instance=ExtResource("p_hollow_trial_fern_1")]
+position = Vector2(275, 605)
+metadata/flip = false
+
+[node name="fern_2_7" parent="Props" instance=ExtResource("p_hollow_trial_fern_2")]
+position = Vector2(754, 603)
+metadata/flip = false
+
+[node name="bush_4_2" parent="Props" instance=ExtResource("p_hollow_trial_bush_4")]
+position = Vector2(421, 636)
+metadata/flip = false
+
+[node name="bush_4_3" parent="Props" instance=ExtResource("p_hollow_trial_bush_4")]
+position = Vector2(612, 640)
+metadata/flip = false
+
+[node name="pedestal_1" parent="Props" instance=ExtResource("p_forest_pedestal")]
+position = Vector2(412, 690)
+metadata/flip = false
+
+[node name="pedestal_2" parent="Props" instance=ExtResource("p_forest_pedestal")]
+position = Vector2(620, 692)
+metadata/flip = false
+
+[node name="roots_1_2" parent="Props" instance=ExtResource("p_hollow_trial_roots_1")]
+position = Vector2(466, 216)
+metadata/flip = false
+
+[node name="roots_2_2" parent="Props" instance=ExtResource("p_hollow_trial_roots_2")]
+position = Vector2(560, 217)
+metadata/flip = false
+
+[node name="branches_2" parent="Props" instance=ExtResource("p_root_hollow_branches")]
+position = Vector2(424, 222)
+metadata/flip = false
+
+[node name="rocks_small_2" parent="Props" instance=ExtResource("p_glade_rocks_small")]
+position = Vector2(582, 214)
+metadata/flip = false
+
+[node name="rocks_3" parent="Props" instance=ExtResource("p_forest_rocks")]
+position = Vector2(438, 210)
+metadata/flip = false
+
+[node name="fern_1_6" parent="Props" instance=ExtResource("p_hollow_trial_fern_1")]
+position = Vector2(476, 208)
+metadata/flip = false
+
+[node name="fern_2_8" parent="Props" instance=ExtResource("p_hollow_trial_fern_2")]
+position = Vector2(542, 209)
+metadata/flip = false
+
+[node name="fern_small_3" parent="Props" instance=ExtResource("p_forest_fern_small")]
+position = Vector2(412, 206)
+metadata/flip = false
+
+[node name="fern_2_9" parent="Props" instance=ExtResource("p_glade_fern_2")]
+position = Vector2(612, 208)
+scale = Vector2(-1, 1)
+metadata/flip = true
+
+[node name="mushrooms_3" parent="Props" instance=ExtResource("p_root_hollow_mushrooms")]
+position = Vector2(552, 224)
+metadata/flip = false

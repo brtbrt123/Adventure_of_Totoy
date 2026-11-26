@@ -6,15 +6,15 @@ uniform vec3 light_colour = vec3(0.64, 0.77, 1.0);
 uniform float shaft_slope = 1.2;
 uniform float strength : hint_range(0.0, 1.0) = 1.0;
 uniform int lamp_count = 0;
-uniform vec4 lamps[32];
+uniform vec4 lamps[48];  // EnvironmentLight.MAX_LIGHTS
 uniform vec3 lamp_colour = vec3(1.0, 0.79, 0.52);
 uniform float emissive_pass_alpha = 0.99;
 uniform float prop_shadow_alpha = 0.30;
 uniform float actor_shadow_alpha = 0.20;
 uniform float lamp_shadow_alpha = 0.85;  // the shadow a lamp or glow stone throws from a character: darker than the moon's
 uniform bool mixed_lights = false;
-uniform vec3 lamp_colours[32];
-uniform vec3 lamp_core_colours[32];
+uniform vec3 lamp_colours[48];
+uniform vec3 lamp_core_colours[48];
 uniform vec3 lamp_core_colour = vec3(1.05, 0.98, 0.88);
 // The ground mist (owner 2026-11-01, presentation/effects/scene_look.gd): a full-scene rect drawn with this alpha between the floor
 // and the characters becomes drifting, moonlit mist, thicker toward the forest edge (mist_edge: 1 near the floor's edge).
@@ -65,7 +65,7 @@ void fragment() {
 	vec3 pool_rgb = vec3(0.0);
 	vec3 halo_rgb = vec3(0.0);
 	vec3 core_rgb = vec3(0.0);
-	for (int i = 0; i < 32; i++) {
+	for (int i = 0; i < 48; i++) {
 		if (i >= lamp_count) { break; }
 		vec4 lamp = lamps[i];
 		vec2 delta = p - lamp.xy;

@@ -69,7 +69,7 @@ const AMBIENT: Dictionary = {
 	&"woodland_layered": Color(0.9, 0.94, 0.88),
 	&"root_hollow_layered": Color(0.88, 0.93, 0.87),
 	&"hollow_trial_layered": Color(0.88, 0.93, 0.87),
-	&"rootcrown_layered": Color(0.86, 0.92, 0.93),
+	&"rootcrown_layered": Color(0.88, 0.93, 0.87),  # v2 is built from Root Hollow's art: the same ambient
 	&"arena": Color(1, 1, 1),
 	&"village_layered": Color(0.93, 0.89, 0.84),
 	&"glade_layered": Color(0.88, 0.95, 0.94),

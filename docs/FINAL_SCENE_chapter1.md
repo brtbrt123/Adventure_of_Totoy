@@ -113,6 +113,26 @@ next session shows pictures (the new floor and props next to the Stag Glade and 
 | Keep | The scene id `rootcrown_layered`, its registration and wiring, debug key Y, the glade entry `rootcrown_side`, the beacon state pair on `cleared_rootcrown` and its light sockets, `tests/core/test_rootcrown.gd` (new numbers), `tools/art/make_rootcrown_art.py` (new inputs). |
 | Remove when replaced | the 14 `rootcrown_*` props (art/src, art/build/sprites, presentation/props, prop_defs_rootcrown.json) and the floor painting, unless the owner wants some kept |
 
+**v2 pictures (2026-11-09, waiting on the owner):** `docs/previews/rootcrown_v2/` (`rootcrown_v2_compare.png`, `_map_2x.png`,
+`_size.png`, `layout.json`), made by `python tools/art/make_rootcrown_v2_preview.py`. Map 1024x672; walkable clearing about 331k
+square px (old arena 315k); open fight floor 624x344, prop-free. Floor stitched from the Root Hollow, Woodland and Hollow Trial floor
+pixels by `tools/art/quilt_ground.py`; the trial's slab ring under the tower; 81 existing forest props; the beacon tower is the only
+new art (placeholder until its picture is approved). No stone stair: a path between two dark stone lanterns (`forest_pedestal`).
+Tower pictures (2026-11-25): `art/reference/rootcrown_v2/tower_dark.png` and `tower_lit.png` (123x152, made from a sheet of the
+existing forest props by Higgsfield, cut by `tools/art/make_rootcrown_tower.py`), now drawn in the v2 pictures; `rootcrown_v2_tower_end.png`
+shows the tower end before and after the fight.
+After the owner's "this looks off" (2026-11-25): no slab ring under the tower, the map 1024x720 (48 px more at the top), the
+tower's feet at (512,204); `rootcrown_v2_tower_end_fix.png` (before/after), `rootcrown_v2_tower_end.png` (the real camera views: the tower is
+cut at the top whenever the hero stands south of it, since the camera follows the hero and stops only at the map's edge).
+After "the ground look plain on the tower part ... the stone and bush ... look like it just got put in there" (2026-11-26): the
+pictures draw the game's prop shadows; the floor is stitched with a brightness wish (darker grass under the trees and behind the
+tower); the tower stands in a grass mound with roots, shed stones, ferns and mushrooms; every edge stone, rock and briar stands
+in a seat of grass with tufts. `rootcrown_v2_tower_depth.png` shows the flagged view before and now. Details: top of [[STATUS]].
+**The owner approved the v2 look on 2026-11-26 ("Yes, looks right"), then "Yes, build it": v2 is built (top of [[STATUS]]).** What it took: the stitched floor (`docs/previews/rootcrown_v2/floor.png`, made with the grass seats and the shade wish), the 99 props
+and the tower from `docs/previews/rootcrown_v2/layout.json`, the tower as a state pair (`tower_dark.png`/`tower_lit.png` into
+art/src, its shadows from `tower_cut.json`), colliders, the entry, exit and checkpoint, the new numbers in
+`tests/core/test_rootcrown.gd`; then in-game captures with the night light. Remove the 14 first-build `rootcrown_*` props.
+
 ## Build order (each step shows the owner pictures before anything is wired)
 
 | Step | What | Notes |
