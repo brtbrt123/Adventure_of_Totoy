@@ -79,20 +79,20 @@
    "pixelfx": "nature/vine-whip",
    "options": {
     "palette": [
-     "#1c1824",
-     "#2e211e",
      "#4d3a30",
      "#62453d",
-     "#3f5226",
-     "#5a7a3a",
-     "#7f9348",
-     "#c2cb7c"
+     "#765f47",
+     "#987959",
+     "#bc9c72",
+     "#c6bfaa",
+     "#f4ecd6",
+     "#e0f0ec"
     ],
     "thorn": [
-     "#2e211e",
-     "#62453d",
-     "#987959",
-     "#bc9c72"
+     "#24365c",
+     "#3f7f7a",
+     "#6aa89a",
+     "#a7cde0"
     ],
     "soil": [
      "#1c1824",
@@ -108,7 +108,7 @@
     "angle": 0.24
    },
    "flags": [],
-   "for": "Heartroot Grab: a mossy root-arm lashing out along the lane (turned to the lane's angle)",
+   "for": "Heartroot Grab: a pale root-arm with the song's blue thorns lashing out along the lane (turned to its angle)",
    "frames": 43,
    "fps": 30,
    "pivot": [
@@ -117,7 +117,7 @@
    ]
   },
   "shock_ring": {
-   "pixelfx": "impacts/heavy-landing",
+   "pixelfx": "ice/frost-nova",
    "options": {
     "palette": [
      "#1c1824",
@@ -126,20 +126,62 @@
      "#5a625e",
      "#737769",
      "#9a9886",
-     "#c6bfaa"
+     "#c6bfaa",
+     "#f4ecd6"
     ],
-    "stone": "#444b49",
-    "seed": 14
+    "reach": 72,
+    "seed": 4
    },
    "flags": [
     "--no-actor"
    ],
-   "for": "the Boulder Toss's ring of shock: dust rings rolling out over the floor",
-   "frames": 49,
+   "for": "the Boulder Toss's ring of shock, option A: PixelFX's ring of shards, set to the ring's real reach (72 px)",
+   "frames": 103,
    "fps": 30,
    "pivot": [
-    88,
-    60
+    144,
+    150
+   ]
+  },
+  "stone_thorn": {
+   "pixelfx": "nature/thorns",
+   "options": {
+    "count": 1,
+    "palette": [
+     "#1c1824",
+     "#2f3231",
+     "#444b49",
+     "#5a625e",
+     "#737769",
+     "#9a9886",
+     "#c6bfaa",
+     "#f4ecd6"
+    ],
+    "glow": [
+     "#24365c",
+     "#3f7f7a",
+     "#6aa89a",
+     "#a7cde0"
+    ],
+    "soil": [
+     "#1c1824",
+     "#2e211e",
+     "#4d3a30",
+     "#62453d",
+     "#765f47",
+     "#987959",
+     "#bc9c72",
+     "#c6bfaa"
+    ],
+    "seed": 8
+   },
+   "flags": [],
+   "for": "the Boulder Toss's ring of shock, option B: one stone shard bursting up, placed round the real ring",
+   "frames": 73,
+   "fps": 30,
+   "pivot": [
+    48,
+    78
    ]
   }
  }

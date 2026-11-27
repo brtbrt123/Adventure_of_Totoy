@@ -129,6 +129,29 @@ func run() -> void:
 		steps(200)
 		await draw_once()
 	check(seen.has(&"told_root_snare") or seen.has(&"told_boulder_toss") or seen.has(&"told_heartroot_grab"), "a part 3b attack: %s" % [seen.filter(func(t: StringName) -> bool: return String(t).begins_with("told_"))])
+	# the PixelFX effects: every frame is in the atlas, and a forced snare and boulder play theirs through the real scene
+	for name: String in ColossusView.effect_frames():
+		check(frames.has(name), "effect frame %s" % name)
+	var shards: bool = false
+	var effect_of: Dictionary = {&"root_snare": &"thorns", &"boulder_toss": &"land", &"heartroot_grab": &"arm"}
+	for id: StringName in [&"root_snare", &"boulder_toss", &"heartroot_grab"]:
+		boss().clear_telegraph()
+		boss().state = &"chase"
+		boss().cooldown = 1
+		boss().next_attack_override = id
+		scene.core.player.position = boss().position + Vector2(130, 40)
+		steps(1)
+		boss().cooldown = 100000
+		var played: bool = false
+		for i: int in 110:
+			steps(1)
+			if i % 6 == 0:
+				await draw_once()
+			played = played or scene.colossus_view.effects.any(func(e: Dictionary) -> bool: return e["kind"] == effect_of[id])
+			shards = shards or scene.colossus_view.effects.any(func(e: Dictionary) -> bool: return e["kind"] == &"shards")
+		check(played, "%s played its effect" % id)
+	check(shards, "the boulder's ring of shock played its stone shards")
+	check(scene.colossus_view.missing.is_empty(), "no missing effect frames: %s" % [scene.colossus_view.missing.keys()])
 	# its fall: the last blow is a real swing inside a step, so the scene hears every event as in play
 	boss().hp = 1
 	boss().cooldown = 100000

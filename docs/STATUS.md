@@ -1,3 +1,31 @@
+## 3b effects: every PixelFX effect of the three new attacks is wired (2026-11-27/28, Claude, NOT committed)
+
+Owner 2026-11-28: "Yes, wire it" (the reworked root-arm). `import_pixelfx.py --install` now also renders `nature/vine-whip` (pale
+root, the song's blue thorns) at 13 angles, every 15 degrees from -90 to 90, through the new `tools/art/pixelfx_render.mjs` (PixelFX's
+own renderer has no margin and cut the turned vine off; the helper only calls the checkout's fxlib), renders kept in
+`.godot/pixelfx_arm_renders/` (ignored, remade on demand), 15 PixelFX frames kept per angle (frame 15 is the lash), each cropped
+tight: `art/src/fx_colossus_arm_<0..12>_<1..15>` (195 sprites). `colossus_view.gd` grows it out of the floor 40 px along the Grab's
+lane during the warning, lashes on the blow's tick (parried or not), then slides back; a lane pointing left draws the mirrored right
+half (`ArenaAnimation.destination`), so it is never more than 7.5 degrees off the real lane. Atlas now 2048x5188 (limit 8192);
+contact sheets grew to 23 pages (21-23 new). Smoke checks every arm frame and that a forced Grab plays it.
+
+Owner 2026-11-28: "Option B" for the ring of shock. Wired: `fx_colossus_shard_1..11` (PixelFX `nature/thorns` in stone, from
+`stone_thorn` by `import_pixelfx.py --install`); `colossus_view.gd` sets 14 round the middle of the ring's real band (radius 56, the
+band 40..72) when the ring strikes. Smoke checks the shards play. Option A (frost-nova, flat) dropped. The full harness run started
+on 2026-11-27 died from `smoke_road_aspects` on: Windows could not start Godot any more (exit codes 0xC0000142 and 0xC000026B,
+the session shutting down while the work was stopped); every suite before it had passed. It was rerun after option B (result in
+the next lines).
+
+
+Owner: "Yes, do that". `tools/art/import_pixelfx.py --install` writes `art/src/fx_colossus_thorn_1..11` (burst, short hold, sink:
+the long hold looked like a lane still dangerous), `fx_colossus_stone_spin_1..18`, `fx_colossus_stone_land_1..21` (boulder cut at
+alpha 240 so its dust no longer becomes dark blobs); atlas, contact sheets and import done. `colossus_view.gd` plays them: thorns
+along every snare lane (depth-sorted items), the stone spinning on its arc with a growing floor shadow, the landing at the crater.
+`tests/smoke_colossus.gd` checks every effect frame and that a forced snare and boulder play them (OK). Proposals, not wired
+(`presentation/review/colossus_3b/colossus_3b_attacks.png`): ring of shock A (frost-nova stone shards at reach 72, flat) or B
+(14 stone shards round the real ring); root-arm reworked (pale root, blue thorns; still faint). The full harness was started
+before the last thorn/landing change; rerun it before committing. Not committed.
+
 ## Step 3b built: phase 3 and three new attacks; their effects proposed with PixelFX (2026-11-27, Claude, committed 94d6abfb)
 
 Owner: "Start 3b now", then, seeing my first effect mock-ups made from existing sprites: "are you not using the pixel effects skill

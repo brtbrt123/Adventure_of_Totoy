@@ -911,6 +911,7 @@ func drawables() -> Array[Dictionary]:
 			out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": ColossusView.FRAME, "left": false, "shadow": float(mob["radius"]) * 0.9, "tint": tint, "height": ColossusView.HEIGHT, "mob": mob})
 			continue
 		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": WardenEffects.SHADOW_RADIUS if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 81.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
+	out.append_array(colossus_view.effect_items(snapshot, tint))  # the Colossus's thorns and stone landings stand on the floor
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
 		var props: Array[Dictionary]=PropsLayer.drawables(prop_placements,frames,_visible_world_rect().grow(8))
@@ -956,6 +957,8 @@ func _draw() -> void:
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
 	ColossusView.draw_glowing_edges(self, snapshot, colors)  # the boss's warnings stay bright on the night floor
+	for stone: Dictionary in colossus_view.stone_shadows(snapshot):  # a thrown stone's shadow grows where it will land
+		ActorShadow.draw(self, stone["at"], float(stone["radius"]), shadow_strength())
 	_draw_lightning_ground()
 	_draw_coil_ground()
 	_draw_staff_ground()
@@ -979,6 +982,7 @@ func _draw() -> void:
 				ActorShadow.draw(self, item["at"], item["shadow"], shadow_strength())
 	for item: Dictionary in items:
 		_draw_item(item)
+	colossus_view.draw_stones(self, snapshot, frames, sprites, ambient())  # a thrown stone in the air, over everything
 	_draw_ward_echo_front(shake_offset())
 	_draw_aspects_front()
 	for item: Dictionary in items:
@@ -1027,6 +1031,9 @@ func hero_hit_flash() -> bool:
 
 
 func _draw_item(item: Dictionary) -> void:
+	if item["kind"] == &"colossus_fx":
+		colossus_view.draw_effect(self, item, frames, sprites)
+		return
 	if item["kind"] == &"firefly":
 		AmbientFireflies.draw(self, item)
 		return

@@ -2,7 +2,7 @@ extends SceneTree
 ## Pictures for the owner, part 3b (docs/PLAN_colossus_step3.md): the REAL warnings of Root Snare, Boulder Toss and Heartroot Grab
 ## and the phase 3 roar in Rootcrown, and, drawn over some of them, a MOCK of the effects proposed for them: PixelFX effects in
 ## Totoy 36 with hard alpha (art/reference/pixelfx_colossus_v1/, tools/art/import_pixelfx.py), placed on the real lanes. Nothing of
-## the mock is in the game. Windowed only:
+## the mock is in the game. Root Snare's thorns and the Boulder Toss's stone (2026-11-27) the ring's stone shards (option B) and the Grab's root-arm (2026-11-28) are wired: every shot is REAL. Windowed only:
 ##   & "C:\Tools\Godot\Godot_v4.7.2-stable_win64_console.exe" --path . --resolution 1152x648 --script res://presentation/review/colossus_3b/capture_3b.gd
 ## Writes user://colossus_3b/<name>.png; tools/art/make_colossus_3b_sheet.py makes the sheet. No save is read or written.
 const Explore := preload("res://presentation/explore/explore_scene.gd")
@@ -15,6 +15,8 @@ const HOME: Vector2 = Vector2(512, 378)
 
 var scene: Explore
 var mock: String = ""
+var ring_center: Vector2 = Vector2.ZERO
+var ring_tick: int = 0
 
 
 func _init() -> void:
@@ -87,33 +89,28 @@ func run() -> void:
 	steps(hit - scene.core.tick - 1)
 	scene.core.player.position = HOME + Vector2(70, 110)
 	steps(9)
-	mock = "roots"
-	await shot("3b_02_snare_second_lane")
-	mock = ""
+	await shot("3b_02_snare_second_lane")  # the thorns are the game's own now
 	steps(40)
 	# Boulder Toss: the stone in the air over its warning; then landed, the ring of shock warns round it
 	attack(&"boulder_toss", Vector2(140, 40), 26)
-	mock = "stone"
 	await shot("3b_03_boulder_in_flight")
 	hit = boss().telegraph.hit_tick
 	scene.core.player.position = HOME + Vector2(140, 120)
 	steps(hit - scene.core.tick + 8)
 	await shot("3b_04_boulder_ring")
 	var ring_hit: int = boss().extra_telegraphs[0].hit_tick
+	ring_center = boss().extra_telegraphs[0].center  # read now: the warning is gone once the ring has struck
+	ring_tick = ring_hit
 	steps(ring_hit - scene.core.tick + 6)
-	mock = "ring"
-	await shot("3b_04b_ring_strikes")
-	mock = ""
+	await shot("3b_04b_ring_strikes")  # the stone shards are the game's own since the owner chose option B
 	steps(50)
-	# Heartroot Grab: the gold lane; then the arm of roots at its strike
-	attack(&"heartroot_grab", Vector2(120, 30), 30)
+	# Heartroot Grab: the gold lane; then the root-arm rearing up out of the floor at the end of its warning, about to lash
+	attack(&"heartroot_grab", Vector2(120, 30), 24)
 	await shot("3b_05_grab_warning")
 	hit = boss().telegraph.hit_tick
 	scene.core.player.position = HOME + Vector2(120, 100)  # out of its reach: the picture shows the arm, not a hit
-	steps(hit - scene.core.tick + 3)
-	mock = "arm"
-	await shot("3b_06_grab_strike")
-	mock = ""
+	steps(hit - scene.core.tick - 6)
+	await shot("3b_06_grab_strike")  # the root-arm is the game's own since "Yes, wire it"
 	steps(40)
 	# phase 3: the roar at a quarter of its health
 	boss().clear_telegraph()
@@ -158,40 +155,22 @@ func pfx_draw(effect: String, list: String, index: int, anchor: Vector2, at: Vec
 
 
 func draw_mock() -> void:
-	if mock == "" or boss().telegraph == null:
-		return
 	var tick: int = scene.core.tick
-	var first: Telegraph = boss().telegraph
 	match mock:
-		"roots":  # one PixelFX thorn bursting up again and again along the lane, a little later the farther out (PixelFX's seam races)
-			var anchor: Vector2 = Vector2(meta("root_thorn")["anchor"][0], meta("root_thorn")["anchor"][1])
-			var k: int = 0
-			var d: float = 50.0
-			while d <= first.size:
-				var age: int = tick - first.hit_tick - k
-				var side: Vector2 = first.direction.orthogonal() * (4.0 if k % 2 == 0 else -4.0)
-				pfx_draw("root_thorn", "frames", 9 + age / 2, anchor, first.center + first.direction * d + side, Rect2(anchor - Vector2(16, 70), Vector2(32, 78)))
-				d += 22.0
-				k += 1
-		"arm":  # the PixelFX vine-whip, turned to the lane, rooted at the body's edge; its lash meets the strike
+		"arm":  # the reworked PixelFX vine-whip (pale root, the song's blue thorns), turned to the lane, rooted at the body's edge
+			if boss().telegraph == null:
+				return
+			var first: Telegraph = boss().telegraph
 			var m: Dictionary = meta("grab_vine")
 			pfx_draw("grab_vine", "frames", 15 + (tick - first.hit_tick) / 2, Vector2(m["pivot"][0], m["pivot"][1]), first.center + first.direction * 40.0)
-		"stone":  # the PixelFX stone spins along the real arc to the warning; its shadow grows on the ground
-			var m: Dictionary = meta("boulder")
-			if tick < first.hit_tick:
-				var progress: float = clampf(float(tick - first.start_tick) / float(first.hit_tick - first.start_tick), 0.0, 1.0)
-				var at: Vector2 = (HOME + Vector2(0, -96)).lerp(first.center, progress) + Vector2(0, -sin(progress * PI) * 70.0)
-				var shade: float = 6.0 + 14.0 * progress
-				scene.draw_colored_polygon(_ellipse(first.center, shade, shade * 0.45), Color(0, 0, 0, 0.3))
-				var spin: Array = m["spin"]
-				var texture: ImageTexture = pfx("boulder", String(spin[(tick / 2) % spin.size()]))
-				scene.draw_texture(texture, (at - texture.get_size() * 0.5).round(), scene.ambient())
-			else:
-				pfx_draw("boulder", "landing", (tick - first.hit_tick) / 2, Vector2(m["land_anchor"][0], m["land_anchor"][1]), first.center)
-		"ring":  # the PixelFX dust rings roll out from the crater as the ring of shock strikes
+		"ring_nova":  # option A: PixelFX frost-nova as stone shards, its reach set to the ring's outer radius (72)
 			var m: Dictionary = meta("shock_ring")
-			var ring: Telegraph = boss().extra_telegraphs[0] if not boss().extra_telegraphs.is_empty() else first
-			pfx_draw("shock_ring", "frames", (tick - ring.hit_tick) / 2 + 2, Vector2(m["pivot"][0], m["pivot"][1]), ring.center)
+			pfx_draw("shock_ring", "frames", 26 + (tick - ring_tick) / 2, Vector2(m["pivot"][0], m["pivot"][1]), ring_center)
+		"ring_thorns":  # option B: one PixelFX stone shard bursting up, 14 times round the middle of the real ring (56 px)
+			var anchor: Vector2 = Vector2(meta("stone_thorn")["anchor"][0], meta("stone_thorn")["anchor"][1])
+			for k: int in 14:
+				var at: Vector2 = ring_center + Vector2.from_angle(TAU * k / 14.0) * 56.0
+				pfx_draw("stone_thorn", "frames", 9 + (tick - ring_tick) / 2, anchor, at, Rect2(anchor - Vector2(16, 70), Vector2(32, 78)))
 
 
 func _ellipse(at: Vector2, rx: float, ry: float) -> PackedVector2Array:

@@ -15,6 +15,8 @@ shock), Heartroot Grab; real warnings, the arena's sounds, shake and dust. Their
 in Totoy 36 (`tools/art/import_pixelfx.py`, `art/reference/pixelfx_colossus_v1/`) and shown in
 `presentation/review/colossus_3b/colossus_3b_attacks.png`: the thorns and the stone work; the ring of shock (side-view dust, too
 faint after hard alpha) and the root-arm (thin and dark at night) need another try. Wire them on the owner's yes.
+Since then (2026-11-28): the thorns, the stone and, for the ring of shock, 14 stone shards round its real band (the owner's option
+B) are in the game, and the reworked root-arm (pale root, the song's blue thorns, rearing before it lashes) too: every 3b effect is wired.
 
 ## Pictures (mock-ups, not gameplay)
 

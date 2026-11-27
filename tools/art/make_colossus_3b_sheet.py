@@ -18,12 +18,12 @@ base.CAPTURES = base.CAPTURES.parent / "colossus_3b"
 
 CELLS = [
     ("3b_01_snare_warning", "7 Root Snare: the first lane", "REAL. Red, 0.8 s, all phases. Damage 18."),
-    ("3b_02_snare_second_lane", "...he dodged: the second lane", "REAL warning (0.5 s, aimed where he went). PIXELFX: thorns burst."),
-    ("3b_03_boulder_in_flight", "8 Boulder Toss (phase 2+)", "REAL warning (0.9 s). PIXELFX: the stone spins along the arc."),
-    ("3b_04_boulder_ring", "...it lands: the ring of shock warns", "REAL ring warning (0.67 s; the crater is safe). PIXELFX: the landing."),
-    ("3b_04b_ring_strikes", "...the ring strikes", "PIXELFX: dust rings roll out (squashed flat: side-view art)."),
+    ("3b_02_snare_second_lane", "...he dodged: the second lane", "IN THE GAME: PixelFX thorns burst along the first lane."),
+    ("3b_03_boulder_in_flight", "8 Boulder Toss (phase 2+)", "IN THE GAME: the PixelFX stone spins along its arc, its shadow grows."),
+    ("3b_04_boulder_ring", "...it lands: the ring of shock warns", "IN THE GAME: the landing. The crater is safe from the ring."),
+    ("3b_04b_ring_strikes", "...the ring strikes (your option B)", "IN THE GAME: 14 PixelFX stone shards over the ring's real band."),
     ("3b_05_grab_warning", "9 Heartroot Grab (phase 2+)", "REAL. Gold, 0.7 s. A parry cracks 60 posture (a perfect one breaks it)."),
-    ("3b_06_grab_strike", "...the root-arm lashes", "PIXELFX: the vine-whip as a mossy root, turned to the lane."),
+    ("3b_06_grab_strike", "...the root-arm rears to lash", "IN THE GAME: PixelFX vine-whip as a pale root, turned to the lane."),
     ("3b_07_phase3_roar", "Phase 3 at a quarter of its health", "REAL. It roars; then every attack, the shortest pauses."),
 ]
 
@@ -33,7 +33,7 @@ def main() -> int:
     for name, _, _ in CELLS:
         shutil.copyfile(base.CAPTURES / f"{name}.png", base.OUT / f"{name}.png")
     base.sheet("colossus_3b_attacks.png", "Part 3b: three new attacks and phase 3",
-               "Real captures. Where it says PIXELFX, the effect is a proposal: PixelFX in Totoy 36 with hard alpha, drawn on the real lanes; not in the game.",
+               "Real captures from the game. The effects are PixelFX in Totoy 36 with hard alpha, wired 2026-11-27 and 28.",
                3, CELLS)
     return 0
 
