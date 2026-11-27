@@ -496,7 +496,67 @@ const MOBS: Dictionary = {
 		"attack": {"id": &"warden_cleave", "kind": &"gold", "start_min": 0.0, "start_max": 56.0, "windup": 40, "strike_ticks": 6, "strike_speed": 0.0, "width": 0.0, "damage": 20,
 			"recover": 44, "cooldown": 40, "interrupt": false, "crash": 0},
 	},
+	# The Mossbound Colossus on the road (Rootcrown, chapter 1's final boss). Its rules live in core/colossus.gd and the COLOSSUS_*
+	# numbers below; this row only holds what every mob needs. `solid`: the hero cannot walk into its body. `attack` is the row the
+	# snapshot names before it has attacked.
+	&"colossus": {
+		"level": 5, "exp": 200, "drop": {"item": &"herb", "chance": 0.0}, "hp": 600, "radius": 46.0, "speed": 0.5, "aggro": 180.0, "tether": 4000.0, "hold": 64.0, "wait": 90.0,
+		"boss": true, "solid": true,
+		"attack": {"id": &"gold_slam", "kind": &"gold", "interrupt": false, "crash": 0},
+	},
 }
+
+# ---- The Mossbound Colossus on the road (core/colossus.gd; docs/PLAN_colossus_step3.md). First guesses, to be tuned by play. ----
+# The arena's armour, posture and counter rules carry over: a blow does ARMOR_DAMAGE_FACTOR damage and fills posture, a perfect
+# parry fills it at once, and a broken Colossus takes COUNTER_DAMAGE_MULT damage (plus the Edge bonus for the weapon's blows).
+const COLOSSUS_WAKE_TICKS: int = 90  # rising: it cannot be hurt yet
+const COLOSSUS_FIRST_ATTACK_TICKS: int = 40  # after it has risen
+const COLOSSUS_COOLDOWN_TICKS: Array[int] = [40, 24, 20]  # between attacks, per phase (1, 2, 3)
+const COLOSSUS_PHASE_HP_FRACTIONS: Array[float] = [0.6, 0.25]  # health left when phase 2 and phase 3 begin
+const COLOSSUS_PHASE2_WINDUP_FACTOR: float = 0.85  # every warning from phase 2 on (phase 3 too)
+const COLOSSUS_ROAR_TICKS: int = 48  # the pause that announces a new phase (it can be hurt)
+const COLOSSUS_POSTURE_MAX: float = 100.0
+const COLOSSUS_POSTURE_DECAY: float = 0.03
+const COLOSSUS_BREAK_TICKS: int = 90  # the counter window
+const COLOSSUS_BREAK_RECOVER_TICKS: int = 20
+const COLOSSUS_STUN_TICKS: int = 45  # Reaper's Coil, counted from the end of the drag (not a counter window)
+const COLOSSUS_STUN_RECOVER_TICKS: int = 12
+const COLOSSUS_HOLD_GAP: float = 12.0  # it stops walking this far from the hero (edge to edge)
+# Nothing comes from off screen: it begins an attack only while the hero is this near its feet (the 384x216 view with the fight
+# camera shows it whole then); otherwise it walks closer.
+const COLOSSUS_SIGHT_SIDE: float = 230.0
+const COLOSSUS_SIGHT_ABOVE: float = 160.0
+const COLOSSUS_SIGHT_BELOW: float = 75.0
+const COLOSSUS_SHARDS_ORIGIN: Vector2 = Vector2(0.0, -48.0)  # the chest: where the three lanes start
+# The attacks, in the order they are considered. phase: the first phase that uses it; start_min/start_max: the hero's distance
+# that allows it; windup: warning ticks (x the phase factor); active: dangerous ticks; recover: the pause after it.
+# follow: a second warning that BEGINS when the first one strikes (so it is aimed then): its own windup (x the phase factor),
+# active, damage and size. parry_posture: the posture an early parry of this gold attack adds (else PARRY_EARLY_POSTURE).
+const COLOSSUS_ATTACKS: Array[Dictionary] = [
+	{"id": &"gold_slam", "kind": &"gold", "phase": 1, "start_min": 0.0, "start_max": 170.0, "windup": 60, "active": 1, "recover": 26, "damage": 30,
+		"radius": 44.0},
+	{"id": &"red_sweep", "kind": &"gold", "phase": 1, "start_min": 0.0, "start_max": 112.0, "windup": 60, "active": 5, "recover": 24, "damage": 20,
+		"radius": 112.0, "half_angle_deg": 50.0},  # gold since 2026-10-16 (the owner asked); the id keeps the old name
+	{"id": &"red_shards", "kind": &"red", "phase": 1, "start_min": 70.0, "start_max": 235.0, "windup": 48, "active": 7, "recover": 22, "damage": 15,
+		"length": 240.0, "width": 16.0, "spread_deg": 22.0},
+	{"id": &"red_stomp", "kind": &"red", "phase": 1, "start_min": 0.0, "start_max": 150.0, "windup": 60, "active": 4, "recover": 28, "damage": 25,
+		"inner": 76.0, "outer": 150.0},
+	{"id": &"gold_combo", "kind": &"gold", "phase": 2, "start_min": 0.0, "start_max": 150.0, "windup": 54, "active": 1, "recover": 30, "damage": 25,
+		"radius": 40.0, "offset": 56.0, "gap": 26, "blows": 3},
+	{"id": &"red_charge", "kind": &"red", "phase": 2, "start_min": 90.0, "start_max": 235.0, "windup": 60, "active": 14, "recover": 34, "damage": 28,
+		"length": 260.0, "width": 88.0},
+	# Part 3b. Root Snare: roots burst along a lane toward the hero, then along a second lane aimed where he went. The second
+	# strikes inside PLAYER_HURT_INVULN_TICKS of the first: it can only catch a hero who dodged the first, never hit twice.
+	{"id": &"root_snare", "kind": &"red", "phase": 1, "start_min": 60.0, "start_max": 235.0, "windup": 48, "active": 6, "recover": 26, "damage": 18,
+		"length": 240.0, "width": 28.0, "follow": {"windup": 30, "active": 6, "damage": 18, "length": 240.0, "width": 28.0}},
+	# Boulder Toss: a stone thrown at where the hero stands; where it lands a ring of shock follows.
+	{"id": &"boulder_toss", "kind": &"red", "phase": 2, "start_min": 90.0, "start_max": 235.0, "windup": 54, "active": 3, "recover": 30, "damage": 24,
+		"radius": 40.0, "follow": {"windup": 40, "active": 3, "damage": 12, "inner": 40.0, "outer": 72.0}},
+	# Heartroot Grab: a root-arm lunges along a narrow lane; parried, it snaps back and the posture cracks wide.
+	{"id": &"heartroot_grab", "kind": &"gold", "phase": 2, "start_min": 55.0, "start_max": 200.0, "windup": 44, "active": 6, "recover": 32, "damage": 26,
+		"length": 220.0, "width": 20.0, "parry_posture": 60.0},
+]
+
 const MOB_MAX_ATTACKERS: int = 2  # mobs of one encounter that may wind up or strike at the same time
 const MOB_FIRST_COOLDOWN: int = 30  # a woken mob waits this long, plus MOB_COOLDOWN_STAGGER x its place, before its first attack
 const MOB_COOLDOWN_STAGGER: int = 25

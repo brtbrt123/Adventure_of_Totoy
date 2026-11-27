@@ -28,6 +28,7 @@ extends RefCounted
 ## the mobs wake, chase and attack by their own rules, and the hero can fall (`hero_defeated`, then he stands up at the last checkpoint
 ## HERO_DEFEAT_TICKS later with every uncleared encounter whole again). Clearing an encounter sets the flag `cleared_<id>` and pays its reward
 ## into `inventory` (`item_received`); `use_herb_pressed` heals. docs/architecture.md "Chapter route, mobs and encounters".
+## An encounter with a seal (the Colossus's climb) adds its solid circles while its fight is on (`arena_sealed` / `arena_opened`).
 const Tuning := preload("res://core/tuning.gd")
 const InputFrame := preload("res://core/input_frame.gd")
 const GameEvent := preload("res://core/game_event.gd")
@@ -179,6 +180,7 @@ var _talk: Dictionary = {}  # the running conversation: {npc_id, dialogue_id, in
 var _armed: Dictionary = {}  # exit id -> true once the hero has been outside it
 var _blocked_told: Dictionary = {}  # exit id -> true while the hero stands in a closed exit (the message is said once per visit)
 var _queued: Array[GameEvent] = []  # events raised between steps (gate changes), emitted with the next step
+var _sealed: Array[StringName] = []  # the encounters whose seal circles are in `obstacles`
 
 
 ## `entry` empty = the scene's default entry. An unknown scene gives an empty world (and pushes an error).
@@ -194,7 +196,7 @@ func _init(p_scene_id: StringName = SceneDefs.START_SCENE, entry: StringName = &
 	if gate_open:  # an opened gate was opened by lighting every switch (the save keeps only the gate)
 		lit_switches.append_array(_puzzle_switches())
 	_uses_flag_states = _scene_uses_flag_states()
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
+	obstacles = _build_obstacles()
 	entry_id = entry if def["entries"].has(entry) else StringName(def["default_entry"])
 	place_at(def["entries"][entry_id])
 	for npc: Dictionary in def["npcs"]:
@@ -236,7 +238,7 @@ func set_gate_open(open: bool) -> void:
 	lit_switches.clear()
 	if open:  # an open gate means every switch is lit
 		lit_switches.append_array(_puzzle_switches())
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
+	obstacles = _build_obstacles()
 	player.position = _clamp(player.position)
 	_queued.append(GameEvent.new(GameEvent.GATE_CHANGED, tick, {"scene": scene_id, "gate_open": gate_open}))
 
@@ -462,16 +464,41 @@ func _scene_uses_flag_states() -> bool:
 	return false
 
 
+## The scene's colliders for the state it is in now: props (gate, switches, flags, trial) and any standing fight seal.
+func _build_obstacles() -> Array[Obstacle]:
+	var list: Array[Obstacle] = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
+	if mobs != null:
+		list.append_array(mobs.seal_obstacles())
+	return list
+
+
+## A fight's seal goes up or comes down: the colliders follow and it is announced.
+func _sync_seals(events: Array[GameEvent]) -> void:
+	if mobs == null:
+		return
+	var now: Array[StringName] = mobs.sealed_ids()
+	if now == _sealed:
+		return
+	for id: StringName in now:
+		if not _sealed.has(id):
+			events.append(GameEvent.new(GameEvent.ARENA_SEALED, tick, {"scene": scene_id, "encounter_id": id}))
+	for id: StringName in _sealed:
+		if not now.has(id):
+			events.append(GameEvent.new(GameEvent.ARENA_OPENED, tick, {"scene": scene_id, "encounter_id": id}))
+	_sealed = now
+	rebuild_obstacles()
+
+
 ## The colliders again now (the trial sealed or opened its entry); the hero is pushed out of anything that closed on him.
 func rebuild_obstacles() -> void:
-	obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
+	obstacles = _build_obstacles()
 	player.position = _clamp(player.position)
 
 
 ## The colliders again for the story flags now set (a barrier that opens when its fight is cleared).
 func _rebuild_flag_obstacles() -> void:
 	if _uses_flag_states:
-		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
+		obstacles = _build_obstacles()
 
 
 func _flag_added(flag: StringName, events: Array[GameEvent]) -> void:
@@ -553,6 +580,7 @@ func step(input: InputFrame) -> void:
 	if (mobs == null or not mobs.is_engaged()) and player.state != PlayerState.STATE_DEAD:
 		player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.EXPLORE_EDGE_REGEN_PER_TICK)
 	_check_defeat(events)
+	_sync_seals(events)
 	if not exiting:
 		_check_checkpoints(events)
 		_check_exits(events)
@@ -832,7 +860,7 @@ func _use_switch(target: StringName, events: Array[GameEvent]) -> void:
 	if all_lit:
 		set_gate_open(true)  # rebuilds the colliders and queues gate_changed for the next step
 	else:
-		obstacles = SceneDefs.build_obstacles(scene_id, gate_open, lit_switches, story_flags, trial.tags() if trial != null else [] as Array[StringName])
+		obstacles = _build_obstacles()
 
 
 ## True when the hero's body (PLAYER_RADIUS) touches `rect`.

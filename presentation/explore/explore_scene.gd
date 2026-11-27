@@ -20,6 +20,10 @@ const CreatureGlow := preload("res://presentation/explore/creature_glow.gd")
 var creature_effects: CreatureEffects = CreatureEffects.new()
 var creature_glow: CreatureGlow
 const WardenEffects := preload("res://presentation/explore/warden_effects.gd")
+const ColossusView := preload("res://presentation/explore/colossus_view.gd")
+var colossus_view: ColossusView = ColossusView.new()  # the road's Colossus: body, camera, outline, edges, light, blows
+var _camera_framed: bool = false  # the view frames the Colossus's fight
+var _camera_blending: bool = false  # the view is still sliding between following the hero and framing the fight
 const LAMP_SHADOW_EASE: float = 0.12  # how much of the way the shadow turns toward its target each frame
 var _lamp_shadows: Dictionary = {}  # per character: the eased lamp-shadow vector
 const LAMP_SHADOW_LENGTH: float = 2.0  # ground shift per pixel of height, right next to a light
@@ -280,6 +284,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	hero_hit_tick = -1000
 	world_cues.clear()
 	encounter_effects.clear()
+	colossus_view.clear()
 	creature_effects.clear()
 	trial_fx.clear()
 	progression_view.clear()
@@ -304,7 +309,7 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	trial_fx.sync(snapshot.scene_id,snapshot.tick)
 	progression_view.sync(snapshot, colors, frames, sprites)
 	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
-	_update_camera()
+	_update_camera(true)
 	queue_redraw()
 
 
@@ -426,6 +431,11 @@ func advance(intent: InputFrame) -> void:
 	encounter_effects.sync(snapshot, colors, frames, sprites)
 	creature_effects.sync(snapshot)
 	shake_left = maxi(shake_left, creature_effects.fx.take_shake())  # the mobs' heavy blows shake the view
+	for blow: Dictionary in colossus_view.landed(snapshot):  # the Colossus's blows land: the arena's sound, shake and dust
+		practice_view.audio.cue(String(blow["cue"]), snapshot.tick)
+		if bool(blow["heavy"]):
+			shake_left = maxi(shake_left, 4)
+			_burst(blow["at"], 18, colors["j"], 1.4)
 	progression_view.sync(snapshot, colors, frames, sprites)
 	progression_view.visible=not character_menu.is_open and snapshot.dialogue.is_empty() and not conversation.controls_open
 	_update_camera()
@@ -469,7 +479,7 @@ func _on_event(event: GameEvent) -> void:
 	if event.type in [GameEvent.MOB_DEFEATED,GameEvent.ITEM_USED,GameEvent.HERO_RESPAWNED]:
 		world_cues.append({"type":event.type,"tick":snapshot.tick,"at":event.data.get("position",snapshot.hero.position)})
 	if event.type == GameEvent.ENCOUNTER_CLEARED:
-		toast_message = "CLEARING CLEARED"
+		toast_message = "THE GUARDIAN FALLS" if event.data.get("encounter_id", &"") == &"rootcrown" else "CLEARING CLEARED"
 		toast_ticks = 110
 	match event.type:
 		GameEvent.QUEST_COMPLETED, GameEvent.STAT_SPENT, GameEvent.STATS_RESET:
@@ -530,9 +540,13 @@ func _on_event(event: GameEvent) -> void:
 			var finisher: bool = (int(event.data.get("combo_index", 0)) >= snapshot.hero.combo_max and snapshot.hero.combo_max > 0) or event.data.get("skill_id", &"") == &"moon_cleave" or bool(event.data.get("ward_release", false))
 			if bool(event.data.get("lightning_strike", false)):
 				return  # the sky strike draws its own burst (lightning_strike)
-			on_hero_hit(event.tick, event.data["position"], Vector2(event.data["position"]) + Vector2(0, -12), counter, finisher, event.data.get("skill_id", event.data.get("aspect_id", &"")))
+			var spark: Vector2 = fx_target_contact(int(event.data.get("target_id", -1)), Vector2(event.data["position"]) + Vector2(0, 2))
+			on_hero_hit(event.tick, event.data["position"], spark, counter, finisher, event.data.get("skill_id", event.data.get("aspect_id", &"")))
 			if snapshot.hero.weapon_form == Weapons.FORM_LIGHTNING:
 				_add_lightning_fx({"kind": "spark", "tick": event.tick, "at": Vector2(event.data["position"]) + Vector2(0, -12), "life": LightningEffects.sequence_length(LightningEffects.SPARK_TICKS)})
+		GameEvent.POSTURE_BROKEN:  # the Colossus cracks open: the counter window
+			shake_left = maxi(shake_left, 6)
+			_burst(Vector2(event.data.get("position", snapshot.hero.position)) - Vector2(0, ColossusView.CHEST), 16, colors["p"], 1.2)
 		GameEvent.MOB_STAGGERED:
 			practice_effects.append({"type": event.type, "tick": snapshot.tick, "at": event.data["position"], "perfect": false})
 		GameEvent.TRAINING_POST_HIT:
@@ -630,6 +644,9 @@ func jump_to(scene: StringName) -> void:
 	if scene == &"hollow_trial_layered":  # T: the trial can be played again (debug only: the won flag and the opened chest are cleared)
 		var replay: Array[StringName] = core.story_flags.filter(func(f: StringName) -> bool: return f != &"cleared_hollow_trial" and f != &"trial_chest_opened")
 		core.set_story_flags(replay)
+	if scene == SceneDefs.ROOTCROWN_LAYERED:  # Y: the Colossus can be fought again (debug only: its win is cleared, the beacon goes dark)
+		var again: Array[StringName] = core.story_flags.filter(func(f: StringName) -> bool: return f != &"cleared_rootcrown" and f != &"killed_rootcrown_1")
+		core.set_story_flags(again)
 	snapshot=core.snapshot()
 	_save_progress(core.scene_id,core.last_checkpoint)
 	begin_transition(scene, &"")
@@ -733,12 +750,23 @@ func _save_loadout() -> void:
 
 # --- drawing ---
 
-## Follows the hero on a fixed 384x216 screen, locked to his rounded position and clamped to the scene (the arena's rule).
-func _update_camera() -> void:
+## Follows the hero on a fixed 384x216 screen, locked to his rounded position and clamped to the scene (the arena's rule). In the
+## Colossus's fight it slides toward the boss so the whole body stays on screen (ColossusView.fight_view), easing in and out;
+## `snap` (a new scene) jumps.
+func _update_camera(snap: bool = false) -> void:
 	if camera == null or snapshot == null:
 		return
 	var half: Vector2 = VIEW_SIZE * 0.5
-	view_origin = (snapshot.hero.position.round() - half).clamp(Vector2.ZERO, (snapshot.size - VIEW_SIZE).max(Vector2.ZERO))
+	var target: Vector2 = (snapshot.hero.position.round() - half).clamp(Vector2.ZERO, (snapshot.size - VIEW_SIZE).max(Vector2.ZERO))
+	var boss: Dictionary = ColossusView.fighting(snapshot)
+	if not boss.is_empty():
+		target = ColossusView.fight_view(snapshot.hero.position, boss, frames, snapshot.size)
+	if (not boss.is_empty()) != _camera_framed:
+		_camera_framed = not boss.is_empty()
+		_camera_blending = not snap
+	var step: Array = ColossusView.ease_view(view_origin, target, _camera_blending and not snap)
+	view_origin = step[0]
+	_camera_blending = step[1]
 	camera.position = view_origin + half
 	camera.force_update_scroll()
 
@@ -794,8 +822,11 @@ func fx_spin_contacts(event: GameEvent) -> Array[Vector2]:
 	return out
 
 
-## A mob's body: a little above its feet.
-func fx_target_contact(_target_id: int, fallback: Vector2) -> Vector2:
+## A mob's body: a little above its feet (the Colossus: its side toward the hero, at chest height).
+func fx_target_contact(target_id: int, fallback: Vector2) -> Vector2:
+	for mob: Dictionary in snapshot.mobs:
+		if int(mob["id"]) == target_id and ColossusView.is_colossus(mob):
+			return ColossusView.contact(mob, snapshot.hero.position)
 	return fallback + Vector2(0, -14)
 
 
@@ -876,6 +907,9 @@ func drawables() -> Array[Dictionary]:
 		out.append({"kind": &"npc", "id": npc["id"], "at": npc["position"], "frame": String(npc_frames.get(npc["id"], "")), "left": bool(npc["facing_left"]), "shadow": HERO_SHADOW_RADIUS * height / HERO_HEIGHT, "tint": tint, "height": height})
 	out.append({"kind": &"hero", "id": &"totoy", "at": snapshot.hero.position, "frame": hero_frame, "left": facing_left, "shadow": HERO_SHADOW_RADIUS, "tint": tint, "height": HERO_HEIGHT})
 	for mob: Dictionary in snapshot.mobs:
+		if ColossusView.is_colossus(mob):  # a front view: never mirrored
+			out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": ColossusView.FRAME, "left": false, "shadow": float(mob["radius"]) * 0.9, "tint": tint, "height": ColossusView.HEIGHT, "mob": mob})
+			continue
 		out.append({"kind": &"mob", "id": str(mob["id"]), "at": mob["position"], "frame": MobView.frame(mob, snapshot.telegraphs, snapshot.tick, int(creature_effects.warden.hits.get(int(mob["id"]), -1000))), "left": Vector2(mob["facing"]).x < 0.0, "shadow": WardenEffects.SHADOW_RADIUS if mob["type"] == &"warden" else float(mob["radius"]), "tint": tint, "height": 81.0 if mob["type"] == &"warden" else 30.0, "mob": mob})
 	out.append_array(AmbientFireflies.drawables(snapshot.scene_id, snapshot.tick, snapshot.size))
 	if SceneDefs.LAYERED.has(snapshot.scene_id):
@@ -921,6 +955,7 @@ func _draw() -> void:
 		draw_texture_rect_region(sprites,Rect2((at-Vector2.ONE*diameter/2).round(),Vector2.ONE*diameter),Rect2(f["x"]+6,f["y"]+6,28,28))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		TelegraphView.draw_warning(self, tell, snapshot.tick, colors["x"] if tell.kind == &"gold" else colors["z"], colors["y"] if tell.kind == &"gold" else colors["A"], colors["0"])
+	ColossusView.draw_glowing_edges(self, snapshot, colors)  # the boss's warnings stay bright on the night floor
 	_draw_lightning_ground()
 	_draw_coil_ground()
 	_draw_staff_ground()
@@ -951,7 +986,7 @@ func _draw() -> void:
 			_draw_bubble(Vector2(item["at"]) - Vector2(0, float(item["height"]) + 6.0))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
 		if TelegraphView.warning_visible(tell, snapshot.tick):
-			TelegraphView.draw_marker(self, tell, colors["x"] if tell.kind == &"gold" else colors["z"], colors["0"])
+			TelegraphView.draw_marker(self, tell, colors["x"] if tell.kind == &"gold" else colors["z"], colors["0"], snapshot.size)
 	draw_hero_impacts()
 	_draw_skill_effect(shake_offset())
 	_draw_skill_projectiles(shake_offset())
@@ -969,7 +1004,8 @@ func _draw() -> void:
 	if not snapshot.training.is_empty() and int(snapshot.training["since_hit"]) < 8:
 		draw_arc(snapshot.training["center"], 10.0 + float(snapshot.training["since_hit"]) * 0.5, 0, TAU, 24, colors["1"], 1.0)
 	for mob: Dictionary in snapshot.mobs:
-		MobView.decorate(self, mob, colors, snapshot.hero.position, frames, sprites)
+		if not ColossusView.is_colossus(mob):  # its bars are the HUD's boss panel
+			MobView.decorate(self, mob, colors, snapshot.hero.position, frames, sprites)
 	creature_effects.draw_overlay(self, snapshot, frames, sprites, colors)
 	if snapshot.scene_id == &"hollow_trial_layered":
 		TrialFX.draw_altar_progress(self,snapshot.trial,colors,TrialArt.altar_at(prop_placements))
@@ -1003,6 +1039,10 @@ func _draw_item(item: Dictionary) -> void:
 			rect.position += offset
 			drawn["rect"] = rect
 		PropsLayer.draw(self, drawn, sprites, ambient())
+		return
+	if item["kind"] == &"mob" and ColossusView.is_colossus(item["mob"]):
+		ColossusView.draw_body(self, item, frames, sprites, snapshot.telegraphs, snapshot.tick)
+		colossus_view.draw_hero_ghost(self, item["mob"], snapshot.hero.position, hero_frame, facing_left, frames, sprites, ambient())
 		return
 	var at: Vector2 = Vector2(item["at"]).round()
 	var radius: float = float(item["shadow"])
@@ -1172,12 +1212,24 @@ func _sync_moving_lights() -> void:
 	moving.append_array(staff_lamps())  # the Star Staff's circle, meteor, blast and crater light the ground
 	moving.append_array(impact_lamps())  # hits, parries, the weapon forms and the aspects flash on the ground
 	moving.append_array(creature_effects.fx.lamps(snapshot.tick))  # the mobs' slams, releases and pops
+	moving.append_array(ColossusView.lamps(snapshot))  # the song's light in the Colossus's chest
 	if moving.is_empty() and _moving_lamps == 0:
 		return
 	var points: PackedVector4Array = (_static_lamps["points"] as PackedVector4Array).duplicate()
 	var colours: PackedVector3Array = (_static_lamps["colours"] as PackedVector3Array).duplicate()
 	var cores: PackedVector3Array = (_static_lamps["core_colours"] as PackedVector3Array).duplicate()
 	var count: int = int(_static_lamps["count"])
+	if count + moving.size() > EnvironmentLight.MAX_LIGHTS:  # too many: the props' lights that cannot reach the screen give way
+		var seen: Rect2 = Rect2(view_origin, VIEW_SIZE)
+		var kept: int = 0
+		for i: int in count:
+			var p: Vector4 = points[i]
+			if seen.grow(absf(p.z)).has_point(Vector2(p.x, p.y)):
+				points[kept] = p
+				colours[kept] = colours[i]
+				cores[kept] = cores[i]
+				kept += 1
+		count = kept
 	for lamp: Dictionary in moving:
 		if count >= EnvironmentLight.MAX_LIGHTS:
 			break
@@ -1238,6 +1290,7 @@ func _update_hud() -> void:
 	hud.training_feedback = toast_message if toast_ticks > 0 else ""
 	hud.training_at = Vector2(snapshot.training.get("center", Vector2.INF)) - view_origin
 	hud.sync_combat(snapshot)
+	hud.road_boss = ColossusView.fighting(snapshot) if not character_menu.is_open else {}
 	practice_view.audio.mob_types.clear()
 	for mob: Dictionary in snapshot.mobs: practice_view.audio.mob_types[int(mob["id"])] = String(mob["type"])
 	practice_view.audio.sync_wardens(snapshot.mobs, snapshot.telegraphs, snapshot.tick, snapshot.scene_id)

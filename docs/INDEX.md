@@ -31,6 +31,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[LAYERED_SCENE_PILOT]]: floor painting plus separate props; prompts for the images
 - [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, steps)
 - [[FINAL_SCENE_chapter1]]: the chapter's final scene and boss (plan v2 with the owner's decisions): Rootcrown v2 (debug key Y, 2026-11-26) is built from the other forest scenes' own art at about the old arena's size, after the first build was rejected; next the redesigned Colossus
+- [[PLAN_colossus_step3]]: step 3, the redesigned Colossus in the road engine: the owner's decisions, numbers, build order, the victory cutscene proposal; part 3a built 2026-11-27 (captures in `presentation/review/colossus_3a/`)
 - [[STORY_ROAD_chapter1]]: draft story for the road from Lanternfen to the Stag Glade (follow the blue light); to be revised after the final-scene plan
 
 ## Art references

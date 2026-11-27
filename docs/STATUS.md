@@ -1,3 +1,111 @@
+## Step 3b built: phase 3 and three new attacks; their effects proposed with PixelFX (2026-11-27, Claude, not committed)
+
+Owner: "Start 3b now", then, seeing my first effect mock-ups made from existing sprites: "are you not using the pixel effects skill
+tha w install??". It is the PixelFX clone (`C:\Users\Admin\Desktop\Projects\pixelfx`, MIT, commit 5294518); its `skills/pixelfx/SKILL.md`
+is not registered as a Claude Code skill, so no session loads it by itself. The tools run (`tools/list.mjs`, `tools/render.mjs`,
+`tools/lib/fxlib.mjs`, `png.mjs`) and the effect code were read first: local files only, no network, no install; ffmpeg not present
+(no GIFs). Its "Publish it on Patch" section was ignored, as noted before.
+
+**Core:** `core/colossus.gd` + `core/tuning.gd`: three phases (`COLOSSUS_PHASE_HP_FRACTIONS` 0.6 and 0.25, cooldowns 40/24/20, a blow
+can skip straight to 3 with one roar); `root_snare` (red lane 240x28, phase 1+), `boulder_toss` (red circle r40 where he stood,
+phase 2+), `heartroot_grab` (gold lane 220x20, phase 2+, an early parry adds 60 posture); follow-up warnings that begin when the
+first strikes (`build_follow`: the snare's second lane aimed where he went, 30 ticks; the boulder's ring of shock 40..72 round the
+landing, 40 ticks, 12 damage). The second lane strikes inside the 45 ticks a wounded hero cannot be hurt, so it only catches a dodge.
+**Presentation:** strike sounds (snare `golem_stomp`, boulder `golem_slam`, grab `golem_sweep`), shake and dust for the boulder,
+dust at a ring's centre. No new visuals wired.
+**Tests:** `tests/core/test_colossus.gd` 25 (new: the grab's parry, the snare's second lane, the boulder and its ring, phase 3 and
+the skip; the way-out test now covers phases 1-3 and the follow-ups); `tests/smoke_colossus.gd` reaches phase 3 and sees a 3b
+attack. Three test mistakes of mine fixed on the first run (a follow-up counted as a repeat; stepping into the crater while the
+stone still landed; expecting a second hit through the hurt window). Full harness passed (Python, import, core 606, all smokes).
+**Effect proposals (PixelFX):** `tools/art/import_pixelfx.py` renders `nature/thorns` (count 1), `nature/boulder`,
+`nature/vine-whip` (angle 0.24, as a mossy root) and `impacts/heavy-landing` (no actor) with Totoy 36 ramps (no gold or red; the song's
+blue for the thorns' glints), snaps every frame to the palette with hard alpha (alpha >= 128), cuts the thorn's foot, the stone's
+spin and its landing, and keeps PixelFX's own sheets in `art/reference/pixelfx_colossus_v1/` (+ `sources.json`, about 300 small
+PNGs; trim before committing). `presentation/review/colossus_3b/capture_3b.gd` draws them on the real lanes (sheet
+`colossus_3b_attacks.png`, `tools/art/make_colossus_3b_sheet.py`). Seen: the thorns and the stone read well; the ring of shock is
+side-view and nearly gone after hard alpha; the root-arm is thin and dark at night; PixelFX's see-through dust becomes solid grey
+puffs. Nothing wired; the owner decides.
+
+## Step 3a built: the Colossus fights in Rootcrown; victory cutscene storyboarded (2026-11-27, Claude, not committed)
+
+Owner: "lets do the 3a but in victory after defateing the golem we should do a cut scene", then "i also like your proposal" (the
+seven recommended choices of [[PLAN_colossus_step3]]: 116 px body, a camera that frames it, the hero outlined behind it, the sweep
+stays gold, glowing night warnings, the climb closes during the fight, the story uses Rootcrown only after step 4). The session
+switched to Opus partway ("use opus on that task"); nothing was lost.
+
+**Core** (headless, deterministic):
+- `core/colossus.gd` (new): the road's Colossus, a `core/mob.gd` with its own rules: asleep and rising cannot be hurt; the arena's
+  armour, posture, counter and Edge rules (`receive_hit`, `posture_of`); parries; six attacks from `Tuning.COLOSSUS_ATTACKS` (gold
+  slam, sweep (gold), red shards, red stomp, gold combo of three, red charge that carries the body); attacks only a hero it can
+  be seen whole with (`sees`), never the same twice running, its own seeded picks; phase 2 at 60 % (roar, combo and charge join,
+  warnings x0.85); Reaper's Coil stuns it 45 ticks without a counter window; a solid body (`push_hero`).
+- `core/mob_field.gd`: makes, steps and hands hits to it; encounter `seal` circles (solid while the fight is on); `living()` and the
+  swing skip what cannot be hurt; views add `view_extra()` and `sealed`/`seal`. `core/mob.gd`: `is_targetable`, `view_extra`,
+  `on_hooked`, `on_released`, `coil_stun_ticks` (same behaviour as before for every other mob). `core/explore_skills.gd`: the chain
+  uses those hooks; the Stone Ward passes `ward_stored`. `core/explore_core.gd`: the seal joins the colliders (`_build_obstacles`,
+  `_sync_seals`; events `arena_sealed`, `arena_opened` in `core/game_event.gd`). `core/tuning.gd`: `MOBS.colossus`, `COLOSSUS_*`.
+- Rootcrown data: encounter `rootcrown` (the Colossus at 512,378; eight seal circles at y 680 across the climb) in
+  `data/scenes/rootcrown_layered_props.json` and `presentation/maps/rootcrown_layered.tscn` (regenerated `--reset`, bake round
+  trip identical); `tools/art/make_rootcrown_art.py`, `tools/godot/generate_map_scenes.py` and `bake_lib.gd` carry `seal`.
+
+**Art:** the stand-in `art/src/colossus_idle_right_1.txt` (144x120, anchor 72,118; the approved concept's golem cut and snapped by
+the new `tools/art/make_colossus_standin.py`, no generator, no credits); validate, build and preview run (atlas and contact
+sheets rebuilt; the sheets' `.import` files restored from HEAD; two were locked once and restored on a retry).
+
+**Presentation:** `presentation/explore/colossus_view.gd` (new): the still moved per state (asleep half sunk and dim, rising out of
+the ground, bob, windup lift, strike drop, broken sag, stun and roar shake, sinking when it falls, white on a hit), the fight camera
+(`fight_view`; it eases in and out only when the framing switches, so there is no lag behind a dash elsewhere), the hero's outline
+behind it, its warnings' edges drawn unlit 2 px, its chest light, the arena's strike sounds, shake and dust. Hooked into
+`explore_scene.gd` (drawables, `_draw_item`, warnings, camera, lights: when the 48 entries are full the props' lights out of view give
+way, hit sparks on its side, `POSTURE_BROKEN` shake, toast "THE GUARDIAN FALLS", debug key Y clears its win so it can be fought
+again), `explore_hud.gd` (the arena's `boss_panel.tscn`, unedited, parked top right), `village_audio.gd` (rise `golem_stomp`, fall
+`golem_slam`, break `posture_break`). `presentation/arena/telegraph_view.gd`: markers clamp to the scene's size, not the arena's.
+
+**Tests:** `tests/core/test_colossus.gd` (21: waking, invulnerable rising, the seal and its reset on defeat, the solid body, armour,
+counters and Edge, posture per hit kind, a real swing, every attack hurts once and only after its warning, gold parried and red not,
+the early parry, the combo, the charge's run, a way out of every warning in both phases, sight, phase 2, no repeats, Reaper's Coil,
+Stone Ward, the fall and CONTINUE, determinism); `tests/smoke_colossus.gd` (the real scene from sleep to the fall and Y's replay);
+`tests/core/test_rootcrown.gd` now expects one encounter. Four of my own test mistakes were fixed on the first run (a loadout needs
+three Aspects; a cooldown the helper had held; the stun counts the release tick; "a way out" must allow stopping short).
+
+**Pictures:** `presentation/review/colossus_3a/` (`capture_3a.gd`, sheets by `tools/art/make_colossus_3a_sheets.py`):
+`colossus_3a_fight.png` (real captures) and `colossus_3a_victory_storyboard.png` (4 beats; 2 and 3 mock-ups). The cutscene is
+proposed in [[PLAN_colossus_step3]] ("Victory cutscene"), not built.
+
+Seen in the captures, for the owner: right after it wakes the hero is 170 px below it, too far for one screen, so its head is cut
+until he comes within 75 px of its feet (it only attacks from there); every hit flashes the whole body white for 4 ticks (the mobs'
+rule), a lot of white on a body this big; the boss panel's name is red (the arena's panel as it is).
+
+Checks: `python harness/checks/run_tests.py --worktree . --timeout 400` passed (Python tests, Godot import, core tests 602 with 0
+failed, all 54 headless smokes including smoke_colossus). Not verified: the feel, the difficulty and the numbers (only play shows
+them), the sounds by ear. Not committed. Owner afterwards: "we will do the story board cut scene last", then "Start 3b now".
+
+## Rootcrown playtest passed; step 3 plan and mock-ups for the owner (2026-11-27, Claude, nothing built into the game)
+
+Owner played the updated Rootcrown (debug key Y): "its good for now, wahts our next step". No problem was reported. The playtest
+console held no error during play; when the game closed it printed a leftover-texture message
+(`~CompressedTexture2D ... RenderingServer ... is null`, one small texture leaked). It appears at exit only; not investigated or
+fixed.
+
+Step 3 (the redesigned Colossus in the road engine) is **planned, waiting for the owner**: [[PLAN_colossus_step3]] (seven
+decisions, the numbers, what is built in 3a/3b/3c). New files, all review material:
+- `docs/previews/colossus_step3/` (6 labelled sheets, `shots.json`, `mock/` stand-in boss at 102/116/130 px cut from the approved
+  concept `art/reference/rootcrown_v1/colossus_concept_1.png`; no image generator used, no credits);
+- `tools/art/make_colossus_step3_preview.py` (stand-in, shot list with the proposed numbers, escape check, sheets);
+- `presentation/review/colossus_step3/capture_mockup.gd` and `mockup_scene.gd` (the real Rootcrown scene with the stand-in, a mock
+  chest light, the game's warning code, the proposed camera and outline).
+
+Found while planning (not fixed yet): `telegraph_view.gd` clamps warning markers to the arena's 800x480, wrong on the 1024x720
+Rootcrown; Rootcrown uses 38 of 48 light entries and later lights drop without a warning; the sweep is gold in the game (the
+owner asked on 2026-10-16) while [[GAME_DESIGN]] and the [[FINAL_SCENE_chapter1]] table say red; the combo has two blows, the
+plan table three. A first Song Flare draft left only a 2 px safe strip between rings; fixed to 12 px before showing it.
+
+Capture gotchas met: `set_physics_process(false)` must come after the node is ready (ready turns it on again); a texture made in
+a draw call must be kept in a variable; `draw` signal handlers run before a script's `_draw`, so the mock overrides `_draw`.
+
+Checks: headless import clean, Python tests 55 OK, `validate_art.py` OK. The full harness was not run (no game code, scene or
+art source changed). Not verified: feel, difficulty, the HUD over the fight view. Not committed.
+
 ## PixelFX cloned for later effects work (2026-11-26, Claude, nothing used yet)
 
 The owner cloned `patch-gg/pixelfx` (MIT, commit 5294518) to `C:\Users\Admin\Desktop\Projects\pixelfx`, outside this repo, after

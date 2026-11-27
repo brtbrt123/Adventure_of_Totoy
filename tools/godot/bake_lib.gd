@@ -259,6 +259,8 @@ static func bake_map(root: Node2D) -> Dictionary:
 				row["managed"] = node.get_meta("managed")
 			if node.has_meta("reward"):
 				row["reward"] = node.get_meta("reward")
+			if node.has_meta("seal"):
+				row["seal"] = node.get_meta("seal")
 			var mobs: Array = []
 			for child: Node in node.get_children():
 				if child.has_meta("mob"):

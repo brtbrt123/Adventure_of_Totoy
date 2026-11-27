@@ -1,4 +1,4 @@
-[gd_scene load_steps=54 format=3]
+[gd_scene load_steps=55 format=3]
 
 [ext_resource type="Texture2D" path="res://presentation/forest/rootcrown_layered_ground.png" id="ground"]
 [ext_resource type="PackedScene" path="res://presentation/props/rootcrown_tower_dark.tscn" id="p_rootcrown_tower_dark"]
@@ -56,6 +56,9 @@
 [sub_resource type="RectangleShape2D" id="Exit_1"]
 size = Vector2(86, 6)
 
+[sub_resource type="RectangleShape2D" id="Zone_1"]
+size = Vector2(624, 344)
+
 [node name="rootcrown_layered" type="Node2D"]
 metadata/version = 1
 metadata/title = "ROOTCROWN"
@@ -98,6 +101,23 @@ position = Vector2(512, 656)
 [node name="Npcs" type="Node2D" parent="."]
 
 [node name="Objects" type="Node2D" parent="."]
+
+[node name="Encounters" type="Node2D" parent="."]
+
+[node name="rootcrown" type="Node2D" parent="Encounters"]
+metadata/title = "MOSSBOUND COLOSSUS"
+metadata/leash = 2000
+metadata/seal = [[470, 680, 9], [484, 680, 9], [498, 680, 9], [512, 680, 9], [526, 680, 9], [540, 680, 9], [554, 680, 9], [568, 680, 9]]
+
+[node name="Zone" type="Area2D" parent="Encounters/rootcrown"]
+
+[node name="Rect" type="CollisionShape2D" parent="Encounters/rootcrown/Zone"]
+position = Vector2(512.0, 410.0)
+shape = SubResource("Zone_1")
+
+[node name="colossus_1" type="Marker2D" parent="Encounters/rootcrown"]
+position = Vector2(512, 378)
+metadata/mob = "colossus"
 
 [node name="Props" type="Node2D" parent="."]
 y_sort_enabled = true

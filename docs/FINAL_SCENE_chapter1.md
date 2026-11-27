@@ -9,8 +9,10 @@ narration (`docs/STORY_ROAD_chapter1.md`) are revised to lead into it. Pictures 
 Progress: step 1 done (both concept pictures approved 2026-11-09: "Approve both"); step 2 done as a scene (owner: "Approve, build it"):
 the map `rootcrown_layered` is in the game, reached only by debug key **Y** until the boss lives there (the glade's arch still leads
 to the old arena, so the story never reaches a map without a fight). **The owner played it and rejected it** (2026-11-09):
-"i dont like the looks since it doesnt match our other scene and the stage is too small". Next: redo step 2 (see "Redo after the
-playtest" below, pictures first), then step 3, the boss in the road engine.
+"i dont like the looks since it doesnt match our other scene and the stage is too small". Step 2 was redone (v2, below); the owner
+played it on 2026-11-27: "its good for now". **Step 3, the boss in the road engine:** planned and approved in
+[[PLAN_colossus_step3]]; part 3a (the fight with the six attacks, two phases, a stand-in body) built on 2026-11-27, with a victory
+cutscene storyboarded there.
 
 ## Decisions
 

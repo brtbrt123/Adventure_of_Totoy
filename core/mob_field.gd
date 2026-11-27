@@ -23,6 +23,8 @@ extends RefCounted
 ##   boar charge      RED: dash through it (parry does nothing); it cannot be interrupted; a charge that hits a prop crashes: stunned and
 ##                    exposed.
 ## Exposed mobs take MOB_EXPOSED_MULT damage (`attack_hit` kind counter). The hero's swing hits every mob in its arc once.
+## The Colossus (type `colossus`, core/colossus.gd) is a mob with its own rules: this file hands it its tick and the hero's hits.
+## An encounter row may hold a `seal` ([[x, y, radius], ...]): solid circles that stand while its fight is on (`seal_obstacles`).
 const Tuning := preload("res://core/tuning.gd")
 const GameEvent := preload("res://core/game_event.gd")
 const Snapshots := preload("res://core/snapshots.gd")
@@ -31,6 +33,8 @@ const Weapons := preload("res://core/weapons.gd")
 const PlayerState := preload("res://core/player.gd")
 const Collision := preload("res://core/collision.gd")
 const Mob := preload("res://core/mob.gd")
+const Colossus := preload("res://core/colossus.gd")
+const Obstacle := preload("res://core/obstacle.gd")
 
 const FLAG_PREFIX: String = "cleared_"
 const DORMANT: StringName = &"dormant"
@@ -54,6 +58,7 @@ class Encounter:
 	var touched: bool = false  # something happened here since the encounter was whole (a wake, a blow): a reset has something to undo
 	var managed: bool = false  # a trial's encounter: its mobs come and go with the waves; it never clears itself, leashes or remembers kills
 	var max_attackers: int = Tuning.MOB_MAX_ATTACKERS
+	var seal: Array[Vector3] = []  # (x, y, radius): solid while the fight is on
 
 
 var scene_id: StringName = &""
@@ -86,10 +91,12 @@ static func for_scene(def: Dictionary) -> RefCounted:
 		enc.reward = r.get("reward", {})
 		enc.flag = StringName(FLAG_PREFIX + String(enc.id))
 		enc.managed = bool(r.get("managed", false))
+		for circle: Variant in r.get("seal", []):
+			enc.seal.append(Vector3(float(circle[0]), float(circle[1]), float(circle[2])))
 		var slot: int = 0
 		for m: Variant in r["mobs"]:
 			var spec: Dictionary = m
-			var mob: Mob = Mob.new()
+			var mob: Mob = _new_mob(StringName(str(spec["type"])))
 			mob.setup(next_id, StringName(str(spec["type"])), enc.id, Vector2(float(spec["x"]), float(spec["y"])), slot)
 			enc.mobs.append(mob)
 			next_id += 1
@@ -101,6 +108,46 @@ static func for_scene(def: Dictionary) -> RefCounted:
 ## The flag that records an encounter as cleared.
 static func flag_of(encounter_id: StringName) -> StringName:
 	return StringName(FLAG_PREFIX + String(encounter_id))
+
+
+static func _new_mob(type: StringName) -> Mob:
+	if type == &"colossus":
+		return Colossus.new()
+	return Mob.new()
+
+
+## The next warning id (the warnings of every mob of the field are numbered here).
+func take_telegraph_id() -> int:
+	_next_telegraph += 1
+	return _next_telegraph - 1
+
+
+## The encounters whose seal stands now.
+func sealed_ids() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for enc: Encounter in encounters:
+		if _is_sealed(enc):
+			out.append(enc.id)
+	return out
+
+
+## The solid circles of the standing seals (ExploreCore adds them to the scene's colliders).
+func seal_obstacles() -> Array[Obstacle]:
+	var out: Array[Obstacle] = []
+	for enc: Encounter in encounters:
+		if not _is_sealed(enc):
+			continue
+		for circle: Vector3 in enc.seal:
+			var solid: Obstacle = Obstacle.new()
+			solid.center = Vector2(circle.x, circle.y)
+			solid.feet = solid.center
+			solid.radius = circle.z
+			out.append(solid)
+	return out
+
+
+static func _is_sealed(enc: Encounter) -> bool:
+	return enc.state == ACTIVE and not enc.seal.is_empty()
 
 
 ## The story flags were replaced (CONTINUE): every encounter whose flag is set is cleared and its mobs are gone, no events.
@@ -186,10 +233,17 @@ func resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 		_leash(core, enc, events)
 		for mob: Mob in enc.mobs:
 			if mob.is_alive() and mob.state != &"idle" and not mob.dragged:
-				_step_mob(core, enc, mob, _count_attackers(enc), events)
+				if mob is Colossus:
+					(mob as Colossus).step(core, self, events)
+				else:
+					_step_mob(core, enc, mob, _count_attackers(enc), events)
 		_separate(core, enc)
 		_regen(core, enc, events)
 	_step_projectiles(core, events)
+	for enc: Encounter in encounters:  # a solid body holds the hero out, whichever of the two moved
+		for mob: Mob in enc.mobs:
+			if mob is Colossus and enc.state != CLEARED:
+				(mob as Colossus).push_hero(core)
 
 
 func _count_attackers(enc: Encounter) -> int:
@@ -642,7 +696,7 @@ func _hero_blows(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> 
 	var weapon: StringName = player.weapon_id
 	var swing: int = player.combo_index - 1
 	for mob: Mob in _alive(enc):
-		if mob.last_swing == _swing_serial:
+		if mob.last_swing == _swing_serial or not mob.is_targetable():
 			continue
 		var to_mob: Vector2 = mob.position - player.swing_origin()
 		var dist: float = to_mob.length()
@@ -659,15 +713,16 @@ func _hero_blows(core: RefCounted, enc: Encounter, events: Array[GameEvent]) -> 
 			return
 
 
-## Every living mob of the encounters that are not cleared, with its encounter: [{"enc", "mob"}]. The hero's skills (aspects)
-## look for their targets here.
+## Every living mob that can be hurt now, of the encounters that are not cleared, with its encounter: [{"enc", "mob"}]. The
+## hero's skills (aspects) look for their targets here.
 func living() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for enc: Encounter in encounters:
 		if enc.state == CLEARED:
 			continue
 		for mob: Mob in _alive(enc):
-			out.append({"enc": enc, "mob": mob})
+			if mob.is_targetable():
+				out.append({"enc": enc, "mob": mob})
 	return out
 
 
@@ -676,6 +731,8 @@ func living() -> Array[Dictionary]:
 ## `extra` is merged into the attack_hit event (combo_index, weapon_id, skill_id, ...). Returns true when the hit cleared
 ## the whole encounter (the caller stops looking for more targets then).
 func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dictionary, events: Array[GameEvent]) -> bool:
+	if mob is Colossus:  # its own armour, posture and counter rules; a blow does not wake it
+		return (mob as Colossus).receive_hit(core, self, enc, base, extra, events)
 	var player: PlayerState = core.player
 	if enc.state == DORMANT:
 		_wake(core, enc, events)
@@ -707,6 +764,15 @@ func hit_mob(core: RefCounted, enc: Encounter, mob: Mob, base: float, extra: Dic
 	elif mob.state in [&"alert", &"chase", &"recover", &"hurt", &"return"]:
 		mob.set_state(&"hurt")
 	return false
+
+
+## A mob with its own hit rules fell (core/colossus.gd).
+func kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent]) -> void:
+	_kill(core, enc, mob, events)
+
+
+func is_cleared(enc: Encounter) -> bool:
+	return enc.state == CLEARED
 
 
 func _kill(core: RefCounted, enc: Encounter, mob: Mob, events: Array[GameEvent]) -> void:
@@ -1043,17 +1109,19 @@ func mob_views(tick: int) -> Array[Dictionary]:
 		for mob: Mob in enc.mobs:
 			if mob.state == &"dead" and mob.state_ticks >= Tuning.MOB_DEATH_TICKS:
 				continue
-			out.append({
+			var view: Dictionary = {
 				"id": mob.id, "type": mob.type, "visual_id": mob.type, "level": int(mob.stats()["level"]), "encounter_id": enc.id, "position": mob.position, "facing": mob.facing,
 				"state": mob.state, "state_ticks": mob.state_ticks, "hp": mob.hp, "max_hp": mob.max_hp, "radius": mob.radius,
 				"exposed": mob.is_exposed(), "guarded": mob.is_guarded(), "dragged": mob.dragged, "boss": bool(mob.stats().get("boss", false)), "phase": mob.phase, "attack_id": mob.attack_stats()["id"], "attack": mob.telegraph.attack if mob.telegraph != null else &"", "since_hit": tick - mob.last_hit_tick,
 				"summoner_id": mob.summoner_id, "regen_active": regen_active(enc, mob), "live_summons": live_summons(enc, mob) if mob.stats().has("summon") else 0,
 				"cast_start_tick": mob.cast_start, "cast_release_tick": mob.cast_release,
-			})
+			}
+			view.merge(mob.view_extra())
+			out.append(view)
 	return out
 
 
-## [{id, name, state (dormant, active, cleared), rect, anchor, leash, alive, total, reward_id}].
+## [{id, name, state (dormant, active, cleared), rect, anchor, leash, alive, total, reward_id, sealed, seal (x, y, radius)}].
 func encounter_views() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for enc: Encounter in encounters:
@@ -1061,6 +1129,7 @@ func encounter_views() -> Array[Dictionary]:
 		out.append({
 			"id": enc.id, "name": enc.label, "state": enc.state, "rect": enc.rect, "anchor": enc.anchor, "leash": enc.leash,
 			"alive": alive, "total": _regular_total(enc), "reward_id": StringName(str(enc.reward.get("reward_id", ""))),
+			"sealed": _is_sealed(enc), "seal": enc.seal.duplicate(),
 		})
 	return out
 

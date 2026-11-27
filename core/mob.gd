@@ -71,6 +71,32 @@ func is_alive() -> bool:
 	return state != &"dead"
 
 
+## The hero's blows and skills can reach it (the Colossus cannot be hurt while it sleeps or rises).
+func is_targetable() -> bool:
+	return is_alive()
+
+
+## Extra keys of its snapshot view (the Colossus's posture bar); none for the others.
+func view_extra() -> Dictionary:
+	return {}
+
+
+## Reaper's Coil caught it: its warning is gone and it flinches while dragged.
+func on_hooked() -> void:
+	clear_telegraph()
+	set_state(&"hurt")
+
+
+## The drag ended: stunned and exposed.
+func on_released() -> void:
+	set_state(&"stagger")
+
+
+## The stun after a drag (for the drag event).
+func coil_stun_ticks() -> int:
+	return Tuning.MOB_STAGGER_TICKS
+
+
 ## Stunned and exposed (takes MOB_EXPOSED_MULT damage).
 func is_exposed() -> bool:
 	return state == &"crash" or state == &"stagger"

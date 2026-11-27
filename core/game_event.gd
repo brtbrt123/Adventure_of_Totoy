@@ -105,6 +105,9 @@ const MOB_HEALED: StringName = &"mob_healed"  # the Stag's summon regeneration, 
 const MOB_LEASHED: StringName = &"mob_leashed"
 const ENCOUNTER_RESET: StringName = &"encounter_reset"
 const ENCOUNTER_CLEARED: StringName = &"encounter_cleared"
+## A fight's seal went up or came down (an encounter with `seal` circles, the Colossus's climb): {scene, encounter_id}.
+const ARENA_SEALED: StringName = &"arena_sealed"
+const ARENA_OPENED: StringName = &"arena_opened"
 ## The hero fell (`hero_defeated` {scene, position}) and, HERO_DEFEAT_TICKS later, stood up at the last checkpoint with full health
 ## (`hero_respawned` {scene, checkpoint_id, position}); every uncleared encounter of the scene is whole again.
 const HERO_DEFEATED: StringName = &"hero_defeated"

@@ -241,6 +241,12 @@ def outline() -> list[list[int]]:
     return [list(p) for p in clean]
 
 
+# the Colossus (core/colossus.gd) in the middle of the fight floor, and the seal across the climb that stands while its
+# fight is on: solid circles [x, y, radius] (the hero wakes it far above them, at 180 px from it)
+ENCOUNTER = {"id": "rootcrown", "name": "MOSSBOUND COLOSSUS", "rect": [200, 238, 624, 344], "leash": 2000,
+             "seal": [[x, 680, 9] for x in range(470, 569, 14)], "mobs": [{"type": "colossus", "x": 512, "y": 378}]}
+
+
 def write_scene() -> None:
     ring = outline()
     bottom = sorted(x for x, y in ring if y == v2.H)
@@ -261,7 +267,7 @@ def write_scene() -> None:
             "exits": [{"id": "to_glade", "rect": [x0, v2.H - 6, x1 - x0, 6], "target_scene": "glade_layered",
                        "target_entry": "rootcrown_side"}],
             "checkpoints": [{"id": "rootcrown_layered_stair", "position": list(v2.CHECKPOINT)}], "npcs": [], "objects": [],
-            "props": props}
+            "encounters": [ENCOUNTER], "props": props}
     SCENE.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
     print(f"map: {SCENE.relative_to(ROOT)} {v2.W}x{v2.H}, outline {len(ring)} points, {len(props)} props, exit x {x0}..{x1}")
 

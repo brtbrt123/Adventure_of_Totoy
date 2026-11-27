@@ -59,6 +59,7 @@ func _draw() -> void:
 		_draw_combat()
 	elif strip != null:
 		strip.visible = false
+	_sync_road_boss()
 	_sync_overlay()
 	if not debug_lines.is_empty():
 		var y: float = 24.0
@@ -247,6 +248,53 @@ func _draw_combat() -> void:
 	if feedback_active(combat.tick, item_flash_tick, 15):UiPanel.outline(self, Rect2(207, 183, 28, 28), colors["u"])
 	if combat.defeated:
 		draw_rect(Rect2(0, 164, 384, 52), Color(colors["0"], 0.6))
+
+## The road's boss whose fight is on (the Colossus's mob view; explore_scene.gd sets it), {} when none. Its name, health, posture and
+## counter window show in the arena's boss panel (presentation/ui/boss_panel.tscn), parked top right on the road.
+var road_boss: Dictionary = {}
+const ROAD_BOSS_PANEL_AT: Vector2 = Vector2(278, 3)
+var _boss_ghost: float = -1.0
+var _boss_shown: float = -1.0
+var _boss_delay: int = 0
+var _boss_tick: int = -1
+
+
+func _sync_road_boss() -> void:
+	var shown: bool = not road_boss.is_empty() and fight_hud and fade_alpha <= 0.0
+	if boss_panel_node == null:
+		if not shown:
+			return
+		boss_panel_node = BossPanel.instantiate()
+		boss_panel_node.show_behind_parent = true
+		add_child(boss_panel_node)
+	boss_panel_node.visible = shown
+	if not shown:
+		_boss_ghost = -1.0
+		return
+	var hp: float = float(road_boss["hp"])
+	var tick: int = combat.tick if combat != null else 0
+	var elapsed: int = maxi(0, tick - _boss_tick)
+	if _boss_ghost < 0.0 or hp > _boss_shown:  # the health it lost lingers a moment, then drains (as the hero's)
+		_boss_ghost = hp
+		_boss_delay = 0
+	elif hp < _boss_shown:
+		_boss_delay = 18
+	else:
+		_boss_delay = maxi(0, _boss_delay - elapsed)
+		if _boss_delay == 0:
+			_boss_ghost = move_toward(_boss_ghost, hp, elapsed * maxf(1.0, float(road_boss["max_hp"]) * 0.01))
+	_boss_shown = hp
+	_boss_tick = tick
+	boss_panel_node.atlas = portrait_atlas
+	boss_panel_node.frames = ui_frames
+	boss_panel_node.position = ROAD_BOSS_PANEL_AT
+	boss_panel_node.apply({
+		"hp": hp, "hp_max": float(road_boss["max_hp"]), "ghost": _boss_ghost,
+		"posture": float(road_boss.get("posture", 0.0)), "posture_max": float(road_boss.get("posture_max", 100.0)),
+		"broken": road_boss["state"] == &"posture_broken",
+		"counter_ticks": int(road_boss.get("broken_ticks_left", 0)), "counter_max": int(road_boss.get("break_ticks", 1)),
+	})
+
 
 var task_message: String=""
 var task_tick: int=-1000

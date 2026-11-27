@@ -86,6 +86,12 @@ func handle_event(event: GameEvent, scene: StringName = &"arena") -> void:
 	var mob_type: String = String(event.data.get("type",mob_types.get(int(event.data.get("mob_id",event.data.get("target_id",-1))),"mossling")))
 	if handle_warden_event(event, mob_type):
 		return
+	if event.type == &"posture_broken":  # only the Colossus has a posture on the road
+		cue("posture_break", event.tick)
+		return
+	if mob_type == "colossus" and event.type in [&"mob_alerted", &"mob_defeated"]:  # it rises, it falls: the arena's heavy blows
+		cue("golem_stomp" if event.type == &"mob_alerted" else "golem_slam", event.tick)
+		return
 	match event.type:
 		&"mob_alerted":cue(mob_type+"_alert",event.tick,0.65)
 		&"attack_telegraphed":

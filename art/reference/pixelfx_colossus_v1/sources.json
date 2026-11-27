@@ -1,0 +1,146 @@
+{
+ "what": "Effect proposals for the road Colossus, part 3b (docs/PLAN_colossus_step3.md), rendered with PixelFX and snapped to Totoy 36 with hard alpha by tools/art/import_pixelfx.py. Review material; nothing is in the game.",
+ "library": "https://github.com/patch-gg/pixelfx (MIT), the owner's clone outside this repo, commit 5294518",
+ "alpha_cut": 128,
+ "effects": {
+  "root_thorn": {
+   "pixelfx": "nature/thorns",
+   "options": {
+    "count": 1,
+    "palette": [
+     "#1c1824",
+     "#2e211e",
+     "#4d3a30",
+     "#62453d",
+     "#765f47",
+     "#987959",
+     "#bc9c72",
+     "#f4ecd6"
+    ],
+    "glow": [
+     "#24365c",
+     "#3f7f7a",
+     "#6aa89a",
+     "#a7cde0"
+    ],
+    "soil": [
+     "#1c1824",
+     "#2e211e",
+     "#4d3a30",
+     "#62453d",
+     "#765f47",
+     "#987959",
+     "#bc9c72",
+     "#c6bfaa"
+    ],
+    "seed": 8
+   },
+   "flags": [],
+   "for": "Root Snare: one root thorn bursting up, placed again and again along the real lane",
+   "frames": 73,
+   "fps": 30,
+   "pivot": [
+    48,
+    78
+   ]
+  },
+  "boulder": {
+   "pixelfx": "nature/boulder",
+   "options": {
+    "palette": [
+     "#1c1824",
+     "#2f3231",
+     "#444b49",
+     "#5a625e",
+     "#737769",
+     "#9a9886",
+     "#c6bfaa",
+     "#f4ecd6"
+    ],
+    "sparks": [
+     "#f4ecd6",
+     "#c6bfaa",
+     "#9a9886",
+     "#737769"
+    ],
+    "size": 11,
+    "seed": 11
+   },
+   "flags": [],
+   "for": "Boulder Toss: the spinning stone (its flight is drawn along the real arc) and its landing burst",
+   "frames": 70,
+   "fps": 30,
+   "pivot": [
+    40,
+    104
+   ]
+  },
+  "grab_vine": {
+   "pixelfx": "nature/vine-whip",
+   "options": {
+    "palette": [
+     "#1c1824",
+     "#2e211e",
+     "#4d3a30",
+     "#62453d",
+     "#3f5226",
+     "#5a7a3a",
+     "#7f9348",
+     "#c2cb7c"
+    ],
+    "thorn": [
+     "#2e211e",
+     "#62453d",
+     "#987959",
+     "#bc9c72"
+    ],
+    "soil": [
+     "#1c1824",
+     "#2e211e",
+     "#4d3a30",
+     "#62453d",
+     "#765f47",
+     "#987959",
+     "#bc9c72",
+     "#c6bfaa"
+    ],
+    "seed": 3,
+    "angle": 0.24
+   },
+   "flags": [],
+   "for": "Heartroot Grab: a mossy root-arm lashing out along the lane (turned to the lane's angle)",
+   "frames": 43,
+   "fps": 30,
+   "pivot": [
+    60,
+    114
+   ]
+  },
+  "shock_ring": {
+   "pixelfx": "impacts/heavy-landing",
+   "options": {
+    "palette": [
+     "#1c1824",
+     "#2f3231",
+     "#444b49",
+     "#5a625e",
+     "#737769",
+     "#9a9886",
+     "#c6bfaa"
+    ],
+    "stone": "#444b49",
+    "seed": 14
+   },
+   "flags": [
+    "--no-actor"
+   ],
+   "for": "the Boulder Toss's ring of shock: dust rings rolling out over the floor",
+   "frames": 49,
+   "fps": 30,
+   "pivot": [
+    88,
+    60
+   ]
+  }
+ }
+}

@@ -50,7 +50,8 @@ func test_the_map_is_a_registered_valid_layered_scene() -> void:
 	assert_eq(def["name"], "ROOTCROWN", "its title")
 	assert_eq(def["size"], Vector2(1024, 720), "the floor painting's size")
 	assert_eq(def["default_entry"], &"glade_side", "the hero arrives up the climb")
-	assert_eq(def["npcs"].size() + def["objects"].size() + def["encounters"].size(), 0, "nobody and nothing to use yet: the Colossus comes later")
+	assert_eq(def["npcs"].size() + def["objects"].size(), 0, "nobody and nothing to use")
+	assert_eq(def["encounters"].size(), 1, "one fight: the Colossus (tests/core/test_colossus.gd)")
 
 
 func test_its_one_exit_goes_down_the_climb_to_an_open_spot_under_the_glade_arch() -> void:

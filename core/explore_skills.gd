@@ -281,7 +281,7 @@ func _release_ward(core: RefCounted, reason: StringName, events: Array[GameEvent
 		return
 	player.edge = minf(Tuning.EDGE_MAX, player.edge + Tuning.STONE_WARD_EDGE_GAIN)
 	for row: Dictionary in hit_rows:
-		if core.mobs.hit_mob(core, row["enc"], row["mob"], base, {"aspect_id": Aspects.STONE_WARD, "ward_release": true}, events):
+		if core.mobs.hit_mob(core, row["enc"], row["mob"], base, {"aspect_id": Aspects.STONE_WARD, "ward_release": true, "ward_stored": stored}, events):
 			return
 
 
@@ -667,9 +667,8 @@ func _coil_hook(core: RefCounted, events: Array[GameEvent]) -> void:
 		for other: Dictionary in core.mobs.living():
 			if other["mob"].id == mob.id or other["mob"].position.distance_to(mob.position) <= Tuning.CLUMP_RADIUS:
 				var held: RefCounted = other["mob"]
-				held.clear_telegraph()
+				held.on_hooked()
 				held.dragged = true
-				held.set_state(&"hurt")
 				_dragged.append(held.id)
 				if other["enc"].state == MobField.DORMANT:
 					core.mobs._wake(core, other["enc"], events)
@@ -788,12 +787,12 @@ func _coil_drag(core: RefCounted, events: Array[GameEvent]) -> void:
 		_release_dragged(core, events)
 		events.append(GameEvent.new(GameEvent.REAPER_COIL_DRAG, core.tick, {
 			"entity_id": player.id, "target_id": main_mob.id, "from": player.coil_drag_from, "to": main_mob.position,
-			"ticks": player.coil_phase_tick, "stagger_ticks": Tuning.MOB_STAGGER_TICKS,
+			"ticks": player.coil_phase_tick, "stagger_ticks": main_mob.coil_stun_ticks(),
 		}))
 		player.set_coil_phase(PlayerState.COIL_SPIN)
 
 
-## Let go of everything the chain held: each is stunned and exposed for the usual stagger.
+## Let go of everything the chain held: each is stunned for its own stagger (a regular mob is exposed through it).
 func _release_dragged(core: RefCounted, events: Array[GameEvent]) -> void:
 	for id: int in _dragged:
 		var row: Dictionary = _find_mob(core, id)
@@ -801,7 +800,7 @@ func _release_dragged(core: RefCounted, events: Array[GameEvent]) -> void:
 			continue
 		var mob: RefCounted = row["mob"]
 		mob.dragged = false
-		mob.set_state(&"stagger")
+		mob.on_released()
 		events.append(GameEvent.new(GameEvent.MOB_STAGGERED, core.tick, {"scene": core.scene_id, "mob_id": mob.id, "reason": &"coil", "position": mob.position}))
 	_dragged.clear()
 

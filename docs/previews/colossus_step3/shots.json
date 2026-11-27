@@ -1,0 +1,655 @@
+{
+ "boss": [
+  512,
+  378
+ ],
+ "body_radius": 46.0,
+ "shots": [
+  {
+   "name": "size_102",
+   "size": 102,
+   "hero": [
+    616,
+    414
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "size_116",
+   "size": 116,
+   "hero": [
+    616,
+    414
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "size_130",
+   "size": 130,
+   "hero": [
+    616,
+    414
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "camera_below_follow",
+   "size": 116,
+   "hero": [
+    536,
+    448
+   ],
+   "camera": "follow",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "camera_below_frame",
+   "size": 116,
+   "hero": [
+    536,
+    448
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "camera_beside_follow",
+   "size": 116,
+   "hero": [
+    702,
+    402
+   ],
+   "camera": "follow",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "camera_beside_frame",
+   "size": 116,
+   "hero": [
+    702,
+    402
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "camera_corner_follow",
+   "size": 116,
+   "hero": [
+    342,
+    440
+   ],
+   "camera": "follow",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "camera_corner_frame",
+   "size": 116,
+   "hero": [
+    342,
+    440
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "behind_hidden",
+   "size": 116,
+   "hero": [
+    526,
+    344
+   ],
+   "camera": "frame",
+   "outline": false,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "behind_outline",
+   "size": 116,
+   "hero": [
+    526,
+    344
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [],
+   "whole_map": false
+  },
+  {
+   "name": "attack_slam",
+   "size": 116,
+   "hero": [
+    608,
+    422
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "gold",
+     "shape": "circle",
+     "center": [
+      608,
+      422
+     ],
+     "direction": [
+      1,
+      0
+     ],
+     "size": 44
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_sweep",
+   "size": 116,
+   "hero": [
+    574,
+    434
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "gold",
+     "shape": "cone",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.7421026427511382,
+      0.6702862579687701
+     ],
+     "size": 112,
+     "half_angle": 0.8726646259971648
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_shards",
+   "size": 116,
+   "hero": [
+    644,
+    430
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      330
+     ],
+     "direction": [
+      0.9652600417783449,
+      0.2612911245068761
+     ],
+     "size": 240,
+     "width": 16
+    },
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      330
+     ],
+     "direction": [
+      0.7970921481540103,
+      0.6038576879954624
+     ],
+     "size": 240,
+     "width": 16
+    },
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      330
+     ],
+     "direction": [
+      0.5128418989623672,
+      0.8584830730239665
+     ],
+     "size": 240,
+     "width": 16
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_stomp",
+   "size": 116,
+   "hero": [
+    608,
+    418
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "ring",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.9230769230769231,
+      0.38461538461538464
+     ],
+     "size": 150,
+     "inner_size": 76
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_combo",
+   "size": 116,
+   "hero": [
+    578,
+    418
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "gold",
+     "shape": "circle",
+     "center": [
+      578.0,
+      418.0
+     ],
+     "direction": [
+      1,
+      0
+     ],
+     "size": 40
+    },
+    {
+     "kind": "gold",
+     "shape": "circle",
+     "center": [
+      625.891078567025,
+      447.0248961012273
+     ],
+     "direction": [
+      1,
+      0
+     ],
+     "size": 40
+    },
+    {
+     "kind": "gold",
+     "shape": "circle",
+     "center": [
+      673.78215713405,
+      476.04979220245457
+     ],
+     "direction": [
+      1,
+      0
+     ],
+     "size": 40
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_charge",
+   "size": 116,
+   "hero": [
+    662,
+    434
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.9368415147273569,
+      0.34975416549821325
+     ],
+     "size": 260,
+     "width": 88
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_snare",
+   "size": 116,
+   "hero": [
+    634,
+    444
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.8795434461109204,
+      0.4758185856009897
+     ],
+     "size": 240,
+     "width": 28
+    },
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.9992009587217894,
+      -0.039968038348871575
+     ],
+     "size": 240,
+     "width": 28
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_boulder",
+   "size": 116,
+   "hero": [
+    648,
+    420
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "circle",
+     "center": [
+      648,
+      420
+     ],
+     "direction": [
+      1,
+      0
+     ],
+     "size": 40
+    },
+    {
+     "kind": "red",
+     "shape": "ring",
+     "center": [
+      648,
+      420
+     ],
+     "direction": [
+      0.9554746911816386,
+      0.29507306639432956
+     ],
+     "size": 72,
+     "inner_size": 40
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_grab",
+   "size": 116,
+   "hero": [
+    658,
+    412
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "gold",
+     "shape": "line",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.9739395288041127,
+      0.22680783547493036
+     ],
+     "size": 220,
+     "width": 20
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_briar",
+   "size": 116,
+   "hero": [
+    742,
+    468
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "ring",
+     "center": [
+      512,
+      410
+     ],
+     "direction": [
+      0,
+      1
+     ],
+     "size": 620,
+     "inner_size": 170
+    }
+   ],
+   "whole_map": true
+  },
+  {
+   "name": "attack_flare_waves",
+   "size": 116,
+   "hero": [
+    612,
+    434
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "ring",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.8725060159497201,
+      0.48860336893184325
+     ],
+     "size": 88,
+     "inner_size": 52
+    },
+    {
+     "kind": "red",
+     "shape": "ring",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.8725060159497201,
+      0.48860336893184325
+     ],
+     "size": 148,
+     "inner_size": 112
+    },
+    {
+     "kind": "red",
+     "shape": "ring",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.8725060159497201,
+      0.48860336893184325
+     ],
+     "size": 208,
+     "inner_size": 172
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "attack_flare_gold",
+   "size": 116,
+   "hero": [
+    598,
+    426
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "gold",
+     "shape": "circle",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      1,
+      0
+     ],
+     "size": 120
+    }
+   ],
+   "whole_map": false
+  },
+  {
+   "name": "bright_attack_sweep",
+   "size": 116,
+   "hero": [
+    574,
+    434
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "gold",
+     "shape": "cone",
+     "center": [
+      512,
+      378
+     ],
+     "direction": [
+      0.7421026427511382,
+      0.6702862579687701
+     ],
+     "size": 112,
+     "half_angle": 0.8726646259971648
+    }
+   ],
+   "whole_map": false,
+   "bright": true
+  },
+  {
+   "name": "bright_attack_shards",
+   "size": 116,
+   "hero": [
+    644,
+    430
+   ],
+   "camera": "frame",
+   "outline": true,
+   "telegraphs": [
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      330
+     ],
+     "direction": [
+      0.9652600417783449,
+      0.2612911245068761
+     ],
+     "size": 240,
+     "width": 16
+    },
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      330
+     ],
+     "direction": [
+      0.7970921481540103,
+      0.6038576879954624
+     ],
+     "size": 240,
+     "width": 16
+    },
+    {
+     "kind": "red",
+     "shape": "line",
+     "center": [
+      512,
+      330
+     ],
+     "direction": [
+      0.5128418989623672,
+      0.8584830730239665
+     ],
+     "size": 240,
+     "width": 16
+    }
+   ],
+   "whole_map": false,
+   "bright": true
+  }
+ ]
+}

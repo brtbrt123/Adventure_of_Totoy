@@ -133,6 +133,8 @@ def build_map(data: dict) -> tscn.Scene:
                 meta(p, "managed", row["managed"])
             if "reward" in row:
                 meta(p, "reward", row["reward"])
+            if "seal" in row:
+                meta(p, "seal", row["seal"])
             scene.add(row["id"], "Node2D", "Encounters", p)
             add_rect_area(scene, "Zone", f"Encounters/{row['id']}", row["rect"], f"Zone_{i}", {}, False)
             for n, mob in enumerate(row["mobs"], start=1):
