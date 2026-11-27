@@ -4,13 +4,13 @@ Status: **approved and part 3a built** (2026-11-27, Claude). The owner: "lets do
 should do a cut scene", then "i also like your proposal" (the seven recommended choices below). Follows step 3 of
 [[FINAL_SCENE_chapter1]]. The owner's Rootcrown playtest ended with "its good for now" (2026-11-27).
 
-**3a in the game (not committed, waiting for the owner's playtest):** `core/colossus.gd`, the encounter and seal in Rootcrown, the
+**3a in the game (committed 94d6abfb, waiting for the owner's playtest):** `core/colossus.gd`, the encounter and seal in Rootcrown, the
 stand-in body `colossus_idle_right_1` (`tools/art/make_colossus_standin.py`), `presentation/explore/colossus_view.gd`; interface in
 [[architecture]] ("The Mossbound Colossus on the road"); tests `tests/core/test_colossus.gd` (20) and `tests/smoke_colossus.gd`;
 captures and the victory storyboard in `presentation/review/colossus_3a/`. Details: the top of [[STATUS]]. The victory cutscene is
 proposed below ("Victory cutscene"), not built.
 
-**3b in the game too (2026-11-27, not committed):** phase 3 at 25 %, Root Snare (with its second lane), Boulder Toss (with its ring of
+**3b in the game too (2026-11-27, committed 94d6abfb):** phase 3 at 25 %, Root Snare (with its second lane), Boulder Toss (with its ring of
 shock), Heartroot Grab; real warnings, the arena's sounds, shake and dust. Their effects are **proposed only**, rendered with PixelFX
 in Totoy 36 (`tools/art/import_pixelfx.py`, `art/reference/pixelfx_colossus_v1/`) and shown in
 `presentation/review/colossus_3b/colossus_3b_attacks.png`: the thorns and the stone work; the ring of shock (side-view dust, too

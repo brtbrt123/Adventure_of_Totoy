@@ -1,4 +1,4 @@
-## Step 3b built: phase 3 and three new attacks; their effects proposed with PixelFX (2026-11-27, Claude, not committed)
+## Step 3b built: phase 3 and three new attacks; their effects proposed with PixelFX (2026-11-27, Claude, committed 94d6abfb)
 
 Owner: "Start 3b now", then, seeing my first effect mock-ups made from existing sprites: "are you not using the pixel effects skill
 tha w install??". It is the PixelFX clone (`C:\Users\Admin\Desktop\Projects\pixelfx`, MIT, commit 5294518); its `skills/pixelfx/SKILL.md`
@@ -26,7 +26,7 @@ PNGs; trim before committing). `presentation/review/colossus_3b/capture_3b.gd` d
 side-view and nearly gone after hard alpha; the root-arm is thin and dark at night; PixelFX's see-through dust becomes solid grey
 puffs. Nothing wired; the owner decides.
 
-## Step 3a built: the Colossus fights in Rootcrown; victory cutscene storyboarded (2026-11-27, Claude, not committed)
+## Step 3a built: the Colossus fights in Rootcrown; victory cutscene storyboarded (2026-11-27, Claude, committed 94d6abfb)
 
 Owner: "lets do the 3a but in victory after defateing the golem we should do a cut scene", then "i also like your proposal" (the
 seven recommended choices of [[PLAN_colossus_step3]]: 116 px body, a camera that frames it, the hero outlined behind it, the sweep
@@ -78,7 +78,7 @@ rule), a lot of white on a body this big; the boss panel's name is red (the aren
 
 Checks: `python harness/checks/run_tests.py --worktree . --timeout 400` passed (Python tests, Godot import, core tests 602 with 0
 failed, all 54 headless smokes including smoke_colossus). Not verified: the feel, the difficulty and the numbers (only play shows
-them), the sounds by ear. Not committed. Owner afterwards: "we will do the story board cut scene last", then "Start 3b now".
+them), the sounds by ear. Committed with 3b (94d6abfb). Owner afterwards: "we will do the story board cut scene last", then "Start 3b now".
 
 ## Rootcrown playtest passed; step 3 plan and mock-ups for the owner (2026-11-27, Claude, nothing built into the game)
 
