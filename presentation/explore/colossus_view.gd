@@ -22,7 +22,7 @@ const CHEST: float = 57.0  # the song's light above the feet, standing (colossus
 const BODY: String = "colossus_%s_right_%d"
 const FRAMES_DATA: String = "res://presentation/explore/colossus_frames.json"
 const COUNTS: Dictionary = {"sleep": 2, "idle": 4, "walk": 6, "slam_windup": 3, "slam_strike": 2, "slam_recover": 1, "sweep_windup": 2,
-	"sweep_strike": 2, "sweep_recover": 1, "shards_windup": 2, "shards_strike": 1, "shards_recover": 1, "stomp_windup": 2, "stomp_strike": 1,
+	"sweep_strike": 4, "sweep_recover": 2, "shards_windup": 2, "shards_strike": 1, "shards_recover": 1, "stomp_windup": 2, "stomp_strike": 1,
 	"stomp_recover": 1, "charge_windup": 2, "charge_run": 2, "charge_recover": 1, "snare_windup": 2, "snare_strike": 2, "boulder_windup": 2,
 	"boulder_strike": 1, "grab_windup": 2, "grab_strike": 1, "grab_recover": 1, "broken": 2, "stagger": 2, "roar": 2, "death": 8}
 const ATTACK_SETS: Dictionary = {
@@ -48,7 +48,24 @@ const WINDUP_SPREAD: float = 0.75  # the windup frames play over this share of a
 const TREMBLE: float = 0.8
 const FALL_TICKS: int = 3  # the falling frame (a set's first strike frame, when it has two) shows this many ticks before the blow
 const IMPACT_HOLD: int = 10  # between a combo's blows the impact holds this long before it raises its fists again
-const RECOVER_HOLD: int = 16  # the recover frame, then standing
+const RECOVER_HOLD: int = 16  # the recover frames (spread over this), then standing
+## The Gold Sweep's swing (reworked, the owner's "Looks good, wire it", 2026-11-28): its four strike frames begin these ticks from the
+## blow (each shows at least 2 ticks, so the arc reads), after the windup over its warning. Its dust: puffs across the real cone,
+## two rows, one column a tick later than the last in the order the arm swings through it.
+const SWEEP_SWING: Array[int] = [-4, -2, 0, 4]
+const SWEEP_DUST: String = "fx_colossus_dust_%d"
+const SWEEP_DUST_COUNT: int = 8
+const SWEEP_PUFFS: int = 7
+const SWEEP_ROWS: Array[float] = [0.55, 0.85]
+## Step 5 (the owner's "Wire all five", 2026-11-28): the Gold Slam's and each Combo blow's impact (PixelFX impacts/ground-slam in stone
+## and the song's blue, on the real circle), stone shards round the Red Stomp's ring and racing along the Red Shards' lanes (the
+## approved fx_colossus_shard), and the pale dust trailing the Red Charge along its lane (fx_colossus_dust).
+const SLAM: String = "fx_colossus_slam_%d"
+const SLAM_COUNT: int = 15
+const STOMP_SPACING: float = 40.0  # one shard every this many px round the middle of the ring's band
+const LANE_FIRST: float = 30.0  # the Shards' first shard this far along its lane, then one every LANE_SPACING, a tick later each
+const LANE_SPACING: float = 22.0
+const CHARGE_SIDE: float = 22.0  # its two trails this far either side of the lane's middle (its feet)
 ## The Boulder Toss: it tears the stone up, holds it overhead until BOULDER_THROW of the warning, then throws; the stone lands on the
 ## warned circle on the tick it strikes (the flight is drawn shorter, the warning and its timing are the core's).
 const BOULDER_RIP: float = 0.2
@@ -148,6 +165,10 @@ static func effect_frames() -> Array[String]:
 		out.append(SONG_SHARD % n)
 	for n: int in range(1, SONG_BURST_COUNT + 1):
 		out.append(SONG_BURST % n)
+	for n: int in range(1, SWEEP_DUST_COUNT + 1):
+		out.append(SWEEP_DUST % n)
+	for n: int in range(1, SLAM_COUNT + 1):
+		out.append(SLAM % n)
 	for n: int in range(1, STONE_SPIN_COUNT + 1):
 		out.append(STONE_SPIN % n)
 	for n: int in range(1, STONE_LAND_COUNT + 1):
@@ -259,6 +280,46 @@ func effect_items(view: ExploreCore.ExploreSnapshot, tint: Color) -> Array[Dicti
 			var b: int = _burst_frame(age)
 			if b > 0:
 				out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d" % i, "at": Vector2(e["at"]).round(), "frame": SONG_BURST % b, "tint": tint})
+		elif e["kind"] == &"sweep_dust":  # the Gold Sweep: pale dust across the real cone, in the order the arm swings through it
+			for k: int in SWEEP_PUFFS:
+				var angle: float = Vector2(e["direction"]).angle() - float(e["half"]) * (1.0 - 2.0 * float(k) / float(SWEEP_PUFFS - 1))
+				var n: int = floori(float(age - k) / FRAME_TICKS) + 1
+				if n < 1 or n > SWEEP_DUST_COUNT:
+					continue
+				for r: int in SWEEP_ROWS.size():
+					var spot: Vector2 = Vector2(e["at"]) + Vector2.from_angle(angle) * float(e["size"]) * SWEEP_ROWS[r]
+					out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d_%d_%d" % [i, k, r], "at": spot.round(), "frame": SWEEP_DUST % n, "tint": tint})
+		elif e["kind"] == &"slam":
+			var n: int = age / FRAME_TICKS + 1
+			if n >= 1 and n <= SLAM_COUNT:
+				out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d" % i, "at": Vector2(e["at"]).round(), "frame": SLAM % n, "tint": tint})
+		elif e["kind"] == &"stomp":
+			var count: int = roundi(TAU * float(e["radius"]) / STOMP_SPACING)
+			for k: int in count:
+				var n: int = floori(float(age - k % 3) / FRAME_TICKS) + 1
+				if n >= 1 and n <= THORN_COUNT:
+					var spot: Vector2 = Vector2(e["at"]) + Vector2.from_angle(TAU * float(k) / float(count)) * float(e["radius"])
+					out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d_%d" % [i, k], "at": spot.round(), "frame": SHARD % n, "tint": tint})
+		elif e["kind"] == &"shard_lane":
+			var k: int = 0
+			var d: float = LANE_FIRST
+			while d <= float(e["size"]):
+				var n: int = floori(float(age - k) / FRAME_TICKS) + 1
+				if n >= 1 and n <= THORN_COUNT:
+					var side: Vector2 = Vector2(e["direction"]).orthogonal() * (3.0 if k % 2 == 0 else -3.0)
+					out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d_%d" % [i, k], "at": (Vector2(e["at"]) + Vector2(e["direction"]) * d + side).round(), "frame": SHARD % n, "tint": tint})
+				d += LANE_SPACING
+				k += 1
+		elif e["kind"] == &"charge_dust":
+			var run: int = int(e["run"])
+			for k: int in range(0, run, 2):
+				var n: int = (age - k) / FRAME_TICKS + 1
+				if age < k or n > SWEEP_DUST_COUNT:
+					continue
+				var along: Vector2 = Vector2(e["at"]) + Vector2(e["direction"]) * float(e["size"]) * float(k + 1) / float(run)
+				for s: int in 2:
+					var spot: Vector2 = along + Vector2(e["direction"]).orthogonal() * (CHARGE_SIDE if s == 0 else -CHARGE_SIDE)
+					out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d_%d_%d" % [i, k, s], "at": spot.round(), "frame": SWEEP_DUST % n, "tint": tint})
 		elif e["kind"] == &"burst":  # the appearing: stone shards where a fist breaks out of the floor
 			var n: int = floori(float(age) / FRAME_TICKS) + 1
 			if n >= 1 and n <= THORN_COUNT:
@@ -287,6 +348,16 @@ static func _lifetime(e: Dictionary) -> int:
 		return THORN_COUNT * FRAME_TICKS + 3
 	if e["kind"] == &"burst":
 		return THORN_COUNT * FRAME_TICKS
+	if e["kind"] == &"sweep_dust":
+		return SWEEP_DUST_COUNT * FRAME_TICKS + SWEEP_PUFFS
+	if e["kind"] == &"slam":
+		return SLAM_COUNT * FRAME_TICKS
+	if e["kind"] == &"stomp":
+		return THORN_COUNT * FRAME_TICKS + 3
+	if e["kind"] == &"shard_lane":
+		return THORN_COUNT * FRAME_TICKS + int(float(e["size"]) / LANE_SPACING) + 1
+	if e["kind"] == &"charge_dust":
+		return SWEEP_DUST_COUNT * FRAME_TICKS + int(e["run"])
 	if e["kind"] == &"dust":
 		return APPEAR_DUST_FRAMES * 2
 	if e["kind"] == &"song_burst":
@@ -413,7 +484,9 @@ static func body_frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot
 			return _attack_frame(mob, tells, tick)
 		&"recover":
 			var sets: Dictionary = ATTACK_SETS.get(StringName(mob.get("attack_id", &"")), {})
-			return _f(sets["recover"], 1) if t < RECOVER_HOLD and not sets.is_empty() else _f("idle", 1)
+			if t >= RECOVER_HOLD or sets.is_empty():
+				return _f("idle", 1)
+			return _f(sets["recover"], 1 + t * int(COUNTS[sets["recover"]]) / RECOVER_HOLD)
 		&"posture_broken":
 			return _f("broken", 1 + posmod(t / BROKEN_TICKS, 2))
 		&"stagger":
@@ -479,6 +552,16 @@ static func _attack_frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnaps
 			if landed_count == 1 and next != null and tick - last.hit_tick >= IMPACT_HOLD - 2:  # the second lane: the other fist
 				return _f(windup, 2, 1 if next.hit_tick - tick <= 8 else 0)
 			return _f(strike, mini(landed_count, sn), 1 if tick - last.hit_tick < 6 else 0)
+		&"red_sweep":  # the windup, then the swing's frames on their own ticks round the blow
+			var blow: Snapshots.TelegraphSnapshot = next if last == null else last
+			var to: int = tick - blow.hit_tick
+			if to < SWEEP_SWING[0]:
+				return _windup(windup, wn, strike, 1, blow, tick)
+			var n: int = 1
+			for i: int in SWEEP_SWING.size():
+				if to >= SWEEP_SWING[i]:
+					n = i + 1
+			return _f(strike, n)
 		&"red_charge":
 			if last == null:
 				return _windup(windup, wn, strike, 1, next, tick)
@@ -710,6 +793,17 @@ func landed(view: ExploreCore.ExploreSnapshot) -> Array[Dictionary]:
 			effects.append({"kind": &"song_ring", "tick": t.hit_tick, "at": t.center, "radius": (t.inner_size + t.size) * 0.5})
 		elif t.attack == &"song_flare" and t.kind == &"gold":  # the gold blow: the song blows out of its chest (parried or not)
 			effects.append({"kind": &"song_burst", "tick": t.hit_tick, "at": t.center})
+		elif t.attack == &"gold_slam" or t.attack == &"gold_combo":  # the floor cracks under each real circle (parried or not)
+			effects.append({"kind": &"slam", "tick": t.hit_tick, "at": t.center})
+		elif t.attack == &"red_stomp":  # stone shards round the middle of its ring
+			effects.append({"kind": &"stomp", "tick": t.hit_tick, "at": t.center, "radius": (t.inner_size + t.size) * 0.5})
+		elif t.attack == &"red_shards":  # stone shards racing out along each lane
+			effects.append({"kind": &"shard_lane", "tick": t.hit_tick, "at": t.center, "direction": t.direction, "size": t.size})
+		elif t.attack == &"red_charge":  # dust where its feet pass along the lane
+			effects.append({"kind": &"charge_dust", "tick": t.hit_tick, "at": t.center, "direction": t.direction, "size": t.size,
+				"run": t.end_tick - t.hit_tick + 1})
+		elif t.attack == &"red_sweep":  # dust kicked up across the cone as the arm swings through it (parried or not)
+			effects.append({"kind": &"sweep_dust", "tick": t.hit_tick, "at": t.center, "direction": t.direction, "size": t.size, "half": t.half_angle})
 		elif t.attack == &"heartroot_grab":  # the root-arm lashes (parried or not) and slides back
 			effects.append({"kind": &"arm", "tick": t.hit_tick, "at": t.center + t.direction * ARM_ROOT, "direction": t.direction})
 		elif t.attack == &"boulder_toss" and t.shape == &"ring":  # its ring of shock strikes: shards over the real band

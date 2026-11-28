@@ -1,0 +1,41 @@
+{
+ "fps": 30,
+ "size": [
+  128,
+  88
+ ],
+ "pivot": [
+  64,
+  72
+ ],
+ "frames": [
+  "dust_puff_1.png",
+  "dust_puff_2.png",
+  "dust_puff_3.png",
+  "dust_puff_4.png",
+  "dust_puff_5.png",
+  "dust_puff_6.png",
+  "dust_puff_7.png",
+  "dust_puff_8.png",
+  "dust_puff_9.png",
+  "dust_puff_10.png",
+  "dust_puff_11.png",
+  "dust_puff_12.png",
+  "dust_puff_13.png",
+  "dust_puff_14.png",
+  "dust_puff_15.png",
+  "dust_puff_16.png",
+  "dust_puff_17.png",
+  "dust_puff_18.png",
+  "dust_puff_19.png",
+  "dust_puff_20.png",
+  "dust_puff_21.png",
+  "dust_puff_22.png",
+  "dust_puff_23.png",
+  "dust_puff_24.png",
+  "dust_puff_25.png",
+  "dust_puff_26.png",
+  "dust_puff_27.png",
+  "dust_puff_28.png"
+ ]
+}

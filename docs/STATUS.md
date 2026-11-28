@@ -1,4 +1,37 @@
+## Step 5: effects for the five other attacks kept from the arena, in the game (2026-11-28, Claude, NOT committed)
+
+Owner judged real-game GIFs (`capture_5.gd -- --gifs`: each attack with its warning, the hits and the proposed effect as a mock),
+then "Wire all five". `fx_colossus_slam_1..15` installed (PixelFX ground-slam); `colossus_view.gd` plays the Slam's and each Combo
+blow's impact, stone shards round the Stomp's ring and along the Shards' lanes, pale dust trailing the Charge. Every Colossus attack
+now has its own effect. Smoke COLOSSUS OK (all ten forced attacks play their effect). The wired capture matches the mocks except for
+depth (`presentation/review/colossus_5/colossus_5_mock_vs_wired.png`). The five GIFs are 6 to 8 MB each. Details: [[PLAN_colossus_step5]].
+Full harness: exit 0, all 57 suites passed.
+
+## The Gold Sweep's arm swing reworked, and its dust, in the game (2026-11-28, Claude, NOT committed)
+
+Owner asked for "a gif with full effect even the gold mark" (`presentation/review/colossus_sweep/capture_sweep.gd`: the real game,
+the swing and dust mocked, `colossus_sweep_in_game.gif`), then "Looks good, wire it". Wired: 89 body frames installed (only the
+Sweep's changed; the rim seeds now follow frame names), `fx_colossus_dust_1..8` (PixelFX blunt-hit, pale stone), the swing timing
+and the dust across the real cone in `colossus_view.gd`; atlas 2048x6320. Smoke COLOSSUS OK (89 frames, the Sweep plays its dust).
+The wired capture (`colossus_sweep_wired.gif`) matches the approved mock pixel for pixel through the swing. The other five step 5
+effects (Slam, Combo, Stomp, Shards, Charge) are still proposals. Full harness: exit 0, all 57 suites passed.
+
+Owner asked whether the arm swing is a proper animation (it was not: 2 strike frames in about 3 ticks, the arm ending limp, no
+trail), then "Yes, rework it". `tools/art/rig_colossus.py`: arm shortening and motion smears; the Sweep now 2 windup, 4 swing
+(an arc across the chest, the body twisting, a pale smear) and 2 recover frames. Before/after GIF at the real timing (and slowed):
+`presentation/review/colossus_sweep/`. Not installed or wired. Details: [[PLAN_colossus_step4]].
+
+## Step 5 proposed: effects for the six attacks kept from the arena (2026-11-28, Claude, NOT committed)
+
+Owner: "Effects first". Gold Slam, Combo, Stomp, Sweep, Shards and Charge had only sounds and shakes. Proposed (a labelled mock
+over the real fight, `presentation/review/colossus_5/colossus_5_effects.png`): PixelFX `impacts/ground-slam` in stone with the
+song's blue for the Slam and each Combo blow; the approved stone shards round the Stomp's ring and racing along the Shards' lanes;
+PixelFX `impacts/blunt-hit` as pale dust across the Sweep's cone and along the Charge's lane. `tools/art/import_pixelfx.py` gained
+the two renders and `--only <name>`. Nothing wired. Plan: [[PLAN_colossus_step5]].
+
 ## Step 4c: the Colossus's rigged body in the game (2026-11-28, Claude, committed fefb3742)
+
+**Owner's playtest of the new body (2026-11-28): "yeah its good for now".** No changes asked for.
 
 Owner: "Approve, do 4c". The 86 frames are installed (`tools/art/rig_colossus.py --install`: `art/src/colossus_<set>_right_<n>.txt`,
 `presentation/explore/colossus_frames.json` with fists and chest per frame); validate, build (atlas 2048x6294), preview (26 pages),

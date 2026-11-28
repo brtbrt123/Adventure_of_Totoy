@@ -102,6 +102,30 @@ flare, broken, stagger, roar, death, appear).
   old arena; the owner's choice 7 of step 3). After the dead state (40 ticks) the body is gone: whether the heap stays as a prop is
   the owner's call (the victory cutscene comes last).
 
+## The Gold Sweep reworked (2026-11-28, in the game: the owner's "Looks good, wire it")
+
+Owner: "do we have a proper animation on an arm swing" (no: 2 strike frames in about 3 ticks, the arm ending limp across the legs,
+no trail), then "Yes, rework it". The rig gained arm shortening along the arm (`arm_*_len`, a fist swinging toward the viewer) and
+smears (`smear`: pale dithered ghosts of the right arm where it just was, outside the body). The new Sweep: 2 windup frames (the arm
+out, then drawn back at chest height), 4 swing frames (the swing starts with a smear, the fist passes in front shortened, the arm
+across the belly to the far left, the follow-through) with the body twisting, 2 recover frames. Proposed timing: the swing frames
+start 4 and 2 ticks before the blow, on it, and 4 after (2 ticks each at least, so they read). Review copy:
+`python tools/art/rig_colossus.py --set sweep --to sweep_v2` (`art/reference/colossus_body_v1/sweep_v2/`);
+`python tools/art/make_colossus_sweep_review.py`: `presentation/review/colossus_sweep/colossus_sweep_before_after.gif` (now vs
+reworked, real speed then slowed 4 times) and `colossus_sweep_swing_frames.png`. On the owner's yes: `--install`, `COUNTS`
+(sweep_strike 4, sweep_recover 2) and the sweep's swing timing in `colossus_view.gd`, smoke, captures.
+The owner asked for "a gif with full effect even the gold mark": `presentation/review/colossus_sweep/capture_sweep.gd` (windowed)
+records the REAL game (gold cone, parry marker, hit and parry effects, HUD) with `sweep_view_mock.gd` drawing the reworked frames and
+the proposed step 5 dust drawn over the cone (both mocks); `make_colossus_sweep_review.py --game` makes
+`colossus_sweep_in_game.gif` (he takes the blow, he parries it, then slowed 3 times).
+Wired on the owner's "Looks good, wire it" (the GIF showed the swing and the Sweep's dust): `rig_colossus.py --install` (89 frames;
+the earth rim's seeds now follow the frame names, `SEED_BASE`, so the approved appearing stays pixel-identical), the dust
+`fx_colossus_dust_1..8` by `import_pixelfx.py --install` (blunt-hit frames 7, 9 ... 21), `colossus_view.gd`: `COUNTS` (sweep_strike 4,
+sweep_recover 2; recover frames spread over `RECOVER_HOLD`), the swing on `SWEEP_SWING` (-4, -2, 0, 4 ticks from the blow), the dust
+(`sweep_dust`: 7 columns x 2 rows across the real cone, a column a tick later each, depth-sorted). Smoke: 89 body frames, a forced
+Sweep plays its dust. `capture_sweep.gd -- --real` records the wired game: its swing is pixel-identical to the approved mock, the
+dust differs only by depth (puffs north of its feet pass behind its arm); `colossus_sweep_wired.gif`.
+
 ## Known limits
 
 - It faces the viewer (the concept's view) in every pose; it is not mirrored. Rigged cut-outs can look stiff; the owner judges.

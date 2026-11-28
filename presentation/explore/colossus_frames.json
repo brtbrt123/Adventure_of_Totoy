@@ -286,8 +286,8 @@
     -16
    ],
    "fist_r": [
-    95,
-    -44
+    100,
+    -72
    ],
    "chest": [
     1,
@@ -300,8 +300,8 @@
     -20
    ],
    "fist_r": [
-    98,
-    -87
+    93,
+    -98
    ],
    "chest": [
     2,
@@ -310,44 +310,86 @@
   },
   "colossus_sweep_strike_right_1": {
    "fist_l": [
-    -53,
-    -13
+    -59,
+    -18
    ],
    "fist_r": [
-    51,
-    -11
+    94,
+    -63
    ],
    "chest": [
-    -1,
-    -56
+    1,
+    -58
    ]
   },
   "colossus_sweep_strike_right_2": {
    "fist_l": [
-    -52,
-    -10
+    -53,
+    -14
    ],
    "fist_r": [
-    3,
-    -23
+    15,
+    -47
+   ],
+   "chest": [
+    -1,
+    -57
+   ]
+  },
+  "colossus_sweep_strike_right_3": {
+   "fist_l": [
+    -51,
+    -11
+   ],
+   "fist_r": [
+    -24,
+    -52
    ],
    "chest": [
     -4,
+    -56
+   ]
+  },
+  "colossus_sweep_strike_right_4": {
+   "fist_l": [
+    -50,
+    -9
+   ],
+   "fist_r": [
+    -26,
+    -54
+   ],
+   "chest": [
+    -5,
     -55
    ]
   },
   "colossus_sweep_recover_right_1": {
    "fist_l": [
-    -54,
+    -55,
     -13
    ],
    "fist_r": [
-    31,
+    -3,
+    -31
+   ],
+   "chest": [
+    -3,
+    -56
+   ]
+  },
+  "colossus_sweep_recover_right_2": {
+   "fist_l": [
+    -54,
+    -14
+   ],
+   "fist_r": [
+    38,
     -11
    ],
    "chest": [
     -2,
-    -56
+    -57
    ]
   },
   "colossus_shards_windup_right_1": {

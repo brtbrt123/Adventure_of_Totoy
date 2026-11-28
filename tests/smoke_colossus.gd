@@ -68,7 +68,7 @@ func run() -> void:
 	check(frames.has(ColossusView.FRAME), "the standing frame is in the atlas")
 	check(int(frames.get(ColossusView.FRAME, {}).get("ay", 0)) == 118, "its feet anchor")
 	var body_names: Array[String] = ColossusView.body_frames()
-	check(body_names.size() == 86, "86 body frames: %d" % body_names.size())
+	check(body_names.size() == 89, "89 body frames: %d" % body_names.size())
 	for name: String in body_names:
 		check(frames.has(name), "body frame %s" % name)
 	check((ColossusView.data()["appear_ticks"] as Array).size() == 25 and int(ColossusView.data()["appear_ticks"][-1]) < Tuning.COLOSSUS_WAKE_TICKS,
@@ -158,8 +158,9 @@ func run() -> void:
 	for name: String in ColossusView.effect_frames():
 		check(frames.has(name), "effect frame %s" % name)
 	var shards: bool = false
-	var effect_of: Dictionary = {&"root_snare": &"thorns", &"boulder_toss": &"land", &"heartroot_grab": &"arm"}
-	for id: StringName in [&"root_snare", &"boulder_toss", &"heartroot_grab"]:
+	var effect_of: Dictionary = {&"root_snare": &"thorns", &"boulder_toss": &"land", &"heartroot_grab": &"arm", &"red_sweep": &"sweep_dust",
+		&"gold_slam": &"slam", &"gold_combo": &"slam", &"red_stomp": &"stomp", &"red_shards": &"shard_lane", &"red_charge": &"charge_dust"}
+	for id: StringName in effect_of.keys():
 		boss().clear_telegraph()
 		boss().state = &"chase"
 		boss().cooldown = 1

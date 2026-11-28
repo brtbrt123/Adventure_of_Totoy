@@ -1,0 +1,172 @@
+{
+ "frames": {
+  "colossus_sweep_windup_right_1": {
+   "w": 232,
+   "h": 120,
+   "ax": 116,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -56,
+     -16
+    ],
+    "fist_r": [
+     100,
+     -72
+    ],
+    "chest": [
+     1,
+     -58
+    ]
+   },
+   "note": "Sweep windup: the right arm swings out"
+  },
+  "colossus_sweep_windup_right_2": {
+   "w": 216,
+   "h": 120,
+   "ax": 108,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -59,
+     -20
+    ],
+    "fist_r": [
+     93,
+     -98
+    ],
+    "chest": [
+     2,
+     -59
+    ]
+   },
+   "note": "windup: drawn back, ready"
+  },
+  "colossus_sweep_strike_right_1": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -59,
+     -18
+    ],
+    "fist_r": [
+     94,
+     -63
+    ],
+    "chest": [
+     1,
+     -58
+    ]
+   },
+   "note": "the swing starts"
+  },
+  "colossus_sweep_strike_right_2": {
+   "w": 208,
+   "h": 120,
+   "ax": 104,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -14
+    ],
+    "fist_r": [
+     15,
+     -47
+    ],
+    "chest": [
+     -1,
+     -57
+    ]
+   },
+   "note": "the fist passes in front"
+  },
+  "colossus_sweep_strike_right_3": {
+   "w": 136,
+   "h": 120,
+   "ax": 68,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -51,
+     -11
+    ],
+    "fist_r": [
+     -24,
+     -52
+    ],
+    "chest": [
+     -4,
+     -56
+    ]
+   },
+   "note": "across to the far left"
+  },
+  "colossus_sweep_strike_right_4": {
+   "w": 136,
+   "h": 120,
+   "ax": 68,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -50,
+     -9
+    ],
+    "fist_r": [
+     -26,
+     -54
+    ],
+    "chest": [
+     -5,
+     -55
+    ]
+   },
+   "note": "follow-through"
+  },
+  "colossus_sweep_recover_right_1": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -55,
+     -13
+    ],
+    "fist_r": [
+     -3,
+     -31
+    ],
+    "chest": [
+     -3,
+     -56
+    ]
+   },
+   "note": "recover: the arm comes back"
+  },
+  "colossus_sweep_recover_right_2": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -54,
+     -14
+    ],
+    "fist_r": [
+     38,
+     -11
+    ],
+    "chest": [
+     -2,
+     -57
+    ]
+   },
+   "note": "recover"
+  }
+ }
+}

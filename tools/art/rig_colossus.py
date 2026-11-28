@@ -65,9 +65,12 @@ PEBBLES = ["e", "f"]  # dark clods on the crest, sparse
 def F(**kw: object) -> dict:
     """One pose. Offsets are in final pixels; angles in degrees, positive = clockwise on screen (the left arm up and out, the
     right arm in and down). body moves everything above the roots (the arms too, plus their own arm_*_off); sink lowers the whole
-    golem into the ground; clip drops what is below the ground; crumble (0..1) breaks it into a heap of rubble (the death)."""
+    golem into the ground; clip drops what is below the ground; crumble (0..1) breaks it into a heap of rubble (the death).
+    arm_*_len shortens an arm along its own length (a fist swinging toward the viewer). smear: ghosts of the right arm along its path
+    ((angle, length, (dx, dy)), oldest first), drawn as a pale dither outside the body (the classic pixel-art motion smear)."""
     return {"body": kw.get("body", (0, 0)), "arm_l": kw.get("arm_l", 0.0), "arm_r": kw.get("arm_r", 0.0),
             "arm_l_off": kw.get("arm_l_off", (0, 0)), "arm_r_off": kw.get("arm_r_off", (0, 0)),
+            "arm_l_len": kw.get("arm_l_len", 1.0), "arm_r_len": kw.get("arm_r_len", 1.0), "smear": kw.get("smear", ()),
             "head": kw.get("head", (0, 0)), "nod": kw.get("nod", 0.0), "roots_l": kw.get("roots_l", (0, 0)),
             "roots_r": kw.get("roots_r", (0, 0)), "light": kw.get("light", "lit"), "sink": kw.get("sink", 0),
             "clip": kw.get("clip", False), "crumble": kw.get("crumble", 0.0), "stumps": kw.get("stumps", True),
@@ -119,11 +122,19 @@ SETS: dict[str, list[dict]] = {
     "slam_strike": [F(body=(0, 1), arm_l=70.0, arm_r=-70.0, light="bright", note="the blow falls"),
                     F(body=(0, 5), arm_l=-22.0, arm_r=22.0, head=(0, 4), front=FRONT, note="the blow: fists down in front")],
     "slam_recover": [F(body=(0, 3), arm_l=-10.0, arm_r=10.0, head=(0, 2), front=FRONT, note="recover (Slam, Combo, Snare, Boulder)")],
-    "sweep_windup": [F(body=(2, -1), arm_l=5.0, arm_r=-50.0, head=(1, 0), note="Sweep windup: the right arm draws back"),
-                     F(body=(3, -2), arm_l=10.0, arm_r=-95.0, head=(2, -1), light="bright", note="windup")],
-    "sweep_strike": [F(body=(0, 1), arm_r=5.0, front=("arm_r",), note="the arm swings"),
-                     F(body=(-3, 2), arm_l=-5.0, arm_r=55.0, head=(-2, 1), front=("arm_r",), note="across the body")],
-    "sweep_recover": [F(body=(-1, 1), arm_r=25.0, front=("arm_r",), note="recover")],
+    # the Sweep (reworked 2026-11-28, the owner's "Yes, rework it"): the right arm drawn back at chest height, then swung across the
+    # chest to the far left (shortened as the fist passes in front of it), the body twisting with it, a smear on the fast frames
+    "sweep_windup": [F(body=(2, -1), arm_l=5.0, arm_r=-80.0, head=(1, 0), note="Sweep windup: the right arm swings out"),
+                     F(body=(3, -2), arm_l=10.0, arm_r=-108.0, head=(2, -1), light="bright", note="windup: drawn back, ready")],
+    "sweep_strike": [F(body=(2, -1), arm_l=8.0, arm_r=-70.0, arm_r_len=0.9, head=(1, 0), light="bright", front=("arm_r",),
+                       smear=((-108.0, 1.0, (0, 0)), (-90.0, 1.0, (0, 0))), note="the swing starts"),
+                     F(body=(0, 0), arm_r=58.0, arm_r_len=0.5, arm_r_off=(-8, 0), front=("arm_r",),
+                       smear=((-70.0, 0.9, (0, 0)), (-30.0, 0.75, (-3, 2)), (12.0, 0.6, (-6, 2))), note="the fist passes in front"),
+                     F(body=(-3, 1), arm_l=-6.0, arm_r=98.0, arm_r_off=(-8, 8), head=(-2, 1), front=("arm_r",),
+                       smear=((58.0, 0.5, (-8, 0)), (80.0, 0.75, (-8, 4))), note="across to the far left"),
+                     F(body=(-4, 2), arm_l=-8.0, arm_r=104.0, arm_r_off=(-9, 11), head=(-3, 1), front=("arm_r",), note="follow-through")],
+    "sweep_recover": [F(body=(-2, 1), arm_r=60.0, arm_r_off=(-4, -4), front=("arm_r",), note="recover: the arm comes back"),
+                      F(body=(-1, 0), arm_r=18.0, front=("arm_r",), note="recover")],
     "shards_windup": [F(body=(0, -1), arm_l=30.0, arm_r=-30.0, head=(0, -1), light="bright", note="Shards / Song Flare windup: the chest opens"),
                       F(body=(0, -3), arm_l=55.0, arm_r=-55.0, head=(0, -3), light="bright", note="windup")],
     "shards_strike": [F(body=(0, -1), arm_l=80.0, arm_r=-80.0, head=(0, -2), light="bright", note="the song bursts out")],
@@ -232,6 +243,9 @@ def attachments(layers: dict[str, Image.Image], pose: dict) -> dict[str, list[in
         dx, dy = pose["body"]
         if part in ("arm_l", "arm_r"):
             px, py = PIVOTS[part]
+            ux, uy = _axis(part)
+            along = (x - px) * ux + (y - py) * uy
+            x, y = x + (float(pose[part + "_len"]) - 1.0) * along * ux, y + (float(pose[part + "_len"]) - 1.0) * along * uy
             a = math.radians(float(pose[part]))
             x, y = px + (x - px) * math.cos(a) - (y - py) * math.sin(a), py + (x - px) * math.sin(a) + (y - py) * math.cos(a)
             dx, dy = dx + pose[part + "_off"][0], dy + pose[part + "_off"][1]
@@ -354,8 +368,9 @@ def scale_of(cut: Image.Image) -> float:
     return HEIGHT / cut.height
 
 
-def compose(layers: dict[str, Image.Image], pose: dict, scale: float) -> Image.Image:
-    """The pose at the concept's size on a canvas with MARGIN round the cut-out (the feet stay where they were)."""
+def compose(layers: dict[str, Image.Image], pose: dict, scale: float, only: str = "") -> Image.Image:
+    """The pose at the concept's size on a canvas with MARGIN round the cut-out (the feet stay where they were). `only`: just that
+    part (a smear's ghost arm)."""
     w, h = layers["body"].size
     canvas = Image.new("RGBA", (w + 2 * MARGIN, h + 2 * MARGIN), (0, 0, 0, 0))
     per = 1.0 / scale  # concept pixels per final pixel
@@ -364,6 +379,8 @@ def compose(layers: dict[str, Image.Image], pose: dict, scale: float) -> Image.I
     order += [a for a in ("arm_l", "arm_r") if a not in pose["front"]]
     order += (["shoulders"] if pose["stumps"] else []) + ["body", "head"]
     order += [a for a in ("arm_l", "arm_r") if a in pose["front"]]
+    if only:
+        order = [only]
     for name in order:
         layer = layers[name]
         big = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
@@ -381,11 +398,31 @@ def compose(layers: dict[str, Image.Image], pose: dict, scale: float) -> Image.I
             pivot = PIVOTS["head"]
         elif name in ("roots_l", "roots_r"):
             offset = (float(pose[name][0]), float(pose[name][1]))
+        if name in ("arm_l", "arm_r") and float(pose[name + "_len"]) != 1.0:
+            big = _shorten(big, name, float(pose[name + "_len"]))
         if angle and pivot is not None:
             big = big.rotate(-angle, resample=Image.Resampling.NEAREST, center=(pivot[0] + MARGIN, pivot[1] + MARGIN))
         dx, dy = round(offset[0] * per), round(offset[1] * per)
         canvas.alpha_composite(big.transform(big.size, Image.Transform.AFFINE, (1, 0, -dx, 0, 1, -dy), resample=Image.Resampling.NEAREST))
     return canvas
+
+
+def _axis(arm: str) -> tuple[float, float]:
+    """The unit vector along an arm at rest, from its shoulder to its fist."""
+    px, py = PIVOTS[arm]
+    fx, fy = ATTACH["fist_l" if arm == "arm_l" else "fist_r"][1]
+    length = math.hypot(fx - px, fy - py)
+    return (fx - px) / length, (fy - py) / length
+
+
+def _shorten(big: Image.Image, arm: str, factor: float) -> Image.Image:
+    """The arm scaled to `factor` along its own length about its shoulder (before it is turned): foreshortening."""
+    ux, uy = _axis(arm)
+    k = 1.0 / factor - 1.0  # the inverse map: a point at distance d along the arm samples the source at d / factor
+    m11, m12, m21, m22 = 1 + k * ux * ux, k * ux * uy, k * uy * ux, 1 + k * uy * uy
+    px, py = PIVOTS[arm][0] + MARGIN, PIVOTS[arm][1] + MARGIN
+    coeffs = (m11, m12, px - m11 * px - m12 * py, m21, m22, py - m21 * px - m22 * py)
+    return big.transform(big.size, Image.Transform.AFFINE, coeffs, resample=Image.Resampling.NEAREST)
 
 
 def palette() -> tuple[dict[tuple[int, int, int], str], dict[str, tuple[int, int, int]], set[str]]:
@@ -492,6 +529,7 @@ def render(layers: dict[str, Image.Image], pose: dict, seed: int = 7) -> tuple[l
     grid, at = shrink(big, scale, feet)
     despeck(grid)
     light(grid, pose["light"])
+    smear(layers, pose, scale, feet, grid)
     if pose["clip"] or pose["crumble"] > 0.0:
         for y in range(at[1] + 1, len(grid)):
             grid[y] = ["."] * len(grid[y])
@@ -499,6 +537,22 @@ def render(layers: dict[str, Image.Image], pose: dict, seed: int = 7) -> tuple[l
         crumble(grid, at, float(pose["crumble"]))
     bury(grid, at, int(pose["sink"]), seed)
     return grid, at
+
+
+SMEAR = ["j", "1"]  # the smear's pale dither (stone_6, cream), outside the body only
+
+
+def smear(layers: dict[str, Image.Image], pose: dict, scale: float, feet: tuple[int, int], grid: list[list[str]]) -> None:
+    """Pale ghosts of the right arm where it just was: the newest dithered every other pixel, older ones sparser."""
+    ghosts = list(pose["smear"])
+    for age, (angle, length, off) in enumerate(reversed(ghosts)):
+        ghost = dict(pose, arm_r=float(angle), arm_r_len=float(length), arm_r_off=tuple(off))
+        mask, _ = shrink(compose(layers, ghost, scale, only="arm_r"), scale, feet)
+        step = 2 + age  # every 2nd pixel for the newest ghost, every 3rd, 4th for older ones
+        for y, row in enumerate(mask):
+            for x, ch in enumerate(row):
+                if ch != "." and grid[y][x] == "." and (x + 2 * y) % step == 0:
+                    grid[y][x] = SMEAR[(x + y) % 2]
 
 
 def _stone(x: int, y: int, size: int, seed: int) -> tuple[tuple[int, int], bool]:
@@ -596,7 +650,7 @@ def build(poses: dict[str, dict]) -> dict[str, tuple[list[str], tuple[int, int]]
     layers = split(cut_golem())
     out = {}
     for i, (name, pose) in enumerate(poses.items()):
-        grid, feet = render(layers, pose, seed=7 + i)
+        grid, feet = render(layers, pose, seed=frame_seed(name))
         out[name] = trim(grid, feet)
     return out
 
@@ -606,7 +660,11 @@ def main() -> int:
     parser.add_argument("--preview", action="store_true", help="write the 4a poses as PNGs to art/reference/colossus_body_v1/")
     parser.add_argument("--frames", action="store_true", help="write every frame of 4b to art/reference/colossus_body_v1/frames/")
     parser.add_argument("--install", action="store_true", help="write every frame into art/src and presentation/explore/colossus_frames.json")
+    parser.add_argument("--set", default="", help="with --to: write only this set family (for example sweep) as a review copy")
+    parser.add_argument("--to", default="", help="the folder for --set, under art/reference/colossus_body_v1/")
     args = parser.parse_args()
+    if args.set:
+        return write_set(args.set, OUT / (args.to or args.set))
     if args.frames:
         return write_frames()
     if args.install:
@@ -625,6 +683,33 @@ def main() -> int:
     return 0
 
 
+## The earth rim's random clumps (sunk frames only): seeds tied to the frame's name, the values the appearing and sleep were approved
+## with (2026-11-28), so adding frames elsewhere never changes them.
+SEED_BASE = {"sleep": 7, "appear": 68}
+
+
+def frame_seed(name: str) -> int:
+    set_name, n = name[len("colossus_"):].rsplit("_right_", 1)
+    return SEED_BASE.get(set_name, 7) + int(n) - 1
+
+
+def write_set(prefix: str, folder: Path) -> int:
+    """Only the frames of one set family (colossus_<prefix>...), as PNGs with frames.json, into `folder` (a review copy)."""
+    layers = split(cut_golem())
+    folder.mkdir(parents=True, exist_ok=True)
+    meta: dict[str, dict] = {}
+    for i, (name, pose) in enumerate(frame_set().items()):
+        if not name.startswith(f"colossus_{prefix}"):
+            continue
+        grid, feet = render(layers, pose, seed=frame_seed(name))
+        rows, at = trim(grid, feet)
+        to_image(rows).save(folder / f"{name}.png")
+        meta[name] = {"w": len(rows[0]), "h": len(rows), "ax": at[0], "ay": at[1], "attach": attachments(layers, pose), "note": pose["note"]}
+    (folder / "frames.json").write_text(json.dumps({"frames": meta}, indent=1) + "\n", encoding="utf-8")
+    print(f"{len(meta)} {prefix} frames into {folder}")
+    return 0
+
+
 def write_frames() -> int:
     """Every frame of step 4b as a PNG with frames.json (size, feet, attachments, note; the appearing's first ticks)."""
     layers = split(cut_golem())
@@ -633,7 +718,7 @@ def write_frames() -> int:
     (OUT / ".gdignore").write_text("", encoding="utf-8")
     meta: dict[str, dict] = {}
     for i, (name, pose) in enumerate(frame_set().items()):
-        grid, feet = render(layers, pose, seed=7 + i)
+        grid, feet = render(layers, pose, seed=frame_seed(name))
         rows, at = trim(grid, feet)
         to_image(rows).save(folder / f"{name}.png")
         meta[name] = {"w": len(rows[0]), "h": len(rows), "ax": at[0], "ay": at[1], "attach": attachments(layers, pose), "note": pose["note"]}
@@ -661,7 +746,7 @@ def install() -> int:
             print(f"removed {old.name}")
     attach: dict[str, dict] = {}
     for i, (name, pose) in enumerate(names.items()):
-        grid, feet = render(layers, pose, seed=7 + i)
+        grid, feet = render(layers, pose, seed=frame_seed(name))
         rows, at = trim(grid, feet)
         assert not any(ch in reserved for row in rows for ch in row), f"{name}: gold or red"
         header = ["# kind: sprite", f"# anchor: {at[0]},{at[1]}",

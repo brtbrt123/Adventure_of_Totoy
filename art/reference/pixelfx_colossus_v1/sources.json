@@ -249,6 +249,58 @@
     104,
     124
    ]
+  },
+  "ground_slam": {
+   "pixelfx": "impacts/ground-slam",
+   "options": {
+    "palette": [
+     "#1c1824",
+     "#24365c",
+     "#33508a",
+     "#3f7f7a",
+     "#6aa89a",
+     "#a7cde0",
+     "#f4ecd6"
+    ],
+    "stone": "#737769",
+    "reach": 48,
+    "seed": 5
+   },
+   "flags": [],
+   "for": "Gold Slam and Gold Combo: the floor cracks with the song's light, shock fronts run out to the circle's edge, rocks erupt",
+   "frames": 97,
+   "fps": 30,
+   "pivot": [
+    144,
+    164
+   ]
+  },
+  "dust_puff": {
+   "pixelfx": "impacts/blunt-hit",
+   "options": {
+    "palette": [
+     "#1c1824",
+     "#5a625e",
+     "#737769",
+     "#9a9886",
+     "#c6bfaa",
+     "#f4ecd6",
+     "#f4ecd6"
+    ],
+    "warm": "#c6bfaa",
+    "dust": "#c6bfaa",
+    "clod": "#737769",
+    "height": 6,
+    "seed": 9
+   },
+   "flags": [],
+   "for": "Gold Sweep and Red Charge: a puff of dust and clods kicked up, set along the sweep's arc and the charge's lane",
+   "frames": 28,
+   "fps": 30,
+   "pivot": [
+    64,
+    72
+   ]
   }
  }
 }

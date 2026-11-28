@@ -9,12 +9,16 @@ drop out, the game's own lights glow instead. Writes, per effect, art/reference/
 and art/reference/pixelfx_colossus_v1/sources.json. Proposals for part 3b (docs/PLAN_colossus_step3.md); nothing is wired.
 
     python tools/art/import_pixelfx.py             # render, snap and cut the proposals
+    python tools/art/import_pixelfx.py --only ground_slam   # just one of them (the others' entries in sources.json stay)
     python tools/art/import_pixelfx.py --install   # then write the APPROVED ones into art/src (validate, build, preview after)
 
 Approved by the owner on 2026-11-27 ("Yes, do that"): the Root Snare's thorn and the Boulder Toss's stone; on 2026-11-28
 ("Option B") the stone shard for the ring of shock, ("Yes, wire it") the reworked root-arm, and ("Yes, wire them") the 3c
 effects: fx_colossus_song_shard (the thorn burst in the song's blue, round the Song Flare's rings) and fx_colossus_song_burst
-(arcane/mana-burst in the song's blue, its gold blow); the Briar Ring's wall reuses fx_colossus_thorn. --install writes art/src/fx_colossus_thorn_<n>.txt (one thorn bursting up
+(arcane/mana-burst in the song's blue, its gold blow); the Briar Ring's wall reuses fx_colossus_thorn; on 2026-11-28 ("Looks good,
+wire it") fx_colossus_dust (impacts/blunt-hit as pale dust, kicked up across the Gold Sweep's cone), and ("Wire all five")
+fx_colossus_slam (impacts/ground-slam, the Gold Slam's and Combo's impact; the Stomp and Shards reuse fx_colossus_shard, the Charge
+fx_colossus_dust). --install writes art/src/fx_colossus_thorn_<n>.txt (one thorn bursting up
 and sinking), fx_colossus_shard_<n>.txt (the same in stone, set round the ring), fx_colossus_stone_spin_<n>.txt (the stone in
 flight) and fx_colossus_stone_land_<n>.txt (its landing); generated, do not hand-edit. presentation/explore/colossus_view.gd
 plays them. The root-arm is rendered at ARM_ANGLES (every 15 degrees, right half; the left half is drawn mirrored) through
@@ -70,6 +74,13 @@ EFFECTS: dict[str, tuple[str, dict, list[str], str]] = {
                    "Song Flare: a shard of the song's blue light bursting up, placed round each of its three real rings"),
     "song_burst": ("arcane/mana-burst", {"palette": [INK, WATER[0], WATER[1], WATER[2], TEAL[0], WATER[3], WATER[4], WATER[5], CREAM], "seed": 9}, [],
                    "Song Flare's last blow: the song's light rushing into its chest and blowing out"),
+    # step 5 proposals (2026-11-28, the owner's "Effects first"): the six attacks kept from the arena
+    "ground_slam": ("impacts/ground-slam", {"palette": [INK, WATER[0], WATER[1], TEAL[0], TEAL[1], WATER[4], CREAM], "stone": STONE[3],
+                                            "reach": 48, "seed": 5}, [],
+                    "Gold Slam and Gold Combo: the floor cracks with the song's light, shock fronts run out to the circle's edge, rocks erupt"),
+    "dust_puff": ("impacts/blunt-hit", {"palette": [INK, STONE[2], STONE[3], STONE[4], STONE[5], CREAM, CREAM], "warm": STONE[5], "dust": STONE[5],
+                                         "clod": STONE[3], "height": 6, "seed": 9}, [],
+                  "Gold Sweep and Red Charge: a puff of dust and clods kicked up, set along the sweep's arc and the charge's lane"),
 }
 
 
@@ -174,6 +185,12 @@ ARM_ANGLES = [i * 15 - 90 for i in range(13)]  # degrees, -90 (up the screen) to
 ARM_MARGIN = 150
 # the Song Flare's gold blow (PixelFX arcane/mana-burst): frames kept; frame 16 is the blow-out, which meets the blow (colossus_view.gd)
 BURST_FRAMES = range(10, 56, 2)
+# the Gold Sweep's dust (PixelFX impacts/blunt-hit in pale stone; the owner's "Looks good, wire it", 2026-11-28): frames kept, past
+# its flash and hit marks (a ring of dust puffs and clods)
+DUST_FRAMES = range(6, 22, 2)
+# the Gold Slam's and Gold Combo's impact (PixelFX impacts/ground-slam in stone and the song's blue; the owner's "Wire all five",
+# 2026-11-28): the first second only (its later dust column turns into dark lumps under hard alpha)
+SLAM_FRAMES = range(0, 30, 2)
 ARM_RAW = Path(__file__).resolve().parents[2] / ".godot" / "pixelfx_arm_renders"  # scratch for the turned renders (ignored by git; big, remade on demand)
 
 
@@ -246,6 +263,28 @@ def install() -> int:
         cut = Image.new("RGBA", (bx1 - bx0, by1 - by0), (0, 0, 0, 0))
         cut.alpha_composite(b.crop((bx0, by0, min(bx1, b.width), min(by1, b.height))), (0, 0))
         write_sprite(f"fx_colossus_song_burst_{n}", cut, (burst["pivot"][0] - bx0, burst["pivot"][1] - by0), symbols, note.format("arcane/mana-burst in the song's blue"))
+    # the Gold Sweep's dust: every kept frame cut to their common box, the anchor on the puff's floor point
+    puff = json.loads((OUT / "dust_puff" / "frames.json").read_text(encoding="utf-8"))
+    puffs = [Image.open(OUT / "dust_puff" / puff["frames"][i]).convert("RGBA") for i in DUST_FRAMES]
+    boxes = [b.getbbox() for b in puffs if b.getbbox()]
+    dx0, dy0 = min(b[0] for b in boxes), min(b[1] for b in boxes)
+    dx1, dy1 = max(b[2] for b in boxes), max(b[3] for b in boxes)
+    dx1, dy1 = dx0 + pad8(dx1 - dx0), dy0 + pad8(dy1 - dy0)
+    for n, b in enumerate(puffs, start=1):
+        cut = Image.new("RGBA", (dx1 - dx0, dy1 - dy0), (0, 0, 0, 0))
+        cut.alpha_composite(b.crop((dx0, dy0, min(dx1, b.width), min(dy1, b.height))), (0, 0))
+        write_sprite(f"fx_colossus_dust_{n}", cut, (puff["pivot"][0] - dx0, puff["pivot"][1] - dy0), symbols, note.format("impacts/blunt-hit as pale dust"))
+    # the Gold Slam's impact: every kept frame cut to their common box, the anchor on the impact point
+    slam = json.loads((OUT / "ground_slam" / "frames.json").read_text(encoding="utf-8"))
+    slams = [Image.open(OUT / "ground_slam" / slam["frames"][i]).convert("RGBA") for i in SLAM_FRAMES]
+    boxes = [b.getbbox() for b in slams if b.getbbox()]
+    sx0, sy0 = min(b[0] for b in boxes), min(b[1] for b in boxes)
+    sx1, sy1 = max(b[2] for b in boxes), max(b[3] for b in boxes)
+    sx1, sy1 = sx0 + pad8(sx1 - sx0), sy0 + pad8(sy1 - sy0)
+    for n, b in enumerate(slams, start=1):
+        cut = Image.new("RGBA", (sx1 - sx0, sy1 - sy0), (0, 0, 0, 0))
+        cut.alpha_composite(b.crop((sx0, sy0, min(sx1, b.width), min(sy1, b.height))), (0, 0))
+        write_sprite(f"fx_colossus_slam_{n}", cut, (slam["pivot"][0] - sx0, slam["pivot"][1] - sy0), symbols, note.format("impacts/ground-slam in stone and the song's blue"))
     # the stone in flight: each spin frame centred on one canvas
     stone = json.loads((OUT / "boulder" / "frames.json").read_text(encoding="utf-8"))
     spins = [Image.open(OUT / "boulder" / f).convert("RGBA") for f in stone["spin"]]
@@ -273,14 +312,20 @@ def install() -> int:
 
 
 def main() -> int:
+    """Renders the proposals (all, or with --only <name> just that one, keeping the other entries of sources.json)."""
     if "--install" in sys.argv:
         return install()
     colours = palette()
+    only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
     sources = {"what": "Effect proposals for the road Colossus, part 3b (docs/PLAN_colossus_step3.md), rendered with PixelFX and snapped "
                        "to Totoy 36 with hard alpha by tools/art/import_pixelfx.py. Review material; nothing is in the game.",
                "library": "https://github.com/patch-gg/pixelfx (MIT), the owner's clone outside this repo, commit " + COMMIT,
                "alpha_cut": ALPHA_CUT, "effects": {}}
+    if only is not None:
+        sources = json.loads((OUT / "sources.json").read_text(encoding="utf-8"))
     for name, (effect, options, flags, purpose) in EFFECTS.items():
+        if only is not None and name != only:
+            continue
         sheet, meta = render(name, effect, options, flags)
         info = meta["meta"]["pixelfx"]
         frames = []
