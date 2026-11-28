@@ -1,13 +1,14 @@
-## Step 5: effects for the five other attacks kept from the arena, in the game (2026-11-28, Claude, NOT committed)
+## Step 5: effects for the five other attacks kept from the arena, in the game (2026-11-28, Claude, committed 65476296)
 
 Owner judged real-game GIFs (`capture_5.gd -- --gifs`: each attack with its warning, the hits and the proposed effect as a mock),
 then "Wire all five". `fx_colossus_slam_1..15` installed (PixelFX ground-slam); `colossus_view.gd` plays the Slam's and each Combo
 blow's impact, stone shards round the Stomp's ring and along the Shards' lanes, pale dust trailing the Charge. Every Colossus attack
 now has its own effect. Smoke COLOSSUS OK (all ten forced attacks play their effect). The wired capture matches the mocks except for
-depth (`presentation/review/colossus_5/colossus_5_mock_vs_wired.png`). The five GIFs are 6 to 8 MB each. Details: [[PLAN_colossus_step5]].
+depth (`presentation/review/colossus_5/colossus_5_mock_vs_wired.png`). The five GIFs are 6 to 8 MB each and, with the sweep's two in-game GIFs (10 MB each), stay out of git (untracked in their folders).
+Details: [[PLAN_colossus_step5]].
 Full harness: exit 0, all 57 suites passed.
 
-## The Gold Sweep's arm swing reworked, and its dust, in the game (2026-11-28, Claude, NOT committed)
+## The Gold Sweep's arm swing reworked, and its dust, in the game (2026-11-28, Claude, committed 65476296)
 
 Owner asked for "a gif with full effect even the gold mark" (`presentation/review/colossus_sweep/capture_sweep.gd`: the real game,
 the swing and dust mocked, `colossus_sweep_in_game.gif`), then "Looks good, wire it". Wired: 89 body frames installed (only the
@@ -21,7 +22,7 @@ trail), then "Yes, rework it". `tools/art/rig_colossus.py`: arm shortening and m
 (an arc across the chest, the body twisting, a pale smear) and 2 recover frames. Before/after GIF at the real timing (and slowed):
 `presentation/review/colossus_sweep/`. Not installed or wired. Details: [[PLAN_colossus_step4]].
 
-## Step 5 proposed: effects for the six attacks kept from the arena (2026-11-28, Claude, NOT committed)
+## Step 5 proposed: effects for the six attacks kept from the arena (2026-11-28, Claude, committed 65476296)
 
 Owner: "Effects first". Gold Slam, Combo, Stomp, Sweep, Shards and Charge had only sounds and shakes. Proposed (a labelled mock
 over the real fight, `presentation/review/colossus_5/colossus_5_effects.png`): PixelFX `impacts/ground-slam` in stone with the
