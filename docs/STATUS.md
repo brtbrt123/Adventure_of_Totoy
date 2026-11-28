@@ -1,4 +1,4 @@
-## Step 4c: the Colossus's rigged body in the game (2026-11-28, Claude, NOT committed)
+## Step 4c: the Colossus's rigged body in the game (2026-11-28, Claude, committed fefb3742)
 
 Owner: "Approve, do 4c". The 86 frames are installed (`tools/art/rig_colossus.py --install`: `art/src/colossus_<set>_right_<n>.txt`,
 `presentation/explore/colossus_frames.json` with fists and chest per frame); validate, build (atlas 2048x6294), preview (26 pages),
@@ -11,7 +11,7 @@ body frame and the appearing, attacks and death playing (COLOSSUS OK); core 609 
 Full harness (`python harness/checks/run_tests.py --worktree . --timeout 400`): exit 0, all 57 suites passed. Not judged by me: how the
 body feels in motion (the owner's playtest).
 
-## Step 4b: every body frame of the Colossus (2026-11-28, Claude, NOT committed; approved)
+## Step 4b: every body frame of the Colossus (2026-11-28, Claude, committed fefb3742; approved)
 
 Owner: "Approve, do 4b" (the 4a look and the appearing approved). `tools/art/rig_colossus.py --frames` now poses all 86 frames
 (sleep 2, appear 25, idle 4, walk 6, slam 6, sweep 5, shards 4, stomp 4, charge 5, snare 4, boulder 3, grab 4, broken 2, stagger 2,
@@ -21,7 +21,7 @@ outlined stones). All frames pass the art rules. `tools/art/make_colossus_4b_rev
 `presentation/review/colossus_4b/` (PREVIEWS composited by Python). Nothing wired, no game file changed. Which attack plays which
 set, and step 4c: [[PLAN_colossus_step4]].
 
-## Step 4a: the Colossus's body rigged from the approved concept, and its appearing (2026-11-28, Claude, NOT committed; approved)
+## Step 4a: the Colossus's body rigged from the approved concept, and its appearing (2026-11-28, Claude, committed fefb3742; approved)
 
 Owner: "OKAY LETS START ALSO WE NEED AN ANIMATION WHEN HE IS APPEARING" (step 4 by the recommended way: rig the approved concept).
 New `tools/art/rig_colossus.py`: the concept's golem cut into six parts (two arms, head, two root legs, body), posed at the concept's
