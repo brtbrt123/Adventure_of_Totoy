@@ -32,6 +32,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[LAYERED_VILLAGE_FOREST]]: redoing the village and forest as layered scenes (prompts, steps)
 - [[FINAL_SCENE_chapter1]]: the chapter's final scene and boss (plan v2 with the owner's decisions): Rootcrown v2 (debug key Y, 2026-11-26) is built from the other forest scenes' own art at about the old arena's size, after the first build was rejected; next the redesigned Colossus
 - [[PLAN_colossus_step3]]: step 3, the redesigned Colossus in the road engine: the owner's decisions, numbers, build order, the victory cutscene proposal; parts 3a (2026-11-27), 3b and 3c (2026-11-28) built, so step 3 is complete: ten attacks, three phases, the Briar Ring, the PixelFX effects (captures in `presentation/review/colossus_3a/`, `colossus_3b/`, `colossus_3c/`)
+- [[PLAN_colossus_step4]]: step 4, the Colossus's real body rigged from the approved concept (`tools/art/rig_colossus.py`) and its appearing animation; 4a previews in `presentation/review/colossus_4a/`, 4b sheets and GIFs in `colossus_4b/`, 4c real captures in `colossus_4c/` (wired 2026-11-28)
 - [[STORY_ROAD_chapter1]]: draft story for the road from Lanternfen to the Stag Glade (follow the blue light); to be revised after the final-scene plan
 
 ## Art references

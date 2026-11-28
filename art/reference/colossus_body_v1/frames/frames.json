@@ -1,0 +1,1837 @@
+{
+ "frames": {
+  "colossus_sleep_right_1": {
+   "w": 128,
+   "h": 48,
+   "ax": 64,
+   "ay": 46,
+   "attach": {
+    "fist_l": [
+     -36,
+     58
+    ],
+    "fist_r": [
+     39,
+     57
+    ],
+    "chest": [
+     -1,
+     11
+    ]
+   },
+   "note": "asleep: a mossy mound"
+  },
+  "colossus_sleep_right_2": {
+   "w": 128,
+   "h": 56,
+   "ax": 64,
+   "ay": 54,
+   "attach": {
+    "fist_l": [
+     -36,
+     57
+    ],
+    "fist_r": [
+     39,
+     56
+    ],
+    "chest": [
+     -1,
+     10
+    ]
+   },
+   "note": "asleep: breathing"
+  },
+  "colossus_idle_right_1": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -14
+    ],
+    "fist_r": [
+     56,
+     -13
+    ],
+    "chest": [
+     -1,
+     -57
+    ]
+   },
+   "note": "idle"
+  },
+  "colossus_idle_right_2": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -13
+    ],
+    "fist_r": [
+     56,
+     -12
+    ],
+    "chest": [
+     -1,
+     -56
+    ]
+   },
+   "note": "idle: breath in"
+  },
+  "colossus_idle_right_3": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -52,
+     -12
+    ],
+    "fist_r": [
+     55,
+     -12
+    ],
+    "chest": [
+     -1,
+     -56
+    ]
+   },
+   "note": "idle"
+  },
+  "colossus_idle_right_4": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -13
+    ],
+    "fist_r": [
+     56,
+     -13
+    ],
+    "chest": [
+     -1,
+     -57
+    ]
+   },
+   "note": "idle: breath out"
+  },
+  "colossus_walk_right_1": {
+   "w": 160,
+   "h": 120,
+   "ax": 80,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -62,
+     -21
+    ],
+    "fist_r": [
+     55,
+     -14
+    ],
+    "chest": [
+     -2,
+     -58
+    ]
+   },
+   "note": "walk: left fist lifts"
+  },
+  "colossus_walk_right_2": {
+   "w": 152,
+   "h": 120,
+   "ax": 76,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -58,
+     -16
+    ],
+    "fist_r": [
+     55,
+     -13
+    ],
+    "chest": [
+     -2,
+     -57
+    ]
+   },
+   "note": "walk"
+  },
+  "colossus_walk_right_3": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -13
+    ],
+    "fist_r": [
+     56,
+     -12
+    ],
+    "chest": [
+     -1,
+     -56
+    ]
+   },
+   "note": "walk: plant"
+  },
+  "colossus_walk_right_4": {
+   "w": 160,
+   "h": 120,
+   "ax": 80,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -52,
+     -15
+    ],
+    "fist_r": [
+     64,
+     -19
+    ],
+    "chest": [
+     0,
+     -58
+    ]
+   },
+   "note": "walk: right fist lifts"
+  },
+  "colossus_walk_right_5": {
+   "w": 152,
+   "h": 120,
+   "ax": 76,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -52,
+     -14
+    ],
+    "fist_r": [
+     61,
+     -15
+    ],
+    "chest": [
+     0,
+     -57
+    ]
+   },
+   "note": "walk"
+  },
+  "colossus_walk_right_6": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -13
+    ],
+    "fist_r": [
+     56,
+     -12
+    ],
+    "chest": [
+     -1,
+     -56
+    ]
+   },
+   "note": "walk: plant"
+  },
+  "colossus_slam_windup_right_1": {
+   "w": 216,
+   "h": 120,
+   "ax": 108,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -85,
+     -44
+    ],
+    "fist_r": [
+     90,
+     -39
+    ],
+    "chest": [
+     -1,
+     -58
+    ]
+   },
+   "note": "Gold Slam / Combo windup"
+  },
+  "colossus_slam_windup_right_2": {
+   "w": 216,
+   "h": 120,
+   "ax": 108,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -83,
+     -96
+    ],
+    "fist_r": [
+     93,
+     -91
+    ],
+    "chest": [
+     -1,
+     -59
+    ]
+   },
+   "note": "windup"
+  },
+  "colossus_slam_windup_right_3": {
+   "w": 152,
+   "h": 144,
+   "ax": 76,
+   "ay": 142,
+   "attach": {
+    "fist_l": [
+     -44,
+     -124
+    ],
+    "fist_r": [
+     58,
+     -123
+    ],
+    "chest": [
+     -1,
+     -60
+    ]
+   },
+   "note": "windup: fists overhead"
+  },
+  "colossus_slam_strike_right_1": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -90,
+     -65
+    ],
+    "fist_r": [
+     98,
+     -60
+    ],
+    "chest": [
+     -1,
+     -56
+    ]
+   },
+   "note": "the blow falls"
+  },
+  "colossus_slam_strike_right_2": {
+   "w": 120,
+   "h": 112,
+   "ax": 60,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -32,
+     -5
+    ],
+    "fist_r": [
+     35,
+     -7
+    ],
+    "chest": [
+     -1,
+     -52
+    ]
+   },
+   "note": "the blow: fists down in front"
+  },
+  "colossus_slam_recover_right_1": {
+   "w": 128,
+   "h": 120,
+   "ax": 64,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -44,
+     -8
+    ],
+    "fist_r": [
+     46,
+     -8
+    ],
+    "chest": [
+     -1,
+     -54
+    ]
+   },
+   "note": "recover (Slam, Combo, Snare, Boulder)"
+  },
+  "colossus_sweep_windup_right_1": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -56,
+     -16
+    ],
+    "fist_r": [
+     95,
+     -44
+    ],
+    "chest": [
+     1,
+     -58
+    ]
+   },
+   "note": "Sweep windup: the right arm draws back"
+  },
+  "colossus_sweep_windup_right_2": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -59,
+     -20
+    ],
+    "fist_r": [
+     98,
+     -87
+    ],
+    "chest": [
+     2,
+     -59
+    ]
+   },
+   "note": "windup"
+  },
+  "colossus_sweep_strike_right_1": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -13
+    ],
+    "fist_r": [
+     51,
+     -11
+    ],
+    "chest": [
+     -1,
+     -56
+    ]
+   },
+   "note": "the arm swings"
+  },
+  "colossus_sweep_strike_right_2": {
+   "w": 136,
+   "h": 120,
+   "ax": 68,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -52,
+     -10
+    ],
+    "fist_r": [
+     3,
+     -23
+    ],
+    "chest": [
+     -4,
+     -55
+    ]
+   },
+   "note": "across the body"
+  },
+  "colossus_sweep_recover_right_1": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -54,
+     -13
+    ],
+    "fist_r": [
+     31,
+     -11
+    ],
+    "chest": [
+     -2,
+     -56
+    ]
+   },
+   "note": "recover"
+  },
+  "colossus_shards_windup_right_1": {
+   "w": 200,
+   "h": 120,
+   "ax": 100,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -77,
+     -31
+    ],
+    "fist_r": [
+     81,
+     -28
+    ],
+    "chest": [
+     -1,
+     -58
+    ]
+   },
+   "note": "Shards / Song Flare windup: the chest opens"
+  },
+  "colossus_shards_windup_right_2": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -88,
+     -55
+    ],
+    "fist_r": [
+     94,
+     -50
+    ],
+    "chest": [
+     -1,
+     -60
+    ]
+   },
+   "note": "windup"
+  },
+  "colossus_shards_strike_right_1": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -89,
+     -77
+    ],
+    "fist_r": [
+     98,
+     -72
+    ],
+    "chest": [
+     -1,
+     -58
+    ]
+   },
+   "note": "the song bursts out"
+  },
+  "colossus_shards_recover_right_1": {
+   "w": 184,
+   "h": 120,
+   "ax": 92,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -70,
+     -23
+    ],
+    "fist_r": [
+     74,
+     -21
+    ],
+    "chest": [
+     -1,
+     -57
+    ]
+   },
+   "note": "recover"
+  },
+  "colossus_stomp_windup_right_1": {
+   "w": 192,
+   "h": 120,
+   "ax": 96,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -74,
+     -30
+    ],
+    "fist_r": [
+     78,
+     -27
+    ],
+    "chest": [
+     -1,
+     -60
+    ]
+   },
+   "note": "Stomp windup: it rears up"
+  },
+  "colossus_stomp_windup_right_2": {
+   "w": 208,
+   "h": 128,
+   "ax": 104,
+   "ay": 126,
+   "attach": {
+    "fist_l": [
+     -83,
+     -44
+    ],
+    "fist_r": [
+     88,
+     -40
+    ],
+    "chest": [
+     -1,
+     -63
+    ]
+   },
+   "note": "windup"
+  },
+  "colossus_stomp_strike_right_1": {
+   "w": 176,
+   "h": 112,
+   "ax": 88,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -66,
+     -16
+    ],
+    "fist_r": [
+     69,
+     -14
+    ],
+    "chest": [
+     -1,
+     -53
+    ]
+   },
+   "note": "the stomp"
+  },
+  "colossus_stomp_recover_right_1": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -12
+    ],
+    "fist_r": [
+     56,
+     -11
+    ],
+    "chest": [
+     -1,
+     -55
+    ]
+   },
+   "note": "recover"
+  },
+  "colossus_charge_windup_right_1": {
+   "w": 192,
+   "h": 120,
+   "ax": 96,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -74,
+     -24
+    ],
+    "fist_r": [
+     78,
+     -21
+    ],
+    "chest": [
+     -1,
+     -54
+    ]
+   },
+   "note": "Charge windup: it crouches"
+  },
+  "colossus_charge_windup_right_2": {
+   "w": 208,
+   "h": 112,
+   "ax": 104,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -83,
+     -33
+    ],
+    "fist_r": [
+     88,
+     -29
+    ],
+    "chest": [
+     -1,
+     -52
+    ]
+   },
+   "note": "windup"
+  },
+  "colossus_charge_run_right_1": {
+   "w": 120,
+   "h": 120,
+   "ax": 60,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -39,
+     -7
+    ],
+    "fist_r": [
+     42,
+     -8
+    ],
+    "chest": [
+     -1,
+     -54
+    ]
+   },
+   "note": "the charge"
+  },
+  "colossus_charge_run_right_2": {
+   "w": 128,
+   "h": 120,
+   "ax": 64,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -44,
+     -9
+    ],
+    "fist_r": [
+     46,
+     -9
+    ],
+    "chest": [
+     -1,
+     -55
+    ]
+   },
+   "note": "the charge"
+  },
+  "colossus_charge_recover_right_1": {
+   "w": 136,
+   "h": 120,
+   "ax": 68,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -49,
+     -10
+    ],
+    "fist_r": [
+     51,
+     -10
+    ],
+    "chest": [
+     -1,
+     -55
+    ]
+   },
+   "note": "recover"
+  },
+  "colossus_snare_windup_right_1": {
+   "w": 184,
+   "h": 128,
+   "ax": 92,
+   "ay": 126,
+   "attach": {
+    "fist_l": [
+     -79,
+     -104
+    ],
+    "fist_r": [
+     54,
+     -15
+    ],
+    "chest": [
+     -3,
+     -59
+    ]
+   },
+   "note": "Root Snare windup: a fist rises"
+  },
+  "colossus_snare_windup_right_2": {
+   "w": 216,
+   "h": 120,
+   "ax": 108,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -28,
+     -11
+    ],
+    "fist_r": [
+     90,
+     -99
+    ],
+    "chest": [
+     0,
+     -58
+    ]
+   },
+   "note": "the second lane: the other fist"
+  },
+  "colossus_snare_strike_right_1": {
+   "w": 144,
+   "h": 112,
+   "ax": 72,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -31,
+     -6
+    ],
+    "fist_r": [
+     54,
+     -9
+    ],
+    "chest": [
+     -3,
+     -53
+    ]
+   },
+   "note": "the fist drives into the ground"
+  },
+  "colossus_snare_strike_right_2": {
+   "w": 120,
+   "h": 112,
+   "ax": 60,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -29,
+     -5
+    ],
+    "fist_r": [
+     32,
+     -7
+    ],
+    "chest": [
+     -1,
+     -52
+    ]
+   },
+   "note": "and the other"
+  },
+  "colossus_boulder_windup_right_1": {
+   "w": 112,
+   "h": 112,
+   "ax": 56,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -25,
+     -5
+    ],
+    "fist_r": [
+     27,
+     -7
+    ],
+    "chest": [
+     -1,
+     -51
+    ]
+   },
+   "note": "Boulder Toss: it tears up a stone"
+  },
+  "colossus_boulder_windup_right_2": {
+   "w": 120,
+   "h": 144,
+   "ax": 60,
+   "ay": 142,
+   "attach": {
+    "fist_l": [
+     -29,
+     -125
+    ],
+    "fist_r": [
+     44,
+     -125
+    ],
+    "chest": [
+     -1,
+     -60
+    ]
+   },
+   "note": "lifts it overhead"
+  },
+  "colossus_boulder_strike_right_1": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -89,
+     -54
+    ],
+    "fist_r": [
+     96,
+     -50
+    ],
+    "chest": [
+     -1,
+     -55
+    ]
+   },
+   "note": "and throws"
+  },
+  "colossus_grab_windup_right_1": {
+   "w": 232,
+   "h": 120,
+   "ax": 116,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -51,
+     -15
+    ],
+    "fist_r": [
+     98,
+     -53
+    ],
+    "chest": [
+     1,
+     -58
+    ]
+   },
+   "note": "Heartroot Grab windup"
+  },
+  "colossus_grab_windup_right_2": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -63,
+     -22
+    ],
+    "fist_r": [
+     96,
+     -91
+    ],
+    "chest": [
+     2,
+     -59
+    ]
+   },
+   "note": "windup"
+  },
+  "colossus_grab_strike_right_1": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -55,
+     -12
+    ],
+    "fist_r": [
+     25,
+     -11
+    ],
+    "chest": [
+     -3,
+     -55
+    ]
+   },
+   "note": "it lunges"
+  },
+  "colossus_grab_recover_right_1": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -13
+    ],
+    "fist_r": [
+     46,
+     -10
+    ],
+    "chest": [
+     -1,
+     -56
+    ]
+   },
+   "note": "recover"
+  },
+  "colossus_broken_right_1": {
+   "w": 136,
+   "h": 112,
+   "ax": 68,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -48,
+     -5
+    ],
+    "fist_r": [
+     50,
+     -5
+    ],
+    "chest": [
+     -1,
+     -50
+    ]
+   },
+   "note": "posture broken"
+  },
+  "colossus_broken_right_2": {
+   "w": 136,
+   "h": 112,
+   "ax": 68,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -48,
+     -5
+    ],
+    "fist_r": [
+     50,
+     -5
+    ],
+    "chest": [
+     -1,
+     -50
+    ]
+   },
+   "note": "posture broken: the song flickers"
+  },
+  "colossus_stagger_right_1": {
+   "w": 136,
+   "h": 120,
+   "ax": 68,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -51,
+     -9
+    ],
+    "fist_r": [
+     51,
+     -9
+    ],
+    "chest": [
+     -2,
+     -54
+    ]
+   },
+   "note": "stagger (Reaper\u2019s Coil)"
+  },
+  "colossus_stagger_right_2": {
+   "w": 136,
+   "h": 120,
+   "ax": 68,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -47,
+     -9
+    ],
+    "fist_r": [
+     51,
+     -9
+    ],
+    "chest": [
+     0,
+     -54
+    ]
+   },
+   "note": "stagger"
+  },
+  "colossus_roar_right_1": {
+   "w": 208,
+   "h": 128,
+   "ax": 104,
+   "ay": 126,
+   "attach": {
+    "fist_l": [
+     -74,
+     -108
+    ],
+    "fist_r": [
+     86,
+     -104
+    ],
+    "chest": [
+     -1,
+     -59
+    ]
+   },
+   "note": "roar (and the Song Flare gold blow)"
+  },
+  "colossus_roar_right_2": {
+   "w": 192,
+   "h": 136,
+   "ax": 96,
+   "ay": 134,
+   "attach": {
+    "fist_l": [
+     -66,
+     -115
+    ],
+    "fist_r": [
+     79,
+     -112
+    ],
+    "chest": [
+     -1,
+     -60
+    ]
+   },
+   "note": "roar"
+  },
+  "colossus_death_right_1": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -89,
+     -58
+    ],
+    "fist_r": [
+     96,
+     -54
+    ],
+    "chest": [
+     -1,
+     -59
+    ]
+   },
+   "note": "death: the last blow, the song flares"
+  },
+  "colossus_death_right_2": {
+   "w": 184,
+   "h": 120,
+   "ax": 92,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -70,
+     -20
+    ],
+    "fist_r": [
+     74,
+     -18
+    ],
+    "chest": [
+     -1,
+     -54
+    ]
+   },
+   "note": "it sags"
+  },
+  "colossus_death_right_3": {
+   "w": 136,
+   "h": 112,
+   "ax": 68,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -50,
+     3
+    ],
+    "fist_r": [
+     37,
+     4
+    ],
+    "chest": [
+     -1,
+     -51
+    ]
+   },
+   "note": "the arms break off"
+  },
+  "colossus_death_right_4": {
+   "w": 232,
+   "h": 104,
+   "ax": 116,
+   "ay": 102,
+   "attach": {
+    "fist_l": [
+     -94,
+     -8
+    ],
+    "fist_r": [
+     102,
+     -3
+    ],
+    "chest": [
+     -1,
+     -43
+    ]
+   },
+   "note": "the arms fall, the head topples"
+  },
+  "colossus_death_right_5": {
+   "w": 224,
+   "h": 88,
+   "ax": 112,
+   "ay": 86,
+   "attach": {
+    "fist_l": [
+     -94,
+     8
+    ],
+    "fist_r": [
+     102,
+     13
+    ],
+    "chest": [
+     -1,
+     -27
+    ]
+   },
+   "note": "it breaks apart"
+  },
+  "colossus_death_right_6": {
+   "w": 104,
+   "h": 72,
+   "ax": 52,
+   "ay": 70,
+   "attach": {
+    "fist_l": [
+     -94,
+     24
+    ],
+    "fist_r": [
+     102,
+     29
+    ],
+    "chest": [
+     -1,
+     -13
+    ]
+   },
+   "note": "sinking into stone and moss"
+  },
+  "colossus_death_right_7": {
+   "w": 104,
+   "h": 64,
+   "ax": 52,
+   "ay": 62,
+   "attach": {
+    "fist_l": [
+     -94,
+     38
+    ],
+    "fist_r": [
+     102,
+     43
+    ],
+    "chest": [
+     -1,
+     -1
+    ]
+   },
+   "note": "rubble"
+  },
+  "colossus_death_right_8": {
+   "w": 112,
+   "h": 24,
+   "ax": 56,
+   "ay": 22,
+   "attach": {
+    "fist_l": [
+     -94,
+     42
+    ],
+    "fist_r": [
+     102,
+     47
+    ],
+    "chest": [
+     -1,
+     3
+    ]
+   },
+   "note": "a heap of rubble"
+  },
+  "colossus_appear_right_1": {
+   "w": 128,
+   "h": 56,
+   "ax": 64,
+   "ay": 54,
+   "attach": {
+    "fist_l": [
+     -36,
+     56
+    ],
+    "fist_r": [
+     39,
+     55
+    ],
+    "chest": [
+     -1,
+     9
+    ]
+   },
+   "note": "the song wakes in the moss"
+  },
+  "colossus_appear_right_2": {
+   "w": 136,
+   "h": 56,
+   "ax": 68,
+   "ay": 54,
+   "attach": {
+    "fist_l": [
+     -78,
+     32
+    ],
+    "fist_r": [
+     39,
+     52
+    ],
+    "chest": [
+     -1,
+     6
+    ]
+   },
+   "note": "a fist bursts out (in-between)"
+  },
+  "colossus_appear_right_3": {
+   "w": 208,
+   "h": 64,
+   "ax": 104,
+   "ay": 62,
+   "attach": {
+    "fist_l": [
+     -89,
+     -16
+    ],
+    "fist_r": [
+     39,
+     48
+    ],
+    "chest": [
+     -1,
+     2
+    ]
+   },
+   "note": "a fist bursts out (in-between)"
+  },
+  "colossus_appear_right_4": {
+   "w": 152,
+   "h": 80,
+   "ax": 76,
+   "ay": 78,
+   "attach": {
+    "fist_l": [
+     -64,
+     -58
+    ],
+    "fist_r": [
+     39,
+     45
+    ],
+    "chest": [
+     -1,
+     -1
+    ]
+   },
+   "note": "a fist bursts out"
+  },
+  "colossus_appear_right_5": {
+   "w": 176,
+   "h": 72,
+   "ax": 88,
+   "ay": 70,
+   "attach": {
+    "fist_l": [
+     -76,
+     -50
+    ],
+    "fist_r": [
+     82,
+     27
+    ],
+    "chest": [
+     -1,
+     -3
+    ]
+   },
+   "note": "then the other (in-between)"
+  },
+  "colossus_appear_right_6": {
+   "w": 224,
+   "h": 64,
+   "ax": 112,
+   "ay": 62,
+   "attach": {
+    "fist_l": [
+     -84,
+     -39
+    ],
+    "fist_r": [
+     98,
+     -18
+    ],
+    "chest": [
+     -1,
+     -5
+    ]
+   },
+   "note": "then the other (in-between)"
+  },
+  "colossus_appear_right_7": {
+   "w": 208,
+   "h": 80,
+   "ax": 104,
+   "ay": 78,
+   "attach": {
+    "fist_l": [
+     -89,
+     -26
+    ],
+    "fist_r": [
+     77,
+     -61
+    ],
+    "chest": [
+     -1,
+     -7
+    ]
+   },
+   "note": "then the other"
+  },
+  "colossus_appear_right_8": {
+   "w": 224,
+   "h": 72,
+   "ax": 112,
+   "ay": 70,
+   "attach": {
+    "fist_l": [
+     -90,
+     -14
+    ],
+    "fist_r": [
+     95,
+     -39
+    ],
+    "chest": [
+     -1,
+     -10
+    ]
+   },
+   "note": "it plants both fists (in-between)"
+  },
+  "colossus_appear_right_9": {
+   "w": 232,
+   "h": 72,
+   "ax": 116,
+   "ay": 70,
+   "attach": {
+    "fist_l": [
+     -87,
+     -1
+    ],
+    "fist_r": [
+     97,
+     -12
+    ],
+    "chest": [
+     -1,
+     -12
+    ]
+   },
+   "note": "it plants both fists (in-between)"
+  },
+  "colossus_appear_right_10": {
+   "w": 200,
+   "h": 80,
+   "ax": 100,
+   "ay": 78,
+   "attach": {
+    "fist_l": [
+     -80,
+     9
+    ],
+    "fist_r": [
+     84,
+     12
+    ],
+    "chest": [
+     -1,
+     -15
+    ]
+   },
+   "note": "it plants both fists"
+  },
+  "colossus_appear_right_11": {
+   "w": 200,
+   "h": 80,
+   "ax": 100,
+   "ay": 78,
+   "attach": {
+    "fist_l": [
+     -77,
+     8
+    ],
+    "fist_r": [
+     81,
+     11
+    ],
+    "chest": [
+     -1,
+     -19
+    ]
+   },
+   "note": "and pulls itself up (in-between)"
+  },
+  "colossus_appear_right_12": {
+   "w": 192,
+   "h": 88,
+   "ax": 96,
+   "ay": 86,
+   "attach": {
+    "fist_l": [
+     -75,
+     7
+    ],
+    "fist_r": [
+     78,
+     10
+    ],
+    "chest": [
+     -1,
+     -23
+    ]
+   },
+   "note": "and pulls itself up (in-between)"
+  },
+  "colossus_appear_right_13": {
+   "w": 192,
+   "h": 88,
+   "ax": 96,
+   "ay": 86,
+   "attach": {
+    "fist_l": [
+     -72,
+     5
+    ],
+    "fist_r": [
+     75,
+     8
+    ],
+    "chest": [
+     -1,
+     -27
+    ]
+   },
+   "note": "and pulls itself up"
+  },
+  "colossus_appear_right_14": {
+   "w": 192,
+   "h": 96,
+   "ax": 96,
+   "ay": 94,
+   "attach": {
+    "fist_l": [
+     -69,
+     3
+    ],
+    "fist_r": [
+     73,
+     6
+    ],
+    "chest": [
+     -1,
+     -31
+    ]
+   },
+   "note": "roots tear free (in-between)"
+  },
+  "colossus_appear_right_15": {
+   "w": 184,
+   "h": 96,
+   "ax": 92,
+   "ay": 94,
+   "attach": {
+    "fist_l": [
+     -67,
+     1
+    ],
+    "fist_r": [
+     70,
+     4
+    ],
+    "chest": [
+     -1,
+     -35
+    ]
+   },
+   "note": "roots tear free (in-between)"
+  },
+  "colossus_appear_right_16": {
+   "w": 184,
+   "h": 104,
+   "ax": 92,
+   "ay": 102,
+   "attach": {
+    "fist_l": [
+     -64,
+     -1
+    ],
+    "fist_r": [
+     67,
+     1
+    ],
+    "chest": [
+     -1,
+     -39
+    ]
+   },
+   "note": "roots tear free"
+  },
+  "colossus_appear_right_17": {
+   "w": 176,
+   "h": 104,
+   "ax": 88,
+   "ay": 102,
+   "attach": {
+    "fist_l": [
+     -62,
+     -4
+    ],
+    "fist_r": [
+     65,
+     -2
+    ],
+    "chest": [
+     -1,
+     -43
+    ]
+   },
+   "note": "almost out (in-between)"
+  },
+  "colossus_appear_right_18": {
+   "w": 176,
+   "h": 112,
+   "ax": 88,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -60,
+     -5
+    ],
+    "fist_r": [
+     63,
+     -4
+    ],
+    "chest": [
+     -1,
+     -46
+    ]
+   },
+   "note": "almost out (in-between)"
+  },
+  "colossus_appear_right_19": {
+   "w": 168,
+   "h": 112,
+   "ax": 84,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -58,
+     -8
+    ],
+    "fist_r": [
+     61,
+     -7
+    ],
+    "chest": [
+     -1,
+     -50
+    ]
+   },
+   "note": "almost out"
+  },
+  "colossus_appear_right_20": {
+   "w": 160,
+   "h": 112,
+   "ax": 80,
+   "ay": 110,
+   "attach": {
+    "fist_l": [
+     -56,
+     -10
+    ],
+    "fist_r": [
+     59,
+     -9
+    ],
+    "chest": [
+     -1,
+     -52
+    ]
+   },
+   "note": "standing (in-between)"
+  },
+  "colossus_appear_right_21": {
+   "w": 160,
+   "h": 120,
+   "ax": 80,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -55,
+     -12
+    ],
+    "fist_r": [
+     58,
+     -11
+    ],
+    "chest": [
+     -1,
+     -55
+    ]
+   },
+   "note": "standing (in-between)"
+  },
+  "colossus_appear_right_22": {
+   "w": 144,
+   "h": 120,
+   "ax": 72,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -53,
+     -14
+    ],
+    "fist_r": [
+     56,
+     -13
+    ],
+    "chest": [
+     -1,
+     -57
+    ]
+   },
+   "note": "standing"
+  },
+  "colossus_appear_right_23": {
+   "w": 208,
+   "h": 120,
+   "ax": 104,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -82,
+     -38
+    ],
+    "fist_r": [
+     87,
+     -34
+    ],
+    "chest": [
+     -1,
+     -58
+    ]
+   },
+   "note": "it roars (in-between)"
+  },
+  "colossus_appear_right_24": {
+   "w": 224,
+   "h": 120,
+   "ax": 112,
+   "ay": 118,
+   "attach": {
+    "fist_l": [
+     -90,
+     -74
+    ],
+    "fist_r": [
+     98,
+     -69
+    ],
+    "chest": [
+     -1,
+     -58
+    ]
+   },
+   "note": "it roars (in-between)"
+  },
+  "colossus_appear_right_25": {
+   "w": 208,
+   "h": 128,
+   "ax": 104,
+   "ay": 126,
+   "attach": {
+    "fist_l": [
+     -74,
+     -108
+    ],
+    "fist_r": [
+     86,
+     -104
+    ],
+    "chest": [
+     -1,
+     -59
+    ]
+   },
+   "note": "it roars"
+  }
+ },
+ "appear_ticks": [
+  0,
+  16,
+  19,
+  24,
+  40,
+  43,
+  48,
+  62,
+  66,
+  72,
+  75,
+  80,
+  88,
+  90,
+  95,
+  102,
+  104,
+  108,
+  114,
+  116,
+  119,
+  124,
+  126,
+  129,
+  134
+ ]
+}

@@ -1,8 +1,9 @@
 extends RefCounted
-## How the road's Mossbound Colossus is drawn (docs/PLAN_colossus_step3.md, part 3a, the owner's choices of 2026-11-27): the
-## STAND-IN body (one still, art/src/colossus_idle_right_1.txt) moved per state, the fight camera that keeps it whole on screen, the
-## hero's outline when he walks behind it, the glowing edges of its warnings, its chest light, and the sounds, shake and dust of
-## its blows. It reads the snapshot only: the core (core/colossus.gd) decides every hit and time.
+## How the road's Mossbound Colossus is drawn (docs/PLAN_colossus_step3.md, the owner's choices of 2026-11-27; its body since step 4,
+## docs/PLAN_colossus_step4.md): the rigged body frames (tools/art/rig_colossus.py, approved 2026-11-28) picked per state and attack,
+## its appearing, the fight camera that keeps it whole on screen, the hero's outline when he walks behind it, the glowing edges of
+## its warnings, its chest light, and the sounds, shake and dust of its blows. It reads the snapshot only: the core
+## (core/colossus.gd) decides every hit and time.
 const ExploreCore := preload("res://core/explore_core.gd")
 const Snapshots := preload("res://core/snapshots.gd")
 const Tuning := preload("res://core/tuning.gd")
@@ -12,16 +13,58 @@ const WHITE := preload("res://art/build/sprites_white.png")
 const Fireflies := preload("res://presentation/common/ambient_fireflies.gd")
 
 const TYPE: StringName = &"colossus"
-const FRAME: String = "colossus_idle_right_1"
-const HEIGHT: float = 116.0  # the stand-in's visible height (the owner's choice B)
-const CHEST: float = 53.0  # the song's light above the feet
-const ASLEEP_SINK: int = 46  # rows sunk into the ground while it sleeps (it rises out of it)
+const FRAME: String = "colossus_idle_right_1"  # the standing frame: the camera and the hero's outline test use its size, every pose
+const HEIGHT: float = 116.0  # its visible height standing (the owner's choice B)
+const CHEST: float = 57.0  # the song's light above the feet, standing (colossus_frames.json has it per frame)
+## The body (step 4, the owner's "Approve, do 4c", 2026-11-28): frames colossus_<set>_right_<n>, generated with the fists' and chest's
+## points per frame and the appearing's ticks in colossus_frames.json. COUNTS is every set; ATTACK_SETS says which sets each attack
+## plays (attacks that move alike share them).
+const BODY: String = "colossus_%s_right_%d"
+const FRAMES_DATA: String = "res://presentation/explore/colossus_frames.json"
+const COUNTS: Dictionary = {"sleep": 2, "idle": 4, "walk": 6, "slam_windup": 3, "slam_strike": 2, "slam_recover": 1, "sweep_windup": 2,
+	"sweep_strike": 2, "sweep_recover": 1, "shards_windup": 2, "shards_strike": 1, "shards_recover": 1, "stomp_windup": 2, "stomp_strike": 1,
+	"stomp_recover": 1, "charge_windup": 2, "charge_run": 2, "charge_recover": 1, "snare_windup": 2, "snare_strike": 2, "boulder_windup": 2,
+	"boulder_strike": 1, "grab_windup": 2, "grab_strike": 1, "grab_recover": 1, "broken": 2, "stagger": 2, "roar": 2, "death": 8}
+const ATTACK_SETS: Dictionary = {
+	&"gold_slam": {"windup": "slam_windup", "strike": "slam_strike", "recover": "slam_recover"},
+	&"gold_combo": {"windup": "slam_windup", "strike": "slam_strike", "recover": "slam_recover"},
+	&"red_sweep": {"windup": "sweep_windup", "strike": "sweep_strike", "recover": "sweep_recover"},
+	&"red_shards": {"windup": "shards_windup", "strike": "shards_strike", "recover": "shards_recover"},
+	&"red_stomp": {"windup": "stomp_windup", "strike": "stomp_strike", "recover": "stomp_recover"},
+	&"red_charge": {"windup": "charge_windup", "strike": "charge_run", "recover": "charge_recover"},
+	&"root_snare": {"windup": "snare_windup", "strike": "snare_strike", "recover": "slam_recover"},
+	&"boulder_toss": {"windup": "boulder_windup", "strike": "boulder_strike", "recover": "slam_recover"},
+	&"heartroot_grab": {"windup": "grab_windup", "strike": "grab_strike", "recover": "grab_recover"},
+	&"song_flare": {"windup": "shards_windup", "strike": "shards_strike", "recover": "shards_recover"},
+}
+const SLEEP_TICKS: int = 40  # asleep it breathes this slowly (on the simulation tick: its state_ticks stay 0)
+const IDLE_TICKS: int = 12
+const WALK_TICKS: int = 8
+const BROKEN_TICKS: int = 8  # the song flickers while the posture is broken
+const STAGGER_TICKS: int = 4
+const ROAR_TICKS: int = 6
+const DEATH_TICKS: int = 5  # 8 frames in the 40 ticks it stays dead in the snapshot
+const WINDUP_SPREAD: float = 0.75  # the windup frames play over this share of a warning; the last holds, trembling from TREMBLE
+const TREMBLE: float = 0.8
+const FALL_TICKS: int = 3  # the falling frame (a set's first strike frame, when it has two) shows this many ticks before the blow
+const IMPACT_HOLD: int = 10  # between a combo's blows the impact holds this long before it raises its fists again
+const RECOVER_HOLD: int = 16  # the recover frame, then standing
+## The Boulder Toss: it tears the stone up, holds it overhead until BOULDER_THROW of the warning, then throws; the stone lands on the
+## warned circle on the tick it strikes (the flight is drawn shorter, the warning and its timing are the core's).
+const BOULDER_RIP: float = 0.2
+const BOULDER_THROW: float = 0.45
+## The appearing (state alert): the body shakes while it breaks out, and at these alert ticks the floor breaks: stone shards where a
+## fist bursts out, dust where both fists plant ([tick, x from its feet, kind, with a stomp and a shake]).
+const APPEAR_SHAKE: Vector2i = Vector2i(14, 76)
+const APPEAR_CUES: Array = [[20, -44.0, &"burst", true], [22, -32.0, &"burst", false], [24, -54.0, &"burst", false],
+	[44, 44.0, &"burst", true], [46, 32.0, &"burst", false], [48, 54.0, &"burst", false], [70, -60.0, &"dust", true], [70, 60.0, &"dust", false]]
 const VIEW: Vector2 = Vector2(384, 216)
 ## The fight camera: how near each screen edge the hero may get, and how fast the view slides when the fight starts or ends.
 const HERO_SIDE: float = 28.0
 const HERO_TOP: float = 44.0
 const HERO_BOTTOM: float = 20.0
 const SNAP_DISTANCE: float = 160.0  # a jump this far (a respawn) is not eased
+const REACH: Vector2 = Vector2(116, 142)  # its widest and tallest poses round its feet (fists flung wide, fists overhead)
 const OUTLINE: Color = Color("e0f0ec")  # water_6
 const CHEST_COLOUR: Vector3 = Vector3(0.36, 0.82, 1.0)
 const CHEST_CORE: Vector3 = Vector3(0.80, 0.96, 1.0)
@@ -57,7 +100,8 @@ const STONE_SPIN: String = "fx_colossus_stone_spin_%d"
 const STONE_SPIN_COUNT: int = 18
 const STONE_LAND: String = "fx_colossus_stone_land_%d"
 const STONE_LAND_COUNT: int = 21
-const STONE_FROM: Vector2 = Vector2(0, -96)  # where the stone leaves its raised hands, from its feet
+const APPEAR_DUST_FRAMES: int = 10  # the stone landing before its ring spreads
+const STONE_HELD: String = "colossus_boulder_windup_right_2"  # the frame that holds the stone overhead, between its fists
 const STONE_ARC: float = 70.0  # how high the throw rises above the straight line
 const FRAME_TICKS: int = 4
 ## The Heartroot Grab's root-arm (PixelFX nature/vine-whip, the owner's "Yes, wire it", 2026-11-28): rendered every 15 degrees from -90
@@ -76,7 +120,12 @@ var _atlas_image: Image = null
 var _last_tick: int = -1
 ## Effects still playing after their blow: {kind (&"thorns", &"land", &"shards" or &"arm"), tick (the blow), at, direction, size, radius}.
 var effects: Array[Dictionary] = []
-var missing: Dictionary = {}  # effect frames asked for but not in the atlas (warned once)
+var missing: Dictionary = {}  # body and effect frames asked for but not in the atlas (warned once)
+var _appear_seen: Dictionary = {}  # APPEAR_CUES index -> true once played this waking
+var _body_tick: int = -1
+var _body_at: Vector2 = Vector2.INF
+var _walking: bool = false
+static var _data: Dictionary = {}
 
 
 func clear() -> void:
@@ -84,6 +133,10 @@ func clear() -> void:
 	_previous.clear()
 	_last_tick = -1
 	effects.clear()
+	_appear_seen.clear()
+	_body_tick = -1
+	_body_at = Vector2.INF
+	_walking = false
 
 
 ## Every effect frame this view may ask for (smoke_colossus checks they are all in the atlas).
@@ -206,6 +259,14 @@ func effect_items(view: ExploreCore.ExploreSnapshot, tint: Color) -> Array[Dicti
 			var b: int = _burst_frame(age)
 			if b > 0:
 				out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d" % i, "at": Vector2(e["at"]).round(), "frame": SONG_BURST % b, "tint": tint})
+		elif e["kind"] == &"burst":  # the appearing: stone shards where a fist breaks out of the floor
+			var n: int = floori(float(age) / FRAME_TICKS) + 1
+			if n >= 1 and n <= THORN_COUNT:
+				out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d" % i, "at": Vector2(e["at"]).round(), "frame": SHARD % n, "tint": tint})
+		elif e["kind"] == &"dust":  # the appearing: dust where its fists plant (the stone landing's first, dust-only frames)
+			var n: int = age / 2 + 1
+			if n >= 1 and n <= APPEAR_DUST_FRAMES:
+				out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d" % i, "at": Vector2(e["at"]).round(), "frame": STONE_LAND % n, "tint": tint})
 		elif e["kind"] == &"shards":  # stone shards burst up round the ring of shock, over its whole band
 			for k: int in SHARDS:
 				var n: int = floori(float(age - k % 3 + THORN_LEAD) / FRAME_TICKS) + 1
@@ -224,6 +285,10 @@ static func _lifetime(e: Dictionary) -> int:
 		return THORN_COUNT * FRAME_TICKS + int(float(e["size"]) / THORN_SPACING) + 1
 	if e["kind"] == &"shards" or e["kind"] == &"song_ring":
 		return THORN_COUNT * FRAME_TICKS + 3
+	if e["kind"] == &"burst":
+		return THORN_COUNT * FRAME_TICKS
+	if e["kind"] == &"dust":
+		return APPEAR_DUST_FRAMES * 2
 	if e["kind"] == &"song_burst":
 		return (SONG_BURST_FIRST + SONG_BURST_COUNT * 2 - SONG_BURST_LASH) * 2
 	if e["kind"] == &"arm":
@@ -244,15 +309,21 @@ func draw_effect(canvas: CanvasItem, item: Dictionary, frames: Dictionary, sprit
 	canvas.draw_texture_rect_region(sprites, rect, Rect2(f["x"], f["y"], f["w"], f["h"]), item["tint"])
 
 
-## The stone of a Boulder Toss in the air: it leaves the raised hands as the warning begins and spins along an arc onto the warned
-## circle, landing on the tick the warning strikes. Its shadow on the floor grows as it falls (draw_stone_shadows, under the actors).
+## The stone of a Boulder Toss: held overhead between its fists, then thrown along an arc onto the warned circle, landing on the
+## tick the warning strikes. Its shadow on the floor grows as it falls (stone_shadows, under the actors).
 func draw_stones(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: Dictionary, sprites: Texture2D, tint: Color) -> void:
 	for t: Snapshots.TelegraphSnapshot in view.telegraphs:
 		if t.attack != &"boulder_toss" or t.shape != &"circle" or view.tick >= t.hit_tick:
 			continue
-		var progress: float = clampf(float(view.tick - t.start_tick) / maxf(1.0, float(t.hit_tick - t.start_tick)), 0.0, 1.0)
-		var from: Vector2 = t.muzzle + STONE_FROM
-		var at: Vector2 = from.lerp(t.center, progress) + Vector2(0, -sin(progress * PI) * STONE_ARC)
+		var progress: float = _warned(t, view.tick)
+		if progress < BOULDER_RIP:
+			continue
+		var held: Vector2 = t.muzzle + (attach(STONE_HELD, "fist_l") + attach(STONE_HELD, "fist_r")) * 0.5 + Vector2(0, -4)
+		if progress < BOULDER_THROW:
+			draw_effect(canvas, {"at": held, "frame": STONE_SPIN % 1, "tint": tint}, frames, sprites)
+			continue
+		var flight: float = (progress - BOULDER_THROW) / (1.0 - BOULDER_THROW)
+		var at: Vector2 = held.lerp(t.center, flight) + Vector2(0, -sin(flight * PI) * STONE_ARC)
 		var n: int = posmod(view.tick / 2, STONE_SPIN_COUNT) + 1
 		draw_effect(canvas, {"at": at, "frame": STONE_SPIN % n, "tint": tint}, frames, sprites)
 
@@ -260,10 +331,15 @@ func draw_stones(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, frames: 
 func stone_shadows(view: ExploreCore.ExploreSnapshot) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for t: Snapshots.TelegraphSnapshot in view.telegraphs:
-		if t.attack == &"boulder_toss" and t.shape == &"circle" and view.tick < t.hit_tick:
-			var progress: float = clampf(float(view.tick - t.start_tick) / maxf(1.0, float(t.hit_tick - t.start_tick)), 0.0, 1.0)
-			out.append({"at": t.center, "radius": 4.0 + 12.0 * progress})
+		if t.attack == &"boulder_toss" and t.shape == &"circle" and view.tick < t.hit_tick and _warned(t, view.tick) >= BOULDER_THROW:
+			var flight: float = (_warned(t, view.tick) - BOULDER_THROW) / (1.0 - BOULDER_THROW)
+			out.append({"at": t.center, "radius": 4.0 + 12.0 * flight})
 	return out
+
+
+## How far a warning has run, 0 at its start to 1 when it strikes.
+static func _warned(t: Snapshots.TelegraphSnapshot, tick: int) -> float:
+	return clampf(float(tick - t.start_tick) / maxf(1.0, float(t.hit_tick - t.start_tick)), 0.0, 1.0)
 
 
 static func is_colossus(mob: Dictionary) -> bool:
@@ -288,70 +364,186 @@ static func fighting(view: ExploreCore.ExploreSnapshot) -> Dictionary:
 
 # ---- the body ---------------------------------------------------------------------------------------------------------------
 
-## The pose of the still for this tick: {offset (px), sink (rows below the ground), dim (0..1 darker)}.
-static func pose(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> Dictionary:
+## The data of the generated frames (fists and chest per frame, the appearing's ticks), read once.
+static func data() -> Dictionary:
+	if _data.is_empty():
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(FRAMES_DATA))
+		_data = parsed if parsed is Dictionary else {"appear_ticks": [0], "attach": {}}
+	return _data
+
+
+## A frame's point (`fist_l`, `fist_r` or `chest`) in pixels from its feet; the standing chest when the frame has none.
+static func attach(frame: String, point: String) -> Vector2:
+	var pair: Variant = data()["attach"].get(frame, {}).get(point, null)
+	return Vector2(float(pair[0]), float(pair[1])) if pair is Array else Vector2(0, -CHEST)
+
+
+## Every body frame this view may ask for (smoke_colossus checks they are all in the atlas).
+static func body_frames() -> Array[String]:
+	var out: Array[String] = []
+	for set_name: String in COUNTS:
+		for n: int in range(1, int(COUNTS[set_name]) + 1):
+			out.append(BODY % [set_name, n])
+	for n: int in range(1, (data()["appear_ticks"] as Array).size() + 1):
+		out.append(BODY % ["appear", n])
+	return out
+
+
+static func _f(set_name: String, n: int, shake: int = 0) -> Dictionary:
+	return {"frame": BODY % [set_name, n], "shake": shake}
+
+
+## The body frame for this tick and how hard it shakes ({frame, shake}), from the snapshot only: its state and state_ticks, its
+## attack and the ticks of that attack's warnings. `moving`: it walked since the last tick (chase plays the walk only then).
+static func body_frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int, moving: bool) -> Dictionary:
 	var t: int = int(mob["state_ticks"])
-	var offset: Vector2 = Vector2.ZERO
-	var sink: int = 0
-	var dim: float = 0.0
 	match mob["state"]:
 		&"idle":
-			sink = ASLEEP_SINK
-			dim = 0.3
-			offset.y = 0.0 if posmod(tick / 40, 2) == 0 else 1.0  # slow breath
+			return _f("sleep", 1 + posmod(tick / SLEEP_TICKS, 2))
 		&"alert":
-			var risen: float = clampf(float(t) / Tuning.COLOSSUS_WAKE_TICKS, 0.0, 1.0)
-			sink = roundi(ASLEEP_SINK * (1.0 - risen * risen * (3.0 - 2.0 * risen)))
-			dim = 0.3 * (1.0 - risen)
-			offset.x = float(posmod(t / 3, 3) - 1) if risen < 0.9 else 0.0
+			var ticks: Array = data()["appear_ticks"]
+			var n: int = 1
+			for i: int in ticks.size():
+				if t >= int(ticks[i]):
+					n = i + 1
+			return _f("appear", n, 1 if t >= APPEAR_SHAKE.x and t < APPEAR_SHAKE.y else 0)
 		&"chase":
-			offset.y = -1.0 if posmod(t / 16, 2) == 1 else 0.0
-		&"windup":
-			var progress: float = 0.0
-			for tell: Snapshots.TelegraphSnapshot in tells:
-				if tell.owner_id == int(mob["id"]):
-					progress = clampf(float(tick - tell.start_tick) / maxf(1.0, float(tell.hit_tick - tell.start_tick)), 0.0, 1.0)
-					break
-			offset.y = -roundf(3.0 * progress)
-			if progress > 0.8:
-				offset.x = float(posmod(t, 2) * 2 - 1)
-		&"strike":
-			offset.y = 2.0 if mob.get("attack", &"") in HEAVY else 0.0
+			return _f("walk", 1 + posmod(tick / WALK_TICKS, 6)) if moving else _f("idle", 1 + posmod(tick / IDLE_TICKS, 4))
+		&"windup", &"strike":
+			return _attack_frame(mob, tells, tick)
 		&"recover":
-			offset.y = 1.0 if t < 8 else 0.0
+			var sets: Dictionary = ATTACK_SETS.get(StringName(mob.get("attack_id", &"")), {})
+			return _f(sets["recover"], 1) if t < RECOVER_HOLD and not sets.is_empty() else _f("idle", 1)
 		&"posture_broken":
-			offset.y = 4.0
-			dim = 0.25 + 0.1 * float(posmod(t / 8, 2))
+			return _f("broken", 1 + posmod(t / BROKEN_TICKS, 2))
 		&"stagger":
-			offset = Vector2(float(posmod(t / 2, 2) * 2 - 1), 2.0)
+			return _f("stagger", 1 + posmod(t / STAGGER_TICKS, 2), 1)
 		&"roar":
-			offset = Vector2(float(posmod(t / 2, 2) * 2 - 1), -2.0)
+			return _f("roar", 1 + posmod(t / ROAR_TICKS, 2), 1)
 		&"dead":
-			sink = roundi(HEIGHT * clampf(float(t) / Tuning.MOB_DEATH_TICKS, 0.0, 1.0))
-			offset.x = float(posmod(t / 2, 2) * 2 - 1)
-	return {"offset": offset, "sink": sink, "dim": dim}
+			return _f("death", mini(int(COUNTS["death"]), t / DEATH_TICKS + 1), 1 if t < 15 else 0)
+	return _f("idle", 1)
 
 
-## Draws the body at its feet: the visible part above the ground line (it sinks into the ground asleep and as it falls), white for
-## a few ticks after a blow, darker asleep and broken.
-static func draw_body(canvas: CanvasItem, item: Dictionary, frames: Dictionary, sprites: Texture2D, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> void:
+## An attack's frame: the windup over its first warning, then the blows. Between a combo's blows the fists rise again; the Root
+## Snare's second lane takes the other fist; the Boulder Toss holds and throws its stone; the Song Flare bursts on each ring and
+## gathers the song (the roar) for its gold blow.
+static func _attack_frame(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> Dictionary:
+	var attack: StringName = StringName(mob.get("attack_id", &""))
+	var sets: Dictionary = ATTACK_SETS.get(attack, ATTACK_SETS[&"gold_slam"])
+	var mine: Array[Snapshots.TelegraphSnapshot] = []
+	for tell: Snapshots.TelegraphSnapshot in tells:
+		if tell.owner_id == int(mob["id"]) and tell.attack != BRIAR:
+			mine.append(tell)
+	if mine.is_empty():
+		return _f("idle", 1)
+	mine.sort_custom(func(a: Snapshots.TelegraphSnapshot, b: Snapshots.TelegraphSnapshot) -> bool: return a.hit_tick < b.hit_tick)
+	var last: Snapshots.TelegraphSnapshot = null  # the latest blow that has landed
+	var next: Snapshots.TelegraphSnapshot = null  # the next one to land
+	var landed_count: int = 0
+	for tell: Snapshots.TelegraphSnapshot in mine:
+		if tell.hit_tick <= tick:
+			last = tell
+			landed_count += 1
+		elif next == null:
+			next = tell
+	var windup: String = sets["windup"]
+	var strike: String = sets["strike"]
+	var wn: int = int(COUNTS[windup])
+	var sn: int = int(COUNTS[strike])
+	match attack:
+		&"song_flare":
+			var gold: Snapshots.TelegraphSnapshot = null
+			for tell: Snapshots.TelegraphSnapshot in mine:
+				if tell.kind == &"gold":
+					gold = tell
+			if last == null:
+				return _windup(windup, wn, strike, 1, next, tick)
+			if gold != null and tick >= gold.hit_tick:
+				return _f("roar", 2, 2 if tick - gold.hit_tick < 8 else 0)
+			if gold != null and next == gold:  # the rings are done: the song gathers for the gold blow
+				return _f("roar", 1, 1 if gold.hit_tick - tick <= 12 else 0)
+			return _f(strike, 1, 1) if tick - last.hit_tick < 6 else _f(windup, wn)
+		&"boulder_toss":
+			if last == null:
+				var p: float = _warned(next, tick)
+				if p < BOULDER_RIP:
+					return _f(windup, 1)
+				if p < BOULDER_THROW:
+					return _f(windup, 2, 1 if p > BOULDER_THROW - 0.08 else 0)
+				return _f(strike, 1)
+			return _f("slam_recover", 1) if tick - mine[0].hit_tick < 24 else _f("idle", 1)
+		&"root_snare":
+			if last == null:
+				return _f(windup, 1, 1 if _warned(next, tick) > TREMBLE else 0)
+			if landed_count == 1 and next != null and tick - last.hit_tick >= IMPACT_HOLD - 2:  # the second lane: the other fist
+				return _f(windup, 2, 1 if next.hit_tick - tick <= 8 else 0)
+			return _f(strike, mini(landed_count, sn), 1 if tick - last.hit_tick < 6 else 0)
+		&"red_charge":
+			if last == null:
+				return _windup(windup, wn, strike, 1, next, tick)
+			return _f(strike, 1 + posmod(tick / 3, 2)) if tick <= last.end_tick else _f(sets["recover"], 1)
+	if last == null:
+		return _windup(windup, wn, strike, sn, next, tick)
+	if next != null:  # between a combo's blows: hold the impact, raise the fists again, let them fall
+		var since: int = tick - last.hit_tick
+		var to: int = next.hit_tick - tick
+		if to <= FALL_TICKS and sn > 1:
+			return _f(strike, 1)
+		if since > IMPACT_HOLD:
+			var q: float = float(since - IMPACT_HOLD) / float(maxi(1, since - IMPACT_HOLD + to - FALL_TICKS))
+			return _f(windup, clampi(2 + floori(q * float(wn - 1)), mini(2, wn), wn), 1 if to <= 12 else 0)
+		return _f(strike, sn)
+	return _f(strike, sn, 1 if tick - last.hit_tick < 8 else 0)
+
+
+## The windup toward warning `next`: its frames over WINDUP_SPREAD of it, the last held and trembling from TREMBLE, and with two
+## strike frames the first (the blow falling) in the last FALL_TICKS.
+static func _windup(windup: String, wn: int, strike: String, sn: int, next: Snapshots.TelegraphSnapshot, tick: int) -> Dictionary:
+	var p: float = _warned(next, tick)
+	if sn > 1 and next.hit_tick - tick <= FALL_TICKS:
+		return _f(strike, 1)
+	return _f(windup, mini(wn, 1 + floori(p / WINDUP_SPREAD * float(wn))), 1 if p > TREMBLE else 0)
+
+
+## Whether it walked since the last tick (position memory for the walk cycle only; nothing rules-bearing).
+func _moved(mob: Dictionary, tick: int) -> bool:
+	if tick != _body_tick:
+		var at: Vector2 = mob["position"]
+		_walking = _body_at != Vector2.INF and at.distance_to(_body_at) > 0.05
+		_body_at = at
+		_body_tick = tick
+	return _walking
+
+
+## Draws the body at its feet: this tick's frame (body_frame), shaking sideways when it trembles, white for a few ticks after a blow.
+## A frame missing from the atlas warns once and draws the standing frame instead.
+func draw_body(canvas: CanvasItem, item: Dictionary, frames: Dictionary, sprites: Texture2D, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> void:
 	var mob: Dictionary = item["mob"]
-	if not frames.has(FRAME):
-		return
-	var frame: Dictionary = frames[FRAME]
-	var p: Dictionary = pose(mob, tells, tick)
-	var sink: int = int(p["sink"])
-	var w: float = float(frame["w"])
-	var h: float = float(frame["h"])
-	var shown: float = h - float(sink)
-	if shown <= 0.0:
-		return
-	var corner: Vector2 = (Vector2(item["at"]).round() - Vector2(float(frame["ax"]), float(frame["ay"])) + Vector2(p["offset"])).round()
-	var tint: Color = item["tint"]
-	var dim: float = float(p["dim"])
-	tint = Color(tint.r * (1.0 - dim), tint.g * (1.0 - dim), tint.b * (1.0 - dim * 0.6), tint.a)
+	var pick: Dictionary = body_frame(mob, tells, tick, _moved(mob, tick))
+	var key: String = pick["frame"]
+	if not frames.has(key):
+		if not missing.has(key):
+			missing[key] = true
+			push_warning("Missing Colossus body frame: " + key)
+		key = FRAME
+		if not frames.has(key):
+			return
+	var frame: Dictionary = frames[key]
+	var shake: float = float(int(pick["shake"]) * (1 if posmod(tick / 2, 2) == 0 else -1))
+	var corner: Vector2 = (Vector2(item["at"]).round() - Vector2(float(frame["ax"]), float(frame["ay"])) + Vector2(shake, 0.0)).round()
 	var white: bool = int(mob.get("since_hit", 1000)) < 4 and mob["state"] != &"dead"
-	canvas.draw_texture_rect_region(WHITE if white else sprites, Rect2(corner + Vector2(0, float(sink)), Vector2(w, shown)), Rect2(float(frame["x"]), float(frame["y"]), w, shown), tint)
+	var size: Vector2 = Vector2(float(frame["w"]), float(frame["h"]))
+	canvas.draw_texture_rect_region(WHITE if white else sprites, Rect2(corner, size), Rect2(float(frame["x"]), float(frame["y"]), size.x, size.y), item["tint"])
+
+
+## Where the song's light sits in its chest this tick (asleep and while it is still in the ground: just above the floor).
+static func chest_at(mob: Dictionary, tells: Array[Snapshots.TelegraphSnapshot], tick: int) -> Vector2:
+	var feet: Vector2 = mob["position"]
+	if mob["state"] == &"idle":
+		return feet - Vector2(0, 7)
+	var chest: Vector2 = feet + attach(String(body_frame(mob, tells, tick, false)["frame"]), "chest")
+	return Vector2(chest.x, minf(chest.y, feet.y - 7.0))
 
 
 ## The drawn rectangle of the body (for the hero's outline test and the camera).
@@ -436,10 +628,12 @@ static func draw_glowing_edges(canvas: CanvasItem, view: ExploreCore.ExploreSnap
 
 # ---- the camera -------------------------------------------------------------------------------------------------------------
 
-## The view's top-left corner in the fight: the hero-centred view slid only as far as it takes to show the whole body, the hero
-## kept off the screen's edges, inside the scene.
+## The view's top-left corner in the fight: the hero-centred view slid only as far as it takes to show the whole body (and, where
+## it fits, its reach: fists raised overhead or flung wide), the hero kept off the screen's edges, inside the scene.
 static func fight_view(hero: Vector2, mob: Dictionary, frames: Dictionary, scene_size: Vector2) -> Vector2:
 	var origin: Vector2 = hero - VIEW * 0.5
+	var reach: Rect2 = Rect2(Vector2(mob["position"]) - REACH, Vector2(REACH.x * 2.0, REACH.y + 2.0)).grow(4.0)
+	origin = origin.clamp(reach.end - VIEW, reach.position.max(reach.end - VIEW))
 	var box: Rect2 = body_rect(mob, frames).grow(4.0)
 	origin = origin.clamp(box.end - VIEW, box.position.max(box.end - VIEW))
 	origin = origin.clamp(hero - VIEW + Vector2(HERO_SIDE, HERO_BOTTOM), hero - Vector2(HERO_SIDE, HERO_TOP))
@@ -465,7 +659,7 @@ static func lamps(view: ExploreCore.ExploreSnapshot) -> Array[Dictionary]:
 		return out
 	var feet: Vector2 = mob["position"]
 	var asleep: bool = mob["state"] == &"idle"
-	var chest: Vector2 = feet - Vector2(0, CHEST - (ASLEEP_SINK if asleep else 0))
+	var chest: Vector2 = chest_at(mob, view.telegraphs, view.tick)
 	out.append({"point": Vector4(chest.x, chest.y, 20.0 if asleep else 56.0, 0.35 if asleep else 1.1), "colour": CHEST_COLOUR, "core": CHEST_CORE})
 	out.append({"point": Vector4(feet.x, feet.y + 6.0, 50.0 if asleep else 140.0, -(0.3 if asleep else 1.2)), "colour": CHEST_COLOUR, "core": CHEST_CORE})
 	return out
@@ -486,6 +680,19 @@ func landed(view: ExploreCore.ExploreSnapshot) -> Array[Dictionary]:
 	if boss.is_empty():
 		_previous.clear()
 		return out
+	if boss["state"] == &"alert":  # it breaks out of the floor: shards, dust, a stomp and a shake at each burst
+		var t: int = int(boss["state_ticks"])
+		for i: int in APPEAR_CUES.size():
+			var cue: Array = APPEAR_CUES[i]
+			if t < int(cue[0]) or _appear_seen.has(i):
+				continue
+			_appear_seen[i] = true
+			var at: Vector2 = Vector2(boss["position"]) + Vector2(float(cue[1]), 2.0)
+			effects.append({"kind": cue[2], "tick": view.tick - (t - int(cue[0])), "at": at})
+			if bool(cue[3]):
+				out.append({"attack": &"appear", "at": at, "heavy": true, "cue": "golem_stomp"})
+	elif boss["state"] == &"idle":
+		_appear_seen.clear()
 	var candidates: Array[Snapshots.TelegraphSnapshot] = []
 	candidates.append_array(_previous)
 	candidates.append_array(view.telegraphs)

@@ -1048,7 +1048,7 @@ func _draw_item(item: Dictionary) -> void:
 		PropsLayer.draw(self, drawn, sprites, ambient())
 		return
 	if item["kind"] == &"mob" and ColossusView.is_colossus(item["mob"]):
-		ColossusView.draw_body(self, item, frames, sprites, snapshot.telegraphs, snapshot.tick)
+		colossus_view.draw_body(self, item, frames, sprites, snapshot.telegraphs, snapshot.tick)
 		colossus_view.draw_hero_ghost(self, item["mob"], snapshot.hero.position, hero_frame, facing_left, frames, sprites, ambient())
 		return
 	var at: Vector2 = Vector2(item["at"]).round()

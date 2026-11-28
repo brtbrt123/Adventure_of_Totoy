@@ -509,7 +509,7 @@ const MOBS: Dictionary = {
 # ---- The Mossbound Colossus on the road (core/colossus.gd; docs/PLAN_colossus_step3.md). First guesses, to be tuned by play. ----
 # The arena's armour, posture and counter rules carry over: a blow does ARMOR_DAMAGE_FACTOR damage and fills posture, a perfect
 # parry fills it at once, and a broken Colossus takes COUNTER_DAMAGE_MULT damage (plus the Edge bonus for the weapon's blows).
-const COLOSSUS_WAKE_TICKS: int = 90  # rising: it cannot be hurt yet
+const COLOSSUS_WAKE_TICKS: int = 150  # rising out of the ground (its appearing, 2.5 s; the owner's yes of 2026-11-28): it cannot be hurt yet
 const COLOSSUS_FIRST_ATTACK_TICKS: int = 40  # after it has risen
 const COLOSSUS_COOLDOWN_TICKS: Array[int] = [40, 24, 20]  # between attacks, per phase (1, 2, 3)
 const COLOSSUS_PHASE_HP_FRACTIONS: Array[float] = [0.6, 0.25]  # health left when phase 2 and phase 3 begin

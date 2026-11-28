@@ -1,4 +1,6 @@
-"""The Colossus's STAND-IN body for the road fight (docs/PLAN_colossus_step3.md, part 3a; owner approved the plan on 2026-11-27).
+"""HISTORY (superseded by tools/art/rig_colossus.py in step 4c, 2026-11-28): running this would overwrite the rigged idle frame.
+
+The Colossus's STAND-IN body for the road fight (docs/PLAN_colossus_step3.md, part 3a; owner approved the plan on 2026-11-27).
 
 One still picture: the golem cut from the approved concept (art/reference/rootcrown_v1/colossus_concept_1.png), 116 px tall,
 snapped to Totoy 36 without gold and red, hard alpha. It stands in until the real body frames of step 4; presentation moves it per

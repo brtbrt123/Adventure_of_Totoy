@@ -1,6 +1,6 @@
 extends SceneTree
-## The Mossbound Colossus on the road, through the real scene (docs/PLAN_colossus_step3.md, part 3a): Rootcrown loads it asleep,
-## the stand-in frame exists, walking up wakes it and seals the climb, the fight camera shows the whole body, its warnings, the boss
+## The Mossbound Colossus on the road, through the real scene (docs/PLAN_colossus_step3.md, part 3a; its body: step 4): Rootcrown
+## loads it asleep, every body frame exists, walking up wakes it (the appearing plays through, with its shards and dust) and seals the climb, the fight camera shows the whole body, its warnings, the boss
 ## panel and its chest light work, a posture break and phase 2 play, its fall clears the scene, lights the beacon and opens the climb,
 ## and debug key Y's jump lets it be fought again. No save is read or written (no persist meta). Prints FAIL and exits 1 on failure.
 const Explore := preload("res://presentation/explore/explore_scene.gd")
@@ -14,6 +14,14 @@ const VIEW: Vector2 = Vector2(384, 216)
 var failures: int = 0
 var scene: Explore
 var seen: Array[StringName] = []
+var bodies: Dictionary = {}  # body frames the view picked during the run
+
+
+## Notes the body frame the view picks for this snapshot.
+func note_body() -> void:
+	var mob: Dictionary = ColossusView.find(scene.snapshot)
+	if not mob.is_empty():
+		bodies[ColossusView.body_frame(mob, scene.snapshot.telegraphs, scene.snapshot.tick, false)["frame"]] = true
 
 
 func _init() -> void:
@@ -32,6 +40,7 @@ func steps(count: int, keep_alive: bool = true) -> void:
 			scene.core.player.hp = scene.core.hero_max_hp()
 		scene.advance(InputFrame.new())
 		scene.fade_phase = &""
+		note_body()
 		for event: GameEvent in scene.core.last_events:
 			seen.append(event.type)
 			if event.type == GameEvent.ATTACK_TELEGRAPHED:
@@ -56,8 +65,14 @@ func whole_body_on_screen() -> bool:
 
 func run() -> void:
 	var frames: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://art/build/sprites.json"))["frames"]
-	check(frames.has(ColossusView.FRAME), "the stand-in frame is in the atlas")
+	check(frames.has(ColossusView.FRAME), "the standing frame is in the atlas")
 	check(int(frames.get(ColossusView.FRAME, {}).get("ay", 0)) == 118, "its feet anchor")
+	var body_names: Array[String] = ColossusView.body_frames()
+	check(body_names.size() == 86, "86 body frames: %d" % body_names.size())
+	for name: String in body_names:
+		check(frames.has(name), "body frame %s" % name)
+	check((ColossusView.data()["appear_ticks"] as Array).size() == 25 and int(ColossusView.data()["appear_ticks"][-1]) < Tuning.COLOSSUS_WAKE_TICKS,
+		"the appearing fits in the wake")
 	if Engine.has_meta(Explore.PERSIST_META):
 		Engine.remove_meta(Explore.PERSIST_META)
 	Engine.set_meta(Explore.START_META, {"scene": SceneDefs.ROOTCROWN_LAYERED})
@@ -75,7 +90,16 @@ func run() -> void:
 	await draw_once()
 	# walk up: it wakes, the climb closes, the camera slides to show it whole
 	scene.core.player.position = Vector2(512, 548)
-	steps(Tuning.COLOSSUS_WAKE_TICKS + 30)
+	var appear_kinds: Dictionary = {}
+	for i: int in Tuning.COLOSSUS_WAKE_TICKS + 30:
+		steps(1)
+		for e: Dictionary in scene.colossus_view.effects:
+			appear_kinds[e["kind"]] = true
+		if i % 10 == 0:
+			await draw_once()
+	check(bodies.has("colossus_sleep_right_1") and bodies.has("colossus_appear_right_1") and bodies.has("colossus_appear_right_25"),
+		"asleep, then the whole appearing: %s" % [bodies.keys()])
+	check(appear_kinds.has(&"burst") and appear_kinds.has(&"dust"), "the floor breaks as it appears: %s" % [appear_kinds.keys()])
 	check(seen.has(GameEvent.ARENA_SEALED), "the climb sealed")
 	check(scene.hud.road_boss.size() > 0, "the HUD has the boss")
 	await draw_once()
@@ -91,11 +115,12 @@ func run() -> void:
 		var count: int = int(material.get_shader_parameter("lamp_count"))
 		check(count <= EnvironmentLight.MAX_LIGHTS, "within the light budget: %d" % count)
 		var lamps: PackedVector4Array = material.get_shader_parameter("lamps")
-		var chest_y: float = boss().position.y - ColossusView.CHEST
+		var chest: Vector2 = ColossusView.chest_at(ColossusView.find(scene.snapshot), scene.snapshot.telegraphs, scene.snapshot.tick)
+		check(absf(chest.y - (boss().position.y - ColossusView.CHEST)) <= 8.0, "the chest is near the standing chest: %s" % chest)
 		var found: bool = false
 		for i: int in count:
-			found = found or (absf(lamps[i].x - boss().position.x) < 0.5 and absf(lamps[i].y - chest_y) < 0.5)
-		check(found, "the chest light is lit")
+			found = found or (absf(lamps[i].x - chest.x) < 0.5 and absf(lamps[i].y - chest.y) < 0.5)
+		check(found, "the chest light is lit, at the frame's chest")
 	# fight a while from in front of it, then from below (the camera keeps it whole)
 	for spot: Vector2 in [Vector2(100, 40), Vector2(-90, 50), Vector2(0, 70)]:
 		scene.core.player.position = boss().position + spot
@@ -215,6 +240,11 @@ func run() -> void:
 		lit = lit or (p["id"] == &"beacon" and p["type"] == &"rootcrown_tower_lit")
 	check(lit, "the beacon is lit")
 	check(ColossusView.fighting(scene.snapshot).is_empty() and scene.hud.road_boss.is_empty(), "the fight is over")
+	check(bodies.has("colossus_death_right_1") and bodies.has("colossus_death_right_8"), "it broke apart (the death frames played)")
+	var attacked: Array = bodies.keys().filter(func(k: Variant) -> bool: return String(k).contains("windup") or String(k).contains("strike"))
+	check(attacked.size() >= 8, "its attacks played their frames: %s" % [attacked])
+	var lost: Array = scene.colossus_view.missing.keys().filter(func(k: Variant) -> bool: return String(k).begins_with("colossus_"))
+	check(lost.is_empty(), "no missing body frames: %s" % [lost])
 	# debug key Y: it can be fought again
 	scene.jump_to(SceneDefs.ROOTCROWN_LAYERED)
 	for i: int in 120:

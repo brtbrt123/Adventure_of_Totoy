@@ -1,4 +1,42 @@
+## Step 4c: the Colossus's rigged body in the game (2026-11-28, Claude, NOT committed)
+
+Owner: "Approve, do 4c". The 86 frames are installed (`tools/art/rig_colossus.py --install`: `art/src/colossus_<set>_right_<n>.txt`,
+`presentation/explore/colossus_frames.json` with fists and chest per frame); validate, build (atlas 2048x6294), preview (26 pages),
+import; the contact sheets' `.import` files restored from HEAD. `colossus_view.gd` picks the frame from the snapshot only
+(`body_frame`: state, state_ticks, `attack_id`, its warnings' ticks), the stand-in's offsets are gone, the chest light follows the
+frame, the boulder is held overhead then thrown (still lands on the warned tick), the appearing breaks the floor (shards, dust,
+stomps, shakes), and the camera keeps its reach in view where it fits. Core: `COLOSSUS_WAKE_TICKS` 90 -> 150. Smoke checks every
+body frame and the appearing, attacks and death playing (COLOSSUS OK); core 609 pass. Real captures:
+`presentation/review/colossus_4c/colossus_4c_body.png` and `colossus_4c_appear.gif`. Details: [[PLAN_colossus_step4]].
+Full harness (`python harness/checks/run_tests.py --worktree . --timeout 400`): exit 0, all 57 suites passed. Not judged by me: how the
+body feels in motion (the owner's playtest).
+
+## Step 4b: every body frame of the Colossus (2026-11-28, Claude, NOT committed; approved)
+
+Owner: "Approve, do 4b" (the 4a look and the appearing approved). `tools/art/rig_colossus.py --frames` now poses all 86 frames
+(sleep 2, appear 25, idle 4, walk 6, slam 6, sweep 5, shards 4, stomp 4, charge 5, snare 4, boulder 3, grab 4, broken 2, stagger 2,
+roar 2, death 8) into `art/reference/colossus_body_v1/frames/` with `frames.json` (feet, fist and chest attachment points, the
+appearing's ticks). New in the rig: arm offsets, shoulders as a part, clipping, the crumble (stone-shaped chunks and a heap of
+outlined stones). All frames pass the art rules. `tools/art/make_colossus_4b_review.py`: two sheets and 17 GIFs at real timing in
+`presentation/review/colossus_4b/` (PREVIEWS composited by Python). Nothing wired, no game file changed. Which attack plays which
+set, and step 4c: [[PLAN_colossus_step4]].
+
+## Step 4a: the Colossus's body rigged from the approved concept, and its appearing (2026-11-28, Claude, NOT committed; approved)
+
+Owner: "OKAY LETS START ALSO WE NEED AN ANIMATION WHEN HE IS APPEARING" (step 4 by the recommended way: rig the approved concept).
+New `tools/art/rig_colossus.py`: the concept's golem cut into six parts (two arms, head, two root legs, body), posed at the concept's
+size, shrunk to 116 px and snapped to Totoy 36 (no gold or red, hard alpha); the song's light in four states; a rim of broken
+earth while sunk. 16 poses in `art/reference/colossus_body_v1/` (key poses and the ten of the appearing). New
+`tools/art/make_colossus_4a_review.py`: `presentation/review/colossus_4a/colossus_4a_poses.png`, `colossus_4a_appear.gif` (the
+appearing at game speed: a mossy mound, the song wakes, the fists burst out with stone shards, it pulls itself up and roars;
+proposed 2.5 s, `COLOSSUS_WAKE_TICKS` 90 -> 150) and `colossus_4a_slam.gif`. PREVIEWS composited by Python on the ground painting
+(not the game renderer). Nothing wired, no game file changed. Plan and next steps: [[PLAN_colossus_step4]]. Waits for the owner's
+yes on the look and the appearing.
+
 ## Step 3c built: the Briar Ring and the Song Flare, with their PixelFX effects (2026-11-28, Claude, committed 74d9d25f)
+
+**Owner's playtest of the whole step 3 fight (2026-11-28): "ITS GOOD NOW".** No tuning asked for. Next: step 4, the real body
+frames (the plan is put to the owner before anything starts).
 
 Owner: "Yes, wire them" (the 3c effects). Wired: the Briar Ring's wall (`fx_colossus_thorn`, the approved root thorns, about 50 round
 the safe circle 12 px outside it: rising as the briars stand, holding, sinking over their last 16 ticks); `fx_colossus_song_shard_1..11`

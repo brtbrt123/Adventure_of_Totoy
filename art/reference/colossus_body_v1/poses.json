@@ -1,0 +1,114 @@
+{
+ "idle_1": {
+  "w": 144,
+  "h": 120,
+  "ax": 72,
+  "ay": 118,
+  "note": "idle: breathing"
+ },
+ "idle_2": {
+  "w": 144,
+  "h": 120,
+  "ax": 72,
+  "ay": 118,
+  "note": "idle: breathing"
+ },
+ "slam_windup": {
+  "w": 152,
+  "h": 144,
+  "ax": 76,
+  "ay": 142,
+  "note": "Gold Slam: both fists overhead"
+ },
+ "slam_strike": {
+  "w": 120,
+  "h": 112,
+  "ax": 60,
+  "ay": 110,
+  "note": "Gold Slam: fists down in front"
+ },
+ "posture_broken": {
+  "w": 136,
+  "h": 112,
+  "ax": 68,
+  "ay": 110,
+  "note": "posture broken: slumped, song dim"
+ },
+ "roar": {
+  "w": 208,
+  "h": 128,
+  "ax": 104,
+  "ay": 126,
+  "note": "roar: arms up and wide, song blazing"
+ },
+ "appear_1": {
+  "w": 128,
+  "h": 48,
+  "ax": 64,
+  "ay": 46,
+  "note": "asleep: a mossy mound"
+ },
+ "appear_2": {
+  "w": 128,
+  "h": 56,
+  "ax": 64,
+  "ay": 54,
+  "note": "the song wakes in the moss"
+ },
+ "appear_3": {
+  "w": 152,
+  "h": 80,
+  "ax": 76,
+  "ay": 78,
+  "note": "a fist bursts out"
+ },
+ "appear_4": {
+  "w": 208,
+  "h": 80,
+  "ax": 104,
+  "ay": 78,
+  "note": "then the other"
+ },
+ "appear_5": {
+  "w": 200,
+  "h": 80,
+  "ax": 100,
+  "ay": 78,
+  "note": "it plants both fists"
+ },
+ "appear_6": {
+  "w": 192,
+  "h": 88,
+  "ax": 96,
+  "ay": 86,
+  "note": "and pulls itself up"
+ },
+ "appear_7": {
+  "w": 184,
+  "h": 104,
+  "ax": 92,
+  "ay": 102,
+  "note": "roots tear free"
+ },
+ "appear_8": {
+  "w": 168,
+  "h": 112,
+  "ax": 84,
+  "ay": 110,
+  "note": "almost out"
+ },
+ "appear_9": {
+  "w": 144,
+  "h": 120,
+  "ax": 72,
+  "ay": 118,
+  "note": "standing"
+ },
+ "appear_10": {
+  "w": 208,
+  "h": 128,
+  "ax": 104,
+  "ay": 126,
+  "note": "it roars"
+ }
+}
