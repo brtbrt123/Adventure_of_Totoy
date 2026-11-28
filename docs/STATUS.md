@@ -1,4 +1,4 @@
-## Step 3c built: the Briar Ring and the Song Flare, with their PixelFX effects (2026-11-28, Claude, NOT committed)
+## Step 3c built: the Briar Ring and the Song Flare, with their PixelFX effects (2026-11-28, Claude, committed 74d9d25f)
 
 Owner: "Yes, wire them" (the 3c effects). Wired: the Briar Ring's wall (`fx_colossus_thorn`, the approved root thorns, about 50 round
 the safe circle 12 px outside it: rising as the briars stand, holding, sinking over their last 16 ticks); `fx_colossus_song_shard_1..11`
