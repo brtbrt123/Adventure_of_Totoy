@@ -34,6 +34,7 @@ Open the `docs/` folder as a vault in Obsidian. Start here; every note links onw
 - [[PLAN_colossus_step3]]: step 3, the redesigned Colossus in the road engine: the owner's decisions, numbers, build order, the victory cutscene proposal; parts 3a (2026-11-27), 3b and 3c (2026-11-28) built, so step 3 is complete: ten attacks, three phases, the Briar Ring, the PixelFX effects (captures in `presentation/review/colossus_3a/`, `colossus_3b/`, `colossus_3c/`)
 - [[PLAN_colossus_step4]]: step 4, the Colossus's real body rigged from the approved concept (`tools/art/rig_colossus.py`) and its appearing animation; 4a previews in `presentation/review/colossus_4a/`, 4b sheets and GIFs in `colossus_4b/`, 4c real captures in `colossus_4c/` (wired 2026-11-28)
 - [[PLAN_colossus_step5]]: step 5, effects for the Colossus's six attacks kept from the arena (PixelFX ground-slam, stone shards, pale dust); proposals, GIFs and the wired comparison in `presentation/review/colossus_5/`; all six wired 2026-11-28
+- [[PLAN_hit_feedback]]: hit feedback from the owner's TikTok reference: damage numbers, hit counter, the redesigned mob bar and level badge (wired 2026-11-28), then kills that react to the killing blow
 - [[STORY_ROAD_chapter1]]: draft story for the road from Lanternfen to the Stag Glade (follow the blue light); to be revised after the final-scene plan
 
 ## Art references

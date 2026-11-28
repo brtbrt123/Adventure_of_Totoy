@@ -1,3 +1,20 @@
+## Hit feedback wired: damage numbers, hit counter, the mob bar and level (2026-11-28, Claude, NOT committed)
+
+Owner: "Yes, wire them". In the game: `hit_numbers.gd` (chunky numbers per hit, kills and counters bigger, "xN HITS"), the new bar
+and level badge over every mob with its drain chunk (`MobView.draw_bar`, `bar_drain.gd`); the old mob numbers and the old bar and
+"L1" label are retired. New `tests/smoke_hit_feedback.gd` (HIT FEEDBACK OK). The wired game matches the approved run pixel for pixel
+(280 pictures). Full harness: exit 0, all 58 suites passed (57 and the new smoke).
+
+## Hit feedback proposed: damage numbers, hit counter, the mob bar and level (2026-11-28, Claude, NOT committed; approved)
+
+The owner sent a TikTok devlog as a reference (damage text, mob health bars, satisfying kills). New, not wired:
+`presentation/explore/hit_numbers.gd` (chunky pixel numbers per hit, bigger counters and killing blows, "xN HITS"),
+a target bar at the top (dropped: the owner, "remove the hp bar at the top of the screen just improve the healthbar and lvl design on
+the top of the mob"), so `MobView.draw_bar` (off by default) redraws the bar over each mob with a framed level badge and a drain
+chunk (`presentation/explore/bar_drain.gd`). Shown as a real-game before/after GIF of the same fight and a 4x close-up
+(`presentation/review/hit_feedback/`). Gold and red stay off them (combat cues). Kills (slice, ash, hit-stop) are part 3. Plan:
+[[PLAN_hit_feedback]].
+
 ## Step 5: effects for the five other attacks kept from the arena, in the game (2026-11-28, Claude, committed 65476296)
 
 Owner judged real-game GIFs (`capture_5.gd -- --gifs`: each attack with its warning, the hits and the proposed effect as a mock),

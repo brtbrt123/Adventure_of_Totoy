@@ -56,6 +56,10 @@ var defeat_started_tick: int = -1
 var world_cues: Array[Dictionary] = []
 const EncounterEffects := preload("res://presentation/explore/encounter_effects.gd")
 var encounter_effects: EncounterEffects
+const HitNumbers := preload("res://presentation/explore/hit_numbers.gd")
+const BarDrain := preload("res://presentation/explore/bar_drain.gd")
+var hit_numbers: HitNumbers  # Totoy's hits: chunky numbers and the "xN HITS" counter (the owner's yes, 2026-11-28)
+var bar_drain: BarDrain = BarDrain.new()  # the cream chunk of lost health on each mob's bar
 const ProgressionView := preload("res://presentation/explore/progression_view.gd")
 var progression_view: ProgressionView
 
@@ -146,6 +150,8 @@ func _ready() -> void:
 	add_child(progression_view)
 	encounter_effects = EncounterEffects.new()
 	add_child(encounter_effects)
+	hit_numbers = HitNumbers.new()
+	add_child(hit_numbers)
 	practice_view = PracticeView.new()
 	add_child(practice_view)
 	creature_glow = CreatureGlow.new()  # the healing particles' additive glow, over the world and under the HUD
@@ -284,6 +290,8 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	hero_hit_tick = -1000
 	world_cues.clear()
 	encounter_effects.clear()
+	hit_numbers.clear()
+	bar_drain.clear()
 	colossus_view.clear()
 	creature_effects.clear()
 	trial_fx.clear()
@@ -305,6 +313,8 @@ func enter_scene(scene: StringName, entry: StringName = &"", checkpoint: StringN
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
+	hit_numbers.sync(snapshot, colors)
+	bar_drain.sync(snapshot)
 	creature_effects.sync(snapshot)
 	trial_fx.sync(snapshot.scene_id,snapshot.tick)
 	progression_view.sync(snapshot, colors, frames, sprites)
@@ -429,6 +439,8 @@ func advance(intent: InputFrame) -> void:
 	_choose_frames()
 	practice_view.sync(snapshot, practice_effects, frames, sprites)
 	encounter_effects.sync(snapshot, colors, frames, sprites)
+	hit_numbers.sync(snapshot, colors)
+	bar_drain.sync(snapshot)
 	creature_effects.sync(snapshot)
 	shake_left = maxi(shake_left, creature_effects.fx.take_shake())  # the mobs' heavy blows shake the view
 	for blow: Dictionary in colossus_view.landed(snapshot):  # the Colossus's blows land: the arena's sound, shake and dust
@@ -475,6 +487,7 @@ func _on_event(event: GameEvent) -> void:
 		practice_view.audio.mob_types[int(mob["id"])] = String(mob["type"])
 	hud.combat_event(event)
 	encounter_effects.handle_event(event, snapshot)
+	hit_numbers.handle_event(event, snapshot)
 	practice_view.audio.handle_event(event, snapshot.scene_id)
 	if event.type in [GameEvent.MOB_DEFEATED,GameEvent.ITEM_USED,GameEvent.HERO_RESPAWNED]:
 		world_cues.append({"type":event.type,"tick":snapshot.tick,"at":event.data.get("position",snapshot.hero.position)})

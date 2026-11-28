@@ -35,9 +35,7 @@ func handle_event(event: GameEvent, state: ExploreCore.ExploreSnapshot) -> void:
 	var at: Vector2 = event.data.get("position",state.hero.position)
 	var family: String = ""
 	match event.type:
-		GameEvent.ATTACK_HIT:
-			var kind: String = "counter" if event.data.get("kind",&"")==&"counter" else "mob"
-			number(at,int(event.data.get("damage",0)),kind,int(event.data.get("target_id",-1)),event.tick)
+		GameEvent.ATTACK_HIT:  # its number: hit_numbers.gd (chunky, one per hit, since 2026-11-28)
 			family = "hit"
 		GameEvent.DAMAGE_TAKEN:
 			number(state.hero.position,int(event.data.get("amount",0)),"hero",state.hero.id,event.tick)

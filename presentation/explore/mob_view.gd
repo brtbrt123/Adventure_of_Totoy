@@ -3,8 +3,15 @@ extends RefCounted
 const Snapshots := preload("res://core/snapshots.gd")
 const Tuning := preload("res://core/tuning.gd")
 const WHITE := preload("res://art/build/sprites_white.png")
-const Kit := preload("res://presentation/common/ui_kit.gd")
 const AnimLib := preload("res://presentation/common/anim_library.gd")  # the owner's SpriteFrames: frame order and free-running timing
+## The bar over a mob (the owner, 2026-11-28, after the TikTok reference: "improve the healthbar and lvl design on the top of the
+## mob"; wired on "Yes, wire them"; docs/PLAN_hit_feedback.md): the level in a framed badge joined to the left of a copper-rimmed bar,
+## its fill bevelled, the health just lost as a cream chunk that lingers, then drains (`ghosts`, kept by bar_drain.gd).
+static var ghosts: Dictionary = {}  # mob id -> the health its bar still shows (lost health drains to its hp)
+const BAR_WIDTH: int = 34
+const BOSS_BAR_WIDTH: int = 58
+const BAR_HEIGHT: int = 7
+const DIGITS: Dictionary = {"0":["111","101","101","101","111"], "1":["010","110","010","010","111"], "2":["111","001","111","100","111"], "3":["111","001","111","001","111"], "4":["101","101","111","001","001"], "5":["111","100","111","001","111"], "6":["111","100","111","101","111"], "7":["111","001","010","010","010"], "8":["111","101","111","101","111"], "9":["111","101","111","001","111"]}
 const STATES: Dictionary = {
  "warden": {"idle":["idle",6,12,true], "alert":["wake",4,6,false], "chase":["walk",6,7,true], "return":["walk",6,7,true], "windup":["cleave_tell",5,1,false], "strike":["cleave_strike",3,2,false], "recover":["recover",4,4,false], "stagger":["exposed",4,8,true], "hurt":["hurt",2,5,false], "dead":["death",8,8,false]},
  "glowmoth": {"idle":["idle",24,2,true], "alert":["idle",24,2,true], "chase":["move",12,2,true], "return":["move",12,2,true], "windup":["shot_tell",4,1,false], "strike":["shot_release",2,4,false], "recover":["idle",24,2,true], "hurt":["hurt",2,5,false], "dead":["death",4,8,false]},
@@ -85,23 +92,45 @@ static func decorate(canvas: CanvasItem, mob: Dictionary, colors: Dictionary, he
 	if mob["type"] == &"warden":
 		top = (at - Vector2(0, 86)).round()  # above the 79 px Warden (tools/art/rig_warden_v2.py, 1.5x smaller since 2026-10-31)
 	if int(mob["hp"]) < int(mob["max_hp"]) or at.distance_to(hero_at)<72.0:
-		if mob.has("level") and int(mob.get("summoner_id", 0)) == 0:  # a summoned moth shows only its bar (five labels stacked are noise)
-			draw_level(canvas, top + Vector2(-7,-7), int(mob["level"]), colors)
-		var bar_width: int = 56 if boss else 32
-		Kit.bar(canvas, top + Vector2(-bar_width / 2, 0), bar_width, [["fill_health_thin", float(mob["hp"]) / maxi(1, int(mob["max_hp"]))]], true)
+		draw_bar(canvas, top, mob, colors)
 	if bool(mob["exposed"]):
 		canvas.draw_polyline(PackedVector2Array([top+Vector2(0,-8),top+Vector2(3,-5),top+Vector2(0,-2),top+Vector2(-3,-5),top+Vector2(0,-8)]),colors["u"],1.0)
 	if mob["state"] == &"alert":
 		canvas.draw_rect(Rect2(top+Vector2(-1,-8),Vector2(2,4)),colors["1"])
 		canvas.draw_rect(Rect2(top+Vector2(-1,-3),Vector2(2,1)),colors["1"])
 
-## Tiny hard-pixel level label leaves the original HP bar unchanged.
-static func draw_level(canvas: CanvasItem, at: Vector2, level: int, colors: Dictionary) -> void:
-	var glyphs: Dictionary = {"L":["100","100","100","100","111"], "0":["111","101","101","101","111"], "1":["010","110","010","010","111"], "2":["111","001","111","100","111"], "3":["111","001","111","001","111"], "4":["101","101","111","001","001"], "5":["111","100","111","001","111"], "6":["111","100","111","101","111"], "7":["111","001","010","010","010"], "8":["111","101","111","101","111"], "9":["111","101","111","001","111"]}
-	var text: String = "L" + str(level)
-	canvas.draw_rect(Rect2(at-Vector2.ONE,Vector2(text.length()*4+1,7)),colors["0"])
-	for i: int in text.length():
-		var rows: Array = glyphs.get(text[i],glyphs["0"])
-		for y: int in 5:
-			for x: int in 3:
-				if rows[y][x] == "1":canvas.draw_rect(Rect2(at+Vector2(i*4+x,y),Vector2.ONE),colors["1"])
+## The redesigned bar, centred on `top` (its top edge): [level badge][bar]. A summoned moth shows only its bar (stacked badges are noise).
+static func draw_bar(canvas: CanvasItem, top: Vector2, mob: Dictionary, colors: Dictionary) -> void:
+	var width: int = BOSS_BAR_WIDTH if bool(mob.get("boss", false)) else BAR_WIDTH
+	var badge: bool = mob.has("level") and int(mob.get("summoner_id", 0)) == 0
+	var digits: String = str(int(mob.get("level", 1)))
+	var badge_width: int = 4 * digits.length() + 5
+	var total: int = width + (badge_width - 1 if badge else 0)
+	var x0: float = roundf(top.x - float(total) * 0.5)
+	var y0: float = top.y
+	var bx: float = x0 + (badge_width - 1 if badge else 0)
+	canvas.draw_rect(Rect2(bx, y0, width, BAR_HEIGHT), colors["0"])  # the ink outline
+	canvas.draw_rect(Rect2(bx + 1, y0 + 1, width - 2, 1), colors["r"])  # copper rim: lit above
+	canvas.draw_rect(Rect2(bx + 1, y0 + BAR_HEIGHT - 2, width - 2, 1), colors["a"])  # and shaded below
+	var inside: Rect2 = Rect2(bx + 1, y0 + 2, width - 2, BAR_HEIGHT - 4)
+	canvas.draw_rect(inside, colors["e"])
+	var max_hp: float = maxf(1.0, float(mob["max_hp"]))
+	var hp: float = float(mob["hp"])
+	var fill: float = floorf(inside.size.x * clampf(hp / max_hp, 0.0, 1.0))
+	var ghost: float = floorf(inside.size.x * clampf(float(ghosts.get(int(mob["id"]), hp)) / max_hp, 0.0, 1.0))
+	if ghost > fill:  # the health just lost, lingering before it drains
+		canvas.draw_rect(Rect2(inside.position + Vector2(fill, 0), Vector2(ghost - fill, inside.size.y)), colors["1"])
+	if fill > 0.0:  # the fill, bevelled: lit, mid and shaded rows
+		canvas.draw_rect(Rect2(inside.position, Vector2(fill, 1)), colors["5"])
+		canvas.draw_rect(Rect2(inside.position + Vector2(0, 1), Vector2(fill, 1)), colors["4"])
+		canvas.draw_rect(Rect2(inside.position + Vector2(0, 2), Vector2(fill, inside.size.y - 2)), colors["3"])
+	if badge:  # the level: a framed box joined to the bar's left, its number in cream
+		canvas.draw_rect(Rect2(x0, y0 - 1, badge_width, BAR_HEIGHT + 2), colors["0"])
+		canvas.draw_rect(Rect2(x0 + 1, y0, badge_width - 2, BAR_HEIGHT), colors["q"])
+		canvas.draw_rect(Rect2(x0 + 2, y0 + 1, badge_width - 4, BAR_HEIGHT - 2), colors["0"])
+		for i: int in digits.length():
+			var rows: Array = DIGITS.get(digits[i], DIGITS["0"])
+			for y: int in 5:
+				for x: int in 3:
+					if rows[y][x] == "1":
+						canvas.draw_rect(Rect2(x0 + 3 + i * 4 + x, y0 + 1 + y, 1, 1), colors["1"])
