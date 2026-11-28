@@ -555,7 +555,16 @@ const COLOSSUS_ATTACKS: Array[Dictionary] = [
 	# Heartroot Grab: a root-arm lunges along a narrow lane; parried, it snaps back and the posture cracks wide.
 	{"id": &"heartroot_grab", "kind": &"gold", "phase": 2, "start_min": 55.0, "start_max": 200.0, "windup": 44, "active": 6, "recover": 32, "damage": 26,
 		"length": 220.0, "width": 20.0, "parry_posture": 60.0},
+	# Part 3c. Song Flare (phase 3): the song bursts out in three red rings round the body ([inner, outer, ticks to its strike]: stand in
+	# a gap or dash through), then a gold blow round it that any parry turns into a posture break (parry_posture 100).
+	{"id": &"song_flare", "kind": &"red", "phase": 3, "start_min": 0.0, "start_max": 200.0, "windup": 50, "active": 3, "recover": 44, "damage": 18,
+		"waves": [[52.0, 88.0, 50], [112.0, 148.0, 68], [172.0, 208.0, 86]], "gold_after": 140, "gold_radius": 120.0, "gold_damage": 35,
+		"parry_posture": 100.0},
 ]
+# Briar Ring (part 3c): when a new phase begins, thorns rise round the fight: outside a circle of safe_radius round the encounter's
+# centre the floor hurts (damage every `every` ticks, timed just past the hero's hurt window) for `lasts` ticks, after `windup` ticks of
+# warning (the farthest walk in from the clearing's edge is 240 px: 30 ticks to spare, tests/core/test_colossus.gd). Not scaled by the phase factor. `outer` covers the clearing.
+const COLOSSUS_BRIAR: Dictionary = {"windup": 270, "lasts": 600, "every": 48, "damage": 8, "safe_radius": 170.0, "outer": 420.0}
 
 const MOB_MAX_ATTACKERS: int = 2  # mobs of one encounter that may wind up or strike at the same time
 const MOB_FIRST_COOLDOWN: int = 30  # a woken mob waits this long, plus MOB_COOLDOWN_STAGGER x its place, before its first attack

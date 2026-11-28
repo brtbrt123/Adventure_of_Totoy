@@ -1,8 +1,9 @@
 extends "res://core/mob.gd"
-## The Mossbound Colossus on the road: chapter 1's final boss in Rootcrown (docs/PLAN_colossus_step3.md, parts 3a and 3b).
+## The Mossbound Colossus on the road: chapter 1's final boss in Rootcrown (docs/PLAN_colossus_step3.md, parts 3a to 3c).
 ## core/mob_field.gd owns it like any mob (id, place, health, state, warnings, the chain's drag, death and the encounter) and
 ## calls step(), receive_hit(), push_hero() and the drag hooks; everything special is here: waking, the arena's armour, posture
-## and counter rules, parries, three phases, nine attacks (two with a follow-up warning), the solid body. No rendering.
+## and counter rules, parries, three phases, ten attacks (two with a follow-up warning; the Song Flare's rings and gold blow), the
+## Briar Ring that rises at each phase change, the solid body. No rendering.
 ## Deterministic: its own small generator
 ## picks the attacks. Numbers: core/tuning.gd MOBS.colossus and COLOSSUS_*. The title screen's practice fight keeps the old
 ## core/boss.gd.
@@ -24,6 +25,8 @@ const ATTACK_CHARGE: StringName = &"red_charge"
 const ATTACK_SNARE: StringName = &"root_snare"
 const ATTACK_BOULDER: StringName = &"boulder_toss"
 const ATTACK_GRAB: StringName = &"heartroot_grab"
+const ATTACK_FLARE: StringName = &"song_flare"
+const BRIAR: StringName = &"briar_ring"  # not an attack of the rotation: it rises when a phase begins (Tuning.COLOSSUS_BRIAR)
 
 var posture: float = 0.0
 var broken_left: int = 0
@@ -39,6 +42,9 @@ var _recover_ticks: int = 0
 var _charge: Telegraph = null
 var _charge_from: Vector2 = Vector2.ZERO
 var _follow_due: int = -1  # the tick the running attack's follow-up warning begins (-1: none waiting)
+## The Briar Ring while it warns or stands: a red ring whose inside (inner_size round the encounter's centre) is safe. It outlives
+## attacks, breaks and drags; the hero's defeat (reset) and the boss's fall end it.
+var briar: Telegraph = null
 
 
 func setup(p_id: int, p_type: StringName, p_encounter: StringName, p_home: Vector2, p_slot: int) -> void:
@@ -56,6 +62,7 @@ func reset() -> void:
 	_random = id * 2654435 + 1
 	_charge = null
 	_follow_due = -1
+	briar = null
 
 
 ## The counter window: only a broken posture exposes it.
@@ -121,6 +128,29 @@ func step(core: RefCounted, field: RefCounted, events: Array[GameEvent]) -> void
 			if state_ticks >= Tuning.COLOSSUS_ROAR_TICKS:
 				cooldown = Tuning.COLOSSUS_COOLDOWN_TICKS[phase - 1]
 				set_state(&"chase")
+	_step_briar(core, events)
+
+
+## The Briar Ring stands from its strike for `lasts` ticks: every `every` ticks a hero outside its safe circle takes its damage (a dash
+## or a ward answers it like any blow). Then it is gone.
+func _step_briar(core: RefCounted, events: Array[GameEvent]) -> void:
+	if briar == null:
+		return
+	if core.tick > briar.end_tick:
+		briar = null
+		return
+	var player: PlayerState = core.player
+	if briar.is_dangerous_at(core.tick) and (core.tick - briar.hit_tick) % int(Tuning.COLOSSUS_BRIAR["every"]) == 0 \
+			and briar.overlaps_circle(player.position, Tuning.PLAYER_RADIUS):
+		player.take_damage(briar.damage, core.tick, events, id)
+
+
+## Every warning to draw: the attack's and the Briar Ring's.
+func all_telegraphs() -> Array[Telegraph]:
+	var out: Array[Telegraph] = super.all_telegraphs()
+	if briar != null:
+		out.append(briar)
+	return out
 
 
 ## The hero cannot stand inside the body, whatever moved: him or it. The scene's solids still hold him.
@@ -253,6 +283,17 @@ func build_warnings(core: RefCounted, field: RefCounted, row: Dictionary) -> Arr
 			var stone: Telegraph = _warning(field, row, Telegraph.SHAPE_CIRCLE, hero, aim, core.tick, hit)
 			stone.size = float(row["radius"])
 			out.append(stone)
+		ATTACK_FLARE:  # three red rings, each on its own beat, then the gold blow
+			for wave: Variant in row["waves"]:
+				var ring: Telegraph = _warning(field, row, Telegraph.SHAPE_RING, position, aim, core.tick, core.tick + roundi(int(wave[2]) * windup_factor()))
+				ring.inner_size = float(wave[0])
+				ring.size = float(wave[1])
+				out.append(ring)
+			var blow: Telegraph = _warning(field, row, Telegraph.SHAPE_CIRCLE, position, aim, core.tick, core.tick + roundi(int(row["gold_after"]) * windup_factor()))
+			blow.kind = Telegraph.KIND_GOLD
+			blow.size = float(row["gold_radius"])
+			blow.damage = int(row["gold_damage"])
+			out.append(blow)
 	return out
 
 
@@ -329,7 +370,7 @@ func _step_charge(core: RefCounted) -> void:
 ## him (unless a dash or a ward answers it). Each warning acts once.
 func _resolve(core: RefCounted, events: Array[GameEvent]) -> void:
 	var player: PlayerState = core.player
-	for warning: Telegraph in all_telegraphs():
+	for warning: Telegraph in super.all_telegraphs():  # the attack's warnings (the Briar Ring hurts at its own pace)
 		if player.state == PlayerState.STATE_DEAD or state == STATE_BROKEN:
 			return
 		if warning.has_hit or not warning.is_dangerous_at(core.tick) or not warning.overlaps_circle(player.position, Tuning.PLAYER_RADIUS):
@@ -393,6 +434,7 @@ func receive_hit(core: RefCounted, field: RefCounted, enc: RefCounted, base: flo
 		if counter:
 			events.append(GameEvent.new(GameEvent.COUNTER_WINDOW_CLOSED, core.tick, {"entity_id": id}))
 		dragged = false
+		briar = null
 		field.kill(core, enc, self, events)
 		return field.is_cleared(enc)
 	if not counter:
@@ -402,7 +444,7 @@ func receive_hit(core: RefCounted, field: RefCounted, enc: RefCounted, base: flo
 		if float(hp) <= float(max_hp) * Tuning.COLOSSUS_PHASE_HP_FRACTIONS[i]:
 			reached = maxi(reached, i + 2)
 	if reached > phase:
-		_begin_phase(core, reached, events)
+		_begin_phase(core, field, enc, reached, events)
 	return false
 
 
@@ -445,16 +487,42 @@ func add_posture(amount: float, tick: int, events: Array[GameEvent]) -> void:
 
 ## Health below a COLOSSUS_PHASE_HP_FRACTIONS mark: phase `new_phase` (one blow that crosses both marks goes straight to 3). It drops
 ## its attack and roars; the attacks of that phase join; from phase 2 on the warnings are shorter. Broken or held by the chain it
-## changes phase without the roar.
-func _begin_phase(core: RefCounted, new_phase: int, events: Array[GameEvent]) -> void:
+## changes phase without the roar. Either way the Briar Ring rises round the encounter (a new one replaces a standing one).
+func _begin_phase(core: RefCounted, field: RefCounted, enc: RefCounted, new_phase: int, events: Array[GameEvent]) -> void:
 	phase = new_phase
 	events.append(GameEvent.new(GameEvent.BOSS_PHASE_CHANGED, core.tick, {"entity_id": id, "phase": phase, "scene": core.scene_id, "position": position}))
+	_raise_briar(core, field, enc.anchor, events)
 	if state == STATE_BROKEN or state == &"stagger" or dragged:
 		return
 	clear_telegraph()
 	_charge = null
 	_follow_due = -1
 	set_state(&"roar")
+
+
+## The Briar Ring round `centre`: it warns for COLOSSUS_BRIAR.windup ticks, then stands for `lasts`.
+func _raise_briar(core: RefCounted, field: RefCounted, centre: Vector2, events: Array[GameEvent]) -> void:
+	var spec: Dictionary = Tuning.COLOSSUS_BRIAR
+	var ring: Telegraph = Telegraph.new()
+	ring.id = field.take_telegraph_id()
+	ring.owner_id = id
+	ring.attack = BRIAR
+	ring.kind = Telegraph.KIND_RED
+	ring.shape = Telegraph.SHAPE_RING
+	ring.center = centre
+	ring.muzzle = centre
+	ring.direction = Vector2.UP
+	ring.inner_size = float(spec["safe_radius"])
+	ring.size = float(spec["outer"])
+	ring.damage = int(spec["damage"])
+	ring.start_tick = core.tick
+	ring.hit_tick = core.tick + int(spec["windup"])
+	ring.end_tick = ring.hit_tick + int(spec["lasts"]) - 1
+	briar = ring
+	events.append(GameEvent.new(GameEvent.ATTACK_TELEGRAPHED, core.tick, {
+		"telegraph_id": ring.id, "telegraph_ids": [ring.id], "sites": 1, "owner_id": id, "kind": ring.kind, "attack": BRIAR,
+		"scene": core.scene_id, "mob_id": id, "hit_tick": ring.hit_tick, "end_tick": ring.end_tick,
+	}))
 
 
 # ---- Reaper's Coil ----------------------------------------------------------------------------------------------------------

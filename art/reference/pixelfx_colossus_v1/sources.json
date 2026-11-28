@@ -183,6 +183,72 @@
     48,
     78
    ]
+  },
+  "song_shard": {
+   "pixelfx": "nature/thorns",
+   "options": {
+    "count": 1,
+    "palette": [
+     "#1c1824",
+     "#24365c",
+     "#33508a",
+     "#4a72ae",
+     "#3f7f7a",
+     "#6f9bc8",
+     "#a7cde0",
+     "#e0f0ec"
+    ],
+    "glow": [
+     "#24365c",
+     "#3f7f7a",
+     "#6aa89a",
+     "#a7cde0"
+    ],
+    "soil": [
+     "#1c1824",
+     "#2e211e",
+     "#4d3a30",
+     "#62453d",
+     "#765f47",
+     "#987959",
+     "#bc9c72",
+     "#c6bfaa"
+    ],
+    "seed": 8
+   },
+   "flags": [],
+   "for": "Song Flare: a shard of the song's blue light bursting up, placed round each of its three real rings",
+   "frames": 73,
+   "fps": 30,
+   "pivot": [
+    48,
+    78
+   ]
+  },
+  "song_burst": {
+   "pixelfx": "arcane/mana-burst",
+   "options": {
+    "palette": [
+     "#1c1824",
+     "#24365c",
+     "#33508a",
+     "#4a72ae",
+     "#3f7f7a",
+     "#6f9bc8",
+     "#a7cde0",
+     "#e0f0ec",
+     "#f4ecd6"
+    ],
+    "seed": 9
+   },
+   "flags": [],
+   "for": "Song Flare's last blow: the song's light rushing into its chest and blowing out",
+   "frames": 55,
+   "fps": 30,
+   "pivot": [
+    104,
+    124
+   ]
   }
  }
 }

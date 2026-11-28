@@ -1,4 +1,37 @@
-## 3b effects: every PixelFX effect of the three new attacks is wired (2026-11-27/28, Claude, NOT committed)
+## Step 3c built: the Briar Ring and the Song Flare, with their PixelFX effects (2026-11-28, Claude, NOT committed)
+
+Owner: "Yes, wire them" (the 3c effects). Wired: the Briar Ring's wall (`fx_colossus_thorn`, the approved root thorns, about 50 round
+the safe circle 12 px outside it: rising as the briars stand, holding, sinking over their last 16 ticks); `fx_colossus_song_shard_1..11`
+(the thorn burst in the song's blue, one every 56 px on each Song Flare ring as it strikes); `fx_colossus_song_burst_1..23`
+(`arcane/mana-burst` in the song's blue: it gathers in the chest 12 ticks before the gold blow and blows out on it, parried or not).
+All by `import_pixelfx.py --install`, played by `colossus_view.gd` from the snapshot, depth-sorted. Atlas 2048x5448, contact
+sheets 24 pages (24 new). `smoke_colossus.gd` checks the wall (40+ thorns), the shards and the burst play, and no frame is missing.
+The sheet `presentation/review/colossus_3c/colossus_3c_attacks.png` is now all real captures.
+
+Owner: "Start 3c" (after "commit then tell me what next": the 3b effects are committed as 5ce0a05d and pushed; its full harness run
+passed). **Core** (`core/colossus.gd`, `core/tuning.gd`): **Briar Ring** (`COLOSSUS_BRIAR`): when a phase begins (60 % and 25 %; one blow
+that skips to 3 raises one), a red ring warning round the encounter's centre (512,410) whose inside (170 px) is safe; it warns 270 ticks
+(4.5 s; the farthest walk in from the clearing is 240 px, first set to 240 and lengthened when the test showed no margin), then stands
+600 ticks and hurts 8 every 48 ticks (just past the hurt window) outside. It is `Colossus.briar`, kept apart from the attack's warnings
+(it outlives attacks, breaks and drags; defeat and the boss's fall end it), drawn through `all_telegraphs()`. **Song Flare** (phase 3,
+row `song_flare`): three red rings round the body, 52-88, 112-148, 172-208 px, striking at 50, 68 and 86 ticks (x0.85), then a gold
+blow of radius 120 at 140 ticks (35 damage) that any parry turns into a posture break (`parry_posture` 100).
+**Presentation:** the Briar Ring's warning (its red fill outside the circle) has no marker; while the briars stand, the safe circle's
+edge stays drawn red and unlit (the warning alone vanished at its strike, which would have left a 10 s danger invisible). Strike
+sounds: flare `golem_beam`, briars `golem_stomp`.
+**Tests:** `test_colossus.gd` 28 (the flare joins every per-attack check, its rings each checked on their own beat; new: its gaps
+and the early parry that breaks it; the Briar Ring rising, hurting outside only, replaced at phase 3, gone after 10 s and with the
+boss; a flood of the whole clearing proving the walk in fits the warning). Core 609, 0 failed. `smoke_colossus.gd` raises a Briar Ring
+and plays a Song Flare through the real scene (OK). Two test mistakes of mine fixed on the first run.
+**Effect proposals** (`presentation/review/colossus_3c/colossus_3c_attacks.png`, `capture_3c.gd`, `tools/art/make_colossus_3c_sheet.py`;
+new PixelFX renders `song_shard` (thorns in the song's blue) and `song_burst` (`arcane/mana-burst` in the song's blue) by
+`import_pixelfx.py`): a wall of the approved root thorns round the safe circle; sparse song-blue shards on each real flare ring (dense
+ones, 26 px apart, hid the hero standing in a gap, so 56 px); the mana-burst at its chest for the gold blow. All three are wired now
+(the paragraph above).
+Full harness on the finished 3c (after the art rebuild): `python harness/checks/run_tests.py --worktree . --timeout 400`, exit 0,
+all 57 suites passed. Not checked by me: whether the fight is fun and the effects look right in play (the owner's playtest).
+
+## 3b effects: every PixelFX effect of the three new attacks is wired (2026-11-27/28, Claude, committed 5ce0a05d)
 
 Owner 2026-11-28: "Yes, wire it" (the reworked root-arm). `import_pixelfx.py --install` now also renders `nature/vine-whip` (pale
 root, the song's blue thorns) at 13 angles, every 15 degrees from -90 to 90, through the new `tools/art/pixelfx_render.mjs` (PixelFX's

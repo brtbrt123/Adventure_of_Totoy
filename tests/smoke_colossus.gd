@@ -151,6 +151,43 @@ func run() -> void:
 			shards = shards or scene.colossus_view.effects.any(func(e: Dictionary) -> bool: return e["kind"] == &"shards")
 		check(played, "%s played its effect" % id)
 	check(shards, "the boulder's ring of shock played its stone shards")
+	# part 3c: a phase change raises the Briar Ring (it warns, then stands), and a Song Flare plays its rings and gold blow
+	boss().clear_telegraph()
+	boss().state = &"chase"
+	boss().phase = 2
+	boss().hp = 152
+	var crossing: Array[GameEvent] = []
+	scene.core.mobs.hit_mob(scene.core, enc, boss(), 8.0, {"combo_index": 1, "weapon_id": &"black_katana"}, crossing)
+	check(boss().briar != null, "the Briar Ring rose with phase 3")
+	scene.core.player.position = Vector2(420, 430)  # inside its safe circle
+	boss().state = &"stagger"
+	boss().stun_left = 100000
+	for i: int in Tuning.COLOSSUS_BRIAR["windup"] + 40:
+		steps(1)
+		if i % 30 == 0:
+			await draw_once()
+	check(scene.snapshot.telegraphs.any(func(w: Variant) -> bool: return w.attack == &"briar_ring" and scene.snapshot.tick >= w.hit_tick), "the briars stand, in the snapshot")
+	var wall: Array = scene.colossus_view.effect_items(scene.snapshot, Color.WHITE).filter(func(i: Dictionary) -> bool: return String(i["id"]).begins_with("colossus_wall_"))
+	check(wall.size() > 40, "the thorn wall stands round the safe circle: %d thorns" % wall.size())
+	boss().stun_left = 0
+	steps(20)
+	boss().clear_telegraph()
+	boss().state = &"chase"
+	boss().cooldown = 1
+	boss().next_attack_override = &"song_flare"
+	scene.core.player.position = boss().position + Vector2(100, 0)
+	steps(1)
+	boss().cooldown = 100000
+	check(scene.snapshot.telegraphs.filter(func(w: Variant) -> bool: return w.attack == &"song_flare").size() == 4, "the Song Flare: three rings and its gold blow")
+	var song_kinds: Dictionary = {}
+	for i: int in 140:
+		steps(1)
+		if i % 10 == 0:
+			await draw_once()
+		for e: Dictionary in scene.colossus_view.effects:
+			song_kinds[e["kind"]] = true
+	check(song_kinds.has(&"song_ring") and song_kinds.has(&"song_burst"), "the Song Flare played its shards and its burst: %s" % [song_kinds.keys()])
+	check(scene.colossus_view.missing.is_empty(), "no missing effect frames after 3c: %s" % [scene.colossus_view.missing.keys()])
 	check(scene.colossus_view.missing.is_empty(), "no missing effect frames: %s" % [scene.colossus_view.missing.keys()])
 	# its fall: the last blow is a real swing inside a step, so the scene hears every event as in play
 	boss().hp = 1

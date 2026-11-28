@@ -17,11 +17,14 @@ const SPOTS: Dictionary = {
 	&"gold_slam": Vector2(100, 40), &"red_sweep": Vector2(0, 74), &"red_shards": Vector2(130, 40), &"red_stomp": Vector2(100, 20),
 	&"gold_combo": Vector2(80, 40), &"red_charge": Vector2(150, 40),
 	&"root_snare": Vector2(120, 40), &"boulder_toss": Vector2(140, 40), &"heartroot_grab": Vector2(120, 30),
+	&"song_flare": Vector2(70, 0),  # in its first ring
 }
 ## What a hero who never moves takes from an attack's follow-up as well: nothing. The snare's second lane comes 30 ticks after the
 ## first, inside the 45 ticks a wounded hero cannot be hurt (PLAYER_HURT_INVULN_TICKS): it punishes the dodge, never doubles a hit.
 ## The boulder's ring of shock spares the crater he stands in.
-const FOLLOW_ON_A_STILL_HERO: Dictionary = {}
+## The Song Flare: its first ring, then (the hurt window long over) its gold blow.
+const FOLLOW_ON_A_STILL_HERO: Dictionary = {&"song_flare": 35}
+const LayoutFlood := preload("res://tests/layout_flood.gd")
 const KATANA: StringName = &"black_katana"
 
 
@@ -223,9 +226,12 @@ func test_every_attack_wounds_a_hero_who_stands_still() -> void:
 		assert_eq(hit - core.tick, int(row["windup"]), "its warning runs the full time: " + String(row["id"]))
 		assert_eq(core.snapshot().telegraphs.size(), int(told[0].data["sites"]), "every warning is in the snapshot")
 		var hp: int = core.player.hp
+		var last_end: int = 0
+		for w: Variant in core.snapshot().telegraphs:
+			last_end = maxi(last_end, int(w.end_tick))
 		_steps(core, hit - core.tick - 1)
 		assert_eq(core.player.hp, hp, "nothing hurts before the warning ends: " + String(row["id"]))
-		_steps(core, int(row["active"]) + 60)
+		_steps(core, maxi(int(row["active"]) + 60, last_end - core.tick + 5))
 		assert_eq(core.player.hp, hp - int(row["damage"]) - int(FOLLOW_ON_A_STILL_HERO.get(row["id"], 0)), "once each: " + String(row["id"]))
 		assert_eq(core.snapshot().telegraphs.size(), 0, "and the warning is gone")
 
@@ -347,7 +353,11 @@ func test_every_warning_leaves_a_way_out() -> void:
 						continue
 					core.player.position = at
 					var first: Array[Telegraph] = boss.build_warnings(core, core.mobs, row)
-					if not _has_way_out(first, at, _way(int(row["windup"]), phase)):
+					if row["id"] == Colossus.ATTACK_FLARE:  # each ring and the blow on its own beat (stand in a gap, dash through, parry)
+						for w: Telegraph in first:
+							if not _has_way_out([w], at, _way_ticks(w.hit_tick - core.tick, phase)):
+								trapped.append("song_flare %s %.0f..%.0f phase %d at %s" % [w.shape, w.inner_size, w.size, phase, at - HOME])
+					elif not _has_way_out(first, at, _way(int(row["windup"]), phase)):
 						trapped.append("%s phase %d at %s" % [row["id"], phase, at - HOME])
 					if not row.has("follow"):
 						continue
@@ -364,7 +374,12 @@ func test_every_warning_leaves_a_way_out() -> void:
 ## How far he gets during a warning of `windup` ticks in `phase` (a dash adds 24 px from phase 2 on).
 func _way(windup: int, phase: int) -> float:
 	var factor: float = 1.0 if phase == 1 else Tuning.COLOSSUS_PHASE2_WINDUP_FACTOR
-	var way: float = roundi(windup * factor) * Tuning.PLAYER_SPEED
+	return _way_ticks(roundi(windup * factor), phase)
+
+
+## How far he gets in `ticks` already counted (a dash adds 24 px from phase 2 on).
+func _way_ticks(ticks: int, phase: int) -> float:
+	var way: float = ticks * Tuning.PLAYER_SPEED
 	if phase > 1:
 		way += (Tuning.DASH_SPEED - Tuning.PLAYER_SPEED) * Tuning.DASH_TICKS
 	return way
@@ -438,6 +453,92 @@ func test_phase_three_starts_at_a_quarter_and_one_big_blow_can_skip_to_it() -> v
 	var big: Colossus = _boss(other)
 	var jump: Array[GameEvent] = _hit(other, 2000.0, _swing())  # 500 of 600 in one counter-less blow
 	assert_eq([big.phase, _of(jump, GameEvent.BOSS_PHASE_CHANGED).size()], [3, 1], "straight to phase 3, one roar")
+	var flare: Callable = func(b: Colossus) -> bool: return b.choices(100.0).any(func(r: Dictionary) -> bool: return r["id"] == Colossus.ATTACK_FLARE)
+	assert_true(flare.call(boss), "the Song Flare in phase 3")
+	boss.phase = 2
+	assert_false(flare.call(boss), "not before")
+
+
+# ---- part 3c: the Song Flare and the Briar Ring ----------------------------------------------------------------------------------
+
+func test_the_song_flare_leaves_gaps_and_any_parry_of_its_gold_blow_breaks_it() -> void:
+	var core: ExploreCore = _fight()
+	_force(core, Colossus.ATTACK_FLARE, Vector2(160, 0))  # between the second and the third ring, outside the gold blow
+	var warnings: Array = core.snapshot().telegraphs
+	assert_eq(warnings.map(func(w: Variant) -> StringName: return w.kind), [&"red", &"red", &"red", &"gold"])
+	assert_eq([warnings[1].hit_tick - warnings[0].hit_tick, warnings[2].hit_tick - warnings[0].hit_tick, warnings[3].hit_tick - warnings[0].hit_tick], [18, 36, 90], "the beats")
+	var hp: int = core.player.hp
+	_steps(core, warnings[3].end_tick - core.tick + 5)
+	assert_eq(core.player.hp, hp, "the gap between the rings is safe")
+	var other: ExploreCore = _fight()
+	_force(other, Colossus.ATTACK_FLARE, Vector2(100, 0))  # between the first two rings, inside the gold blow
+	var blow: Variant = other.snapshot().telegraphs[3]
+	_steps(other, int(blow.hit_tick) - other.tick - 10)
+	var events: Array[GameEvent] = _steps(other, 1, input(Vector2.ZERO, false, true))
+	events.append_array(_steps(other, 11))
+	assert_eq(_of(events, GameEvent.PARRY_SUCCEEDED)[0].data["quality"], &"early")
+	assert_eq(_boss(other).state, &"posture_broken", "an early parry breaks it too")
+
+
+func test_the_briar_ring_rises_at_each_phase_and_hurts_outside_its_circle() -> void:
+	var core: ExploreCore = _fight()
+	var boss: Colossus = _boss(core)
+	boss.hp = 362
+	var events: Array[GameEvent] = _hit(core, 8.0, _swing())
+	var ring: Telegraph = boss.briar
+	assert_true(ring != null, "it rises with phase 2")
+	assert_eq([ring.shape, ring.kind, ring.center, ring.inner_size, ring.size], [Telegraph.SHAPE_RING, &"red", Vector2(512, 410), 170.0, 420.0])
+	assert_eq([ring.hit_tick - core.tick, ring.end_tick - ring.hit_tick], [270, 599], "4.5 s of warning, 10 s standing")
+	assert_true(_of(events, GameEvent.ATTACK_TELEGRAPHED).any(func(e: GameEvent) -> bool: return e.data["attack"] == Colossus.BRIAR), "announced")
+	assert_true(core.snapshot().telegraphs.any(func(w: Variant) -> bool: return w.attack == Colossus.BRIAR), "drawn")
+	boss.state = &"stagger"  # held still: only the briars act
+	boss.stun_left = 100000
+	core.player.position = Vector2(512, 600)  # outside the circle
+	var hp: int = core.player.hp
+	_steps(core, ring.hit_tick - core.tick - 1)
+	assert_eq(core.player.hp, hp, "nothing during its warning")
+	_steps(core, 100)
+	assert_eq(hp - core.player.hp, 24, "8 every 48 ticks outside")
+	core.player.position = Vector2(400, 430)  # inside
+	hp = core.player.hp
+	_steps(core, 200)
+	assert_eq(core.player.hp, hp, "safe inside")
+	boss.hp = 152
+	_hit(core, 8.0, _swing())
+	assert_true(boss.briar != ring and boss.briar.start_tick == core.tick, "phase 3 raises a new one")
+	_steps(core, 270 + 600 + 2)
+	assert_true(boss.briar == null, "and it goes")
+	boss.hp = 100
+	boss.phase = 2
+	_hit(core, 8.0, _swing())
+	boss.briar = null
+	var dying: ExploreCore = _fight()
+	var last: Colossus = _boss(dying)
+	last.hp = 362
+	_hit(dying, 8.0, _swing())
+	last.hp = 1
+	_hit(dying, 400.0, _swing())
+	assert_true(last.briar == null, "its fall ends it")
+
+
+## From anywhere he can stand in the clearing (above the sealed climb), its warning leaves time to walk into the safe circle.
+func test_the_briar_ring_leaves_time_to_walk_in_from_anywhere() -> void:
+	var def: Dictionary = SceneDefs.get_def(SCENE)
+	var flood: LayoutFlood = LayoutFlood.new(def["size"], SceneDefs.build_obstacles(SCENE), Tuning.PLAYER_RADIUS)
+	flood.flood(HOME + Vector2(0, 80))
+	var spec: Dictionary = Tuning.COLOSSUS_BRIAR
+	var centre: Vector2 = Vector2(512, 410)
+	var worst: float = 0.0
+	var y: float = 8.0
+	while y < 672.0:
+		var x: float = 8.0
+		while x < 1016.0:
+			if flood.reaches(Vector2(x, y)):
+				worst = maxf(worst, Vector2(x, y).distance_to(centre) - (float(spec["safe_radius"]) - Tuning.PLAYER_RADIUS))
+			x += 12.0
+		y += 12.0
+	assert_true(worst > 100.0, "the flood found the clearing: %s" % worst)
+	assert_true(worst <= float(spec["windup"]) * Tuning.PLAYER_SPEED, "the farthest walk in (%.0f px) fits its %d ticks" % [worst, int(spec["windup"])])
 
 
 func test_it_does_not_repeat_the_attack_it_just_used() -> void:

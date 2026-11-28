@@ -989,7 +989,7 @@ func _draw() -> void:
 		if item["kind"] == &"npc" and bubbles.has(item["id"]):
 			_draw_bubble(Vector2(item["at"]) - Vector2(0, float(item["height"]) + 6.0))
 	for tell: Snapshots.TelegraphSnapshot in snapshot.telegraphs:
-		if TelegraphView.warning_visible(tell, snapshot.tick):
+		if TelegraphView.warning_visible(tell, snapshot.tick) and tell.attack != ColossusView.BRIAR:  # a zone: its red fill says enough
 			TelegraphView.draw_marker(self, tell, colors["x"] if tell.kind == &"gold" else colors["z"], colors["0"], snapshot.size)
 	draw_hero_impacts()
 	_draw_skill_effect(shake_offset())

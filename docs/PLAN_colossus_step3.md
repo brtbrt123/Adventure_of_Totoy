@@ -18,6 +18,12 @@ faint after hard alpha) and the root-arm (thin and dark at night) need another t
 Since then (2026-11-28): the thorns, the stone and, for the ring of shock, 14 stone shards round its real band (the owner's option
 B) are in the game, and the reworked root-arm (pale root, the song's blue thorns, rearing before it lashes) too: every 3b effect is wired.
 
+**3c in the game (2026-11-28, not committed):** the Briar Ring (warning 4.5 s, not 3.5: the farthest walk in from the clearing is 240 px;
+8 damage every 0.8 s outside, not every 0.5 s: a hit hero cannot be hurt for 0.75 s) and the Song Flare (as in the table). Effects
+wired on the owner's "Yes, wire them" (`presentation/review/colossus_3c/colossus_3c_attacks.png`): the root-thorn wall, sparse
+song-blue shards on the rings, a song-blue mana-burst for the gold blow. **Step 3 is complete** (all ten attacks, three phases, every
+effect); next the owner's playtest and tuning, step 4 (the real body), then the story moments with the victory cutscene last.
+
 ## Pictures (mock-ups, not gameplay)
 
 In `docs/previews/colossus_step3/`. The boss is a stand-in cut from the approved concept picture; the attack sizes are the

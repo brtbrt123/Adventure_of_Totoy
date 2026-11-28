@@ -12,7 +12,9 @@ and art/reference/pixelfx_colossus_v1/sources.json. Proposals for part 3b (docs/
     python tools/art/import_pixelfx.py --install   # then write the APPROVED ones into art/src (validate, build, preview after)
 
 Approved by the owner on 2026-11-27 ("Yes, do that"): the Root Snare's thorn and the Boulder Toss's stone; on 2026-11-28
-("Option B") the stone shard for the ring of shock, and ("Yes, wire it") the reworked root-arm. --install writes art/src/fx_colossus_thorn_<n>.txt (one thorn bursting up
+("Option B") the stone shard for the ring of shock, ("Yes, wire it") the reworked root-arm, and ("Yes, wire them") the 3c
+effects: fx_colossus_song_shard (the thorn burst in the song's blue, round the Song Flare's rings) and fx_colossus_song_burst
+(arcane/mana-burst in the song's blue, its gold blow); the Briar Ring's wall reuses fx_colossus_thorn. --install writes art/src/fx_colossus_thorn_<n>.txt (one thorn bursting up
 and sinking), fx_colossus_shard_<n>.txt (the same in stone, set round the ring), fx_colossus_stone_spin_<n>.txt (the stone in
 flight) and fx_colossus_stone_land_<n>.txt (its landing); generated, do not hand-edit. presentation/explore/colossus_view.gd
 plays them. The root-arm is rendered at ARM_ANGLES (every 15 degrees, right half; the left half is drawn mirrored) through
@@ -62,6 +64,12 @@ EFFECTS: dict[str, tuple[str, dict, list[str], str]] = {
                    "the Boulder Toss's ring of shock, option A: PixelFX's ring of shards, set to the ring's real reach (72 px)"),
     "stone_thorn": ("nature/thorns", {"count": 1, "palette": STONE8, "glow": SONG4, "soil": SOIL8, "seed": 8}, [],
                     "the Boulder Toss's ring of shock, option B: one stone shard bursting up, placed round the real ring"),
+    # part 3c proposals (2026-11-28)
+    "song_shard": ("nature/thorns", {"count": 1, "palette": [INK, WATER[0], WATER[1], WATER[2], TEAL[0], WATER[3], WATER[4], WATER[5]],
+                                     "glow": SONG4, "soil": SOIL8, "seed": 8}, [],
+                   "Song Flare: a shard of the song's blue light bursting up, placed round each of its three real rings"),
+    "song_burst": ("arcane/mana-burst", {"palette": [INK, WATER[0], WATER[1], WATER[2], TEAL[0], WATER[3], WATER[4], WATER[5], CREAM], "seed": 9}, [],
+                   "Song Flare's last blow: the song's light rushing into its chest and blowing out"),
 }
 
 
@@ -132,7 +140,7 @@ def anchors(name: str, folder: Path, meta: dict, detect: list[Image.Image]) -> d
     the frames snapped at the normal cut (the landing's flash is found in them even when the saved frames keep less)."""
     frames = [Image.open(folder / f) for f in meta["frames"]]
     floor = meta["pivot"][1]
-    if name in ("root_thorn", "stone_thorn"):
+    if name in ("root_thorn", "stone_thorn", "song_shard"):
         tops = [(b[1][1], (b[1][0] + b[1][2]) // 2) for f in frames for b in blobs(f)[:1] if b[0] > 20]
         return {"anchor": [min(tops)[1], floor]}
     if name == "boulder":
@@ -164,6 +172,8 @@ LAND_FRAMES = range(0, 42, 2)  # from the impact until the dust has settled
 ARM_SOURCES = [1, 3, 5, 7, 9, 11, 13, 14, 15, 16, 18, 21, 24, 28, 32]
 ARM_ANGLES = [i * 15 - 90 for i in range(13)]  # degrees, -90 (up the screen) to 90 (down); index 0..12
 ARM_MARGIN = 150
+# the Song Flare's gold blow (PixelFX arcane/mana-burst): frames kept; frame 16 is the blow-out, which meets the blow (colossus_view.gd)
+BURST_FRAMES = range(10, 56, 2)
 ARM_RAW = Path(__file__).resolve().parents[2] / ".godot" / "pixelfx_arm_renders"  # scratch for the turned renders (ignored by git; big, remade on demand)
 
 
@@ -218,13 +228,24 @@ def install() -> int:
     for path in old:
         path.unlink()
     # the thorn and the stone shard: a window round the foot
-    for source, sprite in (("root_thorn", "fx_colossus_thorn"), ("stone_thorn", "fx_colossus_shard")):
+    for source, sprite in (("root_thorn", "fx_colossus_thorn"), ("stone_thorn", "fx_colossus_shard"), ("song_shard", "fx_colossus_song_shard")):
         thorn = json.loads((OUT / source / "frames.json").read_text(encoding="utf-8"))
         ax, ay = thorn["anchor"]
         left, up, w, h = THORN_WINDOW
         for n, i in enumerate(THORN_FRAMES, start=1):
             frame = Image.open(OUT / source / thorn["frames"][i]).convert("RGBA").crop((ax - left, ay - up, ax - left + w, ay - up + h))
-            write_sprite(f"{sprite}_{n}", frame, (left, up), symbols, note.format("nature/thorns" + (" in stone" if source == "stone_thorn" else "")))
+            write_sprite(f"{sprite}_{n}", frame, (left, up), symbols, note.format("nature/thorns" + {"stone_thorn": " in stone", "song_shard": " in the song's blue"}.get(source, "")))
+    # the Song Flare's gold blow: the song's light blowing out of its chest, every kept frame cut to their common box
+    burst = json.loads((OUT / "song_burst" / "frames.json").read_text(encoding="utf-8"))
+    blows = [Image.open(OUT / "song_burst" / burst["frames"][i]).convert("RGBA") for i in BURST_FRAMES]
+    boxes = [b.getbbox() for b in blows if b.getbbox()]
+    bx0, by0 = min(b[0] for b in boxes), min(b[1] for b in boxes)
+    bx1, by1 = max(b[2] for b in boxes), max(b[3] for b in boxes)
+    bx1, by1 = bx0 + pad8(bx1 - bx0), by0 + pad8(by1 - by0)
+    for n, b in enumerate(blows, start=1):
+        cut = Image.new("RGBA", (bx1 - bx0, by1 - by0), (0, 0, 0, 0))
+        cut.alpha_composite(b.crop((bx0, by0, min(bx1, b.width), min(by1, b.height))), (0, 0))
+        write_sprite(f"fx_colossus_song_burst_{n}", cut, (burst["pivot"][0] - bx0, burst["pivot"][1] - by0), symbols, note.format("arcane/mana-burst in the song's blue"))
     # the stone in flight: each spin frame centred on one canvas
     stone = json.loads((OUT / "boulder" / "frames.json").read_text(encoding="utf-8"))
     spins = [Image.open(OUT / "boulder" / f).convert("RGBA") for f in stone["spin"]]

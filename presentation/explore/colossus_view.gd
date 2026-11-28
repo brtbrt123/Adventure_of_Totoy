@@ -27,7 +27,9 @@ const CHEST_COLOUR: Vector3 = Vector3(0.36, 0.82, 1.0)
 const CHEST_CORE: Vector3 = Vector3(0.80, 0.96, 1.0)
 ## The sound of each blow as it lands (the arena's recordings).
 const STRIKE_CUES: Dictionary = {&"gold_slam": "golem_slam", &"gold_combo": "golem_slam", &"red_stomp": "golem_stomp", &"red_sweep": "golem_sweep",
-	&"red_charge": "golem_charge", &"red_shards": "golem_beam", &"root_snare": "golem_stomp", &"boulder_toss": "golem_slam", &"heartroot_grab": "golem_sweep"}
+	&"red_charge": "golem_charge", &"red_shards": "golem_beam", &"root_snare": "golem_stomp", &"boulder_toss": "golem_slam", &"heartroot_grab": "golem_sweep",
+	&"song_flare": "golem_beam", &"briar_ring": "golem_stomp"}
+const BRIAR: StringName = &"briar_ring"  # the zone that rises at a phase change (core/colossus.gd): no marker, its edge stays drawn
 const HEAVY: Array[StringName] = [&"gold_slam", &"gold_combo", &"red_stomp", &"boulder_toss"]
 
 ## The attacks' effects (PixelFX in Totoy 36, approved 2026-11-27; tools/art/import_pixelfx.py --install). Frames last 4 ticks.
@@ -38,6 +40,19 @@ const THORN_SPACING: float = 22.0  # one thorn every this many px along the lane
 const THORN_FIRST: float = 50.0
 const SHARD: String = "fx_colossus_shard_%d"  # the same burst in stone (the owner's option B, 2026-11-28), set round a ring of shock
 const SHARDS: int = 14  # round the middle of the ring's real band (inner to outer radius)
+## Part 3c (the owner's "Yes, wire them", 2026-11-28). The Briar Ring's wall: the root thorns standing just outside its safe circle
+## while the briars stand (rise, hold, sink as they end). The Song Flare: song-blue shards on each ring as it strikes (sparse: denser
+## ones hid the hero in a gap) and the song's light blowing out of its chest on the gold blow (PixelFX arcane/mana-burst, its frames
+## SONG_BURST_FIRST.. every second one; SONG_BURST_LASH is the blow-out and meets the blow).
+const WALL_OUTSIDE: float = 12.0  # the wall stands this far outside the safe circle
+const WALL_SPACING: float = 22.0
+const WALL_HOLD: Array[int] = [6, 7]  # the thorn frames that hold while the briars stand
+const SONG_SHARD: String = "fx_colossus_song_shard_%d"
+const SONG_SPACING: float = 56.0
+const SONG_BURST: String = "fx_colossus_song_burst_%d"
+const SONG_BURST_COUNT: int = 23
+const SONG_BURST_FIRST: int = 10
+const SONG_BURST_LASH: int = 16
 const STONE_SPIN: String = "fx_colossus_stone_spin_%d"
 const STONE_SPIN_COUNT: int = 18
 const STONE_LAND: String = "fx_colossus_stone_land_%d"
@@ -77,6 +92,9 @@ static func effect_frames() -> Array[String]:
 	for n: int in range(1, THORN_COUNT + 1):
 		out.append(THORN % n)
 		out.append(SHARD % n)
+		out.append(SONG_SHARD % n)
+	for n: int in range(1, SONG_BURST_COUNT + 1):
+		out.append(SONG_BURST % n)
 	for n: int in range(1, STONE_SPIN_COUNT + 1):
 		out.append(STONE_SPIN % n)
 	for n: int in range(1, STONE_LAND_COUNT + 1):
@@ -84,6 +102,36 @@ static func effect_frames() -> Array[String]:
 	for a: int in ARM_ANGLES:
 		for n: int in range(1, ARM_SOURCES.size() + 1):
 			out.append(ARM % [a, n])
+	return out
+
+
+## The song burst's frame `ticks` after the gold blow (negative before it); 0 = not shown. PixelFX runs at 30 fps: 2 ticks a frame.
+static func _burst_frame(ticks: int) -> int:
+	var source: int = SONG_BURST_LASH + floori(float(ticks) / 2.0)
+	if source < SONG_BURST_FIRST:
+		return 0
+	var n: int = (source - SONG_BURST_FIRST) / 2 + 1
+	return n if n <= SONG_BURST_COUNT else 0
+
+
+## The thorn wall round a standing Briar Ring `t`: up as the briars rise, holding, down over the last ticks.
+func _wall_items(t: Snapshots.TelegraphSnapshot, tick: int, tint: Color) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var radius: float = t.inner_size + WALL_OUTSIDE
+	var count: int = roundi(TAU * radius / WALL_SPACING)
+	var age: int = tick - t.hit_tick
+	var left: int = t.end_tick - tick
+	for k: int in count:
+		var n: int = WALL_HOLD[k % WALL_HOLD.size()]
+		var rising: int = floori(float(age - k % 4 + THORN_LEAD) / FRAME_TICKS) + 1
+		if rising < WALL_HOLD[0]:
+			n = rising
+		if left < (THORN_COUNT - WALL_HOLD[-1]) * FRAME_TICKS:  # sinking as the briars end
+			n = THORN_COUNT - left / FRAME_TICKS
+		if n < 1 or n > THORN_COUNT:
+			continue
+		var spot: Vector2 = t.center + Vector2.from_angle(TAU * float(k) / float(count)) * radius
+		out.append({"kind": &"colossus_fx", "id": "colossus_wall_%d" % k, "at": spot.round(), "frame": THORN % n, "tint": tint})
 	return out
 
 
@@ -118,6 +166,13 @@ func _arm_item(id: String, root: Vector2, direction: Vector2, ticks: int, tint: 
 func effect_items(view: ExploreCore.ExploreSnapshot, tint: Color) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	effects = effects.filter(func(e: Dictionary) -> bool: return view.tick - int(e["tick"]) < _lifetime(e) and view.tick >= int(e["tick"]) - THORN_LEAD)
+	for t: Snapshots.TelegraphSnapshot in view.telegraphs:  # the Briar Ring's thorn wall while the briars stand
+		if t.attack == BRIAR and view.tick >= t.hit_tick and view.tick <= t.end_tick:
+			out.append_array(_wall_items(t, view.tick, tint))
+		elif t.attack == &"song_flare" and t.kind == &"gold" and view.tick < t.hit_tick:  # the song gathers before the gold blow
+			var n: int = _burst_frame(view.tick - t.hit_tick)
+			if n > 0:
+				out.append({"kind": &"colossus_fx", "id": "colossus_burst_%d" % t.id, "at": t.center.round(), "frame": SONG_BURST % n, "tint": tint})
 	for t: Snapshots.TelegraphSnapshot in view.telegraphs:  # the root-arm rises during the Grab's warning
 		if t.attack == &"heartroot_grab" and view.tick < t.hit_tick:
 			var rising: Dictionary = _arm_item("colossus_arm_%d" % t.id, t.center + t.direction * ARM_ROOT, t.direction, view.tick - t.hit_tick, tint)
@@ -140,6 +195,17 @@ func effect_items(view: ExploreCore.ExploreSnapshot, tint: Color) -> Array[Dicti
 			var lashing: Dictionary = _arm_item("colossus_fx_%d" % i, e["at"], e["direction"], age, tint)
 			if not lashing.is_empty():
 				out.append(lashing)
+		elif e["kind"] == &"song_ring":  # song-blue shards on a Song Flare ring
+			var count: int = maxi(6, roundi(TAU * float(e["radius"]) / SONG_SPACING))
+			for k: int in count:
+				var n: int = floori(float(age - k % 3 + THORN_LEAD) / FRAME_TICKS) + 1
+				if n >= 1 and n <= THORN_COUNT:
+					var spot: Vector2 = Vector2(e["at"]) + Vector2.from_angle(TAU * float(k) / float(count)) * float(e["radius"])
+					out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d_%d" % [i, k], "at": spot.round(), "frame": SONG_SHARD % n, "tint": tint})
+		elif e["kind"] == &"song_burst":
+			var b: int = _burst_frame(age)
+			if b > 0:
+				out.append({"kind": &"colossus_fx", "id": "colossus_fx_%d" % i, "at": Vector2(e["at"]).round(), "frame": SONG_BURST % b, "tint": tint})
 		elif e["kind"] == &"shards":  # stone shards burst up round the ring of shock, over its whole band
 			for k: int in SHARDS:
 				var n: int = floori(float(age - k % 3 + THORN_LEAD) / FRAME_TICKS) + 1
@@ -156,8 +222,10 @@ func effect_items(view: ExploreCore.ExploreSnapshot, tint: Color) -> Array[Dicti
 static func _lifetime(e: Dictionary) -> int:
 	if e["kind"] == &"thorns":
 		return THORN_COUNT * FRAME_TICKS + int(float(e["size"]) / THORN_SPACING) + 1
-	if e["kind"] == &"shards":
+	if e["kind"] == &"shards" or e["kind"] == &"song_ring":
 		return THORN_COUNT * FRAME_TICKS + 3
+	if e["kind"] == &"song_burst":
+		return (SONG_BURST_FIRST + SONG_BURST_COUNT * 2 - SONG_BURST_LASH) * 2
 	if e["kind"] == &"arm":
 		return (ARM_SOURCES[-1] + 3 - ARM_LASH) * 2 + 1
 	return STONE_LAND_COUNT * FRAME_TICKS
@@ -343,12 +411,18 @@ func _ghost(key: String, frame: Dictionary, sprites: Texture2D) -> ImageTexture:
 
 # ---- warnings ---------------------------------------------------------------------------------------------------------------
 
-## Its warnings' edges once more, unlit and 2 px wide, so the night floor does not dim them.
+## Its warnings' edges once more, unlit and 2 px wide, so the night floor does not dim them; and while the Briar Ring stands, the
+## edge of its safe circle.
 static func draw_glowing_edges(canvas: CanvasItem, view: ExploreCore.ExploreSnapshot, colors: Dictionary) -> void:
 	var boss: Dictionary = find(view)
 	if boss.is_empty():
 		return
 	for t: Snapshots.TelegraphSnapshot in view.telegraphs:
+		if t.attack == BRIAR and view.tick >= t.hit_tick and view.tick <= t.end_tick:  # standing: the safe circle's edge stays drawn
+			var edge: PackedVector2Array = TelegraphView.ring_points(t.center, t.inner_size)
+			canvas.draw_polyline(edge, Color(colors["0"], Fireflies.EMISSIVE_ALPHA), 4.0)
+			canvas.draw_polyline(edge, Color(colors["z"], Fireflies.EMISSIVE_ALPHA), 2.0)
+			continue
 		if t.owner_id != int(boss["id"]) or not TelegraphView.warning_visible(t, view.tick):
 			continue
 		var colour: Color = colors["x"] if t.kind == &"gold" else colors["z"]
@@ -425,6 +499,10 @@ func landed(view: ExploreCore.ExploreSnapshot) -> Array[Dictionary]:
 			effects.append({"kind": &"thorns", "tick": t.hit_tick, "at": t.center, "direction": t.direction, "size": t.size})
 		elif t.attack == &"boulder_toss" and t.shape == &"circle":  # the stone lands
 			effects.append({"kind": &"land", "tick": t.hit_tick, "at": t.center})
+		elif t.attack == &"song_flare" and t.shape == &"ring":  # a ring of the song bursts
+			effects.append({"kind": &"song_ring", "tick": t.hit_tick, "at": t.center, "radius": (t.inner_size + t.size) * 0.5})
+		elif t.attack == &"song_flare" and t.kind == &"gold":  # the gold blow: the song blows out of its chest (parried or not)
+			effects.append({"kind": &"song_burst", "tick": t.hit_tick, "at": t.center})
 		elif t.attack == &"heartroot_grab":  # the root-arm lashes (parried or not) and slides back
 			effects.append({"kind": &"arm", "tick": t.hit_tick, "at": t.center + t.direction * ARM_ROOT, "direction": t.direction})
 		elif t.attack == &"boulder_toss" and t.shape == &"ring":  # its ring of shock strikes: shards over the real band
